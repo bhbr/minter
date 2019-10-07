@@ -1,0 +1,74 @@
+import { Vertex } from './transform.js'
+import { Polygon, CurvedShape } from './mobject.js'
+
+export class Circle extends CurvedShape {
+    
+    constructor(radius) {
+        super()
+        this.radius = radius
+    }
+
+    // midPoint is a synonym for anchor
+    get midPoint() { return this.anchor }
+    set midPoint(newValue) {
+        this.anchor = newValue
+        this.updateView()
+    }
+
+    updateBezierPoints() {
+        let newBezierPoints = []
+        let n = 8
+        for (let i = 0; i <= n; i++) {
+            let theta = i/n * 2 * Math.PI
+            let d = this.radius * 4/3 * Math.tan(Math.PI/(2*n))
+            let radialUnitVector = new Vertex(Math.cos(theta), Math.sin(theta))
+            let tangentUnitVector = new Vertex(-Math.sin(theta), Math.cos(theta))
+            let anchorPoint = radialUnitVector.scaledBy(this.radius)
+
+            let leftControlPoint = anchorPoint.translatedBy(tangentUnitVector.scaledBy(-d))
+            let rightControlPoint = anchorPoint.translatedBy(tangentUnitVector.scaledBy(d))
+
+            if (i != 0) { newBezierPoints.push(leftControlPoint) }
+            newBezierPoints.push(anchorPoint)
+            if (i != n) { newBezierPoints.push(rightControlPoint) }
+        }
+        this.bezierPoints = newBezierPoints
+
+        // do NOT update the view, because updateView called updateBezierPoints
+    }
+
+    rightEdge() {
+        return new Vertex(this.radius, 0)
+    }
+
+    get radius() { return this._radius }
+    set radius(newRadius) {
+        this._radius = newRadius
+        this.updateView()
+    }
+
+    update(data) {
+        let newRadius = data.radius
+        let newMidPoint = data.midPoint
+        if (newRadius != undefined) { this.radius = newRadius }
+        if (newMidPoint != undefined) { this.midPoint = newMidPoint }
+        super.update(data)
+    }
+
+}
+
+
+export class Ellipse extends CurvedShape {
+    
+    constructor(midPoint, majorAxis, minorAxis, tilt) {
+        super()
+        this.majorAxis = majorAxis
+        this.minorAxis = minorAxis
+        this.tilt = tilt
+
+    }
+
+    get midPoint() { return this.anchor }
+    set midPoint(newValue) { this.anchor = newValue }
+
+}

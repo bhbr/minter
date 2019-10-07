@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name='viewport' content='width=device-width,initial-scale=1,maximum-scale=10,user-scalable=yes'>
+
+    <title></title>
+
+    <link rel="stylesheet" href="./minter.css">
+    <script type="module" src='./modules/helpers.js'></script>
+    
+    <script type="text/javascript" src="CindyJS/build/js/Cindy.js"></script>
+    
+  </head>
+
+  <body>
+      
+      <div class="row">
+        <div class="column" width="200px" height="1000px">
+            <div class='svg-container sidebar-container' width='200px' height='1000px'>
+                <svg id='sidebar' width='200px' height='1000px'></svg>
+                <!--<p id='sidebar-console' width='200px' height='200px' style='background-color: red; color: white; white-space: pre;'>sidebar console</p>-->
+            </div>
+        </div>
+        <div class="column" width="1000px" height="600px">
+            <div id='paper-container' class='svg-container paper-container' width='1000px' height='600px'>
+           
+                <svg id='paper' width='1000px' height='600px'>
+                </svg>
+                <p id='paper-console' width='800px' height='200px' style='background-color: green; color: white; white-space: pre;'>paper console</p>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src='./paper.js'></script>
+    <script type="module" src='./sidebar.js'></script>
+      
+    <script id="csinit" type="text/x-cindyscript">
+        resetclock();
+    </script>
+  </body>
+</html>
