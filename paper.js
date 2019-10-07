@@ -4,7 +4,6 @@ import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import { Line } from './modules/arrows.js'
 
-
 let creating = false
 let paper = document.querySelector('#paper')
 paper.mode = 'freehand'
