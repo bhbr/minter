@@ -11,8 +11,7 @@ export class Vertex extends Array {
             this.x = x[0]
             this.y = x[1]
         } else if (x instanceof Vertex) {
-            this.x = x.x
-            this.y = x.y
+            throw 'Argument of Vertex constructor is already a Vertex. cannot assign by reference'
         }
     }
 
@@ -20,6 +19,12 @@ export class Vertex extends Array {
         return new Vertex()
         this.x = 0
         this.y = 0
+    }
+
+    static new(...args) {
+        let x = args[0]
+        if (x instanceof Vertex) { return x }
+        else { return new Vertex(...args) }
     }
 
     get x() { return this[0] }
@@ -92,9 +97,6 @@ export class Vertex extends Array {
     }
 
 }
-
-
-
 
 
 
@@ -246,12 +248,6 @@ export class Transform {
     }
 
 }
-
-
-
-
-
-
 
 
 

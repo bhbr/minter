@@ -3,16 +3,18 @@ import { Polygon, CurvedShape } from './mobject.js'
 
 export class Circle extends CurvedShape {
     
-    constructor(radius) {
-        super()
-        this.radius = radius
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            radius: 10,
+            midPoint: Vertex.origin()
+        })
     }
 
     // midPoint is a synonym for anchor
     get midPoint() { return this.anchor }
     set midPoint(newValue) {
-        this.anchor = newValue
-        this.updateView()
+        this.anchor = newValue // updates automatically
     }
 
     updateBezierPoints() {
@@ -44,15 +46,7 @@ export class Circle extends CurvedShape {
     get radius() { return this._radius }
     set radius(newRadius) {
         this._radius = newRadius
-        this.updateView()
-    }
-
-    update(data) {
-        let newRadius = data.radius
-        let newMidPoint = data.midPoint
-        if (newRadius != undefined) { this.radius = newRadius }
-        if (newMidPoint != undefined) { this.midPoint = newMidPoint }
-        super.update(data)
+        this.update()
     }
 
 }

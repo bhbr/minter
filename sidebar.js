@@ -2,7 +2,7 @@ import { pointerEventPageLocation, rgb, gray, addPointerDown, removePointerDown,
 import { Vertex, Translation } from './modules/transform.js'
 import { MGroup, TextLabel } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import { Line } from './modules/arrows.js'
+import {Segment } from './modules/arrows.js'
 
 let sidebar = document.querySelector('#sidebar')
 sidebar.add = function(mobject) {
@@ -11,15 +11,12 @@ sidebar.add = function(mobject) {
 
 let log = function(msg) { logInto(msg, 'sidebar-console') }
 
-
-function changeMode(newMode) {
-    try {
-        webkit.messageHandlers.changeMode.postMessage({mode: newMode});
-    } catch {
-        paper = document.querySelector('#paper')
-        paper.changeMode(newMode)
-    }
+function buttonCenter(index) {
+    let y = buttonYOffset + index * (buttonSpacing + 2*buttonRadius)
+    return new Vertex(buttonXOffset, y)
 }
+
+
 
 const buttonXOffset = 50
 const buttonYOffset = 50
@@ -29,22 +26,25 @@ const buttonScaleFactor = 1.3
 
 class SidebarButton extends Circle {
     
-    constructor(modes, key) {
-        super(buttonRadius)
-        this.key = key
-        this.modes = modes
-        this.currentModeIndex = 0
-        this.baseColor = [1, 1, 1]
-        this.locationIndex = 0
-        this.modeSpacing = 25
-        this.active = false
-        this.showLabel = true
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            currentModeIndex: 0,
+            baseColor: rgb(1, 1, 1),
+            locationIndex: 0,
+            modeSpacing: 25,
+            active: false,
+            showLabel: true
+        })
+        this.setAttributes({
+            radius: buttonRadius
+        })
 
-        this.text = new TextLabel('text')
-        this.text.text = this.modes[0]
+        this.text = new TextLabel({text: 'text'})
+        try { this.text.text = this.modes[0] } catch { }
         this.text.anchor = Vertex.origin()
         this.add(this.text)
-        
+
         this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
         this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
         this.boundButtonUpByPointer = this.buttonUpByPointer.bind(this)
@@ -67,7 +67,8 @@ class SidebarButton extends Circle {
     get locationIndex() { return this._locationIndex }
     set locationIndex(newIndex) {
         this._locationIndex = newIndex
-        this.midPoint = buttonCenter(this._locationIndex)
+        this.anchor = buttonCenter(this._locationIndex)
+        
     }
     
     static brighten(color, factor) {
@@ -91,13 +92,11 @@ class SidebarButton extends Circle {
         }
     }
 
-    
-    
     commonButtonDown() {
         if (this.active) { return }
         this.active = true
         this.radius = buttonRadius * buttonScaleFactor
-        changeMode(this.modes[0])
+        this.changeMode(this.modes[0])
         this.text.view.setAttribute('font-size', '16')
     }
     
@@ -139,7 +138,16 @@ class SidebarButton extends Circle {
         this.fillColor = this.colorForIndex(this.currentModeIndex)
         this.updateModeIndex(0)
         this.text.view.setAttribute('font-size', '12')
-        changeMode('freehand')
+        this.changeMode('freehand')
+    }
+
+    changeMode(newMode) {
+        try {
+            webkit.messageHandlers.changeMode.postMessage({mode: newMode});
+        } catch {
+            paper = document.querySelector('#paper').mobject
+            paper.changeMode(newMode)
+        }
     }
     
     updateModeIndex(newIndex) {
@@ -147,7 +155,7 @@ class SidebarButton extends Circle {
         this.currentModeIndex = newIndex
         let newMode = this.modes[this.currentModeIndex]
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        changeMode(newMode)
+        this.changeMode(newMode)
         if (this.showLabel) {
             this.text.text = newMode
         } else {
@@ -195,19 +203,21 @@ class SidebarButton extends Circle {
 
 class ColorChangeButton extends SidebarButton {
 
-    constructor(key) {
-        super([], key)
-        this.showLabel = false
-        this.palette = {
-            'white': [1, 1, 1],
-            'red': [1, 0, 0],
-            'orange': [1, 0.5, 0],
-            'yellow': [1, 1, 0],
-            'green': [0, 1, 0],
-            'blue': [0, 0, 1],
-            'indigo': [0.5, 0, 1],
-            'violet': [1, 0, 1]
-        }
+    constructor(argsDict) {
+        super(argsDict)
+        this.setAttributes({
+            showLabel: false,
+            palette: {
+                'white': [1, 1, 1],
+                'red': [1, 0, 0],
+                'orange': [1, 0.5, 0],
+                'yellow': [1, 1, 0],
+                'green': [0, 1, 0],
+                'blue': [0, 0, 1],
+                'indigo': [0.5, 0, 1],
+                'violet': [1, 0, 1]
+            }
+        })
         this.modes = Object.keys(this.palette)
         this.text.text = ''
     }
@@ -223,47 +233,53 @@ class ColorChangeButton extends SidebarButton {
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
         this.text.view.setAttribute('font-size', '12')
-        changeMode('freehand')
+        this.changeMode('freehand')
     }
 }
 
-function buttonCenter(index) {
-    let y = buttonYOffset + index * (buttonSpacing + 2*buttonRadius)
-    return new Vertex(buttonXOffset, y)
-}
-
-let lineButton = new SidebarButton(['segment', 'halfline', 'fullline'], 'q')
+let lineButton = new SidebarButton({
+    modes: ['point', 'segment', 'ray', 'line'],
+    key: 'q',
+    locationIndex: 0
+})
 lineButton.baseColor = gray(0.2)
-lineButton.locationIndex = 0
 sidebar.add(lineButton)
 
-let circleButton = new SidebarButton(['circle'], 'w')
+let circleButton = new SidebarButton({
+    modes: ['circle'],
+    key: 'w',
+    locationIndex: 1
+})
 circleButton.baseColor = gray(0.4)
-circleButton.locationIndex = 1
 sidebar.add(circleButton)
 
-let cindyButton = new SidebarButton(['cindy'], 'e')
+let cindyButton = new SidebarButton({
+    modes: ['cindy'],
+    key: 'e',
+    locationIndex: 2
+})
 cindyButton.baseColor = gray(0.6)
-cindyButton.modeSpacing = 15
-cindyButton.locationIndex = 2
 sidebar.add(cindyButton)
   
-let colorButton = new ColorChangeButton('r')
+let colorButton = new ColorChangeButton({
+    key: 'r',
+    modeSpacing: 15,
+    locationIndex: 3
+})
 colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0)
-console.log(colorButton.palette['white'])
-colorButton.modeSpacing = 15
-colorButton.locationIndex = 3
 sidebar.add(colorButton)
 
-let dragButton = new SidebarButton(['drag'], 'a')
+let dragButton = new SidebarButton({
+    modes: ['drag'],
+    key: 'a',
+    locationIndex: 4
+})
 dragButton.baseColor = gray(1)
 dragButton.text.view.setAttribute('fill', 'black')
-dragButton.modeSpacing = 15
-dragButton.locationIndex = 4
 sidebar.add(dragButton)
 
 
-let mode = 'freehand'
+let mode = paper.currentMode
 let creating = false
 
 

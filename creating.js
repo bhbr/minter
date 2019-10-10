@@ -2,20 +2,14 @@ import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPo
 import { Vertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import { Line } from './modules/arrows.js'
+import {Segment } from './modules/arrows.js'
 
-class Freehand extends MGroup {
-    
-    constructor(paper, p) {
-        super(paper)
-        this.update(p, 'freehand')
-        this.strokeColor = paper.color
-    }
+export class Freehand extends MGroup {
     
     updateWithPoints(q) {
         let nbDrawnPoints = this.submobjects.length
         if (nbDrawnPoints > 0) {
-            p = this.submobjects[nbDrawnPoints - 1].midPoint
+            p = this.children[nbDrawnPoints - 1].midPoint
         }
         let pointDistance = 10
         let distance = ((p.x - q.x)**2 + (p.y - q.y)**2)**0.5
@@ -24,104 +18,134 @@ class Freehand extends MGroup {
             let x = p.x + step * unitVector.x + 0.5 * Math.random()
             let y = p.y + step * unitVector.y + 0.5 * Math.random()
             let newPoint = new Vertex([x, y])
-            let c = new Circle(2)
+            let c = new Circle({radius: 2})
             c.fillColor = this.strokeColor
             c.midPoint = new Vertex(newPoint)
             this.add(c)
         }
         let t = Math.random()
         let r = (1 - t) * 0.5 + t * 0.75
-        let c = new Circle(r)
-        c.midPoint = new Vertex(q)
+        let c = new Circle({radius: r, midPoint: new Vertex(q)})
         this.add(c)
     }
     
     updateWithLines(q) {
 
-        let nbDrawnPoints = this.submobjects.length
+        let nbDrawnPoints = this.children.length
         let p = null
         if (nbDrawnPoints == 0) {
             p = q
         } else {
-            p = this.submobjects[nbDrawnPoints - 1].endPoint
+            p = this.children[nbDrawnPoints - 1].endPoint
         }
-        let newLine = new Line([p, q])
+        let newLine = new Segment({startPoint: p, endPoint: q})
         newLine.strokeColor = this.strokeColor
         this.add(newLine)
+
     }
     
-    update(q) {
-        //this.strokeColor = paper.colors[paper.color]
+    updateFromTip(q) {
         this.updateWithLines(q)
     }
 }
 
-class DrawnPoint extends Circle {
+export class DrawnPoint extends Circle {
 
-    constructor(paper, p) {
-        super(5)
-        this.midPoint = p
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            midPoint: Vertex.origin()
+        })
+        this.radius = 5
+        this.draggable = true
     }
+
+    updateFromTip(q) {
+        if (q == undefined) { return }
+        this.update({midPoint: q})
+    }
+
+    update(argsDict) {
+        super.update(argsDict)
+    }
+
 }
 
-class DrawnSegment extends MGroup {
+export class DrawnSegment extends MGroup {
     
-    constructor(p, q) {
-        super()
-        if (q == undefined) { q = p }
-        this.startPoint = p
-        this.endPoint = q
-        this.c1 = new DrawnPoint(p)
-        this.c2 = new DrawnPoint(q)
-        this.line = new Line([p, q])
+    constructor(argsDict) {
+        super(argsDict)
+        if (this.c1 == undefined) { this.c1 = new DrawnPoint({midPoint: this.startPoint}) }
+        if (this.c2 == undefined) { this.c2 = new DrawnPoint({midPoint: this.startPoint}) }
+        this.startPoint = this.c1.midPoint
+        this.endPoint = this.c2.midPoint
+
+        this.line = new Segment({startPoint: this.startPoint, endPoint: this.endPoint})
+
+        this.dependents.push({
+            dependent: this.line,
+            properties: ['startPoint', 'endPoint'],
+            function: this.drawingStartPoint,
+            as: 'startPoint'
+        })
+        this.dependents.push({
+            dependent: this.line,
+            properties: ['startPoint', 'endPoint'],
+            function: this.drawingEndPoint,
+            as: 'endPoint'
+        })
+
+        this.c1.dependents.push({
+            dependent: this,
+            properties: ['anchor'],
+            as: 'startPoint'
+        })
+        this.c2.dependents.push({
+            dependent: this,
+            properties: ['anchor'],
+            as: 'endPoint'
+        })
 
         this.add(this.c1)
         this.add(this.c2)
         this.add(this.line)
-
-        this.strokeColor = paper.color
-        this.fillColor = paper.color
     }
-    
-    update(q) {
-        this.c2.midPoint = q
-        this.line.vertices = [this.line.startPoint, q]
-        this.updateView()
+
+    drawingStartPoint(args) { return args[0] }
+    drawingEndPoint(args) { return args[1] }
+
+    updateFromTip(q) {
+        if (q == undefined) { return }
+        this.c2.update({midPoint: q})
+        //this.update()
+    }
+
+    update(argsDict) {
+        this.vertices = [this.c1.midPoint, this.c2.midPoint]
+        this.line.startPoint = this.drawingStartPoint(this.vertices)
+        this.line.endPoint = this.drawingEndPoint(this.vertices)
+        super.update(argsDict)
+        // this.line.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
+        // this.line.updateView()
     }
 }
 
-class DrawnHalfLine extends DrawnSegment {
+export class DrawnRay extends DrawnSegment {
 
-    constructor(p, q) {
-        super(p, q)
-        this.line.vertices = [this.startPoint, this.farOffEndPoint()]
-
-    }
-
-    farOffEndPoint() {
-        if (this.startPoint == this.endPoint) {
-            return this.endPoint
+    drawingEndPoint([p, q]) {
+        if (p == q) {
+            return p
         }
-        let farOffX = this.startPoint.x + 100 * (this.endPoint.x - this.startPoint.x)
-        let farOffY = this.startPoint.y + 100 * (this.endPoint.y - this.startPoint.y)
+        let farOffX = p.x + 100 * (q.x - p.x)
+        let farOffY = p.y + 100 * (q.y - p.y)
         return new Vertex(farOffX, farOffY)
     }
 
-    update(q) {
-        this.endPoint = q
-        this.c2.midPoint = this.endPoint
-        this.line.vertices = [this.startPoint, this.farOffEndPoint()]
-    }
 }
 
-class DrawnFullLine extends DrawnHalfLine {
+export class DrawnLine extends DrawnRay {
 
-    constructor(p, q) {
-        super(p, q)
-        this.line.vertices = [this.farOffStartPoint(), this.farOffEndPoint()]
-    }
-
-    farOffStartPoint() {
+    drawingStartPoint() {
         if (this.startPoint == this.endPoint) {
             return this.startPoint
         }
@@ -130,14 +154,9 @@ class DrawnFullLine extends DrawnHalfLine {
         return new Vertex(farOffX, farOffY)
     }
 
-    update(q) {
-        this.endPoint = q
-        this.c2.midPoint = this.endPoint
-        this.line.vertices = [this.farOffStartPoint(), this.farOffEndPoint()]
-    }
 }
 
-class DrawnCircle extends MGroup {
+export class DrawnCircle extends MGroup {
     
     constructor(p) {
         super()
@@ -180,7 +199,7 @@ class DrawnCircle extends MGroup {
 }
 
 
-class DrawnRectangle extends MGroup {
+export class DrawnRectangle extends MGroup {
     
     constructor(p) {
         super()
@@ -189,10 +208,10 @@ class DrawnRectangle extends MGroup {
         this.p3 = new Vertex(p)
         this.p4 = new Vertex(p)
         this.startPoint = new Vertex(p)
-        this.top = new Line([p, p])
-        this.bottom = new Line([p, p])
-        this.left = new Line([p, p])
-        this.right = new Line([p, p])
+        this.top = new Segment([p, p])
+        this.bottom = new Segment([p, p])
+        this.left = new Segment([p, p])
+        this.right = new Segment([p, p])
         this.top.strokeColor = rgb(1, 1, 1)
         this.bottom.strokeColor = rgb(1, 1, 1)
         this.left.strokeColor = rgb(1, 1, 1)
@@ -224,7 +243,7 @@ class DrawnRectangle extends MGroup {
 }
 
 
-class CindyCanvas {
+export class CindyCanvas {
     
     constructor(p, width, height) {
 
@@ -340,3 +359,6 @@ class CindyCanvas {
 
     }
 }
+
+
+

@@ -1,62 +1,55 @@
 import { Vertex, Transform } from './transform.js'
 import { stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
-
 export class Mobject {
 
-    constructor() {
+    constructor(argsDict) {
         this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         this.view.setAttribute('class', this.constructor.name)
         this.view.mobject = this
-        this.transform = Transform.identity()
-        this.submobjects = []
-        this.childMobjects = []
-        this.vertices = []
-        try {
-            this.parentMobject = paper // default
-        } catch {
-            this.parentMobject = sidebar // if no paper
-        }
-
-        this.draggable = false
-        this.isDragged = false
-        this.strokeColor = rgb(1, 1, 1)
-        this.fillColor = rgb(1, 1, 1)
+        this.setAttributes(argsDict)
+        this.setDefaults({
+            transform: Transform.identity(),
+            anchor: Vertex.origin(),
+            vertices: [],
+            children: [],
+            dependents: [],
+            strokeWidth: 1,
+            strokeColor: rgb(1, 1, 1),
+            fillColor: rgb(1, 1, 1),
+            draggable: false,
+            isDragged: false,
+            visible: true,
+        })
         this.show()
 
-        // give event-triggered methods reference to this = self (instead of window)
-        // also, they need proper names to refer to them
-        // when removing the event listeners
-        this.boundDragStart = this.dragStart.bind(this)
-        this.boundDrag = this.drag.bind(this)
-        this.boundDragEnd = this.dragEnd.bind(this)
-        // this.boundScrubStart = this.scrubStart.bind(this)
-        // this.boundScrub = this.scrub.bind(this)
-        // this.boundScrubEnd = this.scrubEnd.bind(this)
         this.boundCreatePopover = this.createPopover.bind(this)
         this.boundDismissPopover = this.dismissPopover.bind(this)
         this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
-        //this.view.addEventListener('mousedown', this.boundDragStart)
-        //this.view.addEventListener('dblclick', this.boundMakeScrubbable)
+    }
+
+    setAttributes(argsDict) {
+        for (let [key, value] of Object.entries(argsDict)) {
+            this[key] = value
+        }
+    }
+
+    setDefaults(argsDict) {
+        for (let [key, value] of Object.entries(argsDict)) {
+            if (this[key] == undefined) { this[key] = value }
+        }
 
     }
 
-    get parentMobject() { return this._parentMobject }
-    set parentMobject(newValue) {
+    get parent() { return this._parent }
+    set parent(newValue) {
         this.view.remove()
-        this._parentMobject = newValue
+        this._parent = newValue
         if (newValue == undefined) { return }
-        if (newValue.id == 'paper' || newValue.id == 'sidebar') {
-            newValue.add(this)
-        } else {
-            newValue.view.appendChild(this.view)
-        }
-        if (this.parentMobject.visible || newValue.id == 'paper') {
-            this.show()
-        } else {
-            this.hide()
-        }
+        newValue.add(this)
+        if (this.parent.visible) { this.show() }
+        else { this.hide() }
     }
 
     globalTransform() {
@@ -64,31 +57,54 @@ export class Mobject {
         let mob = this
         while (mob && mob.transform instanceof Transform) {
             t.leftComposeWith(mob.transform)
-            mob = mob.parentMobject
+            mob = mob.parent
         }
         return t
     }
 
     globalVertices() {
-        return this.globalTransform().appliedTo(this.vertices)
+        let returnValue = this.globalTransform().appliedTo(this.vertices)
+        if (returnValue == undefined) { return [] }
+        else { return returnValue }
     }
 
-    updateView() {
-        if (this.view == undefined) { return }
-
-        for (let submob of this.submobjects) {
-            submob.updateView()
+    update(argsDict) {
+        this.setAttributes(argsDict || {})
+        //for (let submob of this.children || []) { submob.update() }
+        if (this.dependents == undefined) {
+            this.updateView()
+            return
+        }
+        for (let dependency of this.dependents || []) {
+            let mob = dependency.dependent
+            let f = dependency.function || (x => x[0])
+            let args = []
+            for (let property of dependency.properties || []) {
+                args.push(this[property])
+            }
+            let updateDict = {}
+            try { updateDict[dependency.as] = f(args) } catch { }
+            mob.update(updateDict)
         }
 
         if (this.popover != undefined) {
             this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
         }
+
+        this.updateView()
     }
+
+
+    updateView() {
+        if (this.view == undefined) { return }
+    }
+
 
     get fillColor() { return this.view.fill }
     set fillColor(newValue) {
         this.view.fill = newValue
-        for (let submob of this.submobjects) {
+        if (this.children == undefined) { return }
+        for (let submob of this.children || []) {
             submob.fillColor = newValue
         }
         this.updateView()
@@ -109,7 +125,8 @@ export class Mobject {
     get strokeColor() { return this.view.stroke }
     set strokeColor(newValue) {
         this.view.stroke = newValue
-        for (let submob of this.submobjects) {
+        if (this.children == undefined) { return }
+        for (let submob of this.children || []) {
             submob.strokeColor = newValue
         }
         this.updateView()
@@ -118,81 +135,42 @@ export class Mobject {
     get strokeWidth() { return this.view.strokeWidth }
     set strokeWidth(newValue) {
         this.view.strokeWidth = newValue
-        for (let submob of this.submobjects) {
+        for (let submob of this.children || []) {
             submob.strokeWidth = newValue
         }
         this.updateView()
     }
 
-    get draggable() { return this._draggable }
-    set draggable(newValue) {
-        this._draggable = newValue
-        if (this._draggable) {
-            addPointerDown(this.view, this.boundDragStart)
-        } else {
-            removePointerDown(this.view, this.boundDragStart)
-        }
-    }
-
-    dragStart(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        this.draggable = true
-        this.isDragged = true
-        this.dragStartingPoint = new Vertex(e.x, e.y)
-        this.anchorBeforeDragging = Object.create(this.anchor)
-        if (this.popover != undefined) {
-            this.popover.anchorBeforeDragging = Object.create(this.popover.anchor)
-        }
-        addPointerMove(paper, this.boundDrag)
-        addPointerUp(paper, this.boundDragEnd)
-    }
-
-    drag(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        //if (!(this.draggable && this.isDragged)) { return }
-        let dragVector = new Vertex(e.x, e.y).subtract(this.dragStartingPoint)
-        this.anchor.copyFrom(this.anchorBeforeDragging.add(dragVector))
-        if (this.popover != undefined) {
-            this.popover.anchor.copyFrom(this.popover.anchorBeforeDragging.add(dragVector))
-        }
-        this.updateView()
-    }
-
-    dragEnd(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        this.isDragged = false
-        this.dragStartingPoint = undefined
-        this.anchorBeforeDragging = undefined
-        if (this.popover != undefined) {
-            this.popover.anchorBeforeDragging = undefined
-        }
-        removePointerMove(paper, this.boundDrag)
-        removePointerUp(paper, this.boundDragEnd)
-    }
 
     add(submob) {
-        submob.draggable = false
-        submob.parentMobject = this
-        this.submobjects.push(submob)
+        if (submob.parent != this) { submob.parent = this }
+        if (!this.children.includes(submob)) {
+            this.children.push(submob)
+        }
         this.view.appendChild(submob.view)
         submob.updateView()
     }
 
     remove(submob) {
         submob.view.remove()
-        remove(this.submobjects, submob)
-        submob.parentMobject = undefined
+        remove(this.children, submob)
+        submob.parent = undefined
     }
+
+    get transform() {
+        if (this._transform == undefined) {
+            this._transform = Transform.identity()
+        }
+        return this._transform
+    }
+    set transform(newValue) { this._transform = newValue }
 
     get anchor() {
         return new Vertex(this.transform.e, this.transform.f)
     }
     set anchor(newValue) {
         this.transform.centerAt(newValue)
-        this.updateView()
+        this.update()
     }
 
     hide() {
@@ -200,9 +178,7 @@ export class Mobject {
         if (this.view != undefined) {
             this.view.style["visibility"] = "hidden"
         }
-        for (let submob of this.submobjects) {
-            submob.hide() // we have to propagate invisibility
-        }
+        for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
         this.updateView()
     }
 
@@ -211,9 +187,7 @@ export class Mobject {
         if (this.view != undefined) {
             this.view.style["visibility"] = "visible"
         }
-        for (let submob of this.submobjects) {
-            submob.show() // we have to propagate visibility bc we have to for invisibility
-        }
+        for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
         this.updateView()
     }
 
@@ -252,13 +226,6 @@ export class Mobject {
     registerTouchStart(e) {
         this.touchStart = new Vertex(pointerEventPageLocation(e))
     }
-
-    update(data) {
-        for (let child of this.childMobjects) {
-            child.update(data)
-        }
-        this.updateView()
-    }
            
 }
 
@@ -266,9 +233,9 @@ export class Mobject {
 
 export class MGroup extends Mobject {
 
-    constructor(submobs = []) {
-        super()
-        for (let submob of submobs) {
+    constructor(argsDict) {
+        super(argsDict)
+        for (let submob of this.children) {
             submob.draggable = false
             this.add(submob)
         }
@@ -292,35 +259,24 @@ export class MGroup extends Mobject {
 
 export class Polygon extends Mobject {
 
-    constructor(vertices) {
-        super()
-        this.vertices = vertices
+    constructor(argsDict) {
+        super(argsDict)
+        this.vertices = []
         this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-        this.view.appendChild(this.path)
-        this.updateView()
+        this.view.appendChild(this.path) // why not just add?
+        this.update()
     }
 
     updateView() {
-        let pathString = Polygon.pathString(this.globalVertices())
-        if (this.path == undefined) { return }
+        let globalVertices = this.globalVertices()
+        let pathString = Polygon.pathString(globalVertices)
+        
+        if (this.path == undefined || this.vertices.length == 0) { return }
         this.path.setAttribute('d', pathString)
-        //console.log(this.vertices)
-        if (this.fillColor != undefined) {
-            this.path.setAttribute('fill', this.fillColor)
-        }
-        if (this.strokeColor != undefined) {
-            this.path.setAttribute('stroke', this.strokeColor)
-        }
-        if (this.strokeWidth != undefined) {
-            this.path.setAttribute('stroke-width', this.strokeWidth)
-        }
+        this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1))
+        this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1))
+        this.path.setAttribute('stroke-width', this.strokeWidth || 1)
         super.updateView()
-    }
-
-    get vertices() { return this._vertices }
-    set vertices(newVertices) {
-        this._vertices = newVertices
-        this.updateView()
     }
 
     static pathString(points) {
@@ -370,17 +326,11 @@ export class Polygon extends Mobject {
 
 export class CurvedShape extends Mobject {
 
-    constructor(bezierPoints = []) {
-        super()
-        this.bezierPoints = bezierPoints
+    constructor(argsDict) {
+        super(argsDict)
+        this.bezierPoints = []
         this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
         this.view.appendChild(this.path)
-    }
-
-    get bezierPoints() { return this._bezierPoints }
-    set bezierPoints(newBezierPoints) {
-        this._bezierPoints = newBezierPoints
-        // do NOT update view, because updateView calls updateBezierPoints
     }
 
     updateBezierPoints() { }
@@ -393,7 +343,7 @@ export class CurvedShape extends Mobject {
     updateView() {
         this.updateBezierPoints()
         let pathString = CurvedShape.pathString(this.globalBezierPoints())
-        if (this.path) {
+        if (this.path && this.bezierPoints.length > 0) {
             this.path.setAttribute('d', pathString)
             this.path.setAttribute('fill', this.fillColor)
             this.path.setAttribute('fill-opacity', this.fillOpacity)
@@ -442,8 +392,11 @@ export class CurvedShape extends Mobject {
 
 export class TextLabel extends Mobject {
 
-    constructor(text) {
-        super()
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            text: ''
+        })
         this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
         this.view.setAttribute('class', this.constructor.name + ' unselectable')
         this.view.setAttribute('text-anchor', 'middle')
@@ -452,14 +405,6 @@ export class TextLabel extends Mobject {
         this.view.setAttribute('font-family', 'Helvetica')
         this.view.setAttribute('font-size', '12')
         this.view.mobject = this
-        this.text = text
-        this.transform = Transform.identity()
-        this.submobjects = []
-        //this.parentMobject = paper // default
-
-        this.isDraggable = false
-        this.isDragged = false
-        this.visible = true
 
         this.view.setAttribute('x', 0)
         this.view.setAttribute('y', 0)
@@ -469,11 +414,6 @@ export class TextLabel extends Mobject {
     set text(newText) {
         this._text = newText
         if (this.view != undefined) { this.view.textContent = newText }
-    }
-
-    set anchor(newValue) {
-        this.transform.centerAt(newValue)
-        this.updateView()
     }
 
     updateView() {
@@ -496,64 +436,72 @@ export class TextLabel extends Mobject {
 
 
 
-export class Popover extends CurvedShape {
-    constructor(sourceMobject, width, height, direction = 'right') {
-        super()
-        this.sourceMobject = sourceMobject
-        this.anchor = sourceMobject.anchor.translatedBy(sourceMobject.rightEdge())
-        // sourceMobject != parentMobject because using the latter
-        // conflicts with the z hierarchy
+// export class Popover extends CurvedShape {
+//     constructor(sourceMobject, width, height, direction = 'right') {
+//         super()
+//         this.sourceMobject = sourceMobject
+//         this.anchor = sourceMobject.anchor.translatedBy(sourceMobject.rightEdge())
+//         // sourceMobject != parentMobject because using the latter
+//         // conflicts with the z hierarchy
 
-        let tipSize = 10
-        let cornerRadius = 30
-        this.fillColor = 'white'
-        this.strokeColor = 'black'
-        this.strokeWidth = 1
-        if (direction == 'right') {
-            let bezierPoints = Vertex.vertices([
-                [0, 0], [0, 0],
-                [tipSize, tipSize], [tipSize, tipSize], [tipSize, tipSize],
-                [tipSize, height/2 - cornerRadius], [tipSize, height/2 - cornerRadius], [tipSize, height/2],
-                [tipSize, height/2], [tipSize + cornerRadius, height/2], [tipSize + cornerRadius, height/2],
-                [tipSize + width - cornerRadius, height/2], [tipSize + width - cornerRadius, height/2], [tipSize + width, height/2],
-                [tipSize + width, height/2], [tipSize + width, height/2 - cornerRadius], [tipSize + width, height/2 - cornerRadius],
-                [tipSize + width, -height/2 + cornerRadius], [tipSize + width, -height/2 + cornerRadius], [tipSize + width, -height/2],
-                [tipSize + width, -height/2], [tipSize + width - cornerRadius, -height/2], [tipSize + width - cornerRadius, -height/2],
-                [tipSize + cornerRadius, -height/2], [tipSize + cornerRadius, -height/2], [tipSize, -height/2], 
-                [tipSize, -height/2], [tipSize, -height/2 + cornerRadius], [tipSize, -height/2 + cornerRadius],
-                [tipSize, -tipSize], [tipSize, -tipSize], [tipSize, -tipSize],
-                [0, 0], [0, 0]
-            ])
-            // let translatedBezierPoints = []
-            // for (let point of bezierPoints) {
-            //     point.translateBy(this.anchor)
-            // }
-            this.bezierPoints = bezierPoints
-        }
+//         let tipSize = 10
+//         let cornerRadius = 30
+//         this.fillColor = 'white'
+//         this.strokeColor = 'black'
+//         this.strokeWidth = 1
+//         if (direction == 'right') {
+//             let bezierPoints = Vertex.vertices([
+//                 [0, 0], [0, 0],
+//                 [tipSize, tipSize], [tipSize, tipSize], [tipSize, tipSize],
+//                 [tipSize, height/2 - cornerRadius], [tipSize, height/2 - cornerRadius], [tipSize, height/2],
+//                 [tipSize, height/2], [tipSize + cornerRadius, height/2], [tipSize + cornerRadius, height/2],
+//                 [tipSize + width - cornerRadius, height/2], [tipSize + width - cornerRadius, height/2], [tipSize + width, height/2],
+//                 [tipSize + width, height/2], [tipSize + width, height/2 - cornerRadius], [tipSize + width, height/2 - cornerRadius],
+//                 [tipSize + width, -height/2 + cornerRadius], [tipSize + width, -height/2 + cornerRadius], [tipSize + width, -height/2],
+//                 [tipSize + width, -height/2], [tipSize + width - cornerRadius, -height/2], [tipSize + width - cornerRadius, -height/2],
+//                 [tipSize + cornerRadius, -height/2], [tipSize + cornerRadius, -height/2], [tipSize, -height/2], 
+//                 [tipSize, -height/2], [tipSize, -height/2 + cornerRadius], [tipSize, -height/2 + cornerRadius],
+//                 [tipSize, -tipSize], [tipSize, -tipSize], [tipSize, -tipSize],
+//                 [0, 0], [0, 0]
+//             ])
+//             // let translatedBezierPoints = []
+//             // for (let point of bezierPoints) {
+//             //     point.translateBy(this.anchor)
+//             // }
+//             this.bezierPoints = bezierPoints
+//         }
         
-        this.closeButton = new TextLabel('X')
-        this.closeButton.anchor = new Vertex(70, -130)
-        this.boundDismiss = this.dismiss.bind(this)
-        this.closeButton.view.addEventListener('click', this.boundDismiss)
-        this.add(this.closeButton)
+//         this.closeButton = new TextLabel('X')
+//         this.closeButton.anchor = new Vertex(70, -130)
+//         this.boundDismiss = this.dismiss.bind(this)
+//         this.closeButton.view.addEventListener('click', this.boundDismiss)
+//         this.add(this.closeButton)
 
-        this.deleteButton = new TextLabel('🗑')
-        this.deleteButton.anchor = new Vertex(65, 140)
-        this.boundDelete = this.delete.bind(this)
-        this.deleteButton.view.addEventListener('click', this.boundDelete)
-        this.add(this.deleteButton)
+//         this.deleteButton = new TextLabel('🗑')
+//         this.deleteButton.anchor = new Vertex(65, 140)
+//         this.boundDelete = this.delete.bind(this)
+//         this.deleteButton.view.addEventListener('click', this.boundDelete)
+//         this.add(this.deleteButton)
 
-    }
+//     }
 
-    dismiss(e) {
-        this.sourceMobject.dismissPopover(e)
-    }
+//     dismiss(e) {
+//         this.sourceMobject.dismissPopover(e)
+//     }
 
-    delete(e) {
-        this.dismiss(e)
-    }
+//     delete(e) {
+//         this.dismiss(e)
+//     }
                                                                                             
-}
+// }
+
+
+
+
+
+
+
+
 
 
 
@@ -583,7 +531,7 @@ export class Popover extends CurvedShape {
 //  }
 
 //  unmakeScrubbable(e) {
-//      this.remove(this.scrub_indicator)
+//      this.remove(this.scrubrub_indicator)
 //      this.remove(this.scrubbingBackground)
 //      this.view.removeEventListener('mousedown', this.boundScrubStart)
 //      this.view.addEventListener('mousedown', this.boundDragStart)
