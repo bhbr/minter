@@ -1,5 +1,6 @@
 import { Vertex } from './transform.js'
 import { Polygon, CurvedShape } from './mobject.js'
+import { rgb } from './helpers.js'
 
 export class Circle extends CurvedShape {
     
@@ -49,6 +50,33 @@ export class Circle extends CurvedShape {
         this.update()
     }
 
+}
+
+export class DrawnCircle extends Circle {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            outerPoint: new Vertex(10, 0),
+            fillOpacity: 0
+        })
+        this.setAttributes({
+            strokeColor: rgb(1, 1, 1),
+            strokeWidth: 1
+        })
+        this.update()
+    }
+
+    update() {
+        let innie = this.midPoint
+        let outie = this.outerPoint
+        if (outie == undefined) { return }
+        this._radius = innie.subtract(outie).norm()
+        this.updateBezierPoints()
+        console
+        super.update()
+
+    }
 }
 
 

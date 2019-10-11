@@ -38,10 +38,9 @@ export class Mobject {
 
     setDefaults(argsDict) {
         for (let [key, value] of Object.entries(argsDict)) {
-            if (this[key] == undefined) {
-                if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-                else { this[key] = value }
-            }
+            if (this[key] != undefined) { continue }
+            if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
+            else { this[key] = value }
         }
 
     }
@@ -68,12 +67,16 @@ export class Mobject {
 
     globalVertices() {
         let returnValue = this.globalTransform().appliedTo(this.vertices)
+        //console.log(this.vertices, this.globalTransform(), returnValue)
         if (returnValue == undefined) { return [] }
         else { return returnValue }
     }
 
     update(argsDict) {
         this.setAttributes(argsDict || {})
+
+        if (Object.values(this).includes(undefined)) { return }
+
         for (let submob of this.children || []) { submob.update() }
 
         if (this.popover != undefined) {
@@ -159,7 +162,7 @@ export class Mobject {
         return this._anchor
     }
     set anchor(newValue) {
-        if (this._anchor == undefined) { this._anchor = new Vertex(newValue) }
+        if (this._anchor == undefined) { this._anchor = newValue }
         else { this._anchor.copyFrom(newValue) }
         this.transform.centerAt(newValue)
         this.update()
@@ -332,7 +335,6 @@ export class CurvedShape extends Mobject {
 
     globalBezierPoints() {
         let ret = this.globalTransform().appliedTo(this.bezierPoints)
-        console.log(ret)
         return ret
     }
 

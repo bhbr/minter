@@ -1,8 +1,8 @@
 import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
-import { Circle } from './modules/shapes.js'
-import { Segment } from './modules/arrows.js'
+import { Circle, DrawnCircle } from './modules/shapes.js'
+import { Segment, Ray, Line } from './modules/arrows.js'
 import { Freehand, FreePoint } from './creating.js'
 
 
@@ -13,7 +13,7 @@ class Paper {
         this.view.mobject = this
         this.useCapture = true
         this.isCreating = false
-        this.modes = ['freehand', 'drag', 'segment'] //, 'ray', 'line'] //, 'fullline', 'circle', 'cindy', 'drag']
+        this.modes = ['freehand', 'drag', 'segment', 'ray', 'line'] //, 'fullline', 'circle', 'cindy', 'drag']
         this.currentMode = 'freehand'
         this.colorPalette = {
             'black': rgb(0, 0, 0),
@@ -31,6 +31,7 @@ class Paper {
         this.constructedObjects = []
         this.cindyPorts = []
         this.boundPointerDown = this.pointerDown.bind(this)
+        this.boundPointerMove = this.pointerMove.bind(this)
         this.boundPointerUp = this.pointerUp.bind(this)
         this.boundDrag = this.drag.bind(this)
         this.boundEndDragging = this.endDragging.bind(this)
@@ -107,32 +108,72 @@ class Paper {
         }
 
         if (target == this) {
-            let dp = new FreePoint({anchor: p})
-            this.add(dp)
-            this.createFromExistingPoint(e, dp)
+            if (this.currentMode == 'freehand') {
+                let freehand = new Freehand({startPoint: p, endPoint: p.copy()})
+                console.log(freehand)
+                this.mobjectsCurrentlyBeingDrawn['freehand'] = freehand
+                this.add(freehand)
+                addPointerMove(this.view, this.boundPointerMove)
+                addPointerUp(this.view, this.boundPointerUp)
+            } else {
+                let dp = new FreePoint({anchor: p})
+                this.add(dp)
+                this.createFromExistingPoint(e, dp)
+            }
         }
 
     }
 
     createFromExistingPoint(e, dp) {
+
+        let p = new Vertex()
+        p.copyFrom(dp.anchor)
+        let dq = new FreePoint({anchor: p})
+
         switch (this.currentMode) {
         case 'segment':
-            let p = new Vertex()
-            p.copyFrom(dp.anchor)
-            let dq = new FreePoint({anchor: p})
             let s = new Segment({startPoint: dp.anchor, endPoint: dq.anchor})
             this.add(dq)
             this.add(s)
             this.update()
             this.startDragging(new Vertex(pointerEventPageLocation(e)), dq)
+            break
 
-            return
+        case 'ray':
+            let r = new Ray({startPoint: dp.anchor, endPoint: dq.anchor})
+            this.add(dq)
+            this.add(r)
+            this.update()
+            this.startDragging(new Vertex(pointerEventPageLocation(e)), dq)
+            break
+
+        case 'line':
+            let l = new Line({startPoint: dp.anchor, endPoint: dq.anchor})
+            this.add(dq)
+            this.add(l)
+            this.update()
+            this.startDragging(new Vertex(pointerEventPageLocation(e)), dq)
+            break
+
+        case 'circle':
+            let c = new DrawnCircle({midPoint: dp.anchor, outerPoint: dq.anchor})
+            this.add(dq)
+            this.add(c)
+            this.update()
+            this.startDragging(new Vertex(pointerEventPageLocation(e)), dq)
+            break
         }
     }
 
+    pointerMove(e) {
+        let p = new Vertex(pointerEventPageLocation(e))
+        let fh = this.mobjectsCurrentlyBeingDrawn['freehand']
+        fh.updateFromTip(p)
+    }
 
     pointerUp(e) {
-
+        removePointerMove(this.view, this.boundPointerMove)
+        this.mobjectsCurrentlyBeingDrawn = {}
     }
 
     snappablePoints() {
@@ -142,15 +183,15 @@ class Paper {
                 retArr.push(mob.anchor)
             }
         }
+        console.log(retArr)
         return retArr
     }
 
-    snap(p) {
+    snap(dp) {
+        let p = dp.anchor
         for (let q of this.snappablePoints()) {
-            if (p == q) { continue }
             let d = p.subtract(q).norm()
-            if (d < 10) {
-
+            if (d < 10 && q != p) {
                 p.copyFrom(q)
             }
         }
@@ -319,9 +360,9 @@ class Paper {
     drag(e) {
         let dragPoint = new Vertex(pointerEventPageLocation(e))
         //this.draggedMobject.update({anchor: dragPoint.add(this.mobOffsetFromCursor)})
+        
         this.draggedMobject.anchor = dragPoint.add(this.mobOffsetFromCursor)
-
-        //this.snap(anchor)
+        this.snap(this.draggedMobject)
         // we may need the next two lines for Cindy canvases
         // mob.view.style.left = (dragPoint.x + this.mobOffsetFromCursor.x) + 'px'
         // mob.view.style.top = (dragPoint.y + this.mobOffsetFromCursor.y) + 'px'
@@ -342,12 +383,6 @@ class Paper {
 
 
 let paper = new Paper({view: document.querySelector('#paper')})
-
-let dp = new FreePoint({anchor: new Vertex(50, 50)})
-paper.add(dp)
-
-
-
 
 
 

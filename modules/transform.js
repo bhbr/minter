@@ -43,7 +43,11 @@ export class Vertex extends Array {
 
     update(otherVertex) { this.copyFrom(otherVertex) }
 
-    copy() { return Vertex.origin().copyFrom(this) }
+    copy() {
+        let ret = new Vertex()
+        ret.copyFrom(this)
+        return ret
+    }
 
     imageUnder(transform) {
         return transform.appliedTo(this)
