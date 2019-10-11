@@ -49,154 +49,19 @@ export class Freehand extends MGroup {
     }
 }
 
-export class DrawnPoint extends Circle {
+export class FreePoint extends Circle {
 
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
-            midPoint: Vertex.origin()
+            midPoint: Vertex.origin(),
         })
         this.radius = 5
         this.draggable = true
     }
 
-    updateFromTip(q) {
-        if (q == undefined) { return }
-        this.update({midPoint: q})
-    }
-
-    update(argsDict) {
-        super.update(argsDict)
-    }
-
 }
 
-export class DrawnSegment extends MGroup {
-    
-    constructor(argsDict) {
-        super(argsDict)
-        if (this.c1 == undefined) { this.c1 = new DrawnPoint({midPoint: this.startPoint}) }
-        if (this.c2 == undefined) { this.c2 = new DrawnPoint({midPoint: this.startPoint}) }
-        this.startPoint = this.c1.midPoint
-        this.endPoint = this.c2.midPoint
-
-        this.line = new Segment({startPoint: this.startPoint, endPoint: this.endPoint})
-
-        this.dependents.push({
-            dependent: this.line,
-            properties: ['startPoint', 'endPoint'],
-            function: this.drawingStartPoint,
-            as: 'startPoint'
-        })
-        this.dependents.push({
-            dependent: this.line,
-            properties: ['startPoint', 'endPoint'],
-            function: this.drawingEndPoint,
-            as: 'endPoint'
-        })
-
-        this.c1.dependents.push({
-            dependent: this,
-            properties: ['anchor'],
-            as: 'startPoint'
-        })
-        this.c2.dependents.push({
-            dependent: this,
-            properties: ['anchor'],
-            as: 'endPoint'
-        })
-
-        this.add(this.c1)
-        this.add(this.c2)
-        this.add(this.line)
-    }
-
-    drawingStartPoint(args) { return args[0] }
-    drawingEndPoint(args) { return args[1] }
-
-    updateFromTip(q) {
-        if (q == undefined) { return }
-        this.c2.update({midPoint: q})
-        //this.update()
-    }
-
-    update(argsDict) {
-        this.vertices = [this.c1.midPoint, this.c2.midPoint]
-        this.line.startPoint = this.drawingStartPoint(this.vertices)
-        this.line.endPoint = this.drawingEndPoint(this.vertices)
-        super.update(argsDict)
-        // this.line.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-        // this.line.updateView()
-    }
-}
-
-export class DrawnRay extends DrawnSegment {
-
-    drawingEndPoint([p, q]) {
-        if (p == q) {
-            return p
-        }
-        let farOffX = p.x + 100 * (q.x - p.x)
-        let farOffY = p.y + 100 * (q.y - p.y)
-        return new Vertex(farOffX, farOffY)
-    }
-
-}
-
-export class DrawnLine extends DrawnRay {
-
-    drawingStartPoint() {
-        if (this.startPoint == this.endPoint) {
-            return this.startPoint
-        }
-        let farOffX = this.endPoint.x + 100 * (this.startPoint.x - this.endPoint.x)
-        let farOffY = this.endPoint.y + 100 * (this.startPoint.y - this.endPoint.y)
-        return new Vertex(farOffX, farOffY)
-    }
-
-}
-
-export class DrawnCircle extends MGroup {
-    
-    constructor(p) {
-        super()
-        this.center = new Vertex(p)
-        this.outer = new Vertex(p)
-        this.radius = 0
-        this.centerPoint = new Circle(5)
-        this.outerPoint = new Circle(5)
-        this.centerPoint.midPoint = this.center
-        this.outerPoint.midPoint = this.outer
-        this.circle = new Circle(this.radius)
-        this.circle.fillOpacity = 0
-        this.circle.strokeWidth = 1
-        this.circle.strokeColor = rgb(0, 0, 0)
-        this.circle.midPoint = this.center
-        this.add(this.centerPoint)
-        this.add(this.outerPoint)
-        this.add(this.circle)
-        this.strokeColor = paper.color
-        this.fillColor = paper.color
-    }
-    
-    update(q) {
-        let r = Math.sqrt((q.x - this.center.x)**2 + (q.y - this.center.y)**2)
-        this.updateRadius(r)
-        this.updateOuter(q)
-    }
-    
-    updateRadius(r) {
-        this.circle.radius = r
-        this.radius = r
-    }
-    
-    updateOuter(q) {
-        this.outer = q
-        this.outerPoint.midPoint = q
-        
-    }
-    
-}
 
 
 export class DrawnRectangle extends MGroup {

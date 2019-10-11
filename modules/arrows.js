@@ -3,13 +3,22 @@ import { MGroup, Polygon } from './mobject.js'
 
 export class Segment extends Polygon {
 
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            startPoint: Vertex.origin(),
+            endPoint: Vertex.origin(),
+        })
+        this.vertices = [this.startPoint, this.endPoint]
+        this.update()
+    }
+
     components() {
         return this.endPoint.subtract(this.startPoint)
     }
 
     update(argsDict) {
         super.update(argsDict)
-        this.vertices = [this.startPoint, this.endPoint]
         this.updateView()
     }
 

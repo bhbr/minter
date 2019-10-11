@@ -31,13 +31,17 @@ export class Mobject {
 
     setAttributes(argsDict) {
         for (let [key, value] of Object.entries(argsDict)) {
-            this[key] = value
+            if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
+            else { this[key] = value }
         }
     }
 
     setDefaults(argsDict) {
         for (let [key, value] of Object.entries(argsDict)) {
-            if (this[key] == undefined) { this[key] = value }
+            if (this[key] == undefined) {
+                if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
+                else { this[key] = value }
+            }
         }
 
     }
@@ -70,27 +74,13 @@ export class Mobject {
 
     update(argsDict) {
         this.setAttributes(argsDict || {})
-        //for (let submob of this.children || []) { submob.update() }
-        if (this.dependents == undefined) {
-            this.updateView()
-            return
-        }
-        for (let dependency of this.dependents || []) {
-            let mob = dependency.dependent
-            let f = dependency.function || (x => x[0])
-            let args = []
-            for (let property of dependency.properties || []) {
-                args.push(this[property])
-            }
-            let updateDict = {}
-            try { updateDict[dependency.as] = f(args) } catch { }
-            mob.update(updateDict)
-        }
+        for (let submob of this.children || []) { submob.update() }
 
         if (this.popover != undefined) {
             this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
         }
 
+        this.transform.recenter()
         this.updateView()
     }
 
@@ -163,15 +153,19 @@ export class Mobject {
         }
         return this._transform
     }
-    set transform(newValue) { this._transform = newValue }
+    set transform(newValue) { this._transform.copyFrom(newValue) }
 
     get anchor() {
-        return new Vertex(this.transform.e, this.transform.f)
+        return this._anchor
     }
     set anchor(newValue) {
+        if (this._anchor == undefined) { this._anchor = new Vertex(newValue) }
+        else { this._anchor.copyFrom(newValue) }
         this.transform.centerAt(newValue)
         this.update()
     }
+
+
 
     hide() {
         this.visible = false
@@ -337,7 +331,9 @@ export class CurvedShape extends Mobject {
     // implemented by subclasses
 
     globalBezierPoints() {
-        return this.globalTransform().appliedTo(this.bezierPoints)
+        let ret = this.globalTransform().appliedTo(this.bezierPoints)
+        console.log(ret)
+        return ret
     }
 
     updateView() {

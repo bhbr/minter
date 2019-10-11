@@ -41,7 +41,9 @@ export class Vertex extends Array {
         this.y = otherVertex.y
     }
 
-    copy() { return this.concat() }
+    update(otherVertex) { this.copyFrom(otherVertex) }
+
+    copy() { return Vertex.origin().copyFrom(this) }
 
     imageUnder(transform) {
         return transform.appliedTo(this)
@@ -163,7 +165,7 @@ export class Transform {
     set anchor(newValue) {
         this.e = newValue[0]
         this.f = newValue[1]
-        if (this._anchor) {
+        if (this._anchor != undefined) {
             this._anchor.x = this.e
             this._anchor.y = this.f
         } else {
@@ -245,6 +247,10 @@ export class Transform {
 
     centerAt(vertex) {
         this.anchor = vertex
+    }
+
+    recenter() {
+        this.centerAt(this.anchor)
     }
 
 }
