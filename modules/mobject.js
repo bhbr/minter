@@ -83,7 +83,9 @@ export class Mobject {
             this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
         }
 
-        this.transform.recenter()
+        //this.transform.recenter()
+        this.transform.e = this.anchor.x
+        this.transform.f = this.anchor.y
         this.updateView()
     }
 

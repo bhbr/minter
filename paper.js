@@ -97,6 +97,20 @@ class Paper {
         let target = this.targetMobject(e)
         let p = new Vertex(pointerEventPageLocation(e))
 
+        if (target instanceof DrawnCircle) {
+            for (let mob of this.constructedObjects) {
+                if (mob instanceof FreePoint && mob.anchor.subtract(target.outerPoint).norm() < 10) {
+                    target = mob
+                    break
+                }
+                if (mob instanceof FreePoint && mob.anchor == target.midPoint && p.subtract(target.midPoint).norm() < 10) {
+                    target = mob
+                    break
+                }
+            }
+        }
+
+
         if (target != this && ['freehand', 'drag'].includes(this.currentMode)) {
             this.startDragging(p, target)
 
@@ -110,7 +124,6 @@ class Paper {
         if (target == this) {
             if (this.currentMode == 'freehand') {
                 let freehand = new Freehand({startPoint: p, endPoint: p.copy()})
-                console.log(freehand)
                 this.mobjectsCurrentlyBeingDrawn['freehand'] = freehand
                 this.add(freehand)
                 addPointerMove(this.view, this.boundPointerMove)
@@ -183,7 +196,6 @@ class Paper {
                 retArr.push(mob.anchor)
             }
         }
-        console.log(retArr)
         return retArr
     }
 
@@ -197,148 +209,6 @@ class Paper {
         }
     }
 
-    // startCreating(e) {
-    //     console.log('starting')
-    //     e.preventDefault()
-    //     let mob = this.targetMobject(e)
-    //     let p = new Vertex(pointerEventPageLocation(e))
-    //     let dp = new FreePoint({anchor: p})
-
-    //     let freehand = new Freehand({startPoint: p, endPoint: p})
-    //     this.mobjectsCurrentlyBeingDrawn['freehand'] = freehand
-    //     this.add(freehand)
-
-    //     if (mob != this) {
-    //         if (['freehand', 'drag'].includes(this.currentMode)) {
-    //             this.startDragging(p, mob)
-    //         } else {
-    //             dp = mob
-    //         }
-    //     }
-
-    //     let dq = new FreePoint({anchor: p.copy()})
-    //     let createdMob = this.createMobject(dp, dq)
-    //     if (createdMob == undefined) { return }
-    //     this.add(dp)
-    //     this.add(dq)
-    //     this.add(createdMob)
-    //     this.constructedObjects.push(dp)
-    //     this.constructedObjects.push(dq)
-    //     this.constructedObjects.push(createdMob)
-    //     this.mobjectsCurrentlyBeingDrawn[this.currentMode] = createdMob
-    //     this.startDragging(p, dq)
-        
-    //     removePointerDown(this.view, this.boundStartCreating)
-    //     addPointerMove(this.view, this.boundCreativeMove)
-    //     addPointerUp(this.view, this.boundEndCreating)
-
-
-
-
-
-
-    //     // if (mob != this) {
-    //     //     if ((mob.draggable && this.currentMode == 'freehand') || this.currentMode == 'drag') {
-    //     //         this.startDragging(p, mob)
-    //     //         return
-    //     //     }
-    //     // } else {
-    //     //     let dp = new FreePoint({anchor: p})
-    //     //     this.add(dp)
-    //     //     this.constructedObjects.push(dp)
-    //     // }
-
-    //     // this.isCreating = true
-    //     // let dq = new FreePoint({anchor: p})
-    //     // this.add(dq)
-    //     // this.constructedObjects.push(dq)
-    //     // this.startDragging(p, dq)
-        
-    //     // e.stopPropagation()
-        
-    //     // this.isCreating = true
-       
-
-        
-    //     // let dp = new FreePoint({anchor: p})
-    //     // let segment = new Segment({startPoint: dp.anchor, endPoint: dq.anchor})
-
-        
-    //     // this.add(freehand)
-    //     // this.add(segment)
-    //     // this.constructedObjects.push(segment)
-
-    //     this.changeMode(this.currentMode)
-
-    // }
-
-
-    // creativeMove(e) {
-    //     console.log('moving')
-    //     e.preventDefault()
-    //     e.stopPropagation()
-
-
-    //     for (let mode of this.modes) {
-    //         if (mode == 'freehand') {
-    //             let p = pointerEventPageLocation(e)
-    //             this.mobjectsCurrentlyBeingDrawn['freehand'].updateFromTip(p)
-    //         } else if (mode != 'drag') {
-    //             console.log('not dragging')
-    //             let targetMobject = this.targetMobject(e)
-    //             if (targetMobject == this) { return }
-    //             this.snap(targetMobject)
-    //         }
-    //     }
-
-    //     for (let mob of this.constructedObjects) { mob.update() }
-    // }
-
-
-    // endCreating(e) {
-        
-    //     e.preventDefault()
-    //     e.stopPropagation()
-
-    //     let p = pointerEventPageLocation(e)
-        
-    //     removePointerMove(this.view, this.boundCreativeMove)
-    //     removePointerUp(this.view, this.boundEndCreating)
-    //     addPointerDown(this.view, this.boundStartCreating)
-
-    //     this.isCreating = false
-
-    //     switch (this.currentMode) {
-    //     case 'point':
-    //         this.constructedObjects.push(this.mobjectsCurrentlyBeingDrawn['point'])
-    //         this.snappablePoints.push(this.mobjectsCurrentlyBeingDrawn['point'])
-    //         break
-    //     case 'segment':
-    //     case 'ray':
-    //     case 'line':
-    //         break
-    //     }
-
-    //     // if (this.currentMode == 'cindy') {
-    //     //     let origin = this.createdMobjects['cindy'].p1
-    //     //     let lrCorner = this.createdMobjects['cindy'].p3
-    //     //     let cindyWidth = lrCorner.x - origin.x
-    //     //     let cindyHeight = lrCorner.y - origin.y
-    //     //     this.createdMobjects['cindy'].view.remove()
-    //     //     this.constructedObjects.push(new CindyCanvas(origin, cindyWidth, cindyHeight))
-    //     // }
-
-    //     for (let mode of this.modes) {
-    //         if (mode == 'drag') { continue }
-    //         if (this.currentMode != mode) {
-    //             this.mobjectsCurrentlyBeingDrawn[mode].hide()
-    //         } else {
-    //             this.mobjectsCurrentlyBeingDrawn[mode].show()
-    //         }
-    //     }
-    //     this.mobjectsCurrentlyBeingDrawn = {}
-        
-    // }
 
     add(mobject) {
         this.view.appendChild(mobject.view)
@@ -387,7 +257,16 @@ let paper = new Paper({view: document.querySelector('#paper')})
 
 
 
-
+let a = new FreePoint({anchor: new Vertex(50, 50)})
+paper.add(a)
+let b = new FreePoint({anchor: new Vertex(150, 200)})
+paper.add(b)
+let c = new DrawnCircle({midPoint: a.anchor, outerPoint: b.anchor})
+paper.add(c)
+console.log(a.anchor, c.midPoint)
+//a.anchor.copyFrom(new Vertex(70,190))
+console.log(a.anchor, c.midPoint)
+//paper.update()
 
 
 

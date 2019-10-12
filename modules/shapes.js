@@ -57,7 +57,7 @@ export class DrawnCircle extends Circle {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
-            outerPoint: new Vertex(10, 0),
+            //outerPoint: new Vertex(10, 0),
             fillOpacity: 0
         })
         this.setAttributes({
@@ -70,11 +70,15 @@ export class DrawnCircle extends Circle {
     update() {
         let innie = this.midPoint
         let outie = this.outerPoint
+        console.log(innie, outie)
         if (outie == undefined) { return }
         this._radius = innie.subtract(outie).norm()
         this.updateBezierPoints()
-        console
+        this.transform.e = innie.x
+        this.transform.f = innie.y
+
         super.update()
+        console.log(this.transform)
 
     }
 }
