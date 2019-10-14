@@ -61,20 +61,18 @@ class Paper {
     changeMode(newMode) {
         this.currentMode = newMode
         if (!this.isCreating) { return }
-        for (let mob of Object.values(this.newConstructions)) {
-            mob.hide()
-        }
+        for (let mob of Object.values(this.newConstructions)) { mob.hide() }
+        for (let point of this.newPoints) { point.hide() }
+        try { this.newFreehand.hide() } catch { }
+
         switch (this.currentMode) {
         case 'freehand':
-            this.newPoints[0].hide()
-            this.newPoints[1].hide()
             this.newFreehand.show()
             break
 
         case 'segment':
             this.newPoints[0].show()
-            this.newPoints[1].show()
-            this.newFreehand.hide()
+            try { this.newPoints[1].show() } catch { }
             this.newConstructions['segment'].show()
             break
         }
@@ -143,6 +141,7 @@ class Paper {
         let target = this.targetMobject(e)
         let p = new Vertex(pointerEventPageLocation(e))
 
+        if (target != this && !this.isCreating) { this.currentMode = 'drag' }
         this.handlePointerMove(target, p)
     }
 
@@ -198,22 +197,42 @@ class Paper {
 
     handlePointerDownOnFreePoint(target, p) {
         console.log('handling pointer down on freepoint', target)
-        switch (this.currentMode) {
-        case 'freehand':
-        case 'drag':
+        if (this.currentMode == 'freehand') { this.currentMode = 'drag' }
+        if (this.currentMode == 'drag') {
             this.draggedPoint = target
-            this.currentMode = 'drag'
-            break
-        case 'segment':
+            return
+        }
 
-            break
-        }        
+        // else: create something
+        let fp1 = target
+        let fp2 = new FreePoint({anchor: p})
+        let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        // more geometric objects to follow
+        this.add(fp2)
+        this.add(s)
+
+        this.newPoints = [fp2]
+        this.newConstructions['segment'] = s
+
+        for (let mob of Object.values(this.newConstructions)) {
+            mob.hide()
+        }
+        for (let point of Object.values(this.newPoints)) {
+            point.hide()
+        }
+
+        // show the relevant objects
+        this.changeMode(this.currentMode)
+
+        this.draggedPoint = fp2
+        console.log('creating on!')
+        this.isCreating = true
     }
 
     handlePointerMove(target, p) {
         console.log('handling pointer move')
         this.draggedPoint.anchor.copyFrom(p)
-        this.newFreehand.updateFromTip(p)
+        try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
         this.changeMode(this.currentMode)
     }
@@ -222,24 +241,40 @@ class Paper {
     handlePointerUp(target, p) {
         console.log('handling pointer up')
         this.draggedPoint = undefined
+        this.isCreating = false
         console.log(this.currentMode)
+        for (let mob of Object.values(this.newConstructions)) {
+            mob.view.remove()
+        }
         switch (this.currentMode) {
         case 'freehand':
             this.freehands.push(this.newFreehand)
-            this.newFreehand = undefined
-            this.newPoints[0].view.remove()
-            this.newPoints[1].view.remove()
-            this.newPoints = []
-            for (let mob of Object.values(this.newConstructions)) {
-                mob.view.remove()
-            }
-            this.newConstructions = {}
+            for (let point of this.newPoints) { point.view.remove() }
             break
         case 'segment':
+            let fp1 = this.newPoints[0]
+            if (!this.freePoints.includes(fp1)) {
+                this.freePoints.push(fp1)
+                this.add(fp1)
+            }
+            let fp2 = this.newPoints[1]
+            if (fp2 != undefined) {
+                if (!this.freePoints.includes(fp2)) {
+                    this.freePoints.push(fp2)
+                    this.add(fp2)
+                }
+            }
+            let s = this.newConstructions['segment']
+            this.constructions.push(s)
+            this.add(s)
         case 'drag':
             this.currentMode = 'freehand'
             break
+
         }
+        this.newFreehand = undefined
+        this.newPoints = []
+        this.newConstructions = {}
         this.update()
     }
 
