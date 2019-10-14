@@ -101,13 +101,12 @@ class Paper {
                 return tm
             }
         }
-        
-        try {
+        tm = e.target.parentNode.mobject
+        if (tm != undefined) {
             // maybe the event got detected by a point, but by its path
-            tm = e.target.parentNode.mobject
             console.log('event on path, target is ', tm)
             return tm
-        } catch {
+        } else {
             // paper or Cindy canvas
             tm = e.target.mobject
             console.log('should be paper or Cindy canvas: ', e, tm)
@@ -184,6 +183,9 @@ class Paper {
 
         for (let mob of Object.values(this.newConstructions)) {
             mob.hide()
+        }
+        for (let point of Object.values(this.newPoints)) {
+            point.hide()
         }
 
         // show the relevant objects
