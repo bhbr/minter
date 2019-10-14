@@ -66,17 +66,16 @@ export class FreePoint extends Circle {
 
 export class DrawnRectangle extends MGroup {
     
-    constructor(p) {
-        super()
-        this.p1 = new Vertex(p)
-        this.p2 = new Vertex(p)
-        this.p3 = new Vertex(p)
-        this.p4 = new Vertex(p)
-        this.startPoint = new Vertex(p)
-        this.top = new Segment([p, p])
-        this.bottom = new Segment([p, p])
-        this.left = new Segment([p, p])
-        this.right = new Segment([p, p])
+    constructor(argsDict) {
+        super(argsDict)
+        this.p1 = this.startPoint
+        this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
+        this.p3 = this.endPoint
+        this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
+        this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
+        this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
+        this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
+        this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
         this.top.strokeColor = rgb(1, 1, 1)
         this.bottom.strokeColor = rgb(1, 1, 1)
         this.left.strokeColor = rgb(1, 1, 1)
@@ -86,25 +85,17 @@ export class DrawnRectangle extends MGroup {
         this.add(this.left)
         this.add(this.right)
     }
-    
-    update(q) {
-        let xMin = Math.min(this.startPoint.x, q.x)
-        let xMax = Math.max(this.startPoint.x, q.x)
-        let yMin = Math.min(this.startPoint.y, q.y)
-        let yMax = Math.max(this.startPoint.y, q.y)
-        this.p1.x = xMin
-        this.p1.y = yMin
-        this.p2.x = xMax
-        this.p2.y = yMin
-        this.p3.x = xMax
-        this.p3.y = yMax
-        this.p4.x = xMin
-        this.p4.y = yMax
-        this.top.vertices = [this.p1, this.p2]
-        this.bottom.vertices = [this.p3, this.p4]
-        this.left.vertices = [this.p1, this.p4]
-        this.right.vertices = [this.p2, this.p3]
+
+
+    update(argsDict) {
+        super.update(argsDict)
+        this.p2.x = this.endPoint.x
+        this.p2.y = this.startPoint.y
+        this.p4.x = this.startPoint.x
+        this.p4.y = this.endPoint.y
+        this.updateView()
     }
+    
 }
 
 

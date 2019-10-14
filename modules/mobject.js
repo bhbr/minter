@@ -166,7 +166,7 @@ export class Mobject {
         if (this._anchor == undefined) { this._anchor = newValue }
         else { this._anchor.copyFrom(newValue) }
         this.transform.centerAt(newValue)
-        this.update()
+        //this.update()
     }
 
 

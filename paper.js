@@ -3,7 +3,7 @@ import { Vertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, DrawnCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { Freehand, FreePoint } from './creating.js'
+import { Freehand, FreePoint, DrawnRectangle, CindyCanvas } from './creating.js'
 
 
 class Paper {
@@ -14,7 +14,7 @@ class Paper {
         this.useCapture = true
         this.isCreating = false
         this.draggedPoint = undefined
-        this.constructionModes = ['segment']
+        this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
         this.currentMode = 'freehand'
         this.colorPalette = {
             'black': rgb(0, 0, 0),
@@ -71,9 +71,15 @@ class Paper {
             break
 
         case 'segment':
+        case 'ray':
+        case 'line':
+        case 'circle':
             this.newPoints[0].show()
             try { this.newPoints[1].show() } catch { }
-            this.newConstructions['segment'].show()
+            this.newConstructions[this.currentMode].show()
+            break
+        case 'cindy':
+            this.newConstructions['cindy'].show()
             break
         }
     }
@@ -170,15 +176,27 @@ class Paper {
         let fp2 = new FreePoint({anchor: p.copy()})
         let fh = new Freehand({anchor: Vertex.origin()})
         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor})
+        let cindyRect = new DrawnRectangle({startPoint: fp1.anchor, endPoint: fp2.anchor})
         // more geometric objects to follow
         this.add(fp1)
         this.add(fp2)
         this.add(fh)
         this.add(s)
+        this.add(r)
+        this.add(l)
+        this.add(c)
+        this.add(cindyRect)
 
         this.newPoints = [fp1, fp2]
         this.newFreehand = fh
         this.newConstructions['segment'] = s
+        this.newConstructions['ray'] = r
+        this.newConstructions['line'] = l
+        this.newConstructions['circle'] = c
+        this.newConstructions['cindy'] = cindyRect
 
         for (let mob of Object.values(this.newConstructions)) {
             mob.hide()
@@ -207,12 +225,21 @@ class Paper {
         let fp1 = target
         let fp2 = new FreePoint({anchor: p})
         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor})
+        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor})
         // more geometric objects to follow
         this.add(fp2)
         this.add(s)
+        this.add(r)
+        this.add(l)
+        this.add(c)
 
         this.newPoints = [fp2]
         this.newConstructions['segment'] = s
+        this.newConstructions['ray'] = r
+        this.newConstructions['line'] = l
+        this.newConstructions['circle'] = c
 
         for (let mob of Object.values(this.newConstructions)) {
             mob.hide()
@@ -252,6 +279,9 @@ class Paper {
             for (let point of this.newPoints) { point.view.remove() }
             break
         case 'segment':
+        case 'ray':
+        case 'line':
+        case 'circle':
             let fp1 = this.newPoints[0]
             if (!this.freePoints.includes(fp1)) {
                 this.freePoints.push(fp1)
@@ -264,12 +294,21 @@ class Paper {
                     this.add(fp2)
                 }
             }
-            let s = this.newConstructions['segment']
-            this.constructions.push(s)
-            this.add(s)
+            for (let mob of Object.values(this.newConstructions)) {
+                this.constructions.push(mob)
+                this.add(mob)
+            }
         case 'drag':
             this.currentMode = 'freehand'
             break
+        case 'cindy':
+            let origin = this.newConstructions['cindy'].p1
+            let lrCorner = this.newConstructions['cindy'].p3
+            let cindyWidth = lrCorner.x - origin.x
+            let cindyHeight = lrCorner.y - origin.y
+            this.newConstructions['cindy'].view.remove()
+            console.log(origin, cindyWidth, cindyHeight)
+            this.newConstructions['cindy'] = new CindyCanvas(origin, cindyWidth, cindyHeight)
 
         }
         this.newFreehand = undefined
