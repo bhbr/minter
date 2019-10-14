@@ -67,7 +67,6 @@ export class Mobject {
 
     globalVertices() {
         let returnValue = this.globalTransform().appliedTo(this.vertices)
-        //console.log(this.vertices, this.globalTransform(), returnValue)
         if (returnValue == undefined) { return [] }
         else { return returnValue }
     }
@@ -226,6 +225,9 @@ export class Mobject {
         this.touchStart = new Vertex(pointerEventPageLocation(e))
     }
            
+    closeTo(otherMobject) {
+        return (this.anchor.subtract(otherMobject.anchor).norm() < 10)
+    }
 }
 
 

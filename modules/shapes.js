@@ -70,7 +70,6 @@ export class DrawnCircle extends Circle {
     update() {
         let innie = this.midPoint
         let outie = this.outerPoint
-        console.log(innie, outie)
         if (outie == undefined) { return }
         this._radius = innie.subtract(outie).norm()
         this.updateBezierPoints()
@@ -78,7 +77,6 @@ export class DrawnCircle extends Circle {
         this.transform.f = innie.y
 
         super.update()
-        console.log(this.transform)
 
     }
 }
