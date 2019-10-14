@@ -72,8 +72,8 @@ class Paper {
             break
 
         case 'segment':
-            fp1.show()
-            fp2.show()
+            this.newPoints[0].show()
+            this.newPoints[1].show()
             this.newFreehand.hide()
             this.newConstructions['segment'].show()
             break
@@ -191,7 +191,8 @@ class Paper {
         // show the relevant objects
         this.changeMode(this.currentMode)
 
-
+        this.draggedPoint = fp2
+        this.isCreating = true
 
     }
 
@@ -211,18 +212,10 @@ class Paper {
 
     handlePointerMove(target, p) {
         console.log('handling pointer move')
-        switch (this.currentMode) {
-        case 'freehand':
-            this.newFreehand.updateFromTip(p)
-            // the constructions (old and new) should self-update
-            break
-        case 'drag':
-            this.draggedPoint.anchor.copyFrom(p)
-        case 'segment':
-            // shouldn't happen
-            break
-        }
+        this.draggedPoint.anchor.copyFrom(p)
+        this.newFreehand.updateFromTip(p)
         this.update()
+        this.changeMode(this.currentMode)
     }
 
 
