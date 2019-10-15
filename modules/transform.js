@@ -36,6 +36,8 @@ export class Vertex extends Array {
     norm2() { return this.x**2 + this.y**2 }
     norm() { return Math.sqrt(this.norm2()) }
 
+    closeTo(otherVertex) { return (this.subtract(otherVertex).norm() < 1) }
+
     copyFrom(otherVertex) {
         this.x = otherVertex.x
         this.y = otherVertex.y

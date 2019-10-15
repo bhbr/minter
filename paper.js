@@ -80,7 +80,7 @@ class Paper {
         }
         for (let mob of Object.values(this.newConstructions)) { mob.hide() }
         for (let point of this.newPoints) { point.hide() }
-        try { this.newFreehand.hide() } catch { }
+        if (this.newFreehand != undefined) { this.newFreehand.hide() }
 
         switch (this.currentMode) {
         case 'freehand':
@@ -277,7 +277,6 @@ class Paper {
 
     handlePointerMove(target, p) {
         this.draggedMobject.anchor.copyFrom(p)
-        console.log('handling move of', this.draggedMobject)
         this.snap(this.draggedMobject)
         try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
@@ -299,7 +298,6 @@ class Paper {
 
     handlePointerUp(target, p) {
         this.draggedMobject = undefined
-        this.isCreating = false
         for (let mob of Object.values(this.newConstructions)) {
             mob.view.remove()
         }
@@ -312,22 +310,55 @@ class Paper {
         case 'ray':
         case 'line':
         case 'circle':
+            let newMob = this.newConstructions[this.currentMode]
+            console.log(newMob)
             let fp1 = this.newPoints[0]
-            if (!this.freePoints.includes(fp1)) {
-                this.freePoints.push(fp1)
-                this.add(fp1)
-            }
             let fp2 = this.newPoints[1]
-            if (fp2 != undefined) {
-                if (!this.freePoints.includes(fp2)) {
-                    this.freePoints.push(fp2)
-                    this.add(fp2)
+
+            function replaceWithSnappedPoint(fp, newMob, freePoints, paper) {
+                let snappedFP = undefined
+                for (let point of freePoints) {
+                    if (point.anchor.subtract(fp.anchor).norm() < 1) {
+                        snappedFP = point
+                        break
+                    }
                 }
+                if (snappedFP == undefined) { return }
+
+                try {
+                if (newMob.startPoint.subtract(fp.anchor).norm() < 1) { newMob.startPoint = snappedFP.anchor }
+                } catch {}
+                try {
+                if (newMob.endPoint.subtract(fp.anchor).norm() < 1)  {
+                    newMob.endPoint = snappedFP.anchor
+                }
+                } catch {}
+                try {
+                if (newMob.midPoint.subtract(fp.anchor).norm() < 1)  { newMob.midPoint = snappedFP.anchor }
+                } catch {}
+                try {
+                    if (newMob.outerPoint.subtract(fp.anchor).norm() < 1)  { newMob.outerPoint = snappedFP.anchor }
+                } catch {}
+                fp.view.remove()
+                paper.add(snappedFP)
             }
-            for (let mob of Object.values(this.newConstructions)) {
-                this.constructions.push(mob)
-                this.add(mob)
+
+            if (this.isCreating) {
+                if (fp1 != undefined) { replaceWithSnappedPoint(fp1, newMob, this.freePoints, this) }
+                if (fp2 != undefined) { replaceWithSnappedPoint(fp2, newMob, this.freePoints, this) }
             }
+            //}
+
+
+            // ??? I thought only for the current mode
+            // for (let mob of Object.values(this.newConstructions)) {
+            //     this.constructions.push(mob)
+            //     this.add(mob)
+            // }
+            this.constructions.push(newMob)
+            this.add(newMob)
+            console.log('just added:', newMob)
+
         case 'drag':
             this.currentMode = 'freehand'
             break
@@ -340,6 +371,8 @@ class Paper {
             this.constructions.push(new CindyCanvas(origin, cindyWidth, cindyHeight))
 
         }
+
+        this.isCreating = false
         this.newFreehand = undefined
         this.newPoints = []
         this.newConstructions = {}
