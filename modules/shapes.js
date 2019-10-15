@@ -57,11 +57,11 @@ export class DrawnCircle extends Circle {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
+            strokeColor: rgb(1, 1, 1),
             //outerPoint: new Vertex(10, 0),
             fillOpacity: 0
         })
         this.setAttributes({
-            strokeColor: rgb(1, 1, 1),
             strokeWidth: 1
         })
         this.update()

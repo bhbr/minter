@@ -116,9 +116,9 @@ export class Mobject {
         this.updateView()
     }
 
-    get strokeColor() { return this.view.stroke }
+    get strokeColor() { return this.view.style.stroke }
     set strokeColor(newValue) {
-        this.view.stroke = newValue
+        this.view.style.stroke = newValue
         if (this.children == undefined) { return }
         for (let submob of this.children || []) {
             submob.strokeColor = newValue

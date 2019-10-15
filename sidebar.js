@@ -234,7 +234,17 @@ class ColorChangeButton extends SidebarButton {
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
         this.text.view.setAttribute('font-size', '12')
-        this.changeMode('freehand')
+        this.changeColor(this.fillColor)
+    }
+
+    changeColor(newColor) {
+        console.log('changing mode')
+        try {
+            webkit.messageHandlers.changeColor.postMessage({color: newColor});
+        } catch {
+            paper = document.querySelector('#paper').mobject
+            paper.changeColor(newColor)
+        }
     }
 }
 

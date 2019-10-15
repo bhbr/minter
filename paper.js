@@ -56,10 +56,19 @@ class Paper {
 
     changeColor(newColor) {
         this.currentColor = newColor
-        for (let [key, mob] of this.mobjectsCurrentlyBeingDrawn.entries()) {
+        for (let mob of Object.values(this.newConstructions)) {
             mob.strokeColor = this.currentColor
             mob.fillColor = this.currentColor
         }
+        for (let mob of Object.values(this.newPoints)) {
+            mob.strokeColor = this.currentColor
+            mob.fillColor = this.currentColor
+        }
+        try {
+            this.newFreehand.strokeColor = this.currentColor
+            this.newFreehand.fillColor = this.currentColor
+        } catch { }
+
     }
 
     changeMode(newMode) {
@@ -193,13 +202,13 @@ class Paper {
         }
         // start a new construction from nowhere
         // including a freehand drawing)
-        let fp1 = new FreePoint({anchor: p})
-        let fp2 = new FreePoint({anchor: p.copy()})
-        let fh = new Freehand({anchor: Vertex.origin()})
-        let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor})
+        let fp1 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let fp2 = new FreePoint({anchor: p.copy(), strokeColor: this.currentColor, fillColor: this.currentColor})
+        let fh = new Freehand({anchor: Vertex.origin(), strokeColor: this.currentColor, fillColor: this.currentColor})
+        let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
         let cindyRect = new DrawnRectangle({startPoint: fp1.anchor, endPoint: fp2.anchor})
         // more geometric objects to follow
         this.add(fp1)
@@ -243,11 +252,11 @@ class Paper {
 
         // else: create something
         let fp1 = target
-        let fp2 = new FreePoint({anchor: p})
-        let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor})
-        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor})
+        let fp2 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+        let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
         // more geometric objects to follow
         this.add(fp2)
         this.add(s)
@@ -433,17 +442,6 @@ class Paper {
 let paper = new Paper({view: document.querySelector('#paper')})
 
 
-
-
-let a = new FreePoint({anchor: new Vertex(50, 50)})
-paper.add(a)
-paper.freePoints.push(a)
-let b = new FreePoint({anchor: new Vertex(150, 200)})
-paper.add(b)
-paper.freePoints.push(b)
-let c = new DrawnCircle({midPoint: a.anchor, outerPoint: b.anchor})
-paper.add(c)
-paper.constructions.push(c)
 
 
 
