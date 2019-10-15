@@ -13,7 +13,7 @@ class Paper {
         this.view.mobject = this
         this.useCapture = true
         this.isCreating = false
-        this.draggedPoint = undefined
+        this.draggedMobject = undefined
         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
         this.currentMode = 'freehand'
         this.colorPalette = {
@@ -59,10 +59,14 @@ class Paper {
     }
 
     changeMode(newMode) {
-        console.log('constructions:', this.constructions)
         this.currentMode = newMode
-        if (!this.isCreating) { return }
-        console.log('still here')
+        if (!this.isCreating) {
+            for (let mob of this.constructions) {
+            console.log('taking event control from', mob)
+                mob.view.style['pointer-events'] = 'none'
+            }
+            return
+        }
         for (let mob of Object.values(this.newConstructions)) { mob.hide() }
         for (let point of this.newPoints) { point.hide() }
         try { this.newFreehand.hide() } catch { }
@@ -103,30 +107,32 @@ class Paper {
     // (event detection completely handled by paper except maybe for Cindy)
         //if (!(e.target.mobject instanceof CindyCanvas || e.target.mobject instanceof FreePoint)) {
         let tm = undefined
-        if (this.draggedPoint != undefined) {
-            tm = this.draggedPoint
-            console.log('found a dragged point: ', tm)
+        if (this.draggedMobject != undefined) {
+            tm = this.draggedMobject
             return tm
         }
         let p = new Vertex(pointerEventPageLocation(e))
-        console.log(p)
-        console.log(this.freePoints)
         for (let point of this.freePoints) {
             if (point.anchor.subtract(p).norm() < 10) {
                 tm = point
-                console.log('found a close point:', tm)
                 return tm
             }
         }
         tm = e.target.parentNode.mobject
         if (tm != undefined) {
             // maybe the event got detected by a point, but by its path
-            console.log('event on path, target is ', tm)
+            if (tm instanceof DrawnCircle) {
+                // for (let point of this.freePoints) {
+                //     if (point.anchor == tm.midPoint && p.subtract(point.anchor).norm() < 10) {
+                //         return point
+                //     }
+                // }
+                return this // clicked inside a circle, but not on its center
+            }
             return tm
         } else {
             // paper or Cindy canvas
             tm = e.target.mobject
-            console.log('should be paper or Cindy canvas: ', e, tm)
             return tm
         }
     }
@@ -136,7 +142,7 @@ class Paper {
         e.stopPropagation()
         let target = this.targetMobject(e)
         let p = new Vertex(pointerEventPageLocation(e))
-
+        console.log(target)
         switch (target.constructor.name) {
         case 'Paper':
             this.handlePointerDownOnPaper(target, p)
@@ -184,7 +190,6 @@ class Paper {
     handlePointerDownOnPaper(target, p) {
         // start a new construction from nowhere
         // including a freehand drawing)
-        console.log('handling pointer down on paper')
         let fp1 = new FreePoint({anchor: p})
         let fp2 = new FreePoint({anchor: p.copy()})
         let fh = new Freehand({anchor: Vertex.origin()})
@@ -221,16 +226,15 @@ class Paper {
         // show the relevant objects
         this.changeMode(this.currentMode)
 
-        this.draggedPoint = fp2
+        this.draggedMobject = fp2
         this.isCreating = true
 
     }
 
     handlePointerDownOnFreePoint(target, p) {
-        console.log('handling pointer down on freepoint', target)
         if (this.currentMode == 'freehand') { this.currentMode = 'drag' }
         if (this.currentMode == 'drag') {
-            this.draggedPoint = target
+            this.draggedMobject = target
             return
         }
 
@@ -264,14 +268,12 @@ class Paper {
         // show the relevant objects
         this.changeMode(this.currentMode)
 
-        this.draggedPoint = fp2
-        console.log('creating on!')
+        this.draggedMobject = fp2
         this.isCreating = true
     }
 
     handlePointerMove(target, p) {
-        console.log('handling pointer move')
-        this.draggedPoint.anchor.copyFrom(p)
+        this.draggedMobject.anchor.copyFrom(p)
         try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
         this.changeMode(this.currentMode)
@@ -279,10 +281,8 @@ class Paper {
 
 
     handlePointerUp(target, p) {
-        console.log('handling pointer up')
-        this.draggedPoint = undefined
+        this.draggedMobject = undefined
         this.isCreating = false
-        console.log(this.currentMode)
         for (let mob of Object.values(this.newConstructions)) {
             mob.view.remove()
         }
@@ -320,7 +320,6 @@ class Paper {
             let cindyWidth = lrCorner.x - origin.x
             let cindyHeight = lrCorner.y - origin.y
             this.newConstructions['cindy'].view.remove()
-            console.log(origin, cindyWidth, cindyHeight)
             this.constructions.push(new CindyCanvas(origin, cindyWidth, cindyHeight))
 
         }

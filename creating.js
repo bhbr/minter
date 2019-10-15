@@ -126,6 +126,7 @@ export class CindyCanvas {
         this.boundDragEnd = this.dragEnd.bind(this)
 
         this.draggable = false
+        this.view.style['pointer-events'] = 'auto'
         document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
         document.body.appendChild(script)
 
@@ -154,7 +155,6 @@ export class CindyCanvas {
     set draggable(newValue) {
         this._draggable = newValue
         if (this._draggable) {
-            log('setting draggable')
             let useCapture = true
             addPointerDown(this.view, this.boundDragStart, useCapture)
         } else {
@@ -188,10 +188,6 @@ export class CindyCanvas {
         addPointerMove(this.view, this.boundDrag, useCapture)
         addPointerUp(this.view, this.boundDragEnd)
         
-        log(e.clientX)
-        log(e.clientY)
-        log(this.dragStartX)
-        log(this.dragStartY)
     }
 
     drag(e) {
@@ -201,8 +197,6 @@ export class CindyCanvas {
         let newY = e.clientY
         this.view.style.left = (newX - this.dragStartX) + 'px'
         this.view.style.top = (newY - this.dragStartY) + 'px'
-        log(newX)
-        log(newY)
     }
 
     dragEnd(e) {
