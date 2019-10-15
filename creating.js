@@ -60,8 +60,8 @@ export class FreePoint extends Circle {
         this.draggable = true
     }
 
-    update() {
-        super.update()
+    update(argsDict) {
+        super.update(argsDict)
     }
 }
 
@@ -158,7 +158,7 @@ export class CindyCanvas {
         return ret
     }
     
-    update() {
+    update(argsDict) {
         
     }
     

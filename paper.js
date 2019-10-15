@@ -330,7 +330,9 @@ class Paper {
                 let snappedFP = undefined
                 for (let point of freePoints) {
                     if (point.anchor.subtract(fp.anchor).norm() < 1) {
+                        let color = fp.fillColor
                         snappedFP = point
+                        snappedFP.update({strokeColor: color, fillColor: color})
                         break
                     }
                 }
@@ -447,5 +449,10 @@ class Paper {
 
 
 let paper = new Paper({view: document.querySelector('#paper')})
+
+let a = new FreePoint({anchor: new Vertex(50, 50)})
+let red = paper.colorPalette['red']
+a.update({strokeColor: red, fillColor: red})
+paper.add(a)
 
 
