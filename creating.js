@@ -60,6 +60,9 @@ export class FreePoint extends Circle {
         this.draggable = true
     }
 
+    update() {
+        super.update()
+    }
 }
 
 

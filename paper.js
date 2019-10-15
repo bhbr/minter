@@ -137,9 +137,7 @@ class Paper {
         e.preventDefault()
         e.stopPropagation()
         let target = this.targetMobject(e)
-        console.log('pointer down', target)
         let p = new Vertex(pointerEventPageLocation(e))
-        console.log(target)
         switch (target.constructor.name) {
         case 'Paper':
             this.handlePointerDownOnPaper(target, p)
@@ -152,12 +150,9 @@ class Paper {
         }
         this.update()
 
-        //if (this.currentMode != 'drag') {
-            console.log('adding pointerMove')
-            addPointerMove(this.view, this.boundPointerMove)
-            addPointerUp(this.view, this.boundPointerUp)
-            removePointerDown(this.view, this.boundPointerDown)
-        //}
+        addPointerMove(this.view, this.boundPointerMove)
+        addPointerUp(this.view, this.boundPointerUp)
+        removePointerDown(this.view, this.boundPointerDown)
     }
 
     pointerMove(e) {
@@ -167,6 +162,7 @@ class Paper {
         let p = new Vertex(pointerEventPageLocation(e))
 
         if (target != this && !this.isCreating) { this.currentMode = 'drag' }
+        console.log(p, target)
         this.handlePointerMove(target, p)
     }
 
@@ -189,7 +185,6 @@ class Paper {
 
     handlePointerDownOnPaper(target, p) {
         if (this.currentMode == 'drag') {
-            console.log('target is ', target)
             for (let mob of this.constructions) {
                 if (mob instanceof CindyCanvas) { target = mob }
             }
@@ -240,10 +235,10 @@ class Paper {
     }
 
     handlePointerDownOnFreePoint(target, p) {
-        console.log('handlePointerDownOnFreePoint')
         if (this.currentMode == 'freehand') {
             this.currentMode = 'drag'
-            //return
+            this.draggedMobject = target
+            return
         }
 
         // else: create something
@@ -281,10 +276,10 @@ class Paper {
     }
 
     handlePointerMove(target, p) {
-        console.log('handlePointerMove')
         this.draggedMobject.anchor.copyFrom(p)
         try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
+
         this.changeMode(this.currentMode)
     }
 
@@ -359,12 +354,10 @@ class Paper {
 
 
     startDragging(p, mob) {
-        console.log('we are dragging:', mob)
         let oldX = parseInt(mob.view.style.left.replace('px', ''))
         let oldY = parseInt(mob.view.style.top.replace('px', ''))
         let q = new Vertex(oldX, oldY)
         this.mobOffsetFromCursor = q.subtract(p)
-        console.log('offset:', mob.view.style)
         
         addPointerMove(this.view, this.boundDrag)
         addPointerUp(this.view, this.boundEndDragging)
@@ -376,10 +369,8 @@ class Paper {
         for (let mob2 of this.constructions) {
             if (mob2 instanceof CindyCanvas) {mob = mob2 }
         }
-        console.log('dragging', mob)
         mob.view.style.left = (dragPoint.x + this.mobOffsetFromCursor.x) + 'px'
         mob.view.style.top = (dragPoint.y + this.mobOffsetFromCursor.y) + 'px'
-        console.log('style.left:', mob.view.style.left)
     }
 
     endDragging(e) {
