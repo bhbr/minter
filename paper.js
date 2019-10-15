@@ -252,6 +252,7 @@ class Paper {
 
         // else: create something
         let fp1 = target
+        fp1.update({strokeColor: this.currentColor, fillColor: this.currentColor})
         let fp2 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
         let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
@@ -450,9 +451,5 @@ class Paper {
 
 let paper = new Paper({view: document.querySelector('#paper')})
 
-let a = new FreePoint({anchor: new Vertex(50, 50)})
-let red = paper.colorPalette['red']
-a.update({strokeColor: red, fillColor: red})
-paper.add(a)
 
 
