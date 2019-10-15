@@ -277,10 +277,23 @@ class Paper {
 
     handlePointerMove(target, p) {
         this.draggedMobject.anchor.copyFrom(p)
+        console.log('handling move of', this.draggedMobject)
+        this.snap(this.draggedMobject)
         try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
 
         this.changeMode(this.currentMode)
+    }
+
+    snap(mobject) {
+        if (!(mobject instanceof FreePoint)) { return }
+        for (let otherPoint of this.freePoints) {
+            if (otherPoint == mobject) { continue }
+            if (otherPoint.anchor.subtract(mobject.anchor).norm() < 10) {
+                mobject.anchor.copyFrom(otherPoint.anchor)
+                return
+            }
+        }
     }
 
 
