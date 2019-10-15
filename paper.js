@@ -287,7 +287,9 @@ class Paper {
     handlePointerMove(target, p) {
         this.draggedMobject.anchor.copyFrom(p)
         this.snap(this.draggedMobject)
-        try { this.newFreehand.updateFromTip(p) } catch { }
+        if (this.newFreehand != undefined) {
+            this.newFreehand.updateFromTip(p)
+        }
         this.update()
 
         this.changeMode(this.currentMode)
@@ -332,7 +334,7 @@ class Paper {
                         break
                     }
                 }
-                if (snappedFP == undefined) { return }
+                if (snappedFP == undefined) { return fp }
 
                 try {
                 if (newMob.startPoint.subtract(fp.anchor).norm() < 1) { newMob.startPoint = snappedFP.anchor }
@@ -350,20 +352,25 @@ class Paper {
                 } catch {}
                 fp.view.remove()
                 paper.add(snappedFP)
+                return snappedFP
             }
 
             if (this.isCreating) {
-                if (fp1 != undefined) { replaceWithSnappedPoint(fp1, newMob, this.freePoints, this) }
-                if (fp2 != undefined) { replaceWithSnappedPoint(fp2, newMob, this.freePoints, this) }
+                if (fp1 != undefined) {
+                    fp1 = replaceWithSnappedPoint(fp1, newMob, this.freePoints, this)
+                    if (!this.freePoints.includes(fp1)) {
+                        this.freePoints.push(fp1)
+                    }
+                }
+                if (fp2 != undefined) {
+                    fp2 = replaceWithSnappedPoint(fp2, newMob, this.freePoints, this)
+                    if (!this.freePoints.includes(fp2)) {
+                        this.freePoints.push(fp2)
+                    }
+                }
             }
-            //}
+            
 
-
-            // ??? I thought only for the current mode
-            // for (let mob of Object.values(this.newConstructions)) {
-            //     this.constructions.push(mob)
-            //     this.add(mob)
-            // }
             this.constructions.push(newMob)
             this.add(newMob)
             console.log('just added:', newMob)
@@ -440,9 +447,5 @@ class Paper {
 
 
 let paper = new Paper({view: document.querySelector('#paper')})
-
-
-
-
 
 
