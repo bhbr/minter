@@ -2,20 +2,14 @@ import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPo
 import { Vertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import { Line } from './modules/arrows.js'
+import {Segment } from './modules/arrows.js'
 
-class Freehand extends MGroup {
-    
-    constructor(paper, p) {
-        super(paper)
-        this.update(p, 'freehand')
-        this.strokeColor = paper.color
-    }
+export class Freehand extends MGroup {
     
     updateWithPoints(q) {
         let nbDrawnPoints = this.submobjects.length
         if (nbDrawnPoints > 0) {
-            p = this.submobjects[nbDrawnPoints - 1].midPoint
+            p = this.children[nbDrawnPoints - 1].midPoint
         }
         let pointDistance = 10
         let distance = ((p.x - q.x)**2 + (p.y - q.y)**2)**0.5
@@ -24,175 +18,67 @@ class Freehand extends MGroup {
             let x = p.x + step * unitVector.x + 0.5 * Math.random()
             let y = p.y + step * unitVector.y + 0.5 * Math.random()
             let newPoint = new Vertex([x, y])
-            let c = new Circle(2)
+            let c = new Circle({radius: 2})
             c.fillColor = this.strokeColor
             c.midPoint = new Vertex(newPoint)
             this.add(c)
         }
         let t = Math.random()
         let r = (1 - t) * 0.5 + t * 0.75
-        let c = new Circle(r)
-        c.midPoint = new Vertex(q)
+        let c = new Circle({radius: r, midPoint: new Vertex(q)})
         this.add(c)
     }
     
     updateWithLines(q) {
 
-        let nbDrawnPoints = this.submobjects.length
+        let nbDrawnPoints = this.children.length
         let p = null
         if (nbDrawnPoints == 0) {
             p = q
         } else {
-            p = this.submobjects[nbDrawnPoints - 1].endPoint
+            p = this.children[nbDrawnPoints - 1].endPoint
         }
-        let newLine = new Line([p, q])
+        let newLine = new Segment({startPoint: p, endPoint: q})
         newLine.strokeColor = this.strokeColor
         this.add(newLine)
+
     }
     
-    update(q) {
-        //this.strokeColor = paper.colors[paper.color]
+    updateFromTip(q) {
         this.updateWithLines(q)
     }
 }
 
-class DrawnPoint extends Circle {
+export class FreePoint extends Circle {
 
-    constructor(paper, p) {
-        super(5)
-        this.midPoint = p
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            midPoint: Vertex.origin(),
+        })
+        this.radius = 5
+        this.draggable = true
+    }
+
+    update(argsDict) {
+        super.update(argsDict)
     }
 }
 
-class DrawnSegment extends MGroup {
+
+
+export class DrawnRectangle extends MGroup {
     
-    constructor(p, q) {
-        super()
-        if (q == undefined) { q = p }
-        this.startPoint = p
-        this.endPoint = q
-        this.c1 = new DrawnPoint(p)
-        this.c2 = new DrawnPoint(q)
-        this.line = new Line([p, q])
-
-        this.add(this.c1)
-        this.add(this.c2)
-        this.add(this.line)
-
-        this.strokeColor = paper.color
-        this.fillColor = paper.color
-    }
-    
-    update(q) {
-        this.c2.midPoint = q
-        this.line.vertices = [this.line.startPoint, q]
-        this.updateView()
-    }
-}
-
-class DrawnHalfLine extends DrawnSegment {
-
-    constructor(p, q) {
-        super(p, q)
-        this.line.vertices = [this.startPoint, this.farOffEndPoint()]
-
-    }
-
-    farOffEndPoint() {
-        if (this.startPoint == this.endPoint) {
-            return this.endPoint
-        }
-        let farOffX = this.startPoint.x + 100 * (this.endPoint.x - this.startPoint.x)
-        let farOffY = this.startPoint.y + 100 * (this.endPoint.y - this.startPoint.y)
-        return new Vertex(farOffX, farOffY)
-    }
-
-    update(q) {
-        this.endPoint = q
-        this.c2.midPoint = this.endPoint
-        this.line.vertices = [this.startPoint, this.farOffEndPoint()]
-    }
-}
-
-class DrawnFullLine extends DrawnHalfLine {
-
-    constructor(p, q) {
-        super(p, q)
-        this.line.vertices = [this.farOffStartPoint(), this.farOffEndPoint()]
-    }
-
-    farOffStartPoint() {
-        if (this.startPoint == this.endPoint) {
-            return this.startPoint
-        }
-        let farOffX = this.endPoint.x + 100 * (this.startPoint.x - this.endPoint.x)
-        let farOffY = this.endPoint.y + 100 * (this.startPoint.y - this.endPoint.y)
-        return new Vertex(farOffX, farOffY)
-    }
-
-    update(q) {
-        this.endPoint = q
-        this.c2.midPoint = this.endPoint
-        this.line.vertices = [this.farOffStartPoint(), this.farOffEndPoint()]
-    }
-}
-
-class DrawnCircle extends MGroup {
-    
-    constructor(p) {
-        super()
-        this.center = new Vertex(p)
-        this.outer = new Vertex(p)
-        this.radius = 0
-        this.centerPoint = new Circle(5)
-        this.outerPoint = new Circle(5)
-        this.centerPoint.midPoint = this.center
-        this.outerPoint.midPoint = this.outer
-        this.circle = new Circle(this.radius)
-        this.circle.fillOpacity = 0
-        this.circle.strokeWidth = 1
-        this.circle.strokeColor = rgb(0, 0, 0)
-        this.circle.midPoint = this.center
-        this.add(this.centerPoint)
-        this.add(this.outerPoint)
-        this.add(this.circle)
-        this.strokeColor = paper.color
-        this.fillColor = paper.color
-    }
-    
-    update(q) {
-        let r = Math.sqrt((q.x - this.center.x)**2 + (q.y - this.center.y)**2)
-        this.updateRadius(r)
-        this.updateOuter(q)
-    }
-    
-    updateRadius(r) {
-        this.circle.radius = r
-        this.radius = r
-    }
-    
-    updateOuter(q) {
-        this.outer = q
-        this.outerPoint.midPoint = q
-        
-    }
-    
-}
-
-
-class DrawnRectangle extends MGroup {
-    
-    constructor(p) {
-        super()
-        this.p1 = new Vertex(p)
-        this.p2 = new Vertex(p)
-        this.p3 = new Vertex(p)
-        this.p4 = new Vertex(p)
-        this.startPoint = new Vertex(p)
-        this.top = new Line([p, p])
-        this.bottom = new Line([p, p])
-        this.left = new Line([p, p])
-        this.right = new Line([p, p])
+    constructor(argsDict) {
+        super(argsDict)
+        this.p1 = this.startPoint
+        this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
+        this.p3 = this.endPoint
+        this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
+        this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
+        this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
+        this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
+        this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
         this.top.strokeColor = rgb(1, 1, 1)
         this.bottom.strokeColor = rgb(1, 1, 1)
         this.left.strokeColor = rgb(1, 1, 1)
@@ -202,32 +88,23 @@ class DrawnRectangle extends MGroup {
         this.add(this.left)
         this.add(this.right)
     }
-    
-    update(q) {
-        let xMin = Math.min(this.startPoint.x, q.x)
-        let xMax = Math.max(this.startPoint.x, q.x)
-        let yMin = Math.min(this.startPoint.y, q.y)
-        let yMax = Math.max(this.startPoint.y, q.y)
-        this.p1.x = xMin
-        this.p1.y = yMin
-        this.p2.x = xMax
-        this.p2.y = yMin
-        this.p3.x = xMax
-        this.p3.y = yMax
-        this.p4.x = xMin
-        this.p4.y = yMax
-        this.top.vertices = [this.p1, this.p2]
-        this.bottom.vertices = [this.p3, this.p4]
-        this.left.vertices = [this.p1, this.p4]
-        this.right.vertices = [this.p2, this.p3]
+
+
+    update(argsDict) {
+        super.update(argsDict)
+        this.p2.x = this.endPoint.x
+        this.p2.y = this.startPoint.y
+        this.p4.x = this.startPoint.x
+        this.p4.y = this.endPoint.y
+        this.updateView()
     }
+    
 }
 
 
-class CindyCanvas {
+export class CindyCanvas {
     
     constructor(p, width, height) {
-
 
         let script = document.createElement('script')
         script.setAttribute('type', 'text/x-cindyscript')
@@ -240,17 +117,13 @@ class CindyCanvas {
         this.view.style.position = 'absolute'
         this.view.style.left =  p.x + "px"
         this.view.style.top = p.y + "px"
-        
+
         let csView = document.createElement('div')
         let canvasID = 'CSCanvas' + paper.cindyPorts.length
         csView.setAttribute('id', canvasID)
         this.view.appendChild(csView)
-        
-        this.boundDragStart = this.dragStart.bind(this)
-        this.boundDrag = this.drag.bind(this)
-        this.boundDragEnd = this.dragEnd.bind(this)
 
-        this.draggable = false
+        this.view.style['pointer-events'] = 'auto'
         document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
         document.body.appendChild(script)
 
@@ -275,18 +148,6 @@ class CindyCanvas {
         
     }
 
-    get draggable() { return this._draggable }
-    set draggable(newValue) {
-        this._draggable = newValue
-        if (this._draggable) {
-            log('setting draggable')
-            let useCapture = true
-            addPointerDown(this.view, this.boundDragStart, useCapture)
-        } else {
-            removePointerDown(this.view, this.boundDragStart)
-        }
-    }
-
     geometry() {
         let ret = []
         let i = 0
@@ -297,47 +158,11 @@ class CindyCanvas {
         return ret
     }
     
-    update() {
+    update(argsDict) {
         
     }
     
-
-    dragStart(e) {
-        console.log('dragStart of CindyCanvas')
-        e.preventDefault()
-        e.stopPropagation()
-        this.dragStartX = e.clientX - parseInt(this.view.style.left.replace('px', ''))
-        this.dragStartY = e.clientY - parseInt(this.view.style.top.replace('px', ''))
-
-        let useCapture = true
-        removePointerDown(this.view, this.boundDragStart)
-        addPointerMove(this.view, this.boundDrag, useCapture)
-        addPointerUp(this.view, this.boundDragEnd)
-        
-        log(e.clientX)
-        log(e.clientY)
-        log(this.dragStartX)
-        log(this.dragStartY)
-    }
-
-    drag(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        let newX = e.clientX
-        let newY = e.clientY
-        this.view.style.left = (newX - this.dragStartX) + 'px'
-        this.view.style.top = (newY - this.dragStartY) + 'px'
-        log(newX)
-        log(newY)
-    }
-
-    dragEnd(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        removePointerUp(this.view, this.boundDragEnd)
-        removePointerMove(this.view, this.boundDrag)
-        let useCapture = true
-        addPointerDown(this.view, this.boundDragStart, useCapture)
-
-    }
 }
+
+
+

@@ -1,18 +1,21 @@
 import { Vertex } from './transform.js'
 import { Polygon, CurvedShape } from './mobject.js'
+import { rgb } from './helpers.js'
 
 export class Circle extends CurvedShape {
     
-    constructor(radius) {
-        super()
-        this.radius = radius
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            radius: 10,
+            midPoint: Vertex.origin()
+        })
     }
 
     // midPoint is a synonym for anchor
     get midPoint() { return this.anchor }
     set midPoint(newValue) {
-        this.anchor = newValue
-        this.updateView()
+        this.anchor = newValue // updates automatically
     }
 
     updateBezierPoints() {
@@ -44,17 +47,38 @@ export class Circle extends CurvedShape {
     get radius() { return this._radius }
     set radius(newRadius) {
         this._radius = newRadius
-        this.updateView()
+        this.update()
     }
 
-    update(data) {
-        let newRadius = data.radius
-        let newMidPoint = data.midPoint
-        if (newRadius != undefined) { this.radius = newRadius }
-        if (newMidPoint != undefined) { this.midPoint = newMidPoint }
-        super.update(data)
+}
+
+export class DrawnCircle extends Circle {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            strokeColor: rgb(1, 1, 1),
+            //outerPoint: new Vertex(10, 0),
+            fillOpacity: 0
+        })
+        this.setAttributes({
+            strokeWidth: 1
+        })
+        this.update()
     }
 
+    update() {
+        let innie = this.midPoint
+        let outie = this.outerPoint
+        if (outie == undefined) { return }
+        this._radius = innie.subtract(outie).norm()
+        this.updateBezierPoints()
+        this.transform.e = innie.x
+        this.transform.f = innie.y
+
+        super.update()
+
+    }
 }
 
 

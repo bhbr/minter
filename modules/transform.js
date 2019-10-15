@@ -11,8 +11,7 @@ export class Vertex extends Array {
             this.x = x[0]
             this.y = x[1]
         } else if (x instanceof Vertex) {
-            this.x = x.x
-            this.y = x.y
+            throw 'Argument of Vertex constructor is already a Vertex. cannot assign by reference'
         }
     }
 
@@ -20,6 +19,12 @@ export class Vertex extends Array {
         return new Vertex()
         this.x = 0
         this.y = 0
+    }
+
+    static new(...args) {
+        let x = args[0]
+        if (x instanceof Vertex) { return x }
+        else { return new Vertex(...args) }
     }
 
     get x() { return this[0] }
@@ -31,12 +36,20 @@ export class Vertex extends Array {
     norm2() { return this.x**2 + this.y**2 }
     norm() { return Math.sqrt(this.norm2()) }
 
+    closeTo(otherVertex) { return (this.subtract(otherVertex).norm() < 1) }
+
     copyFrom(otherVertex) {
         this.x = otherVertex.x
         this.y = otherVertex.y
     }
 
-    copy() { return this.concat() }
+    update(otherVertex) { this.copyFrom(otherVertex) }
+
+    copy() {
+        let ret = new Vertex()
+        ret.copyFrom(this)
+        return ret
+    }
 
     imageUnder(transform) {
         return transform.appliedTo(this)
@@ -92,9 +105,6 @@ export class Vertex extends Array {
     }
 
 }
-
-
-
 
 
 
@@ -161,7 +171,7 @@ export class Transform {
     set anchor(newValue) {
         this.e = newValue[0]
         this.f = newValue[1]
-        if (this._anchor) {
+        if (this._anchor != undefined) {
             this._anchor.x = this.e
             this._anchor.y = this.f
         } else {
@@ -245,13 +255,11 @@ export class Transform {
         this.anchor = vertex
     }
 
+    recenter() {
+        this.centerAt(this.anchor)
+    }
+
 }
-
-
-
-
-
-
 
 
 

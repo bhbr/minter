@@ -126,3 +126,21 @@ export function logInto(obj, id) {
     //myConsole.scrollTop = console.scrollHeight
     //newLine.scrollIntoView()
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
