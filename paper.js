@@ -11,7 +11,7 @@ class Paper {
     constructor() {
         this.view = document.querySelector('#paper')
         this.view.mobject = this
-        this.useCapture = false
+        this.useCapture = true
         this.isCreating = false
         this.draggedMobject = undefined
         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
