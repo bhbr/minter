@@ -154,8 +154,8 @@ export class CindyCanvas {
     get draggable() { return this._draggable }
     set draggable(newValue) {
         this._draggable = newValue
+        let useCapture = true
         if (this._draggable) {
-            let useCapture = true
             addPointerDown(this.view, this.boundDragStart, useCapture)
         } else {
             removePointerDown(this.view, this.boundDragStart)
@@ -178,6 +178,7 @@ export class CindyCanvas {
     
 
     dragStart(e) {
+        console.log('dragStart')
         e.preventDefault()
         e.stopPropagation()
         this.dragStartX = e.clientX - parseInt(this.view.style.left.replace('px', ''))
@@ -186,7 +187,7 @@ export class CindyCanvas {
         let useCapture = true
         removePointerDown(this.view, this.boundDragStart)
         addPointerMove(this.view, this.boundDrag, useCapture)
-        addPointerUp(this.view, this.boundDragEnd)
+        addPointerUp(this.view, this.boundDragEnd, useCapture)
         
     }
 

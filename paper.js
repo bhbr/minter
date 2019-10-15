@@ -11,7 +11,7 @@ class Paper {
     constructor() {
         this.view = document.querySelector('#paper')
         this.view.mobject = this
-        this.useCapture = true
+        this.useCapture = false
         this.isCreating = false
         this.draggedMobject = undefined
         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
@@ -59,11 +59,13 @@ class Paper {
     }
 
     changeMode(newMode) {
+
         this.currentMode = newMode
         if (!this.isCreating) {
             for (let mob of this.constructions) {
             console.log('taking event control from', mob)
                 mob.view.style['pointer-events'] = 'none'
+                mob.draggable = false
             }
             return
         }
@@ -71,33 +73,30 @@ class Paper {
         for (let point of this.newPoints) { point.hide() }
         try { this.newFreehand.hide() } catch { }
 
-        for (let mob of this.constructions) {
-            console.log('giving event control to', mob)
-            mob.view.style['pointer-events'] = 'auto'
-        }
-
         switch (this.currentMode) {
         case 'freehand':
-            this.newFreehand.show()
+            try { this.newFreehand.show() } catch { }
             break
 
         case 'segment':
         case 'ray':
         case 'line':
         case 'circle':
-            this.newPoints[0].show()
+            try {this.newPoints[0].show() } catch { }
             try { this.newPoints[1].show() } catch { }
-            this.newConstructions[this.currentMode].show()
+            try { this.newConstructions[this.currentMode].show() } catch { }
             break
         case 'cindy':
-            this.newConstructions['cindy'].show()
+            try { this.newConstructions['cindy'].show() } catch { }
             break
         case 'drag':
             // forbid all objects to handle input themselves
             for (let mob of this.constructions) {
             console.log('taking event control from', mob)
                 mob.view.style['pointer-events'] = 'none'
+                mob.draggable = true
             }
+            break
         }
     }
 
@@ -120,16 +119,10 @@ class Paper {
         }
         tm = e.target.parentNode.mobject
         if (tm != undefined) {
-            // maybe the event got detected by a point, but by its path
+            // maybe the event got detected by a point, but through its path
             if (tm instanceof DrawnCircle) {
-                // for (let point of this.freePoints) {
-                //     if (point.anchor == tm.midPoint && p.subtract(point.anchor).norm() < 10) {
-                //         return point
-                //     }
-                // }
                 return this // clicked inside a circle, but not on its center
             }
-            return tm
         } else {
             // paper or Cindy canvas
             tm = e.target.mobject
@@ -141,6 +134,7 @@ class Paper {
         e.preventDefault()
         e.stopPropagation()
         let target = this.targetMobject(e)
+        console.log(target)
         let p = new Vertex(pointerEventPageLocation(e))
         console.log(target)
         switch (target.constructor.name) {
@@ -155,9 +149,9 @@ class Paper {
         }
         this.update()
 
-        addPointerMove(this.view, this.boundPointerMove)
-        addPointerUp(this.view, this.boundPointerUp)
-        removePointerDown(this.view, this.boundPointerDown)
+        addPointerMove(this.view, this.boundPointerMove, this.useCapture)
+        addPointerUp(this.view, this.boundPointerUp, this.useCapture)
+        removePointerDown(this.view, this.boundPointerDown, this.useCapture)
     }
 
     pointerMove(e) {
@@ -178,9 +172,9 @@ class Paper {
 
         this.handlePointerUp(target, p)
 
-        addPointerDown(this.view, this.boundPointerDown)
-        removePointerMove(this.view, this.boundPointerMove)
-        removePointerUp(this.view, this.boundPointerUp)
+        addPointerDown(this.view, this.boundPointerDown, this.useCapture)
+        removePointerMove(this.view, this.boundPointerMove, this.useCapture)
+        removePointerUp(this.view, this.boundPointerUp, this.useCapture)
     }
 
 
@@ -285,6 +279,7 @@ class Paper {
         this.isCreating = false
         for (let mob of Object.values(this.newConstructions)) {
             mob.view.remove()
+            //if (mob instanceof CindyCanvas) { mob.draggable = false }
         }
         switch (this.currentMode) {
         case 'freehand':
@@ -313,6 +308,9 @@ class Paper {
             }
         case 'drag':
             this.currentMode = 'freehand'
+            // for (let mob of Object.values(this.newConstructions)) {
+            //     if (mob instanceof CindyCanvas) { mob.draggable = true }
+            // }
             break
         case 'cindy':
             let origin = this.newConstructions['cindy'].p1
