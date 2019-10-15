@@ -103,7 +103,6 @@ export class CindyCanvas {
     
     constructor(p, width, height) {
 
-
         let script = document.createElement('script')
         script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + paper.cindyPorts.length
@@ -115,17 +114,12 @@ export class CindyCanvas {
         this.view.style.position = 'absolute'
         this.view.style.left =  p.x + "px"
         this.view.style.top = p.y + "px"
-        
+
         let csView = document.createElement('div')
         let canvasID = 'CSCanvas' + paper.cindyPorts.length
         csView.setAttribute('id', canvasID)
         this.view.appendChild(csView)
-        
-        this.boundDragStart = this.dragStart.bind(this)
-        this.boundDrag = this.drag.bind(this)
-        this.boundDragEnd = this.dragEnd.bind(this)
 
-        this.draggable = false
         this.view.style['pointer-events'] = 'auto'
         document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
         document.body.appendChild(script)
@@ -151,17 +145,6 @@ export class CindyCanvas {
         
     }
 
-    get draggable() { return this._draggable }
-    set draggable(newValue) {
-        this._draggable = newValue
-        let useCapture = true
-        if (this._draggable) {
-            addPointerDown(this.view, this.boundDragStart, useCapture)
-        } else {
-            removePointerDown(this.view, this.boundDragStart)
-        }
-    }
-
     geometry() {
         let ret = []
         let i = 0
@@ -177,38 +160,6 @@ export class CindyCanvas {
     }
     
 
-    dragStart(e) {
-        console.log('dragStart')
-        e.preventDefault()
-        e.stopPropagation()
-        this.dragStartX = e.clientX - parseInt(this.view.style.left.replace('px', ''))
-        this.dragStartY = e.clientY - parseInt(this.view.style.top.replace('px', ''))
-
-        let useCapture = true
-        removePointerDown(this.view, this.boundDragStart)
-        addPointerMove(this.view, this.boundDrag, useCapture)
-        addPointerUp(this.view, this.boundDragEnd, useCapture)
-        
-    }
-
-    drag(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        let newX = e.clientX
-        let newY = e.clientY
-        this.view.style.left = (newX - this.dragStartX) + 'px'
-        this.view.style.top = (newY - this.dragStartY) + 'px'
-    }
-
-    dragEnd(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        removePointerUp(this.view, this.boundDragEnd)
-        removePointerMove(this.view, this.boundDrag)
-        let useCapture = true
-        addPointerDown(this.view, this.boundDragStart, useCapture)
-
-    }
 }
 
 

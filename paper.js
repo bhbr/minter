@@ -39,6 +39,10 @@ class Paper {
         this.newConstructions = {}
         this.newCindyPort = undefined
 
+        this.boundStartDragging = this.startDragging.bind(this)
+        this.boundDrag = this.drag.bind(this)
+        this.boundEndDragging = this.endDragging.bind(this)
+
         this.boundPointerDown = this.pointerDown.bind(this)
         this.boundPointerMove = this.pointerMove.bind(this)
         this.boundPointerUp = this.pointerUp.bind(this)
@@ -61,13 +65,18 @@ class Paper {
     changeMode(newMode) {
 
         this.currentMode = newMode
-        if (!this.isCreating) {
+        if (newMode == 'drag') {
             for (let mob of this.constructions) {
-            console.log('taking event control from', mob)
-                mob.view.style['pointer-events'] = 'none'
-                mob.draggable = false
+                if (mob instanceof CindyCanvas) {
+                    mob.view.style['pointer-events'] = 'none'
+                }
             }
-            return
+        } else {
+            for (let mob of this.constructions) {
+                if (mob instanceof CindyCanvas) {
+                    mob.view.style['pointer-events'] = 'auto'
+                }
+            }
         }
         for (let mob of Object.values(this.newConstructions)) { mob.hide() }
         for (let point of this.newPoints) { point.hide() }
@@ -90,12 +99,6 @@ class Paper {
             try { this.newConstructions['cindy'].show() } catch { }
             break
         case 'drag':
-            // forbid all objects to handle input themselves
-            for (let mob of this.constructions) {
-            console.log('taking event control from', mob)
-                mob.view.style['pointer-events'] = 'none'
-                mob.draggable = true
-            }
             break
         }
     }
@@ -134,7 +137,7 @@ class Paper {
         e.preventDefault()
         e.stopPropagation()
         let target = this.targetMobject(e)
-        console.log(target)
+        console.log('pointer down', target)
         let p = new Vertex(pointerEventPageLocation(e))
         console.log(target)
         switch (target.constructor.name) {
@@ -149,9 +152,12 @@ class Paper {
         }
         this.update()
 
-        addPointerMove(this.view, this.boundPointerMove, this.useCapture)
-        addPointerUp(this.view, this.boundPointerUp, this.useCapture)
-        removePointerDown(this.view, this.boundPointerDown, this.useCapture)
+        //if (this.currentMode != 'drag') {
+            console.log('adding pointerMove')
+            addPointerMove(this.view, this.boundPointerMove)
+            addPointerUp(this.view, this.boundPointerUp)
+            removePointerDown(this.view, this.boundPointerDown)
+        //}
     }
 
     pointerMove(e) {
@@ -182,6 +188,14 @@ class Paper {
 
 
     handlePointerDownOnPaper(target, p) {
+        if (this.currentMode == 'drag') {
+            console.log('target is ', target)
+            for (let mob of this.constructions) {
+                if (mob instanceof CindyCanvas) { target = mob }
+            }
+            this.startDragging(p, target)
+            return
+        }
         // start a new construction from nowhere
         // including a freehand drawing)
         let fp1 = new FreePoint({anchor: p})
@@ -226,10 +240,10 @@ class Paper {
     }
 
     handlePointerDownOnFreePoint(target, p) {
-        if (this.currentMode == 'freehand') { this.currentMode = 'drag' }
-        if (this.currentMode == 'drag') {
-            this.draggedMobject = target
-            return
+        console.log('handlePointerDownOnFreePoint')
+        if (this.currentMode == 'freehand') {
+            this.currentMode = 'drag'
+            //return
         }
 
         // else: create something
@@ -267,6 +281,7 @@ class Paper {
     }
 
     handlePointerMove(target, p) {
+        console.log('handlePointerMove')
         this.draggedMobject.anchor.copyFrom(p)
         try { this.newFreehand.updateFromTip(p) } catch { }
         this.update()
@@ -279,7 +294,6 @@ class Paper {
         this.isCreating = false
         for (let mob of Object.values(this.newConstructions)) {
             mob.view.remove()
-            //if (mob instanceof CindyCanvas) { mob.draggable = false }
         }
         switch (this.currentMode) {
         case 'freehand':
@@ -308,9 +322,6 @@ class Paper {
             }
         case 'drag':
             this.currentMode = 'freehand'
-            // for (let mob of Object.values(this.newConstructions)) {
-            //     if (mob instanceof CindyCanvas) { mob.draggable = true }
-            // }
             break
         case 'cindy':
             let origin = this.newConstructions['cindy'].p1
@@ -344,6 +355,38 @@ class Paper {
         for (let point of this.newPoints) { point.update() }
         for (let mob of this.constructions) { mob.update() }
         for (let mob of Object.values(this.newConstructions)) { mob.update() }
+    }
+
+
+    startDragging(p, mob) {
+        console.log('we are dragging:', mob)
+        let oldX = parseInt(mob.view.style.left.replace('px', ''))
+        let oldY = parseInt(mob.view.style.top.replace('px', ''))
+        let q = new Vertex(oldX, oldY)
+        this.mobOffsetFromCursor = q.subtract(p)
+        console.log('offset:', mob.view.style)
+        
+        addPointerMove(this.view, this.boundDrag)
+        addPointerUp(this.view, this.boundEndDragging)
+    }
+
+    drag(e) {
+        let dragPoint = new Vertex(pointerEventPageLocation(e))
+        let mob = null
+        for (let mob2 of this.constructions) {
+            if (mob2 instanceof CindyCanvas) {mob = mob2 }
+        }
+        console.log('dragging', mob)
+        mob.view.style.left = (dragPoint.x + this.mobOffsetFromCursor.x) + 'px'
+        mob.view.style.top = (dragPoint.y + this.mobOffsetFromCursor.y) + 'px'
+        console.log('style.left:', mob.view.style.left)
+    }
+
+    endDragging(e) {
+        removePointerMove(this.view, this.boundDrag)
+        removePointerUp(this.view, this.boundEndDragging)
+        this.currentMode = 'freehand'
+        this.draggedMobject = undefined
     }
 
 
