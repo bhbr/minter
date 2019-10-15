@@ -303,6 +303,7 @@ class CindyCanvas {
     
 
     dragStart(e) {
+        console.log('dragStart of CindyCanvas')
         e.preventDefault()
         e.stopPropagation()
         this.dragStartX = e.clientX - parseInt(this.view.style.left.replace('px', ''))

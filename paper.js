@@ -367,11 +367,6 @@ class CindyCanvas {
         csView.setAttribute('id', canvasID)
         this.view.appendChild(csView)
         
-        this.boundDragStart = this.dragStart.bind(this)
-        this.boundDrag = this.drag.bind(this)
-        this.boundDragEnd = this.dragEnd.bind(this)
-
-        this.draggable = false
         document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
         document.body.appendChild(script)
 
@@ -396,17 +391,6 @@ class CindyCanvas {
         
     }
 
-    get draggable() { return this._draggable }
-    set draggable(newValue) {
-        this._draggable = newValue
-        if (this._draggable) {
-            log('setting draggable')
-            let useCapture = true
-            addPointerDown(this.view, this.boundDragStart, useCapture)
-        } else {
-            removePointerDown(this.view, this.boundDragStart)
-        }
-    }
 
     geometry() {
         let ret = []
@@ -423,43 +407,6 @@ class CindyCanvas {
     }
     
 
-    dragStart(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        this.dragStartX = e.clientX - parseInt(this.view.style.left.replace('px', ''))
-        this.dragStartY = e.clientY - parseInt(this.view.style.top.replace('px', ''))
-
-        let useCapture = true
-        removePointerDown(this.view, this.boundDragStart)
-        addPointerMove(this.view, this.boundDrag, useCapture)
-        addPointerUp(this.view, this.boundDragEnd)
-        
-        log(e.clientX)
-        log(e.clientY)
-        log(this.dragStartX)
-        log(this.dragStartY)
-    }
-
-    drag(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        let newX = e.clientX
-        let newY = e.clientY
-        this.view.style.left = (newX - this.dragStartX) + 'px'
-        this.view.style.top = (newY - this.dragStartY) + 'px'
-        log(newX)
-        log(newY)
-    }
-
-    dragEnd(e) {
-        e.preventDefault()
-        e.stopPropagation()
-        removePointerUp(this.view, this.boundDragEnd)
-        removePointerMove(this.view, this.boundDrag)
-        let useCapture = true
-        addPointerDown(this.view, this.boundDragStart, useCapture)
-
-    }
 }
 
 
@@ -477,6 +424,7 @@ function endDragging(e) {
 }
 
 function startDragging(p, mob) {
+    console.log('startDragging of paper')
     let oldX = parseInt(mob.view.style.left.replace('px', ''))
     let oldY = parseInt(mob.view.style.top.replace('px', ''))
     let q = new Vertex(oldX, oldY)
