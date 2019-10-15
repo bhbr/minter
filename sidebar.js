@@ -142,6 +142,7 @@ class SidebarButton extends Circle {
     }
 
     changeMode(newMode) {
+        console.log('changing mode')
         try {
             webkit.messageHandlers.changeMode.postMessage({mode: newMode});
         } catch {

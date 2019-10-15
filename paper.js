@@ -59,11 +59,18 @@ class Paper {
     }
 
     changeMode(newMode) {
+        console.log('constructions:', this.constructions)
         this.currentMode = newMode
         if (!this.isCreating) { return }
+        console.log('still here')
         for (let mob of Object.values(this.newConstructions)) { mob.hide() }
         for (let point of this.newPoints) { point.hide() }
         try { this.newFreehand.hide() } catch { }
+
+        for (let mob of this.constructions) {
+            console.log('giving event control to', mob)
+            mob.view.style['pointer-events'] = 'auto'
+        }
 
         switch (this.currentMode) {
         case 'freehand':
@@ -81,6 +88,12 @@ class Paper {
         case 'cindy':
             this.newConstructions['cindy'].show()
             break
+        case 'drag':
+            // forbid all objects to handle input themselves
+            for (let mob of this.constructions) {
+            console.log('taking event control from', mob)
+                mob.view.style['pointer-events'] = 'none'
+            }
         }
     }
 
@@ -308,7 +321,7 @@ class Paper {
             let cindyHeight = lrCorner.y - origin.y
             this.newConstructions['cindy'].view.remove()
             console.log(origin, cindyWidth, cindyHeight)
-            this.newConstructions['cindy'] = new CindyCanvas(origin, cindyWidth, cindyHeight)
+            this.constructions.push(new CindyCanvas(origin, cindyWidth, cindyHeight))
 
         }
         this.newFreehand = undefined
