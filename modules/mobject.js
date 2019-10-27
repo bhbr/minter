@@ -52,10 +52,11 @@ export class Mobject {
     }
 
     pointerDown(e) {
+        e.stopPropagation()
         removePointerDown(this.view, this.boundPointerDown)
         addPointerMove(this.view, this.boundPointerMove)
         addPointerUp(this.view, this.boundPointerUp)
-
+        
         this.eventTarget = this.boundEventTargetMobject(e)
         if (this.passAlongEvents) {
             this.eventTarget.pointerDown(e)
@@ -65,6 +66,8 @@ export class Mobject {
     }
 
     pointerMove(e) {
+        e.stopPropagation()
+
         if (this.passAlongEvents) {
             this.eventTarget.pointerMove(e)
         } else {
@@ -73,6 +76,8 @@ export class Mobject {
     }
 
     pointerUp(e) {
+        e.stopPropagation()
+        removePointerMove(this.view, this.boundPointerMove)
         removePointerUp(this.view, this.boundPointerUp)
         addPointerDown(this.view, this.boundPointerDown)
 
@@ -85,7 +90,9 @@ export class Mobject {
     }
 
     selfHandlePointerDown(e) { }
+
     selfHandlePointerMove(e) { }
+
     selfHandlePointerUp(e) { }
 
 

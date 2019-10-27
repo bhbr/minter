@@ -72,9 +72,10 @@ class Paper extends Mobject {
 
 //     }
 
-//     changeMode(newMode) {
+     changeMode(newMode) {
 
-//         this.currentMode = newMode
+         this.currentMode = newMode
+
 //         if (newMode == 'drag') {
 //             for (let mob of this.constructions) {
 //                 if (mob instanceof CindyCanvas) {
@@ -111,7 +112,7 @@ class Paper extends Mobject {
 //         case 'drag':
 //             break
 //         }
-//     }
+     }
 
 
 //     targetMobject(e) {
@@ -447,7 +448,7 @@ class Paper extends Mobject {
 }
 
 
-let paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true})
+let paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
 
 let ip = new InteractivePoint({midPoint: new Vertex(100, 100), radius: 20})
 

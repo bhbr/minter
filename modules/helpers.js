@@ -85,34 +85,35 @@ export function pointerEventPageLocation(e) {
 
 
 export function addPointerDown(element, method) {
-    element.addEventListener('touchstart', method)
-    element.addEventListener('mousedown', method)
+    element.addEventListener('touchstart', method, { capture: true })
+    element.addEventListener('mousedown', method, { capture: true })
 }
 
 export function removePointerDown(element, method) {
-    element.removeEventListener('touchstart', method)
-    element.removeEventListener('mousedown', method)
+    element.removeEventListener('touchstart', method, { capture: true })
+    element.removeEventListener('mousedown', method, { capture: true })
 }
 
 export function addPointerMove(element, method) {
-    element.addEventListener('touchmove', method)
-    element.addEventListener('mousemove', method)
+    element.addEventListener('touchmove', method, { capture: true })
+    element.addEventListener('mousemove', method, { capture: true })
 }
 
 export function removePointerMove(element, method) {
-    element.removeEventListener('touchmove', method)
-    element.removeEventListener('mousemove', method)
+    element.removeEventListener('touchmove', method, { capture: true })
+    element.removeEventListener('mousemove', method, { capture: true })
 }
 
 export function addPointerUp(element, method) {
-    element.addEventListener('touchend', method)
-    element.addEventListener('mouseup', method)
-    element.addEventListener('pointerup', method)
+    element.addEventListener('touchend', method, { capture: true })
+    element.addEventListener('mouseup', method, { capture: true })
+    element.addEventListener('pointerup', method, { capture: true })
 }
 
 export function removePointerUp(element, method) {
-    element.removeEventListener('touchend', method)
-    element.removeEventListener('mouseup', method)
+    element.removeEventListener('touchend', method, { capture: true })
+    element.removeEventListener('mouseup', method, { capture: true })
+    element.removeEventListener('pointerup', method, { capture: true })
 }
 
 export function logInto(obj, id) {
