@@ -166,3 +166,37 @@ export class CindyCanvas {
 
 
 
+
+export class InteractivePoint extends Circle {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            brightness: 0.5
+        })
+        this.update({})
+    }
+
+    selfHandlePointerDown(e) {
+        super.selfHandlePointerDown(e)
+        this.startY = pointerEventPageLocation(e)[1]
+        this.startBrightness = this.brightness
+    }
+
+    selfHandlePointerMove(e) {
+        super.selfHandlePointerMove(e)
+        let newY = pointerEventPageLocation(e)[1]
+        this.brightness = this.startBrightness + (newY - this.startY)/255
+        this.update()
+    }
+
+
+    update(argsDict) {
+        this.fillColor = rgb(this.brightness, this.brightness, this.brightness)
+        super.update(argsDict)
+    }
+
+}
+
+
+

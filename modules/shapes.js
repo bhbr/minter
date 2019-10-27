@@ -96,3 +96,20 @@ export class Ellipse extends CurvedShape {
     set midPoint(newValue) { this.anchor = newValue }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

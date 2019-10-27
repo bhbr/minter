@@ -7,6 +7,7 @@ export class Mobject {
         this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
         this.view.setAttribute('class', this.constructor.name)
         this.view.mobject = this
+        this.eventTarget = null
         this.setAttributes(argsDict)
         this.setDefaults({
             transform: Transform.identity(),
@@ -19,17 +20,77 @@ export class Mobject {
             fillColor: rgb(1, 1, 1),
             draggable: false,
             isDragged: false,
+            passAlongEvents: false, // to event target
             visible: true,
         })
         this.show()
 
-        this.boundCreatePopover = this.createPopover.bind(this)
-        this.boundDismissPopover = this.dismissPopover.bind(this)
-        this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
+        this.boundPointerDown = this.pointerDown.bind(this)
+        this.boundPointerMove = this.pointerMove.bind(this)
+        this.boundPointerUp = this.pointerUp.bind(this)
+        this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
+        addPointerDown(this.view, this.boundPointerDown)
+
+        // this.boundCreatePopover = this.createPopover.bind(this)
+        // this.boundDismissPopover = this.dismissPopover.bind(this)
+        // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
     }
 
+    eventTargetMobject(e) {
+        let t = e.target
+        if (t == this.view) { return this }
+        let targetViewChain = [t]
+        while (t != undefined && t != this.view) {
+            t = t.parentNode
+            targetViewChain.push(t)
+        }
+        while (t != undefined) {
+            if (t.mobject != undefined) { return t.mobject }
+            t = targetViewChain.pop()
+        }
+    }
+
+    pointerDown(e) {
+        removePointerDown(this.view, this.boundPointerDown)
+        addPointerMove(this.view, this.boundPointerMove)
+        addPointerUp(this.view, this.boundPointerUp)
+
+        this.eventTarget = this.boundEventTargetMobject(e)
+        if (this.passAlongEvents) {
+            this.eventTarget.pointerDown(e)
+        } else {
+            this.selfHandlePointerDown(e)
+        }
+    }
+
+    pointerMove(e) {
+        if (this.passAlongEvents) {
+            this.eventTarget.pointerMove(e)
+        } else {
+            this.selfHandlePointerMove(e)
+        }
+    }
+
+    pointerUp(e) {
+        removePointerUp(this.view, this.boundPointerUp)
+        addPointerDown(this.view, this.boundPointerDown)
+
+        if (this.passAlongEvents) {
+            this.eventTarget.pointerUp(e)
+        } else {
+            this.selfHandlePointerUp(e)
+        }
+        this.eventTarget = null
+    }
+
+    selfHandlePointerDown(e) { }
+    selfHandlePointerMove(e) { }
+    selfHandlePointerUp(e) { }
+
+
     setAttributes(argsDict) {
+        argsDict = argsDict || {}
         for (let [key, value] of Object.entries(argsDict)) {
             if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
             else { this[key] = value }
