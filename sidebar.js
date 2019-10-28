@@ -142,14 +142,25 @@ class SidebarButton extends Circle {
         this.changeMode('freehand')
     }
 
-    changeMode(newMode) {
-        console.log('changing mode')
+    changePaperState(argsDict) {
         try {
-            webkit.messageHandlers.changeMode.postMessage({mode: newMode});
+            webkit.messageHandlers.changeState.postMessage(argsDict);
         } catch {
-            // let paperView = document.querySelector('#paper')
-            // let paper = paperView.mobject
-            paper.changeMode(newMode)
+            paper.changeState(argsDict)
+        }
+    }
+
+    changeMode(newMode) {
+        switch (newMode) {
+        case 'freehand':
+        case 'drag':
+            this.changePaperState({mode: newMode})
+            break
+        case 'segment':
+        case 'ray':
+        case 'line':
+        case 'circle':
+            this.changePaperState({mode: 'creating', visibleCreation: newMode})
         }
     }
     
@@ -221,12 +232,12 @@ class ColorChangeButton extends SidebarButton {
                 'violet': [1, 0, 1]
             }
         })
-        this.modes = Object.keys(this.palette)
+        this.colors = Object.keys(this.palette)
         this.text.text = ''
     }
 
     colorForIndex(i) {
-        return SidebarButton.brighten(this.palette[this.modes[i]], 1)
+        return SidebarButton.brighten(this.palette[this.colors[i]], 1)
     }
 
     commonButtonUp() {
@@ -245,29 +256,41 @@ class ColorChangeButton extends SidebarButton {
             webkit.messageHandlers.changeColor.postMessage({color: newColor});
         } catch {
             //let paper = document.querySelector('#paper').mobject
-            paper.changeColor(newColor)
+            paper.changeState({color: newColor})
         }
     }
 }
 
-let lineButton = new SidebarButton({
-    modes: ['point', 'segment', 'ray', 'line'],
+class CreativeButton extends SidebarButton {
+    constructor(argsDict) {
+        super(argsDict)
+        this.creations = argsDict['creations']
+        let modeDict = { }
+        for (let creation of this.creations) {
+            modeDict[creation] = {mode: 'creating', visibleCreation: creation}
+        }
+        super.update(modeDict)
+    }
+}
+
+let lineButton = new CreativeButton({
+    creations: ['point', 'segment', 'ray', 'line'],
     key: 'q',
     locationIndex: 0
 })
 lineButton.baseColor = gray(0.2)
 sidebar.add(lineButton)
 
-let circleButton = new SidebarButton({
-    modes: ['circle'],
+let circleButton = new CreativeButton({
+    creations: ['circle'],
     key: 'w',
     locationIndex: 1
 })
 circleButton.baseColor = gray(0.4)
 sidebar.add(circleButton)
 
-let cindyButton = new SidebarButton({
-    modes: ['cindy'],
+let cindyButton = new CreativeButton({
+    creations: ['cindy'],
     key: 'e',
     locationIndex: 2
 })
@@ -283,7 +306,7 @@ colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0
 sidebar.add(colorButton)
 
 let dragButton = new SidebarButton({
-    modes: ['drag'],
+    modeDict: {'drag': {mode: 'drag'}},
     key: 'a',
     locationIndex: 4
 })

@@ -2,7 +2,7 @@ import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPo
 import { Vertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import {Segment } from './modules/arrows.js'
+import { Segment, Line } from './modules/arrows.js'
 
 export class Freehand extends MGroup {
     
@@ -57,7 +57,7 @@ export class FreePoint extends Circle {
             midPoint: Vertex.origin(),
         })
         this.radius = 5
-        this.draggable = true
+        this.isDraggable = true
     }
 
     update(argsDict) {
@@ -66,11 +66,25 @@ export class FreePoint extends Circle {
 }
 
 
+export class DrawnSegment extends MGroup {
+    constructor(argsDict) {
+        super(argsDict)
+        this.passAlongEvents = true
+        this.startFreePoint = new FreePoint({midPoint: this.startPoint})
+        this.endFreePoint = new FreePoint({midPoint: this.endPoint})
+        this.line = new Line({startPoint: this.startPoint, endPoint: this.endPoint})
+        this.add(this.line)
+        this.add(this.startFreePoint)
+        this.add(this.endFreePoint)
+    }
+}
+
 
 export class DrawnRectangle extends MGroup {
     
     constructor(argsDict) {
         super(argsDict)
+        this.endPoint = this.endPoint || this.startPoint
         this.p1 = this.startPoint
         this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
         this.p3 = this.endPoint
@@ -201,5 +215,32 @@ export class InteractivePoint extends Circle {
 
 }
 
+
+export class Creation extends MGroup {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.creations = { }
+        this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
+        //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
+        this.update()
+
+    }
+
+    update(argsDict) {
+        // let visibleCreation = argsDict['visibleCreation'] || this.visibleCreation
+        // this.setVisibleCreation(visibleCreation)
+        // super.update(argsDict)
+    }
+
+    setVisibleCreation(visibleCreation) {
+        for (let [key, value] of Object.entries(this.creations)) {
+            value.hide()
+        }
+        this.creations[visibleCreation].show()
+    }
+
+
+}
 
 

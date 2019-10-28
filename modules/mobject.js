@@ -14,12 +14,12 @@ export class Mobject {
             anchor: Vertex.origin(),
             vertices: [],
             children: [],
-            dependents: [],
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
             passAlongEvents: false, // to event target
             visible: true,
+            isDraggable: false,
         })
         this.show()
 
@@ -37,16 +37,20 @@ export class Mobject {
 
     eventTargetMobject(e) {
         let t = e.target
+        if (t.tagName == 'path') { t = t.parentNode }
         if (t == this.view) { return this }
         let targetViewChain = [t]
         while (t != undefined && t != this.view) {
             t = t.parentNode
             targetViewChain.push(t)
         }
+        t = targetViewChain.pop()
+        t = targetViewChain.pop()
         while (t != undefined) {
             if (t.mobject != undefined) { return t.mobject }
-            t = targetViewChain.pop()
+            t = targetViewChain.pop() 
         }
+        return this
     }
 
     pointerDown(e) {
@@ -61,6 +65,7 @@ export class Mobject {
         } else {
             this.selfHandlePointerDown(e)
         }
+        this.update()
     }
 
     pointerMove(e) {
@@ -71,6 +76,7 @@ export class Mobject {
         } else {
             this.selfHandlePointerMove(e)
         }
+        this.update()
     }
 
     pointerUp(e) {
@@ -85,6 +91,7 @@ export class Mobject {
             this.selfHandlePointerUp(e)
         }
         this.eventTarget = null
+        this.update()
     }
 
     selfHandlePointerDown(e) {
@@ -345,6 +352,7 @@ export class Polygon extends Mobject {
         super(argsDict)
         this.vertices = []
         this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        this.path.mobject = this
         this.view.appendChild(this.path) // why not just add?
         this.update()
     }
@@ -412,6 +420,7 @@ export class CurvedShape extends Mobject {
         super(argsDict)
         this.bezierPoints = []
         this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        this.path.mobject = this
         this.view.appendChild(this.path)
     }
 

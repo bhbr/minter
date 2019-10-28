@@ -3,7 +3,7 @@ import { Vertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, DrawnCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { Freehand, FreePoint, DrawnRectangle, CindyCanvas, InteractivePoint } from './creating.js'
+import { Freehand, FreePoint, DrawnSegment, DrawnRectangle, CindyCanvas, InteractivePoint } from './creating.js'
 
 
 class Paper extends Mobject {
@@ -74,26 +74,50 @@ class Paper extends Mobject {
 
 //     }
 
-    changeMode(newMode) {
+    setMobjectDraggability(isDraggable) {
+        for (let mob of this.mobjects) {
+                if (mob.isDraggable != undefined) {
+                    mob.isDraggable = isDraggable
+                }
+            }
+    }
 
+    changeMode(newMode) {
         this.currentMode = newMode
 
         switch (newMode) {
         case 'drag':
-            for (let mob of this.mobjects) {
-                if (mob.isDraggable != undefined) {
-                    mob.isDraggable = true
-                }
-            }
+            this.setMobjectDraggability(true)
             break
-        case 'freehand':
-            for (let mob of this.mobjects) {
-                if (mob.isDraggable != undefined) {
-                    mob.isDraggable = false
-                }
-            }
-            break
+        case 'creating':
+            this.startCreating(argsDict)
         }
+    }
+
+    changeState(argsDict) {
+
+        let newMode = argsDict['mode']
+        if (newMode != undefined && newMode != this.currentMode) {
+            this.changeMode(newMode)
+            return
+        }
+
+        let newColor = argsDict['color']
+        if (newColor != undefined && newColor != this.currentColor) {
+            this.changeColor(newColor)
+            return
+        }
+
+        let newVisibleCreation = argsDict['visibleCreation']
+        if (newVisibleCreation != undefined && newVisibleCreation != this.currentVisibleCreation) {
+            this.changeVisibleCreation(newVisibleCreation)
+            return
+        }
+
+        return
+
+
+
 
 //         if (newMode == 'drag') {
 //             for (let mob of this.constructions) {
@@ -131,8 +155,19 @@ class Paper extends Mobject {
 //         case 'drag':
 //             break
 //         }
-     }
+    }
 
+    changeVisibleCreation(newVisibleCreation) {
+        let visibleCreation = argsDict['visibleCreation']
+        this.creation.changeVisible(visibleCreation)
+    }
+
+
+    startCreating(argsDict) {
+
+
+
+    }
 
 //     targetMobject(e) {
 //     // which mobject have we clicked on?
@@ -476,5 +511,10 @@ let ip = new InteractivePoint({
     isDraggable: false
 })
 
-paper.add(ip)
+let ds = new DrawnSegment({
+    startPoint: new Vertex(100, 100),
+    endPoint: new Vertex(200, 200)
+})
+
+paper.add(ds)
 
