@@ -10,13 +10,15 @@ class Paper extends Mobject {
 
      constructor(argsDict) {
         super(argsDict)
+        this.mobjects = []
+        console.log(this.view)
         //this.view = document.querySelector('#paper')
         //this.view.mobject = this
 //         this.useCapture = true
 //         this.isCreating = false
 //         this.draggedMobject = undefined
 //         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
-//         this.currentMode = 'freehand'
+        this.currentMode = 'freehand'
 //         this.colorPalette = {
 //             'black': rgb(0, 0, 0),
 //             'white': rgb(1, 1, 1),
@@ -72,9 +74,26 @@ class Paper extends Mobject {
 
 //     }
 
-     changeMode(newMode) {
+    changeMode(newMode) {
 
-         this.currentMode = newMode
+        this.currentMode = newMode
+
+        switch (newMode) {
+        case 'drag':
+            for (let mob of this.mobjects) {
+                if (mob.isDraggable != undefined) {
+                    mob.isDraggable = true
+                }
+            }
+            break
+        case 'freehand':
+            for (let mob of this.mobjects) {
+                if (mob.isDraggable != undefined) {
+                    mob.isDraggable = false
+                }
+            }
+            break
+        }
 
 //         if (newMode == 'drag') {
 //             for (let mob of this.constructions) {
@@ -405,9 +424,10 @@ class Paper extends Mobject {
 
 
 
-//     add(mobject) {
-//         this.view.appendChild(mobject.view)
-//     }
+    add(mobject) {
+        this.mobjects.push(mobject)
+        this.view.appendChild(mobject.view)
+    }
 
 //     update() {
 //         for (let point of this.freePoints) { point.update() }
@@ -447,10 +467,14 @@ class Paper extends Mobject {
 
 }
 
+export const paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
 
-let paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
-
-let ip = new InteractivePoint({midPoint: new Vertex(100, 100), radius: 20})
+let ip = new InteractivePoint({
+    midPoint: new Vertex(100, 100),
+    radius: 20,
+    fillColor: rgb(1, 1, 1),
+    isDraggable: false
+})
 
 paper.add(ip)
 

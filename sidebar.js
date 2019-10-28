@@ -3,6 +3,7 @@ import { Vertex, Translation } from './modules/transform.js'
 import { MGroup, TextLabel } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import {Segment } from './modules/arrows.js'
+import { paper } from './paper.js'
 
 let sidebar = document.querySelector('#sidebar')
 sidebar.add = function(mobject) {
@@ -146,7 +147,8 @@ class SidebarButton extends Circle {
         try {
             webkit.messageHandlers.changeMode.postMessage({mode: newMode});
         } catch {
-            paper = document.querySelector('#paper').mobject
+            // let paperView = document.querySelector('#paper')
+            // let paper = paperView.mobject
             paper.changeMode(newMode)
         }
     }
@@ -242,7 +244,7 @@ class ColorChangeButton extends SidebarButton {
         try {
             webkit.messageHandlers.changeColor.postMessage({color: newColor});
         } catch {
-            paper = document.querySelector('#paper').mobject
+            //let paper = document.querySelector('#paper').mobject
             paper.changeColor(newColor)
         }
     }
@@ -290,7 +292,6 @@ dragButton.text.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
 
-let mode = paper.currentMode
 let creating = false
 
 

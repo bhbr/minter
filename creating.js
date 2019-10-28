@@ -172,19 +172,22 @@ export class InteractivePoint extends Circle {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
-            brightness: 0.5
+            brightness: 0.5,
+            isDraggable: false
         })
-        this.update({})
+        this.update()
     }
 
     selfHandlePointerDown(e) {
         super.selfHandlePointerDown(e)
+        if (this.isDraggable) { return }
         this.startY = pointerEventPageLocation(e)[1]
         this.startBrightness = this.brightness
     }
 
     selfHandlePointerMove(e) {
         super.selfHandlePointerMove(e)
+        if (this.isDraggable) { return }
         let newY = pointerEventPageLocation(e)[1]
         this.brightness = this.startBrightness + (newY - this.startY)/255
         this.update()

@@ -1,5 +1,5 @@
 import { Vertex, Transform } from './transform.js'
-import { stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
+import { logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
 export class Mobject {
 
@@ -18,8 +18,6 @@ export class Mobject {
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
-            draggable: false,
-            isDragged: false,
             passAlongEvents: false, // to event target
             visible: true,
         })
@@ -56,9 +54,9 @@ export class Mobject {
         removePointerDown(this.view, this.boundPointerDown)
         addPointerMove(this.view, this.boundPointerMove)
         addPointerUp(this.view, this.boundPointerUp)
-        
+
         this.eventTarget = this.boundEventTargetMobject(e)
-        if (this.passAlongEvents) {
+        if (this.eventTarget != this && this.passAlongEvents) {
             this.eventTarget.pointerDown(e)
         } else {
             this.selfHandlePointerDown(e)
@@ -68,7 +66,7 @@ export class Mobject {
     pointerMove(e) {
         e.stopPropagation()
 
-        if (this.passAlongEvents) {
+        if (this.eventTarget != this && this.passAlongEvents) {
             this.eventTarget.pointerMove(e)
         } else {
             this.selfHandlePointerMove(e)
@@ -81,7 +79,7 @@ export class Mobject {
         removePointerUp(this.view, this.boundPointerUp)
         addPointerDown(this.view, this.boundPointerDown)
 
-        if (this.passAlongEvents) {
+        if (this.eventTarget != this && this.passAlongEvents) {
             this.eventTarget.pointerUp(e)
         } else {
             this.selfHandlePointerUp(e)
@@ -89,11 +87,26 @@ export class Mobject {
         this.eventTarget = null
     }
 
-    selfHandlePointerDown(e) { }
+    selfHandlePointerDown(e) {
+        if (this.isDraggable) {
+            this.dragPointStart = new Vertex(pointerEventPageLocation(e))
+            this.dragAnchorStart = this.anchor.copy()
+        }
+    }
 
-    selfHandlePointerMove(e) { }
+    selfHandlePointerMove(e) {
+        if (this.isDraggable) {
+            let dragPoint = new Vertex(pointerEventPageLocation(e))
+            let dr = dragPoint.subtract(this.dragPointStart)
+            this.anchor.copyFrom(this.dragAnchorStart.add(dr))
+            this.update()
+        }
+    }
 
-    selfHandlePointerUp(e) { }
+    selfHandlePointerUp(e) {
+            this.dragPointStart = undefined
+            this.dragAnchorStart = undefined
+    }
 
 
     setAttributes(argsDict) {
