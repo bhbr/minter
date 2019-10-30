@@ -1,5 +1,5 @@
-import { pointerEventPageLocation, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
-import { Vertex, Translation } from './modules/transform.js'
+import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
+import { Vertex, Translation, pointerEventVertex } from './modules/transform.js'
 import { MGroup, TextLabel } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import {Segment } from './modules/arrows.js'
@@ -33,7 +33,7 @@ class SidebarButton extends Circle {
             currentModeIndex: 0,
             baseColor: rgb(1, 1, 1),
             locationIndex: 0,
-            modeSpacing: 25,
+            optionSpacing: 25,
             active: false,
             showLabel: true
         })
@@ -42,7 +42,7 @@ class SidebarButton extends Circle {
         })
 
         this.text = new TextLabel({text: 'text'})
-        try { this.text.text = this.modes[0] } catch { }
+        try { this.text.text = this.messages[0][1] } catch { }
         this.text.anchor = Vertex.origin()
         this.add(this.text)
 
@@ -97,7 +97,7 @@ class SidebarButton extends Circle {
         if (this.active) { return }
         this.active = true
         this.radius = buttonRadius * buttonScaleFactor
-        this.changeMode(this.modes[0])
+        this.messagePaper(this.messages[0])
         this.text.view.setAttribute('font-size', '16')
     }
     
@@ -139,47 +139,33 @@ class SidebarButton extends Circle {
         this.fillColor = this.colorForIndex(this.currentModeIndex)
         this.updateModeIndex(0)
         this.text.view.setAttribute('font-size', '12')
-        this.changeMode('freehand')
+        this.messagePaper(this.outgoingMessage)
     }
 
-    changePaperState(argsDict) {
+    messagePaper(message) {
         try {
-            webkit.messageHandlers.changeState.postMessage(argsDict);
+            webkit.messageHandlers.handleMessage.postMessage(message);
         } catch {
-            paper.changeState(argsDict)
-        }
-    }
-
-    changeMode(newMode) {
-        switch (newMode) {
-        case 'freehand':
-        case 'drag':
-            this.changePaperState({mode: newMode})
-            break
-        case 'segment':
-        case 'ray':
-        case 'line':
-        case 'circle':
-            this.changePaperState({mode: 'creating', visibleCreation: newMode})
+            paper.handleMessage(message)
         }
     }
     
     updateModeIndex(newIndex) {
         if (newIndex == this.currentModeIndex || newIndex == -1) { return }
         this.currentModeIndex = newIndex
-        let newMode = this.modes[this.currentModeIndex]
+        let message = this.messages[this.currentModeIndex]
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.changeMode(newMode)
+        this.messagePaper(message)
         if (this.showLabel) {
-            this.text.text = newMode
+            this.text.text = message[1]
         } else {
             this.text.text = ''
         }
     }
     
     selectNextOption() {
-        if (this.currentModeIndex == this.modes.length - 1) { return }
-        let dx = this.modeSpacing * (this.currentModeIndex + 1)
+        if (this.currentModeIndex == this.messages.length - 1) { return }
+        let dx = this.optionSpacing * (this.currentModeIndex + 1)
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
         this.updateModeIndex(this.currentModeIndex + 1)
     }
@@ -187,7 +173,7 @@ class SidebarButton extends Circle {
     
     selectPreviousOption() {
         if (this.currentModeIndex == 0) { return }
-        let dx = this.modeSpacing * (this.currentModeIndex - 1)
+        let dx = this.optionSpacing * (this.currentModeIndex - 1)
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
         this.updateModeIndex(this.currentModeIndex - 1)
     }
@@ -202,14 +188,14 @@ class SidebarButton extends Circle {
         if (e instanceof MouseEvent) { t = e}
         else { t = e.changedTouches[0] }
     
-        let p = new Vertex(pointerEventPageLocation(e))
+        let p = pointerEventVertex(e)
         let dx = p.x - this.touchStart.x
     
-        dx = Math.min(Math.max(dx, 0), this.modeSpacing * (this.modes.length - 1))
+        dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
         
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 
-        this.updateModeIndex(Math.floor(dx/this.modeSpacing))
+        this.updateModeIndex(Math.floor(dx/this.optionSpacing))
         
     }
     
@@ -251,30 +237,26 @@ class ColorChangeButton extends SidebarButton {
     }
 
     changeColor(newColor) {
-        console.log('changing mode')
-        try {
-            webkit.messageHandlers.changeColor.postMessage({color: newColor});
-        } catch {
-            //let paper = document.querySelector('#paper').mobject
-            paper.changeState({color: newColor})
-        }
+        this.messagePaper({color: newColor})
     }
+
 }
 
 class CreativeButton extends SidebarButton {
     constructor(argsDict) {
         super(argsDict)
         this.creations = argsDict['creations']
-        let modeDict = { }
+        this.messages = []
         for (let creation of this.creations) {
-            modeDict[creation] = {mode: 'creating', visibleCreation: creation}
+            this.messages.push({creating: creation})
         }
-        super.update(modeDict)
+        this.outgoingMessage = {creating: 'segment'}
+        super.update()
     }
 }
 
 let lineButton = new CreativeButton({
-    creations: ['point', 'segment', 'ray', 'line'],
+    creations: ['segment'], //, 'ray', 'line'],
     key: 'q',
     locationIndex: 0
 })
@@ -306,7 +288,8 @@ colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0
 sidebar.add(colorButton)
 
 let dragButton = new SidebarButton({
-    modeDict: {'drag': {mode: 'drag'}},
+    messages: {drag: true},
+    outgoingMessage: {drag: false},
     key: 'a',
     locationIndex: 4
 })

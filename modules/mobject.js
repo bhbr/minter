@@ -1,5 +1,5 @@
 import { Vertex, Transform } from './transform.js'
-import { logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
+import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
 export class Mobject {
 
@@ -19,7 +19,6 @@ export class Mobject {
             fillColor: rgb(1, 1, 1),
             passAlongEvents: false, // to event target
             visible: true,
-            isDraggable: false,
         })
         this.show()
 
@@ -29,10 +28,30 @@ export class Mobject {
         this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
         addPointerDown(this.view, this.boundPointerDown)
 
+        this.savedSelfHandlePointerDown = this.selfHandlePointerDown
+        this.savedSelfHandlePointerMove = this.selfHandlePointerMove
+        this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+        this.disableDragging()
+
         // this.boundCreatePopover = this.createPopover.bind(this)
         // this.boundDismissPopover = this.dismissPopover.bind(this)
         // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
+    }
+
+    enableDragging() {
+        this.savedSelfHandlePointerDown = this.selfHandlePointerDown
+        this.savedSelfHandlePointerMove = this.selfHandlePointerMove
+        this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+        this.selfHandlePointerDown = this.startSelfDragging
+        this.selfHandlePointerMove = this.selfDragging
+        this.selfHandlePointerUp = this.endSelfDragging
+    }
+
+    disableDragging() {
+        this.selfHandlePointerDown = this.savedSelfHandlePointerDown
+        this.selfHandlePointerMove = this.savedSelfHandlePointerMove
+        this.selfHandlePointerUp = this.savedSelfHandlePointerUp
     }
 
     eventTargetMobject(e) {
@@ -94,27 +113,10 @@ export class Mobject {
         this.update()
     }
 
-    selfHandlePointerDown(e) {
-        if (this.isDraggable) {
-            this.dragPointStart = new Vertex(pointerEventPageLocation(e))
-            this.dragAnchorStart = this.anchor.copy()
-        }
-    }
 
-    selfHandlePointerMove(e) {
-        if (this.isDraggable) {
-            let dragPoint = new Vertex(pointerEventPageLocation(e))
-            let dr = dragPoint.subtract(this.dragPointStart)
-            this.anchor.copyFrom(this.dragAnchorStart.add(dr))
-            this.update()
-        }
-    }
-
-    selfHandlePointerUp(e) {
-            this.dragPointStart = undefined
-            this.dragAnchorStart = undefined
-    }
-
+    selfHandlePointerDown(e) { }
+    selfHandlePointerMove(e) { }
+    selfHandlePointerUp(e) { }
 
     setAttributes(argsDict) {
         argsDict = argsDict || {}
@@ -280,6 +282,28 @@ export class Mobject {
     rightEdge() { return Vertex.origin() }
 
 
+
+    startSelfDragging(e) {
+        this.dragPointStart = new Vertex(pointerEventPageLocation(e))
+        this.dragAnchorStart = this.anchor.copy()
+    }
+
+    selfDragging(e) {
+        let dragPoint = new Vertex(pointerEventPageLocation(e))
+        let dr = dragPoint.subtract(this.dragPointStart)
+        this.anchor.copyFrom(this.dragAnchorStart.add(dr))
+        this.update()
+    }
+
+    endSelfDragging(e) {
+        this.dragPointStart = undefined
+        this.dragAnchorStart = undefined
+    }
+
+
+
+
+
     createPopover(e) {
         this.popover = new Popover(this, 200, 300, 'right')
         paper.add(this.popover)
@@ -325,15 +349,11 @@ export class MGroup extends Mobject {
     constructor(argsDict) {
         super(argsDict)
         for (let submob of this.children) {
-            submob.draggable = false
             this.add(submob)
         }
     }
 
 }
-
-
-
 
 
 

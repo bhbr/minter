@@ -1,9 +1,9 @@
-import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
-import { Vertex } from './modules/transform.js'
+import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
+import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, DrawnCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { Freehand, FreePoint, DrawnSegment, DrawnRectangle, CindyCanvas, InteractivePoint } from './creating.js'
+import { CreationGroup, FreePoint, DrawnSegment } from './creating.js'
 
 
 class Paper extends Mobject {
@@ -11,14 +11,12 @@ class Paper extends Mobject {
      constructor(argsDict) {
         super(argsDict)
         this.mobjects = []
-        console.log(this.view)
-        //this.view = document.querySelector('#paper')
-        //this.view.mobject = this
+        this.toggleDragging(false)
 //         this.useCapture = true
 //         this.isCreating = false
 //         this.draggedMobject = undefined
 //         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
-        this.currentMode = 'freehand'
+
 //         this.colorPalette = {
 //             'black': rgb(0, 0, 0),
 //             'white': rgb(1, 1, 1),
@@ -31,6 +29,9 @@ class Paper extends Mobject {
 //             'violet': rgb(1, 0, 1)
 //         }
 //         this.currentColor = this.colorPalette['white']
+
+
+
 
 //         this.freehands = []
 //         this.freePoints = []
@@ -50,6 +51,7 @@ class Paper extends Mobject {
 //         this.boundPointerMove = this.pointerMove.bind(this)
 //         this.boundPointerUp = this.pointerUp.bind(this)
 //         addPointerDown(this.view, this.boundPointerDown, this.useCapture)
+
      }
 
 //     changeColorByName(newColorName) {
@@ -74,48 +76,58 @@ class Paper extends Mobject {
 
 //     }
 
-    setMobjectDraggability(isDraggable) {
-        for (let mob of this.mobjects) {
-                if (mob.isDraggable != undefined) {
-                    mob.isDraggable = isDraggable
-                }
-            }
+
+    toggleDragging(flag) {
+        this.passAlongEvents = !flag
+
+        if (flag) {
+            this.selfHandlePointerDown = this.startDragging
+            this.selfHandlePointerMove = this.dragging
+            this.selfHandlePointerUp = this.endDragging
+        } else {
+            this.selfHandlePointerDown = this.startCreating
+            this.selfHandlePointerMove = this.creativeMove
+            this.selfHandlePointerUp = this.endCreating
+        }
     }
 
-    changeMode(newMode) {
-        this.currentMode = newMode
 
-        switch (newMode) {
-        case 'drag':
-            this.setMobjectDraggability(true)
-            break
+    startDragging(e) {
+        this.draggedMobject = this.eventTargetMobject(e)
+        if (this.draggedMobject == this) { return }
+        this.dragPointStart = pointerEventVertex(e)
+        this.dragAnchorStart = this.draggedMobject.anchor.copy()
+    }
+
+    dragging(e) {
+        let dragPoint = pointerEventVertex(e)
+        let dr = dragPoint.subtract(this.dragPointStart)
+        this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
+        this.update()
+    }
+
+    endDragging(e) {
+        this.dragPointStart = undefined
+        this.dragAnchorStart = undefined
+        this.draggedMobject = undefined
+    }
+
+
+    handleMessage(message) {
+        let key = Object.keys(message)[0]
+        let value = Object.keys(message)[1]
+
+        switch (key) {
         case 'creating':
-            this.startCreating(argsDict)
+            this.changeVisibleCreation(value)
+            break
+        case 'color':
+            this.changeColor(value)
+            break
+        case 'drag':
+            this.toggleDragging(value)
+            break
         }
-    }
-
-    changeState(argsDict) {
-
-        let newMode = argsDict['mode']
-        if (newMode != undefined && newMode != this.currentMode) {
-            this.changeMode(newMode)
-            return
-        }
-
-        let newColor = argsDict['color']
-        if (newColor != undefined && newColor != this.currentColor) {
-            this.changeColor(newColor)
-            return
-        }
-
-        let newVisibleCreation = argsDict['visibleCreation']
-        if (newVisibleCreation != undefined && newVisibleCreation != this.currentVisibleCreation) {
-            this.changeVisibleCreation(newVisibleCreation)
-            return
-        }
-
-        return
-
 
 
 
@@ -158,198 +170,220 @@ class Paper extends Mobject {
     }
 
     changeVisibleCreation(newVisibleCreation) {
-        let visibleCreation = argsDict['visibleCreation']
-        this.creation.changeVisible(visibleCreation)
+        this.visibleCreation = newVisibleCreation
+        if (this.creationGroup != undefined) {
+            this.creationGroup.setVisibleCreation(newVisibleCreation)
+        }
     }
 
 
-    startCreating(argsDict) {
-
-
-
+    startCreating(e) {
+        this.creationStartPoint = pointerEventVertex(e)
+        this.visibleCreation = 'segment'
+        this.changeVisibleCreation(this.visibleCreation)
+        this.creationGroup = new CreationGroup({
+            startPoint: this.creationStartPoint,
+            visibleCreation: 'segment'
+        })
+        this.add(this.creationGroup)
     }
 
-//     targetMobject(e) {
-//     // which mobject have we clicked on?
-//     // (event detection completely handled by paper except maybe for Cindy)
-//         //if (!(e.target.mobject instanceof CindyCanvas || e.target.mobject instanceof FreePoint)) {
-//         let tm = undefined
-//         if (this.draggedMobject != undefined) {
-//             tm = this.draggedMobject
-//             return tm
-//         }
-//         let p = new Vertex(pointerEventPageLocation(e))
-//         for (let point of this.freePoints) {
-//             if (point.anchor.subtract(p).norm() < 10) {
-//                 tm = point
-//                 return tm
-//             }
-//         }
-//         tm = e.target.parentNode.mobject
-//         if (tm != undefined) {
-//             // maybe the event got detected by a point, but through its path
-//             if (tm instanceof DrawnCircle) {
-//                 return this // clicked inside a circle, but not on its center
-//             }
-//         } else {
-//             // paper or Cindy canvas
-//             tm = e.target.mobject
-//             return tm
-//         }
-//     }
+    creativeMove(e) {
+        this.creationGroup.updateFromTip(pointerEventVertex(e))
+    }
 
-//     pointerDown(e) {
-//         e.preventDefault()
-//         e.stopPropagation()
-//         let target = this.targetMobject(e)
-//         let p = new Vertex(pointerEventPageLocation(e))
-//         switch (target.constructor.name) {
-//         case 'Paper':
-//             this.handlePointerDownOnPaper(target, p)
-//             // meaning we create two new points
-//             break
-//         case 'FreePoint':
-//             this.handlePointerDownOnFreePoint(target, p)
-//             // meaning we either drag a point or create something starting there
-//             break
-//         }
-//         this.update()
+    endCreating(e) {
+        this.creationGroup.dissolveInto(this)
+        this.remove(this.creationGroup)
+        this.creationGroup = undefined
+    }
 
-//         addPointerMove(this.view, this.boundPointerMove)
-//         addPointerUp(this.view, this.boundPointerUp)
-//         removePointerDown(this.view, this.boundPointerDown)
-//     }
+    add(mobject) {
+        this.mobjects.push(mobject)
+        this.view.appendChild(mobject.view)
+    }
 
-//     pointerMove(e) {
-//         e.preventDefault()
-//         e.stopPropagation()
-//         let target = this.targetMobject(e)
-//         let p = new Vertex(pointerEventPageLocation(e))
+    // targetMobject(e) {
+    // // which mobject have we clicked on?
+    // // (event detection completely handled by paper except maybe for Cindy)
+    //     //if (!(e.target.mobject instanceof CindyCanvas || e.target.mobject instanceof FreePoint))
+    //     let tm = undefined
+    //     if (this.draggedMobject != undefined) {
+    //         tm = this.draggedMobject
+    //         return tm
+    //     }
+    //     let p = new Vertex(pointerEventPageLocation(e))
+    //     for (let point of this.freePoints) {
+    //         if (point.anchor.subtract(p).norm() < 10) {
+    //             tm = point
+    //             return tm
+    //         }
+    //     }
+    //     tm = e.target.parentNode.mobject
+    //     if (tm != undefined) {
+    //         // maybe the event got detected by a point, but through its path
+    //         if (tm instanceof DrawnCircle) {
+    //             return this // clicked inside a circle, but not on its center
+    //         }
+    //     } else {
+    //         // paper or Cindy canvas
+    //         tm = e.target.mobject
+    //         return tm
+    //     }
+    // }
 
-//         if (target != this && !this.isCreating) { this.currentMode = 'drag' }
-//         console.log(p, target)
-//         this.handlePointerMove(target, p)
-//     }
+    // pointerDown(e) {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     let target = this.targetMobject(e)
+    //     let p = new Vertex(pointerEventPageLocation(e))
+    //     switch (target.constructor.name) {
+    //     case 'Paper':
+    //         this.handlePointerDownOnPaper(target, p)
+    //         // meaning we create two new points
+    //         break
+    //     case 'FreePoint':
+    //         this.handlePointerDownOnFreePoint(target, p)
+    //         // meaning we either drag a point or create something starting there
+    //         break
+    //     }
+    //     this.update()
 
-//     pointerUp(e) {
-//         e.preventDefault()
-//         e.stopPropagation()
-//         let target = this.targetMobject(e)
-//         let p = new Vertex(pointerEventPageLocation(e))
+    //     addPointerMove(this.view, this.boundPointerMove)
+    //     addPointerUp(this.view, this.boundPointerUp)
+    //     removePointerDown(this.view, this.boundPointerDown)
+    // }
 
-//         this.handlePointerUp(target, p)
+    // pointerMove(e) {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     let target = this.targetMobject(e)
+    //     let p = new Vertex(pointerEventPageLocation(e))
 
-//         addPointerDown(this.view, this.boundPointerDown, this.useCapture)
-//         removePointerMove(this.view, this.boundPointerMove, this.useCapture)
-//         removePointerUp(this.view, this.boundPointerUp, this.useCapture)
-//     }
+    //     if (target != this && !this.isCreating) { this.currentMode = 'drag' }
+    //     console.log(p, target)
+    //     this.handlePointerMove(target, p)
+    // }
+
+    // pointerUp(e) {
+    //     e.preventDefault()
+    //     e.stopPropagation()
+    //     let target = this.targetMobject(e)
+    //     let p = new Vertex(pointerEventPageLocation(e))
+
+    //     this.handlePointerUp(target, p)
+
+    //     addPointerDown(this.view, this.boundPointerDown, this.useCapture)
+    //     removePointerMove(this.view, this.boundPointerMove, this.useCapture)
+    //     removePointerUp(this.view, this.boundPointerUp, this.useCapture)
+    // }
 
 
 
 
 
-//     handlePointerDownOnPaper(target, p) {
-//         if (this.currentMode == 'drag') {
-//             for (let mob of this.constructions) {
-//                 if (mob instanceof CindyCanvas) { target = mob }
-//             }
-//             this.startDragging(p, target)
-//             return
-//         }
-//         // start a new construction from nowhere
-//         // including a freehand drawing)
-//         let fp1 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let fp2 = new FreePoint({anchor: p.copy(), strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let fh = new Freehand({anchor: Vertex.origin(), strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let cindyRect = new DrawnRectangle({startPoint: fp1.anchor, endPoint: fp2.anchor})
-//         // more geometric objects to follow
-//         this.add(fp1)
-//         this.add(fp2)
-//         this.add(fh)
-//         this.add(s)
-//         this.add(r)
-//         this.add(l)
-//         this.add(c)
-//         this.add(cindyRect)
+    // handlePointerDownOnPaper(target, p) {
+    //     if (this.currentMode == 'drag') {
+    //         for (let mob of this.constructions) {
+    //             if (mob instanceof CindyCanvas) { target = mob }
+    //         }
+    //         this.startDragging(p, target)
+    //         return
+    //     }
+    //     // start a new construction from nowhere
+    //     // including a freehand drawing)
+    //     let fp1 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let fp2 = new FreePoint({anchor: p.copy(), strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let fh = new Freehand({anchor: Vertex.origin(), strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let cindyRect = new DrawnRectangle({startPoint: fp1.anchor, endPoint: fp2.anchor})
+    //     // more geometric objects to follow
+    //     this.add(fp1)
+    //     this.add(fp2)
+    //     this.add(fh)
+    //     this.add(s)
+    //     this.add(r)
+    //     this.add(l)
+    //     this.add(c)
+    //     this.add(cindyRect)
 
-//         this.newPoints = [fp1, fp2]
-//         this.newFreehand = fh
-//         this.newConstructions['segment'] = s
-//         this.newConstructions['ray'] = r
-//         this.newConstructions['line'] = l
-//         this.newConstructions['circle'] = c
-//         this.newConstructions['cindy'] = cindyRect
+    //     this.newPoints = [fp1, fp2]
+    //     this.newFreehand = fh
+    //     this.newConstructions['segment'] = s
+    //     this.newConstructions['ray'] = r
+    //     this.newConstructions['line'] = l
+    //     this.newConstructions['circle'] = c
+    //     this.newConstructions['cindy'] = cindyRect
 
-//         for (let mob of Object.values(this.newConstructions)) {
-//             mob.hide()
-//         }
-//         for (let point of Object.values(this.newPoints)) {
-//             point.hide()
-//         }
+    //     for (let mob of Object.values(this.newConstructions)) {
+    //         mob.hide()
+    //     }
+    //     for (let point of Object.values(this.newPoints)) {
+    //         point.hide()
+    //     }
 
-//         // show the relevant objects
-//         this.changeMode(this.currentMode)
+    //     // show the relevant objects
+    //     this.changeMode(this.currentMode)
 
-//         this.draggedMobject = fp2
-//         this.isCreating = true
+    //     this.draggedMobject = fp2
+    //     this.isCreating = true
 
-//     }
+    // }
 
-//     handlePointerDownOnFreePoint(target, p) {
-//         if (this.currentMode == 'freehand') {
-//             this.currentMode = 'drag'
-//             this.draggedMobject = target
-//             return
-//         }
+    // handlePointerDownOnFreePoint(target, p) {
+    //     if (this.currentMode == 'freehand') {
+    //         this.currentMode = 'drag'
+    //         this.draggedMobject = target
+    //         return
+    //     }
 
-//         // else: create something
-//         let fp1 = target
-//         fp1.update({strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let fp2 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-//         this.add(fp2)
-//         this.add(s)
-//         this.add(r)
-//         this.add(l)
-//         this.add(c)
+    //     // else: create something
+    //     let fp1 = target
+    //     fp1.update({strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let fp2 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
+    //     this.add(fp2)
+    //     this.add(s)
+    //     this.add(r)
+    //     this.add(l)
+    //     this.add(c)
 
-//         this.newPoints = [fp2]
-//         this.newConstructions['segment'] = s
-//         this.newConstructions['ray'] = r
-//         this.newConstructions['line'] = l
-//         this.newConstructions['circle'] = c
+    //     this.newPoints = [fp2]
+    //     this.newConstructions['segment'] = s
+    //     this.newConstructions['ray'] = r
+    //     this.newConstructions['line'] = l
+    //     this.newConstructions['circle'] = c
 
-//         for (let mob of Object.values(this.newConstructions)) {
-//             mob.hide()
-//         }
-//         for (let point of Object.values(this.newPoints)) {
-//             point.hide()
-//         }
+    //     for (let mob of Object.values(this.newConstructions)) {
+    //         mob.hide()
+    //     }
+    //     for (let point of Object.values(this.newPoints)) {
+    //         point.hide()
+    //     }
 
-//         // show the relevant objects
-//         this.changeMode(this.currentMode)
+    //     // show the relevant objects
+    //     this.changeMode(this.currentMode)
 
-//         this.draggedMobject = fp2
-//         this.isCreating = true
-//     }
+    //     this.draggedMobject = fp2
+    //     this.isCreating = true
+    // }
 
-//     handlePointerMove(target, p) {
-//         this.draggedMobject.anchor.copyFrom(p)
-//         this.snap(this.draggedMobject)
-//         if (this.newFreehand != undefined) {
-//             this.newFreehand.updateFromTip(p)
-//         }
-//         this.update()
+    // handlePointerMove(target, p) {
+    //     this.draggedMobject.anchor.copyFrom(p)
+    //     this.snap(this.draggedMobject)
+    //     if (this.newFreehand != undefined) {
+    //         this.newFreehand.updateFromTip(p)
+    //     }
+    //     this.update()
 
-//         this.changeMode(this.currentMode)
-//     }
+    //     this.changeMode(this.currentMode)
+    // }
 
 //     snap(mobject) {
 //         if (!(mobject instanceof FreePoint)) { return }
@@ -459,11 +493,6 @@ class Paper extends Mobject {
 
 
 
-    add(mobject) {
-        this.mobjects.push(mobject)
-        this.view.appendChild(mobject.view)
-    }
-
 //     update() {
 //         for (let point of this.freePoints) { point.update() }
 //         for (let point of this.newPoints) { point.update() }
@@ -504,17 +533,6 @@ class Paper extends Mobject {
 
 export const paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
 
-let ip = new InteractivePoint({
-    midPoint: new Vertex(100, 100),
-    radius: 20,
-    fillColor: rgb(1, 1, 1),
-    isDraggable: false
-})
 
-let ds = new DrawnSegment({
-    startPoint: new Vertex(100, 100),
-    endPoint: new Vertex(200, 200)
-})
 
-paper.add(ds)
 

@@ -1,10 +1,23 @@
-import { pointerEventPageLocation, rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
-import { Vertex } from './modules/transform.js'
+import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
+import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import { Segment, Line } from './modules/arrows.js'
 
-export class Freehand extends MGroup {
+export class CreatedMobject extends MGroup {
+    
+    dissolveInto(superMobject) {
+        if (!this.visible) { return }
+        for (let submob of this.children) {
+            superMobject.add(submob)
+        }
+    }
+
+    updateFromTip(q) { }
+
+}
+
+export class Freehand extends CreatedMobject {
     
     updateWithPoints(q) {
         let nbDrawnPoints = this.submobjects.length
@@ -49,42 +62,50 @@ export class Freehand extends MGroup {
     }
 }
 
+
+
 export class FreePoint extends Circle {
 
     constructor(argsDict) {
         super(argsDict)
+        this.setAttributes(argsDict)
+        this.view.setAttribute('class', this.constructor.name)
         this.setDefaults({
             midPoint: Vertex.origin(),
         })
         this.radius = 5
-        this.isDraggable = true
+        this.enableDragging()
     }
 
-    update(argsDict) {
-        super.update(argsDict)
-    }
 }
 
 
-export class DrawnSegment extends MGroup {
+export class DrawnSegment extends CreatedMobject {
     constructor(argsDict) {
         super(argsDict)
+        this.endPoint = this.endPoint || this.startPoint.copy()
         this.passAlongEvents = true
         this.startFreePoint = new FreePoint({midPoint: this.startPoint})
         this.endFreePoint = new FreePoint({midPoint: this.endPoint})
-        this.line = new Line({startPoint: this.startPoint, endPoint: this.endPoint})
+        this.line = new Segment({startPoint: this.startPoint, endPoint: this.endPoint})
         this.add(this.line)
         this.add(this.startFreePoint)
         this.add(this.endFreePoint)
     }
+
+    updateFromTip(q) {
+        this.endPoint.copyFrom(q)
+        this.update()
+    }
+
 }
 
 
-export class DrawnRectangle extends MGroup {
+export class DrawnRectangle extends CreatedMobject {
     
     constructor(argsDict) {
         super(argsDict)
-        this.endPoint = this.endPoint || this.startPoint
+        this.endPoint = this.endPoint || this.startPoint.copy()
         this.p1 = this.startPoint
         this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
         this.p3 = this.endPoint
@@ -180,66 +201,38 @@ export class CindyCanvas {
 
 
 
-
-export class InteractivePoint extends Circle {
-
-    constructor(argsDict) {
-        super(argsDict)
-        this.setDefaults({
-            brightness: 0.5,
-            isDraggable: false
-        })
-        this.update()
-    }
-
-    selfHandlePointerDown(e) {
-        super.selfHandlePointerDown(e)
-        if (this.isDraggable) { return }
-        this.startY = pointerEventPageLocation(e)[1]
-        this.startBrightness = this.brightness
-    }
-
-    selfHandlePointerMove(e) {
-        super.selfHandlePointerMove(e)
-        if (this.isDraggable) { return }
-        let newY = pointerEventPageLocation(e)[1]
-        this.brightness = this.startBrightness + (newY - this.startY)/255
-        this.update()
-    }
-
-
-    update(argsDict) {
-        this.fillColor = rgb(this.brightness, this.brightness, this.brightness)
-        super.update(argsDict)
-    }
-
-}
-
-
-export class Creation extends MGroup {
+export class CreationGroup extends CreatedMobject {
 
     constructor(argsDict) {
         super(argsDict)
         this.creations = { }
         this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
+        this.setVisibleCreation(this.visibleCreation)
+        for (let creation of Object.values(this.creations)) {
+            this.add(creation)
+        }
         this.update()
 
     }
 
-    update(argsDict) {
-        // let visibleCreation = argsDict['visibleCreation'] || this.visibleCreation
-        // this.setVisibleCreation(visibleCreation)
-        // super.update(argsDict)
+    updateFromTip(q) {
+        for (let creation of Object.values(this.creations)) {
+            creation.updateFromTip(q)
+        }
     }
 
     setVisibleCreation(visibleCreation) {
-        for (let [key, value] of Object.entries(this.creations)) {
-            value.hide()
+        for (let mob of Object.values(this.creations)) {
+            mob.hide()
         }
+        this.visibleCreation = visibleCreation
         this.creations[visibleCreation].show()
     }
 
+    dissolveInto(mobject) {
+        this.creations[this.visibleCreation].dissolveInto(mobject)
+    }
 
 }
 

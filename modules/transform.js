@@ -1,4 +1,4 @@
-//import {stringFromPoint, remove, rgb, rgba} from './helpers.js'
+import { pointerEventPageLocation } from './helpers.js'
 
 export class Vertex extends Array {
 
@@ -395,4 +395,9 @@ export class Rotation extends Transform {
         return new Rotation(-angle, this.center)
     }
 }
+
+export function pointerEventVertex(e) {
+    return new Vertex(pointerEventPageLocation(e))
+}
+
 
