@@ -11,7 +11,7 @@ class Paper extends Mobject {
      constructor(argsDict) {
         super(argsDict)
         this.children = []
-        this.toggleDragging(false)
+        this.setDragging(false)
 //         this.useCapture = true
 //         this.isCreating = false
 //         this.draggedMobject = undefined
@@ -77,7 +77,7 @@ class Paper extends Mobject {
 //     }
 
 
-    toggleDragging(flag) {
+    setDragging(flag) {
         this.passAlongEvents = !flag
 
         if (flag) {
@@ -94,16 +94,20 @@ class Paper extends Mobject {
 
     startDragging(e) {
         this.draggedMobject = this.eventTargetMobject(e)
-        if (this.draggedMobject == this) { return }
+        if (this.draggedMobject == this) {
+            this.draggedMobject = undefined
+            return
+        }
         this.dragPointStart = pointerEventVertex(e)
         this.dragAnchorStart = this.draggedMobject.anchor.copy()
     }
 
     dragging(e) {
+        if (this.draggedMobject == undefined) { return }
         let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
         this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
-        this.update()
+        this.draggedMobject.update()
     }
 
     endDragging(e) {
@@ -115,7 +119,7 @@ class Paper extends Mobject {
 
     handleMessage(message) {
         let key = Object.keys(message)[0]
-        let value = Object.keys(message)[1]
+        let value = Object.values(message)[0]
 
         switch (key) {
         case 'creating':
@@ -125,7 +129,7 @@ class Paper extends Mobject {
             this.changeColor(value)
             break
         case 'drag':
-            this.toggleDragging(value)
+            this.setDragging(value)
             break
         }
 
