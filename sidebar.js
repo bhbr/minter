@@ -256,7 +256,7 @@ class CreativeButton extends SidebarButton {
 }
 
 let lineButton = new CreativeButton({
-    creations: ['segment'], //, 'ray', 'line'],
+    creations: ['freehand'], //, 'ray', 'line'],
     key: 'q',
     locationIndex: 0
 })

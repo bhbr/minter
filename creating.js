@@ -69,11 +69,14 @@ export class FreePoint extends Circle {
 
     constructor(argsDict) {
         super(argsDict)
-        this.setAttributes(argsDict)
+        this.setAttributes({
+            draggable: true
+        })
         this.view.setAttribute('class', this.constructor.name)
         this.setDefaults({
             midPoint: Vertex.origin(),
         })
+
         this.radius = 5
         this.enableDragging()
     }
@@ -210,7 +213,8 @@ export class CreationGroup extends CreatedMobject {
     constructor(argsDict) {
         super(argsDict)
         this.creations = { }
-        this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
+        this.creations['freehand'] = new Freehand()
+        //this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {

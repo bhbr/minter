@@ -3,7 +3,7 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, DrawnCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { CreationGroup, FreePoint, DrawnSegment } from './creating.js'
+import { CreationGroup, Freehand, FreePoint, DrawnSegment } from './creating.js'
 
 
 class Paper extends Mobject {
@@ -94,7 +94,7 @@ class Paper extends Mobject {
 
     startDragging(e) {
         this.draggedMobject = this.eventTargetMobject(e)
-        if (this.draggedMobject == this) {
+        if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
         }
@@ -183,11 +183,11 @@ class Paper extends Mobject {
 
     startCreating(e) {
         this.creationStartPoint = pointerEventVertex(e)
-        this.visibleCreation = 'segment'
+        this.visibleCreation = 'freehand'
         this.changeVisibleCreation(this.visibleCreation)
         this.creationGroup = new CreationGroup({
             startPoint: this.creationStartPoint,
-            visibleCreation: 'segment'
+            visibleCreation: 'freehand'
         })
         this.add(this.creationGroup)
     }
