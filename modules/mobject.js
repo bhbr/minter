@@ -14,6 +14,7 @@ export class Mobject {
             anchor: Vertex.origin(),
             vertices: [],
             children: [],
+            dependents: [],
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
@@ -167,6 +168,7 @@ export class Mobject {
         if (Object.values(this).includes(undefined)) { return }
 
         for (let submob of this.children || []) { submob.update() }
+        for (let mob of this.dependents || []) { mob.update() }
 
         if (this.popover != undefined) {
             this.popover.anchor = this.anchor.translatedBy(this.rightEdge())

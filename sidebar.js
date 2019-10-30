@@ -288,7 +288,7 @@ colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0
 sidebar.add(colorButton)
 
 let dragButton = new SidebarButton({
-    messages: {drag: true},
+    messages: [{drag: true}],
     outgoingMessage: {drag: false},
     key: 'a',
     locationIndex: 4

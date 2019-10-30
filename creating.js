@@ -8,6 +8,7 @@ export class CreatedMobject extends MGroup {
     
     dissolveInto(superMobject) {
         if (!this.visible) { return }
+        superMobject.remove(this)
         for (let submob of this.children) {
             superMobject.add(submob)
         }
@@ -81,6 +82,7 @@ export class FreePoint extends Circle {
 
 
 export class DrawnSegment extends CreatedMobject {
+
     constructor(argsDict) {
         super(argsDict)
         this.endPoint = this.endPoint || this.startPoint.copy()
@@ -91,6 +93,8 @@ export class DrawnSegment extends CreatedMobject {
         this.add(this.line)
         this.add(this.startFreePoint)
         this.add(this.endFreePoint)
+        this.startFreePoint.dependents.push(this.line)
+        this.endFreePoint.dependents.push(this.line)
     }
 
     updateFromTip(q) {
@@ -230,8 +234,9 @@ export class CreationGroup extends CreatedMobject {
         this.creations[visibleCreation].show()
     }
 
-    dissolveInto(mobject) {
-        this.creations[this.visibleCreation].dissolveInto(mobject)
+    dissolveInto(superMobject) {
+        superMobject.remove(this)
+        this.creations[this.visibleCreation].dissolveInto(superMobject)
     }
 
 }

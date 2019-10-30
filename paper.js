@@ -10,7 +10,7 @@ class Paper extends Mobject {
 
      constructor(argsDict) {
         super(argsDict)
-        this.mobjects = []
+        this.children = []
         this.toggleDragging(false)
 //         this.useCapture = true
 //         this.isCreating = false
@@ -196,11 +196,6 @@ class Paper extends Mobject {
         this.creationGroup.dissolveInto(this)
         this.remove(this.creationGroup)
         this.creationGroup = undefined
-    }
-
-    add(mobject) {
-        this.mobjects.push(mobject)
-        this.view.appendChild(mobject.view)
     }
 
     // targetMobject(e) {
