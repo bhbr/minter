@@ -250,13 +250,13 @@ class CreativeButton extends SidebarButton {
         for (let creation of this.creations) {
             this.messages.push({creating: creation})
         }
-        this.outgoingMessage = {creating: 'segment'}
+        this.outgoingMessage = {creating: 'freehand'}
         super.update()
     }
 }
 
 let lineButton = new CreativeButton({
-    creations: ['freehand'], //, 'ray', 'line'],
+    creations: ['segment'], //, 'ray', 'line'],
     key: 'q',
     locationIndex: 0
 })

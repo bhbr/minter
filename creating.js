@@ -214,7 +214,7 @@ export class CreationGroup extends CreatedMobject {
         super(argsDict)
         this.creations = { }
         this.creations['freehand'] = new Freehand()
-        //this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
+        this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {

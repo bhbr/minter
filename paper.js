@@ -12,6 +12,8 @@ class Paper extends Mobject {
         super(argsDict)
         this.children = []
         this.setDragging(false)
+        this.visibleCreation = 'freehand'
+        
 //         this.useCapture = true
 //         this.isCreating = false
 //         this.draggedMobject = undefined
@@ -183,13 +185,12 @@ class Paper extends Mobject {
 
     startCreating(e) {
         this.creationStartPoint = pointerEventVertex(e)
-        this.visibleCreation = 'freehand'
-        this.changeVisibleCreation(this.visibleCreation)
         this.creationGroup = new CreationGroup({
             startPoint: this.creationStartPoint,
             visibleCreation: 'freehand'
         })
         this.add(this.creationGroup)
+        this.changeVisibleCreation(this.visibleCreation)
     }
 
     creativeMove(e) {
