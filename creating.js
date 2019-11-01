@@ -81,6 +81,10 @@ export class FreePoint extends Circle {
         this.enableDragging()
     }
 
+    update(argsDict) {
+        super.update(argsDict)
+    }
+
 }
 
 
@@ -92,7 +96,7 @@ export class DrawnSegment extends CreatedMobject {
         this.passAlongEvents = true
         this.startFreePoint = new FreePoint({midPoint: this.startPoint})
         this.endFreePoint = new FreePoint({midPoint: this.endPoint})
-        this.line = new Segment({startPoint: this.startPoint, endPoint: this.endPoint})
+        this.line = new Segment({startPoint: this.drawnStartPoint(), endPoint: this.drawnEndPoint()})
         this.add(this.line)
         this.add(this.startFreePoint)
         this.add(this.endFreePoint)
@@ -103,8 +107,21 @@ export class DrawnSegment extends CreatedMobject {
     updateFromTip(q) {
         this.endPoint.copyFrom(q)
         this.update()
+        this.endFreePoint.anchor = this.endPoint
+        this.endFreePoint.updateView()
     }
 
+
+    drawnStartPoint() { return this.startPoint }
+    drawnEndPoint() { return this.endPoint }
+
+
+}
+
+export class DrawnRay extends DrawnSegment {
+    drawnEndPoint() {
+        return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
+    }
 }
 
 
@@ -215,16 +232,21 @@ export class CreationGroup extends CreatedMobject {
         this.creations = { }
         this.creations['freehand'] = new Freehand()
         this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
+        //this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {
             this.add(creation)
+            if (creation.constructor.name == 'DrawnSegment') {
+                console.log('adding to CG', creation)
+            }
         }
         this.update()
 
     }
 
     updateFromTip(q) {
+        console.log('CreationGroup.updateFromTip')
         for (let creation of Object.values(this.creations)) {
             creation.updateFromTip(q)
         }

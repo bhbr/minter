@@ -164,12 +164,21 @@ export class Mobject {
     }
 
     update(argsDict) {
+        let x = Math.random()
         this.setAttributes(argsDict || {})
+        if (Object.values(this).includes(undefined)) { 
+            return
+        }
 
-        if (Object.values(this).includes(undefined)) { return }
-
-        for (let submob of this.children || []) { submob.update() }
-        for (let mob of this.dependents || []) { mob.update() }
+        for (let mob of this.dependents || []) {
+            mob.update()
+        }
+        for (let submob of this.children || []) {
+            if (this.dependsOn(submob)) {
+                continue
+            }
+            submob.update()
+        }
 
         if (this.popover != undefined) {
             this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
@@ -181,9 +190,23 @@ export class Mobject {
         this.updateView()
     }
 
-
     updateView() {
         if (this.view == undefined) { return }
+    }
+
+    allDependents() {
+        let dep = []
+        for (let mob of this.dependents) {
+            dep.push(mob)
+            for (let mob2 of mob.allDependents()) {
+                dep.push(mob2)
+            }
+        }
+        return dep
+    }
+
+    dependsOn(otherMobject) {
+        return otherMobject.allDependents().includes(this)
     }
 
 
@@ -227,7 +250,6 @@ export class Mobject {
         }
         this.updateView()
     }
-
 
     add(submob) {
         if (submob.parent != this) { submob.parent = this }
@@ -292,6 +314,7 @@ export class Mobject {
     }
 
     selfDragging(e) {
+        console.log('self dragging')
         let dragPoint = new Vertex(pointerEventPageLocation(e))
         let dr = dragPoint.subtract(this.dragPointStart)
         this.anchor.copyFrom(this.dragAnchorStart.add(dr))

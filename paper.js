@@ -184,6 +184,7 @@ class Paper extends Mobject {
 
 
     startCreating(e) {
+        console.log('start creating')
         this.creationStartPoint = pointerEventVertex(e)
         this.creationGroup = new CreationGroup({
             startPoint: this.creationStartPoint,

@@ -17,9 +17,9 @@ export class Segment extends Polygon {
     }
 
     update(argsDict) {
-        super.update(argsDict)
         this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-        this.updateView()
+        super.update(argsDict)
+        //this.updateView()
     }
 
     drawingStartPoint() { return this.startPoint }
