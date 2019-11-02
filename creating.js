@@ -2,13 +2,13 @@ import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMo
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import { Segment, Line } from './modules/arrows.js'
+import { Segment, Ray, Line } from './modules/arrows.js'
 
 export class CreatedMobject extends MGroup {
     
     dissolveInto(superMobject) {
-        if (!this.visible) { return }
         superMobject.remove(this)
+        if (!this.visible) { return }
         for (let submob of this.children) {
             superMobject.add(submob)
         }
@@ -61,30 +61,43 @@ export class Freehand extends CreatedMobject {
     updateFromTip(q) {
         this.updateWithLines(q)
     }
+
+    dissolveInto(superMobject) {
+        superMobject.remove(this)
+        if (this.visible) {
+            superMobject.add(this)
+        }
+    }
 }
 
 
 
-export class FreePoint extends Circle {
+export class Point extends Circle {
 
     constructor(argsDict) {
         super(argsDict)
-        this.setAttributes({
-            draggable: true
-        })
         this.view.setAttribute('class', this.constructor.name)
         this.setDefaults({
             midPoint: Vertex.origin(),
         })
 
         this.radius = 5
-        this.enableDragging()
     }
 
     update(argsDict) {
         super.update(argsDict)
     }
 
+}
+
+export class FreePoint extends Point {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setAttributes({
+            draggable: true
+        })
+        this.enableDragging()
+    }
 }
 
 
@@ -94,9 +107,77 @@ export class DrawnSegment extends CreatedMobject {
         super(argsDict)
         this.endPoint = this.endPoint || this.startPoint.copy()
         this.passAlongEvents = true
-        this.startFreePoint = new FreePoint({midPoint: this.startPoint})
-        this.endFreePoint = new FreePoint({midPoint: this.endPoint})
-        this.line = new Segment({startPoint: this.drawnStartPoint(), endPoint: this.drawnEndPoint()})
+        this.startFreePoint = new FreePoint({
+            midPoint: this.startPoint
+        })
+        this.endFreePoint = new FreePoint({
+            midPoint: this.endPoint
+        })
+        this.segment = new Segment({
+            startPoint: this.startFreePoint.midPoint,
+            endPoint: this.endFreePoint.midPoint
+        })
+        this.add(this.segment)
+        this.add(this.startFreePoint)
+        this.add(this.endFreePoint)
+        this.startFreePoint.dependents.push(this.segment)
+        this.endFreePoint.dependents.push(this.segment)
+    }
+
+    updateFromTip(q) {
+        this.endPoint.copyFrom(q)
+        this.update()
+    }
+
+}
+
+export class DrawnRay extends CreatedMobject {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.endPoint = this.endPoint || this.startPoint.copy()
+        this.passAlongEvents = true
+        this.startFreePoint = new FreePoint({
+            midPoint: this.startPoint
+        })
+        this.endFreePoint = new FreePoint({
+            midPoint: this.endPoint
+        })
+        this.ray = new Ray({
+            startPoint: this.startFreePoint.midPoint,
+            endPoint: this.endFreePoint.midPoint
+        })
+        this.add(this.ray)
+        this.add(this.startFreePoint)
+        this.add(this.endFreePoint)
+        this.startFreePoint.dependents.push(this.ray)
+        this.endFreePoint.dependents.push(this.ray)
+    }
+
+    updateFromTip(q) {
+        this.endPoint.copyFrom(q)
+        this.update()
+    }
+
+}
+
+
+export class DrawnLine extends CreatedMobject {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.endPoint = this.endPoint || this.startPoint.copy()
+        this.passAlongEvents = true
+        this.startFreePoint = new FreePoint({
+            midPoint: this.startPoint
+        })
+        this.endFreePoint = new FreePoint({
+            midPoint: this.endPoint
+        })
+        this.line = new Line({
+            startPoint: this.startFreePoint.midPoint,
+            endPoint: this.endFreePoint.midPoint
+        })
         this.add(this.line)
         this.add(this.startFreePoint)
         this.add(this.endFreePoint)
@@ -107,21 +188,8 @@ export class DrawnSegment extends CreatedMobject {
     updateFromTip(q) {
         this.endPoint.copyFrom(q)
         this.update()
-        this.endFreePoint.anchor = this.endPoint
-        this.endFreePoint.updateView()
     }
 
-
-    drawnStartPoint() { return this.startPoint }
-    drawnEndPoint() { return this.endPoint }
-
-
-}
-
-export class DrawnRay extends DrawnSegment {
-    drawnEndPoint() {
-        return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
-    }
 }
 
 
@@ -232,7 +300,8 @@ export class CreationGroup extends CreatedMobject {
         this.creations = { }
         this.creations['freehand'] = new Freehand()
         this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
-        //this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
+        this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
+        this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {
