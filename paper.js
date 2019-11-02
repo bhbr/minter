@@ -3,7 +3,7 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { CreationGroup, CindyCanvas } from './creating.js'
+import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
 
 
 class Paper extends Mobject {
@@ -14,6 +14,7 @@ class Paper extends Mobject {
         this.setDragging(false)
         this.visibleCreation = 'freehand'
         this.cindyPorts = []
+        this.snappablePoints = []
 
 //         this.useCapture = true
 //         this.isCreating = false
@@ -208,14 +209,27 @@ class Paper extends Mobject {
         document.body.appendChild(cindyCanvas.script)
     }
 
+
     removeCindy(cindyCanvas) {
         cindyCanvas.view.remove()
         cindyCanvas.script.remove()
     }
 
+    addFreePoint(fp) {
+        this.snappablePoints.push(fp.midPoint)
+        super.add(fp)
+    }
+
+    removeFreePoint(fp) {
+        this.snappablePoints.remove(fp.midPoint)
+        super.remove(fp)
+    }
+
     add(mobject) {
         if (mobject instanceof CindyCanvas) {
             this.addCindy(mobject)
+        } else if (mobject instanceof FreePoint) {
+            this.addFreePoint(mobject)
         } else {
             super.add(mobject)
         }
@@ -224,6 +238,8 @@ class Paper extends Mobject {
     remove(mobject) {
         if (mobject instanceof CindyCanvas) {
             this.removeCindy(mobject)
+        } else if (mobject instanceof FreePoint) {
+            this.removeFreePoint(mobject)
         } else {
             super.remove(mobject)
         }
