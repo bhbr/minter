@@ -326,6 +326,12 @@ export class Mobject {
         this.dragAnchorStart = undefined
     }
 
+    checkForAttributes(attrs) {
+        for (let attr of attrs) {
+            if (this[attr] == undefined) { return false }
+        }
+        return true
+    }
 
 
 

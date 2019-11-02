@@ -1,7 +1,7 @@
 import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
-import { Circle } from './modules/shapes.js'
+import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 
 export class CreatedMobject extends MGroup {
@@ -175,7 +175,6 @@ export class DrawnCircle extends CreatedMobject {
 
     constructor(argsDict) {
         super(argsDict)
-        
         this.setDefaults({
             strokeColor: rgb(1, 1, 1),
             fillOpacity: 0
@@ -183,20 +182,29 @@ export class DrawnCircle extends CreatedMobject {
         this.setAttributes({
             strokeWidth: 1
         })
-        this.update()
+
+        this.midPoint = this.midPoint || this.startPoint.copy()
+        this.outerPoint = this.outerPoint || this.startPoint.copy()
+        this.passAlongEvents = true
+        this.freeMidpoint = new FreePoint({
+            midPoint: this.midPoint
+        })
+        this.freeOuterPoint = new FreePoint({
+            midPoint: this.outerPoint
+        })
+        this.circle = new TwoPointCircle({
+            midPoint: this.midPoint,
+            outerPoint: this.outerPoint
+        })
+        this.add(this.freeMidpoint)
+        this.add(this.freeOuterPoint)
+        this.add(this.circle)
+
     }
 
-    update() {
-        let innie = this.midPoint
-        let outie = this.outerPoint
-        if (outie == undefined) { return }
-        this._radius = innie.subtract(outie).norm()
-        this.updateBezierPoints()
-        this.transform.e = innie.x
-        this.transform.f = innie.y
-
-        super.update()
-
+    updateFromTip(q) {
+        this.outerPoint.copyFrom(q)
+        this.update()
     }
 }
 
@@ -311,20 +319,17 @@ export class CreationGroup extends CreatedMobject {
         this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
         this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
         this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
+        this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
         //this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {
             this.add(creation)
-            if (creation.constructor.name == 'DrawnSegment') {
-                console.log('adding to CG', creation)
-            }
         }
         this.update()
 
     }
 
     updateFromTip(q) {
-        console.log('CreationGroup.updateFromTip')
         for (let creation of Object.values(this.creations)) {
             creation.updateFromTip(q)
         }
