@@ -3,7 +3,7 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { CreationGroup } from './creating.js'
+import { CreationGroup, CindyCanvas } from './creating.js'
 
 
 class Paper extends Mobject {
@@ -13,7 +13,8 @@ class Paper extends Mobject {
         this.children = []
         this.setDragging(false)
         this.visibleCreation = 'freehand'
-        
+        this.cindyPorts = []
+
 //         this.useCapture = true
 //         this.isCreating = false
 //         this.draggedMobject = undefined
@@ -38,7 +39,6 @@ class Paper extends Mobject {
 //         this.freehands = []
 //         this.freePoints = []
 //         this.constructions = []
-//         this.cindyPorts = []
 
 //         this.newFreehand = undefined
 //         this.newPoints = []
@@ -184,7 +184,6 @@ class Paper extends Mobject {
 
 
     startCreating(e) {
-        console.log('start creating')
         this.creationStartPoint = pointerEventVertex(e)
         this.creationGroup = new CreationGroup({
             startPoint: this.creationStartPoint,
@@ -203,6 +202,42 @@ class Paper extends Mobject {
         this.remove(this.creationGroup)
         this.creationGroup = undefined
     }
+
+    addCindy(cindyCanvas) {
+        document.querySelector('#paper-container').insertBefore(cindyCanvas.view, document.querySelector('#paper-console'))
+        document.body.appendChild(cindyCanvas.script)
+    }
+
+    removeCindy(cindyCanvas) {
+        cindyCanvas.view.remove()
+        cindyCanvas.script.remove()
+    }
+
+    add(mobject) {
+        if (mobject instanceof CindyCanvas) {
+            this.addCindy(mobject)
+        } else {
+            super.add(mobject)
+        }
+    }
+
+    remove(mobject) {
+        if (mobject instanceof CindyCanvas) {
+            this.removeCindy(mobject)
+        } else {
+            super.remove(mobject)
+        }
+    }
+
+
+
+}
+
+export const paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
+
+
+
+
 
     // targetMobject(e) {
     // // which mobject have we clicked on?
@@ -528,12 +563,4 @@ class Paper extends Mobject {
 //         this.currentMode = 'freehand'
 //         this.draggedMobject = undefined
 //     }
-
-
-}
-
-export const paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
-
-
-
 
