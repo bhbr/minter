@@ -7,8 +7,8 @@ export class Circle extends CurvedShape {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
-            midPoint: Vertex.origin(),
-            radius: 10
+            radius: 10,
+            midPoint: Vertex.origin()
         })
     }
 
@@ -44,7 +44,6 @@ export class Circle extends CurvedShape {
         return new Vertex(this.radius, 0)
     }
 
-
 }
 
 export class TwoPointCircle extends Circle {
@@ -57,13 +56,13 @@ export class TwoPointCircle extends Circle {
         })
         this.view.style['pointer-events'] = 'none'
         this.radius = this.midPoint.subtract(this.outerPoint).norm()
-        this.update()
     }
 
     update(argsDict) {
         this.radius = this.midPoint.subtract(this.outerPoint).norm()
         super.update(argsDict)
     }
+
 }
 
 export class Ellipse extends CurvedShape {
@@ -78,6 +77,7 @@ export class Ellipse extends CurvedShape {
 
     get midPoint() { return this.anchor }
     set midPoint(newValue) { this.anchor = newValue }
+
 
 }
 

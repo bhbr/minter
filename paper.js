@@ -40,6 +40,7 @@ class Paper extends Mobject {
 //         this.freehands = []
 //         this.freePoints = []
 //         this.constructions = []
+//         this.cindyPorts = []
 
 //         this.newFreehand = undefined
 //         this.newPoints = []
@@ -249,8 +250,7 @@ class Paper extends Mobject {
 
 }
 
-export const paper = new Paper({view: document.querySelector('#paper'), passAlongEvents: true })
-
+export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
 
 
@@ -579,4 +579,5 @@ export const paper = new Paper({view: document.querySelector('#paper'), passAlon
 //         this.currentMode = 'freehand'
 //         this.draggedMobject = undefined
 //     }
+
 

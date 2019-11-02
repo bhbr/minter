@@ -314,7 +314,6 @@ export class Mobject {
     }
 
     selfDragging(e) {
-        console.log('self dragging')
         let dragPoint = new Vertex(pointerEventPageLocation(e))
         let dr = dragPoint.subtract(this.dragPointStart)
         this.anchor.copyFrom(this.dragAnchorStart.add(dr))
@@ -326,12 +325,6 @@ export class Mobject {
         this.dragAnchorStart = undefined
     }
 
-    checkForAttributes(attrs) {
-        for (let attr of attrs) {
-            if (this[attr] == undefined) { return false }
-        }
-        return true
-    }
 
 
 

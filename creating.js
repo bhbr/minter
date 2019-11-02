@@ -3,7 +3,6 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { paper } from './paper.js'
 
 export class CreatedMobject extends MGroup {
     
@@ -136,6 +135,8 @@ export class DrawnSegment extends DrawnArrow {
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.segment)
+        this.startFreePoint.dependents.push(this.segment)
+        this.endFreePoint.dependents.push(this.segment)
     }
 }
 
@@ -176,6 +177,7 @@ export class DrawnCircle extends CreatedMobject {
 
     constructor(argsDict) {
         super(argsDict)
+        
         this.setDefaults({
             strokeColor: rgb(1, 1, 1),
             fillOpacity: 0
@@ -200,6 +202,9 @@ export class DrawnCircle extends CreatedMobject {
         this.add(this.freeMidpoint)
         this.add(this.freeOuterPoint)
         this.add(this.circle)
+
+        this.freeMidpoint.dependents.push(this.circle)
+        this.freeOuterPoint.dependents.push(this.circle)
 
     }
 
@@ -234,21 +239,13 @@ export class DrawnRectangle extends CreatedMobject {
     }
 
 
-    updateFromTip(q) {
-        this.endPoint.copyFrom(q)
+    update(argsDict) {
+        super.update(argsDict)
         this.p2.x = this.endPoint.x
         this.p2.y = this.startPoint.y
         this.p4.x = this.startPoint.x
         this.p4.y = this.endPoint.y
         this.updateView()
-    }
-
-    dissolveInto(superMobject) {
-        let w = this.p2.x - this.p1.x
-        let h = this.p3.y - this.p1.y
-        let cindy = new CindyCanvas(this.p1, w, h)
-        superMobject.add(cindy)
-        superMobject.remove(this)
     }
     
 }
@@ -258,11 +255,11 @@ export class CindyCanvas {
     
     constructor(p, width, height) {
 
-        this.script = document.createElement('script')
-        this.script.setAttribute('type', 'text/x-cindyscript')
+        let script = document.createElement('script')
+        script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + paper.cindyPorts.length
-        this.script.setAttribute('id', scriptID)
-        this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
+        script.setAttribute('id', scriptID)
+        script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
         //script.textContent = 'colorplot(seconds());'
 
         this.view = document.createElement('div')
@@ -270,14 +267,14 @@ export class CindyCanvas {
         this.view.style.left =  p.x + "px"
         this.view.style.top = p.y + "px"
 
-        this.csView = document.createElement('div')
+        let csView = document.createElement('div')
         let canvasID = 'CSCanvas' + paper.cindyPorts.length
-        this.csView.setAttribute('id', canvasID)
+        csView.setAttribute('id', canvasID)
+        this.view.appendChild(csView)
+
         this.view.style['pointer-events'] = 'auto'
-
-        this.view.appendChild(this.csView)
-
-        paper.add(this)
+        document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
+        document.body.appendChild(script)
 
         paper.cindyPorts.push({
             id: canvasID,
@@ -310,8 +307,9 @@ export class CindyCanvas {
         return ret
     }
     
-    update(argsDict) { }
-    updateView() { }
+    update(argsDict) {
+        
+    }
     
 }
 
