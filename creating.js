@@ -3,6 +3,7 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
+import { paper } from './paper.js'
 
 export class CreatedMobject extends MGroup {
     
@@ -215,51 +216,17 @@ export class DrawnCircle extends CreatedMobject {
 }
 
 
-export class DrawnRectangle extends CreatedMobject {
-    
-    constructor(argsDict) {
-        super(argsDict)
-        this.endPoint = this.endPoint || this.startPoint.copy()
-        this.p1 = this.startPoint
-        this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
-        this.p3 = this.endPoint
-        this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
-        this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
-        this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
-        this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
-        this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
-        this.top.strokeColor = rgb(1, 1, 1)
-        this.bottom.strokeColor = rgb(1, 1, 1)
-        this.left.strokeColor = rgb(1, 1, 1)
-        this.right.strokeColor = rgb(1, 1, 1)
-        this.add(this.top)
-        this.add(this.bottom)
-        this.add(this.left)
-        this.add(this.right)
-    }
-
-
-    update(argsDict) {
-        super.update(argsDict)
-        this.p2.x = this.endPoint.x
-        this.p2.y = this.startPoint.y
-        this.p4.x = this.startPoint.x
-        this.p4.y = this.endPoint.y
-        this.updateView()
-    }
-    
-}
 
 
 export class CindyCanvas {
     
     constructor(p, width, height) {
 
-        let script = document.createElement('script')
-        script.setAttribute('type', 'text/x-cindyscript')
+        this.script = document.createElement('script')
+        this.script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + paper.cindyPorts.length
-        script.setAttribute('id', scriptID)
-        script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
+        this.script.setAttribute('id', scriptID)
+        this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
         //script.textContent = 'colorplot(seconds());'
 
         this.view = document.createElement('div')
@@ -267,14 +234,14 @@ export class CindyCanvas {
         this.view.style.left =  p.x + "px"
         this.view.style.top = p.y + "px"
 
-        let csView = document.createElement('div')
+        this.csView = document.createElement('div')
         let canvasID = 'CSCanvas' + paper.cindyPorts.length
-        csView.setAttribute('id', canvasID)
-        this.view.appendChild(csView)
+        this.csView.setAttribute('id', canvasID)
+        this.view.appendChild(this.csView)
 
         this.view.style['pointer-events'] = 'auto'
-        document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
-        document.body.appendChild(script)
+       
+        paper.add(this)
 
         paper.cindyPorts.push({
             id: canvasID,
@@ -307,11 +274,55 @@ export class CindyCanvas {
         return ret
     }
     
-    update(argsDict) {
-        
+    update(argsDict) { }
+    updateView() { }
+    
+}
+
+
+export class DrawnRectangle extends CreatedMobject {
+    
+    constructor(argsDict) {
+        super(argsDict)
+        this.endPoint = this.endPoint || this.startPoint.copy()
+        this.p1 = this.startPoint
+        this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
+        this.p3 = this.endPoint
+        this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
+        this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
+        this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
+        this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
+        this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
+        this.top.strokeColor = rgb(1, 1, 1)
+        this.bottom.strokeColor = rgb(1, 1, 1)
+        this.left.strokeColor = rgb(1, 1, 1)
+        this.right.strokeColor = rgb(1, 1, 1)
+        this.add(this.top)
+        this.add(this.bottom)
+        this.add(this.left)
+        this.add(this.right)
+    }
+
+    updateFromTip(q) {
+        this.endPoint.copyFrom(q)
+        this.p2.x = this.endPoint.x
+        this.p2.y = this.startPoint.y
+        this.p4.x = this.startPoint.x
+        this.p4.y = this.endPoint.y
+        this.updateView()
+    }
+
+    dissolveInto(superMobject) {
+        console.log('dissolving')
+        let w = this.p2.x - this.p1.x
+        let h = this.p3.y - this.p1.y
+        let cindy = new CindyCanvas(this.p1, w, h)
+        superMobject.add(cindy)
+        superMobject.remove(this)
     }
     
 }
+
 
 
 
