@@ -100,8 +100,7 @@ export class FreePoint extends Point {
     }
 }
 
-
-export class DrawnSegment extends CreatedMobject {
+export class DrawnArrow extends CreatedMobject {
 
     constructor(argsDict) {
         super(argsDict)
@@ -113,83 +112,92 @@ export class DrawnSegment extends CreatedMobject {
         this.endFreePoint = new FreePoint({
             midPoint: this.endPoint
         })
+        this.add(this.startFreePoint)
+        this.add(this.endFreePoint)
+        
+    }
+
+    updateFromTip(q) {
+        this.endPoint.copyFrom(q)
+        this.update()
+    }
+
+}
+
+
+export class DrawnSegment extends DrawnArrow {
+
+    constructor(argsDict) {
+
+        super(argsDict)
         this.segment = new Segment({
             startPoint: this.startFreePoint.midPoint,
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.segment)
-        this.add(this.startFreePoint)
-        this.add(this.endFreePoint)
-        this.startFreePoint.dependents.push(this.segment)
-        this.endFreePoint.dependents.push(this.segment)
     }
-
-    updateFromTip(q) {
-        this.endPoint.copyFrom(q)
-        this.update()
-    }
-
 }
 
-export class DrawnRay extends CreatedMobject {
+export class DrawnRay extends DrawnArrow {
 
     constructor(argsDict) {
         super(argsDict)
-        this.endPoint = this.endPoint || this.startPoint.copy()
-        this.passAlongEvents = true
-        this.startFreePoint = new FreePoint({
-            midPoint: this.startPoint
-        })
-        this.endFreePoint = new FreePoint({
-            midPoint: this.endPoint
-        })
         this.ray = new Ray({
             startPoint: this.startFreePoint.midPoint,
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.ray)
-        this.add(this.startFreePoint)
-        this.add(this.endFreePoint)
         this.startFreePoint.dependents.push(this.ray)
         this.endFreePoint.dependents.push(this.ray)
     }
 
-    updateFromTip(q) {
-        this.endPoint.copyFrom(q)
-        this.update()
-    }
 
 }
 
 
-export class DrawnLine extends CreatedMobject {
+export class DrawnLine extends DrawnArrow {
 
     constructor(argsDict) {
         super(argsDict)
-        this.endPoint = this.endPoint || this.startPoint.copy()
-        this.passAlongEvents = true
-        this.startFreePoint = new FreePoint({
-            midPoint: this.startPoint
-        })
-        this.endFreePoint = new FreePoint({
-            midPoint: this.endPoint
-        })
         this.line = new Line({
             startPoint: this.startFreePoint.midPoint,
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.line)
-        this.add(this.startFreePoint)
-        this.add(this.endFreePoint)
         this.startFreePoint.dependents.push(this.line)
         this.endFreePoint.dependents.push(this.line)
     }
 
-    updateFromTip(q) {
-        this.endPoint.copyFrom(q)
+
+}
+
+export class DrawnCircle extends CreatedMobject {
+
+    constructor(argsDict) {
+        super(argsDict)
+        
+        this.setDefaults({
+            strokeColor: rgb(1, 1, 1),
+            fillOpacity: 0
+        })
+        this.setAttributes({
+            strokeWidth: 1
+        })
         this.update()
     }
 
+    update() {
+        let innie = this.midPoint
+        let outie = this.outerPoint
+        if (outie == undefined) { return }
+        this._radius = innie.subtract(outie).norm()
+        this.updateBezierPoints()
+        this.transform.e = innie.x
+        this.transform.f = innie.y
+
+        super.update()
+
+    }
 }
 
 
@@ -290,6 +298,7 @@ export class CindyCanvas {
     }
     
 }
+
 
 
 

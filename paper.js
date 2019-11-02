@@ -1,9 +1,9 @@
 import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
-import { Circle, DrawnCircle } from './modules/shapes.js'
+import { Circle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { CreationGroup, Freehand, FreePoint, DrawnSegment } from './creating.js'
+import { CreationGroup } from './creating.js'
 
 
 class Paper extends Mobject {

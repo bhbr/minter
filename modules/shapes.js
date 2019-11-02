@@ -52,36 +52,6 @@ export class Circle extends CurvedShape {
 
 }
 
-export class DrawnCircle extends Circle {
-
-    constructor(argsDict) {
-        super(argsDict)
-        this.setDefaults({
-            strokeColor: rgb(1, 1, 1),
-            //outerPoint: new Vertex(10, 0),
-            fillOpacity: 0
-        })
-        this.setAttributes({
-            strokeWidth: 1
-        })
-        this.update()
-    }
-
-    update() {
-        let innie = this.midPoint
-        let outie = this.outerPoint
-        if (outie == undefined) { return }
-        this._radius = innie.subtract(outie).norm()
-        this.updateBezierPoints()
-        this.transform.e = innie.x
-        this.transform.f = innie.y
-
-        super.update()
-
-    }
-}
-
-
 export class Ellipse extends CurvedShape {
     
     constructor(midPoint, majorAxis, minorAxis, tilt) {
