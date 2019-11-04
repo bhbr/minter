@@ -20,7 +20,7 @@ export class Mobject {
             fillColor: rgb(1, 1, 1),
             passAlongEvents: false, // to event target
             visible: true,
-            draggable: false // by outisde forces
+            draggable: false // by outside forces, that is
         })
         this.show()
 

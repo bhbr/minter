@@ -11,6 +11,7 @@ class Paper extends Mobject {
      constructor(argsDict) {
         super(argsDict)
         this.children = []
+        this.cindys = []
         this.setDragging(false)
         this.visibleCreation = 'freehand'
         this.cindyPorts = []
@@ -59,7 +60,10 @@ class Paper extends Mobject {
 
     setDragging(flag) {
         this.passAlongEvents = !flag
-        console.log('setting dragging')
+        for (let c of this.cindys) {
+            c.draggable = flag
+            c.view.style['pointer-events'] = (flag ? 'none' : 'auto')
+        }
         if (flag) {
             this.selfHandlePointerDown = this.startDragging
             this.selfHandlePointerMove = this.dragging
@@ -73,8 +77,7 @@ class Paper extends Mobject {
 
 
     startDragging(e) {
-        this.draggedMobject = this.eventTargetMobject(e)
-        console.log('starting dragging')
+        this.draggedMobject = this.cindys[0]// this.eventTargetMobject(e)
         if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
@@ -88,6 +91,10 @@ class Paper extends Mobject {
         let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
         this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
+        if (this.draggedMobject instanceof CindyCanvas) {
+            this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
+            this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
+        }
         this.draggedMobject.update()
     }
 
@@ -170,6 +177,7 @@ class Paper extends Mobject {
     addCindy(cindyCanvas) {
         document.querySelector('#paper-container').insertBefore(cindyCanvas.view, document.querySelector('#paper-console'))
         document.body.appendChild(cindyCanvas.script)
+        this.cindys.push(cindyCanvas)
     }
 
 

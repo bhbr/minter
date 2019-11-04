@@ -1,6 +1,6 @@
 import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
-import { MGroup } from './modules/mobject.js'
+import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { paper } from './paper.js'
@@ -309,10 +309,10 @@ export class DrawnCircle extends CreatedMobject {
 
 
 
-export class CindyCanvas {
+export class CindyCanvas extends Mobject {
     
     constructor(p, width, height) {
-
+        super({anchor: p, width: width, height: height})
         this.script = document.createElement('script')
         this.script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + paper.cindyPorts.length
