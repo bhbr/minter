@@ -1,4 +1,4 @@
-import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
+import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
@@ -196,7 +196,16 @@ class Paper extends Mobject {
     }
 
     creativeMove(e) {
-        this.creationGroup.updateFromTip(pointerEventVertex(e))
+        let p = pointerEventVertex(e)
+        for (let fq of this.snappablePoints) {
+            let q = fq.midPoint
+            if (p.subtract(q).norm() < 10) {
+                p = q
+                break
+            }
+        }
+
+        this.creationGroup.updateFromTip(p)
     }
 
     endCreating(e) {
@@ -217,12 +226,12 @@ class Paper extends Mobject {
     }
 
     addFreePoint(fp) {
-        this.snappablePoints.push(fp.midPoint)
+        this.snappablePoints.push(fp)
         super.add(fp)
     }
 
     removeFreePoint(fp) {
-        this.snappablePoints.remove(fp.midPoint)
+        remove(this.snappablePoints, fp)
         super.remove(fp)
     }
 
