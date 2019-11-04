@@ -17,46 +17,35 @@ class Paper extends Mobject {
         this.cindyPorts = []
         this.snappablePoints = []
 
-//         this.colorPalette = {
-//             'black': rgb(0, 0, 0),
-//             'white': rgb(1, 1, 1),
-//             'red': rgb(1, 0, 0),
-//             'orange': rgb(1, 0.5, 0),
-//             'yellow': rgb(1, 1, 0),
-//             'green': rgb(0, 1, 0),
-//             'blue': rgb(0, 0, 1),
-//             'indigo': rgb(0.5, 0, 1),
-//             'violet': rgb(1, 0, 1)
-//         }
-//         this.currentColor = this.colorPalette['white']
-
-
-
+        this.colorPalette = {
+            'black': rgb(0, 0, 0),
+            'white': rgb(1, 1, 1),
+            'red': rgb(1, 0, 0),
+            'orange': rgb(1, 0.5, 0),
+            'yellow': rgb(1, 1, 0),
+            'green': rgb(0, 1, 0),
+            'blue': rgb(0, 0, 1),
+            'indigo': rgb(0.5, 0, 1),
+            'violet': rgb(1, 0, 1)
+        }
+        this.currentColor = this.colorPalette['white']
 
      }
 
-//     changeColorByName(newColorName) {
-//         let newColor = this.colorPalette[newColorName]
-//         this.changeColor(newColor)
-//     }
+    changeColorByName(newColorName) {
+        let newColor = this.colorPalette[newColorName]
+        this.changeColor(newColor)
+    }
 
-//     changeColor(newColor) {
-//         this.currentColor = newColor
-//         for (let mob of Object.values(this.newConstructions)) {
-//             mob.strokeColor = this.currentColor
-//             mob.fillColor = this.currentColor
-//         }
-//         for (let mob of Object.values(this.newPoints)) {
-//             mob.strokeColor = this.currentColor
-//             mob.fillColor = this.currentColor
-//         }
-//         try {
-//             this.newFreehand.strokeColor = this.currentColor
-//             this.newFreehand.fillColor = this.currentColor
-//         } catch { }
-
-//     }
-
+    changeColor(newColor) {
+        this.currentColor = newColor
+        console.log(newColor)
+        if (this.creationGroup == undefined) { return }
+        this.creationGroup.strokeColor = this.currentColor
+        this.creationGroup.fillColor = this.currentColor
+        this.creationGroup.update()
+        console.log('changing color')
+    }
 
     setDragging(flag) {
         this.passAlongEvents = !flag
@@ -77,7 +66,7 @@ class Paper extends Mobject {
 
 
     startDragging(e) {
-        this.draggedMobject = this.cindys[0]// this.eventTargetMobject(e)
+        this.draggedMobject = this.eventTargetMobject(e)
         if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
@@ -105,6 +94,8 @@ class Paper extends Mobject {
     }
 
     handleMessage(message) {
+        if (message == undefined || message == {}) { return }
+        console.log(message)
         let key = Object.keys(message)[0]
         let value = Object.values(message)[0]
 
@@ -120,6 +111,7 @@ class Paper extends Mobject {
             }
             break
         case 'color':
+            console.log('changing color to', value)
             this.changeColor(value)
             break
         case 'drag':
@@ -151,6 +143,8 @@ class Paper extends Mobject {
             startPoint: this.creationStartPoint,
             visibleCreation: this.visibleCreation
         })
+        this.creationGroup.strokeColor = this.currentColor
+        this.creationGroup.fillColor = this.currentColor
         this.add(this.creationGroup)
         this.changeVisibleCreation(this.visibleCreation)
     }
@@ -170,8 +164,10 @@ class Paper extends Mobject {
 
     endCreating(e) {
         this.creationGroup.dissolveInto(this)
+        console.log(this.creationGroup)
         this.remove(this.creationGroup)
         this.creationGroup = undefined
+
     }
 
     addCindy(cindyCanvas) {
@@ -226,35 +222,5 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 
 
 
-
-
-
-
-//     startDragging(p, mob) {
-//         let oldX = parseInt(mob.view.style.left.replace('px', ''))
-//         let oldY = parseInt(mob.view.style.top.replace('px', ''))
-//         let q = new Vertex(oldX, oldY)
-//         this.mobOffsetFromCursor = q.subtract(p)
-        
-//         addPointerMove(this.view, this.boundDrag)
-//         addPointerUp(this.view, this.boundEndDragging)
-//     }
-
-//     drag(e) {
-//         let dragPoint = new Vertex(pointerEventPageLocation(e))
-//         let mob = null
-//         for (let mob2 of this.constructions) {
-//             if (mob2 instanceof CindyCanvas) {mob = mob2 }
-//         }
-//         mob.view.style.left = (dragPoint.x + this.mobOffsetFromCursor.x) + 'px'
-//         mob.view.style.top = (dragPoint.y + this.mobOffsetFromCursor.y) + 'px'
-//     }
-
-//     endDragging(e) {
-//         removePointerMove(this.view, this.boundDrag)
-//         removePointerUp(this.view, this.boundEndDragging)
-//         this.currentMode = 'freehand'
-//         this.draggedMobject = undefined
-//     }
 
 

@@ -41,10 +41,9 @@ class SidebarButton extends Circle {
             radius: buttonRadius
         })
 
+        this.updateModeIndex(0)
         this.text = new TextLabel({text: 'text'})
-        try { this.text.text = this.messages[0][1] } catch { }
-        this.text.anchor = Vertex.origin()
-        this.add(this.text)
+        this.updateLabel()
 
         this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
         this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
@@ -58,6 +57,12 @@ class SidebarButton extends Circle {
         document.addEventListener('keydown', this.boundButtonDownByKey)
     }
     
+    updateLabel() {
+        try { this.text.text = Object.values(this.messages[0])[0] } catch { }
+        this.text.anchor = Vertex.origin()
+        this.add(this.text)
+        console.log(this.text.text)
+    }
     
     get baseColor() { return this._baseColor }
     set baseColor(newColor) {
@@ -123,7 +128,6 @@ class SidebarButton extends Circle {
         this.commonButtonUp()
     }
     
-    
     buttonUpByKey(e) {
         if (e.key == this.key) {
             document.removeEventListener('keyup', this.boundButtonUpByKey)
@@ -137,7 +141,6 @@ class SidebarButton extends Circle {
         this.updateView()
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.updateModeIndex(0)
         this.text.view.setAttribute('font-size', '12')
         this.messagePaper(this.outgoingMessage)
     }
@@ -150,14 +153,15 @@ class SidebarButton extends Circle {
         }
     }
     
-    updateModeIndex(newIndex) {
+    updateModeIndex(newIndex, withMessage) {
         if (newIndex == this.currentModeIndex || newIndex == -1) { return }
         this.currentModeIndex = newIndex
         let message = this.messages[this.currentModeIndex]
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.messagePaper(message)
+        if (withMessage) { this.messagePaper(message) }
         if (this.showLabel) {
-            this.text.text = message[1]
+            this.updateLabel()
+            console.log(this.text.text)
         } else {
             this.text.text = ''
         }
@@ -167,7 +171,7 @@ class SidebarButton extends Circle {
         if (this.currentModeIndex == this.messages.length - 1) { return }
         let dx = this.optionSpacing * (this.currentModeIndex + 1)
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
-        this.updateModeIndex(this.currentModeIndex + 1)
+        this.updateModeIndex(this.currentModeIndex + 1, true)
     }
     
     
@@ -175,7 +179,7 @@ class SidebarButton extends Circle {
         if (this.currentModeIndex == 0) { return }
         let dx = this.optionSpacing * (this.currentModeIndex - 1)
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
-        this.updateModeIndex(this.currentModeIndex - 1)
+        this.updateModeIndex(this.currentModeIndex - 1, true)
     }
     
     buttonDrag(e) {
@@ -195,7 +199,7 @@ class SidebarButton extends Circle {
         
         this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 
-        this.updateModeIndex(Math.floor(dx/this.optionSpacing))
+        this.updateModeIndex(Math.floor(dx/this.optionSpacing), true)
         
     }
     
@@ -208,36 +212,35 @@ class ColorChangeButton extends SidebarButton {
         this.setAttributes({
             showLabel: false,
             palette: {
-                'white': [1, 1, 1],
-                'red': [1, 0, 0],
-                'orange': [1, 0.5, 0],
-                'yellow': [1, 1, 0],
-                'green': [0, 1, 0],
-                'blue': [0, 0, 1],
-                'indigo': [0.5, 0, 1],
-                'violet': [1, 0, 1]
+                'white': rgb(1, 1, 1),
+                'red': rgb(1, 0, 0),
+                'orange': rgb(1, 0.5, 0),
+                'yellow': rgb(1, 1, 0),
+                'green': rgb(0, 1, 0),
+                'blue': rgb(0, 0, 1),
+                'indigo': rgb(0.5, 0, 1),
+                'violet': rgb(1, 0, 1)
             }
         })
         this.colors = Object.keys(this.palette)
-        this.text.text = ''
+        this.text.text = 'color'
+
+        this.messages = []
+        for (let value of Object.values(this.palette)) {
+            this.messages.push({color: value})
+        }
+        this.outgoingMessage = {}
     }
 
     colorForIndex(i) {
         return SidebarButton.brighten(this.palette[this.colors[i]], 1)
     }
 
-    commonButtonUp() {
-        this.radius = buttonRadius
-        this.midPoint = buttonCenter(this.locationIndex)
-        this.updateView()
-        this.active = false
-        this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.text.view.setAttribute('font-size', '12')
-        this.changeColor(this.fillColor)
-    }
-
-    changeColor(newColor) {
-        this.messagePaper({color: newColor})
+    updateLabel() {
+        try { this.text.text = Object.keys(this.palette)[this.currentModeIndex] } catch { }
+        this.text.anchor = Vertex.origin()
+        this.add(this.text)
+        console.log(this.text.text)
     }
 
 }
@@ -252,6 +255,14 @@ class CreativeButton extends SidebarButton {
         }
         this.outgoingMessage = {creating: 'freehand'}
         super.update()
+        this.updateLabel()
+    }
+
+    updateLabel() {
+        try { this.text.text = this.creations[this.currentModeIndex] } catch { }
+        this.text.anchor = Vertex.origin()
+        this.add(this.text)
+        console.log(this.text.text)
     }
 }
 
@@ -279,23 +290,24 @@ let cindyButton = new CreativeButton({
 cindyButton.baseColor = gray(0.6)
 sidebar.add(cindyButton)
   
-// let colorButton = new ColorChangeButton({
-//     key: 'r',
-//     modeSpacing: 15,
-//     locationIndex: 3
-// })
-// colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0)
-// sidebar.add(colorButton)
-
 let dragButton = new SidebarButton({
     messages: [{drag: true}],
     outgoingMessage: {drag: false},
     key: 'a',
-    locationIndex: 4
+    locationIndex: 3
 })
-dragButton.baseColor = gray(1)
+dragButton.baseColor = gray(0.8)
 dragButton.text.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
+
+let colorButton = new ColorChangeButton({
+    key: 'r',
+    modeSpacing: 15,
+    locationIndex: 4
+})
+colorButton.baseColor = gray(1.0)
+console.log(colorButton.palette['white'])
+sidebar.add(colorButton)
 
 
 let creating = false

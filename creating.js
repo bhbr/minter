@@ -171,7 +171,12 @@ export class DrawnSegment extends DrawnArrow {
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
         paper.remove(this.segment)
-        this.segment = new Segment({startPoint: this.startPoint, endPoint: this.endPoint})
+        this.segment = new Segment({
+            startPoint: this.startPoint,
+            endPoint: this.endPoint,
+            strokeColor: this.strokeColor,
+        })
+
         this.startFreePoint.dependents.push(this.segment)
         this.endFreePoint.dependents.push(this.segment)
         paper.add(this.segment)
@@ -185,7 +190,7 @@ export class DrawnRay extends DrawnArrow {
         super(argsDict)
         this.ray = new Ray({
             startPoint: this.startFreePoint.midPoint,
-            endPoint: this.endFreePoint.midPoint
+            endPoint: this.endFreePoint.midPoint,
         })
         this.add(this.ray)
         this.startFreePoint.dependents.push(this.ray)
@@ -194,8 +199,12 @@ export class DrawnRay extends DrawnArrow {
 
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
-        paper.remove(this.segment)
-        this.ray = new Ray({startPoint: this.startPoint, endPoint: this.endPoint})
+        paper.remove(this.ray)
+        this.ray = new Ray({
+            startPoint: this.startPoint,
+            endPoint: this.endPoint,
+            strokeColor: this.strokeColor
+        })
         this.startFreePoint.dependents.push(this.ray)
         this.endFreePoint.dependents.push(this.ray)
         paper.add(this.ray)
@@ -220,7 +229,11 @@ export class DrawnLine extends DrawnArrow {
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
         paper.remove(this.line)
-        this.line = new Line({startPoint: this.startPoint, endPoint: this.endPoint})
+        this.line = new Line({
+            startPoint: this.startPoint,
+            endPoint: this.endPoint,
+            strokeColor: this.strokeColor
+        })
         this.startFreePoint.dependents.push(this.line)
         this.endFreePoint.dependents.push(this.line)
         paper.add(this.line)
@@ -297,7 +310,12 @@ export class DrawnCircle extends CreatedMobject {
         paper.add(this.freeOuterPoint)
         
         paper.remove(this.circle)
-        this.circle = new TwoPointCircle({midPoint: this.midPoint, outerPoint: this.outerPoint})
+        this.circle = new TwoPointCircle({
+            midPoint: this.midPoint,
+            outerPoint: this.outerPoint
+        })
+        this.circle.strokeColor = this.strokeColor
+        console.log(this.strokeColor)
         this.freeMidpoint.dependents.push(this.circle)
         this.freeOuterPoint.dependents.push(this.circle)
         paper.add(this.circle)
@@ -404,7 +422,6 @@ export class DrawnRectangle extends CreatedMobject {
     }
 
     dissolveInto(superMobject) {
-        console.log('dissolving')
         let w = this.p2.x - this.p1.x
         let h = this.p3.y - this.p1.y
         let cindy = new CindyCanvas(this.p1, w, h)
@@ -443,12 +460,17 @@ export class CreationGroup extends CreatedMobject {
         }
     }
 
+
     setVisibleCreation(visibleCreation) {
         for (let mob of Object.values(this.creations)) {
             mob.hide()
         }
         this.visibleCreation = visibleCreation
         this.creations[visibleCreation].show()
+
+        if (visibleCreation == 'cindy') {
+            this.creations[visibleCreation].strokeColor = rgb(1, 1, 1)
+        }
     }
 
     dissolveInto(superMobject) {
