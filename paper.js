@@ -127,7 +127,14 @@ class Paper extends Mobject {
 
         switch (key) {
         case 'creating':
-            this.changeVisibleCreation(value)
+                this.changeVisibleCreation(value)
+            if (value == 'freehand') {
+                this.passAlongEvents = true
+                break
+            }
+            if (this.creationGroup == undefined) {
+                this.passAlongEvents = false
+            }
             break
         case 'color':
             this.changeColor(value)
@@ -186,10 +193,17 @@ class Paper extends Mobject {
 
 
     startCreating(e) {
+
         this.creationStartPoint = pointerEventVertex(e)
+        for (let fp of this.snappablePoints) {
+            if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
+                this.creationStartPoint = fp.midPoint
+            }
+        }
+
         this.creationGroup = new CreationGroup({
             startPoint: this.creationStartPoint,
-            visibleCreation: 'freehand'
+            visibleCreation: this.visibleCreation
         })
         this.add(this.creationGroup)
         this.changeVisibleCreation(this.visibleCreation)
