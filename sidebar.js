@@ -279,13 +279,13 @@ let cindyButton = new CreativeButton({
 cindyButton.baseColor = gray(0.6)
 sidebar.add(cindyButton)
   
-let colorButton = new ColorChangeButton({
-    key: 'r',
-    modeSpacing: 15,
-    locationIndex: 3
-})
-colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0)
-sidebar.add(colorButton)
+// let colorButton = new ColorChangeButton({
+//     key: 'r',
+//     modeSpacing: 15,
+//     locationIndex: 3
+// })
+// colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0)
+// sidebar.add(colorButton)
 
 let dragButton = new SidebarButton({
     messages: [{drag: true}],
