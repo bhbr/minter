@@ -35,15 +35,20 @@ class SidebarButton extends Circle {
             locationIndex: 0,
             optionSpacing: 25,
             active: false,
-            showLabel: true
+            showLabel: true,
+            text: 'text',
+            fontSize: 12,
         })
         this.setAttributes({
             radius: buttonRadius
         })
 
         this.updateModeIndex(0)
-        this.text = new TextLabel({text: 'text'})
-        this.updateLabel()
+        this.label = new TextLabel({text: this.text})
+        this.label.view.setAttribute('font-size', this.fontSize.toString())
+        this.label.anchor = Vertex.origin()
+        this.add(this.label)
+        this.update()
 
         this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
         this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
@@ -55,13 +60,6 @@ class SidebarButton extends Circle {
         
         addPointerDown(this.view, this.boundButtonDownByPointer)
         document.addEventListener('keydown', this.boundButtonDownByKey)
-    }
-    
-    updateLabel() {
-        try { this.text.text = Object.values(this.messages[0])[0] } catch { }
-        this.text.anchor = Vertex.origin()
-        this.add(this.text)
-        console.log(this.text.text)
     }
     
     get baseColor() { return this._baseColor }
@@ -103,7 +101,7 @@ class SidebarButton extends Circle {
         this.active = true
         this.radius = buttonRadius * buttonScaleFactor
         this.messagePaper(this.messages[0])
-        this.text.view.setAttribute('font-size', '16')
+        this.update()
     }
     
     buttonDownByPointer(e) {
@@ -138,10 +136,10 @@ class SidebarButton extends Circle {
     commonButtonUp() {
         this.radius = buttonRadius
         this.midPoint = buttonCenter(this.locationIndex)
-        this.updateView()
+        this.update()
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.text.view.setAttribute('font-size', '12')
+        this.label.view.setAttribute('font-size', this.fontSize.toString())
         this.messagePaper(this.outgoingMessage)
     }
 
@@ -152,6 +150,24 @@ class SidebarButton extends Circle {
             paper.handleMessage(message)
         }
     }
+
+    updateLabel() {
+        let f = this.active ? buttonScaleFactor : 1
+        this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+        if (this.showLabel) {
+            try {
+                let msg = this.messages[this.currentModeIndex]
+                this.label.text = Object.values(msg)[0]
+            } catch { }
+        } else {
+            this.label.text = ''
+        }
+    }
+
+    update(argsDict) {
+        super.update(argsDict)
+        this.updateLabel()
+    }
     
     updateModeIndex(newIndex, withMessage) {
         if (newIndex == this.currentModeIndex || newIndex == -1) { return }
@@ -159,12 +175,8 @@ class SidebarButton extends Circle {
         let message = this.messages[this.currentModeIndex]
         this.fillColor = this.colorForIndex(this.currentModeIndex)
         if (withMessage) { this.messagePaper(message) }
-        if (this.showLabel) {
-            this.updateLabel()
-            console.log(this.text.text)
-        } else {
-            this.text.text = ''
-        }
+ 
+        this.update()
     }
     
     selectNextOption() {
@@ -223,7 +235,8 @@ class ColorChangeButton extends SidebarButton {
             }
         })
         this.colors = Object.keys(this.palette)
-        this.text.text = 'color'
+        this.label.text = 'color'
+        this.label.view.setAttribute('fill', 'black')
 
         this.messages = []
         for (let value of Object.values(this.palette)) {
@@ -233,14 +246,12 @@ class ColorChangeButton extends SidebarButton {
     }
 
     colorForIndex(i) {
-        return SidebarButton.brighten(this.palette[this.colors[i]], 1)
+        return this.palette[this.colors[i]]
     }
 
     updateLabel() {
-        try { this.text.text = Object.keys(this.palette)[this.currentModeIndex] } catch { }
-        this.text.anchor = Vertex.origin()
-        this.add(this.text)
-        console.log(this.text.text)
+        let f = this.active ? buttonScaleFactor : 1
+        this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
     }
 
 }
@@ -258,12 +269,42 @@ class CreativeButton extends SidebarButton {
         this.updateLabel()
     }
 
-    updateLabel() {
-        try { this.text.text = this.creations[this.currentModeIndex] } catch { }
-        this.text.anchor = Vertex.origin()
-        this.add(this.text)
-        console.log(this.text.text)
+    commonButtonUp() {
+        this.currentModeIndex = 0
+        super.commonButtonUp()
     }
+
+    updateLabel() {
+        if (this.showLabel) {
+            try {
+                this.label.text = this.creations[this.currentModeIndex]
+            } catch { }
+        } else {
+            this.label.text = ''
+        }
+    }
+}
+
+
+class DragButton extends SidebarButton {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.setAttributes({ fontSize: 20 })
+        this.update()
+    }
+
+    commonButtonUp() {
+        this.currentModeIndex = 0
+        super.commonButtonUp()
+    }
+
+    updateLabel() {
+        this.label.text = '↔︎'
+        let f = this.active ? buttonScaleFactor : 1
+        this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+    }
+
 }
 
 let lineButton = new CreativeButton({
@@ -290,14 +331,14 @@ let cindyButton = new CreativeButton({
 cindyButton.baseColor = gray(0.6)
 sidebar.add(cindyButton)
   
-let dragButton = new SidebarButton({
+let dragButton = new DragButton({
     messages: [{drag: true}],
     outgoingMessage: {drag: false},
     key: 'a',
     locationIndex: 3
 })
 dragButton.baseColor = gray(0.8)
-dragButton.text.view.setAttribute('fill', 'black')
+dragButton.label.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
 let colorButton = new ColorChangeButton({
@@ -306,7 +347,6 @@ let colorButton = new ColorChangeButton({
     locationIndex: 4
 })
 colorButton.baseColor = gray(1.0)
-console.log(colorButton.palette['white'])
 sidebar.add(colorButton)
 
 

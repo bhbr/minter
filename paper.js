@@ -39,12 +39,10 @@ class Paper extends Mobject {
 
     changeColor(newColor) {
         this.currentColor = newColor
-        console.log(newColor)
         if (this.creationGroup == undefined) { return }
         this.creationGroup.strokeColor = this.currentColor
         this.creationGroup.fillColor = this.currentColor
         this.creationGroup.update()
-        console.log('changing color')
     }
 
     setDragging(flag) {
@@ -95,7 +93,6 @@ class Paper extends Mobject {
 
     handleMessage(message) {
         if (message == undefined || message == {}) { return }
-        console.log(message)
         let key = Object.keys(message)[0]
         let value = Object.values(message)[0]
 
@@ -111,7 +108,6 @@ class Paper extends Mobject {
             }
             break
         case 'color':
-            console.log('changing color to', value)
             this.changeColor(value)
             break
         case 'drag':
@@ -164,7 +160,6 @@ class Paper extends Mobject {
 
     endCreating(e) {
         this.creationGroup.dissolveInto(this)
-        console.log(this.creationGroup)
         this.remove(this.creationGroup)
         this.creationGroup = undefined
 
