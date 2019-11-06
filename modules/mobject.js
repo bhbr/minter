@@ -4,10 +4,13 @@ import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPoi
 export class Mobject {
 
     constructor(argsDict) {
-        this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-        this.view.setAttribute('class', this.constructor.name)
-        this.view.mobject = this
+        argsDict = argsDict || {}
         this.eventTarget = null
+        if (argsDict['view'] == undefined) {
+            this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+        } else {
+            this.view = argsDict['view']
+        }
         this.setAttributes(argsDict)
         this.setDefaults({
             transform: Transform.identity(),
@@ -22,6 +25,8 @@ export class Mobject {
             visible: true,
             draggable: false // by outside forces, that is
         })
+        this.view.mobject = this
+        this.view.setAttribute('class', this.constructor.name)
         this.show()
 
         this.boundPointerDown = this.pointerDown.bind(this)

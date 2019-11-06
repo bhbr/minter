@@ -1,5 +1,6 @@
 import { Vertex } from './transform.js'
-import { Polygon, CurvedShape } from './mobject.js'
+import { Polygon, CurvedShape, MGroup } from './mobject.js'
+import { Segment } from './arrows.js'
 import { rgb } from './helpers.js'
 
 export class Circle extends CurvedShape {
@@ -84,7 +85,27 @@ export class Ellipse extends CurvedShape {
 
 
 
-
+export class Rectangle extends MGroup {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            width: 100,
+            height: 100
+        })
+        this.p1 = this.anchor
+        this.p2 = this.p1.translatedBy(new Vertex([this.width, 0]))
+        this.p3 = this.p1.translatedBy(new Vertex([this.width, this.height]))
+        this.p4 = this.p1.translatedBy(new Vertex([0, this.height]))
+        this.s1 = new Segment({startPoint: this.p1, endPoint: this.p2})
+        this.s2 = new Segment({startPoint: this.p2, endPoint: this.p3})
+        this.s3 = new Segment({startPoint: this.p3, endPoint: this.p4})
+        this.s4 = new Segment({startPoint: this.p4, endPoint: this.p1})
+        this.add(this.s1)
+        this.add(this.s2)
+        this.add(this.s3)
+        this.add(this.s4)
+    }
+}
 
 
 

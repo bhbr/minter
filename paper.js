@@ -1,9 +1,11 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
-import { Circle } from './modules/shapes.js'
+import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
+
+let log = function(msg) { logInto(msg, 'paper-console') }
 
 
 class Paper extends Mobject {
@@ -29,7 +31,6 @@ class Paper extends Mobject {
             'violet': rgb(1, 0, 1)
         }
         this.currentColor = this.colorPalette['white']
-
      }
 
     changeColorByName(newColorName) {
@@ -213,9 +214,5 @@ class Paper extends Mobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-
-
-
-
-
-
+//let r = new Rectangle({anchor: new Vertex(100, 100), width: 200, height: 300})
+//paper.add(r)

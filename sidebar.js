@@ -1,9 +1,14 @@
-import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
+import { isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
 import { Vertex, Translation, pointerEventVertex } from './modules/transform.js'
 import { MGroup, TextLabel } from './modules/mobject.js'
 import { Circle } from './modules/shapes.js'
-import {Segment } from './modules/arrows.js'
-import { paper } from './paper.js'
+import { Segment } from './modules/arrows.js'
+
+let paper = null
+if (!isTouchDevice) {
+    const paperView = document.querySelector('#paper')
+    paper = paperView.mobject
+}
 
 let sidebar = document.querySelector('#sidebar')
 sidebar.add = function(mobject) {
@@ -133,6 +138,7 @@ class SidebarButton extends Circle {
             this.commonButtonUp()
         }
     }
+
     commonButtonUp() {
         this.radius = buttonRadius
         this.midPoint = buttonCenter(this.locationIndex)
@@ -145,7 +151,7 @@ class SidebarButton extends Circle {
 
     messagePaper(message) {
         try {
-            webkit.messageHandlers.handleMessage.postMessage(message);
+            webkit.messageHandlers.handleMessage.postMessage(message)
         } catch {
             paper.handleMessage(message)
         }
@@ -254,6 +260,14 @@ class ColorChangeButton extends SidebarButton {
         this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
     }
 
+    commonButtonUp() {
+        this.radius = buttonRadius
+        this.update()
+        this.active = false
+        this.fillColor = this.colorForIndex(this.currentModeIndex)
+        this.label.view.setAttribute('font-size', this.fontSize.toString())
+        this.messagePaper(this.outgoingMessage)
+    }
 }
 
 class CreativeButton extends SidebarButton {

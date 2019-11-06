@@ -3,7 +3,9 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { paper } from './paper.js'
+
+const paperView = document.querySelector('#paper')
+const paper = paperView.mobject
 
 export class CreatedMobject extends MGroup {
     
@@ -124,10 +126,10 @@ export class DrawnArrow extends CreatedMobject {
     }
 
     dissolveInto(superMobject) {
-        paper.removeFreePoint(this.startFreePoint)
-        paper.removeFreePoint(this.endFreePoint)
+        superMobject.removeFreePoint(this.startFreePoint)
+        superMobject.removeFreePoint(this.endFreePoint)
 
-        for (let fq of paper.snappablePoints) {
+        for (let fq of superMobject.snappablePoints) {
             let q = fq.midPoint
             if (this.startPoint.x == q.x && this.startPoint.y == q.y) {
                 this.startPoint = fq.midPoint
@@ -136,7 +138,7 @@ export class DrawnArrow extends CreatedMobject {
                 break
             }
         }
-        for (let fq of paper.snappablePoints) {
+        for (let fq of superMobject.snappablePoints) {
             let q = fq.midPoint
             if (this.endPoint.x == q.x && this.endPoint.y == q.y) {
                 this.endPoint = fq.midPoint
@@ -146,8 +148,8 @@ export class DrawnArrow extends CreatedMobject {
             }
         }
 
-        paper.add(this.startFreePoint)
-        paper.add(this.endFreePoint)
+        superMobject.add(this.startFreePoint)
+        superMobject.add(this.endFreePoint)
         
     }
 
@@ -170,7 +172,7 @@ export class DrawnSegment extends DrawnArrow {
 
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
-        paper.remove(this.segment)
+        superMobject.remove(this.segment)
         this.segment = new Segment({
             startPoint: this.startPoint,
             endPoint: this.endPoint,
@@ -179,7 +181,7 @@ export class DrawnSegment extends DrawnArrow {
 
         this.startFreePoint.dependents.push(this.segment)
         this.endFreePoint.dependents.push(this.segment)
-        paper.add(this.segment)
+        superMobject.add(this.segment)
 
     }
 }
@@ -199,7 +201,7 @@ export class DrawnRay extends DrawnArrow {
 
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
-        paper.remove(this.ray)
+        superMobject.remove(this.ray)
         this.ray = new Ray({
             startPoint: this.startPoint,
             endPoint: this.endPoint,
@@ -207,7 +209,7 @@ export class DrawnRay extends DrawnArrow {
         })
         this.startFreePoint.dependents.push(this.ray)
         this.endFreePoint.dependents.push(this.ray)
-        paper.add(this.ray)
+        superMobject.add(this.ray)
 
     }
 }
@@ -228,7 +230,7 @@ export class DrawnLine extends DrawnArrow {
 
     dissolveInto(superMobject) {
         super.dissolveInto(superMobject)
-        paper.remove(this.line)
+        superMobject.remove(this.line)
         this.line = new Line({
             startPoint: this.startPoint,
             endPoint: this.endPoint,
@@ -236,7 +238,7 @@ export class DrawnLine extends DrawnArrow {
         })
         this.startFreePoint.dependents.push(this.line)
         this.endFreePoint.dependents.push(this.line)
-        paper.add(this.line)
+        superMobject.add(this.line)
 
     }
 
@@ -284,10 +286,10 @@ export class DrawnCircle extends CreatedMobject {
     }
 
     dissolveInto(superMobject) {
-        paper.removeFreePoint(this.freeMidpoint)
-        paper.removeFreePoint(this.freeOuterPoint)
+        superMobject.removeFreePoint(this.freeMidpoint)
+        superMobject.removeFreePoint(this.freeOuterPoint)
 
-        for (let fq of paper.snappablePoints) {
+        for (let fq of superMobject.snappablePoints) {
             let q = fq.midPoint
             if (this.midPoint.x == q.x && this.midPoint.y == q.y) {
                 this.midPoint = fq.midPoint
@@ -296,7 +298,7 @@ export class DrawnCircle extends CreatedMobject {
                 break
             }
         }
-        for (let fq of paper.snappablePoints) {
+        for (let fq of superMobject.snappablePoints) {
             let q = fq.midPoint
             if (this.outerPoint.x == q.x && this.outerPoint.y == q.y) {
                 this.outerPoint = fq.midPoint
@@ -306,10 +308,10 @@ export class DrawnCircle extends CreatedMobject {
             }
         }
 
-        paper.add(this.freeMidpoint)
-        paper.add(this.freeOuterPoint)
+        superMobject.add(this.freeMidpoint)
+        superMobject.add(this.freeOuterPoint)
         
-        paper.remove(this.circle)
+        superMobject.remove(this.circle)
         this.circle = new TwoPointCircle({
             midPoint: this.midPoint,
             outerPoint: this.outerPoint
@@ -318,7 +320,7 @@ export class DrawnCircle extends CreatedMobject {
         console.log(this.strokeColor)
         this.freeMidpoint.dependents.push(this.circle)
         this.freeOuterPoint.dependents.push(this.circle)
-        paper.add(this.circle)
+        superMobject.add(this.circle)
     }
 
 
