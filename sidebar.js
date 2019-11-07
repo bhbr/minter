@@ -105,6 +105,7 @@ class SidebarButton extends Circle {
         if (this.active) { return }
         this.active = true
         this.radius = buttonRadius * buttonScaleFactor
+        this.previousIndex = this.currentModeIndex
         this.messagePaper(this.messages[0])
         this.update()
     }
@@ -141,7 +142,10 @@ class SidebarButton extends Circle {
 
     commonButtonUp() {
         this.radius = buttonRadius
-        this.midPoint = buttonCenter(this.locationIndex)
+        let dx = this.currentModeIndex * this.optionSpacing
+        let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+        this.midPoint.copyFrom(newMidpoint)
+
         this.update()
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
@@ -207,17 +211,21 @@ class SidebarButton extends Circle {
         }
     
         let t = null
-        if (e instanceof MouseEvent) { t = e}
+        if (e instanceof MouseEvent) { t = e }
         else { t = e.changedTouches[0] }
     
         let p = pointerEventVertex(e)
-        let dx = p.x - this.touchStart.x
-    
-        dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
-        
-        this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+        var dx = p.x - this.touchStart.x
 
-        this.updateModeIndex(Math.floor(dx/this.optionSpacing), true)
+        var newIndex = Math.floor(this.previousIndex + dx / this.optionSpacing)
+        newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1)
+        dx += this.previousIndex * this.optionSpacing
+        dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
+
+        let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+        this.midPoint.copyFrom(newMidpoint)
+
+        this.updateModeIndex(newIndex, true)
         
     }
     
@@ -228,6 +236,7 @@ class ColorChangeButton extends SidebarButton {
     constructor(argsDict) {
         super(argsDict)
         this.setAttributes({
+            optionSpacing: 15,
             showLabel: false,
             palette: {
                 'white': rgb(1, 1, 1),
@@ -265,8 +274,13 @@ class ColorChangeButton extends SidebarButton {
         this.update()
         this.active = false
         this.fillColor = this.colorForIndex(this.currentModeIndex)
-        this.label.view.setAttribute('font-size', this.fontSize.toString())
+        this.updateLabel()
         this.messagePaper(this.outgoingMessage)
+    }
+
+    buttonDrag(e) {
+        super.buttonDrag(e)
+        this.remove(this.label)
     }
 }
 
@@ -304,7 +318,17 @@ class DragButton extends SidebarButton {
 
     constructor(argsDict) {
         super(argsDict)
-        this.setAttributes({ fontSize: 20 })
+        this.setAttributes({ fontSize: 30 })
+        this.label.view.setAttribute('font-family', 'Times')
+        this.label2 = new TextLabel({text: this.text})
+        this.label2.view.setAttribute('font-family', 'Times')
+        this.label2.view.setAttribute('font-size', this.fontSize.toString())
+        this.label2.view.setAttribute('transform', 'rotate(90, 51, 237.5)')
+        this.label2.color = rgb(1, 1, 1)
+        this.label2.anchor = new Vertex(0, 2)
+        this.label.text = '↕︎'
+        this.label2.text = '↕︎'
+        this.add(this.label2)
         this.update()
     }
 
@@ -314,9 +338,11 @@ class DragButton extends SidebarButton {
     }
 
     updateLabel() {
-        this.label.text = '↔︎'
+        if (this.label == undefined) { return }
+        if (this.label2 == undefined) { return }
         let f = this.active ? buttonScaleFactor : 1
         this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+        this.label2.view.setAttribute('font-size', (f * this.fontSize).toString())
     }
 
 }
@@ -353,6 +379,7 @@ let dragButton = new DragButton({
 })
 dragButton.baseColor = gray(0.8)
 dragButton.label.view.setAttribute('fill', 'black')
+dragButton.label2.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
 let colorButton = new ColorChangeButton({
