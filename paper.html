@@ -4,19 +4,22 @@
         <meta name="viewport" content="initial-scale=1.0, width=device-width, maximum-scale=1.0, user-scalable=0" charset="utf-8"/>
         <link rel="stylesheet" href="./minter.css">
         
-    <script type="text/javascript" src="CindyJS/build/js/Cindy.js"></script>
+    <script type="text/javascript" src="./CindyJS/build/js/Cindy.js"></script>
     </head>
     
     <body>
-         <div id='paper-container' class='svg-container paper-container' width='1166px' height='1024px'>
+         <div id='paper-container' class='svg-container paper-container' width='1166px' height='524px'>
                   
-                       <svg id='paper' width='1166px' height='1024px'>
+                       <svg id='paper' width='1166px' height='524px'>
                        </svg>
-                       <!--<p id='paper-console' width='600px' height='200px' style='background-color: green; color: white; white-space: pre;'>paper console</p>-->
+                       <p id='paper-console' width='600px' height='200px' style='background-color: green; color: white; white-space: pre;'>paper console</p>
         </div>
         
         <script src='paper-bundle.js'></script>
         
+        <script id="csinit" type="text/x-cindyscript">
+            resetclock();
+        </script>
 
     </body>
 </html>

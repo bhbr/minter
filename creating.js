@@ -4,8 +4,7 @@ import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 
-const paperView = document.querySelector('#paper')
-const paper = paperView.mobject
+let log = function(msg) { logInto(msg, 'paper-console') }
 
 export class CreatedMobject extends MGroup {
     
@@ -286,6 +285,7 @@ export class DrawnCircle extends CreatedMobject {
     }
 
     dissolveInto(superMobject) {
+        log('dissolving DrawnRectangle')
         superMobject.removeFreePoint(this.freeMidpoint)
         superMobject.removeFreePoint(this.freeOuterPoint)
 
@@ -331,7 +331,7 @@ export class DrawnCircle extends CreatedMobject {
 
 export class CindyCanvas extends Mobject {
     
-    constructor(p, width, height) {
+    constructor(paper, p, width, height) {
         super({anchor: p, width: width, height: height})
         this.script = document.createElement('script')
         this.script.setAttribute('type', 'text/x-cindyscript')
@@ -365,14 +365,16 @@ export class CindyCanvas extends Mobject {
 
         this.points = [[0.4, 0.4], [0.3, 0.8]]
 
-
+        log(paper.cindyPorts.toString())
+        log(this.geometry().toString())
         CindyJS({
-          scripts: "cs*",
-          autoplay: true,
-          ports: paper.cindyPorts,
+            scripts: "cs*",
+            autoplay: true,
+            ports: paper.cindyPorts,
             geometry: this.geometry()
-        });
-        
+        })
+        log('7')
+       
     }
 
     geometry() {
@@ -424,10 +426,14 @@ export class DrawnRectangle extends CreatedMobject {
     }
 
     dissolveInto(superMobject) {
+        log('dissolving')
         let w = this.p2.x - this.p1.x
         let h = this.p3.y - this.p1.y
-        let cindy = new CindyCanvas(this.p1, w, h)
-        superMobject.add(cindy)
+        let cindy = new CindyCanvas(superMobject, this.p1, w, h)
+        //superMobject.add(cindy)
+        log('dissolving 2')
+        log(superMobject.children.includes(cindy).toString())
+        //log(superMobject.view.children.includes(cindy.view).toString())
         superMobject.remove(this)
     }
     
