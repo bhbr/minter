@@ -331,7 +331,7 @@ export class DrawnCircle extends CreatedMobject {
 
 export class CindyCanvas extends Mobject {
     
-    constructor(p, width, height) {
+    constructor(paper, p, width, height) {
         super({anchor: p, width: width, height: height})
         this.script = document.createElement('script')
         this.script.setAttribute('type', 'text/x-cindyscript')

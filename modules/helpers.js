@@ -123,7 +123,7 @@ export function logInto(obj, id) {
     let myConsole = document.querySelector('#' + id)
     myConsole.appendChild(newLine)
     
-    // Neither of these lines does what they are supposed to. I give up
+    // Neither of these lines does what it is supposed to. I give up
     //myConsole.scrollTop = console.scrollHeight
     //newLine.scrollIntoView()
 }

@@ -6,7 +6,7 @@ import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
 
 
-let log = function(msg) { logInto(msg, 'paper-console') }
+let log = function(msg) { } // logInto(msg, 'paper-console') }
 
 function loadScript(url, completeCallback) {
    var script = document.createElement('script'), done = false,
