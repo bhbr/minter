@@ -430,7 +430,7 @@ export class DrawnRectangle extends CreatedMobject {
         let w = this.p2.x - this.p1.x
         let h = this.p3.y - this.p1.y
         let cindy = new CindyCanvas(superMobject, this.p1, w, h)
-        //superMobject.add(cindy)
+        superMobject.add(cindy)
         log('dissolving 2')
         log(superMobject.children.includes(cindy).toString())
         //log(superMobject.view.children.includes(cindy.view).toString())

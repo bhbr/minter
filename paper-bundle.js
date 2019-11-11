@@ -1,4 +1,4 @@
-(function () {
+var Paper = (function (exports) {
    'use strict';
 
    const isTouchDevice = 'ontouchstart' in document.documentElement;
@@ -8,6 +8,15 @@
        let x = point[0],
            y = point[1];
        return x + ' ' + y
+   }
+
+   function remove(arr, value, all = false) {
+      for (let i = 0; i < arr.length; i++) {
+           if (arr[i] == value) {
+               arr.splice(i,1);
+               if (!all) { break }
+           }
+       }
    }
 
    function rgb(r, g, b) {
@@ -75,8 +84,6 @@
        //myConsole.scrollTop = console.scrollHeight
        //newLine.scrollIntoView()
    }
-
-   //import {stringFromPoint, remove, rgb, rgba} from './helpers.js'
 
    class Vertex extends Array {
 
@@ -474,13 +481,20 @@
        }
    }
 
+   function pointerEventVertex(e) {
+       return new Vertex(pointerEventPageLocation(e))
+   }
+
    class Mobject {
 
        constructor(argsDict) {
-           this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-           this.view.setAttribute('class', this.constructor.name);
-           this.view.mobject = this;
+           argsDict = argsDict || {};
            this.eventTarget = null;
+           if (argsDict['view'] == undefined) {
+               this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+           } else {
+               this.view = argsDict['view'];
+           }
            this.setAttributes(argsDict);
            this.setDefaults({
                transform: Transform.identity(),
@@ -491,11 +505,12 @@
                strokeWidth: 1,
                strokeColor: rgb(1, 1, 1),
                fillColor: rgb(1, 1, 1),
-               draggable: false,
-               isDragged: false,
                passAlongEvents: false, // to event target
                visible: true,
+               draggable: false // by outside forces, that is
            });
+           this.view.mobject = this;
+           this.view.setAttribute('class', this.constructor.name);
            this.show();
 
            this.boundPointerDown = this.pointerDown.bind(this);
@@ -504,86 +519,95 @@
            this.boundEventTargetMobject = this.eventTargetMobject.bind(this);
            addPointerDown(this.view, this.boundPointerDown);
 
+           this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
+           this.savedSelfHandlePointerMove = this.selfHandlePointerMove;
+           this.savedSelfHandlePointerUp = this.selfHandlePointerUp;
+           this.disableDragging();
+
            // this.boundCreatePopover = this.createPopover.bind(this)
            // this.boundDismissPopover = this.dismissPopover.bind(this)
            // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
        }
 
+       enableDragging() {
+           this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
+           this.savedSelfHandlePointerMove = this.selfHandlePointerMove;
+           this.savedSelfHandlePointerUp = this.selfHandlePointerUp;
+           this.selfHandlePointerDown = this.startSelfDragging;
+           this.selfHandlePointerMove = this.selfDragging;
+           this.selfHandlePointerUp = this.endSelfDragging;
+       }
+
+       disableDragging() {
+           this.selfHandlePointerDown = this.savedSelfHandlePointerDown;
+           this.selfHandlePointerMove = this.savedSelfHandlePointerMove;
+           this.selfHandlePointerUp = this.savedSelfHandlePointerUp;
+       }
+
        eventTargetMobject(e) {
            let t = e.target;
+           if (t.tagName == 'path') { t = t.parentNode; }
            if (t == this.view) { return this }
            let targetViewChain = [t];
            while (t != undefined && t != this.view) {
                t = t.parentNode;
                targetViewChain.push(t);
            }
+           t = targetViewChain.pop();
+           t = targetViewChain.pop();
            while (t != undefined) {
                if (t.mobject != undefined) { return t.mobject }
-               t = targetViewChain.pop();
+               t = targetViewChain.pop(); 
            }
+           return this
        }
 
        pointerDown(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer down', 'paper-console');
            removePointerDown(this.view, this.boundPointerDown);
            addPointerMove(this.view, this.boundPointerMove);
            addPointerUp(this.view, this.boundPointerUp);
-           
+
            this.eventTarget = this.boundEventTargetMobject(e);
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerDown(e);
            } else {
                this.selfHandlePointerDown(e);
            }
+           this.update();
        }
 
        pointerMove(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer move', 'paper-console');
 
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerMove(e);
            } else {
                this.selfHandlePointerMove(e);
            }
+           this.update();
        }
 
        pointerUp(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer up', 'paper-console');
            removePointerMove(this.view, this.boundPointerMove);
            removePointerUp(this.view, this.boundPointerUp);
            addPointerDown(this.view, this.boundPointerDown);
 
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerUp(e);
            } else {
                this.selfHandlePointerUp(e);
            }
            this.eventTarget = null;
+           this.update();
        }
 
-       selfHandlePointerDown(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer down', 'paper-console');
-       }
 
-       selfHandlePointerMove(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer move', 'paper-console');
-       }
-
-       selfHandlePointerUp(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer up', 'paper-console');
-
-       }
-
+       selfHandlePointerDown(e) { }
+       selfHandlePointerMove(e) { }
+       selfHandlePointerUp(e) { }
 
        setAttributes(argsDict) {
            argsDict = argsDict || {};
@@ -630,10 +654,19 @@
 
        update(argsDict) {
            this.setAttributes(argsDict || {});
+           if (Object.values(this).includes(undefined)) { 
+               return
+           }
 
-           if (Object.values(this).includes(undefined)) { return }
-
-           for (let submob of this.children || []) { submob.update(); }
+           for (let mob of this.dependents || []) {
+               mob.update();
+           }
+           for (let submob of this.children || []) {
+               if (this.dependsOn(submob)) {
+                   continue
+               }
+               submob.update();
+           }
 
            if (this.popover != undefined) {
                this.popover.anchor = this.anchor.translatedBy(this.rightEdge());
@@ -645,9 +678,23 @@
            this.updateView();
        }
 
-
        updateView() {
            if (this.view == undefined) { return }
+       }
+
+       allDependents() {
+           let dep = [];
+           for (let mob of this.dependents) {
+               dep.push(mob);
+               for (let mob2 of mob.allDependents()) {
+                   dep.push(mob2);
+               }
+           }
+           return dep
+       }
+
+       dependsOn(otherMobject) {
+           return otherMobject.allDependents().includes(this)
        }
 
 
@@ -691,7 +738,6 @@
            }
            this.updateView();
        }
-
 
        add(submob) {
            if (submob.parent != this) { submob.parent = this; }
@@ -749,6 +795,28 @@
        rightEdge() { return Vertex.origin() }
 
 
+
+       startSelfDragging(e) {
+           this.dragPointStart = new Vertex(pointerEventPageLocation(e));
+           this.dragAnchorStart = this.anchor.copy();
+       }
+
+       selfDragging(e) {
+           let dragPoint = new Vertex(pointerEventPageLocation(e));
+           let dr = dragPoint.subtract(this.dragPointStart);
+           this.anchor.copyFrom(this.dragAnchorStart.add(dr));
+           this.update();
+       }
+
+       endSelfDragging(e) {
+           this.dragPointStart = undefined;
+           this.dragAnchorStart = undefined;
+       }
+
+
+
+
+
        createPopover(e) {
            this.popover = new Popover(this, 200, 300, 'right');
            paper.add(this.popover);
@@ -789,6 +857,85 @@
 
 
 
+   class MGroup extends Mobject {
+
+       constructor(argsDict) {
+           super(argsDict);
+           for (let submob of this.children) {
+               this.add(submob);
+           }
+       }
+
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+   class Polygon extends Mobject {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.vertices = [];
+           this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+           this.path.mobject = this;
+           this.view.appendChild(this.path); // why not just add?
+           this.update();
+       }
+
+       updateView() {
+           let globalVertices = this.globalVertices();
+           let pathString = Polygon.pathString(globalVertices);
+           
+           if (this.path == undefined || this.vertices.length == 0) { return }
+           this.path.setAttribute('d', pathString);
+           this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1));
+           this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1));
+           this.path.setAttribute('stroke-width', this.strokeWidth || 1);
+           super.updateView();
+       }
+
+       static pathString(points) {
+           let pathString = '';
+           for (let point of points) {
+               if (point.isNaN()) {
+                   pathString = '';
+                   return pathString
+               }
+               let prefix = (pathString == '') ? 'M' : 'L';
+               pathString += prefix + stringFromPoint(point);
+           }
+           pathString += 'Z';
+           return pathString
+       }
+
+       get strokeWidth() { return super.strokeWidth }
+       set strokeWidth(newValue) {
+           super.strokeWidth = newValue;
+           if (this.path != undefined) {
+               this.path.setAttribute('stroke-width', newValue);
+           }
+       }
+       
+       get strokeColor() { return super.strokeColor }
+       set strokeColor(newValue) {
+           super.strokeColor = newValue;
+           if (this.path != undefined) {
+               this.path.setAttribute('stroke', newValue);
+           }
+       }
+       
+   }
+
+
+
 
 
 
@@ -806,6 +953,7 @@
            super(argsDict);
            this.bezierPoints = [];
            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+           this.path.mobject = this;
            this.view.appendChild(this.path);
        }
 
@@ -999,6 +1147,120 @@
 
    // }
 
+   class Segment extends Polygon {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.setDefaults({
+               startPoint: Vertex.origin(),
+               endPoint: Vertex.origin(),
+           });
+           this.update();
+       }
+
+       components() {
+           return this.endPoint.subtract(this.startPoint)
+       }
+
+       update(argsDict) {
+           this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()];
+           super.update(argsDict);
+           //this.updateView()
+       }
+
+       drawingStartPoint() { return this.startPoint }
+       drawingEndPoint() { return this.endPoint }
+
+       norm2() { return this.components().norm2() }
+       norm() { return Math.sqrt(this.norm2()) }
+
+   }
+
+   class Ray extends Segment {
+
+       drawingEndPoint() {
+           if (this.startPoint == this.endPoint) { return this.endPoint }
+           return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
+       }
+
+
+   }
+
+   class Line extends Ray {
+
+       drawingStartPoint() {
+           if (this.startPoint == this.endPoint) { return this.startPoint }
+           return this.endPoint.add(this.startPoint.subtract(this.endPoint).multiply(100))
+       }
+
+
+   }
+
+
+   // export class Arrow extends MGroup {
+
+   //     constructor(start = Vertex.origin(), end = Vertex.origin()) {
+   //         super()
+   //         if (end == null) {
+   //             this.components = new Vertex(start)
+   //         } else {
+   //             this.startPoint = new Vertex(start)
+   //             this.components = new Vertex(end)
+   //         }
+   //         this.stem = new Segment(Vertex.origin(), this.components())
+   //         this.add(this.stem)
+   //         this.tip = new Polygon(this.tipPoints())
+   //         this.add(this.tip)
+   //     }
+
+   //     get startPoint() { return this.anchor }
+   //     set startPoint(newValue) { this.anchor = new Vertex(newValue) }
+
+   //     tipPoints() {
+   //         let w = new Scaling(-0.2).appliedTo(this.components)
+   //         let w1 = new Rotation(Math.PI/8).appliedTo(w)
+   //         let w2 = new Rotation(-Math.PI/8).appliedTo(w)
+   //         return new Translation(this.components).appliedTo([Vertex.origin(), w1, w2])
+
+   //     }
+
+   //     get endPoint() {
+   //         return this.startPoint.translatedBy(this.components)
+   //     }
+
+   //     set endPoint(newValue) {
+   //         this.components = new Vertex(newValue).subtract(this.startPoint)
+   //     }
+
+   //     updateView() {
+
+   //         if (this.view == undefined || this.components == undefined) { return }
+
+   //         if (this.visible && this.components.isNaN()) {
+   //             this.visible = false
+   //         }
+   //         if (!this.visible && !this.components.isNaN()) {
+   //             this.visible = true
+   //         }
+
+   //         if (this.stem != undefined) {
+   //             this.stem.anchor = Vertex.origin()
+   //             this.stem.vertices = [Vertex.origin(), this.components]
+   //         }
+   //         if (this.tip != undefined) {
+   //             this.tip.anchor = Vertex.origin()
+   //             this.tip.vertices = this.tipPoints()
+   //         }
+   //         super.updateView()
+   //     }
+
+   //     norm2() { return this.components.norm2() }
+   //     norm() { return Math.sqrt(this.norm2()) }
+
+   // }
+
+   // export class Vector extends Arrow {}
+
    class Circle extends CurvedShape {
        
        constructor(argsDict) {
@@ -1041,496 +1303,747 @@
            return new Vertex(this.radius, 0)
        }
 
-       get radius() { return this._radius }
-       set radius(newRadius) {
-           this._radius = newRadius;
-           this.update();
-       }
-
    }
 
-   class InteractivePoint extends Circle {
+   class TwoPointCircle extends Circle {
 
        constructor(argsDict) {
            super(argsDict);
-           this.setDefaults({
-               brightness: 0.5
+           this.setAttributes({
+               strokeColor: rgb(1, 1, 1),
+               fillOpacity: 0
            });
-           this.update({});
+           this.view.style['pointer-events'] = 'none';
+           this.radius = this.midPoint.subtract(this.outerPoint).norm();
        }
-
-       selfHandlePointerDown(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('self-handling pointer down', 'paper-console');
-           super.selfHandlePointerDown(e);
-           this.startY = pointerEventPageLocation(e)[1];
-           this.startBrightness = this.brightness;
-       }
-
-       selfHandlePointerMove(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('self-handling pointer move', 'paper-console');
-           super.selfHandlePointerMove(e);
-           let newY = pointerEventPageLocation(e)[1];
-           this.brightness = this.startBrightness + (newY - this.startY)/255;
-           this.update();
-       }
-
 
        update(argsDict) {
-           this.fillColor = rgb(this.brightness, this.brightness, this.brightness);
+           this.radius = this.midPoint.subtract(this.outerPoint).norm();
            super.update(argsDict);
        }
 
    }
 
-   class Paper extends Mobject {
+   let log = function(msg) { logInto(msg, 'paper-console'); };
 
-        constructor(argsDict) {
+   class CreatedMobject extends MGroup {
+       
+       dissolveInto(superMobject) {
+           superMobject.remove(this);
+           if (!this.visible) { return }
+           for (let submob of this.children) {
+               superMobject.add(submob);
+           }
+       }
+
+       updateFromTip(q) { }
+
+   }
+
+   class Freehand extends CreatedMobject {
+       
+       updateWithPoints(q) {
+           let nbDrawnPoints = this.submobjects.length;
+           if (nbDrawnPoints > 0) {
+               p = this.children[nbDrawnPoints - 1].midPoint;
+           }
+           let pointDistance = 10;
+           let distance = ((p.x - q.x)**2 + (p.y - q.y)**2)**0.5;
+           let unitVector = new Vertex([(q.x - p.x)/distance, (q.y - p.y)/distance]);
+           for (var step = pointDistance; step < distance; step += pointDistance) {
+               let x = p.x + step * unitVector.x + 0.5 * Math.random();
+               let y = p.y + step * unitVector.y + 0.5 * Math.random();
+               let newPoint = new Vertex([x, y]);
+               let c = new Circle({radius: 2});
+               c.fillColor = this.strokeColor;
+               c.midPoint = new Vertex(newPoint);
+               this.add(c);
+           }
+           let t = Math.random();
+           let r = (1 - t) * 0.5 + t * 0.75;
+           let c = new Circle({radius: r, midPoint: new Vertex(q)});
+           this.add(c);
+       }
+       
+       updateWithLines(q) {
+
+           let nbDrawnPoints = this.children.length;
+           let p = null;
+           if (nbDrawnPoints == 0) {
+               p = q;
+           } else {
+               p = this.children[nbDrawnPoints - 1].endPoint;
+           }
+           let newLine = new Segment({startPoint: p, endPoint: q});
+           newLine.strokeColor = this.strokeColor;
+           this.add(newLine);
+
+       }
+       
+       updateFromTip(q) {
+           this.updateWithLines(q);
+       }
+
+       dissolveInto(superMobject) {
+           superMobject.remove(this);
+           if (this.visible) {
+               superMobject.add(this);
+           }
+       }
+   }
+
+
+
+   class Point extends Circle {
+
+       constructor(argsDict) {
            super(argsDict);
-           //this.view = document.querySelector('#paper')
-           //this.view.mobject = this
-   //         this.useCapture = true
-   //         this.isCreating = false
-   //         this.draggedMobject = undefined
-   //         this.constructionModes = ['segment', 'ray', 'line', 'circle', 'cindy']
-   //         this.currentMode = 'freehand'
-   //         this.colorPalette = {
-   //             'black': rgb(0, 0, 0),
-   //             'white': rgb(1, 1, 1),
-   //             'red': rgb(1, 0, 0),
-   //             'orange': rgb(1, 0.5, 0),
-   //             'yellow': rgb(1, 1, 0),
-   //             'green': rgb(0, 1, 0),
-   //             'blue': rgb(0, 0, 1),
-   //             'indigo': rgb(0.5, 0, 1),
-   //             'violet': rgb(1, 0, 1)
-   //         }
-   //         this.currentColor = this.colorPalette['white']
+           this.view.setAttribute('class', this.constructor.name);
+           this.setDefaults({
+               midPoint: Vertex.origin(),
+           });
 
-   //         this.freehands = []
-   //         this.freePoints = []
-   //         this.constructions = []
-   //         this.cindyPorts = []
+           this.radius = 5;
+       }
 
-   //         this.newFreehand = undefined
-   //         this.newPoints = []
-   //         this.newConstructions = {}
-   //         this.newCindyPort = undefined
+       update(argsDict) {
+           super.update(argsDict);
+       }
 
-   //         this.boundStartDragging = this.startDragging.bind(this)
-   //         this.boundDrag = this.drag.bind(this)
-   //         this.boundEndDragging = this.endDragging.bind(this)
+   }
 
-   //         this.boundPointerDown = this.pointerDown.bind(this)
-   //         this.boundPointerMove = this.pointerMove.bind(this)
-   //         this.boundPointerUp = this.pointerUp.bind(this)
-   //         addPointerDown(this.view, this.boundPointerDown, this.useCapture)
-        }
+   class FreePoint extends Point {
+       constructor(argsDict) {
+           super(argsDict);
+           this.setAttributes({
+               draggable: true
+           });
+           this.enableDragging();
+       }
+   }
 
-   //     changeColorByName(newColorName) {
-   //         let newColor = this.colorPalette[newColorName]
-   //         this.changeColor(newColor)
-   //     }
+   class DrawnArrow extends CreatedMobject {
 
-   //     changeColor(newColor) {
-   //         this.currentColor = newColor
-   //         for (let mob of Object.values(this.newConstructions)) {
-   //             mob.strokeColor = this.currentColor
-   //             mob.fillColor = this.currentColor
-   //         }
-   //         for (let mob of Object.values(this.newPoints)) {
-   //             mob.strokeColor = this.currentColor
-   //             mob.fillColor = this.currentColor
-   //         }
-   //         try {
-   //             this.newFreehand.strokeColor = this.currentColor
-   //             this.newFreehand.fillColor = this.currentColor
-   //         } catch { }
-
-   //     }
-
-        changeMode(newMode) {
-
-            this.currentMode = newMode;
-
-   //         if (newMode == 'drag') {
-   //             for (let mob of this.constructions) {
-   //                 if (mob instanceof CindyCanvas) {
-   //                     mob.view.style['pointer-events'] = 'none'
-   //                 }
-   //             }
-   //         } else {
-   //             for (let mob of this.constructions) {
-   //                 if (mob instanceof CindyCanvas) {
-   //                     mob.view.style['pointer-events'] = 'auto'
-   //                 }
-   //             }
-   //         }
-   //         for (let mob of Object.values(this.newConstructions)) { mob.hide() }
-   //         for (let point of this.newPoints) { point.hide() }
-   //         if (this.newFreehand != undefined) { this.newFreehand.hide() }
-
-   //         switch (this.currentMode) {
-   //         case 'freehand':
-   //             try { this.newFreehand.show() } catch { }
-   //             break
-
-   //         case 'segment':
-   //         case 'ray':
-   //         case 'line':
-   //         case 'circle':
-   //             try { this.newPoints[0].show() } catch { }
-   //             try { this.newPoints[1].show() } catch { }
-   //             try { this.newConstructions[this.currentMode].show() } catch { }
-   //             break
-   //         case 'cindy':
-   //             try { this.newConstructions['cindy'].show() } catch { }
-   //             break
-   //         case 'drag':
-   //             break
-   //         }
-        }
-
-
-   //     targetMobject(e) {
-   //     // which mobject have we clicked on?
-   //     // (event detection completely handled by paper except maybe for Cindy)
-   //         //if (!(e.target.mobject instanceof CindyCanvas || e.target.mobject instanceof FreePoint)) {
-   //         let tm = undefined
-   //         if (this.draggedMobject != undefined) {
-   //             tm = this.draggedMobject
-   //             return tm
-   //         }
-   //         let p = new Vertex(pointerEventPageLocation(e))
-   //         for (let point of this.freePoints) {
-   //             if (point.anchor.subtract(p).norm() < 10) {
-   //                 tm = point
-   //                 return tm
-   //             }
-   //         }
-   //         tm = e.target.parentNode.mobject
-   //         if (tm != undefined) {
-   //             // maybe the event got detected by a point, but through its path
-   //             if (tm instanceof DrawnCircle) {
-   //                 return this // clicked inside a circle, but not on its center
-   //             }
-   //         } else {
-   //             // paper or Cindy canvas
-   //             tm = e.target.mobject
-   //             return tm
-   //         }
-   //     }
-
-   //     pointerDown(e) {
-   //         e.preventDefault()
-   //         e.stopPropagation()
-   //         let target = this.targetMobject(e)
-   //         let p = new Vertex(pointerEventPageLocation(e))
-   //         switch (target.constructor.name) {
-   //         case 'Paper':
-   //             this.handlePointerDownOnPaper(target, p)
-   //             // meaning we create two new points
-   //             break
-   //         case 'FreePoint':
-   //             this.handlePointerDownOnFreePoint(target, p)
-   //             // meaning we either drag a point or create something starting there
-   //             break
-   //         }
-   //         this.update()
-
-   //         addPointerMove(this.view, this.boundPointerMove)
-   //         addPointerUp(this.view, this.boundPointerUp)
-   //         removePointerDown(this.view, this.boundPointerDown)
-   //     }
-
-   //     pointerMove(e) {
-   //         e.preventDefault()
-   //         e.stopPropagation()
-   //         let target = this.targetMobject(e)
-   //         let p = new Vertex(pointerEventPageLocation(e))
-
-   //         if (target != this && !this.isCreating) { this.currentMode = 'drag' }
-   //         console.log(p, target)
-   //         this.handlePointerMove(target, p)
-   //     }
-
-   //     pointerUp(e) {
-   //         e.preventDefault()
-   //         e.stopPropagation()
-   //         let target = this.targetMobject(e)
-   //         let p = new Vertex(pointerEventPageLocation(e))
-
-   //         this.handlePointerUp(target, p)
-
-   //         addPointerDown(this.view, this.boundPointerDown, this.useCapture)
-   //         removePointerMove(this.view, this.boundPointerMove, this.useCapture)
-   //         removePointerUp(this.view, this.boundPointerUp, this.useCapture)
-   //     }
-
-
-
-
-
-   //     handlePointerDownOnPaper(target, p) {
-   //         if (this.currentMode == 'drag') {
-   //             for (let mob of this.constructions) {
-   //                 if (mob instanceof CindyCanvas) { target = mob }
-   //             }
-   //             this.startDragging(p, target)
-   //             return
-   //         }
-   //         // start a new construction from nowhere
-   //         // including a freehand drawing)
-   //         let fp1 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let fp2 = new FreePoint({anchor: p.copy(), strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let fh = new Freehand({anchor: Vertex.origin(), strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let cindyRect = new DrawnRectangle({startPoint: fp1.anchor, endPoint: fp2.anchor})
-   //         // more geometric objects to follow
-   //         this.add(fp1)
-   //         this.add(fp2)
-   //         this.add(fh)
-   //         this.add(s)
-   //         this.add(r)
-   //         this.add(l)
-   //         this.add(c)
-   //         this.add(cindyRect)
-
-   //         this.newPoints = [fp1, fp2]
-   //         this.newFreehand = fh
-   //         this.newConstructions['segment'] = s
-   //         this.newConstructions['ray'] = r
-   //         this.newConstructions['line'] = l
-   //         this.newConstructions['circle'] = c
-   //         this.newConstructions['cindy'] = cindyRect
-
-   //         for (let mob of Object.values(this.newConstructions)) {
-   //             mob.hide()
-   //         }
-   //         for (let point of Object.values(this.newPoints)) {
-   //             point.hide()
-   //         }
-
-   //         // show the relevant objects
-   //         this.changeMode(this.currentMode)
-
-   //         this.draggedMobject = fp2
-   //         this.isCreating = true
-
-   //     }
-
-   //     handlePointerDownOnFreePoint(target, p) {
-   //         if (this.currentMode == 'freehand') {
-   //             this.currentMode = 'drag'
-   //             this.draggedMobject = target
-   //             return
-   //         }
-
-   //         // else: create something
-   //         let fp1 = target
-   //         fp1.update({strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let fp2 = new FreePoint({anchor: p, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let s = new Segment({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let r = new Ray({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let l = new Line({startPoint: fp1.anchor, endPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         let c = new DrawnCircle({midPoint: fp1.anchor, outerPoint: fp2.anchor, strokeColor: this.currentColor, fillColor: this.currentColor})
-   //         this.add(fp2)
-   //         this.add(s)
-   //         this.add(r)
-   //         this.add(l)
-   //         this.add(c)
-
-   //         this.newPoints = [fp2]
-   //         this.newConstructions['segment'] = s
-   //         this.newConstructions['ray'] = r
-   //         this.newConstructions['line'] = l
-   //         this.newConstructions['circle'] = c
-
-   //         for (let mob of Object.values(this.newConstructions)) {
-   //             mob.hide()
-   //         }
-   //         for (let point of Object.values(this.newPoints)) {
-   //             point.hide()
-   //         }
-
-   //         // show the relevant objects
-   //         this.changeMode(this.currentMode)
-
-   //         this.draggedMobject = fp2
-   //         this.isCreating = true
-   //     }
-
-   //     handlePointerMove(target, p) {
-   //         this.draggedMobject.anchor.copyFrom(p)
-   //         this.snap(this.draggedMobject)
-   //         if (this.newFreehand != undefined) {
-   //             this.newFreehand.updateFromTip(p)
-   //         }
-   //         this.update()
-
-   //         this.changeMode(this.currentMode)
-   //     }
-
-   //     snap(mobject) {
-   //         if (!(mobject instanceof FreePoint)) { return }
-   //         for (let otherPoint of this.freePoints) {
-   //             if (otherPoint == mobject) { continue }
-   //             if (otherPoint.anchor.subtract(mobject.anchor).norm() < 10) {
-   //                 mobject.anchor.copyFrom(otherPoint.anchor)
-   //                 return
-   //             }
-   //         }
-   //     }
-
-
-   //     handlePointerUp(target, p) {
-   //         this.draggedMobject = undefined
-   //         for (let mob of Object.values(this.newConstructions)) {
-   //             mob.view.remove()
-   //         }
-   //         switch (this.currentMode) {
-   //         case 'freehand':
-   //             this.freehands.push(this.newFreehand)
-   //             for (let point of this.newPoints) { point.view.remove() }
-   //             break
-   //         case 'segment':
-   //         case 'ray':
-   //         case 'line':
-   //         case 'circle':
-   //             let newMob = this.newConstructions[this.currentMode]
-   //             console.log(newMob)
-   //             let fp1 = this.newPoints[0]
-   //             let fp2 = this.newPoints[1]
-
-   //             function replaceWithSnappedPoint(fp, newMob, freePoints, paper) {
-   //                 let snappedFP = undefined
-   //                 for (let point of freePoints) {
-   //                     if (point.anchor.subtract(fp.anchor).norm() < 1) {
-   //                         let color = fp.fillColor
-   //                         snappedFP = point
-   //                         snappedFP.update({strokeColor: color, fillColor: color})
-   //                         break
-   //                     }
-   //                 }
-   //                 if (snappedFP == undefined) { return fp }
-
-   //                 try {
-   //                 if (newMob.startPoint.subtract(fp.anchor).norm() < 1) { newMob.startPoint = snappedFP.anchor }
-   //                 } catch {}
-   //                 try {
-   //                 if (newMob.endPoint.subtract(fp.anchor).norm() < 1)  {
-   //                     newMob.endPoint = snappedFP.anchor
-   //                 }
-   //                 } catch {}
-   //                 try {
-   //                 if (newMob.midPoint.subtract(fp.anchor).norm() < 1)  { newMob.midPoint = snappedFP.anchor }
-   //                 } catch {}
-   //                 try {
-   //                     if (newMob.outerPoint.subtract(fp.anchor).norm() < 1)  { newMob.outerPoint = snappedFP.anchor }
-   //                 } catch {}
-   //                 fp.view.remove()
-   //                 paper.add(snappedFP)
-   //                 return snappedFP
-   //             }
-
-   //             if (this.isCreating) {
-   //                 if (fp1 != undefined) {
-   //                     fp1 = replaceWithSnappedPoint(fp1, newMob, this.freePoints, this)
-   //                     if (!this.freePoints.includes(fp1)) {
-   //                         this.freePoints.push(fp1)
-   //                     }
-   //                 }
-   //                 if (fp2 != undefined) {
-   //                     fp2 = replaceWithSnappedPoint(fp2, newMob, this.freePoints, this)
-   //                     if (!this.freePoints.includes(fp2)) {
-   //                         this.freePoints.push(fp2)
-   //                     }
-   //                 }
-   //             }
-               
-
-   //             this.constructions.push(newMob)
-   //             this.add(newMob)
-   //             console.log('just added:', newMob)
-
-   //         case 'drag':
-   //             this.currentMode = 'freehand'
-   //             break
-   //         case 'cindy':
-   //             let origin = this.newConstructions['cindy'].p1
-   //             let lrCorner = this.newConstructions['cindy'].p3
-   //             let cindyWidth = lrCorner.x - origin.x
-   //             let cindyHeight = lrCorner.y - origin.y
-   //             this.newConstructions['cindy'].view.remove()
-   //             this.constructions.push(new CindyCanvas(origin, cindyWidth, cindyHeight))
-
-   //         }
-
-   //         this.isCreating = false
-   //         this.newFreehand = undefined
-   //         this.newPoints = []
-   //         this.newConstructions = {}
-   //         this.update()
-   //     }
-
-
-
-
-
-
-
-   //     add(mobject) {
-   //         this.view.appendChild(mobject.view)
-   //     }
-
-   //     update() {
-   //         for (let point of this.freePoints) { point.update() }
-   //         for (let point of this.newPoints) { point.update() }
-   //         for (let mob of this.constructions) { mob.update() }
-   //         for (let mob of Object.values(this.newConstructions)) { mob.update() }
-   //     }
-
-
-   //     startDragging(p, mob) {
-   //         let oldX = parseInt(mob.view.style.left.replace('px', ''))
-   //         let oldY = parseInt(mob.view.style.top.replace('px', ''))
-   //         let q = new Vertex(oldX, oldY)
-   //         this.mobOffsetFromCursor = q.subtract(p)
+       constructor(argsDict) {
+           super(argsDict);
+           this.endPoint = this.endPoint || this.startPoint.copy();
+           this.passAlongEvents = true;
+           this.startFreePoint = new FreePoint({
+               midPoint: this.startPoint
+           });
+           this.endFreePoint = new FreePoint({
+               midPoint: this.endPoint
+           });
+           this.add(this.startFreePoint);
+           this.add(this.endFreePoint);
            
-   //         addPointerMove(this.view, this.boundDrag)
-   //         addPointerUp(this.view, this.boundEndDragging)
-   //     }
+       }
 
-   //     drag(e) {
-   //         let dragPoint = new Vertex(pointerEventPageLocation(e))
-   //         let mob = null
-   //         for (let mob2 of this.constructions) {
-   //             if (mob2 instanceof CindyCanvas) {mob = mob2 }
-   //         }
-   //         mob.view.style.left = (dragPoint.x + this.mobOffsetFromCursor.x) + 'px'
-   //         mob.view.style.top = (dragPoint.y + this.mobOffsetFromCursor.y) + 'px'
-   //     }
+       updateFromTip(q) {
+           this.endPoint.copyFrom(q);
+           this.update();
+       }
 
-   //     endDragging(e) {
-   //         removePointerMove(this.view, this.boundDrag)
-   //         removePointerUp(this.view, this.boundEndDragging)
-   //         this.currentMode = 'freehand'
-   //         this.draggedMobject = undefined
-   //     }
+       dissolveInto(superMobject) {
+           superMobject.removeFreePoint(this.startFreePoint);
+           superMobject.removeFreePoint(this.endFreePoint);
+
+           for (let fq of superMobject.snappablePoints) {
+               let q = fq.midPoint;
+               if (this.startPoint.x == q.x && this.startPoint.y == q.y) {
+                   this.startPoint = fq.midPoint;
+                   this.startFreePoint = fq;
+                   this.update();
+                   break
+               }
+           }
+           for (let fq of superMobject.snappablePoints) {
+               let q = fq.midPoint;
+               if (this.endPoint.x == q.x && this.endPoint.y == q.y) {
+                   this.endPoint = fq.midPoint;
+                   this.endFreePoint = fq;
+                   this.update();
+                   break
+               }
+           }
+
+           superMobject.add(this.startFreePoint);
+           superMobject.add(this.endFreePoint);
+           
+       }
+
+   }
+
+
+   class DrawnSegment extends DrawnArrow {
+
+       constructor(argsDict) {
+
+           super(argsDict);
+           this.segment = new Segment({
+               startPoint: this.startFreePoint.midPoint,
+               endPoint: this.endFreePoint.midPoint
+           });
+           this.add(this.segment);
+           this.startFreePoint.dependents.push(this.segment);
+           this.endFreePoint.dependents.push(this.segment);
+       }
+
+       dissolveInto(superMobject) {
+           super.dissolveInto(superMobject);
+           superMobject.remove(this.segment);
+           this.segment = new Segment({
+               startPoint: this.startPoint,
+               endPoint: this.endPoint,
+               strokeColor: this.strokeColor,
+           });
+
+           this.startFreePoint.dependents.push(this.segment);
+           this.endFreePoint.dependents.push(this.segment);
+           superMobject.add(this.segment);
+
+       }
+   }
+
+   class DrawnRay extends DrawnArrow {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.ray = new Ray({
+               startPoint: this.startFreePoint.midPoint,
+               endPoint: this.endFreePoint.midPoint,
+           });
+           this.add(this.ray);
+           this.startFreePoint.dependents.push(this.ray);
+           this.endFreePoint.dependents.push(this.ray);
+       }
+
+       dissolveInto(superMobject) {
+           super.dissolveInto(superMobject);
+           superMobject.remove(this.ray);
+           this.ray = new Ray({
+               startPoint: this.startPoint,
+               endPoint: this.endPoint,
+               strokeColor: this.strokeColor
+           });
+           this.startFreePoint.dependents.push(this.ray);
+           this.endFreePoint.dependents.push(this.ray);
+           superMobject.add(this.ray);
+
+       }
+   }
+
+
+   class DrawnLine extends DrawnArrow {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.line = new Line({
+               startPoint: this.startFreePoint.midPoint,
+               endPoint: this.endFreePoint.midPoint
+           });
+           this.add(this.line);
+           this.startFreePoint.dependents.push(this.line);
+           this.endFreePoint.dependents.push(this.line);
+       }
+
+       dissolveInto(superMobject) {
+           super.dissolveInto(superMobject);
+           superMobject.remove(this.line);
+           this.line = new Line({
+               startPoint: this.startPoint,
+               endPoint: this.endPoint,
+               strokeColor: this.strokeColor
+           });
+           this.startFreePoint.dependents.push(this.line);
+           this.endFreePoint.dependents.push(this.line);
+           superMobject.add(this.line);
+
+       }
 
 
    }
 
-   logInto('test', 'paper-console');
+   class DrawnCircle extends CreatedMobject {
 
-   let paper$1 = new Paper({view: document.querySelector('#paper'), passAlongEvents: true });
+       constructor(argsDict) {
+           super(argsDict);
+           
+           this.setDefaults({
+               strokeColor: rgb(1, 1, 1),
+               fillOpacity: 0
+           });
+           this.setAttributes({
+               strokeWidth: 1
+           });
 
-   let ip = new InteractivePoint({midPoint: new Vertex(100, 100), radius: 20, fillColor: rgb(1, 1, 1)});
+           this.midPoint = this.midPoint || this.startPoint.copy();
+           this.outerPoint = this.outerPoint || this.startPoint.copy();
+           this.passAlongEvents = true;
+           this.freeMidpoint = new FreePoint({
+               midPoint: this.midPoint
+           });
+           this.freeOuterPoint = new FreePoint({
+               midPoint: this.outerPoint
+           });
+           this.circle = new TwoPointCircle({
+               midPoint: this.midPoint,
+               outerPoint: this.outerPoint
+           });
+           this.add(this.freeMidpoint);
+           this.add(this.freeOuterPoint);
+           this.add(this.circle);
 
-   paper$1.add(ip);
+           this.freeMidpoint.dependents.push(this.circle);
+           this.freeOuterPoint.dependents.push(this.circle);
 
-}());
+       }
+
+       updateFromTip(q) {
+           this.outerPoint.copyFrom(q);
+           this.update();
+       }
+
+       dissolveInto(superMobject) {
+           log('dissolving DrawnRectangle');
+           superMobject.removeFreePoint(this.freeMidpoint);
+           superMobject.removeFreePoint(this.freeOuterPoint);
+
+           for (let fq of superMobject.snappablePoints) {
+               let q = fq.midPoint;
+               if (this.midPoint.x == q.x && this.midPoint.y == q.y) {
+                   this.midPoint = fq.midPoint;
+                   this.freeMidpoint = fq;
+                   this.update();
+                   break
+               }
+           }
+           for (let fq of superMobject.snappablePoints) {
+               let q = fq.midPoint;
+               if (this.outerPoint.x == q.x && this.outerPoint.y == q.y) {
+                   this.outerPoint = fq.midPoint;
+                   this.freeOuterPoint = fq;
+                   this.update();
+                   break
+               }
+           }
+
+           superMobject.add(this.freeMidpoint);
+           superMobject.add(this.freeOuterPoint);
+           
+           superMobject.remove(this.circle);
+           this.circle = new TwoPointCircle({
+               midPoint: this.midPoint,
+               outerPoint: this.outerPoint
+           });
+           this.circle.strokeColor = this.strokeColor;
+           console.log(this.strokeColor);
+           this.freeMidpoint.dependents.push(this.circle);
+           this.freeOuterPoint.dependents.push(this.circle);
+           superMobject.add(this.circle);
+       }
+
+
+   }
+
+
+
+
+   class CindyCanvas extends Mobject {
+       
+       constructor(paper, p, width, height) {
+           super({anchor: p, width: width, height: height});
+           this.script = document.createElement('script');
+           this.script.setAttribute('type', 'text/x-cindyscript');
+           let scriptID = 'csdraw'; // + paper.cindyPorts.length
+           this.script.setAttribute('id', scriptID);
+           this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);';
+           //script.textContent = 'colorplot(seconds());'
+
+           this.view = document.createElement('div');
+           this.view.style.position = 'absolute';
+           this.view.style.left =  p.x + "px";
+           this.view.style.top = p.y + "px";
+
+           this.csView = document.createElement('div');
+           let canvasID = 'CSCanvas' + paper.cindyPorts.length;
+           this.csView.setAttribute('id', canvasID);
+           this.view.appendChild(this.csView);
+
+           this.view.style['pointer-events'] = 'auto';
+          
+           paper.add(this);
+
+           paper.cindyPorts.push({
+               id: canvasID,
+               width: width,
+               height: height,
+               transform: [{
+                 visibleRect: [0, 1, 1, 0]
+               }]
+             });
+
+           this.points = [[0.4, 0.4], [0.3, 0.8]];
+
+           log(paper.cindyPorts.toString());
+           log(this.geometry().toString());
+           CindyJS({
+               scripts: "cs*",
+               autoplay: true,
+               ports: paper.cindyPorts,
+               geometry: this.geometry()
+           });
+           log('7');
+          
+       }
+
+       geometry() {
+           let ret = [];
+           let i = 0;
+           for (let point of this.points) {
+               ret.push({name: "A" + i, kind:"P", type:"Free", pos: point});
+               i += 1;
+           }
+           return ret
+       }
+       
+       update(argsDict) { }
+       updateView() { }
+       
+   }
+
+
+   class DrawnRectangle extends CreatedMobject {
+       
+       constructor(argsDict) {
+           super(argsDict);
+           this.endPoint = this.endPoint || this.startPoint.copy();
+           this.p1 = this.startPoint;
+           this.p2 = new Vertex(this.endPoint.x, this.startPoint.y);
+           this.p3 = this.endPoint;
+           this.p4 = new Vertex(this.startPoint.x, this.endPoint.y);
+           this.top = new Segment({startPoint: this.p1, endPoint: this.p2});
+           this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4});
+           this.left = new Segment({startPoint: this.p1, endPoint: this.p4});
+           this.right = new Segment({startPoint: this.p2, endPoint: this.p3});
+           this.top.strokeColor = rgb(1, 1, 1);
+           this.bottom.strokeColor = rgb(1, 1, 1);
+           this.left.strokeColor = rgb(1, 1, 1);
+           this.right.strokeColor = rgb(1, 1, 1);
+           this.add(this.top);
+           this.add(this.bottom);
+           this.add(this.left);
+           this.add(this.right);
+       }
+
+       updateFromTip(q) {
+           this.endPoint.copyFrom(q);
+           this.p2.x = this.endPoint.x;
+           this.p2.y = this.startPoint.y;
+           this.p4.x = this.startPoint.x;
+           this.p4.y = this.endPoint.y;
+           this.updateView();
+       }
+
+       dissolveInto(superMobject) {
+           log('dissolving');
+           let w = this.p2.x - this.p1.x;
+           let h = this.p3.y - this.p1.y;
+           let cindy = new CindyCanvas(superMobject, this.p1, w, h);
+           superMobject.add(cindy);
+           log('dissolving 2');
+           log(superMobject.children.includes(cindy).toString());
+           //log(superMobject.view.children.includes(cindy.view).toString())
+           superMobject.remove(this);
+       }
+       
+   }
+
+
+
+
+
+   class CreationGroup extends CreatedMobject {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.creations = { };
+           this.creations['freehand'] = new Freehand();
+           this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint});
+           this.creations['ray'] = new DrawnRay({startPoint: this.startPoint});
+           this.creations['line'] = new DrawnLine({startPoint: this.startPoint});
+           this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint});
+           this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint});
+           this.setVisibleCreation(this.visibleCreation);
+           for (let creation of Object.values(this.creations)) {
+               this.add(creation);
+           }
+           this.update();
+
+       }
+
+       updateFromTip(q) {
+           for (let creation of Object.values(this.creations)) {
+               creation.updateFromTip(q);
+           }
+       }
+
+
+       setVisibleCreation(visibleCreation) {
+           for (let mob of Object.values(this.creations)) {
+               mob.hide();
+           }
+           this.visibleCreation = visibleCreation;
+           this.creations[visibleCreation].show();
+
+           if (visibleCreation == 'cindy') {
+               this.creations[visibleCreation].strokeColor = rgb(1, 1, 1);
+           }
+       }
+
+       dissolveInto(superMobject) {
+           superMobject.remove(this);
+           this.creations[this.visibleCreation].dissolveInto(superMobject);
+       }
+
+   }
+
+   let log$1 = function(msg) { logInto(msg, 'paper-console'); };
+
+   function loadScript(url, completeCallback) {
+      var script = document.createElement('script'), done = false,
+          head = document.getElementsByTagName("head")[0];
+      script.src = url;
+      script.onload = script.onreadystatechange = function(){
+        if ( !done && (!this.readyState ||
+             this.readyState == "loaded" || this.readyState == "complete") ) {
+          done = true;
+          completeCallback();
+
+         // IE memory leak
+         script.onload = script.onreadystatechange = null;
+         head.removeChild( script );
+       }
+     };
+     head.appendChild(script);
+   }
+
+   loadScript("./CindyJS/build/Cindy.js",
+               function () { });
+
+
+   class Paper extends Mobject {
+
+        constructor(argsDict) {
+           super(argsDict);
+           this.children = [];
+           this.cindys = [];
+           this.setDragging(false);
+           this.visibleCreation = 'freehand';
+           this.cindyPorts = [];
+           this.snappablePoints = [];
+
+           this.colorPalette = {
+               'black': rgb(0, 0, 0),
+               'white': rgb(1, 1, 1),
+               'red': rgb(1, 0, 0),
+               'orange': rgb(1, 0.5, 0),
+               'yellow': rgb(1, 1, 0),
+               'green': rgb(0, 1, 0),
+               'blue': rgb(0, 0, 1),
+               'indigo': rgb(0.5, 0, 1),
+               'violet': rgb(1, 0, 1)
+           };
+           this.currentColor = this.colorPalette['white'];
+        }
+
+       changeColorByName(newColorName) {
+           let newColor = this.colorPalette[newColorName];
+           this.changeColor(newColor);
+       }
+
+       changeColor(newColor) {
+           this.currentColor = newColor;
+           if (this.creationGroup == undefined) { return }
+           this.creationGroup.strokeColor = this.currentColor;
+           this.creationGroup.fillColor = this.currentColor;
+           this.creationGroup.update();
+       }
+
+       setDragging(flag) {
+           this.passAlongEvents = !flag;
+           for (let c of this.cindys) {
+               c.draggable = flag;
+               c.view.style['pointer-events'] = (flag ? 'none' : 'auto');
+           }
+           if (flag) {
+               this.selfHandlePointerDown = this.startDragging;
+               this.selfHandlePointerMove = this.dragging;
+               this.selfHandlePointerUp = this.endDragging;
+           } else {
+               this.selfHandlePointerDown = this.startCreating;
+               this.selfHandlePointerMove = this.creativeMove;
+               this.selfHandlePointerUp = this.endCreating;
+           }
+       }
+
+
+       startDragging(e) {
+           this.draggedMobject = this.eventTargetMobject(e);
+           if (this.draggedMobject == this || !this.draggedMobject.draggable) {
+               this.draggedMobject = undefined;
+               return
+           }
+           this.dragPointStart = pointerEventVertex(e);
+           this.dragAnchorStart = this.draggedMobject.anchor.copy();
+       }
+
+       dragging(e) {
+           if (this.draggedMobject == undefined) { return }
+           let dragPoint = pointerEventVertex(e);
+           let dr = dragPoint.subtract(this.dragPointStart);
+           this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr));
+           if (this.draggedMobject instanceof CindyCanvas) {
+               this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px";
+               this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px";
+           }
+           this.draggedMobject.update();
+       }
+
+       endDragging(e) {
+           this.dragPointStart = undefined;
+           this.dragAnchorStart = undefined;
+           this.draggedMobject = undefined;
+       }
+
+       handleMessage(message) {
+           if (message == undefined || message == {}) { return }
+           let key = Object.keys(message)[0];
+           let value = Object.values(message)[0];
+
+           switch (key) {
+           case 'creating':
+                   this.changeVisibleCreation(value);
+               if (value == 'freehand') {
+                   this.passAlongEvents = true;
+                   break
+               }
+               if (this.creationGroup == undefined) {
+                   this.passAlongEvents = false;
+               }
+               break
+           case 'color':
+               this.changeColor(value);
+               break
+           case 'drag':
+               this.setDragging(value);
+               break
+           }
+
+
+       }
+
+       changeVisibleCreation(newVisibleCreation) {
+           this.visibleCreation = newVisibleCreation;
+           if (this.creationGroup != undefined) {
+               this.creationGroup.setVisibleCreation(newVisibleCreation);
+           }
+       }
+
+
+       startCreating(e) {
+
+           this.creationStartPoint = pointerEventVertex(e);
+           for (let fp of this.snappablePoints) {
+               if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
+                   this.creationStartPoint = fp.midPoint;
+               }
+           }
+
+           this.creationGroup = new CreationGroup({
+               startPoint: this.creationStartPoint,
+               visibleCreation: this.visibleCreation
+           });
+           this.creationGroup.strokeColor = this.currentColor;
+           this.creationGroup.fillColor = this.currentColor;
+           this.add(this.creationGroup);
+           this.changeVisibleCreation(this.visibleCreation);
+       }
+
+       creativeMove(e) {
+           let p = pointerEventVertex(e);
+           for (let fq of this.snappablePoints) {
+               let q = fq.midPoint;
+               if (p.subtract(q).norm() < 10) {
+                   p = q;
+                   break
+               }
+           }
+
+           this.creationGroup.updateFromTip(p);
+       }
+
+       endCreating(e) {
+           this.creationGroup.dissolveInto(this);
+           this.remove(this.creationGroup);
+           this.creationGroup = undefined;
+
+       }
+
+       addCindy(cindyCanvas) {
+           document.querySelector('#paper-container').insertBefore(cindyCanvas.view, document.querySelector('#paper-console'));
+           document.body.appendChild(cindyCanvas.script);
+           this.cindys.push(cindyCanvas);
+       }
+
+
+       removeCindy(cindyCanvas) {
+           cindyCanvas.view.remove();
+           cindyCanvas.script.remove();
+       }
+
+       addFreePoint(fp) {
+           this.snappablePoints.push(fp);
+           super.add(fp);
+       }
+
+       removeFreePoint(fp) {
+           remove(this.snappablePoints, fp);
+           super.remove(fp);
+       }
+
+       add(mobject) {
+           if (mobject instanceof CindyCanvas) {
+               this.addCindy(mobject);
+           } else if (mobject instanceof FreePoint) {
+               this.addFreePoint(mobject);
+           } else {
+               super.add(mobject);
+           }
+       }
+
+       remove(mobject) {
+           if (mobject instanceof CindyCanvas) {
+               this.removeCindy(mobject);
+           } else if (mobject instanceof FreePoint) {
+               this.removeFreePoint(mobject);
+           } else {
+               super.remove(mobject);
+           }
+       }
+
+
+
+   }
+
+   const paper$1 = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true });
+
+   let c = new CindyCanvas(paper$1, new Vertex(100, 100), 200, 300);
+
+   log$1(paper$1.children.toString());
+
+   exports.paper = paper$1;
+
+   return exports;
+
+}({}));

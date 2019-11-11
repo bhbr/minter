@@ -5,7 +5,29 @@ import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
 
+
 let log = function(msg) { logInto(msg, 'paper-console') }
+
+function loadScript(url, completeCallback) {
+   var script = document.createElement('script'), done = false,
+       head = document.getElementsByTagName("head")[0]
+   script.src = url
+   script.onload = script.onreadystatechange = function(){
+     if ( !done && (!this.readyState ||
+          this.readyState == "loaded" || this.readyState == "complete") ) {
+       done = true
+       completeCallback()
+
+      // IE memory leak
+      script.onload = script.onreadystatechange = null
+      head.removeChild( script )
+    }
+  };
+  head.appendChild(script)
+}
+
+loadScript("./CindyJS/build/Cindy.js",
+            function () { })
 
 
 class Paper extends Mobject {
@@ -214,5 +236,6 @@ class Paper extends Mobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-//let r = new Rectangle({anchor: new Vertex(100, 100), width: 200, height: 300})
-//paper.add(r)
+let c = new CindyCanvas(paper, new Vertex(100, 100), 200, 300)
+
+log(paper.children.toString())

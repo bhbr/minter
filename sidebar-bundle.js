@@ -10,6 +10,15 @@
        return x + ' ' + y
    }
 
+   function remove(arr, value, all = false) {
+      for (let i = 0; i < arr.length; i++) {
+           if (arr[i] == value) {
+               arr.splice(i,1);
+               if (!all) { break }
+           }
+       }
+   }
+
    function rgb(r, g, b) {
        let hex_r = (Math.round(r*255)).toString(16).padStart(2, '0');
        let hex_g = (Math.round(g*255)).toString(16).padStart(2, '0');
@@ -65,20 +74,6 @@
        element.removeEventListener('mouseup', method, { capture: true });
        element.removeEventListener('pointerup', method, { capture: true });
    }
-
-   function logInto(obj, id) {
-       let msg = obj.toString();
-       let newLine = document.createElement('p');
-       newLine.innerText = msg;
-       let myConsole = document.querySelector('#' + id);
-       myConsole.appendChild(newLine);
-       
-       // Neither of these lines does what they are supposed to. I give up
-       //myConsole.scrollTop = console.scrollHeight
-       //newLine.scrollIntoView()
-   }
-
-   //import {stringFromPoint, remove, rgb, rgba} from './helpers.js'
 
    class Vertex extends Array {
 
@@ -476,13 +471,20 @@
        }
    }
 
+   function pointerEventVertex(e) {
+       return new Vertex(pointerEventPageLocation(e))
+   }
+
    class Mobject {
 
        constructor(argsDict) {
-           this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-           this.view.setAttribute('class', this.constructor.name);
-           this.view.mobject = this;
+           argsDict = argsDict || {};
            this.eventTarget = null;
+           if (argsDict['view'] == undefined) {
+               this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+           } else {
+               this.view = argsDict['view'];
+           }
            this.setAttributes(argsDict);
            this.setDefaults({
                transform: Transform.identity(),
@@ -493,11 +495,12 @@
                strokeWidth: 1,
                strokeColor: rgb(1, 1, 1),
                fillColor: rgb(1, 1, 1),
-               draggable: false,
-               isDragged: false,
                passAlongEvents: false, // to event target
                visible: true,
+               draggable: false // by outside forces, that is
            });
+           this.view.mobject = this;
+           this.view.setAttribute('class', this.constructor.name);
            this.show();
 
            this.boundPointerDown = this.pointerDown.bind(this);
@@ -506,86 +509,95 @@
            this.boundEventTargetMobject = this.eventTargetMobject.bind(this);
            addPointerDown(this.view, this.boundPointerDown);
 
+           this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
+           this.savedSelfHandlePointerMove = this.selfHandlePointerMove;
+           this.savedSelfHandlePointerUp = this.selfHandlePointerUp;
+           this.disableDragging();
+
            // this.boundCreatePopover = this.createPopover.bind(this)
            // this.boundDismissPopover = this.dismissPopover.bind(this)
            // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
        }
 
+       enableDragging() {
+           this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
+           this.savedSelfHandlePointerMove = this.selfHandlePointerMove;
+           this.savedSelfHandlePointerUp = this.selfHandlePointerUp;
+           this.selfHandlePointerDown = this.startSelfDragging;
+           this.selfHandlePointerMove = this.selfDragging;
+           this.selfHandlePointerUp = this.endSelfDragging;
+       }
+
+       disableDragging() {
+           this.selfHandlePointerDown = this.savedSelfHandlePointerDown;
+           this.selfHandlePointerMove = this.savedSelfHandlePointerMove;
+           this.selfHandlePointerUp = this.savedSelfHandlePointerUp;
+       }
+
        eventTargetMobject(e) {
            let t = e.target;
+           if (t.tagName == 'path') { t = t.parentNode; }
            if (t == this.view) { return this }
            let targetViewChain = [t];
            while (t != undefined && t != this.view) {
                t = t.parentNode;
                targetViewChain.push(t);
            }
+           t = targetViewChain.pop();
+           t = targetViewChain.pop();
            while (t != undefined) {
                if (t.mobject != undefined) { return t.mobject }
-               t = targetViewChain.pop();
+               t = targetViewChain.pop(); 
            }
+           return this
        }
 
        pointerDown(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer down', 'paper-console');
            removePointerDown(this.view, this.boundPointerDown);
            addPointerMove(this.view, this.boundPointerMove);
            addPointerUp(this.view, this.boundPointerUp);
-           
+
            this.eventTarget = this.boundEventTargetMobject(e);
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerDown(e);
            } else {
                this.selfHandlePointerDown(e);
            }
+           this.update();
        }
 
        pointerMove(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer move', 'paper-console');
 
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerMove(e);
            } else {
                this.selfHandlePointerMove(e);
            }
+           this.update();
        }
 
        pointerUp(e) {
            e.stopPropagation();
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) handling pointer up', 'paper-console');
            removePointerMove(this.view, this.boundPointerMove);
            removePointerUp(this.view, this.boundPointerUp);
            addPointerDown(this.view, this.boundPointerDown);
 
-           if (this.passAlongEvents) {
+           if (this.eventTarget != this && this.passAlongEvents) {
                this.eventTarget.pointerUp(e);
            } else {
                this.selfHandlePointerUp(e);
            }
            this.eventTarget = null;
+           this.update();
        }
 
-       selfHandlePointerDown(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer down', 'paper-console');
-       }
 
-       selfHandlePointerMove(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer move', 'paper-console');
-       }
-
-       selfHandlePointerUp(e) {
-           logInto(this.constructor.name, 'paper-console');
-           logInto('(as Mobject) self-handling pointer up', 'paper-console');
-
-       }
-
+       selfHandlePointerDown(e) { }
+       selfHandlePointerMove(e) { }
+       selfHandlePointerUp(e) { }
 
        setAttributes(argsDict) {
            argsDict = argsDict || {};
@@ -632,10 +644,19 @@
 
        update(argsDict) {
            this.setAttributes(argsDict || {});
+           if (Object.values(this).includes(undefined)) { 
+               return
+           }
 
-           if (Object.values(this).includes(undefined)) { return }
-
-           for (let submob of this.children || []) { submob.update(); }
+           for (let mob of this.dependents || []) {
+               mob.update();
+           }
+           for (let submob of this.children || []) {
+               if (this.dependsOn(submob)) {
+                   continue
+               }
+               submob.update();
+           }
 
            if (this.popover != undefined) {
                this.popover.anchor = this.anchor.translatedBy(this.rightEdge());
@@ -647,9 +668,23 @@
            this.updateView();
        }
 
-
        updateView() {
            if (this.view == undefined) { return }
+       }
+
+       allDependents() {
+           let dep = [];
+           for (let mob of this.dependents) {
+               dep.push(mob);
+               for (let mob2 of mob.allDependents()) {
+                   dep.push(mob2);
+               }
+           }
+           return dep
+       }
+
+       dependsOn(otherMobject) {
+           return otherMobject.allDependents().includes(this)
        }
 
 
@@ -693,7 +728,6 @@
            }
            this.updateView();
        }
-
 
        add(submob) {
            if (submob.parent != this) { submob.parent = this; }
@@ -749,6 +783,28 @@
        }
 
        rightEdge() { return Vertex.origin() }
+
+
+
+       startSelfDragging(e) {
+           this.dragPointStart = new Vertex(pointerEventPageLocation(e));
+           this.dragAnchorStart = this.anchor.copy();
+       }
+
+       selfDragging(e) {
+           let dragPoint = new Vertex(pointerEventPageLocation(e));
+           let dr = dragPoint.subtract(this.dragPointStart);
+           this.anchor.copyFrom(this.dragAnchorStart.add(dr));
+           this.update();
+       }
+
+       endSelfDragging(e) {
+           this.dragPointStart = undefined;
+           this.dragAnchorStart = undefined;
+       }
+
+
+
 
 
        createPopover(e) {
@@ -808,6 +864,7 @@
            super(argsDict);
            this.bezierPoints = [];
            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+           this.path.mobject = this;
            this.view.appendChild(this.path);
        }
 
@@ -1081,12 +1138,12 @@
            return new Vertex(this.radius, 0)
        }
 
-       get radius() { return this._radius }
-       set radius(newRadius) {
-           this._radius = newRadius;
-           this.update();
-       }
+   }
 
+   let paper$1 = null;
+   if (!isTouchDevice) {
+       const paperView = document.querySelector('#paper');
+       paper$1 = paperView.mobject;
    }
 
    let sidebar = document.querySelector('#sidebar');
@@ -1115,18 +1172,22 @@
                currentModeIndex: 0,
                baseColor: rgb(1, 1, 1),
                locationIndex: 0,
-               modeSpacing: 25,
+               optionSpacing: 25,
                active: false,
-               showLabel: true
+               showLabel: true,
+               text: 'text',
+               fontSize: 12,
            });
            this.setAttributes({
                radius: buttonRadius
            });
 
-           this.text = new TextLabel({text: 'text'});
-           try { this.text.text = this.modes[0]; } catch { }
-           this.text.anchor = Vertex.origin();
-           this.add(this.text);
+           this.updateModeIndex(0);
+           this.label = new TextLabel({text: this.text});
+           this.label.view.setAttribute('font-size', this.fontSize.toString());
+           this.label.anchor = Vertex.origin();
+           this.add(this.label);
+           this.update();
 
            this.boundButtonUpByKey = this.buttonUpByKey.bind(this);
            this.boundButtonDownByKey = this.buttonDownByKey.bind(this);
@@ -1139,7 +1200,6 @@
            addPointerDown(this.view, this.boundButtonDownByPointer);
            document.addEventListener('keydown', this.boundButtonDownByKey);
        }
-       
        
        get baseColor() { return this._baseColor }
        set baseColor(newColor) {
@@ -1179,8 +1239,9 @@
            if (this.active) { return }
            this.active = true;
            this.radius = buttonRadius * buttonScaleFactor;
-           this.changeMode(this.modes[0]);
-           this.text.view.setAttribute('font-size', '16');
+           this.previousIndex = this.currentModeIndex;
+           this.messagePaper(this.messages[0]);
+           this.update();
        }
        
        buttonDownByPointer(e) {
@@ -1205,7 +1266,6 @@
            this.commonButtonUp();
        }
        
-       
        buttonUpByKey(e) {
            if (e.key == this.key) {
                document.removeEventListener('keyup', this.boundButtonUpByKey);
@@ -1213,53 +1273,69 @@
                this.commonButtonUp();
            }
        }
+
        commonButtonUp() {
            this.radius = buttonRadius;
-           this.midPoint = buttonCenter(this.locationIndex);
-           this.updateView();
+           let dx = this.currentModeIndex * this.optionSpacing;
+           let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y);
+           this.midPoint.copyFrom(newMidpoint);
+
+           this.update();
            this.active = false;
            this.fillColor = this.colorForIndex(this.currentModeIndex);
-           this.updateModeIndex(0);
-           this.text.view.setAttribute('font-size', '12');
-           this.changeMode('freehand');
+           this.label.view.setAttribute('font-size', this.fontSize.toString());
+           this.messagePaper(this.outgoingMessage);
        }
 
-       changeMode(newMode) {
-           console.log('changing mode');
+       messagePaper(message) {
            try {
-               webkit.messageHandlers.changeMode.postMessage({mode: newMode});
+               webkit.messageHandlers.handleMessage.postMessage(message);
            } catch {
-               paper = document.querySelector('#paper').mobject;
-               paper.changeMode(newMode);
+               paper$1.handleMessage(message);
            }
        }
+
+       updateLabel() {
+           let f = this.active ? buttonScaleFactor : 1;
+           this.label.view.setAttribute('font-size', (f * this.fontSize).toString());
+           if (this.showLabel) {
+               try {
+                   let msg = this.messages[this.currentModeIndex];
+                   this.label.text = Object.values(msg)[0];
+               } catch { }
+           } else {
+               this.label.text = '';
+           }
+       }
+
+       update(argsDict) {
+           super.update(argsDict);
+           this.updateLabel();
+       }
        
-       updateModeIndex(newIndex) {
+       updateModeIndex(newIndex, withMessage) {
            if (newIndex == this.currentModeIndex || newIndex == -1) { return }
            this.currentModeIndex = newIndex;
-           let newMode = this.modes[this.currentModeIndex];
+           let message = this.messages[this.currentModeIndex];
            this.fillColor = this.colorForIndex(this.currentModeIndex);
-           this.changeMode(newMode);
-           if (this.showLabel) {
-               this.text.text = newMode;
-           } else {
-               this.text.text = '';
-           }
+           if (withMessage) { this.messagePaper(message); }
+    
+           this.update();
        }
        
        selectNextOption() {
-           if (this.currentModeIndex == this.modes.length - 1) { return }
-           let dx = this.modeSpacing * (this.currentModeIndex + 1);
+           if (this.currentModeIndex == this.messages.length - 1) { return }
+           let dx = this.optionSpacing * (this.currentModeIndex + 1);
            this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y);
-           this.updateModeIndex(this.currentModeIndex + 1);
+           this.updateModeIndex(this.currentModeIndex + 1, true);
        }
        
        
        selectPreviousOption() {
            if (this.currentModeIndex == 0) { return }
-           let dx = this.modeSpacing * (this.currentModeIndex - 1);
+           let dx = this.optionSpacing * (this.currentModeIndex - 1);
            this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y);
-           this.updateModeIndex(this.currentModeIndex - 1);
+           this.updateModeIndex(this.currentModeIndex - 1, true);
        }
        
        buttonDrag(e) {
@@ -1269,17 +1345,21 @@
            }
        
            let t = null;
-           if (e instanceof MouseEvent) { t = e;}
+           if (e instanceof MouseEvent) { t = e; }
            else { t = e.changedTouches[0]; }
        
-           let p = new Vertex(pointerEventPageLocation(e));
-           let dx = p.x - this.touchStart.x;
-       
-           dx = Math.min(Math.max(dx, 0), this.modeSpacing * (this.modes.length - 1));
-           
-           this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y);
+           let p = pointerEventVertex(e);
+           var dx = p.x - this.touchStart.x;
 
-           this.updateModeIndex(Math.floor(dx/this.modeSpacing));
+           var newIndex = Math.floor(this.previousIndex + dx / this.optionSpacing);
+           newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1);
+           dx += this.previousIndex * this.optionSpacing;
+           dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1));
+
+           let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y);
+           this.midPoint.copyFrom(newMidpoint);
+
+           this.updateModeIndex(newIndex, true);
            
        }
        
@@ -1290,89 +1370,158 @@
        constructor(argsDict) {
            super(argsDict);
            this.setAttributes({
+               optionSpacing: 15,
                showLabel: false,
                palette: {
-                   'white': [1, 1, 1],
-                   'red': [1, 0, 0],
-                   'orange': [1, 0.5, 0],
-                   'yellow': [1, 1, 0],
-                   'green': [0, 1, 0],
-                   'blue': [0, 0, 1],
-                   'indigo': [0.5, 0, 1],
-                   'violet': [1, 0, 1]
+                   'white': rgb(1, 1, 1),
+                   'red': rgb(1, 0, 0),
+                   'orange': rgb(1, 0.5, 0),
+                   'yellow': rgb(1, 1, 0),
+                   'green': rgb(0, 1, 0),
+                   'blue': rgb(0, 0, 1),
+                   'indigo': rgb(0.5, 0, 1),
+                   'violet': rgb(1, 0, 1)
                }
            });
-           this.modes = Object.keys(this.palette);
-           this.text.text = '';
+           this.colors = Object.keys(this.palette);
+           this.label.text = 'color';
+           this.label.view.setAttribute('fill', 'black');
+
+           this.messages = [];
+           for (let value of Object.values(this.palette)) {
+               this.messages.push({color: value});
+           }
+           this.outgoingMessage = {};
        }
 
        colorForIndex(i) {
-           return SidebarButton.brighten(this.palette[this.modes[i]], 1)
+           return this.palette[this.colors[i]]
+       }
+
+       updateLabel() {
+           let f = this.active ? buttonScaleFactor : 1;
+           this.label.view.setAttribute('font-size', (f * this.fontSize).toString());
        }
 
        commonButtonUp() {
            this.radius = buttonRadius;
-           this.midPoint = buttonCenter(this.locationIndex);
-           this.updateView();
+           this.update();
            this.active = false;
            this.fillColor = this.colorForIndex(this.currentModeIndex);
-           this.text.view.setAttribute('font-size', '12');
-           this.changeColor(this.fillColor);
+           this.updateLabel();
+           this.messagePaper(this.outgoingMessage);
        }
 
-       changeColor(newColor) {
-           console.log('changing mode');
-           try {
-               webkit.messageHandlers.changeColor.postMessage({color: newColor});
-           } catch {
-               paper = document.querySelector('#paper').mobject;
-               paper.changeColor(newColor);
+       buttonDrag(e) {
+           super.buttonDrag(e);
+           this.remove(this.label);
+       }
+   }
+
+   class CreativeButton extends SidebarButton {
+       constructor(argsDict) {
+           super(argsDict);
+           this.creations = argsDict['creations'];
+           this.messages = [];
+           for (let creation of this.creations) {
+               this.messages.push({creating: creation});
+           }
+           this.outgoingMessage = {creating: 'freehand'};
+           super.update();
+           this.updateLabel();
+       }
+
+       commonButtonUp() {
+           this.currentModeIndex = 0;
+           super.commonButtonUp();
+       }
+
+       updateLabel() {
+           if (this.showLabel) {
+               try {
+                   this.label.text = this.creations[this.currentModeIndex];
+               } catch { }
+           } else {
+               this.label.text = '';
            }
        }
    }
 
-   let lineButton = new SidebarButton({
-       modes: ['point', 'segment', 'ray', 'line'],
+
+   class DragButton extends SidebarButton {
+
+       constructor(argsDict) {
+           super(argsDict);
+           this.setAttributes({ fontSize: 30 });
+           this.label.view.setAttribute('font-family', 'Times');
+           this.label2 = new TextLabel({text: this.text});
+           this.label2.view.setAttribute('font-family', 'Times');
+           this.label2.view.setAttribute('font-size', this.fontSize.toString());
+           this.label2.view.setAttribute('transform', 'rotate(90, 51, 237.5)');
+           this.label2.color = rgb(1, 1, 1);
+           this.label2.anchor = new Vertex(0, 2);
+           this.label.text = '↕︎';
+           this.label2.text = '↕︎';
+           this.add(this.label2);
+           this.update();
+       }
+
+       commonButtonUp() {
+           this.currentModeIndex = 0;
+           super.commonButtonUp();
+       }
+
+       updateLabel() {
+           if (this.label == undefined) { return }
+           if (this.label2 == undefined) { return }
+           let f = this.active ? buttonScaleFactor : 1;
+           this.label.view.setAttribute('font-size', (f * this.fontSize).toString());
+           this.label2.view.setAttribute('font-size', (f * this.fontSize).toString());
+       }
+
+   }
+
+   let lineButton = new CreativeButton({
+       creations: ['segment', 'ray', 'line'],
        key: 'q',
        locationIndex: 0
    });
    lineButton.baseColor = gray(0.2);
    sidebar.add(lineButton);
 
-   let circleButton = new SidebarButton({
-       modes: ['circle'],
+   let circleButton = new CreativeButton({
+       creations: ['circle'],
        key: 'w',
        locationIndex: 1
    });
    circleButton.baseColor = gray(0.4);
    sidebar.add(circleButton);
 
-   let cindyButton = new SidebarButton({
-       modes: ['cindy'],
+   let cindyButton = new CreativeButton({
+       creations: ['cindy'],
        key: 'e',
        locationIndex: 2
    });
    cindyButton.baseColor = gray(0.6);
    sidebar.add(cindyButton);
      
+   let dragButton = new DragButton({
+       messages: [{drag: true}],
+       outgoingMessage: {drag: false},
+       key: 'a',
+       locationIndex: 3
+   });
+   dragButton.baseColor = gray(0.8);
+   dragButton.label.view.setAttribute('fill', 'black');
+   dragButton.label2.view.setAttribute('fill', 'black');
+   sidebar.add(dragButton);
+
    let colorButton = new ColorChangeButton({
        key: 'r',
        modeSpacing: 15,
-       locationIndex: 3
-   });
-   colorButton.baseColor = SidebarButton.brighten(colorButton.palette['white'], 1.0);
-   sidebar.add(colorButton);
-
-   let dragButton = new SidebarButton({
-       modes: ['drag'],
-       key: 'a',
        locationIndex: 4
    });
-   dragButton.baseColor = gray(1);
-   dragButton.text.view.setAttribute('fill', 'black');
-   sidebar.add(dragButton);
-
-
-   let mode = paper.currentMode;
+   colorButton.baseColor = gray(1.0);
+   sidebar.add(colorButton);
 
 }());
