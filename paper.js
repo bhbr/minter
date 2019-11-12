@@ -6,7 +6,7 @@ import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
 
 
-let log = function(msg) { } // logInto(msg, 'paper-console') }
+let log = function(msg) { } // logInto(msg.toString(), 'paper-console') }
 
 class Paper extends Mobject {
 
@@ -47,13 +47,10 @@ class Paper extends Mobject {
     }
 
     setDragging(flag) {
-        console.log(this.cindys)
         this.passAlongEvents = !flag
         for (let c of this.cindys) {
             c.draggable = flag
             c.view.style['pointer-events'] = (flag ? 'none' : 'auto')
-            console.log(c.draggable)
-            console.log(c.view.style['pointer-events'])
         }
         if (flag) {
             this.selfHandlePointerDown = this.startDragging
@@ -69,7 +66,25 @@ class Paper extends Mobject {
 
     startDragging(e) {
         this.draggedMobject = this.eventTargetMobject(e)
-        console.log(this.draggedMobject, this.draggedMobject.draggable)
+        if (this.draggedMobject == this) {
+            // check if we hit a CindyCanvas
+            for (let c of this.cindys) {
+                let p = pointerEventVertex(e)
+                let p1 = (p.x > c.anchor.x)
+                let p2 = (p.y > c.anchor.y)
+                let p3 = (p.x < c.anchor.x + c.width)
+                let p4 = (p.y < c.anchor.y + c.height)
+                log(p1)
+                log(p2)
+                log(p3)
+                log(p4)
+                if (p1 && p2 && p3 && p4) {
+                    this.draggedMobject = c
+                    break
+                }
+            }
+        }
+        log(this.draggedMobject.constructor.name)
         if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
@@ -80,7 +95,6 @@ class Paper extends Mobject {
 
     dragging(e) {
         if (this.draggedMobject == undefined) { return }
-        console.log('still dragging')  
         let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
         this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
@@ -117,10 +131,11 @@ class Paper extends Mobject {
             this.changeColor(value)
             break
         case 'drag':
+            if (value == "true") { value = true }
+            if (value == "false") { value = false }
             this.setDragging(value)
             break
         }
-
 
     }
 
@@ -133,7 +148,6 @@ class Paper extends Mobject {
 
 
     startCreating(e) {
-
         this.creationStartPoint = pointerEventVertex(e)
         for (let fp of this.snappablePoints) {
             if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
@@ -177,7 +191,6 @@ class Paper extends Mobject {
         )
         document.body.appendChild(cindyCanvas.script)
         this.cindys.push(cindyCanvas)
-        console.log('adding cindy')
     }
 
 
@@ -197,7 +210,6 @@ class Paper extends Mobject {
     }
 
     add(mobject) {
-        console.log('adding', mobject)
         if (mobject instanceof CindyCanvas) {
             this.addCindy(mobject)
         } else if (mobject instanceof FreePoint) {
@@ -217,12 +229,9 @@ class Paper extends Mobject {
         }
     }
 
-
-
 }
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-//let c = new CindyCanvas({paper: paper, anchor: new Vertex(100, 100), width: 200, height: 300})
-
+//let c = new CindyCanvas({ paper: paper, anchor: new Vertex(100, 100), width: 200, height: 300})
 

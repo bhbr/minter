@@ -346,15 +346,15 @@ export class CindyCanvas extends Mobject {
         this.view.style.position = 'absolute'
         this.view.style.left =  this.anchor.x + "px"
         this.view.style.top = this.anchor.y + "px"
-
+        
         this.csView = document.createElement('div')
         let canvasID = 'CSCanvas' + this.paper.cindyPorts.length
         this.csView.setAttribute('id', canvasID)
         this.view.appendChild(this.csView)
-
+        
         this.draggable = true
         this.view.style['pointer-events'] = 'auto'
-
+        
         document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
         document.body.appendChild(this.script)
 
