@@ -8,28 +8,6 @@ import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
 
 let log = function(msg) { } // logInto(msg, 'paper-console') }
 
-function loadScript(url, completeCallback) {
-   var script = document.createElement('script'), done = false,
-       head = document.getElementsByTagName("head")[0]
-   script.src = url
-   script.onload = script.onreadystatechange = function(){
-     if ( !done && (!this.readyState ||
-          this.readyState == "loaded" || this.readyState == "complete") ) {
-       done = true
-       completeCallback()
-
-      // IE memory leak
-      script.onload = script.onreadystatechange = null
-      head.removeChild( script )
-    }
-  };
-  head.appendChild(script)
-}
-
-loadScript("./CindyJS/build/Cindy.js",
-            function () { })
-
-
 class Paper extends Mobject {
 
      constructor(argsDict) {
@@ -69,10 +47,13 @@ class Paper extends Mobject {
     }
 
     setDragging(flag) {
+        console.log(this.cindys)
         this.passAlongEvents = !flag
         for (let c of this.cindys) {
             c.draggable = flag
             c.view.style['pointer-events'] = (flag ? 'none' : 'auto')
+            console.log(c.draggable)
+            console.log(c.view.style['pointer-events'])
         }
         if (flag) {
             this.selfHandlePointerDown = this.startDragging
@@ -88,6 +69,7 @@ class Paper extends Mobject {
 
     startDragging(e) {
         this.draggedMobject = this.eventTargetMobject(e)
+        console.log(this.draggedMobject, this.draggedMobject.draggable)
         if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
@@ -98,6 +80,7 @@ class Paper extends Mobject {
 
     dragging(e) {
         if (this.draggedMobject == undefined) { return }
+        console.log('still dragging')  
         let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
         this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
@@ -189,9 +172,12 @@ class Paper extends Mobject {
     }
 
     addCindy(cindyCanvas) {
-        document.querySelector('#paper-container').insertBefore(cindyCanvas.view, document.querySelector('#paper-console'))
+        document.querySelector('#paper-container').insertBefore(
+            cindyCanvas.view, document.querySelector('#paper-console')
+        )
         document.body.appendChild(cindyCanvas.script)
         this.cindys.push(cindyCanvas)
+        console.log('adding cindy')
     }
 
 
@@ -211,6 +197,7 @@ class Paper extends Mobject {
     }
 
     add(mobject) {
+        console.log('adding', mobject)
         if (mobject instanceof CindyCanvas) {
             this.addCindy(mobject)
         } else if (mobject instanceof FreePoint) {
@@ -236,6 +223,6 @@ class Paper extends Mobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-let c = new CindyCanvas(paper, new Vertex(100, 100), 200, 300)
+//let c = new CindyCanvas({paper: paper, anchor: new Vertex(100, 100), width: 200, height: 300})
 
-log(paper.children.toString())
+

@@ -5,7 +5,7 @@ import { Circle } from './modules/shapes.js'
 import { Segment } from './modules/arrows.js'
 
 let paper = null
-if (!isTouchDevice) {
+if (isTouchDevice === false) {
     const paperView = document.querySelector('#paper')
     paper = paperView.mobject
 }

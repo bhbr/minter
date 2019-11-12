@@ -317,7 +317,6 @@ export class DrawnCircle extends CreatedMobject {
             outerPoint: this.outerPoint
         })
         this.circle.strokeColor = this.strokeColor
-        console.log(this.strokeColor)
         this.freeMidpoint.dependents.push(this.circle)
         this.freeOuterPoint.dependents.push(this.circle)
         superMobject.add(this.circle)
@@ -331,47 +330,53 @@ export class DrawnCircle extends CreatedMobject {
 
 export class CindyCanvas extends Mobject {
     
-    constructor(paper, p, width, height) {
-        super({anchor: p, width: width, height: height})
+    constructor(argsDict) {
+        super(argsDict)
+        this.paper = argsDict.paper
+        this.anchor = argsDict.anchor
+        this.width = argsDict.width
+        this.height = argsDict.height
         this.script = document.createElement('script')
         this.script.setAttribute('type', 'text/x-cindyscript')
-        let scriptID = 'csdraw' // + paper.cindyPorts.length
+        let scriptID = 'csdraw' // + this.paper.cindyPorts.length
         this.script.setAttribute('id', scriptID)
         this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
-        //script.textContent = 'colorplot(seconds());'
-
+        
         this.view = document.createElement('div')
         this.view.style.position = 'absolute'
-        this.view.style.left =  p.x + "px"
-        this.view.style.top = p.y + "px"
+        this.view.style.left =  this.anchor.x + "px"
+        this.view.style.top = this.anchor.y + "px"
 
         this.csView = document.createElement('div')
-        let canvasID = 'CSCanvas' + paper.cindyPorts.length
+        let canvasID = 'CSCanvas' + this.paper.cindyPorts.length
         this.csView.setAttribute('id', canvasID)
         this.view.appendChild(this.csView)
 
+        this.draggable = true
         this.view.style['pointer-events'] = 'auto'
-       
-        paper.add(this)
 
-        paper.cindyPorts.push({
+        document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
+        document.body.appendChild(this.script)
+
+        this.paper.cindyPorts.push({
             id: canvasID,
-            width: width,
-            height: height,
+            width: this.width,
+            height: this.height,
             transform: [{
               visibleRect: [0, 1, 1, 0]
             }]
           })
 
+
         this.points = [[0.4, 0.4], [0.3, 0.8]]
-
-
         CindyJS({
-          scripts: "cs*",
-          autoplay: true,
-          ports: paper.cindyPorts,
+            scripts: "cs*",
+            autoplay: true,
+            ports: this.paper.cindyPorts,
             geometry: this.geometry()
-        });
+        })
+
+        this.paper.add(this)
         
     }
 
@@ -423,11 +428,15 @@ export class DrawnRectangle extends CreatedMobject {
         this.updateView()
     }
 
-    dissolveInto(superMobject) {
+    dissolveInto(parent) {
         let w = this.p2.x - this.p1.x
         let h = this.p3.y - this.p1.y
-        let cindy = new CindyCanvas(superMobject, this.p1, w, h)
-        superMobject.add(cindy)
+        let cindy = new CindyCanvas({
+            paper: parent,
+            anchor: this.p1,
+            width: w,
+            height: h
+        }) // auto-adds to parent
     }
     
 }

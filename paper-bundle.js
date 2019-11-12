@@ -73,18 +73,6 @@ var Paper = (function (exports) {
        element.removeEventListener('pointerup', method, { capture: true });
    }
 
-   function logInto(obj, id) {
-       let msg = obj.toString();
-       let newLine = document.createElement('p');
-       newLine.innerText = msg;
-       let myConsole = document.querySelector('#' + id);
-       myConsole.appendChild(newLine);
-       
-       // Neither of these lines does what they are supposed to. I give up
-       //myConsole.scrollTop = console.scrollHeight
-       //newLine.scrollIntoView()
-   }
-
    class Vertex extends Array {
 
        constructor(x = [0, 0], y = null) {
@@ -1655,7 +1643,7 @@ var Paper = (function (exports) {
            super({anchor: p, width: width, height: height});
            this.script = document.createElement('script');
            this.script.setAttribute('type', 'text/x-cindyscript');
-           let scriptID = 'csdraw'; // + paper.cindyPorts.length
+           let scriptID = 'csdraw' + paper.cindyPorts.length;
            this.script.setAttribute('id', scriptID);
            this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);';
            //script.textContent = 'colorplot(seconds());'
@@ -1800,30 +1788,6 @@ var Paper = (function (exports) {
        }
 
    }
-
-   let log = function(msg) { logInto(msg, 'paper-console'); };
-
-   function loadScript(url, completeCallback) {
-      var script = document.createElement('script'), done = false,
-          head = document.getElementsByTagName("head")[0];
-      script.src = url;
-      script.onload = script.onreadystatechange = function(){
-        if ( !done && (!this.readyState ||
-             this.readyState == "loaded" || this.readyState == "complete") ) {
-          done = true;
-          completeCallback();
-
-         // IE memory leak
-         script.onload = script.onreadystatechange = null;
-         head.removeChild( script );
-       }
-     };
-     head.appendChild(script);
-   }
-
-   loadScript("./CindyJS/build/Cindy.js",
-               function () { });
-
 
    class Paper extends Mobject {
 
@@ -2032,8 +1996,6 @@ var Paper = (function (exports) {
    const paper$2 = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true });
 
    let c = new CindyCanvas(paper$2, new Vertex(100, 100), 200, 300);
-
-   log(paper$2.children.toString());
 
    exports.paper = paper$2;
 

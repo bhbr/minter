@@ -1141,7 +1141,7 @@
    }
 
    let paper$1 = null;
-   if (!isTouchDevice) {
+   if (isTouchDevice === false) {
        const paperView = document.querySelector('#paper');
        paper$1 = paperView.mobject;
    }
