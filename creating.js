@@ -340,7 +340,7 @@ export class CindyCanvas extends Mobject {
         this.script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + this.paper.cindyPorts.length
         this.script.setAttribute('id', scriptID)
-        this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|)); colorplot([0,W(#, A0)+W(#, A1),0]);'
+        this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
         
         this.view = document.createElement('div')
         this.view.style.position = 'absolute'

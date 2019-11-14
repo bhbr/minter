@@ -1,7 +1,74 @@
-import { Vertex } from './transform.js'
+import { rgb, gray } from './helpers.js'
+import { Vertex, pointerEventVertex } from './transform.js'
 import { Mobject, MGroup, TextLabel, Polygon } from './mobject.js'
 import { Line } from './arrows.js'
-import { Circle } from './shapes.js'
+import { Circle, Rectangle } from './shapes.js'
+
+
+export class BoxSlider extends Rectangle {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            min: 0,
+            max: 1,
+            value: 0.6
+        })
+        this.view.addEventListener('pointerdown', this.boundScrubStart)
+
+        this.filledBar = new Rectangle({
+            width: this.width,
+            height: this.normalizedValue() * this.height,
+            fillColor: gray(0.5)
+        })
+        this.add(this.filledBar)
+        this.label = new TextLabel(this.value.toString())
+        this.label.anchor = new Vertex(this.width/2, this.height/2)
+        this.add(this.label)
+        this.update()
+    }
+
+    normalizedValue() {
+        return (this.value - this.min) / (this.max - this.min)
+    }
+
+    update(argsDict) {
+        let a = this.normalizedValue()
+        if (isNaN(a)) { return }
+        this.filledBar.anchor.copyFrom(new Vertex(
+            0,
+            this.height - this.filledBar.height
+        ))
+        this.filledBar.update({height: a * this.height})
+        this.label.text = this.value.toPrecision(2).toString()
+        super.update(argsDict)
+    }
+
+    selfHandlePointerDown(e) {
+        this.scrubStartingPoint = pointerEventVertex(e)
+        this.valueBeforeScrubbing = this.value
+    }
+
+    selfHandlePointerMove(e) {
+        let scrubVector = pointerEventVertex(e).subtract(this.scrubStartingPoint)
+        this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
+        this.value = Math.max(Math.min(this.value, this.max), this.min)
+        this.update()
+    }
+
+    selfHandlePointerUp(e) {
+        this.scrubStartingPoint = undefined
+        this.valueBeforeScrubbing = undefined
+    }
+
+}
+
+
+
+
+
+
+
+
 
 export class Slider extends Mobject {
 
@@ -23,7 +90,6 @@ export class Slider extends Mobject {
         this.scrubber = new Polygon([
             new Vertex(0,0), new Vertex(10,-10), new Vertex(10,10)
         ])
-        console.log(this.scrubber.path)
         this.scrubber.anchor = this.valueToCoords(this.value)
         this.add(this.scrubber)
 
@@ -164,7 +230,7 @@ export class Slider extends Mobject {
     }
 
     dragScaleStart(e) {
-        console.log('drag start')
+
         this.scale.dragStartingPoint = new Vertex(e.x, e.y)
         this.oldMin = this.min
         this.oldMax = this.max
@@ -175,7 +241,6 @@ export class Slider extends Mobject {
     }
 
     dragScale(e) {
-        console.log('dragging')
         let dragVector = new Vertex(e.x, e.y).subtract(this.scale.dragStartingPoint)
         let dvalue = 0
         if (this.orientation == 'horizontal') {
@@ -204,7 +269,6 @@ export class Slider extends Mobject {
 
 
     dragScaleEnd(e) {
-        console.log('drag end')
         this.scale.view.addEventListener('mousedown', this.boundDragScaleStart)
         this.scale.view.removeEventListener('mousemove', this.boundDragScale)
         this.scale.view.removeEventListener('mouseup', this.boundDragScaleEnd)

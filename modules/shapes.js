@@ -85,25 +85,28 @@ export class Ellipse extends CurvedShape {
 
 
 
-export class Rectangle extends MGroup {
+export class Rectangle extends Polygon {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
             width: 100,
             height: 100
         })
-        this.p1 = this.anchor
-        this.p2 = this.p1.translatedBy(new Vertex([this.width, 0]))
-        this.p3 = this.p1.translatedBy(new Vertex([this.width, this.height]))
-        this.p4 = this.p1.translatedBy(new Vertex([0, this.height]))
-        this.s1 = new Segment({startPoint: this.p1, endPoint: this.p2})
-        this.s2 = new Segment({startPoint: this.p2, endPoint: this.p3})
-        this.s3 = new Segment({startPoint: this.p3, endPoint: this.p4})
-        this.s4 = new Segment({startPoint: this.p4, endPoint: this.p1})
-        this.add(this.s1)
-        this.add(this.s2)
-        this.add(this.s3)
-        this.add(this.s4)
+        this.p1 = Vertex.origin()
+        this.p2 = new Vertex([this.width, 0])
+        this.p3 = new Vertex([this.width, this.height])
+        this.p4 = new Vertex([0, this.height])
+        this.vertices = [this.p1, this.p2, this.p3, this.p4]
+    }
+
+    update(argsDict) {
+        try {
+            this.p2.x = this.width
+            this.p3.x = this.width
+            this.p3.y = this.height
+            this.p4.y = this.height
+            super.update(argsDict)
+        } catch { }
     }
 }
 

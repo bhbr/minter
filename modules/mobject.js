@@ -370,6 +370,8 @@ export class Mobject {
     closeTo(otherMobject) {
         return (this.anchor.subtract(otherMobject.anchor).norm() < 10)
     }
+
+
 }
 
 
@@ -647,57 +649,3 @@ export class TextLabel extends Mobject {
 
 
 
-
-// class ScrubbableMobject extends Mobject {
-
-//  constructor(anchor, quantity = null) {
-//      super(anchor)
-//      this.quantity = quantity
-//      this.boundMakeScrubbable = this.makeScrubbable.bind(this)
-//      this.boundUnmakeScrubbable = this.unmakeScrubbable.bind(this)
-//  }
-
-//  makeScrubbable(e) {
-//      this.scrub_indicator = new Circle(this.radius + 5)
-//      this.scrub_indicator.midPoint = this.midPoint
-//      this.scrub_indicator.fillColor = rgba(0, 0, 0, 0.2)
-//      this.add(this.scrub_indicator)
-//      this.view.removeEventListener('mousedown', this.boundDragStart)
-//      this.view.addEventListener('mousedown', this.boundScrubStart)
-
-//      this.scrubbingBackground = new Circle(1000)
-//      this.scrubbingBackground.midPoint = this.midPoint
-//      this.scrubbingBackground.fillColor = rgba(0,0,0,0)
-//      this.add(this.scrubbingBackground)
-//      paper.addEventListener('mousedown', this.boundUnmakeScrubbable)
-//  }
-
-//  unmakeScrubbable(e) {
-//      this.remove(this.scrubrub_indicator)
-//      this.remove(this.scrubbingBackground)
-//      this.view.removeEventListener('mousedown', this.boundScrubStart)
-//      this.view.addEventListener('mousedown', this.boundDragStart)
-//      paper.removeEventListener('mousedown', this.boundUnmakeScrubbable)
-//  }
-
-//  scrubStart(e) {
-//      this.scrubStartingPoint = [e.x, e.y]
-//      this.quantityBeforeScrubbing = this.quantity
-//      this.scrubbingBackground.view.addEventListener('mousemove', this.boundScrub)
-//      this.scrubbingBackground.view.addEventListener('mouseup', this.boundScrubEnd)
-//  }
-
-//  scrub(e) {
-//      let scrubVector = vsub([e.x, e.y], this.scrubStartingPoint)
-//      this.quantity = this.quantityBeforeScrubbing - 0.1*scrubVector[1]
-//      this.updateView()
-//  }
-
-//  scrubEnd(e) {
-//      this.scrubStartingPoint = undefined
-//      this.quantityBeforeScrubbing = undefined
-//      this.scrubbingBackground.view.removeEventListener('mousemove', this.boundScrub)
-//      this.scrubbingBackground.view.removeEventListener('mouseup', this.boundScrubEnd)
-//  }
-
-// }
