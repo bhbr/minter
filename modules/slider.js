@@ -26,11 +26,11 @@ export class BoxSlider extends Rectangle {
         this.add(this.label)
         this.update()
     }
-
+    
     normalizedValue() {
         return (this.value - this.min) / (this.max - this.min)
     }
-
+    
     update(argsDict) {
         let a = this.normalizedValue()
         if (isNaN(a)) { return }

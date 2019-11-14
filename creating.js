@@ -340,7 +340,6 @@ export class CindyCanvas extends Mobject {
         this.script.setAttribute('type', 'text/x-cindyscript')
         let scriptID = 'csdraw' // + this.paper.cindyPorts.length
         this.script.setAttribute('id', scriptID)
-        this.script.textContent = 'W(x, p) := 0.5*(1+sin(100*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
         
         this.view = document.createElement('div')
         this.view.style.position = 'absolute'
@@ -380,6 +379,25 @@ export class CindyCanvas extends Mobject {
         
     }
 
+    geometry() { return [] }
+    
+    update(argsDict) { }
+    updateView() { }
+    
+}
+
+
+export class WaveCindyCanvas extends CindyCanvas {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            wavelength: 0.01
+        })
+        this.update(argsDict)
+        }
+
+    waveVector() { return 1/this.wavelength }
+
     geometry() {
         let ret = []
         let i = 0
@@ -389,11 +407,12 @@ export class CindyCanvas extends Mobject {
         }
         return ret
     }
-    
-    update(argsDict) { }
-    updateView() { }
-    
+
+    update(argsDict) {
+        this.script.textContent = 'W(x, p) := 0.5*(1+sin(' + this.waveVector().toString() + '*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
+    }
 }
+
 
 
 export class DrawnRectangle extends CreatedMobject {
@@ -431,11 +450,12 @@ export class DrawnRectangle extends CreatedMobject {
     dissolveInto(parent) {
         let w = this.p2.x - this.p1.x
         let h = this.p3.y - this.p1.y
-        let cindy = new CindyCanvas({
+        let cindy = new WaveCindyCanvas({
             paper: parent,
             anchor: this.p1,
             width: w,
-            height: h
+            height: h,
+            wavelength: 0.01
         }) // auto-adds to parent
     }
     
@@ -469,7 +489,6 @@ export class CreationGroup extends CreatedMobject {
             creation.updateFromTip(q)
         }
     }
-
 
     setVisibleCreation(visibleCreation) {
         for (let mob of Object.values(this.creations)) {

@@ -3,7 +3,7 @@ import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { FreePoint, CreationGroup, CindyCanvas } from './creating.js'
+import { FreePoint, CreationGroup, CindyCanvas, WaveCindyCanvas } from './creating.js'
 import { BoxSlider } from './modules/slider.js'
 
 
@@ -234,20 +234,30 @@ class Paper extends Mobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
+
+let c = new WaveCindyCanvas({
+    paper: paper,
+    anchor: new Vertex(300, 100),
+    width: 200,
+    height: 200,
+    wavelength: 0.01
+})
+
+paper.add(c)
+
+
 let s = new BoxSlider({
     anchor: new Vertex(100, 100),
     width: 50,
     height: 200,
     value: 0.6,
     strokeColor: rgb(1, 1, 1),
-    fillColor: rgb(0, 0, 0)
+    fillColor: rgb(0, 0, 0),
 })
 
+s.dependents.push(c)
+
 paper.add(s)
-
-
-
-
 
 
 
