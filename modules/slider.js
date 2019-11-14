@@ -13,6 +13,7 @@ export class BoxSlider extends Rectangle {
             max: 1,
             value: 0.6
         })
+        this.draggable = true
         this.view.addEventListener('pointerdown', this.boundScrubStart)
 
         this.filledBar = new Rectangle({
@@ -26,21 +27,28 @@ export class BoxSlider extends Rectangle {
         this.add(this.label)
         this.update()
     }
-    
+
     normalizedValue() {
         return (this.value - this.min) / (this.max - this.min)
     }
-    
+
     update(argsDict) {
         let a = this.normalizedValue()
         if (isNaN(a)) { return }
-        this.filledBar.anchor.copyFrom(new Vertex(
-            0,
-            this.height - this.filledBar.height
-        ))
-        this.filledBar.update({height: a * this.height})
-        this.label.text = this.value.toPrecision(2).toString()
-        super.update(argsDict)
+        try {
+            this.filledBar.anchor.copyFrom(new Vertex(
+                0,
+                this.height - this.filledBar.height
+            ))
+            this.filledBar.update({height: a * this.height})
+            this.label.text = this.value.toPrecision(3).toString()
+            super.update(argsDict)
+            for (let d of this.dependents) {
+                if (this.value != d.wavelength) {
+                    d.update({ wavelength: this.value })
+                }
+            }
+        } catch { }
     }
 
     selfHandlePointerDown(e) {

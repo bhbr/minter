@@ -240,17 +240,21 @@ let c = new WaveCindyCanvas({
     anchor: new Vertex(300, 100),
     width: 200,
     height: 200,
-    wavelength: 0.01
+    wavelength: 0.02
 })
 
 paper.add(c)
+//c.script.textContent = 'W(x, p) := 0.5*(1+sin(' + this.waveVector().toString() + '*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
+
 
 
 let s = new BoxSlider({
     anchor: new Vertex(100, 100),
     width: 50,
     height: 200,
-    value: 0.6,
+    min: 0,
+    max: 0.1,
+    value: 0.02,
     strokeColor: rgb(1, 1, 1),
     fillColor: rgb(0, 0, 0),
 })
@@ -259,8 +263,7 @@ s.dependents.push(c)
 
 paper.add(s)
 
-
-
+window.setTimeout(c.update({ wavelength: 0.005 }), 5000)
 
 
 

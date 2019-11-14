@@ -368,14 +368,16 @@ export class CindyCanvas extends Mobject {
 
 
         this.points = [[0.4, 0.4], [0.3, 0.8]]
-        CindyJS({
+        this.core = CindyJS({
             scripts: "cs*",
             autoplay: true,
             ports: this.paper.cindyPorts,
             geometry: this.geometry()
         })
+        console.log('core at setup:', this.core)
 
         this.paper.add(this)
+        this.update()
         
     }
 
@@ -393,10 +395,9 @@ export class WaveCindyCanvas extends CindyCanvas {
         this.setDefaults({
             wavelength: 0.01
         })
+        this.script.textContent = `drawcmd();`
         this.update(argsDict)
-        }
-
-    waveVector() { return 1/this.wavelength }
+    }
 
     geometry() {
         let ret = []
@@ -409,7 +410,15 @@ export class WaveCindyCanvas extends CindyCanvas {
     }
 
     update(argsDict) {
-        this.script.textContent = 'W(x, p) := 0.5*(1+sin(' + this.waveVector().toString() + '*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
+        if (argsDict != undefined) {
+            this.wavelength = argsDict['wavelength'] // ??? why do we have to do this
+        }
+        try {
+            let newCode = `W(x, p, l) := 0.5*(1+sin(|x-p|/l-3*seconds()));drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}) + W(#, A1, ${this.wavelength}), 0]););`
+            console.log(this.wavelength)
+            this.core.evokeCS(newCode)
+        } catch { }
+        super.update(argsDict)
     }
 }
 
