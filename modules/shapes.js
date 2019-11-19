@@ -1,7 +1,7 @@
-import { Vertex } from './transform.js'
+import { Vertex, pointerEventVertex } from './transform.js'
 import { Polygon, CurvedShape, MGroup } from './mobject.js'
 import { Segment } from './arrows.js'
-import { rgb } from './helpers.js'
+import { rgb, gray } from './helpers.js'
 
 export class Circle extends CurvedShape {
     
@@ -109,6 +109,7 @@ export class Rectangle extends Polygon {
         } catch { }
     }
 }
+
 
 
 

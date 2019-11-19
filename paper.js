@@ -42,8 +42,8 @@ class Paper extends Mobject {
     changeColor(newColor) {
         this.currentColor = newColor
         if (this.creationGroup == undefined) { return }
-        this.creationGroup.strokeColor = this.currentColor
-        this.creationGroup.fillColor = this.currentColor
+        this.creationGroup.setStrokeColor(this.currentColor)
+        this.creationGroup.setfillColor(this.currentColor)
         this.creationGroup.update()
     }
 
@@ -85,7 +85,6 @@ class Paper extends Mobject {
                 }
             }
         }
-        log(this.draggedMobject.constructor.name)
         if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
@@ -98,12 +97,12 @@ class Paper extends Mobject {
         if (this.draggedMobject == undefined) { return }
         let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
+
         this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
         if (this.draggedMobject instanceof CindyCanvas) {
             this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
             this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
         }
-        this.draggedMobject.update()
     }
 
     endDragging(e) {
@@ -244,26 +243,22 @@ let c = new WaveCindyCanvas({
 })
 
 paper.add(c)
-//c.script.textContent = 'W(x, p) := 0.5*(1+sin(' + this.waveVector().toString() + '*|x-p|-3*seconds())); colorplot([0,W(#, A0)+W(#, A1),0]);'
 
 
 
+let p = new Vertex(100, 100)
 let s = new BoxSlider({
-    anchor: new Vertex(100, 100),
+    anchor: p,
     width: 50,
     height: 200,
     min: 0,
     max: 0.1,
-    value: 0.02,
-    strokeColor: rgb(1, 1, 1),
-    fillColor: rgb(0, 0, 0),
+    value: 0.02
 })
 
 s.dependents.push(c)
 
 paper.add(s)
-
-window.setTimeout(c.update({ wavelength: 0.005 }), 5000)
 
 
 

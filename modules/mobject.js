@@ -91,7 +91,6 @@ export class Mobject {
         } else {
             this.selfHandlePointerDown(e)
         }
-        this.update()
     }
 
     pointerMove(e) {
@@ -102,7 +101,6 @@ export class Mobject {
         } else {
             this.selfHandlePointerMove(e)
         }
-        this.update()
     }
 
     pointerUp(e) {
@@ -117,7 +115,6 @@ export class Mobject {
             this.selfHandlePointerUp(e)
         }
         this.eventTarget = null
-        this.update()
     }
 
 
@@ -139,7 +136,6 @@ export class Mobject {
             if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
             else { this[key] = value }
         }
-
     }
 
     get parent() { return this._parent }
@@ -185,11 +181,10 @@ export class Mobject {
             submob.update()
         }
 
-        if (this.popover != undefined) {
-            this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
-        }
+        // if (this.popover != undefined) {
+        //     this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
+        // }
 
-        //this.transform.recenter()
         this.transform.e = this.anchor.x
         this.transform.f = this.anchor.y
         this.updateView()
@@ -225,6 +220,15 @@ export class Mobject {
         this.updateView()
     }
 
+    setFillColor(newColor, propagate = false) {
+        this.fillColor = newColor
+        if (propagate) {
+            for (let submob of this.children) {
+                submob.setFillColor(newColor, true)
+            }
+        }
+    }
+
     get fillOpacity() { return this.view.fillOpacity }
     set fillOpacity(newValue) {
         this.view.fillOpacity = newValue
@@ -237,6 +241,14 @@ export class Mobject {
         this.updateView()
     }
 
+    setFillOpacity(newOpacity, propagate = false) {
+        this.fillOpacity = newOpacity
+        if (propagate) {
+            for (let submob of this.children) {
+                submob.setFillOpacity(newOpacity, true)
+            }
+        }
+    }
     get strokeColor() { return this.view.style.stroke }
     set strokeColor(newValue) {
         this.view.style.stroke = newValue
@@ -247,6 +259,15 @@ export class Mobject {
         this.updateView()
     }
 
+    setStrokeColor(newColor, propagate = false) {
+        this.strokeColor = newColor
+        if (propagate) {
+            for (let submob of this.children) {
+                submob.setStrokeColor(newColor, true)
+            }
+        }
+    }
+
     get strokeWidth() { return this.view.strokeWidth }
     set strokeWidth(newValue) {
         this.view.strokeWidth = newValue
@@ -254,6 +275,15 @@ export class Mobject {
             submob.strokeWidth = newValue
         }
         this.updateView()
+    }
+
+    setStrokeWidth(newWidth, propagate = false) {
+        this.strokeWidth = newWidth
+        if (propagate) {
+            for (let submob of this.children) {
+                submob.setStrokeWidth(newWidth, true)
+            }
+        }
     }
 
     add(submob) {
@@ -334,42 +364,42 @@ export class Mobject {
 
 
 
-    createPopover(e) {
-        this.popover = new Popover(this, 200, 300, 'right')
-        paper.add(this.popover)
-        //paper.addEventListener('mousedown', this.boundDismissPopover)
-        this.view.removeEventListener('dblclick', this.boundCreatePopover)
-        this.view.removeEventListener('mousedown', this.boundDragStart)
-        paper.removeEventListener('mousemove', this.boundDrag)
-        removeLongPress(this.view)
-        this.view.addEventListener('mouseup', this.boundMouseUpAfterCreatingPopover)
-    }
+    // createPopover(e) {
+    //     this.popover = new Popover(this, 200, 300, 'right')
+    //     paper.add(this.popover)
+    //     //paper.addEventListener('mousedown', this.boundDismissPopover)
+    //     this.view.removeEventListener('dblclick', this.boundCreatePopover)
+    //     this.view.removeEventListener('mousedown', this.boundDragStart)
+    //     paper.removeEventListener('mousemove', this.boundDrag)
+    //     removeLongPress(this.view)
+    //     this.view.addEventListener('mouseup', this.boundMouseUpAfterCreatingPopover)
+    // }
 
-    mouseUpAfterCreatingPopover(e) {
-        this.view.addEventListener('mousedown', this.boundDragStart)
-        this.view.removeEventListener('mouseup', this.boundMouseUpAfterCreatingPopover)
-    }
+    // mouseUpAfterCreatingPopover(e) {
+    //     this.view.addEventListener('mousedown', this.boundDragStart)
+    //     this.view.removeEventListener('mouseup', this.boundMouseUpAfterCreatingPopover)
+    // }
 
-    dismissPopover(e) {
-        if (this.popover == undefined) { return }
-        if (this.popover.view.contains(e.target)
-            && !this.popover.closeButton.view.contains(e.target)
-            && !this.popover.deleteButton.view.contains(e.target))
-            { return }
-        this.popover.view.remove()
-        //paper.removeEventListener('mousedown', this.boundDismissPopover)
-        this.view.addEventListener('dblclick', this.boundCreatePopover)
-        addLongPress(this.view, this.boundCreatePopover)
-        this.popover = undefined
-    }
+    // dismissPopover(e) {
+    //     if (this.popover == undefined) { return }
+    //     if (this.popover.view.contains(e.target)
+    //         && !this.popover.closeButton.view.contains(e.target)
+    //         && !this.popover.deleteButton.view.contains(e.target))
+    //         { return }
+    //     this.popover.view.remove()
+    //     //paper.removeEventListener('mousedown', this.boundDismissPopover)
+    //     this.view.addEventListener('dblclick', this.boundCreatePopover)
+    //     addLongPress(this.view, this.boundCreatePopover)
+    //     this.popover = undefined
+    // }
                                                    
-    registerTouchStart(e) {
-        this.touchStart = new Vertex(pointerEventPageLocation(e))
-    }
+    // registerTouchStart(e) {
+    //     this.touchStart = new Vertex(pointerEventPageLocation(e))
+    // }
            
-    closeTo(otherMobject) {
-        return (this.anchor.subtract(otherMobject.anchor).norm() < 10)
-    }
+    // closeTo(otherMobject) {
+    //     return (this.anchor.subtract(otherMobject.anchor).norm() < 10)
+    // }
 
 
 }
@@ -567,9 +597,6 @@ export class TextLabel extends Mobject {
     }
 
 }
-
-
-
 
 
 

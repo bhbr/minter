@@ -162,6 +162,7 @@ class SidebarButton extends Circle {
     }
 
     updateLabel() {
+        if (this.label == undefined) { return }
         let f = this.active ? buttonScaleFactor : 1
         this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
         if (this.showLabel) {
@@ -265,6 +266,7 @@ class ColorChangeButton extends SidebarButton {
     }
 
     updateLabel() {
+        if (this.label == undefined) { return }
         let f = this.active ? buttonScaleFactor : 1
         this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
     }
@@ -303,6 +305,7 @@ class CreativeButton extends SidebarButton {
     }
 
     updateLabel() {
+        if (this.label == undefined) { return }
         if (this.showLabel) {
             try {
                 this.label.text = this.creations[this.currentModeIndex]
@@ -363,10 +366,18 @@ let circleButton = new CreativeButton({
 circleButton.baseColor = gray(0.4)
 sidebar.add(circleButton)
 
-let cindyButton = new CreativeButton({
-    creations: ['cindy'],
+let sliderButton = new CreativeButton({
+    creations: ['slider'],
     key: 'e',
     locationIndex: 2
+})
+sliderButton.baseColor = gray(0.4)
+sidebar.add(sliderButton)
+
+let cindyButton = new CreativeButton({
+    creations: ['cindy'],
+    key: 'r',
+    locationIndex: 3
 })
 cindyButton.baseColor = gray(0.6)
 sidebar.add(cindyButton)
@@ -374,8 +385,8 @@ sidebar.add(cindyButton)
 let dragButton = new DragButton({
     messages: [{drag: true}],
     outgoingMessage: {drag: false},
-    key: 'a',
-    locationIndex: 3
+    key: 't',
+    locationIndex: 4
 })
 dragButton.baseColor = gray(0.8)
 dragButton.label.view.setAttribute('fill', 'black')
@@ -383,9 +394,9 @@ dragButton.label2.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
 let colorButton = new ColorChangeButton({
-    key: 'r',
+    key: 'a',
     modeSpacing: 15,
-    locationIndex: 4
+    locationIndex: 5
 })
 colorButton.baseColor = gray(1.0)
 sidebar.add(colorButton)

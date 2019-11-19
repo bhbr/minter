@@ -1,8 +1,9 @@
-import { rgb, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
+import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
+import { BoxSlider } from './modules/slider.js'
 
 const paperView = document.querySelector('#paper')
 const paper = paperView.mobject
@@ -374,7 +375,6 @@ export class CindyCanvas extends Mobject {
             ports: this.paper.cindyPorts,
             geometry: this.geometry()
         })
-        console.log('core at setup:', this.core)
 
         this.paper.add(this)
         this.update()
@@ -396,6 +396,7 @@ export class WaveCindyCanvas extends CindyCanvas {
             wavelength: 0.01
         })
         this.script.textContent = `drawcmd();`
+        this.core.evokeCS(`W(x, p, l) := 0.5 * (1 + sin(|x - p| / l));`)
         this.update(argsDict)
     }
 
@@ -403,7 +404,7 @@ export class WaveCindyCanvas extends CindyCanvas {
         let ret = []
         let i = 0
         for (let point of this.points) {
-            ret.push({name: "A" + i, kind:"P", type:"Free", pos: point})
+            ret.push({name: "A" + i, kind: "P", type: "Free", pos: point})
             i += 1
         }
         return ret
@@ -414,8 +415,7 @@ export class WaveCindyCanvas extends CindyCanvas {
             this.wavelength = argsDict['wavelength'] // ??? why do we have to do this
         }
         try {
-            let newCode = `W(x, p, l) := 0.5*(1+sin(|x-p|/l-3*seconds()));drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}) + W(#, A1, ${this.wavelength}), 0]););`
-            console.log(this.wavelength)
+            let newCode = `drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}) + W(#, A1, ${this.wavelength}), 0]););`
             this.core.evokeCS(newCode)
         } catch { }
         super.update(argsDict)
@@ -471,6 +471,57 @@ export class DrawnRectangle extends CreatedMobject {
 }
 
 
+export class CreatedBoxSlider extends CreatedMobject {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setAttributes({
+            width: 50,
+            height: 0,
+            fillColor: rgb(0, 0, 0)
+        })
+        this.setDefaults({ startPoint: Vertex.origin() })
+        this.anchor = this.startPoint
+        this.protoSlider = new BoxSlider(argsDict)
+        this.protoSlider.update({
+            value: 0.5,
+            width: this.width,
+            height: 0,
+            fillColor: rgb(0, 0, 0)
+        })
+        this.protoSlider.filledBar.update({
+            width: this.width,
+            fillColor: gray(0.5)
+        })
+        this.add(this.protoSlider)
+    }
+
+    updateFromTip(q) {
+        this.update({ // This shouldn't be necessary, fix
+            fillColor: gray(0)
+        })
+        this.protoSlider.update({
+            height: q.y - this.startPoint.y,
+            //fillColor: gray(0.5) // This shouldn't be necessary, fix
+        })
+        this.protoSlider.filledBar.update({
+            fillColor: gray(0.5)
+        })
+
+
+    }
+
+    dissolveInto(superMobject) {
+        superMobject.remove(this)
+        superMobject.add(this.protoSlider)
+        this.protoSlider.update({
+            anchor: this.anchor
+        })
+        this.protoSlider.label.update({
+            anchor: new Vertex(this.protoSlider.width/2, this.protoSlider.height/2)
+        })
+    }
+}
+
 
 
 
@@ -485,6 +536,7 @@ export class CreationGroup extends CreatedMobject {
         this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
         this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
         this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
+        this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
         this.setVisibleCreation(this.visibleCreation)
         for (let creation of Object.values(this.creations)) {
             this.add(creation)
