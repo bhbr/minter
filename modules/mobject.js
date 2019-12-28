@@ -362,8 +362,6 @@ export class Mobject {
 
 
 
-
-
     // createPopover(e) {
     //     this.popover = new Popover(this, 200, 300, 'right')
     //     paper.add(this.popover)
@@ -526,7 +524,7 @@ export class CurvedShape extends Mobject {
     }
 
     static pathString(points) {
-        if (points.length == 0) { return '' }
+        if (points == undefined || points.length == 0) { return '' }
 
         // there should be 3n+1 points
         let nbCurves = (points.length - 1)/3

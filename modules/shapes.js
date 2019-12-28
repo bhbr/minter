@@ -110,6 +110,49 @@ export class Rectangle extends Polygon {
     }
 }
 
+export class RoundedRectangle extends CurvedShape {
+
+    constructor(argsDict) {
+        super(argsDict)
+        this.setDefaults({
+            width: 100,
+            height: 100,
+            cornerRadius: 10
+        })
+        this.p1 = Vertex.origin()
+        this.p2 = new Vertex([this.width, 0])
+        this.p3 = new Vertex([this.width, this.height])
+        this.p4 = new Vertex([0, this.height])
+        this.updateBezierPoints()
+    }
+
+    updateBezierPoints() {
+        try {
+            let r = this.cornerRadius
+            let p11 = this.p1.translatedBy(0, r)
+            let p12 = this.p1.translatedBy(r, 0)
+            let p21 = this.p2.translatedBy(-r, 0)
+            let p22 = this.p2.translatedBy(0, r)
+            let p31 = this.p3.translatedBy(0, -r)
+            let p32 = this.p3.translatedBy(-r, 0)
+            let p41 = this.p4.translatedBy(r, 0)
+            let p42 = this.p4.translatedBy(0, -r)
+            this.bezierPoints = [
+                p12, p21,
+                p12, p21, this.p2,
+                this.p2, p22, p31,
+                p22, p31, this.p3,
+                this.p3, p32, p41,
+                p32, p41, this.p4,
+                this.p4, p42, p11,
+                p42, p11, this.p1,
+                this.p1, p12
+            ]
+        } catch { }
+    }
+
+}
+
 
 
 

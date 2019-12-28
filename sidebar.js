@@ -8,6 +8,7 @@ let paper = null
 if (isTouchDevice === false) {
     const paperView = document.querySelector('#paper')
     paper = paperView.mobject
+    console.log(paperView)
 }
 
 let sidebar = document.querySelector('#sidebar')

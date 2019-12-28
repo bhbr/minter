@@ -5,6 +5,7 @@ import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas, WaveCindyCanvas } from './creating.js'
 import { BoxSlider } from './modules/slider.js'
+import { IOList } from './modules/linkables.js'
 
 
 let log = function(msg) { } // logInto(msg.toString(), 'paper-console') }
@@ -32,7 +33,7 @@ class Paper extends Mobject {
             'violet': rgb(1, 0, 1)
         }
         this.currentColor = this.colorPalette['white']
-     }
+    }
 
     changeColorByName(newColorName) {
         let newColor = this.colorPalette[newColorName]
@@ -103,6 +104,7 @@ class Paper extends Mobject {
             this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
             this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
         }
+        this.draggedMobject.update()
     }
 
     endDragging(e) {
@@ -234,31 +236,32 @@ class Paper extends Mobject {
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
 
-let c = new WaveCindyCanvas({
-    paper: paper,
-    anchor: new Vertex(300, 100),
-    width: 200,
-    height: 200,
-    wavelength: 0.02
-})
+// let c = new WaveCindyCanvas({
+//     paper: paper,
+//     anchor: new Vertex(300, 100),
+//     width: 200,
+//     height: 200,
+//     wavelength: 0.02
+// })
 
-paper.add(c)
-
-
-
-let p = new Vertex(100, 100)
-let s = new BoxSlider({
-    anchor: p,
-    width: 50,
-    height: 200,
-    min: 0,
-    max: 0.1,
-    value: 0.02
-})
-
-s.dependents.push(c)
-
-paper.add(s)
+// paper.add(c)
 
 
+
+// let p = new Vertex(100, 100)
+// let s = new BoxSlider({
+//     anchor: p,
+//     width: 50,
+//     height: 200,
+//     min: 0,
+//     max: 0.1,
+//     value: 0.02
+// })
+
+// s.dependents.push(c)
+
+// paper.add(s)
+
+let r = new IOList()
+paper.add(r)
 

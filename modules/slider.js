@@ -15,13 +15,15 @@ export class BoxSlider extends Rectangle {
             value: 0.6,
             height: 200,
             width: 50,
-            draggable: true,
             strokeColor: rgb(1, 1, 1)
+        })
+        this.setAttributes({
+            draggable: true
         })
         this.setAttributes({
             fillColor: argsDict['backgroundColor'] || rgb(0, 0, 0)
         })
-        
+
         this.filledBar = new Rectangle({
             width: this.width,
             height: this.normalizedValue() * this.height,

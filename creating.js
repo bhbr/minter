@@ -1,6 +1,7 @@
 import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
+import { LinkableMobject } from './modules/linkables.js'
 import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { BoxSlider } from './modules/slider.js'
@@ -8,7 +9,7 @@ import { BoxSlider } from './modules/slider.js'
 const paperView = document.querySelector('#paper')
 const paper = paperView.mobject
 
-export class CreatedMobject extends MGroup {
+export class CreatedMobject extends LinkableMobject {
     
     dissolveInto(superMobject) {
         superMobject.remove(this)
