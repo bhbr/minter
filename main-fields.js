@@ -1,6 +1,6 @@
 import { Vertex } from './modules/transform.js'
 import { Popover, TextLabel } from './modules/mobject.js'
-import { Circle } from './modules/shapes.js'
+import { Circle } from './modules/mobject.js'
 import { VectorField } from './modules/vector-field.js'
 import { Slider } from './modules/slider.js'
 

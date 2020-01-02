@@ -1,15 +1,14 @@
 import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
-import { Mobject, MGroup } from './modules/mobject.js'
-import { LinkableMobject } from './modules/linkables.js'
-import { Circle, TwoPointCircle } from './modules/shapes.js'
+import { Mobject, Circle, MGroup } from './modules/mobject.js'
+import { TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { BoxSlider } from './modules/slider.js'
 
 const paperView = document.querySelector('#paper')
 const paper = paperView.mobject
 
-export class CreatedMobject extends LinkableMobject {
+export class CreatedMobject extends Mobject {
     
     dissolveInto(superMobject) {
         superMobject.remove(this)
@@ -345,8 +344,8 @@ export class CindyCanvas extends Mobject {
         
         this.view = document.createElement('div')
         this.view.style.position = 'absolute'
-        this.view.style.left =  this.anchor.x + "px"
-        this.view.style.top = this.anchor.y + "px"
+        this.view.style.left =  this.anchor.x + 'px'
+        this.view.style.top = this.anchor.y + 'px'
         
         this.csView = document.createElement('div')
         let canvasID = 'CSCanvas' + this.paper.cindyPorts.length
@@ -396,6 +395,8 @@ export class WaveCindyCanvas extends CindyCanvas {
         this.setDefaults({
             wavelength: 0.01
         })
+        this.inputs = [this.wavelength]
+        this.linkNames = ['wavelength']
         this.script.textContent = `drawcmd();`
         this.core.evokeCS(`W(x, p, l) := 0.5 * (1 + sin(|x - p| / l));`)
         this.update(argsDict)

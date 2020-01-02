@@ -1,7 +1,7 @@
 import { isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
 import { Vertex, Translation, pointerEventVertex } from './modules/transform.js'
-import { MGroup, TextLabel } from './modules/mobject.js'
-import { Circle } from './modules/shapes.js'
+import { MGroup, Circle, TextLabel } from './modules/mobject.js'
+//import { } from './modules/shapes.js'
 import { Segment } from './modules/arrows.js'
 
 let paper = null
@@ -318,7 +318,7 @@ class CreativeButton extends SidebarButton {
 }
 
 
-class DragButton extends SidebarButton {
+class ToggleButton extends SidebarButton {
 
     constructor(argsDict) {
         super(argsDict)
@@ -330,8 +330,6 @@ class DragButton extends SidebarButton {
         this.label2.view.setAttribute('transform', 'rotate(90, 51, 237.5)')
         this.label2.color = rgb(1, 1, 1)
         this.label2.anchor = new Vertex(0, 2)
-        this.label.text = '↕︎'
-        this.label2.text = '↕︎'
         this.add(this.label2)
         this.update()
     }
@@ -350,6 +348,24 @@ class DragButton extends SidebarButton {
     }
 
 }
+
+class DragButton extends ToggleButton {
+    constructor(argsDict) {
+        super(argsDict)
+        this.label.text = '↕︎'
+        this.label2.text = '↕︎'
+        this.update()
+    }
+}
+
+class LinkButton extends ToggleButton {
+    constructor(argsDict) {
+        super(argsDict)
+        this.label.text = 'link'
+        this.update()
+    }
+}
+
 
 let lineButton = new CreativeButton({
     creations: ['segment', 'ray', 'line'],
@@ -394,10 +410,21 @@ dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
+let linkButton = new LinkButton({
+    messages: [{showInputs: true}],
+    outgoingMessage: {showInputs: false},
+    key: 'z',
+    locationIndex: 5
+})
+linkButton.baseColor = rgb(0.3, 0, 0)
+linkButton.label.view.setAttribute('fill', 'black')
+linkButton.label2.view.setAttribute('fill', 'black')
+sidebar.add(linkButton)
+
 let colorButton = new ColorChangeButton({
     key: 'a',
     modeSpacing: 15,
-    locationIndex: 5
+    locationIndex: 6
 })
 colorButton.baseColor = gray(1.0)
 sidebar.add(colorButton)

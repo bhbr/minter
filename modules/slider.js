@@ -1,8 +1,8 @@
 import { rgb, gray } from './helpers.js'
 import { Vertex, pointerEventVertex } from './transform.js'
-import { Mobject, MGroup, TextLabel, Polygon } from './mobject.js'
+import { Mobject, MGroup, Circle, TextLabel, Polygon } from './mobject.js'
 import { Line } from './arrows.js'
-import { Circle, Rectangle } from './shapes.js'
+import { Rectangle } from './shapes.js'
 
 
 export class BoxSlider extends Rectangle {

@@ -123,7 +123,7 @@ export class Transform {
     }
 
     static identity() {
-        return new Transform(1,0,0,1,0,0)
+        return new Transform(1, 0, 0, 1, 0, 0)
     }
 
     copyFrom(otherTransform) {
@@ -137,7 +137,7 @@ export class Transform {
     }
 
     asString() {
-        return `matrix(${this.a},${this.b},${this.c},${this.d},${this.e},${this.f})`
+        return `matrix(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.e}, ${this.f})`
     }
 
     appliedToVertex(v) {
@@ -251,11 +251,11 @@ export class Transform {
         return new Transform(this.a, this.b, this.c, this.d, vertex[0], vertex[1])
     }
 
-    centerAt(vertex) {
+    anchorAt(vertex) {
         this.anchor = vertex
     }
 
-    recenter() {
+    reanchor() {
         this.centerAt(this.anchor)
     }
 
