@@ -204,6 +204,10 @@ export class Mobject {
 
     updateView() {
         if (this.view == undefined) { return }
+        if (this.children == undefined) { return }
+        for (let submob of this.children) {
+            submob.updateView()
+        }
     }
 
     allDependents() {
@@ -355,7 +359,7 @@ export class Mobject {
         }
         if (this.children != undefined) {
             for (let mob of this.children) {
-                xMin = Math.min(xMin, mob.localXMin())
+                xMin = Math.min(xMin, mob.localXMin() + mob.anchor.x)
             }
         }
         return xMin
@@ -368,7 +372,7 @@ export class Mobject {
         }
         if (this.children != undefined) {
             for (let mob of this.children) {
-                xMax = Math.max(xMax, mob.localXMax())
+                xMax = Math.max(xMax, mob.localXMax() + mob.anchor.x)
             }
         }
         return xMax
@@ -381,7 +385,7 @@ export class Mobject {
         }
         if (this.children != undefined) {
             for (let mob of this.children) {
-                yMin = Math.min(yMin, mob.localYMin())
+                yMin = Math.min(yMin, mob.localYMin() + mob.anchor.y)
             }
         }
         return yMin
@@ -389,16 +393,24 @@ export class Mobject {
 
     localYMax() {
         let yMax = -Infinity
+        if (this instanceof MGroup) {
+
+        }
         if (this.vertices != undefined) {
             for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
         }
+        console.log('yMax:', yMax, this)
         if (this.children != undefined) {
             for (let mob of this.children) {
-                yMax = Math.max(yMax, mob.localYMax())
+                yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
             }
         }
+        console.log('yMax:', yMax, this)
         return yMax
     }
+
+    getWidth() { return this.localXMax() - this.localXMin() }
+    getHeight() { return this.localYMax() - this.localYMin() }
 
     localULCorner() { return new Vertex(this.localXMin(), this.localYMin()) }
     localURCorner() { return new Vertex(this.localXMax(), this.localYMin()) }
@@ -413,7 +425,10 @@ export class Mobject {
     localTopCenter() { return new Vertex(this.localMidX(), this.localYMin()) }
     localBottomCenter() { return new Vertex(this.localMidX(), this.localYMax()) }
 
-    localCenter() { return new Vertex(this.localMidX(), this.localMidY()) }
+    localCenter() {
+        console.log('midX and midY:', this.localMidX(), this.localMidY(), this)
+        return new Vertex(this.localMidX(), this.localMidY())
+    }
 
     ulCorner(frame) {
         if (!frame) { frame = this }
@@ -457,6 +472,7 @@ export class Mobject {
 
     center(frame) {
         if (!frame) { frame = this }
+        console.log('local center:', this.localCenter(), this)
         return this.relativeTransform(frame).appliedTo(this.localCenter())
     }
 
@@ -484,19 +500,27 @@ export class Mobject {
         this.dragAnchorStart = undefined
     }
 
-    showInputsOfSubmobs() {
-        this.inputLists = new MGroup()
+    showLinksOfSubmobs() {
+        this.ioLists = new MGroup()
         for (let submob of this.children) {
             if (submob.inputs.length == 0) { continue }
-            let inputList = new InputList({inputs: submob.inputs, inputNames: submob.inputNames})
-            inputList.centerAt(submob.center(this), this)
-            this.inputLists.add(inputList)
+            let ioList = new IOList({
+                listInputs: submob.inputs,
+                listInputNames: submob.inputNames,
+                listOutputs: submob.outputs,
+                listOutputNames: submob.outputNames,
+            })
+            console.log(ioList.center(this))
+            console.log(submob.center(this))
+            ioList.centerAt(submob.center(this), this)
+            console.log(ioList.center(this))
+            this.ioLists.add(ioList)
         }
-        this.add(this.inputLists)
+        this.add(this.ioLists)
     }
 
-    hideInputsOfSubmobs() {
-        this.remove(this.inputLists)
+    hideLinksOfSubmobs() {
+        this.remove(this.ioLists)
     }
 
 
@@ -803,12 +827,15 @@ export class InputList extends RoundedRectangle {
             fillOpacity: 0.1,
         })
         this.setDefaults({
-            inputs: [], // inputs or outputs
-            inputNames: []
+            listInputs: [], // inputs or outputs
+            listInputNames: [],
+            listOutputs: [], // inputs or outputs
+            listOutputNames: [],
         })
-        for (let i = 0; i < this.inputs.length; i++) {
+        console.log(this.listInputs.length)
+        for (let i = 0; i < this.listInputs.length; i++) {
             console.log(i)
-            let name = this.inputNames[i]
+            let name = this.listInputNames[i]
             let c = new Circle({
                 radius: 5,
                 fillOpacity: 0,
@@ -831,15 +858,15 @@ export class OutputList extends RoundedRectangle {
         this.setAttributes({
             cornerRadius: 30,
             fillColor: rgb(1, 1, 1),
-            fillOpacity: 0.1,
+            fillOpacity: 0.3,
         })
         this.setDefaults({
             outputs: [], // inputs or outputs
             outputNames: []
         })
-        for (let i = 0; i < this.outputs.length; i++) {
+        for (let i = 0; i < this.listOutputs.length; i++) {
             console.log(i)
-            let name = this.outputNames[i]
+            let name = this.listOutputNames[i]
             let c = new Circle({
                 radius: 5,
                 fillOpacity: 0,
@@ -854,7 +881,17 @@ export class OutputList extends RoundedRectangle {
     }
 }
 
+export class IOList extends MGroup {
+    constructor(argsDict) {
+        super(argsDict)
+        this.inputList = new InputList(argsDict)
+        this.outputList = new OutputList(argsDict)
+        this.outputList.anchor = new Vertex(0, this.inputList.getHeight() + 10)
+        this.add(this.inputList)
+        this.add(this.outputList)
 
+    }
+}
 
 export class Circle extends CurvedShape {
     
@@ -871,6 +908,8 @@ export class Circle extends CurvedShape {
     set midPoint(newValue) {
         this.anchor = newValue // updates automatically
     }
+
+    getArea() { return Math.PI * this.radius ** 2 }
 
     updateBezierPoints() {
         let newBezierPoints = []

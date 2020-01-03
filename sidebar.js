@@ -118,18 +118,16 @@ class SidebarButton extends Circle {
         removePointerDown(this.view, this.boundButtonDownByPointer)
         addPointerUp(this.view, this.boundButtonUpByPointer)
         addPointerMove(this.view, this.boundButtonDrag)
-        this.registerTouchStart(e)
+        this.touchStart = pointerEventVertex(e)
     }
     
 
     buttonUpByPointer(e) {
         e.preventDefault()
         e.stopPropagation()
-        
         removePointerUp(this.view, this.boundButtonUpByPointer)
         addPointerDown(this.view, this.boundButtonDownByPointer)
         removePointerMove(this.view, this.boundButtonDrag)
-        
         this.commonButtonUp()
     }
     
@@ -320,8 +318,24 @@ class CreativeButton extends SidebarButton {
 
 class ToggleButton extends SidebarButton {
 
+    commonButtonUp() {
+        this.currentModeIndex = 0
+        super.commonButtonUp()
+    }
+
+    updateLabel() {
+        if (this.label == undefined) { return }
+        let f = this.active ? buttonScaleFactor : 1
+        this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+    }
+
+}
+
+class DragButton extends ToggleButton {
+
     constructor(argsDict) {
         super(argsDict)
+        this.label.text = '↕︎'
         this.setAttributes({ fontSize: 30 })
         this.label.view.setAttribute('font-family', 'Times')
         this.label2 = new TextLabel({text: this.text})
@@ -334,27 +348,11 @@ class ToggleButton extends SidebarButton {
         this.update()
     }
 
-    commonButtonUp() {
-        this.currentModeIndex = 0
-        super.commonButtonUp()
-    }
-
     updateLabel() {
-        if (this.label == undefined) { return }
+        super.updateLabel()
         if (this.label2 == undefined) { return }
         let f = this.active ? buttonScaleFactor : 1
-        this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
         this.label2.view.setAttribute('font-size', (f * this.fontSize).toString())
-    }
-
-}
-
-class DragButton extends ToggleButton {
-    constructor(argsDict) {
-        super(argsDict)
-        this.label.text = '↕︎'
-        this.label2.text = '↕︎'
-        this.update()
     }
 }
 
@@ -411,14 +409,13 @@ dragButton.label2.view.setAttribute('fill', 'black')
 sidebar.add(dragButton)
 
 let linkButton = new LinkButton({
-    messages: [{showInputs: true}],
-    outgoingMessage: {showInputs: false},
+    messages: [{toggleLinks: true}],
+    outgoingMessage: {toggleLinks: false},
     key: 'z',
     locationIndex: 5
 })
-linkButton.baseColor = rgb(0.3, 0, 0)
+linkButton.baseColor = gray(0.3)
 linkButton.label.view.setAttribute('fill', 'black')
-linkButton.label2.view.setAttribute('fill', 'black')
 sidebar.add(linkButton)
 
 let colorButton = new ColorChangeButton({

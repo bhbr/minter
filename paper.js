@@ -137,9 +137,9 @@ class Paper extends Mobject {
         case 'drag':
             this.setDragging(value)
             break
-        case 'showInputs':
-            if (value) { this.showAllInputs() }
-            else { this.hideAllInputs() }
+        case 'toggleLinks':
+            if (value) { this.showAllLinks() }
+            else { this.hideAllLinks() }
             break
         }
 
@@ -235,12 +235,12 @@ class Paper extends Mobject {
         }
     }
 
-    showAllInputs() {
-        this.showInputsOfSubmobs()
+    showAllLinks() {
+        this.showLinksOfSubmobs()
     }
 
-    hideAllInputs() {
-        this.hideInputsOfSubmobs()
+    hideAllLinks() {
+        this.hideLinksOfSubmobs()
     }
 
 }
@@ -280,9 +280,12 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 let d = new Circle({ radius: 100, fillColor: rgb(0.2, 0, 0), anchor: new Vertex(200, 200) })
 d.inputs = [d.radius]
 d.inputNames = ['radius']
+d.outputs = [d.getArea]
+d.outputNames = ['area']
 
 paper.add(d)
-//paper.showAllInputs()
+
+
 
 
 // let p = new Vertex(100, 100)
