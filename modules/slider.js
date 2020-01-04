@@ -18,7 +18,9 @@ export class BoxSlider extends Rectangle {
             strokeColor: rgb(1, 1, 1)
         })
         this.setAttributes({
-            draggable: true
+            draggable: true,
+            outputs: ['value'],
+            outputNames: ['value']
         })
         this.setAttributes({
             fillColor: argsDict['backgroundColor'] || rgb(0, 0, 0)
@@ -49,11 +51,6 @@ export class BoxSlider extends Rectangle {
             this.filledBar.update({ height: a * this.height })
             this.label.text = this.value.toPrecision(3).toString()
             this.label.anchor.copyFrom(new Vertex(this.width/2, this.height/2))
-            for (let d of this.dependents) {
-                if (this.value != d.wavelength) {
-                    d.update({ wavelength: this.value })
-                }
-            }
         } catch { }
     }
 

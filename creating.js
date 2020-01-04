@@ -393,12 +393,13 @@ export class WaveCindyCanvas extends CindyCanvas {
     constructor(argsDict) {
         super(argsDict)
         this.setDefaults({
-            wavelength: 0.01
+            wavelength: 0.01,
+            frequency: 1
         })
-        this.inputs = [this.wavelength]
-        this.linkNames = ['wavelength']
+        this.inputs = [this.wavelength, this.frequency]
+        this.linkNames = ['wavelength', 'frequency']
         this.script.textContent = `drawcmd();`
-        this.core.evokeCS(`W(x, p, l) := 0.5 * (1 + sin(|x - p| / l));`)
+        this.core.evokeCS(`W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f));`)
         this.update(argsDict)
     }
 
@@ -417,7 +418,7 @@ export class WaveCindyCanvas extends CindyCanvas {
             this.wavelength = argsDict['wavelength'] // ??? why do we have to do this
         }
         try {
-            let newCode = `drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}) + W(#, A1, ${this.wavelength}), 0]););`
+            let newCode = `drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}, ${this.frequency}) + W(#, A1, ${this.wavelength}, ${this.frequency}), 0]););`
             this.core.evokeCS(newCode)
         } catch { }
         super.update(argsDict)

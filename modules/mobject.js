@@ -1,6 +1,14 @@
 import { Vertex, Transform } from './transform.js'
 import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
+export class Dependency {
+    constructor(argsDict) {
+        this.sourceOutput = argsDict['output']
+        this.targetMob = argsDict['target']
+        this.targetInput = argsDict['input']
+    }
+}
+
 export class Mobject {
 
     constructor(argsDict) {
@@ -17,7 +25,7 @@ export class Mobject {
             anchor: Vertex.origin(),
             vertices: [],
             children: [],
-            dependents: [],
+            dependencies: [],
             inputs: [],  // linkable parameters
             outputs: [], // linkable parameters
             inputNames: [],  // linkable parameters
@@ -184,19 +192,19 @@ export class Mobject {
             return
         }
 
-        for (let mob of this.dependents || []) {
-            mob.update()
+        for (let dep of this.dependencies || []) {
+            let output = this[dep.sourceOutput]
+            if (typeof output === 'function') {
+                dep.targetMob[dep.targetInput] = output()
+            } else {
+                dep.targetMob[dep.targetInput] = output
+            }
+            dep.targetMob.update()
         }
         for (let submob of this.children || []) {
-            if (this.dependsOn(submob)) {
-                continue
-            }
+            if (this.dependsOn(submob)) { continue }
             submob.update()
         }
-
-        // if (this.popover != undefined) {
-        //     this.popover.anchor = this.anchor.translatedBy(this.rightEdge())
-        // }
 
         this.transform.anchorAt(this.anchor)
         this.updateView()
@@ -210,13 +218,18 @@ export class Mobject {
         }
     }
 
-    allDependents() {
+    dependents() {
         let dep = []
-        for (let mob of this.dependents) {
-            dep.push(mob)
-            for (let mob2 of mob.allDependents()) {
-                dep.push(mob2)
-            }
+        for (let d of this.dependencies) {
+            dep.push(d.targetMob)
+        }
+        return dep
+    }
+
+    allDependents() {
+        let dep = this.dependents()
+        for (let mob of dep) {
+            dep.push(mob.allDependents())
         }
         return dep
     }
@@ -523,6 +536,14 @@ export class Mobject {
         this.remove(this.ioLists)
     }
 
+    createDependency(sourceMob, output, targetMob, input) {
+        let dep = new Dependency({
+            output: output,
+            target: targetMob,
+            input: input
+        })
+        sourceMob.dependencies.push(dep)
+    }
 
 
     // createPopover(e) {

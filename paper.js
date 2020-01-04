@@ -269,37 +269,48 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 // paper.add(r2)
 
 
-// let c = new WaveCindyCanvas({
-//     paper: paper,
-//     anchor: new Vertex(300, 100),
-//     width: 200,
-//     height: 200,
-//     wavelength: 0.02
-// })
+let c = new WaveCindyCanvas({
+    paper: paper,
+    anchor: new Vertex(300, 100),
+    width: 200,
+    height: 200,
+    wavelength: 0.02
+})
 
-let d = new Circle({ radius: 100, fillColor: rgb(0.2, 0, 0), anchor: new Vertex(200, 200) })
-d.inputs = [d.radius]
-d.inputNames = ['radius']
-d.outputs = [d.getArea]
-d.outputNames = ['area']
+// let d = new Circle({ radius: 100, fillColor: rgb(0.2, 0, 0), anchor: new Vertex(200, 200) })
+// d.inputs = [d.radius]
+// d.inputNames = ['radius']
+// d.outputs = [d.getArea]
+// d.outputNames = ['area']
 
-paper.add(d)
-
-
+// paper.add(d)
 
 
-// let p = new Vertex(100, 100)
-// let s = new BoxSlider({
-//     anchor: p,
-//     width: 50,
-//     height: 200,
-//     min: 0,
-//     max: 0.1,
-//     value: 0.02
-// })
 
-// s.dependents.push(c)
 
-// paper.add(s)
+let p = new Vertex(100, 100)
+let s = new BoxSlider({
+    anchor: p,
+    width: 50,
+    height: 200,
+    min: 0,
+    max: 0.1,
+    value: 0.02
+})
 
+paper.add(s)
+
+let s2 = new BoxSlider({
+    anchor: p.translatedBy(60, 0),
+    width: 50,
+    height: 200,
+    min: 0,
+    max: 100,
+    value: 2
+})
+
+paper.add(s)
+paper.add(s2)
+paper.createDependency(s, 'value', c, 'wavelength')
+paper.createDependency(s2, 'value', c, 'frequency')
 
