@@ -1,6 +1,6 @@
 import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
-import { Mobject, Circle, MGroup } from './modules/mobject.js'
+import { Mobject, Circle, MGroup, Dependency } from './modules/mobject.js'
 import { TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { BoxSlider } from './modules/slider.js'
@@ -167,8 +167,8 @@ export class DrawnSegment extends DrawnArrow {
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.segment)
-        this.startFreePoint.dependents.push(this.segment)
-        this.endFreePoint.dependents.push(this.segment)
+        this.startFreePoint.addDependent(this.segment)
+        this.endFreePoint.addDependent(this.segment)
     }
 
     dissolveInto(superMobject) {
@@ -180,8 +180,8 @@ export class DrawnSegment extends DrawnArrow {
             strokeColor: this.strokeColor,
         })
 
-        this.startFreePoint.dependents.push(this.segment)
-        this.endFreePoint.dependents.push(this.segment)
+        this.startFreePoint.addDependent(this.segment)
+        this.endFreePoint.addDependent(this.segment)
         superMobject.add(this.segment)
 
     }
@@ -196,8 +196,8 @@ export class DrawnRay extends DrawnArrow {
             endPoint: this.endFreePoint.midPoint,
         })
         this.add(this.ray)
-        this.startFreePoint.dependents.push(this.ray)
-        this.endFreePoint.dependents.push(this.ray)
+        this.startFreePoint.addDependent(this.ray)
+        this.endFreePoint.addDependent(this.ray)
     }
 
     dissolveInto(superMobject) {
@@ -208,8 +208,8 @@ export class DrawnRay extends DrawnArrow {
             endPoint: this.endPoint,
             strokeColor: this.strokeColor
         })
-        this.startFreePoint.dependents.push(this.ray)
-        this.endFreePoint.dependents.push(this.ray)
+        this.startFreePoint.addDependent(this.ray)
+        this.endFreePoint.addDependent(this.ray)
         superMobject.add(this.ray)
 
     }
@@ -225,8 +225,8 @@ export class DrawnLine extends DrawnArrow {
             endPoint: this.endFreePoint.midPoint
         })
         this.add(this.line)
-        this.startFreePoint.dependents.push(this.line)
-        this.endFreePoint.dependents.push(this.line)
+        this.startFreePoint.addDependent(this.line)
+        this.endFreePoint.addDependent(this.line)
     }
 
     dissolveInto(superMobject) {
@@ -237,8 +237,8 @@ export class DrawnLine extends DrawnArrow {
             endPoint: this.endPoint,
             strokeColor: this.strokeColor
         })
-        this.startFreePoint.dependents.push(this.line)
-        this.endFreePoint.dependents.push(this.line)
+        this.startFreePoint.addDependent(this.line)
+        this.endFreePoint.addDependent(this.line)
         superMobject.add(this.line)
 
     }
@@ -276,8 +276,8 @@ export class DrawnCircle extends CreatedMobject {
         this.add(this.freeOuterPoint)
         this.add(this.circle)
 
-        this.freeMidpoint.dependents.push(this.circle)
-        this.freeOuterPoint.dependents.push(this.circle)
+        this.freeMidpoint.addDependent(this.circle)
+        this.freeOuterPoint.addDependent(this.circle)
 
     }
 
@@ -318,8 +318,8 @@ export class DrawnCircle extends CreatedMobject {
             outerPoint: this.outerPoint
         })
         this.circle.strokeColor = this.strokeColor
-        this.freeMidpoint.dependents.push(this.circle)
-        this.freeOuterPoint.dependents.push(this.circle)
+        this.freeMidpoint.addDependent(this.circle)
+        this.freeOuterPoint.addDependent(this.circle)
         superMobject.add(this.circle)
     }
 

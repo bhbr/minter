@@ -3,9 +3,10 @@ import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPoi
 
 export class Dependency {
     constructor(argsDict) {
-        this.sourceOutput = argsDict['output']
-        this.targetMob = argsDict['target']
-        this.targetInput = argsDict['input']
+        this.source = argsDict['source']
+        this.outputName = argsDict['outputName'] // may be undefined
+        this.target = argsDict['target']
+        this.inputName = argsDict['inputName'] // may be undefined
     }
 }
 
@@ -26,10 +27,8 @@ export class Mobject {
             vertices: [],
             children: [],
             dependencies: [],
-            inputs: [],  // linkable parameters
-            outputs: [], // linkable parameters
             inputNames: [],  // linkable parameters
-            outputNames: [], // linkable parameters)
+            outputNames: [], // linkable parameters
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
@@ -193,13 +192,13 @@ export class Mobject {
         }
 
         for (let dep of this.dependencies || []) {
-            let output = this[dep.sourceOutput]
-            if (typeof output === 'function') {
-                dep.targetMob[dep.targetInput] = output()
-            } else {
-                dep.targetMob[dep.targetInput] = output
+            let outputName = this[dep.outputName] // may be undefined
+            if (typeof outputName === 'function') {
+                dep.target[dep.inputName] = outputName()
+            } else if (outputName != undefined && outputName != null) {
+                dep.target[dep.inputName] = outputName
             }
-            dep.targetMob.update()
+            dep.target.update()
         }
         for (let submob of this.children || []) {
             if (this.dependsOn(submob)) { continue }
@@ -221,7 +220,7 @@ export class Mobject {
     dependents() {
         let dep = []
         for (let d of this.dependencies) {
-            dep.push(d.targetMob)
+            dep.push(d.target)
         }
         return dep
     }
@@ -229,7 +228,7 @@ export class Mobject {
     allDependents() {
         let dep = this.dependents()
         for (let mob of dep) {
-            dep.push(mob.allDependents())
+            dep.push(...mob.allDependents())
         }
         return dep
     }
@@ -516,11 +515,9 @@ export class Mobject {
     showLinksOfSubmobs() {
         this.ioLists = new MGroup()
         for (let submob of this.children) {
-            if (submob.inputs.length == 0) { continue }
+            if (submob.inputNames.length == 0) { continue }
             let ioList = new IOList({
-                listInputs: submob.inputs,
                 listInputNames: submob.inputNames,
-                listOutputs: submob.outputs,
                 listOutputNames: submob.outputNames,
             })
             console.log(ioList.center(this))
@@ -536,15 +533,27 @@ export class Mobject {
         this.remove(this.ioLists)
     }
 
-    createDependency(sourceMob, output, targetMob, input) {
+    addDependency(outputName, target, inputName) {
         let dep = new Dependency({
-            output: output,
-            target: targetMob,
-            input: input
+            source: this,
+            outputName: outputName,
+            target: target,
+            inputName: inputName
         })
-        sourceMob.dependencies.push(dep)
+        this.dependencies.push(dep)
     }
 
+    addDependent(target) {
+        this.addDependency(null, target, null)
+    }
+
+    dependenciesBetweenChildren() {
+        let deps = []
+        for (let submob of this.children) {
+            deps.push(...submob.dependencies)
+        }
+        return deps
+    }
 
     // createPopover(e) {
     //     this.popover = new Popover(this, 200, 300, 'right')
@@ -848,20 +857,13 @@ export class InputList extends RoundedRectangle {
             fillOpacity: 0.1,
         })
         this.setDefaults({
-            listInputs: [], // inputs or outputs
             listInputNames: [],
-            listOutputs: [], // inputs or outputs
-            listOutputNames: [],
+            listOutputNames: []
         })
         console.log(this.listInputs.length)
-        for (let i = 0; i < this.listInputs.length; i++) {
-            console.log(i)
+        for (let i = 0; i < this.listInputNames.length; i++) {
             let name = this.listInputNames[i]
-            let c = new Circle({
-                radius: 5,
-                fillOpacity: 0,
-                strokeColor: rgb(1, 1, 1)
-            })
+            let c = new LinkBullet()
             let t = new TextLabel({text: name})
             c.anchor = new Vertex([25, 25 * (i + 1)])
             t.anchor = c.anchor.translatedBy(35, 0)
@@ -882,17 +884,12 @@ export class OutputList extends RoundedRectangle {
             fillOpacity: 0.3,
         })
         this.setDefaults({
-            outputs: [], // inputs or outputs
             outputNames: []
         })
-        for (let i = 0; i < this.listOutputs.length; i++) {
+        for (let i = 0; i < this.listOutputNames.length; i++) {
             console.log(i)
             let name = this.listOutputNames[i]
-            let c = new Circle({
-                radius: 5,
-                fillOpacity: 0,
-                strokeColor: rgb(1, 1, 1)
-            })
+            let c = new LinkBullet()
             let t = new TextLabel({text: name})
             c.anchor = new Vertex([25, 25 * (i + 1)])
             t.anchor = c.anchor.translatedBy(35, 0)
@@ -961,6 +958,17 @@ export class Circle extends CurvedShape {
 }
 
 
+
+export class LinkBullet extends Circle {
+    constructor(argsDict) {
+        super(argsDict)
+        this.setAttributes({        
+            radius: 5,
+            fillOpacity: 0,
+            strokeColor: rgb(1, 1, 1)
+        })
+    }
+}
 
 
 

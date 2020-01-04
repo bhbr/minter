@@ -297,6 +297,7 @@ let s = new BoxSlider({
     max: 0.1,
     value: 0.02
 })
+s.outputNames = ['value']
 
 paper.add(s)
 
@@ -311,6 +312,6 @@ let s2 = new BoxSlider({
 
 paper.add(s)
 paper.add(s2)
-paper.createDependency(s, 'value', c, 'wavelength')
-paper.createDependency(s2, 'value', c, 'frequency')
+s.addDependency('value', c, 'wavelength')
+s2.addDependency('value', c, 'frequency')
 
