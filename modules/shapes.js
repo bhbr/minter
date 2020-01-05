@@ -1,7 +1,7 @@
-import { Vertex, pointerEventVertex } from './transform.js'
+import { Vertex } from './transform.js'
 import { Polygon, CurvedShape, MGroup } from './mobject.js'
 import { Segment } from './arrows.js'
-import { rgb, gray } from './helpers.js'
+import { rgb, gray, pointerEventVertex } from './helpers.js'
 
 
 
@@ -42,7 +42,7 @@ export class Circle extends CurvedShape {
         }
         this.bezierPoints = newBezierPoints
 
-        // do NOT update the view, because updateView called updateBezierPoints
+        // do NOT update the view, because updateView calls updateBezierPoints
     }
 
     rightEdge() {
@@ -135,7 +135,11 @@ export class RoundedRectangle extends CurvedShape {
 
     updateBezierPoints() {
         try {
-            let r = this.cornerRadius
+            let r = Math.min(this.cornerRadius, Math.min(this.width, this.height)/2)
+            this.p2.x = this.width
+            this.p3.x = this.width
+            this.p3.y = this.height
+            this.p4.y = this.height
             let p11 = this.p1.translatedBy(0, r)
             let p12 = this.p1.translatedBy(r, 0)
             let p21 = this.p2.translatedBy(-r, 0)

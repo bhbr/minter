@@ -1,9 +1,11 @@
-import { rgb, gray } from './helpers.js'
-import { Vertex, pointerEventVertex } from './transform.js'
+import { rgb, gray, pointerEventVertex } from './helpers.js'
+import { Vertex } from './transform.js'
 import { Mobject, MGroup, TextLabel, Polygon } from './mobject.js'
 import { Line } from './arrows.js'
 import { Circle, Rectangle } from './shapes.js'
 import { LinkableMobject } from './linkables.js'
+
+
 
 
 export class BoxSlider extends LinkableMobject {
@@ -76,9 +78,6 @@ export class BoxSlider extends LinkableMobject {
     }
 
 }
-
-
-
 
 
 

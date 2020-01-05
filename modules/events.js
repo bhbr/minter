@@ -1,7 +1,7 @@
-export class Paper {
+// export class Paper {
 	
-	constructor() {
+// 	constructor() {
 	
-	}
+// 	}
 
-}
+// }

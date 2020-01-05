@@ -1,3 +1,5 @@
+import { Vertex } from './transform.js'
+
 export const isTouchDevice = 'ontouchstart' in document.documentElement
 
 
@@ -84,6 +86,11 @@ export function pointerEventPageLocation(e) {
 }
 
 
+export function pointerEventVertex(e) {
+    return new Vertex(pointerEventPageLocation(e))
+}
+
+
 export function addPointerDown(element, method) {
     element.addEventListener('touchstart', method, { capture: true })
     element.addEventListener('mousedown', method, { capture: true })
@@ -127,7 +134,6 @@ export function logInto(obj, id) {
     //myConsole.scrollTop = console.scrollHeight
     //newLine.scrollIntoView()
 }
-
 
 
 

@@ -1,5 +1,5 @@
 import { Vertex, Transform } from './transform.js'
-import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
+import { remove, logInto, stringFromPoint, rgb, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
 
 export class Mobject {
@@ -44,6 +44,12 @@ export class Mobject {
         // this.boundDismissPopover = this.dismissPopover.bind(this)
         // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
+    }
+
+    paper() {
+        let p = this
+        while (p != undefined && p.constructor.name != 'Paper') { p = p.parent }
+        return p
     }
 
     enableDragging() {
@@ -400,6 +406,26 @@ export class Mobject {
         return new Vertex(this.localMidX(), this.localMidY())
     }
 
+    xMin(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.localXMin())
+    }
+
+    xMax(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.localXMax())
+    }
+
+    yMin(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.localYMin())
+    }
+
+    yMax(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.localYMax())
+    }
+
     ulCorner(frame) {
         if (!frame) { frame = this }
         return this.relativeTransform(frame).appliedTo(this.localULCorner())
@@ -418,6 +444,16 @@ export class Mobject {
     lrCorner(frame) {
         if (!frame) { frame = this }
         return this.relativeTransform(frame).appliedTo(this.localLRCorner())
+    }
+
+    midX(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.midX())
+    }
+
+    midY(frame) {
+        if (!frame) { frame = this }
+        return this.relativeTransform(frame).appliedTo(this.midY())
     }
 
     leftCenter(frame) {
@@ -445,6 +481,25 @@ export class Mobject {
         return this.relativeTransform(frame).appliedTo(this.localCenter())
     }
 
+    globalXMin() { return this.xMin(this.paper()) }
+    globalXMax() { return this.xMax(this.paper()) }
+    globalYMin() { return this.yMin(this.paper()) }
+    globalYMax() { return this.yMax(this.paper()) }
+    globalULCorner() { return this.ulCorner(this.paper()) }
+    globalURCorner() { return this.urCorner(this.paper()) }
+    globalLLCorner() { return this.llCorner(this.paper()) }
+    globalLRCorner() { return this.lrCorner(this.paper()) }
+    globalMidX() { return this.midX(this.paper()) }
+    globalMidY() { return this.midY(this.paper()) }
+    globalLeftCenter() { return this.leftCenter(this.paper()) }
+    globalRightCenter() { return this.rightCenter(this.paper()) }
+    globalTopCenter() {
+        console.log(this.paper())
+        return this.topCenter(this.paper())
+    }
+    globalBottomCenter() { return this.bottomCenter(this.paper()) }
+    globalCenter() { return this.center(this.paper()) }
+
     centerAt(newCenter, frame) {
         if (!frame) { frame = this }
         let dr = newCenter.subtract(this.center(frame))
@@ -453,12 +508,12 @@ export class Mobject {
     }
 
     startSelfDragging(e) {
-        this.dragPointStart = new Vertex(pointerEventPageLocation(e))
+        this.dragPointStart = pointerEventVertex(e)
         this.dragAnchorStart = this.anchor.copy()
     }
 
     selfDragging(e) {
-        let dragPoint = new Vertex(pointerEventPageLocation(e))
+        let dragPoint = pointerEventVertex(e)
         let dr = dragPoint.subtract(this.dragPointStart)
         this.anchor.copyFrom(this.dragAnchorStart.add(dr))
         this.update()
@@ -607,6 +662,10 @@ export class CurvedShape extends Mobject {
 
     constructor(argsDict) {
         super(argsDict)
+        this.setDefaults({
+            fillColor: rgb(1, 1, 1),
+            fillOpacity: 0.5
+        })
         this.bezierPoints = []
         this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
         this.path.mobject = this

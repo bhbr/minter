@@ -1,4 +1,3 @@
-import { pointerEventPageLocation } from './helpers.js'
 
 export class Vertex extends Array {
 
@@ -394,10 +393,6 @@ export class Rotation extends Transform {
     inverse() {
         return new Rotation(-angle, this.center)
     }
-}
-
-export function pointerEventVertex(e) {
-    return new Vertex(pointerEventPageLocation(e))
 }
 
 

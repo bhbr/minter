@@ -1,9 +1,8 @@
-import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './modules/helpers.js'
-import { Vertex } from './modules/transform.js'
-import { Mobject, MGroup } from './modules/mobject.js'
-import { Circle, TwoPointCircle } from './modules/shapes.js'
-import { Segment, Ray, Line } from './modules/arrows.js'
-import { BoxSlider } from './modules/slider.js'
+import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './helpers.js'
+import { Vertex } from './transform.js'
+import { Mobject, MGroup } from './mobject.js'
+import { Circle, TwoPointCircle } from './shapes.js'
+import { Segment, Ray, Line } from './arrows.js'
 
 const paperView = document.querySelector('#paper')
 const paper = paperView.mobject
@@ -470,103 +469,5 @@ export class DrawnRectangle extends CreatedMobject {
 }
 
 
-export class CreatedBoxSlider extends CreatedMobject {
-    constructor(argsDict) {
-        super(argsDict)
-        this.setAttributes({
-            width: 50,
-            height: 0,
-            fillColor: rgb(0, 0, 0)
-        })
-        this.setDefaults({ startPoint: Vertex.origin() })
-        this.anchor = this.startPoint
-        this.protoSlider = new BoxSlider(argsDict)
-        this.protoSlider.update({
-            value: 0.5,
-            width: this.width,
-            height: 0,
-            fillColor: rgb(0, 0, 0)
-        })
-        this.protoSlider.filledBar.update({
-            width: this.width,
-            fillColor: gray(0.5)
-        })
-        this.add(this.protoSlider)
-    }
-
-    updateFromTip(q) {
-        this.update({ // This shouldn't be necessary, fix
-            fillColor: gray(0)
-        })
-        this.protoSlider.update({
-            height: q.y - this.startPoint.y,
-            //fillColor: gray(0.5) // This shouldn't be necessary, fix
-        })
-        this.protoSlider.filledBar.update({
-            fillColor: gray(0.5)
-        })
-
-
-    }
-
-    dissolveInto(superMobject) {
-        superMobject.remove(this)
-        superMobject.add(this.protoSlider)
-        this.protoSlider.update({
-            anchor: this.anchor
-        })
-        this.protoSlider.label.update({
-            anchor: new Vertex(this.protoSlider.width/2, this.protoSlider.height/2)
-        })
-    }
-}
-
-
-
-
-export class CreationGroup extends CreatedMobject {
-
-    constructor(argsDict) {
-        super(argsDict)
-        this.creations = { }
-        this.creations['freehand'] = new Freehand()
-        this.creations['segment'] = new DrawnSegment({startPoint: this.startPoint})
-        this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
-        this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
-        this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
-        this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
-        this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
-        this.setVisibleCreation(this.visibleCreation)
-        for (let creation of Object.values(this.creations)) {
-            this.add(creation)
-        }
-        this.update()
-
-    }
-
-    updateFromTip(q) {
-        for (let creation of Object.values(this.creations)) {
-            creation.updateFromTip(q)
-        }
-    }
-
-    setVisibleCreation(visibleCreation) {
-        for (let mob of Object.values(this.creations)) {
-            mob.hide()
-        }
-        this.visibleCreation = visibleCreation
-        this.creations[visibleCreation].show()
-
-        if (visibleCreation == 'cindy') {
-            this.creations[visibleCreation].strokeColor = rgb(1, 1, 1)
-        }
-    }
-
-    dissolveInto(superMobject) {
-        superMobject.remove(this)
-        this.creations[this.visibleCreation].dissolveInto(superMobject)
-    }
-
-}
 
 

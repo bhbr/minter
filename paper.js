@@ -1,9 +1,10 @@
-import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
-import { Vertex, pointerEventVertex } from './modules/transform.js'
+import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './modules/helpers.js'
+import { Vertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { FreePoint, CreationGroup, CindyCanvas, WaveCindyCanvas } from './creating.js'
+import { FreePoint, CindyCanvas, WaveCindyCanvas } from './modules/creating.js'
+import { CreationGroup } from './modules/creationgroup.js'
 import { BoxSlider } from './modules/slider.js'
 import { LinkableMobject } from './modules/linkables.js'
 
@@ -288,7 +289,7 @@ let c = new WaveCindyCanvas({
 
 
 
-let p = new Vertex(100, 100)
+let p = new Vertex(50, 100)
 let s = new BoxSlider({
     anchor: p,
     width: 50,
@@ -301,7 +302,7 @@ let s = new BoxSlider({
 paper.add(s)
 
 let s2 = new BoxSlider({
-    anchor: p.translatedBy(60, 0),
+    anchor: p.translatedBy(150, 0),
     width: 50,
     height: 200,
     min: 0,
@@ -313,7 +314,7 @@ paper.add(s2)
 
 s.addDependency('value', c, 'wavelength')
 s2.addDependency('value', c, 'frequency')
-//paper.showLinksOfSubmobs()
+paper.showLinksOfSubmobs()
 
 
 
