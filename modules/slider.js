@@ -1,11 +1,12 @@
 import { rgb, gray } from './helpers.js'
 import { Vertex, pointerEventVertex } from './transform.js'
-import { Mobject, MGroup, Circle, TextLabel, Polygon } from './mobject.js'
+import { Mobject, MGroup, TextLabel, Polygon } from './mobject.js'
 import { Line } from './arrows.js'
-import { Rectangle } from './shapes.js'
+import { Circle, Rectangle } from './shapes.js'
+import { LinkableMobject } from './linkables.js'
 
 
-export class BoxSlider extends Rectangle {
+export class BoxSlider extends LinkableMobject {
 
     constructor(argsDict) {
         super(argsDict)
@@ -25,6 +26,14 @@ export class BoxSlider extends Rectangle {
         this.setAttributes({
             fillColor: argsDict['backgroundColor'] || rgb(0, 0, 0)
         })
+
+        this.outerBar = new Rectangle({
+            width: this.width,
+            height: this.height,
+            fillColor: rgb(0, 0, 0),
+            fillOpacity: 1
+        })
+        this.add(this.outerBar)
 
         this.filledBar = new Rectangle({
             width: this.width,

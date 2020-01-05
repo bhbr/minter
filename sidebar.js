@@ -1,7 +1,7 @@
 import { isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto } from './modules/helpers.js'
 import { Vertex, Translation, pointerEventVertex } from './modules/transform.js'
-import { MGroup, Circle, TextLabel } from './modules/mobject.js'
-//import { } from './modules/shapes.js'
+import { MGroup, TextLabel } from './modules/mobject.js'
+import { Circle } from './modules/shapes.js'
 import { Segment } from './modules/arrows.js'
 
 let paper = null

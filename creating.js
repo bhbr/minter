@@ -1,7 +1,7 @@
 import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
-import { Mobject, Circle, MGroup, Dependency } from './modules/mobject.js'
-import { TwoPointCircle } from './modules/shapes.js'
+import { Mobject, MGroup } from './modules/mobject.js'
+import { Circle, TwoPointCircle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { BoxSlider } from './modules/slider.js'
 
@@ -396,8 +396,7 @@ export class WaveCindyCanvas extends CindyCanvas {
             wavelength: 0.01,
             frequency: 1
         })
-        this.inputs = [this.wavelength, this.frequency]
-        this.linkNames = ['wavelength', 'frequency']
+        this.inputNames = ['wavelength', 'frequency']
         this.script.textContent = `drawcmd();`
         this.core.evokeCS(`W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f));`)
         this.update(argsDict)
@@ -414,9 +413,6 @@ export class WaveCindyCanvas extends CindyCanvas {
     }
 
     update(argsDict) {
-        if (argsDict != undefined) {
-            this.wavelength = argsDict['wavelength'] // ??? why do we have to do this
-        }
         try {
             let newCode = `drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}, ${this.frequency}) + W(#, A1, ${this.wavelength}, ${this.frequency}), 0]););`
             this.core.evokeCS(newCode)

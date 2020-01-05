@@ -1,16 +1,16 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice } from './modules/helpers.js'
 import { Vertex, pointerEventVertex } from './modules/transform.js'
-import { Mobject, Circle, MGroup } from './modules/mobject.js'
-import { Rectangle } from './modules/shapes.js'
+import { Mobject, MGroup } from './modules/mobject.js'
+import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint, CreationGroup, CindyCanvas, WaveCindyCanvas } from './creating.js'
 import { BoxSlider } from './modules/slider.js'
-//import { IOList } from './modules/linkables.js'
+import { LinkableMobject } from './modules/linkables.js'
 
 
 let log = function(msg) { } // logInto(msg.toString(), 'paper-console') }
 
-class Paper extends Mobject {
+class Paper extends LinkableMobject {
 
      constructor(argsDict) {
         super(argsDict)
@@ -297,7 +297,6 @@ let s = new BoxSlider({
     max: 0.1,
     value: 0.02
 })
-s.outputNames = ['value']
 
 paper.add(s)
 
@@ -310,8 +309,12 @@ let s2 = new BoxSlider({
     value: 2
 })
 
-paper.add(s)
 paper.add(s2)
+
 s.addDependency('value', c, 'wavelength')
 s2.addDependency('value', c, 'frequency')
+//paper.showLinksOfSubmobs()
+
+
+
 

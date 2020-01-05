@@ -1,14 +1,6 @@
 import { Vertex, Transform } from './transform.js'
 import { remove, logInto, stringFromPoint, rgb, pointerEventPageLocation, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
-export class Dependency {
-    constructor(argsDict) {
-        this.source = argsDict['source']
-        this.outputName = argsDict['outputName'] // may be undefined
-        this.target = argsDict['target']
-        this.inputName = argsDict['inputName'] // may be undefined
-    }
-}
 
 export class Mobject {
 
@@ -26,9 +18,6 @@ export class Mobject {
             anchor: Vertex.origin(),
             vertices: [],
             children: [],
-            dependencies: [],
-            inputNames: [],  // linkable parameters
-            outputNames: [], // linkable parameters
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
@@ -191,22 +180,16 @@ export class Mobject {
             return
         }
 
-        for (let dep of this.dependencies || []) {
-            let outputName = this[dep.outputName] // may be undefined
-            if (typeof outputName === 'function') {
-                dep.target[dep.inputName] = outputName()
-            } else if (outputName != undefined && outputName != null) {
-                dep.target[dep.inputName] = outputName
-            }
-            dep.target.update()
-        }
-        for (let submob of this.children || []) {
-            if (this.dependsOn(submob)) { continue }
-            submob.update()
-        }
+        this.updateSubmobs()
 
         this.transform.anchorAt(this.anchor)
         this.updateView()
+    }
+
+    updateSubmobs() {
+        for (let submob of this.children || []) {
+            submob.update()
+        }
     }
 
     updateView() {
@@ -215,26 +198,6 @@ export class Mobject {
         for (let submob of this.children) {
             submob.updateView()
         }
-    }
-
-    dependents() {
-        let dep = []
-        for (let d of this.dependencies) {
-            dep.push(d.target)
-        }
-        return dep
-    }
-
-    allDependents() {
-        let dep = this.dependents()
-        for (let mob of dep) {
-            dep.push(...mob.allDependents())
-        }
-        return dep
-    }
-
-    dependsOn(otherMobject) {
-        return otherMobject.allDependents().includes(this)
     }
 
 
@@ -260,14 +223,12 @@ export class Mobject {
     get fillOpacity() { return this.view.fillOpacity }
     set fillOpacity(newValue) {
         this.view.fillOpacity = newValue
-
-        // TODO: rethink this (commented out for circles)
-
-//         for (let submob of this.submobjects) {
-//             submob.fillOpacity = newValue
-//         }
         this.updateView()
     }
+    // TODO: rethink this (commented out for circles)
+    //         for (let submob of this.submobjects) {
+    //             submob.fillOpacity = newValue
+    //         }
 
     setFillOpacity(newOpacity, propagate = false) {
         this.fillOpacity = newOpacity
@@ -411,13 +372,11 @@ export class Mobject {
         if (this.vertices != undefined) {
             for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
         }
-        console.log('yMax:', yMax, this)
         if (this.children != undefined) {
             for (let mob of this.children) {
                 yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
             }
         }
-        console.log('yMax:', yMax, this)
         return yMax
     }
 
@@ -438,7 +397,6 @@ export class Mobject {
     localBottomCenter() { return new Vertex(this.localMidX(), this.localYMax()) }
 
     localCenter() {
-        console.log('midX and midY:', this.localMidX(), this.localMidY(), this)
         return new Vertex(this.localMidX(), this.localMidY())
     }
 
@@ -484,7 +442,6 @@ export class Mobject {
 
     center(frame) {
         if (!frame) { frame = this }
-        console.log('local center:', this.localCenter(), this)
         return this.relativeTransform(frame).appliedTo(this.localCenter())
     }
 
@@ -512,48 +469,6 @@ export class Mobject {
         this.dragAnchorStart = undefined
     }
 
-    showLinksOfSubmobs() {
-        this.ioLists = new MGroup()
-        for (let submob of this.children) {
-            if (submob.inputNames.length == 0) { continue }
-            let ioList = new IOList({
-                listInputNames: submob.inputNames,
-                listOutputNames: submob.outputNames,
-            })
-            console.log(ioList.center(this))
-            console.log(submob.center(this))
-            ioList.centerAt(submob.center(this), this)
-            console.log(ioList.center(this))
-            this.ioLists.add(ioList)
-        }
-        this.add(this.ioLists)
-    }
-
-    hideLinksOfSubmobs() {
-        this.remove(this.ioLists)
-    }
-
-    addDependency(outputName, target, inputName) {
-        let dep = new Dependency({
-            source: this,
-            outputName: outputName,
-            target: target,
-            inputName: inputName
-        })
-        this.dependencies.push(dep)
-    }
-
-    addDependent(target) {
-        this.addDependency(null, target, null)
-    }
-
-    dependenciesBetweenChildren() {
-        let deps = []
-        for (let submob of this.children) {
-            deps.push(...submob.dependencies)
-        }
-        return deps
-    }
 
     // createPopover(e) {
     //     this.popover = new Popover(this, 200, 300, 'right')
@@ -800,174 +715,6 @@ export class TextLabel extends Mobject {
         super.updateView()
     }
 
-}
-
-
-export class RoundedRectangle extends CurvedShape {
-
-    constructor(argsDict) {
-        super(argsDict)
-        this.setDefaults({
-            width: 100,
-            height: 100,
-            cornerRadius: 10
-        })
-        this.p1 = Vertex.origin()
-        this.p2 = new Vertex([this.width, 0])
-        this.p3 = new Vertex([this.width, this.height])
-        this.p4 = new Vertex([0, this.height])
-        this.updateBezierPoints()
-    }
-
-    updateBezierPoints() {
-        try {
-            let r = this.cornerRadius
-            let p11 = this.p1.translatedBy(0, r)
-            let p12 = this.p1.translatedBy(r, 0)
-            let p21 = this.p2.translatedBy(-r, 0)
-            let p22 = this.p2.translatedBy(0, r)
-            let p31 = this.p3.translatedBy(0, -r)
-            let p32 = this.p3.translatedBy(-r, 0)
-            let p41 = this.p4.translatedBy(r, 0)
-            let p42 = this.p4.translatedBy(0, -r)
-            this.bezierPoints = [
-                p12, p21,
-                p12, p21, this.p2,
-                this.p2, p22, p31,
-                p22, p31, this.p3,
-                this.p3, p32, p41,
-                p32, p41, this.p4,
-                this.p4, p42, p11,
-                p42, p11, this.p1,
-                this.p1, p12
-            ]
-        } catch { }
-    }
-
-}
-
-
-
-export class InputList extends RoundedRectangle {
-    constructor(argsDict) {
-        super(argsDict)
-        this.setAttributes({
-            cornerRadius: 30,
-            fillColor: rgb(1, 1, 1),
-            fillOpacity: 0.1,
-        })
-        this.setDefaults({
-            listInputNames: [],
-            listOutputNames: []
-        })
-        console.log(this.listInputs.length)
-        for (let i = 0; i < this.listInputNames.length; i++) {
-            let name = this.listInputNames[i]
-            let c = new LinkBullet()
-            let t = new TextLabel({text: name})
-            c.anchor = new Vertex([25, 25 * (i + 1)])
-            t.anchor = c.anchor.translatedBy(35, 0)
-            this.add(c)
-            this.add(t)
-        }
-    }
-}
-
-
-
-export class OutputList extends RoundedRectangle {
-    constructor(argsDict) {
-        super(argsDict)
-        this.setAttributes({
-            cornerRadius: 30,
-            fillColor: rgb(1, 1, 1),
-            fillOpacity: 0.3,
-        })
-        this.setDefaults({
-            outputNames: []
-        })
-        for (let i = 0; i < this.listOutputNames.length; i++) {
-            console.log(i)
-            let name = this.listOutputNames[i]
-            let c = new LinkBullet()
-            let t = new TextLabel({text: name})
-            c.anchor = new Vertex([25, 25 * (i + 1)])
-            t.anchor = c.anchor.translatedBy(35, 0)
-            this.add(c)
-            this.add(t)
-        }
-    }
-}
-
-export class IOList extends MGroup {
-    constructor(argsDict) {
-        super(argsDict)
-        this.inputList = new InputList(argsDict)
-        this.outputList = new OutputList(argsDict)
-        this.outputList.anchor = new Vertex(0, this.inputList.getHeight() + 10)
-        this.add(this.inputList)
-        this.add(this.outputList)
-
-    }
-}
-
-export class Circle extends CurvedShape {
-    
-    constructor(argsDict) {
-        super(argsDict)
-        this.setDefaults({
-            radius: 10,
-            midPoint: Vertex.origin()
-        })
-    }
-
-    // midPoint is a synonym for anchor
-    get midPoint() { return this.anchor }
-    set midPoint(newValue) {
-        this.anchor = newValue // updates automatically
-    }
-
-    getArea() { return Math.PI * this.radius ** 2 }
-
-    updateBezierPoints() {
-        let newBezierPoints = []
-        let n = 8
-        for (let i = 0; i <= n; i++) {
-            let theta = i/n * 2 * Math.PI
-            let d = this.radius * 4/3 * Math.tan(Math.PI/(2*n))
-            let radialUnitVector = new Vertex(Math.cos(theta), Math.sin(theta))
-            let tangentUnitVector = new Vertex(-Math.sin(theta), Math.cos(theta))
-            let anchorPoint = radialUnitVector.scaledBy(this.radius)
-
-            let leftControlPoint = anchorPoint.translatedBy(tangentUnitVector.scaledBy(-d))
-            let rightControlPoint = anchorPoint.translatedBy(tangentUnitVector.scaledBy(d))
-
-            if (i != 0) { newBezierPoints.push(leftControlPoint) }
-            newBezierPoints.push(anchorPoint)
-            if (i != n) { newBezierPoints.push(rightControlPoint) }
-        }
-        this.bezierPoints = newBezierPoints
-
-        // do NOT update the view, because updateView called updateBezierPoints
-    }
-
-    rightEdge() {
-        return new Vertex(this.radius, 0)
-    }
-
-}
-
-
-
-export class LinkBullet extends Circle {
-    constructor(argsDict) {
-        super(argsDict)
-        this.setAttributes({        
-            radius: 5,
-            fillOpacity: 0,
-            strokeColor: rgb(1, 1, 1)
-        })
-    }
 }
 
 
