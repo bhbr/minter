@@ -32,8 +32,8 @@ export class InputList extends RoundedRectangle {
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
 			let t = new TextLabel({text: name})
-			c.anchor = new Vertex([20, 5 + 10 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(35, 0)
+			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
+			t.anchor = c.anchor.translatedBy(25, 0)
 			this.add(c)
 			this.add(t)
 		}
@@ -42,7 +42,7 @@ export class InputList extends RoundedRectangle {
 	getHeight() {
 		let l = this.listInputNames.length
 		if (l == 0) { return 0 }
-		else { return 30 + 20 * this.listInputNames.length }
+		else { return 20 + 15 * this.listInputNames.length }
 	}
 }
 
@@ -63,8 +63,8 @@ export class OutputList extends RoundedRectangle {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
 			let t = new TextLabel({text: name})
-			c.anchor = new Vertex([20, 5 + 10 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(35, 0)
+			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
+			t.anchor = c.anchor.translatedBy(25, 0)
 			this.add(c)
 			this.add(t)
 		}
@@ -73,7 +73,7 @@ export class OutputList extends RoundedRectangle {
 	getHeight() {
 		let l = this.listOutputNames.length
 		if (l == 0) { return 0 }
-		else { return 30 + 20 * this.listInputNames.length }
+		else { return 20 + 15 * this.listOutputNames.length }
 	}
 }
 
