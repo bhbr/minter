@@ -3,49 +3,49 @@ import { MGroup, Polygon } from './mobject.js'
 
 export class Segment extends Polygon {
 
-    constructor(argsDict) {
-        super(argsDict)
-        this.setDefaults({
-            startPoint: Vertex.origin(),
-            endPoint: Vertex.origin(),
-        })
-        this.update()
-    }
+	constructor(argsDict) {
+		super(argsDict)
+		this.setDefaults({
+			startPoint: Vertex.origin(),
+			endPoint: Vertex.origin(),
+		})
+		this.update()
+	}
 
-    components() {
-        return this.endPoint.subtract(this.startPoint)
-    }
+	components() {
+		return this.endPoint.subtract(this.startPoint)
+	}
 
-    update(argsDict) {
-        this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-        super.update(argsDict)
-        //this.updateView()
-    }
+	update(argsDict) {
+		this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
+		super.update(argsDict)
+		//this.updateView()
+	}
 
-    drawingStartPoint() { return this.startPoint }
-    drawingEndPoint() { return this.endPoint }
+	drawingStartPoint() { return this.startPoint }
+	drawingEndPoint() { return this.endPoint }
 
-    norm2() { return this.components().norm2() }
-    norm() { return Math.sqrt(this.norm2()) }
+	norm2() { return this.components().norm2() }
+	norm() { return Math.sqrt(this.norm2()) }
 
 }
 
 export class Ray extends Segment {
 
-    drawingEndPoint() {
-        if (this.startPoint == this.endPoint) { return this.endPoint }
-        return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
-    }
+	drawingEndPoint() {
+		if (this.startPoint == this.endPoint) { return this.endPoint }
+		return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
+	}
 
 
 }
 
 export class Line extends Ray {
 
-    drawingStartPoint() {
-        if (this.startPoint == this.endPoint) { return this.startPoint }
-        return this.endPoint.add(this.startPoint.subtract(this.endPoint).multiply(100))
-    }
+	drawingStartPoint() {
+		if (this.startPoint == this.endPoint) { return this.startPoint }
+		return this.endPoint.add(this.startPoint.subtract(this.endPoint).multiply(100))
+	}
 
 
 }
