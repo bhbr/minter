@@ -1,5 +1,8 @@
 
+import { rgb, gray } from './helpers.js'
+import { Vertex } from './transform.js'
 import { CreatedMobject } from './creating.js'
+import { BoxSlider } from './slider.js'
 
 
 export class CreatedBoxSlider extends CreatedMobject {

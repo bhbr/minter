@@ -80,7 +80,7 @@
         subtract(otherVertex) { return this.add(otherVertex.opposite()) }
 
         isNaN() {
-            return (isNaN(this.x) || isNaN(this.y)) 
+            return (isNaN(this.x) || isNaN(this.y)) 
         }
 
         static vertices(listOfComponents) {
@@ -1041,7 +1041,7 @@
 
         updateView() {
 
-            if (this.view == undefined || this.components == undefined) { return }
+            if (this.view == undefined || this.components == undefined) { return }
 
             if (this.visible && this.components.isNaN()) {
                 this.visible = false;

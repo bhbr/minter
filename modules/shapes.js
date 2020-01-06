@@ -21,7 +21,7 @@ export class Circle extends CurvedShape {
         this.anchor = newValue // updates automatically
     }
 
-    getArea() { return Math.PI * this.radius ** 2 }
+    getArea() { return Math.PI * this.radius ** 2 }
 
     updateBezierPoints() {
         let newBezierPoints = []
@@ -159,7 +159,7 @@ export class RoundedRectangle extends CurvedShape {
                 p42, p11, this.p1,
                 this.p1, p12
             ]
-        } catch { }
+        } catch { }
     }
 
 }

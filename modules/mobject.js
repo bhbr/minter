@@ -2,10 +2,20 @@ import { Vertex, Transform } from './transform.js'
 import { remove, logInto, stringFromPoint, rgb, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp } from './helpers.js'
 
 
+export class Dependency {
+    constructor(argsDict) {
+        this.source = argsDict['source']
+        this.outputName = argsDict['outputName'] // may be undefined
+        this.target = argsDict['target']
+        this.inputName = argsDict['inputName'] // may be undefined
+    }
+}
+
+
 export class Mobject {
 
     constructor(argsDict) {
-        argsDict = argsDict || {}
+        argsDict = argsDict || {}
         this.eventTarget = null
         if (argsDict['view'] == undefined) {
             this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -18,6 +28,7 @@ export class Mobject {
             anchor: Vertex.origin(),
             vertices: [],
             children: [],
+            dependencies: [],
             strokeWidth: 1,
             strokeColor: rgb(1, 1, 1),
             fillColor: rgb(1, 1, 1),
@@ -40,17 +51,16 @@ export class Mobject {
         this.savedSelfHandlePointerUp = this.selfHandlePointerUp
         this.disableDragging()
 
+        let p = this
+        while (p != undefined && p.constructor.name != 'Paper') { p = p.parent }
+        this.paper = p
+
         // this.boundCreatePopover = this.createPopover.bind(this)
         // this.boundDismissPopover = this.dismissPopover.bind(this)
         // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
     }
 
-    paper() {
-        let p = this
-        while (p != undefined && p.constructor.name != 'Paper') { p = p.parent }
-        return p
-    }
 
     enableDragging() {
         this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -101,7 +111,6 @@ export class Mobject {
 
     pointerMove(e) {
         e.stopPropagation()
-
         if (this.eventTarget != this && this.passAlongEvents) {
             this.eventTarget.pointerMove(e)
         } else {
@@ -157,8 +166,18 @@ export class Mobject {
     relativeTransform(frame) {
         let t = Transform.identity()
         let mob = this
+        if (mob.constructor.name == 'CindyCanvas') {
+            if (frame == this) { return t }
+            else if (frame == this.paper) {
+                t.e = this.anchor.x
+                t.f = this.anchor.y
+                return t
+            } else {
+                throw 'Cannot compute property of CindyCanvas for this frame'
+            }
+        }
         while (mob && mob.transform instanceof Transform) {
-            if (mob == frame) { break }
+            if (mob == frame) { break }
             t.leftComposeWith(mob.transform)
             mob = mob.parent
         }
@@ -180,15 +199,9 @@ export class Mobject {
     }
 
     update(argsDict) {
-        let x = Math.random()
         this.setAttributes(argsDict || {})
-        if (Object.values(this).includes(undefined)) { 
-            return
-        }
-
-        this.updateSubmobs()
-
         this.transform.anchorAt(this.anchor)
+        this.updateSubmobs()
         this.updateView()
     }
 
@@ -197,6 +210,7 @@ export class Mobject {
             submob.update()
         }
     }
+
 
     updateView() {
         if (this.view == undefined) { return }
@@ -248,7 +262,7 @@ export class Mobject {
     set strokeColor(newValue) {
         this.view.style.stroke = newValue
         if (this.children == undefined) { return }
-        for (let submob of this.children || []) {
+        for (let submob of this.children || []) {
             submob.strokeColor = newValue
         }
         this.updateView()
@@ -266,7 +280,7 @@ export class Mobject {
     get strokeWidth() { return this.view.strokeWidth }
     set strokeWidth(newValue) {
         this.view.strokeWidth = newValue
-        for (let submob of this.children || []) {
+        for (let submob of this.children || []) {
             submob.strokeWidth = newValue
         }
         this.updateView()
@@ -309,7 +323,7 @@ export class Mobject {
         if (this._anchor == undefined) { this._anchor = newValue }
         else { this._anchor.copyFrom(newValue) }
         this.transform.anchorAt(newValue)
-        //this.update()
+        this.update()
     }
 
     hide() {
@@ -326,7 +340,7 @@ export class Mobject {
         if (this.view != undefined) {
             this.view.style["visibility"] = "visible"
         }
-        for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+        for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
         this.updateView()
     }
 
@@ -481,24 +495,21 @@ export class Mobject {
         return this.relativeTransform(frame).appliedTo(this.localCenter())
     }
 
-    globalXMin() { return this.xMin(this.paper()) }
-    globalXMax() { return this.xMax(this.paper()) }
-    globalYMin() { return this.yMin(this.paper()) }
-    globalYMax() { return this.yMax(this.paper()) }
-    globalULCorner() { return this.ulCorner(this.paper()) }
-    globalURCorner() { return this.urCorner(this.paper()) }
-    globalLLCorner() { return this.llCorner(this.paper()) }
-    globalLRCorner() { return this.lrCorner(this.paper()) }
-    globalMidX() { return this.midX(this.paper()) }
-    globalMidY() { return this.midY(this.paper()) }
-    globalLeftCenter() { return this.leftCenter(this.paper()) }
-    globalRightCenter() { return this.rightCenter(this.paper()) }
-    globalTopCenter() {
-        console.log(this.paper())
-        return this.topCenter(this.paper())
-    }
-    globalBottomCenter() { return this.bottomCenter(this.paper()) }
-    globalCenter() { return this.center(this.paper()) }
+    globalXMin() { return this.xMin(this.paper) }
+    globalXMax() { return this.xMax(this.paper) }
+    globalYMin() { return this.yMin(this.paper) }
+    globalYMax() { return this.yMax(this.paper) }
+    globalULCorner() { return this.ulCorner(this.paper) }
+    globalURCorner() { return this.urCorner(this.paper) }
+    globalLLCorner() { return this.llCorner(this.paper) }
+    globalLRCorner() { return this.lrCorner(this.paper) }
+    globalMidX() { return this.midX(this.paper) }
+    globalMidY() { return this.midY(this.paper) }
+    globalLeftCenter() { return this.leftCenter(this.paper) }
+    globalRightCenter() { return this.rightCenter(this.paper) }
+    globalTopCenter() { return this.topCenter(this.paper) }
+    globalBottomCenter() { return this.bottomCenter(this.paper) }
+    globalCenter() { return this.center(this.paper) }
 
     centerAt(newCenter, frame) {
         if (!frame) { frame = this }
@@ -524,6 +535,43 @@ export class Mobject {
         this.dragAnchorStart = undefined
     }
 
+
+
+
+    dependents() {
+        let dep = []
+        for (let d of this.dependencies) {
+            dep.push(d.target)
+        }
+        return dep
+    }
+
+    allDependents() {
+        let dep = this.dependents()
+        for (let mob of dep) {
+            dep.push(...mob.allDependents())
+        }
+        return dep
+    }
+
+    dependsOn(otherMobject) {
+        return otherMobject.allDependents().includes(this)
+    }
+
+
+    addDependency(outputName, target, inputName) {
+        let dep = new Dependency({
+            source: this,
+            outputName: outputName,
+            target: target,
+            inputName: inputName
+        })
+        this.dependencies.push(dep)
+    }
+
+    addDependent(target) {
+        this.addDependency(null, target, null)
+    }
 
     // createPopover(e) {
     //     this.popover = new Popover(this, 200, 300, 'right')
@@ -604,12 +652,12 @@ export class Polygon extends Mobject {
         let globalVertices = this.globalVertices()
         let pathString = Polygon.pathString(globalVertices)
         
-        if (this.path == undefined || this.vertices.length == 0) { return }
+        if (this.path == undefined || this.vertices.length == 0) { return }
         this.path.setAttribute('d', pathString)
-        this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1))
-        this.path.setAttribute('fill-opacity', this.fillOpacity || 1)
-        this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1))
-        this.path.setAttribute('stroke-width', this.strokeWidth || 1)
+        this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1))
+        this.path.setAttribute('fill-opacity', this.fillOpacity || 1)
+        this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1))
+        this.path.setAttribute('stroke-width', this.strokeWidth || 1)
         super.updateView()
     }
 

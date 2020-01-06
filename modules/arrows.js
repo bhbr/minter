@@ -22,8 +22,8 @@ export class Segment extends Polygon {
         //this.updateView()
     }
 
-    drawingStartPoint() { return this.startPoint }
-    drawingEndPoint() { return this.endPoint }
+    drawingStartPoint() { return this.startPoint }
+    drawingEndPoint() { return this.endPoint }
 
     norm2() { return this.components().norm2() }
     norm() { return Math.sqrt(this.norm2()) }
@@ -88,7 +88,7 @@ export class Line extends Ray {
 
 //     updateView() {
 
-//         if (this.view == undefined || this.components == undefined) { return }
+//         if (this.view == undefined || this.components == undefined) { return }
 
 //         if (this.visible && this.components.isNaN()) {
 //             this.visible = false

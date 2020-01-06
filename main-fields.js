@@ -1,8 +1,8 @@
-import { Vertex } from './modules/transform.js'
+import { Vertex } from './modules/transform.js'
 import { Popover, TextLabel } from './modules/mobject.js'
 import { Circle } from './modules/mobject.js'
 import { VectorField } from './modules/vector-field.js'
-import { Slider } from './modules/slider.js'
+import { Slider } from './modules/slider.js'
 
 class Charge extends Circle { //, ScrubbableMobject {
 

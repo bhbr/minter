@@ -1,4 +1,5 @@
-import { CreatedMobject, Freehand, DrawnSegment, DrawnRay, DrawnLine, DrawnCircle, DrawnRectangle } from './creating.js'
+import { CreatedMobject, Freehand, DrawnSegment, DrawnRay, DrawnLine, DrawnCircle } from './creating.js'
+import { DrawnRectangle } from './cindycanvas.js'
 import { CreatedBoxSlider } from './createdslider.js'
 
 export class CreationGroup extends CreatedMobject {

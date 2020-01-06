@@ -91,7 +91,7 @@ export class Vertex extends Array {
     subtract(otherVertex) { return this.add(otherVertex.opposite()) }
 
     isNaN() {
-        return (isNaN(this.x) || isNaN(this.y)) 
+        return (isNaN(this.x) || isNaN(this.y)) 
     }
 
     static vertices(listOfComponents) {

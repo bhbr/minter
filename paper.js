@@ -1,15 +1,16 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './modules/helpers.js'
-import { Vertex } from './modules/transform.js'
+import { Vertex } from './modules/transform.js'
 import { Mobject, MGroup } from './modules/mobject.js'
-import { Circle, Rectangle } from './modules/shapes.js'
+import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
-import { FreePoint, CindyCanvas, WaveCindyCanvas } from './modules/creating.js'
+import { FreePoint } from './modules/creating.js'
+import { CindyCanvas, WaveCindyCanvas } from './modules/cindycanvas.js'
 import { CreationGroup } from './modules/creationgroup.js'
 import { BoxSlider } from './modules/slider.js'
 import { LinkableMobject } from './modules/linkables.js'
 
 
-let log = function(msg) { } // logInto(msg.toString(), 'paper-console') }
+let log = function(msg) { } // logInto(msg.toString(), 'paper-console')
 
 class Paper extends LinkableMobject {
 
@@ -18,7 +19,7 @@ class Paper extends LinkableMobject {
         this.children = []
         this.cindys = []
         this.setDragging(false)
-        this.visibleCreation = 'freehand'
+        this.visibleCreation = 'freehand'
         this.cindyPorts = []
         this.snappablePoints = []
 
@@ -87,7 +88,7 @@ class Paper extends LinkableMobject {
                 }
             }
         }
-        if (this.draggedMobject == this || !this.draggedMobject.draggable) {
+        if (this.draggedMobject == this || !this.draggedMobject.draggable) {
             this.draggedMobject = undefined
             return
         }
@@ -198,6 +199,7 @@ class Paper extends LinkableMobject {
         )
         document.body.appendChild(cindyCanvas.script)
         this.cindys.push(cindyCanvas)
+
     }
 
 
@@ -249,25 +251,14 @@ class Paper extends LinkableMobject {
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
 
+
 // let r = new Rectangle({
 //     width: 300,
 //     height: 200,
 //     fillColor: rgb(1, 0, 0),
 //     fillOpacity: 1,
-//     anchor: new Vertex(100, 100)
-// })
-
-// let r2 = new Rectangle({
-//     width: 50,
-//     height: 50,
-//     fillColor: rgb(0, 0, 1),
-//     fillOpacity: 0.5,
 //     anchor: new Vertex(10, 10)
 // })
-
-// r2.centerAt(r.center(paper), paper)
-// paper.add(r)
-// paper.add(r2)
 
 
 let c = new WaveCindyCanvas({
