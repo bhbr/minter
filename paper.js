@@ -305,7 +305,7 @@ paper.add(s2)
 
 s.addDependency('value', c, 'wavelength')
 s2.addDependency('value', c, 'frequency')
-paper.showLinksOfSubmobs()
+//paper.showLinksOfSubmobs()
 
 
 

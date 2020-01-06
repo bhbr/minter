@@ -43,7 +43,7 @@ export class BoxSlider extends LinkableMobject {
 			fillColor: argsDict['fillColor'] || gray(0.5)
 		})
 		this.add(this.filledBar)
-		this.label = new TextLabel(this.value.toString())
+		this.label = new TextLabel({text: this.value.toString()})
 		this.label.anchor = new Vertex(this.width/2, this.height/2)
 		this.add(this.label)
 		this.update()

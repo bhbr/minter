@@ -795,7 +795,7 @@ export class TextLabel extends Mobject {
 		super(argsDict)
 		this.setDefaults({
 			text: '',
-			textAnchor: 'center'
+			textAnchor: 'middle'
 		})
 		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 		this.view.setAttribute('class', this.constructor.name + ' unselectable')
