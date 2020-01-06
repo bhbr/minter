@@ -31,9 +31,9 @@ export class InputList extends RoundedRectangle {
 		for (let i = 0; i < this.listInputNames.length; i++) {
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
-			let t = new TextLabel({text: name})
+			let t = new TextLabel({text: name, textAnchor: 'left'})
 			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(25, 0)
+			t.anchor = c.anchor.translatedBy(15, 0)
 			this.add(c)
 			this.add(t)
 		}
@@ -62,9 +62,9 @@ export class OutputList extends RoundedRectangle {
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
-			let t = new TextLabel({text: name})
+			let t = new TextLabel({text: name, textAnchor: 'left'})
 			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(25, 0)
+			t.anchor = c.anchor.translatedBy(15, 0)
 			this.add(c)
 			this.add(t)
 		}
@@ -194,23 +194,30 @@ export class LinkableMobject extends Mobject {
 		this.dependencyMap.mobject = this
 		this.add(this.dependencyMap)
 		for (let submob of this.children) {
-			if (submob == this.dependencyMap) { continue }
-			if (!(submob instanceof LinkableMobject)) { continue }
-			if (submob.inputNames.length == 0 && submob.outputNames.length == 0) { continue }
-			let ioList = new IOList({
-				mobject: submob,
-				listInputNames: submob.inputNames,
-				listOutputNames: submob.outputNames,
-			})
-			this.dependencyMap.add(ioList)
-			let p1 = ioList.inputList.bottomCenter(this)
-			let p2 = submob.topCenter(this)
-			ioList.inputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] - 10)
-			p1 = ioList.outputList.topCenter(this)
-			p2 = submob.bottomCenter(this)
-			ioList.outputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] + 10)
-			ioList.update()
+			this.createIOListForMobject(submob)
 		}
+		for (let submob of this.cindys || []) {
+			this.createIOListForMobject(submob)
+		}
+	}
+
+	createIOListForMobject(submob) {
+		if (submob == this.dependencyMap) { return }
+		if (!(submob instanceof LinkableMobject)) { return }
+		if (submob.inputNames.length == 0 && submob.outputNames.length == 0) { return }
+		let ioList = new IOList({
+			mobject: submob,
+			listInputNames: submob.inputNames,
+			listOutputNames: submob.outputNames,
+		})
+		this.dependencyMap.add(ioList)
+		let p1 = ioList.inputList.bottomCenter(this)
+		let p2 = submob.topCenter(this)
+		ioList.inputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] - 10)
+		p1 = ioList.outputList.topCenter(this)
+		p2 = submob.bottomCenter(this)
+		ioList.outputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] + 10)
+		ioList.update()
 	}
 
 	hideLinksOfSubmobs() {

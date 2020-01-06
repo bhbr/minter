@@ -287,7 +287,7 @@ let s = new BoxSlider({
 	height: 200,
 	min: 0,
 	max: 0.1,
-	value: 0.02
+	value: 0.02,
 })
 
 paper.add(s)

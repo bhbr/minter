@@ -794,11 +794,12 @@ export class TextLabel extends Mobject {
 	constructor(argsDict) {
 		super(argsDict)
 		this.setDefaults({
-			text: ''
+			text: '',
+			textAnchor: 'center'
 		})
 		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 		this.view.setAttribute('class', this.constructor.name + ' unselectable')
-		this.view.setAttribute('text-anchor', 'middle')
+		this.view.setAttribute('text-anchor', this.textAnchor)
 		this.view.setAttribute('alignment-baseline', 'middle')
 		this.view.setAttribute('fill', 'white')
 		this.view.setAttribute('font-family', 'Helvetica')
