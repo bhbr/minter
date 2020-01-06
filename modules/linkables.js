@@ -28,12 +28,14 @@ export class InputList extends RoundedRectangle {
 			height: this.getHeight()
 		})
 		this.updateView()
+		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listInputNames.length; i++) {
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
 			let t = new TextLabel({text: name, textAnchor: 'left'})
 			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
 			t.anchor = c.anchor.translatedBy(15, 0)
+			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
 		}
@@ -59,12 +61,14 @@ export class OutputList extends RoundedRectangle {
 			height: this.getHeight()
 		})
 		this.updateView()
+		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
 			let t = new TextLabel({text: name, textAnchor: 'left'})
 			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
 			t.anchor = c.anchor.translatedBy(15, 0)
+			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
 		}
@@ -112,6 +116,43 @@ export class DependencyMap extends MGroup {
 
 	selfHandlePointerUp(e) {
 		this.createdLinkLine.dissolveInto(this)
+		this.pointerUpVertex = pointerEventVertex(e)
+	}
+
+	getInputFromVertex(p) {
+		for (let ioList of this.children) {
+			if (!(ioList instanceof IOList)) { continue }
+				let dict = ioList.inputList.bulletLocationDict
+				for (let inputName of Object.keys(dict)) {
+					let loc = ioList.inputList.relativeTransform(this).appliedTo(dict[inputName])
+					if (p.closeTo(loc, 5)) { return [ioList.mobject, inputName] }
+				}
+		}
+		return [null, null]
+	}
+
+	getOutputFromVertex(p) {
+		for (let ioList of this.children) {
+			if (!(ioList instanceof IOList)) { continue }
+				let dict = ioList.outputList.bulletLocationDict
+				for (let outputName of Object.keys(dict)) {
+					let loc = ioList.outputList.relativeTransform(this).appliedTo(dict[outputName])
+					if (p.closeTo(loc, 5)) { return [ioList.mobject, outputName] }
+				}
+		}
+		return [null, null]
+	}
+
+	fixLinkLine(argsDict) {
+		let p = argsDict['fromPoint']
+		let q = argsDict['toPoint']
+		let [source, outputName] = this.getOutputFromVertex(p)
+		let [target, inputName] = this.getInputFromVertex(q)
+		console.log(source, outputName)
+		console.log(target, inputName)
+		if (source == null || target == null) { return }
+		source.addDependency(outputName, target, inputName)
+
 	}
 
 
@@ -122,6 +163,7 @@ export class CreatedLinkLine extends CreatedMobject {
 
 	constructor(argsDict) {
 		super(argsDict)
+		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
 			radius: 5,
 			fillOpacity: 1,
@@ -144,7 +186,11 @@ export class CreatedLinkLine extends CreatedMobject {
 	}
 
 	dissolveInto(superMobject) {
-
+		superMobject.fixLinkLine({
+			fromPoint: this.startPoint,
+			toPoint: this.endPoint
+		})
+		//super.dissolveInto(superMobject)
 	}
 
 	updateFromTip(q) {
@@ -153,6 +199,7 @@ export class CreatedLinkLine extends CreatedMobject {
 		this.update() // why does this not work?
 		this.endBullet.update()
 		this.line.update()
+		this.endPoint.copyFrom(q)
 	}
 }
 
@@ -190,6 +237,10 @@ export class LinkableMobject extends Mobject {
 	}
 
 	showLinksOfSubmobs() {
+		if (this.dependencyMap) {
+			this.dependencyMap.show()
+			return
+		}
 		this.dependencyMap = new DependencyMap()
 		this.dependencyMap.mobject = this
 		this.add(this.dependencyMap)
@@ -221,7 +272,7 @@ export class LinkableMobject extends Mobject {
 	}
 
 	hideLinksOfSubmobs() {
-		this.remove(this.dependencyMap)
+		this.dependencyMap.hide()
 	}
 
 

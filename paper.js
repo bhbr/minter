@@ -14,7 +14,7 @@ let log = function(msg) { } // logInto(msg.toString(), 'paper-console')
 
 class Paper extends LinkableMobject {
 
-	 constructor(argsDict) {
+	constructor(argsDict) {
 		super(argsDict)
 		this.children = []
 		this.cindys = []
@@ -303,8 +303,8 @@ let s2 = new BoxSlider({
 
 paper.add(s2)
 
-s.addDependency('value', c, 'wavelength')
-s2.addDependency('value', c, 'frequency')
+//s.addDependency('value', c, 'wavelength')
+//s2.addDependency('value', c, 'frequency')
 //paper.showLinksOfSubmobs()
 
 

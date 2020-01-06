@@ -20,7 +20,7 @@ sidebar.add = function(mobject) {
 let log = function(msg) { logInto(msg, 'sidebar-console') }
 
 function buttonCenter(index) {
-	let y = buttonYOffset + index * (buttonSpacing + 2*buttonRadius)
+	let y = buttonYOffset + index * (buttonSpacing + 2 * buttonRadius)
 	return new Vertex(buttonXOffset, y)
 }
 
