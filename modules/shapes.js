@@ -64,7 +64,8 @@ export class TwoPointCircle extends Circle {
 	}
 
 	update(argsDict) {
-		this.radius = this.midPoint.subtract(this.outerPoint).norm()
+		try { this.radius = this.midPoint.subtract(this.outerPoint).norm() }
+		catch { }
 		super.update(argsDict)
 	}
 
