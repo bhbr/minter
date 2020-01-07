@@ -119,26 +119,42 @@ export class DependencyMap extends MGroup {
 		this.pointerUpVertex = pointerEventVertex(e)
 	}
 
-	getInputFromVertex(p) {
+	inputLocations() {
+		let arr = []
 		for (let ioList of this.children) {
 			if (!(ioList instanceof IOList)) { continue }
-				let dict = ioList.inputList.bulletLocationDict
-				for (let inputName of Object.keys(dict)) {
-					let loc = ioList.inputList.relativeTransform(this).appliedTo(dict[inputName])
-					if (p.closeTo(loc, 5)) { return [ioList.mobject, inputName] }
-				}
+			let dict = ioList.inputList.bulletLocationDict
+			for (let inputName of Object.keys(dict)) {
+				let loc = ioList.inputList.relativeTransform(this).appliedTo(dict[inputName])
+				arr.push([loc, ioList.mobject, inputName])
+			}
+		}
+		return arr
+	}
+
+	outputLocations() {
+		let arr = []
+		for (let ioList of this.children) {
+			if (!(ioList instanceof IOList)) { continue }
+			let dict = ioList.outputList.bulletLocationDict
+			for (let outputName of Object.keys(dict)) {
+				let loc = ioList.outputList.relativeTransform(this).appliedTo(dict[outputName])
+				arr.push([loc, ioList.mobject, outputName])
+			}
+		}
+		return arr
+	}
+
+	getInputFromVertex(p) {
+		for (let [loc, mobject, inputName] of this.inputLocations()) {
+			if (p.closeTo(loc, 5)) { return [mobject, inputName] }
 		}
 		return [null, null]
 	}
 
 	getOutputFromVertex(p) {
-		for (let ioList of this.children) {
-			if (!(ioList instanceof IOList)) { continue }
-				let dict = ioList.outputList.bulletLocationDict
-				for (let outputName of Object.keys(dict)) {
-					let loc = ioList.outputList.relativeTransform(this).appliedTo(dict[outputName])
-					if (p.closeTo(loc, 5)) { return [ioList.mobject, outputName] }
-				}
+		for (let [loc, mobject, outputName] of this.outputLocations()) {
+			if (p.closeTo(loc, 5)) { return [mobject, outputName] }
 		}
 		return [null, null]
 	}
