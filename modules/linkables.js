@@ -98,25 +98,40 @@ export class DependencyMap extends MGroup {
 		let t = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
 		// find a better way to handle this!
 		if (t instanceof LinkBullet) {
-			this.createdLinkLine = new CreatedLinkLine({
+			this.editedLinkLine = new LinkLine({
 				startPoint: t.center(this),
 				source: t.mobject,
 				inputName: t.inputName
 			})
-			this.add(this.createdLinkLine)
+			this.add(this.editedLinkLine)
 		}
 	}
 
 	selfHandlePointerMove(e) {
-		if (this.createdLinkLine == undefined) { return }
+		if (this.editedLinkLine == undefined) { return }
 		let p = pointerEventVertex(e)
-		this.createdLinkLine.updateFromTip(p)
+		this.editedLinkLine.updateFromTip(this.snapInput(p))
 	}
 
 
 	selfHandlePointerUp(e) {
-		this.createdLinkLine.dissolveInto(this)
+		this.editedLinkLine.dissolveInto(this)
 		this.pointerUpVertex = pointerEventVertex(e)
+	}
+
+	snapInput(p) {
+		for (let [loc, mobject, inputName] of this.inputLocations()) {
+			if (p.closeTo(loc, 5)) { return loc }
+		}
+		return p
+	}
+
+
+	snapOutput(p) {
+		for (let [loc, mobject, outputName] of this.outputLocations()) {
+			if (p.closeTo(loc, 5)) { return loc }
+		}
+		return p
 	}
 
 	inputLocations() {
@@ -166,7 +181,10 @@ export class DependencyMap extends MGroup {
 		let [target, inputName] = this.getInputFromVertex(q)
 		console.log(source, outputName)
 		console.log(target, inputName)
-		if (source == null || target == null) { return }
+		if (source == null || target == null) {
+			this.remove(this.editedLinkLine)
+			return
+		}
 		source.addDependency(outputName, target, inputName)
 
 	}
@@ -175,7 +193,7 @@ export class DependencyMap extends MGroup {
 }
 
 
-export class CreatedLinkLine extends CreatedMobject {
+export class LinkLine extends CreatedMobject {
 
 	constructor(argsDict) {
 		super(argsDict)
