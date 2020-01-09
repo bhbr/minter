@@ -94,6 +94,11 @@ export class IOList extends MGroup {
 
 export class DependencyMap extends MGroup {
 
+	constructor(argsDict) {
+		super(argsDict)
+		this.linkLines = []
+	}
+
 	selfHandlePointerDown(e) {
 		let t = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
 		// find a better way to handle this!
@@ -116,6 +121,8 @@ export class DependencyMap extends MGroup {
 
 	selfHandlePointerUp(e) {
 		this.editedLinkLine.dissolveInto(this)
+		this.linkLines.push(this.editedLinkLine)
+		this.editedLinkLine = undefined
 		this.pointerUpVertex = pointerEventVertex(e)
 	}
 
