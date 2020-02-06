@@ -3,6 +3,7 @@ import { rgb, gray } from './helpers.js'
 import { Vertex } from './transform.js'
 import { CreatedMobject } from './creating.js'
 import { BoxSlider } from './slider.js'
+import { WaveCindyCanvas } from './cindycanvas.js'
 
 
 export class CreatedBoxSlider extends CreatedMobject {
@@ -41,7 +42,6 @@ export class CreatedBoxSlider extends CreatedMobject {
 			fillColor: gray(0.5)
 		})
 
-
 	}
 
 	dissolveInto(superMobject) {
@@ -50,8 +50,10 @@ export class CreatedBoxSlider extends CreatedMobject {
 		this.protoSlider.update({
 			anchor: this.anchor
 		})
+		this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) })
 		this.protoSlider.label.update({
 			anchor: new Vertex(this.protoSlider.width/2, this.protoSlider.height/2)
 		})
+
 	}
 }

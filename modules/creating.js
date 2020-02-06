@@ -81,14 +81,14 @@ export class Point extends Circle {
 		super(argsDict)
 		this.view.setAttribute('class', this.constructor.name)
 		this.setDefaults({
-			midPoint: Vertex.origin(),
+			midPoint: Vertex.origin()
+		})
+		this.setAttributes({
+			fillColor: rgb(1, 1, 1),
+			fillOpacity: 1.0
 		})
 
 		this.radius = 5
-	}
-
-	update(argsDict) {
-		super.update(argsDict)
 	}
 
 }
@@ -150,7 +150,6 @@ export class DrawnArrow extends CreatedMobject {
 
 		superMobject.add(this.startFreePoint)
 		superMobject.add(this.endFreePoint)
-		
 	}
 
 }
@@ -166,8 +165,6 @@ export class DrawnSegment extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.segment)
-		this.startFreePoint.addDependent(this.segment)
-		this.endFreePoint.addDependent(this.segment)
 	}
 
 	dissolveInto(superMobject) {
@@ -320,6 +317,7 @@ export class DrawnCircle extends CreatedMobject {
 		this.freeMidpoint.addDependent(this.circle)
 		this.freeOuterPoint.addDependent(this.circle)
 		superMobject.add(this.circle)
+
 	}
 
 

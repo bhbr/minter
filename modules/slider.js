@@ -58,6 +58,7 @@ export class BoxSlider extends LinkableMobject {
 		let a = this.normalizedValue()
 		if (isNaN(a)) { return }
 		try {
+			this.outerBar.update(argsDict)
 			this.filledBar.anchor.y = this.height - this.filledBar.height
 			this.filledBar.update({ height: a * this.height })
 			this.label.text = this.value.toPrecision(3).toString()

@@ -190,10 +190,10 @@ class Paper extends LinkableMobject {
 		this.creationGroup.dissolveInto(this)
 		this.remove(this.creationGroup)
 		this.creationGroup = undefined
-
 	}
 
 	addCindy(cindyCanvas) {
+		console.log('adding Cindy')
 		document.querySelector('#paper-container').insertBefore(
 			cindyCanvas.view, document.querySelector('#paper-console')
 		)
@@ -201,7 +201,6 @@ class Paper extends LinkableMobject {
 		this.cindys.push(cindyCanvas)
 
 	}
-
 
 	removeCindy(cindyCanvas) {
 		cindyCanvas.view.remove()
@@ -250,62 +249,17 @@ class Paper extends LinkableMobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-
-
-// let r = new Rectangle({
-//     width: 300,
-//     height: 200,
-//     fillColor: rgb(1, 0, 0),
-//     fillOpacity: 1,
-//     anchor: new Vertex(10, 10)
-// })
-
-
-let c = new WaveCindyCanvas({
-	paper: paper,
-	anchor: new Vertex(300, 100),
-	width: 200,
-	height: 200,
-	wavelength: 0.02
-})
-
-// let d = new Circle({ radius: 100, fillColor: rgb(0.2, 0, 0), anchor: new Vertex(200, 200) })
-// d.inputs = [d.radius]
-// d.inputNames = ['radius']
-// d.outputs = [d.getArea]
-// d.outputNames = ['area']
-
-// paper.add(d)
+let c = new WaveCindyCanvas({paper: paper, anchor: Vertex.origin(), width: 200, height: 200})
 
 
 
 
-let p = new Vertex(50, 100)
-let s = new BoxSlider({
-	anchor: p,
-	width: 50,
-	height: 200,
-	min: 0,
-	max: 0.1,
-	value: 0.02,
-})
 
-paper.add(s)
 
-let s2 = new BoxSlider({
-	anchor: p.translatedBy(150, 0),
-	width: 50,
-	height: 200,
-	min: 0,
-	max: 100,
-	value: 2
-})
 
-paper.add(s2)
 
-//s.addDependency('value', c, 'wavelength')
-//s2.addDependency('value', c, 'frequency')
-//paper.showLinksOfSubmobs()
+
+
 
 
 

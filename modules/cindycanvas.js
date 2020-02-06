@@ -43,7 +43,6 @@ export class CindyCanvas extends LinkableMobject {
 			}]
 		})
 
-
 		this.points = [[0.4, 0.4], [0.3, 0.8]]
 		this.core = CindyJS({
 			scripts: "cs*",

@@ -254,21 +254,6 @@ export class LinkableMobject extends Mobject {
 		})
 	}
 
-	update(argsDict) {
-
-		for (let dep of this.dependencies || []) {
-			let outputName = this[dep.outputName] // may be undefined
-			if (typeof outputName === 'function') {
-				dep.target[dep.inputName] = outputName()
-			} else if (outputName != undefined && outputName != null) {
-				dep.target[dep.inputName] = outputName
-			}
-			dep.target.update()
-		}
-
-		super.update(argsDict)
-	}
-
 	dependenciesBetweenChildren() {
 		let deps = []
 		for (let submob of this.children) {

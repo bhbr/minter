@@ -9,7 +9,6 @@ let paper = null
 if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper')
 	paper = paperView.mobject
-	console.log(paperView)
 }
 
 let sidebar = document.querySelector('#sidebar')
@@ -137,6 +136,7 @@ class SidebarButton extends Circle {
 			document.removeEventListener('keyup', this.boundButtonUpByKey)
 			document.addEventListener('keydown', this.boundButtonDownByKey)
 			this.commonButtonUp()
+
 		}
 	}
 

@@ -1,6 +1,7 @@
 import { CreatedMobject, Freehand, DrawnSegment, DrawnRay, DrawnLine, DrawnCircle } from './creating.js'
 import { DrawnRectangle } from './cindycanvas.js'
 import { CreatedBoxSlider } from './createdslider.js'
+import { rgb } from './helpers.js'
 
 export class CreationGroup extends CreatedMobject {
 
