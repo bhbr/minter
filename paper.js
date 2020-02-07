@@ -251,7 +251,9 @@ class Paper extends LinkableMobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-
+function createWCC() {
+	let c = new WaveCindyCanvas({paper: paper, anchor: Vertex.origin(), width: 200, height: 200})
+}
 
 //setTimeout(createWCC, 100)
 
@@ -264,3 +266,12 @@ function dissolveD() {
 }
 
 setTimeout(dissolveD, 100)
+
+
+
+
+
+
+
+
+

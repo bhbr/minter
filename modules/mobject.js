@@ -622,7 +622,6 @@ export class Mobject {
 	// }
 
 
-
 }
 
 
@@ -838,6 +837,7 @@ export class TextLabel extends Mobject {
 	}
 
 }
+
 
 
 // export class Popover extends CurvedShape {
