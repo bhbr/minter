@@ -32,7 +32,7 @@ const buttonRadius = 25
 const buttonScaleFactor = 1.3
 
 class SidebarButton extends Circle {
-	
+
 	constructor(argsDict) {
 		super(argsDict)
 		this.setDefaults({
@@ -186,7 +186,6 @@ class SidebarButton extends Circle {
 		let message = this.messages[this.currentModeIndex]
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		if (withMessage) { this.messagePaper(message) }
- 
 		this.update()
 	}
 	
@@ -314,6 +313,7 @@ class CreativeButton extends SidebarButton {
 			this.label.text = ''
 		}
 	}
+
 }
 
 
