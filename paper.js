@@ -4,7 +4,7 @@ import { Mobject, MGroup } from './modules/mobject.js'
 import { Circle, Rectangle } from './modules/shapes.js'
 import { Segment, Ray, Line } from './modules/arrows.js'
 import { FreePoint } from './modules/creating.js'
-import { CindyCanvas, WaveCindyCanvas } from './modules/cindycanvas.js'
+import { CindyCanvas, WaveCindyCanvas, DrawnRectangle } from './modules/cindycanvas.js'
 import { CreationGroup } from './modules/creationgroup.js'
 import { BoxSlider } from './modules/slider.js'
 import { LinkableMobject } from './modules/linkables.js'
@@ -194,12 +194,11 @@ class Paper extends LinkableMobject {
 
 	addCindy(cindyCanvas) {
 		console.log('adding Cindy')
-		document.querySelector('#paper-container').insertBefore(
-			cindyCanvas.view, document.querySelector('#paper-console')
-		)
-		document.body.appendChild(cindyCanvas.script)
+		// document.querySelector('#paper-container').insertBefore(
+		// 	cindyCanvas.view, document.querySelector('#paper-console')
+		// )
+		// document.body.appendChild(cindyCanvas.script)
 		this.cindys.push(cindyCanvas)
-
 	}
 
 	removeCindy(cindyCanvas) {
@@ -245,16 +244,28 @@ class Paper extends LinkableMobject {
 		this.hideLinksOfSubmobs()
 	}
 
+	callCindyJS(argsDict) {
+		return CindyJS(argsDict)
+	}
 }
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-let c = new WaveCindyCanvas({paper: paper, anchor: Vertex.origin(), width: 200, height: 200})
+function createWCC() {
+	let c = new WaveCindyCanvas({paper: paper, anchor: Vertex.origin(), width: 200, height: 200})
+}
 
+//setTimeout(createWCC, 100)
 
+let d = new DrawnRectangle({startPoint: Vertex.origin(), endPoint: new Vertex(200, 200)})
 
+paper.add(d)
 
+function dissolveD() {
+	d.dissolveInto(paper)
+}
 
+setTimeout(dissolveD, 100)
 
 
 

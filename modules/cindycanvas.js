@@ -34,6 +34,7 @@ export class CindyCanvas extends LinkableMobject {
 		document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
 		document.body.appendChild(this.script)
 
+
 		this.paper.cindyPorts.push({
 			id: canvasID,
 			width: this.width,
@@ -44,16 +45,19 @@ export class CindyCanvas extends LinkableMobject {
 		})
 
 		this.points = [[0.4, 0.4], [0.3, 0.8]]
-		this.core = CindyJS({
+		this.paper.add(this)
+		//this.createCore()
+		//this.update()
+		
+	}
+	createCore() {
+		console.log(this.paper.cindyPorts)
+		this.core = this.paper.callCindyJS({
 			scripts: "cs*",
 			autoplay: true,
 			ports: this.paper.cindyPorts,
 			geometry: this.geometry()
 		})
-
-		this.paper.add(this)
-		this.update()
-		
 	}
 
 	geometry() { return [] }
@@ -78,10 +82,18 @@ export class WaveCindyCanvas extends CindyCanvas {
 			wavelength: 0.01,
 			frequency: 1
 		})
+		this.Wcode = `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f));`
 		this.inputNames = ['wavelength', 'frequency']
 		this.script.textContent = `drawcmd();`
-		this.core.evokeCS(`W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f));`)
+		this.createCore()
+		this.core.evokeCS(this.Wcode)
 		this.update(argsDict)
+	}
+
+	drawCode() {
+		let l = this.wavelength || 1
+		let f = this.frequency || 1
+		return `drawcmd() := (colorplot([0, W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}), 0]););`
 	}
 
 	geometry() {
@@ -95,10 +107,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	update(argsDict) {
-		try {
-			let newCode = `drawcmd() := (colorplot([0, W(#, A0, ${this.wavelength}, ${this.frequency}) + W(#, A1, ${this.wavelength}, ${this.frequency}), 0]););`
-			this.core.evokeCS(newCode)
-		} catch { }
+		try { this.core.evokeCS(this.drawCode()) } catch { }
 		super.update(argsDict)
 	}
 }
@@ -147,6 +156,7 @@ export class DrawnRectangle extends CreatedMobject {
 			height: h,
 			wavelength: 0.01
 		}) // auto-adds to parent
+		cindy.update()
 	}
 	
 }
