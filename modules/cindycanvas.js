@@ -13,18 +13,19 @@ export class CindyCanvas extends LinkableMobject {
 		this.anchor = argsDict.anchor
 		this.width = argsDict.width
 		this.height = argsDict.height
-		this.script = document.createElement('script')
-		this.script.setAttribute('type', 'text/x-cindyscript')
-		let scriptID = 'csdraw' // + this.paper.cindyPorts.length
-		this.script.setAttribute('id', scriptID)
-		
+
+		// this.mainScript = document.createElement('script')
+		// this.mainScript.setAttribute('type', 'text/javascript')
+		// this.mainScript.setAttribute('src', 'CindyJS/build/js/Cindy.js')
+		// this.mainScript.onload = this.createCore.bind(this)
+
 		this.view = document.createElement('div')
 		this.view.style.position = 'absolute'
 		this.view.style.left =  this.anchor.x + 'px'
 		this.view.style.top = this.anchor.y + 'px'
-		
-		this.csView = document.createElement('div')
-		let canvasID = 'CSCanvas' + this.paper.cindyPorts.length
+
+		this.csView = document.createElement('canvas')
+		let canvasID = 'CSCanvas' // + this.paper.cindyPorts.length
 		this.csView.setAttribute('id', canvasID)
 		this.view.appendChild(this.csView)
 		
@@ -32,7 +33,7 @@ export class CindyCanvas extends LinkableMobject {
 		this.view.style['pointer-events'] = 'auto'
 		
 		document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
-		document.body.appendChild(this.script)
+		//document.head.appendChild(this.mainScript)
 
 
 		this.paper.cindyPorts.push({
@@ -46,18 +47,43 @@ export class CindyCanvas extends LinkableMobject {
 
 		this.points = [[0.4, 0.4], [0.3, 0.8]]
 		this.paper.add(this)
-		//this.createCore()
 		//this.update()
 		
+		this.initScript = document.createElement('script')
+		this.initScript.setAttribute('type', 'text/x-cindyscript')
+		this.initScript.setAttribute('id', 'csinit')
+		this.initScript.textContent = this.initCode()
+
+		this.drawScript = document.createElement('script')
+		this.drawScript.setAttribute('type', 'text/x-cindyscript')
+		this.drawScript.setAttribute('id', 'csdraw')
+		this.drawScript.textContent = this.drawCode()
+
+		document.body.appendChild(this.initScript)
+		document.body.appendChild(this.drawScript)
+
+		this.createCore()
+
 	}
+
+	initCode() {
+		return `resetclock();`
+	}
+
+	drawCode() {
+		return `drawcmd();`
+	}
+
 	createCore() {
-		console.log(this.paper.cindyPorts)
-		this.core = this.paper.callCindyJS({
+		console.log('creating core')
+		let argsDict = {
 			scripts: "cs*",
 			autoplay: true,
 			ports: this.paper.cindyPorts,
 			geometry: this.geometry()
-		})
+		}
+		this.core = this.paper.callCindyJS(argsDict)
+		console.log('created core', this.core)
 	}
 
 	geometry() { return [] }
@@ -70,8 +96,6 @@ export class CindyCanvas extends LinkableMobject {
 	localYMin() { return 0 }
 	localYMax() { return this.height }
 
-
-
 }
 
 
@@ -79,21 +103,24 @@ export class WaveCindyCanvas extends CindyCanvas {
 	constructor(argsDict) {
 		super(argsDict)
 		this.setDefaults({
-			wavelength: 0.01,
+			wavelength: 1,
 			frequency: 1
 		})
-		this.Wcode = `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f));`
 		this.inputNames = ['wavelength', 'frequency']
-		this.script.textContent = `drawcmd();`
-		this.createCore()
-		this.core.evokeCS(this.Wcode)
 		this.update(argsDict)
+	}
+
+	initCode() {
+		let l = 0.1*(this.wavelength || 0.1)
+		let f = 10*(this.frequency || 1)
+		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););` + super.initCode()
 	}
 
 	drawCode() {
 		let l = this.wavelength || 1
 		let f = this.frequency || 1
-		return `drawcmd() := (colorplot([0, W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}), 0]););`
+		console.log(l)
+		return `drawcmd();`
 	}
 
 	geometry() {
@@ -107,7 +134,16 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	update(argsDict) {
-		try { this.core.evokeCS(this.drawCode()) } catch { }
+		let l = 0.1*(this.wavelength || 0.1)
+		let f = 10*(this.frequency || 1)
+		console.log('updating WCC')
+		if (this.core != undefined) {
+			console.log('evoking', this.core)
+			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
+		}
+		// if (this.drawScript != undefined) {
+		// 	this.drawScript.textContent = this.drawCode()
+		// }
 		super.update(argsDict)
 	}
 }

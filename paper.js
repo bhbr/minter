@@ -247,25 +247,10 @@ class Paper extends LinkableMobject {
 	callCindyJS(argsDict) {
 		return CindyJS(argsDict)
 	}
+
 }
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
-
-function createWCC() {
-	let c = new WaveCindyCanvas({paper: paper, anchor: Vertex.origin(), width: 200, height: 200})
-}
-
-//setTimeout(createWCC, 100)
-
-let d = new DrawnRectangle({startPoint: Vertex.origin(), endPoint: new Vertex(200, 200)})
-
-paper.add(d)
-
-function dissolveD() {
-	d.dissolveInto(paper)
-}
-
-setTimeout(dissolveD, 100)
 
 
 
