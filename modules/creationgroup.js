@@ -44,7 +44,7 @@ export class CreationGroup extends CreatedMobject {
 	dissolveInto(superMobject) {
 		superMobject.remove(this)
 		this.creations[this.visibleCreation].dissolveInto(superMobject)
-		//superMobject.updateIOList()
+		superMobject.updateIOList()
 	}
 
 

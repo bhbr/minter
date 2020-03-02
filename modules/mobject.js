@@ -51,16 +51,19 @@ export class Mobject {
 		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
 		this.disableDragging()
 
-		let p = this
-		while (p != undefined && p.constructor.name != 'Paper') { p = p.parent }
-		this.paper = p
-
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
 	}
 
+	paper() {
+		let p = this
+		while (p != undefined && p.constructor.name != 'Paper') {
+			p = p.parent
+		}
+		return p
+	}
 
 	enableDragging() {
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -168,7 +171,7 @@ export class Mobject {
 		let mob = this
 		if (mob.constructor.name == 'CindyCanvas') {
 			if (frame == this) { return t }
-			else if (frame == this.paper) {
+			else if (frame == (this.paper())) {
 				t.e = this.anchor.x
 				t.f = this.anchor.y
 				return t
@@ -506,21 +509,21 @@ export class Mobject {
 		return this.relativeTransform(frame).appliedTo(this.localCenter())
 	}
 
-	globalXMin() { return this.xMin(this.paper) }
-	globalXMax() { return this.xMax(this.paper) }
-	globalYMin() { return this.yMin(this.paper) }
-	globalYMax() { return this.yMax(this.paper) }
-	globalULCorner() { return this.ulCorner(this.paper) }
-	globalURCorner() { return this.urCorner(this.paper) }
-	globalLLCorner() { return this.llCorner(this.paper) }
-	globalLRCorner() { return this.lrCorner(this.paper) }
-	globalMidX() { return this.midX(this.paper) }
-	globalMidY() { return this.midY(this.paper) }
-	globalLeftCenter() { return this.leftCenter(this.paper) }
-	globalRightCenter() { return this.rightCenter(this.paper) }
-	globalTopCenter() { return this.topCenter(this.paper) }
-	globalBottomCenter() { return this.bottomCenter(this.paper) }
-	globalCenter() { return this.center(this.paper) }
+	globalXMin() { return this.xMin(this.paper()) }
+	globalXMax() { return this.xMax(this.paper()) }
+	globalYMin() { return this.yMin(this.paper()) }
+	globalYMax() { return this.yMax(this.paper()) }
+	globalULCorner() { return this.ulCorner(this.paper()) }
+	globalURCorner() { return this.urCorner(this.paper()) }
+	globalLLCorner() { return this.llCorner(this.paper()) }
+	globalLRCorner() { return this.lrCorner(this.paper()) }
+	globalMidX() { return this.midX(this.paper()) }
+	globalMidY() { return this.midY(this.paper()) }
+	globalLeftCenter() { return this.leftCenter(this.paper()) }
+	globalRightCenter() { return this.rightCenter(this.paper()) }
+	globalTopCenter() { return this.topCenter(this.paper()) }
+	globalBottomCenter() { return this.bottomCenter(this.paper()) }
+	globalCenter() { return this.center(this.paper()) }
 
 	centerAt(newCenter, frame) {
 		if (!frame) { frame = this }

@@ -96,6 +96,7 @@ class Paper extends LinkableMobject {
 		this.dragAnchorStart = this.draggedMobject.anchor.copy()
 		
 		this.draggedIOList = undefined
+		if (this.dependencyMap == undefined) { return }
 		for (let ioList of this.dependencyMap.children) {
 			if (ioList.mobject == this.draggedMobject) {
 				this.draggedIOList = ioList
@@ -111,14 +112,17 @@ class Paper extends LinkableMobject {
 		let dr = dragPoint.subtract(this.dragPointStart)
 
 		this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
-		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))
-		this.draggedIOList.update()
 		
 		if (this.draggedMobject instanceof CindyCanvas) {
 			this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
 			this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
 		}
 		this.draggedMobject.update()
+
+		if (this.dependencyMap == undefined) { return }
+		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))
+		this.draggedIOList.update()
+		this.dependencyMap.update()
 	}
 
 	endDragging(e) {
@@ -152,7 +156,7 @@ class Paper extends LinkableMobject {
 			this.setDragging(value)
 			break
 		case 'toggleLinks':
-			if (value) { this.showAllLinks() }
+			if (value == 1 || value == '1') { this.showAllLinks() }
 			else { this.hideAllLinks() }
 			break
 		}
@@ -205,7 +209,6 @@ class Paper extends LinkableMobject {
 	}
 
 	addCindy(cindyCanvas) {
-		console.log('adding Cindy')
 		// document.querySelector('#paper-container').insertBefore(
 		// 	cindyCanvas.view, document.querySelector('#paper-console')
 		// )

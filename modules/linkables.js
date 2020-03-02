@@ -9,7 +9,7 @@ export class LinkBullet extends Circle {
 	constructor(argsDict) {
 		super(argsDict)
 		this.setAttributes({        
-			radius: 5,
+			radius: 10,
 			fillOpacity: 0,
 			strokeColor: rgb(1, 1, 1)
 		})
@@ -25,6 +25,7 @@ export class InputList extends RoundedRectangle {
 			cornerRadius: 30,
 			fillColor: rgb(1, 1, 1),
 			fillOpacity: 0.1,
+			width: 150,
 			height: this.getHeight()
 		})
 		this.updateView()
@@ -33,8 +34,8 @@ export class InputList extends RoundedRectangle {
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
 			let t = new TextLabel({text: name, textAnchor: 'left'})
-			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(15, 0)
+			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
+			t.anchor = c.anchor.translatedBy(25, 0)
 			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
@@ -44,7 +45,7 @@ export class InputList extends RoundedRectangle {
 	getHeight() {
 		let l = this.listInputNames.length
 		if (l == 0) { return 0 }
-		else { return 20 + 15 * this.listInputNames.length }
+		else { return 40 + 25 * this.listInputNames.length }
 	}
 }
 
@@ -58,6 +59,7 @@ export class OutputList extends RoundedRectangle {
 			cornerRadius: 30,
 			fillColor: rgb(1, 1, 1),
 			fillOpacity: 0.3,
+			width: 150,
 			height: this.getHeight()
 		})
 		this.updateView()
@@ -66,8 +68,8 @@ export class OutputList extends RoundedRectangle {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
 			let t = new TextLabel({text: name, textAnchor: 'left'})
-			c.anchor = new Vertex([20, 3 + 15 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(15, 0)
+			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
+			t.anchor = c.anchor.translatedBy(25, 0)
 			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
@@ -77,7 +79,7 @@ export class OutputList extends RoundedRectangle {
 	getHeight() {
 		let l = this.listOutputNames.length
 		if (l == 0) { return 0 }
-		else { return 20 + 15 * this.listOutputNames.length }
+		else { return 40 + 25 * this.listOutputNames.length }
 	}
 }
 
@@ -106,10 +108,13 @@ export class DependencyMap extends MGroup {
 			this.editedLinkLine = new LinkLine({
 				startPoint: t.center(this),
 				source: t.mobject,
-				inputName: t.inputName
+				inputName: t.inputName,
+				startHook: t,
+				superMobject: this.superMobject
 			})
 			this.add(this.editedLinkLine)
 		}
+		this.startMobject = t.mobject
 	}
 
 	selfHandlePointerMove(e) {
@@ -120,8 +125,26 @@ export class DependencyMap extends MGroup {
 
 
 	selfHandlePointerUp(e) {
-		this.editedLinkLine.dissolveInto(this)
-		this.linkLines.push(this.editedLinkLine)
+		let line = this.editedLinkLine
+		let t = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
+		// actually this is the Circle that we dragged, not the LinkBullet we snapped it to
+		for (let iol of this.children) {
+			if (!(iol instanceof IOList)) { continue }
+			for (let b of iol.inputList.children) {
+				if (!(b instanceof LinkBullet)) { continue }
+					let bc = b.globalCenter()
+					let tc = t.globalCenter()
+				if (bc.x == tc.x && bc.y == tc.y) {
+					t = b
+					break
+				}
+			}
+		}
+		line.target = t.mobject
+		line.endHook = t
+		line.dissolveInto(this)
+		this.linkLines.push(line)
+
 		this.editedLinkLine = undefined
 		this.pointerUpVertex = pointerEventVertex(e)
 	}
@@ -186,13 +209,12 @@ export class DependencyMap extends MGroup {
 		let q = argsDict['toPoint']
 		let [source, outputName] = this.getOutputFromVertex(p)
 		let [target, inputName] = this.getInputFromVertex(q)
-		console.log(source, outputName)
-		console.log(target, inputName)
 		if (source == null || target == null) {
 			this.remove(this.editedLinkLine)
 			return
 		}
 		source.addDependency(outputName, target, inputName)
+		this.addDependency(null, this.editedLinkLine, null)
 		source.update()
 
 	}
@@ -207,7 +229,7 @@ export class LinkLine extends CreatedMobject {
 		super(argsDict)
 		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
-			radius: 5,
+			radius: 8,
 			fillOpacity: 1,
 			anchor: this.startPoint
 		})
@@ -217,7 +239,7 @@ export class LinkLine extends CreatedMobject {
 			strokeWidth: 3
 		})
 		this.endBullet = new Circle({
-			radius: 5,
+			radius: 8,
 			fillOpacity: 1,
 			anchor: this.startPoint.copy()
 		})
@@ -238,10 +260,27 @@ export class LinkLine extends CreatedMobject {
 	updateFromTip(q) {
 		this.endBullet.anchor.copyFrom(q)
 		this.line.endPoint.copyFrom(q)
-		this.update() // why does this not work?
+		//this.update() // why does this not work?
 		this.endBullet.update()
 		this.line.update()
 		this.endPoint.copyFrom(q)
+	}
+
+	update(argsDict) {
+		if (this.startHook != undefined && this.startBullet != undefined) {
+			this.startBullet.centerAt(this.startHook.center(this.superMobject), this.superMobject)
+		}
+
+		if (this.endHook != undefined && this.endBullet != undefined) {
+			this.endBullet.centerAt(this.endHook.center(this.superMobject), this.superMobject)
+		}
+		if (this.line != undefined) {
+			this.line.update({
+				startPoint: this.startHook.center(this.superMobject),
+				endPoint: this.endHook.center(this.superMobject)
+			})
+		}
+		super.update(argsDict)
 	}
 }
 
@@ -268,7 +307,7 @@ export class LinkableMobject extends Mobject {
 			this.dependencyMap.show()
 			return
 		}
-		this.dependencyMap = new DependencyMap()
+		this.dependencyMap = new DependencyMap({ superMobject: this })
 		this.dependencyMap.mobject = this
 		this.add(this.dependencyMap)
 		for (let submob of this.children) {
@@ -300,28 +339,20 @@ export class LinkableMobject extends Mobject {
 
 	hideLinksOfSubmobs() {
 		this.dependencyMap.hide()
-		console.log('hiding for', this)
 	}
 
-	// updateIOList() {
-	// 	if (this.dependencyMap == undefined) { return }
-	// 	for (let submob of this.children) {
-	// 		var alreadyLinked = false
-	// 		for (let ioList of this.dependencyMap.children) {
-	// 			if (!(ioList instanceof IOList)) { continue }
-	// 			if (ioList.mobject == submob) { alreadyLinked = true }
-	// 		}
-	// 		if (!alreadyLinked) {
-	// 			this.createIOListForMobject(submob)
-	// 		}
-	// 	}
-	// }
-
-	endSelfDragging(e) {
-		console.log('ending here')
-		let dp = pointerEventVertex(e).subtract(this.dragPointStart)
-		this.dependencyMap.anchor.translateBy(dp)
-		super.endSelfDragging(e)
+	updateIOList() {
+		if (this.dependencyMap == undefined) { return }
+		for (let submob of this.children) {
+			var alreadyLinked = false
+			for (let ioList of this.dependencyMap.children) {
+				if (!(ioList instanceof IOList)) { continue }
+				if (ioList.mobject == submob) { alreadyLinked = true }
+			}
+			if (!alreadyLinked) {
+				this.createIOListForMobject(submob)
+			}
+		}
 	}
 
 

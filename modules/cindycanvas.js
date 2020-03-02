@@ -75,7 +75,6 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 	createCore() {
-		console.log('creating core')
 		let argsDict = {
 			scripts: "cs*",
 			autoplay: true,
@@ -83,7 +82,6 @@ export class CindyCanvas extends LinkableMobject {
 			geometry: this.geometry()
 		}
 		this.core = this.paper.callCindyJS(argsDict)
-		console.log('created core', this.core)
 	}
 
 	geometry() { return [] }
@@ -135,9 +133,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 	update(argsDict) {
 		let l = 0.1*(this.wavelength || 1)
 		let f = 10*(this.frequency || 1)
-		console.log('update:', this.wavelength)
 		if (this.core != undefined) {
-			console.log('evoking', this.core)
 			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
 		}
 		// if (this.drawScript != undefined) {
