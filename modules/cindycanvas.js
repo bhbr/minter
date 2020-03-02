@@ -111,15 +111,14 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	initCode() {
-		let l = 0.1*(this.wavelength || 0.1)
+		let l = 0.1*(this.wavelength || 1)
 		let f = 10*(this.frequency || 1)
 		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););` + super.initCode()
 	}
 
 	drawCode() {
-		let l = this.wavelength || 1
-		let f = this.frequency || 1
-		console.log(l)
+		let l = 0.1*(this.wavelength || 1)
+		let f = 10*(this.frequency || 1)
 		return `drawcmd();`
 	}
 
@@ -134,9 +133,9 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	update(argsDict) {
-		let l = 0.1*(this.wavelength || 0.1)
+		let l = 0.1*(this.wavelength || 1)
 		let f = 10*(this.frequency || 1)
-		console.log('updating WCC')
+		console.log('update:', this.wavelength)
 		if (this.core != undefined) {
 			console.log('evoking', this.core)
 			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
@@ -190,7 +189,7 @@ export class DrawnRectangle extends CreatedMobject {
 			anchor: this.p1,
 			width: w,
 			height: h,
-			wavelength: 0.01
+			wavelength: 0.1
 		}) // auto-adds to parent
 		cindy.update()
 	}
