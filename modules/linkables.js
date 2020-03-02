@@ -193,6 +193,7 @@ export class DependencyMap extends MGroup {
 			return
 		}
 		source.addDependency(outputName, target, inputName)
+		source.update()
 
 	}
 
