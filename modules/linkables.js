@@ -300,11 +300,29 @@ export class LinkableMobject extends Mobject {
 
 	hideLinksOfSubmobs() {
 		this.dependencyMap.hide()
+		console.log('hiding for', this)
 	}
 
+	// updateIOList() {
+	// 	if (this.dependencyMap == undefined) { return }
+	// 	for (let submob of this.children) {
+	// 		var alreadyLinked = false
+	// 		for (let ioList of this.dependencyMap.children) {
+	// 			if (!(ioList instanceof IOList)) { continue }
+	// 			if (ioList.mobject == submob) { alreadyLinked = true }
+	// 		}
+	// 		if (!alreadyLinked) {
+	// 			this.createIOListForMobject(submob)
+	// 		}
+	// 	}
+	// }
 
-
-
+	endSelfDragging(e) {
+		console.log('ending here')
+		let dp = pointerEventVertex(e).subtract(this.dragPointStart)
+		this.dependencyMap.anchor.translateBy(dp)
+		super.endSelfDragging(e)
+	}
 
 
 

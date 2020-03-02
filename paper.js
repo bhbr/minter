@@ -94,6 +94,15 @@ class Paper extends LinkableMobject {
 		}
 		this.dragPointStart = pointerEventVertex(e)
 		this.dragAnchorStart = this.draggedMobject.anchor.copy()
+		
+		this.draggedIOList = undefined
+		for (let ioList of this.dependencyMap.children) {
+			if (ioList.mobject == this.draggedMobject) {
+				this.draggedIOList = ioList
+				break
+			}
+		}
+		this.dragIOListAnchorStart = this.draggedIOList.anchor.copy()
 	}
 
 	dragging(e) {
@@ -102,6 +111,9 @@ class Paper extends LinkableMobject {
 		let dr = dragPoint.subtract(this.dragPointStart)
 
 		this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
+		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))
+		this.draggedIOList.update()
+		
 		if (this.draggedMobject instanceof CindyCanvas) {
 			this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
 			this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
