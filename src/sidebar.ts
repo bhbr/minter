@@ -1,0 +1,2 @@
+
+let paper: object = null
