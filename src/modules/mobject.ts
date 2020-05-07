@@ -29,6 +29,7 @@ export class Mobject {
 	vertices: Array<Vertex>
 	children: Array<Mobject>
 	dependencies: Array<Dependency>
+	snappablePoints: Array<any> = [] // workaround, don't ask
 
 	passAlongEvents: boolean // to event target
 	visible: boolean
@@ -266,9 +267,9 @@ export class Mobject {
 	}
 
 
-	get fillColor(): string { return this.view['fill-color'] }
+	get fillColor(): string { return this.view.style.fill }
 	set fillColor(newValue: string) {
-		this.view.setAttribute('fill-color', newValue)
+		this.view.style.fill = newValue
 		if (this.children == undefined) { return }
 		for (let submob of this.children || []) {
 			submob.fillColor = newValue
@@ -285,9 +286,9 @@ export class Mobject {
 		}
 	}
 
-	get fillOpacity(): number { return this.view['fill-opacity'] }
+	get fillOpacity(): number { return parseFloat(this.view.style.fillOpacity) }
 	set fillOpacity(newValue: number) {
-		this.view.setAttribute('fillOpacity', newValue.toString())
+		this.view.style.fillOpacity = newValue.toString()
 		this.updateView()
 	}
 	// TODO: rethink this (commented out for circles)
@@ -303,9 +304,10 @@ export class Mobject {
 			}
 		}
 	}
+
 	get strokeColor(): string { return this.view.style.stroke }
 	set strokeColor(newValue: string) {
-		this.view.style['stroke-color'] = newValue
+		this.view.style.stroke = newValue
 		if (this.children == undefined) { return }
 		for (let submob of this.children || []) {
 			submob.strokeColor = newValue
@@ -322,9 +324,9 @@ export class Mobject {
 		}
 	}
 
-	get strokeWidth(): number { return this.view['stroke-width'] }
+	get strokeWidth(): number { return parseFloat(this.view.style.strokeWidth) }
 	set strokeWidth(newValue: number) {
-		this.view.setAttribute('stroke-width', newValue.toString())
+		this.view.style.strokeWidth = newValue.toString()
 		for (let submob of this.children || []) {
 			submob.strokeWidth = newValue
 		}
@@ -627,6 +629,9 @@ export class Mobject {
 	addDependent(target: Mobject) {
 		this.addDependency(null, target, null)
 	}
+
+	// empty methods as workaround (don't ask)
+	removeFreePoint(fp: any) { }
 
 	// createPopover(e) {
 	//     this.popover = new Popover(this, 200, 300, 'right')

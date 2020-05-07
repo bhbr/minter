@@ -3,10 +3,6 @@ import { Vertex } from './transform'
 import { Mobject, MGroup } from './mobject'
 import { Circle, TwoPointCircle } from './shapes'
 import { Segment, Ray, Line } from './arrows'
-import { Paper } from 'paper'
-
-const paperView: HTMLElement = document.querySelector('#paper')
-const paper: Paper = paperView['mobject']
 
 export class CreatedMobject extends Mobject {
 
@@ -134,10 +130,7 @@ export class DrawnArrow extends CreatedMobject {
 		this.update()
 	}
 
-	dissolveInto(superMobject: Mobject) {
-
-		if (!(superMobject instanceof Paper)) { return }
-		let paper = superMobject as Paper
+	dissolveInto(paper: Mobject) {
 
 		paper.removeFreePoint(this.startFreePoint)
 		paper.removeFreePoint(this.endFreePoint)
@@ -307,11 +300,12 @@ export class DrawnCircle extends CreatedMobject {
 		this.update()
 	}
 
-	dissolveInto(superMobject: Paper) {
-		superMobject.removeFreePoint(this.freeMidpoint)
-		superMobject.removeFreePoint(this.freeOuterPoint)
+	dissolveInto(paper: Mobject) {
 
-		for (let fq of superMobject.snappablePoints) {
+		paper.removeFreePoint(this.freeMidpoint)
+		paper.removeFreePoint(this.freeOuterPoint)
+
+		for (let fq of paper.snappablePoints) {
 			let q = fq.midPoint
 			if (this.midPoint.x == q.x && this.midPoint.y == q.y) {
 				this.midPoint = fq.midPoint
@@ -320,7 +314,7 @@ export class DrawnCircle extends CreatedMobject {
 				break
 			}
 		}
-		for (let fq of superMobject.snappablePoints) {
+		for (let fq of paper.snappablePoints) {
 			let q = fq.midPoint
 			if (this.outerPoint.x == q.x && this.outerPoint.y == q.y) {
 				this.outerPoint = fq.midPoint
@@ -330,10 +324,10 @@ export class DrawnCircle extends CreatedMobject {
 			}
 		}
 
-		superMobject.add(this.freeMidpoint)
-		superMobject.add(this.freeOuterPoint)
+		paper.add(this.freeMidpoint)
+		paper.add(this.freeOuterPoint)
 		
-		superMobject.remove(this.circle)
+		paper.remove(this.circle)
 		this.circle = new TwoPointCircle({
 			midPoint: this.midPoint,
 			outerPoint: this.outerPoint
@@ -341,7 +335,7 @@ export class DrawnCircle extends CreatedMobject {
 		this.circle.strokeColor = this.strokeColor
 		this.freeMidpoint.addDependent(this.circle)
 		this.freeOuterPoint.addDependent(this.circle)
-		superMobject.add(this.circle)
+		paper.add(this.circle)
 
 	}
 
