@@ -46,7 +46,7 @@ export class Vertex extends Array {
 	update(otherVertex: Vertex) { this.copyFrom(otherVertex) }
 
 	copy(): Vertex {
-		let ret: Vertex = new Vertex()
+		let ret = new Vertex()
 		ret.copyFrom(this)
 		return ret
 	}
@@ -98,7 +98,7 @@ export class Vertex extends Array {
 	static vertices(listOfComponents: Array<Array<number>>): Array<Vertex> {
 		let listOfVertices: Array<Vertex> = []
 		for (let components of listOfComponents) {
-			let v: Vertex = new Vertex(components)
+			let v = new Vertex(components)
 			listOfVertices.push(v)
 		}
 		return listOfVertices

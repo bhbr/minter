@@ -21,7 +21,7 @@ export class Dependency {
 export class Mobject {
 
 	eventTarget: Mobject
-	view: SVGElement
+	view: SVGElement | HTMLElement
 	_parent: Mobject
 
 	_transform: Transform
@@ -29,6 +29,7 @@ export class Mobject {
 	vertices: Array<Vertex>
 	children: Array<Mobject>
 	dependencies: Array<Dependency>
+
 	passAlongEvents: boolean // to event target
 	visible: boolean
 	draggable: boolean // by outside forces, that is
@@ -36,8 +37,7 @@ export class Mobject {
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 
-	constructor(argsDict: object) {
-		argsDict = argsDict || {}
+	constructor(argsDict: object = {}) {
 		this.eventTarget = null
 		if (argsDict['view'] == undefined) {
 			this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
@@ -90,13 +90,16 @@ export class Mobject {
 	boundPointerUp(e: LocatedEvent) { }
 	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
 
-	paper(): Mobject {
+	getPaper(): Mobject {
 		let p: Mobject = this
 		while (p != undefined && p.constructor.name != 'Paper') {
 			p = p.parent
 		}
 		return p
 	}
+
+	get superMobject(): Mobject { return this.parent }
+	set superMobject(newValue: Mobject) { this.parent = newValue }
 
 	enableDragging() {
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -199,7 +202,7 @@ export class Mobject {
 		let mob: Mobject = this
 		if (mob.constructor.name == 'CindyCanvas') {
 			if (frame == this) { return t }
-			else if (frame == (this.paper())) {
+			else if (frame == (this.getPaper())) {
 				t.e = this.anchor.x
 				t.f = this.anchor.y
 				return t
@@ -335,6 +338,16 @@ export class Mobject {
 				submob.setStrokeWidth(newWidth, true)
 			}
 		}
+	}
+
+	get submobjects(): Array<Mobject> { return this.children }
+	set submobjects(newValue: Array<Mobject>) {
+		this.children = newValue
+	}
+
+	get submobs(): Array<Mobject> { return this.submobjects }
+	set submobs(newValue: Array<Mobject>) {
+		this.submobs = newValue
 	}
 
 	add(submob: Mobject) {
@@ -537,21 +550,21 @@ export class Mobject {
 		return this.relativeTransform(frame).appliedTo(this.localCenter())
 	}
 
-	globalXMin(): number { return this.xMin(this.paper()) }
-	globalXMax(): number { return this.xMax(this.paper()) }
-	globalYMin(): number { return this.yMin(this.paper()) }
-	globalYMax(): number { return this.yMax(this.paper()) }
-	globalULCorner(): Vertex { return this.ulCorner(this.paper()) }
-	globalURCorner(): Vertex { return this.urCorner(this.paper()) }
-	globalLLCorner(): Vertex { return this.llCorner(this.paper()) }
-	globalLRCorner(): Vertex { return this.lrCorner(this.paper()) }
-	globalMidX(): number { return this.midX(this.paper()) }
-	globalMidY(): number { return this.midY(this.paper()) }
-	globalLeftCenter(): Vertex { return this.leftCenter(this.paper()) }
-	globalRightCenter(): Vertex { return this.rightCenter(this.paper()) }
-	globalTopCenter(): Vertex { return this.topCenter(this.paper()) }
-	globalBottomCenter(): Vertex { return this.bottomCenter(this.paper()) }
-	globalCenter(): Vertex { return this.center(this.paper()) }
+	globalXMin(): number { return this.xMin(this.getPaper()) }
+	globalXMax(): number { return this.xMax(this.getPaper()) }
+	globalYMin(): number { return this.yMin(this.getPaper()) }
+	globalYMax(): number { return this.yMax(this.getPaper()) }
+	globalULCorner(): Vertex { return this.ulCorner(this.getPaper()) }
+	globalURCorner(): Vertex { return this.urCorner(this.getPaper()) }
+	globalLLCorner(): Vertex { return this.llCorner(this.getPaper()) }
+	globalLRCorner(): Vertex { return this.lrCorner(this.getPaper()) }
+	globalMidX(): number { return this.midX(this.getPaper()) }
+	globalMidY(): number { return this.midY(this.getPaper()) }
+	globalLeftCenter(): Vertex { return this.leftCenter(this.getPaper()) }
+	globalRightCenter(): Vertex { return this.rightCenter(this.getPaper()) }
+	globalTopCenter(): Vertex { return this.topCenter(this.getPaper()) }
+	globalBottomCenter(): Vertex { return this.bottomCenter(this.getPaper()) }
+	globalCenter(): Vertex { return this.center(this.getPaper()) }
 
 	centerAt(newCenter: Vertex, frame: Mobject) {
 		if (!frame) { frame = this }
@@ -602,7 +615,7 @@ export class Mobject {
 
 
 	addDependency(outputName: string, target: Mobject, inputName: string) {
-		let dep: Dependency = new Dependency({
+		let dep = new Dependency({
 			source: this,
 			outputName: outputName,
 			target: target,
@@ -757,7 +770,7 @@ export class CurvedShape extends Mobject {
 	bezierPoints: Array<Vertex>
 	path: SVGElement
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.setDefaults({
 			fillColor: rgb(1, 1, 1),
@@ -841,6 +854,7 @@ export class TextLabel extends Mobject {
 
 	_text: string
 	textAnchor: string
+	color: string
 
 	constructor(argsDict: object) {
 		super(argsDict)
