@@ -27,7 +27,7 @@ export class Mobject {
 	_transform: Transform
 	_anchor: Vertex
 	vertices: Array<Vertex>
-	children: Array<Mobject>
+	children: Array<Mobject> = []
 	dependencies: Array<Dependency>
 	snappablePoints: Array<any> = [] // workaround, don't ask
 
