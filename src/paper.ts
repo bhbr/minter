@@ -30,7 +30,7 @@ export class Paper extends LinkableMobject {
 	draggedIOList: IOList
 	dragIOListAnchorStart: Vertex
 
-	constructor(argsDict) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.children = []
 		this.cindys = []

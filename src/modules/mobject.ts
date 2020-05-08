@@ -172,15 +172,14 @@ export class Mobject {
 		this.eventTarget = null
 	}
 
-	setAttributes(argsDict: object) {
-		argsDict = argsDict || {}
+	setAttributes(argsDict: object = {}) {
 		for (let [key, value] of Object.entries(argsDict)) {
 			if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
 			else { this[key] = value }
 		}
 	}
 
-	setDefaults(argsDict: object) {
+	setDefaults(argsDict: object = {}) {
 		for (let [key, value] of Object.entries(argsDict)) {
 			if (this[key] != undefined) { continue }
 			if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
@@ -267,9 +266,11 @@ export class Mobject {
 	}
 
 
-	get fillColor(): string { return this.view.style.fill }
+	get fillColor(): string {
+		return this.view.style['fill']
+	}
 	set fillColor(newValue: string) {
-		this.view.style.fill = newValue
+		this.view.style['fill'] = newValue
 		if (this.children == undefined) { return }
 		for (let submob of this.children || []) {
 			submob.fillColor = newValue
@@ -286,9 +287,9 @@ export class Mobject {
 		}
 	}
 
-	get fillOpacity(): number { return parseFloat(this.view.style.fillOpacity) }
+	get fillOpacity(): number { return parseFloat(this.view.style['fill-opacity']) }
 	set fillOpacity(newValue: number) {
-		this.view.style.fillOpacity = newValue.toString()
+		this.view.style['fill-opacity'] = newValue.toString()
 		this.updateView()
 	}
 	// TODO: rethink this (commented out for circles)
@@ -305,9 +306,9 @@ export class Mobject {
 		}
 	}
 
-	get strokeColor(): string { return this.view.style.stroke }
+	get strokeColor(): string { return this.view.style['stroke'] }
 	set strokeColor(newValue: string) {
-		this.view.style.stroke = newValue
+		this.view.style['stroke'] = newValue
 		if (this.children == undefined) { return }
 		for (let submob of this.children || []) {
 			submob.strokeColor = newValue
@@ -324,9 +325,9 @@ export class Mobject {
 		}
 	}
 
-	get strokeWidth(): number { return parseFloat(this.view.style.strokeWidth) }
+	get strokeWidth(): number { return parseFloat(this.view.style['strokeWidth']) }
 	set strokeWidth(newValue: number) {
-		this.view.style.strokeWidth = newValue.toString()
+		this.view.style['strokeWidth'] = newValue.toString()
 		for (let submob of this.children || []) {
 			submob.strokeWidth = newValue
 		}
@@ -708,8 +709,6 @@ export class Polygon extends Mobject {
 		this.path['mobject'] = this
 		this.view.appendChild(this.path) // why not just add?
 		this.update()
-
-
 	}
 
 	updateView() {
@@ -719,7 +718,6 @@ export class Polygon extends Mobject {
 		if (this.path == undefined || this.vertices.length == 0) { return }
 		this.path.setAttribute('d', pathString)
 		this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1))
-		this.path.setAttribute('fill-opacity', (this.fillOpacity || 1).toString())
 		this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1))
 		this.path.setAttribute('stroke-width', (this.strokeWidth || 1).toString())
 		super.updateView()
@@ -777,14 +775,15 @@ export class CurvedShape extends Mobject {
 
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		this.setDefaults({
-			fillColor: rgb(1, 1, 1),
-			fillOpacity: 0.5
-		})
 		this.bezierPoints = []
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.path['mobject'] = this
 		this.view.appendChild(this.path)
+		this.setDefaults({
+			fillColor: rgb(1, 1, 1),
+			fillOpacity: 0.5
+		})
+		this.fillColor = rgb(0.5, 0.5, 0.5)
 	}
 
 	updateBezierPoints() { }
@@ -797,10 +796,10 @@ export class CurvedShape extends Mobject {
 	updateView() {
 		this.updateBezierPoints()
 		let pathString: string = CurvedShape.pathString(this.globalBezierPoints())
-		if (this.path && this.bezierPoints.length > 0) {
+		if (this.path && !(pathString.includes("NaN")) && this.bezierPoints.length > 0) {
 			this.path.setAttribute('d', pathString)
 			this.path.setAttribute('fill', this.fillColor)
-			this.path.setAttribute('fill-opacity', this.fillOpacity.toString())
+			this.path.setAttribute('fill-opacity', (this.fillOpacity || 1).toString())
 		}
 		super.updateView()
 	}
@@ -838,6 +837,26 @@ export class CurvedShape extends Mobject {
 			this.path.setAttribute('stroke', newValue)
 		}
 	}
+
+	get fillColor(): string { return super.fillColor }
+	set fillColor(newValue: string) {
+		if (this.path != undefined) {
+			this.path.setAttribute('fill', newValue)
+		}
+		super.fillColor = newValue
+	}
+
+	get fillOpacity(): number { return super.fillOpacity }
+	set fillOpacity(newValue: number) {
+		if (this.path != undefined) {
+			this.path.setAttribute('fill-opacity', newValue.toString())
+		}
+		super.fillOpacity = newValue
+	}
+	// TODO: rethink this (commented out for circles)
+	//         for (let submob of this.submobjects) {
+	//             submob.fillOpacity = newValue
+	//     
 
 	get vertices(): Array<Vertex> {
 		if (this.bezierPoints == undefined) { return [] }

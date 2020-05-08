@@ -15,9 +15,7 @@ let sidebar: HTMLElement = document.querySelector('#sidebar')
 
 let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
-interface Window {
-	webkit?: any
-}
+interface Window { webkit?: any }
 
 function buttonCenter(index: number): Vertex {
 	let y: number = buttonYOffset + index * (buttonSpacing + 2 * buttonRadius)
@@ -73,7 +71,8 @@ class SidebarButton extends Circle {
 			messages: []
 		})
 		this.setAttributes({
-			radius: buttonRadius
+			radius: buttonRadius,
+			fillOpacity: 0.5
 		})
 
 		this.updateModeIndex(0)
