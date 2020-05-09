@@ -271,10 +271,6 @@ export class Mobject {
 	}
 	set fillColor(newValue: string) {
 		this.view.style['fill'] = newValue
-		if (this.children == undefined) { return }
-		for (let submob of this.children || []) {
-			submob.fillColor = newValue
-		}
 		this.updateView()
 	}
 
@@ -309,10 +305,6 @@ export class Mobject {
 	get strokeColor(): string { return this.view.style['stroke'] }
 	set strokeColor(newValue: string) {
 		this.view.style['stroke'] = newValue
-		if (this.children == undefined) { return }
-		for (let submob of this.children || []) {
-			submob.strokeColor = newValue
-		}
 		this.updateView()
 	}
 
@@ -328,9 +320,6 @@ export class Mobject {
 	get strokeWidth(): number { return parseFloat(this.view.style['strokeWidth']) }
 	set strokeWidth(newValue: number) {
 		this.view.style['strokeWidth'] = newValue.toString()
-		for (let submob of this.children || []) {
-			submob.strokeWidth = newValue
-		}
 		this.updateView()
 	}
 
@@ -358,7 +347,7 @@ export class Mobject {
 		if (!this.children.includes(submob)) {
 			this.children.push(submob)
 		}
-		this.view.appendChild(submob.view)
+		this.view.append(submob.view)
 		submob.updateView()
 	}
 

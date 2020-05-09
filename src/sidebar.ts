@@ -71,8 +71,7 @@ class SidebarButton extends Circle {
 			messages: []
 		})
 		this.setAttributes({
-			radius: buttonRadius,
-			fillOpacity: 0.5
+			radius: buttonRadius
 		})
 
 		this.updateModeIndex(0)
@@ -97,7 +96,8 @@ class SidebarButton extends Circle {
 	get baseColor(): string { return this._baseColor }
 	set baseColor(newColor: string) {
 		this._baseColor = newColor
-		this.fillColor = newColor
+		this.setFillColor(newColor, false)
+
 	}
 	
 	get locationIndex(): number { return this._locationIndex }
