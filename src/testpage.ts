@@ -1,5 +1,5 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
-import { Vertex } from './modules/transform'
+import { Vertex, Transform } from './modules/transform'
 import { Mobject, MGroup } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Segment, Ray, Line } from './modules/arrows'
@@ -344,7 +344,10 @@ export class Paper extends LinkableMobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
+let c = new Circle({anchor: new Vertex(100, 100), radius: 25})
+c.anchor = new Vertex(300, 400)
+c.fillColor = rgb(1, 0, 1)
+c.redraw()
 paper.add(c)
 
 

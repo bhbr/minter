@@ -168,7 +168,7 @@ export class BoxSlider extends LinkableMobject {
 //         } else {
 //             console.log('Unknown orientation')
 //         }
-//         this.scrubber.updateView()
+//         this.scrubber.redraw()
 //         this.updateValue()
 //     }
 
@@ -280,7 +280,7 @@ export class BoxSlider extends LinkableMobject {
 //         this.min = this.oldMin - dvalue
 //         this.max = this.oldMax - dvalue
 //         this.scrubber.anchor = this.valueToCoords(this.value)
-//         this.scrubber.updateView()
+//         this.scrubber.redraw()
 //         this.updateScale()
 //     }
 

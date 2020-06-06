@@ -31,7 +31,6 @@ export class CindyCanvas extends LinkableMobject {
 		// this.mainScript.setAttribute('src', 'CindyJS/build/js/Cindy.js')
 		// this.mainScript.onload = this.createCore.bind(this)
 
-		this.view = document.createElement('div')
 		this.view.style['position'] = 'absolute'
 		this.view.style['left'] =  this.anchor.x + 'px'
 		this.view.style['top'] = this.anchor.y + 'px'
@@ -101,7 +100,7 @@ export class CindyCanvas extends LinkableMobject {
 	geometry(): Array<any> { return [] }
 	
 	update(argsDict: object) { }
-	updateView() { }
+	redraw() { }
 
 	localXMin(): number { return 0 }
 	localXMax(): number { return this.width }
@@ -201,7 +200,7 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p2.y = this.startPoint.y
 		this.p4.x = this.startPoint.x
 		this.p4.y = this.endPoint.y
-		this.updateView()
+		this.redraw()
 	}
 
 	dissolveInto(parent: Mobject) {

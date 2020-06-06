@@ -1,7 +1,6 @@
 import { Vertex, Transform } from './transform'
 import { remove, logInto, stringFromPoint, rgb, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './helpers'
 
-
 export class Dependency {
 
 	source: Mobject
@@ -9,7 +8,7 @@ export class Dependency {
 	target: Mobject
 	inputName: string
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		this.source = argsDict['source']
 		this.outputName = argsDict['outputName'] // may be undefined
 		this.target = argsDict['target']
@@ -21,8 +20,13 @@ export class Dependency {
 export class Mobject {
 
 	eventTarget: Mobject
-	view: SVGElement | HTMLElement
+	view: HTMLElement | SVGElement
 	_parent: Mobject
+
+	fillColor: string
+	fillOpacity: number
+	strokeColor: string
+	strokeWidth: number
 
 	_transform: Transform
 	_anchor: Vertex
@@ -33,32 +37,56 @@ export class Mobject {
 
 	passAlongEvents: boolean // to event target
 	visible: boolean
-	draggable: boolean // by outside forces, that is
+	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
 
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 
+	get opacity(): number { return this.fillOpacity }
+	set opacity(newValue: number) { this.fillOpacity = newValue }
+
+	get transform(): Transform {
+		if (this._transform == undefined) {
+			this._transform = Transform.identity()
+		}
+		return this._transform
+	}
+	set transform(newValue: Transform) {
+		if (this._transform == undefined) { this._transform = newValue }
+		else { this._transform.copyFrom(newValue) }
+	}
+
+	get anchor(): Vertex { return this._anchor }
+	set anchor(newValue: Vertex) {
+		if (this._anchor == undefined) { this._anchor = newValue }
+		else { this._anchor.copyFrom(newValue) }
+		this.transform.anchorAt(newValue)
+		this.update()
+	}
+
 	constructor(argsDict: object = {}) {
 		this.eventTarget = null
 		if (argsDict['view'] == undefined) {
-			this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+			this.view = document.createElement('div') // placeholder
 		} else {
 			this.view = argsDict['view']
 		}
-		this.setAttributes(argsDict)
-		this.setDefaults({
+		let defaults: object = {
 			transform: Transform.identity(),
 			anchor: Vertex.origin(),
 			vertices: [],
 			children: [],
 			dependencies: [],
-			strokeWidth: 1,
-			strokeColor: rgb(1, 1, 1),
 			fillColor: rgb(1, 1, 1),
+			fillOpacity: 1,
+			strokeColor: rgb(1, 1, 1),
+			strokeWidth: 1,
 			passAlongEvents: false, // to event target
 			visible: true,
 			draggable: false // by outside forces, that is
-		})
+		}
+		Object.assign(defaults, argsDict)
+		this.setAttributes(defaults)
 		this.view['mobject'] = this
 		this.view.setAttribute('class', this.constructor.name)
 		this.show()
@@ -172,13 +200,42 @@ export class Mobject {
 		this.eventTarget = null
 	}
 
+	properties(): Array<string> {
+		let obj: object = this
+		let properties: Array<string> = []
+		while (obj.constructor.name != 'Object') {
+			properties.push(...Object.getOwnPropertyNames(obj))
+			obj = Object.getPrototypeOf(obj)
+		}
+		return properties
+	}
+
+	setter(key: string): any {
+		let descriptor: any = undefined
+		if (this.properties().includes(key)) {
+			let obj: object = this
+			while (obj.constructor.name != 'Object' && descriptor == undefined) {
+				descriptor = Object.getOwnPropertyDescriptor(obj, key)
+				obj = Object.getPrototypeOf(obj)
+			}
+		}
+		if (descriptor != undefined) { return descriptor.set }
+		else { return undefined }
+	}
+
 	setAttributes(argsDict: object = {}) {
 		for (let [key, value] of Object.entries(argsDict)) {
-			if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-			else { this[key] = value }
+			let setter: any = this.setter(key)
+			if (setter != undefined) {
+				setter.call(this, value)
+			} else {
+				if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
+				else { this[key] = value }
+			}
 		}
 	}
 
+	// flagged for deletion
 	setDefaults(argsDict: object = {}) {
 		for (let [key, value] of Object.entries(argsDict)) {
 			if (this[key] != undefined) { continue }
@@ -201,8 +258,9 @@ export class Mobject {
 		let t = Transform.identity()
 		let mob: Mobject = this
 		if (mob.constructor.name == 'CindyCanvas') {
-			if (frame == this) { return t }
-			else if (frame == (this.getPaper())) {
+			if (frame == this) {
+				return t
+			} else if (frame == (this.getPaper())) {
 				t.e = this.anchor.x
 				t.f = this.anchor.y
 				return t
@@ -236,7 +294,6 @@ export class Mobject {
 		this.setAttributes(argsDict)
 		this.transform.anchorAt(this.anchor)
 		this.updateSubmobs()
-		this.updateView()
 
 		for (let dep of this.dependencies || []) {
 			let outputName: any = this[dep.outputName] // may be undefined
@@ -256,80 +313,15 @@ export class Mobject {
 		}
 	}
 
-
-	updateView() {
-		if (this.view == undefined) { return }
-		if (this.children == undefined) { return }
-		for (let submob of this.children) {
-			submob.updateView()
+	redrawSubmobs() {
+		for (let submob of this.children || []) {
+			submob.redraw()
+			submob.redrawSubmobs()
 		}
 	}
 
-
-	get fillColor(): string {
-		return this.view.style['fill']
-	}
-	set fillColor(newValue: string) {
-		this.view.style['fill'] = newValue
-		this.updateView()
-	}
-
-	setFillColor(newColor: string, propagate: boolean = false) {
-		this.fillColor = newColor
-		if (propagate) {
-			for (let submob of this.children) {
-				submob.setFillColor(newColor, true)
-			}
-		}
-	}
-
-	get fillOpacity(): number { return parseFloat(this.view.style['fill-opacity']) }
-	set fillOpacity(newValue: number) {
-		this.view.style['fill-opacity'] = newValue.toString()
-		this.updateView()
-	}
-	// TODO: rethink this (commented out for circles)
-	//         for (let submob of this.submobjects) {
-	//             submob.fillOpacity = newValue
-	//         }
-
-	setFillOpacity(newOpacity: number, propagate: boolean = false) {
-		this.fillOpacity = newOpacity
-		if (propagate) {
-			for (let submob of this.children) {
-				submob.setFillOpacity(newOpacity, true)
-			}
-		}
-	}
-
-	get strokeColor(): string { return this.view.style['stroke'] }
-	set strokeColor(newValue: string) {
-		this.view.style['stroke'] = newValue
-		this.updateView()
-	}
-
-	setStrokeColor(newColor: string, propagate: boolean = false) {
-		this.strokeColor = newColor
-		if (propagate) {
-			for (let submob of this.children) {
-				submob.setStrokeColor(newColor, true)
-			}
-		}
-	}
-
-	get strokeWidth(): number { return parseFloat(this.view.style['strokeWidth']) }
-	set strokeWidth(newValue: number) {
-		this.view.style['strokeWidth'] = newValue.toString()
-		this.updateView()
-	}
-
-	setStrokeWidth(newWidth: number, propagate: boolean = false) {
-		this.strokeWidth = newWidth
-		if (propagate) {
-			for (let submob of this.children) {
-				submob.setStrokeWidth(newWidth, true)
-			}
-		}
+	redraw() {
+		console.warn('Please subclass Mobject.redraw for class', this.constructor.name)
 	}
 
 	get submobjects(): Array<Mobject> { return this.children }
@@ -348,7 +340,7 @@ export class Mobject {
 			this.children.push(submob)
 		}
 		this.view.append(submob.view)
-		submob.updateView()
+		submob.redraw()
 	}
 
 	remove(submob: Mobject) {
@@ -357,29 +349,13 @@ export class Mobject {
 		submob.parent = undefined
 	}
 
-	get transform(): Transform {
-		if (this._transform == undefined) {
-			this._transform = Transform.identity()
-		}
-		return this._transform
-	}
-	set transform(newValue: Transform) { this._transform.copyFrom(newValue) }
-
-	get anchor(): Vertex { return this._anchor }
-	set anchor(newValue: Vertex) {
-		if (this._anchor == undefined) { this._anchor = newValue }
-		else { this._anchor.copyFrom(newValue) }
-		this.transform.anchorAt(newValue)
-		this.update()
-	}
-
 	hide() {
 		this.visible = false
 		if (this.view != undefined) {
 			this.view.style["visibility"] = "hidden"
 		}
 		for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
-		this.updateView()
+		this.redraw()
 	}
 
 	show() {
@@ -388,9 +364,73 @@ export class Mobject {
 			this.view.style["visibility"] = "visible"
 		}
 		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-		this.updateView()
+		this.redraw()
 	}
 
+	centerAt(newCenter: Vertex, frame: Mobject) {
+		if (!frame) { frame = this }
+		let dr: Vertex = newCenter.subtract(this.center(frame))
+		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
+		this.redraw()
+	}
+
+	startSelfDragging(e: LocatedEvent) {
+		this.dragPointStart = pointerEventVertex(e)
+		this.dragAnchorStart = this.anchor.copy()
+	}
+
+	selfDragging(e: LocatedEvent) {
+		let dragPoint: Vertex = pointerEventVertex(e)
+		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
+		this.anchor.copyFrom(this.dragAnchorStart.add(dr))
+		this.update()
+	}
+
+	endSelfDragging(e: LocatedEvent) {
+		this.dragPointStart = undefined
+		this.dragAnchorStart = undefined
+	}
+
+
+
+
+	dependents(): Array<Mobject> {
+		let dep: Array<Mobject> = []
+		for (let d of this.dependencies) {
+			dep.push(d.target)
+		}
+		return dep
+	}
+
+	allDependents(): Array<Mobject> {
+		let dep: Array<Mobject> = this.dependents()
+		for (let mob of dep) {
+			dep.push(...mob.allDependents())
+		}
+		return dep
+	}
+
+	dependsOn(otherMobject: Mobject): boolean {
+		return otherMobject.allDependents().includes(this)
+	}
+
+
+	addDependency(outputName: string, target: Mobject, inputName: string) {
+		let dep = new Dependency({
+			source: this,
+			outputName: outputName,
+			target: target,
+			inputName: inputName
+		})
+		this.dependencies.push(dep)
+	}
+
+	addDependent(target: Mobject) {
+		this.addDependency(null, target, null)
+	}
+
+	// empty methods as workaround (don't ask)
+	removeFreePoint(fp: any) { }
 
 	localXMin(): number {
 		let xMin = Infinity
@@ -558,70 +598,7 @@ export class Mobject {
 	globalBottomCenter(): Vertex { return this.bottomCenter(this.getPaper()) }
 	globalCenter(): Vertex { return this.center(this.getPaper()) }
 
-	centerAt(newCenter: Vertex, frame: Mobject) {
-		if (!frame) { frame = this }
-		let dr: Vertex = newCenter.subtract(this.center(frame))
-		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
-		this.updateView()
-	}
 
-	startSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.anchor.copy()
-	}
-
-	selfDragging(e: LocatedEvent) {
-		let dragPoint: Vertex = pointerEventVertex(e)
-		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
-		this.anchor.copyFrom(this.dragAnchorStart.add(dr))
-		this.update()
-	}
-
-	endSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = undefined
-		this.dragAnchorStart = undefined
-	}
-
-
-
-
-	dependents(): Array<Mobject> {
-		let dep: Array<Mobject> = []
-		for (let d of this.dependencies) {
-			dep.push(d.target)
-		}
-		return dep
-	}
-
-	allDependents(): Array<Mobject> {
-		let dep: Array<Mobject> = this.dependents()
-		for (let mob of dep) {
-			dep.push(...mob.allDependents())
-		}
-		return dep
-	}
-
-	dependsOn(otherMobject: Mobject): boolean {
-		return otherMobject.allDependents().includes(this)
-	}
-
-
-	addDependency(outputName: string, target: Mobject, inputName: string) {
-		let dep = new Dependency({
-			source: this,
-			outputName: outputName,
-			target: target,
-			inputName: inputName
-		})
-		this.dependencies.push(dep)
-	}
-
-	addDependent(target: Mobject) {
-		this.addDependency(null, target, null)
-	}
-
-	// empty methods as workaround (don't ask)
-	removeFreePoint(fp: any) { }
 
 	// createPopover(e) {
 	//     this.popover = new Popover(this, 200, 300, 'right')
@@ -667,11 +644,59 @@ export class Mobject {
 
 export class MGroup extends Mobject {
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		for (let submob of this.children) {
 			this.add(submob)
 		}
+		this.update(argsDict)
+	}
+
+	redraw() {
+		this.redrawSubmobs()
+	}
+
+}
+
+
+
+export class VMobject extends Mobject {
+
+	view: SVGElement
+	path: SVGElement // child of view
+	vertices: Array<Vertex>
+
+	constructor(argsDict: object = {}) {
+		super()
+		this.vertices = []
+		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		this.path['mobject'] = this
+		this.view.appendChild(this.path) // why not just add?
+		this.setAttributes({
+			fillColor: rgb(1, 1, 1),
+			fillOpacity: 0.5,
+			strokeColor: rgb(1, 1, 1),
+			strokeWidth: 1
+		})
+		this.update(argsDict)
+	}
+
+	redraw() {
+		if (this.path == undefined || this.vertices.length == 0) { return }
+		let pathString: string = this.pathString()
+		if (pathString.includes("NaN")) { return }
+		this.path.setAttribute('d', pathString)
+		this.path.style['fill'] = this.fillColor
+		this.path.style['fill-opacity'] = this.fillOpacity.toString()
+		this.path.style['stroke'] = this.strokeColor
+		this.path.style['stroke-width'] = this.strokeWidth.toString()
+		this.redrawSubmobs()
+	}
+
+	pathString(): string {
+		console.log('please subclass pathString')
+		return ''
 	}
 
 }
@@ -683,38 +708,11 @@ export class MGroup extends Mobject {
 
 
 
+export class Polygon extends VMobject {
 
-
-
-
-export class Polygon extends Mobject {
-
-	path: SVGElement
-
-	constructor(argsDict: object) {
-		super(argsDict)
-		this.vertices = []
-		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-		this.path['mobject'] = this
-		this.view.appendChild(this.path) // why not just add?
-		this.update()
-	}
-
-	updateView() {
-		let globalVertices: Array<Vertex> = this.globalVertices()
-		let pathString: string = Polygon.pathString(globalVertices)
-		
-		if (this.path == undefined || this.vertices.length == 0) { return }
-		this.path.setAttribute('d', pathString)
-		this.path.setAttribute('fill', this.fillColor || rgb(1, 1, 1))
-		this.path.setAttribute('stroke', this.strokeColor || rgb(1, 1, 1))
-		this.path.setAttribute('stroke-width', (this.strokeWidth || 1).toString())
-		super.updateView()
-	}
-
-	static pathString(points: Array<Vertex>): string {
+	pathString(): string {
 		let pathString: string = ''
-		for (let point of points) {
+		for (let point of this.vertices) {
 			if (point.isNaN()) {
 				pathString = ''
 				return pathString
@@ -725,22 +723,6 @@ export class Polygon extends Mobject {
 		pathString += 'Z'
 		return pathString
 	}
-
-	get strokeWidth(): number { return super.strokeWidth }
-	set strokeWidth(newValue: number) {
-		super.strokeWidth = newValue
-		if (this.path != undefined) {
-			this.path.setAttribute('stroke-width', newValue.toString())
-		}
-	}
-	
-	get strokeColor(): string { return super.strokeColor }
-	set strokeColor(newValue: string) {
-		super.strokeColor = newValue
-		if (this.path != undefined) {
-			this.path.setAttribute('stroke', newValue.toString())
-		}
-	}
 	
 }
 
@@ -757,23 +739,9 @@ export class Polygon extends Mobject {
 
 
 
-export class CurvedShape extends Mobject {
+export class CurvedShape extends VMobject {
 
-	bezierPoints: Array<Vertex>
-	path: SVGElement
-
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.bezierPoints = []
-		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-		this.path['mobject'] = this
-		this.view.appendChild(this.path)
-		this.setDefaults({
-			fillColor: rgb(1, 1, 1),
-			fillOpacity: 0.5
-		})
-		this.fillColor = rgb(0.5, 0.5, 0.5)
-	}
+	_bezierPoints: Array<Vertex>
 
 	updateBezierPoints() { }
 	// implemented by subclasses
@@ -782,18 +750,13 @@ export class CurvedShape extends Mobject {
 		return this.globalTransform().appliedTo(this.bezierPoints)
 	}
 
-	updateView() {
+	redraw() {
 		this.updateBezierPoints()
-		let pathString: string = CurvedShape.pathString(this.globalBezierPoints())
-		if (this.path && !(pathString.includes("NaN")) && this.bezierPoints.length > 0) {
-			this.path.setAttribute('d', pathString)
-			this.path.setAttribute('fill', this.fillColor)
-			this.path.setAttribute('fill-opacity', (this.fillOpacity || 1).toString())
-		}
-		super.updateView()
+		super.redraw()
 	}
 
-	static pathString(points: Array<Vertex>): string {
+	pathString(): string {
+		let points: Array<Vertex> = this.globalBezierPoints()
 		if (points == undefined || points.length == 0) { return '' }
 
 		// there should be 3n+1 points
@@ -811,52 +774,18 @@ export class CurvedShape extends Mobject {
 		return pathString
 	}
 
-	get strokeWidth(): number { return super.strokeWidth }
-	set strokeWidth(newValue: number) {
-		super.strokeWidth = newValue
-		if (this.path != undefined) {
-			this.path.setAttribute('stroke-width', newValue.toString())
-		}
-	}
-
-	get strokeColor(): string { return super.strokeColor }
-	set strokeColor(newValue: string) {
-		super.strokeColor = newValue
-		if (this.path != undefined) {
-			this.path.setAttribute('stroke', newValue)
-		}
-	}
-
-	get fillColor(): string { return super.fillColor }
-	set fillColor(newValue: string) {
-		if (this.path != undefined) {
-			this.path.setAttribute('fill', newValue)
-		}
-		super.fillColor = newValue
-	}
-
-	get fillOpacity(): number { return super.fillOpacity }
-	set fillOpacity(newValue: number) {
-		if (this.path != undefined) {
-			this.path.setAttribute('fill-opacity', newValue.toString())
-		}
-		super.fillOpacity = newValue
-	}
-	// TODO: rethink this (commented out for circles)
-	//         for (let submob of this.submobjects) {
-	//             submob.fillOpacity = newValue
-	//     
-
-	get vertices(): Array<Vertex> {
-		if (this.bezierPoints == undefined) { return [] }
+	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
+	set bezierPoints(newValue: Array<Vertex>) {
+		this._bezierPoints = newValue
 		let v: Array<Vertex> = []
 		let i: number = 0
 		for (let p of this.bezierPoints) {
 			if (i % 3 == 1) { v.push(p) }
 			i += 1
 		}
-		return v
+		this.vertices = v
 	}
+
 }
 
 
@@ -865,40 +794,38 @@ export class CurvedShape extends Mobject {
 
 export class TextLabel extends Mobject {
 
-	_text: string
+	text: string
 	textAnchor: string
 	color: string
 
-	constructor(argsDict: object) {
-		super(argsDict)
-		this.setDefaults({
+	constructor(argsDict: object = {}) {
+		super()
+		this.setAttributes({
 			text: '',
-			textAnchor: 'middle'
+			textAnchor: 'middle',
+			color: rgb(1, 1, 1)
 		})
 		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+		this.view['mobject'] = this
 		this.view.setAttribute('class', this.constructor.name + ' unselectable')
 		this.view.setAttribute('text-anchor', this.textAnchor)
 		this.view.setAttribute('alignment-baseline', 'middle')
-		this.view.setAttribute('fill', 'white')
 		this.view.setAttribute('font-family', 'Helvetica')
 		this.view.setAttribute('font-size', '12')
-		this.view['mobject'] = this
-
 		this.view.setAttribute('x', '0')
 		this.view.setAttribute('y', '0')
-		this.text = this.text // updates text view
+		this.update(argsDict)
+		this.redraw()
 	}
 
-	get text(): string { return this._text }
-	set text(newText: string) {
-		this._text = newText
-		if (this.view != undefined) { this.view.textContent = newText }
-	}
-
-	updateView() {
+	redraw() {
+		this.view.textContent = this.text
 		this.view.setAttribute('x', this.globalTransform().e.toString())
 		this.view.setAttribute('y', this.globalTransform().f.toString())
-		super.updateView()
+		this.view.setAttribute('fill', this.color)
+		this.view.setAttribute('stroke', this.color)
+		
+		this.redrawSubmobs()
 	}
 
 }

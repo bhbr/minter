@@ -17,7 +17,7 @@ class Charge extends Circle { //, ScrubbableMobject {
 		this.label.view.style.color = 'white'
 		this.add(this.label)
 
-		this.updateView()
+		this.redraw()
 	}
 
 	static radiusFunc(charge) {
@@ -30,13 +30,13 @@ class Charge extends Circle { //, ScrubbableMobject {
 	get location() { return this.midPoint }
 	set location(newValue) { this.midPoint = newValue }
 
-	updateView() {
+	redraw() {
 		//this.radius = Charge.radiusFunc(this.charge)
 		if (this.label != undefined) {
 			this.label.view.innerHTML = this.charge.toFixed(1)
 		}
-		super.updateView()
-		if (this.field != undefined) { this.field.updateView() }
+		super.redraw()
+		if (this.field != undefined) { this.field.redraw() }
 	
 	}
 
@@ -62,7 +62,7 @@ class MagneticField extends VectorField {
 		for (let c of this.charges) {
 			c.field = this
 		}
-		this.updateView()
+		this.redraw()
 	}
 
 	static elementaryField(charge, pos) {
@@ -103,7 +103,7 @@ class ChargePopover extends Popover {
 	updateCharge() {
 		this.slider.value = this.slider.coordsToValue(this.slider.scrubber.anchor)
 		this.slider.updatedMobject.charge = this.slider.value
-		this.slider.updatedMobject.updateView()
+		this.slider.updatedMobject.redraw()
 	}
 
 	delete(e) {
@@ -111,7 +111,7 @@ class ChargePopover extends Popover {
 		remove(this.charge.field.charges,this.charge)
 		remove(charges, this.charge)
 		this.charge.view.remove()
-		v.updateView()
+		v.redraw()
 	}
 }
 
@@ -138,7 +138,7 @@ function createNewCharge(e) {
 	charges.push(c)
 	v.charges.push(c)
 	c.field = v
-	v.updateView()
+	v.redraw()
 }
 
 addLongPressListener(paper, createNewCharge)

@@ -37,14 +37,15 @@ export class BoxSlider extends LinkableMobject {
 			outputNames: ['value']
 		})
 		this.setAttributes({
-			fillColor: argsDict['backgroundColor'] || rgb(0, 0, 0)
+			fillColor: argsDict['backgroundColor'] || rgb(1, 1, 1)
 		})
 
 		this.outerBar = new Rectangle({
 			width: this.width,
 			height: this.height,
 			fillColor: rgb(0, 0, 0),
-			fillOpacity: 1
+			fillOpacity: 1,
+			strokeColor: this.strokeColor
 		})
 		this.add(this.outerBar)
 
@@ -87,12 +88,24 @@ export class BoxSlider extends LinkableMobject {
 		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
 		this.value = Math.max(Math.min(this.value, this.max), this.min)
 		this.update()
+		this.redraw()
 	}
 
 }
 
 
+export class ValueBox extends Rectangle {
+	value: number = 0
+	valueLabel: TextLabel
 
+	constructor(argsDict: object = {}) {
+		super(argsDict)
+		this.valueLabel = new TextLabel()
+		this.add(this.valueLabel)
+		this.redraw()
+	}
+
+}
 
 
 
@@ -179,7 +192,7 @@ export class BoxSlider extends LinkableMobject {
 //         } else {
 //             console.log('Unknown orientation')
 //         }
-//         this.scrubber.updateView()
+//         this.scrubber.redraw()
 //         this.updateValue()
 //     }
 
@@ -291,7 +304,7 @@ export class BoxSlider extends LinkableMobject {
 //         this.min = this.oldMin - dvalue
 //         this.max = this.oldMax - dvalue
 //         this.scrubber.anchor = this.valueToCoords(this.value)
-//         this.scrubber.updateView()
+//         this.scrubber.redraw()
 //         this.updateScale()
 //     }
 

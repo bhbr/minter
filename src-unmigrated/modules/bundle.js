@@ -447,11 +447,11 @@
 			return this.globalTransform().appliedTo(this.vertices)
 		}
 
-		updateView() {
+		redraw() {
 			if (this.view == undefined) { return }
 
 			for (let submob of this.submobjects) {
-				submob.updateView();
+				submob.redraw();
 			}
 
 			if (this.popover != undefined) {
@@ -465,7 +465,7 @@
 			for (let submob of this.submobjects) {
 				submob.fillColor = newValue;
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		get fillOpacity() { return this.view.style['fill-opacity'] }
@@ -477,7 +477,7 @@
 			// for (let submob of this.submobjects) {
 			//     submob.fillOpacity = newValue
 			// }
-			this.updateView();
+			this.redraw();
 		}
 
 		get strokeColor() { return this.view.stroke }
@@ -486,7 +486,7 @@
 			for (let submob of this.submobjects) {
 				submob.strokeColor = newValue;
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		get strokeWidth() { return this.view.style['stroke-width'] }
@@ -495,7 +495,7 @@
 			for (let submob of this.submobjects) {
 				submob.strokeWidth = newValue;
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		dragStart(e) {
@@ -517,7 +517,7 @@
 			if (this.popover != undefined) {
 				this.popover.anchor = this.popover.anchorBeforeDragging.add(dragVector);
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		dragEnd(e) {
@@ -536,7 +536,7 @@
 			submob.parentMobject = this;
 			this.submobjects.push(submob);
 			this.view.appendChild(submob.view);
-			submob.updateView();
+			submob.redraw();
 		}
 
 		remove(submob) {
@@ -550,7 +550,7 @@
 		}
 		set anchor(newValue) {
 			this.transform.centerAt(newValue);
-			this.updateView();
+			this.redraw();
 		}
 
 		hide() {
@@ -561,7 +561,7 @@
 			for (let submob of this.submobjects) {
 				submob.hide();
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		show() {
@@ -572,7 +572,7 @@
 			for (let submob of this.submobjects) {
 				submob.show();
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		rightEdge() { return Vertex.origin() }
@@ -643,10 +643,10 @@
 			this.vertices = vertices;
 			this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 			this.view.appendChild(this.path);
-			this.updateView();
+			this.redraw();
 		}
 
-		updateView() {
+		redraw() {
 			let pathString = Polygon.pathString(this.globalVertices());
 			if (this.path == undefined) { return }
 			this.path.setAttribute('d', pathString);
@@ -659,13 +659,13 @@
 			if (this.strokeWidth != undefined) {
 				this.path.setAttribute('stroke-width', this.strokeWidth);
 			}
-			super.updateView();
+			super.redraw();
 		}
 
 		get vertices() { return this._vertices }
 		set vertices(newVertices) {
 			this._vertices = newVertices;
-			this.updateView();
+			this.redraw();
 		}
 
 		static pathString(points) {
@@ -709,7 +709,7 @@
 		get bezierPoints() { return this._bezierPoints }
 		set bezierPoints(newBezierPoints) {
 			this._bezierPoints = newBezierPoints;
-			// do NOT update view, because updateView calls updateBezierPoints
+			// do NOT update view, because redraw calls updateBezierPoints
 		}
 
 		updateBezierPoints() { }
@@ -719,14 +719,14 @@
 			return this.globalTransform().appliedTo(this.bezierPoints)
 		}
 
-		updateView() {
+		redraw() {
 			this.updateBezierPoints();
 			let pathString = CurvedShape.pathString(this.globalBezierPoints());
 			if (this.path) {
 				this.path.setAttribute('d', pathString);
 				this.path.setAttribute('fill', this.fillColor);
 			}
-			super.updateView();
+			super.redraw();
 		}
 
 		static pathString(points) {
@@ -793,13 +793,13 @@
 
 		set anchor(newValue) {
 			this.transform.centerAt(newValue);
-			this.updateView();
+			this.redraw();
 		}
 
-		updateView() {
+		redraw() {
 			this.view.setAttribute('x', this.globalTransform().e);
 			this.view.setAttribute('y', this.globalTransform().f);
-			super.updateView();
+			super.redraw();
 		}
 
 	}
@@ -923,7 +923,7 @@
 	//  scrub(e) {
 	//      let scrubVector = vsub([e.x, e.y], this.scrubStartingPoint)
 	//      this.quantity = this.quantityBeforeScrubbing - 0.1*scrubVector[1]
-	//      this.updateView()
+	//      this.redraw()
 	//  }
 
 	//  scrubEnd(e) {
@@ -946,7 +946,7 @@
 		get midPoint() { return this.anchor }
 		set midPoint(newValue) {
 			this.anchor = newValue;
-			this.updateView();
+			this.redraw();
 		}
 
 		updateBezierPoints() {
@@ -968,7 +968,7 @@
 			}
 			this.bezierPoints = newBezierPoints;
 
-			// do NOT update the view, because updateView called updateBezierPoints
+			// do NOT update the view, because redraw called updateBezierPoints
 		}
 
 		rightEdge() {
@@ -978,7 +978,7 @@
 		get radius() { return this._radius }
 		set radius(newRadius) {
 			this._radius = newRadius;
-			this.updateView();
+			this.redraw();
 		}
 
 	}
@@ -1039,7 +1039,7 @@
 			this.components = new Vertex(newValue).subtract(this.startPoint);
 		}
 
-		updateView() {
+		redraw() {
 
 			if (this.view == undefined || this.components == undefined) { return }
 
@@ -1058,7 +1058,7 @@
 				this.tip.anchor = Vertex.origin();
 				this.tip.vertices = this.tipPoints();
 			}
-			super.updateView();
+			super.redraw();
 		}
 
 		norm2() { return this.components.norm2() }
@@ -1090,7 +1090,7 @@
 		set anchoringMode(newValue) {
 			if (newValue == 'start' || newValue == 'center' || newValue == 'end') {
 				this._anchoringMode = newValue;
-				this.updateView();
+				this.redraw();
 			}
 		}
 
@@ -1106,7 +1106,7 @@
 			return anchors
 		}
 
-		updateView() {
+		redraw() {
 			for (let v of this.submobjects) {
 				v.components = this.fieldFunction(v.samplingPoint);
 				if (this.anchoringMode == 'start') {
@@ -1119,7 +1119,7 @@
 				if (v.norm2() > 4 * this.samplingLength**2) { v.hide(); }
 					else { v.show(); }
 			}
-			super.updateView();
+			super.redraw();
 		}
 
 	}
@@ -1206,7 +1206,7 @@
 			} else {
 				console.log('Unknown orientation');
 			}
-			this.scrubber.updateView();
+			this.scrubber.redraw();
 			this.updateValue();
 		}
 
@@ -1319,7 +1319,7 @@
 			this.min = this.oldMin - dvalue;
 			this.max = this.oldMax - dvalue;
 			this.scrubber.anchor = this.valueToCoords(this.value);
-			this.scrubber.updateView();
+			this.scrubber.redraw();
 			this.updateScale();
 		}
 
@@ -1361,7 +1361,7 @@
 			this.label.view.style.color = 'white';
 			this.add(this.label);
 
-			this.updateView();
+			this.redraw();
 		}
 
 		static radiusFunc(charge) {
@@ -1374,13 +1374,13 @@
 		get location() { return this.midPoint }
 		set location(newValue) { this.midPoint = newValue; }
 
-		updateView() {
+		redraw() {
 			//this.radius = Charge.radiusFunc(this.charge)
 			if (this.label != undefined) {
 				this.label.view.innerHTML = this.charge.toFixed(1);
 			}
-			super.updateView();
-			if (this.field != undefined) { this.field.updateView(); }
+			super.redraw();
+			if (this.field != undefined) { this.field.redraw(); }
 		
 		}
 
@@ -1406,7 +1406,7 @@
 			for (let c of this.charges) {
 				c.field = this;
 			}
-			this.updateView();
+			this.redraw();
 		}
 
 		static elementaryField(charge, pos) {
@@ -1447,7 +1447,7 @@
 		updateCharge() {
 			this.slider.value = this.slider.coordsToValue(this.slider.scrubber.anchor);
 			this.slider.updatedMobject.charge = this.slider.value;
-			this.slider.updatedMobject.updateView();
+			this.slider.updatedMobject.redraw();
 		}
 
 		delete(e) {
@@ -1455,7 +1455,7 @@
 			remove(this.charge.field.charges,this.charge);
 			remove(charges, this.charge);
 			this.charge.view.remove();
-			v.updateView();
+			v.redraw();
 		}
 	}
 
@@ -1482,7 +1482,7 @@
 		charges.push(c);
 		v.charges.push(c);
 		c.field = v;
-		v.updateView();
+		v.redraw();
 	}
 
 	addLongPressListener(paper, createNewCharge);

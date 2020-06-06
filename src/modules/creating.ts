@@ -4,7 +4,7 @@ import { Mobject, MGroup } from './mobject'
 import { Circle, TwoPointCircle } from './shapes'
 import { Segment, Ray, Line } from './arrows'
 
-export class CreatedMobject extends Mobject {
+export class CreatedMobject extends MGroup {
 
 	startPoint: Vertex
 	endPoint: Vertex
@@ -23,6 +23,13 @@ export class CreatedMobject extends Mobject {
 }
 
 export class Freehand extends CreatedMobject {
+
+	constructor(argsDict: object = {}) {
+		super(argsDict)
+		this.setAttributes({
+			strokeColor: rgb(1, 1, 1)
+		})
+	}
 	
 	updateWithPoints(q) {
 		let nbDrawnPoints: number = this.children.length
@@ -57,8 +64,11 @@ export class Freehand extends CreatedMobject {
 		} else {
 			p = (this.children[nbDrawnPoints - 1] as Segment).endPoint
 		}
-		let newLine = new Segment({startPoint: p, endPoint: q})
-		newLine.strokeColor = this.strokeColor
+		let newLine = new Segment({
+			startPoint: p,
+			endPoint: q,
+			strokeColor: this.strokeColor
+		})
 		this.add(newLine)
 
 	}
@@ -188,6 +198,7 @@ export class DrawnSegment extends DrawnArrow {
 		this.endFreePoint.addDependent(this.segment)
 		superMobject.add(this.segment)
 
+
 	}
 }
 
@@ -266,11 +277,11 @@ export class DrawnCircle extends CreatedMobject {
 		super(argsDict)
 		
 		this.setDefaults({
-			strokeColor: rgb(1, 1, 1),
-			fillOpacity: 0
+			strokeColor: rgb(1, 1, 1)
 		})
 		this.setAttributes({
-			strokeWidth: 1
+			strokeWidth: 1,
+			fillOpacity: 0
 		})
 
 		this.midPoint = this.midPoint || this.startPoint.copy()
@@ -284,7 +295,8 @@ export class DrawnCircle extends CreatedMobject {
 		})
 		this.circle = new TwoPointCircle({
 			midPoint: this.midPoint,
-			outerPoint: this.outerPoint
+			outerPoint: this.outerPoint,
+			fillOpacity: 0
 		})
 		this.add(this.freeMidpoint)
 		this.add(this.freeOuterPoint)

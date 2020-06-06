@@ -7,15 +7,15 @@ import { rgb, gray, pointerEventVertex } from './helpers'
 
 export class Circle extends CurvedShape {
 
-	_midPoint: Vertex
 	radius: number
 	
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({
 			radius: 10,
 			midPoint: Vertex.origin()
 		})
+		this.setAttributes(argsDict)
 	}
 
 	// midPoint is a synonym for anchor
@@ -24,7 +24,7 @@ export class Circle extends CurvedShape {
 		this.anchor = newValue // updates automatically
 	}
 
-	getArea(): number { return Math.PI * this.radius ** 2 }
+	area(): number { return Math.PI * this.radius ** 2 }
 
 	updateBezierPoints() {
 		let newBezierPoints: Array<Vertex> = []
@@ -45,7 +45,7 @@ export class Circle extends CurvedShape {
 		}
 		this.bezierPoints = newBezierPoints
 
-		// do NOT update the view, because updateView calls updateBezierPoints
+		// do NOT update the view, because redraw calls updateBezierPoints
 	}
 
 	rightEdge(): Vertex {
@@ -62,6 +62,7 @@ export class TwoPointCircle extends Circle {
 		super(argsDict)
 		this.setAttributes({
 			strokeColor: rgb(1, 1, 1),
+			fillColor: rgb(1, 1, 1),
 			fillOpacity: 0
 		})
 		this.view.style['pointer-events'] = 'none'
@@ -110,7 +111,7 @@ export class Rectangle extends Polygon {
 	p4: Vertex
 
 	constructor(argsDict: object) {
-		super(argsDict)
+		super()
 		this.setDefaults({
 			width: 100,
 			height: 100
@@ -120,6 +121,7 @@ export class Rectangle extends Polygon {
 		this.p3 = new Vertex([this.width, this.height])
 		this.p4 = new Vertex([0, this.height])
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
+		this.setAttributes(argsDict)
 	}
 
 	update(argsDict: object) {
@@ -131,6 +133,8 @@ export class Rectangle extends Polygon {
 			super.update(argsDict)
 		} catch { }
 	}
+
+	
 }
 
 

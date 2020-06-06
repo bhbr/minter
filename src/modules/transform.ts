@@ -30,7 +30,8 @@ export class Vertex extends Array {
 		else { return new Vertex(...args) }
 	}
 
-	norm2(): number { return this.x**2 + this.y**2 }
+	dot(otherVertex: Vertex): number { return this.x * otherVertex.x + this.y * otherVertex.y }
+	norm2(): number { return this.dot(this) }
 	norm(): number { return Math.sqrt(this.norm2()) }
 
 	closeTo(otherVertex: Vertex, tolerance: number): boolean {
@@ -177,6 +178,7 @@ export class Transform {
 	}
 
 	set anchor(newValue: Vertex) {
+		//console.log('old anchor:', this._anchor, 'new anchor:', newValue)
 		this.e = newValue[0]
 		this.f = newValue[1]
 		if (this._anchor != undefined) {

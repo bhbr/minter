@@ -1,4 +1,3 @@
-
 import os
 
 def single_line_adder(line):

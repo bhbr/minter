@@ -56,9 +56,9 @@ class SidebarButton extends Circle {
 	boundButtonDrag(e: LocatedEvent) { }
 
 
-	constructor(argsDict) {
-		super(argsDict)
-		this.setDefaults({
+	constructor(argsDict: object = {}) {
+		super()
+		this.setAttributes({
 			currentModeIndex: 0,
 			previousIndex: 0,
 			baseColor: rgb(1, 1, 1),
@@ -68,11 +68,10 @@ class SidebarButton extends Circle {
 			showLabel: true,
 			text: 'text',
 			fontSize: 12,
-			messages: []
-		})
-		this.setAttributes({
+			messages: [],
 			radius: buttonRadius
 		})
+		this.update(argsDict)
 
 		this.updateModeIndex(0)
 		this.label = new TextLabel({text: this.text})
@@ -96,7 +95,7 @@ class SidebarButton extends Circle {
 	get baseColor(): string { return this._baseColor }
 	set baseColor(newColor: string) {
 		this._baseColor = newColor
-		this.setFillColor(newColor, false)
+		this.fillColor = newColor
 
 	}
 	
@@ -263,8 +262,8 @@ class ColorChangeButton extends SidebarButton {
 	palette: object
 	colors: Array<string>
 
-	constructor(argsDict) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setAttributes({
 			optionSpacing: 15,
 			showLabel: false,
@@ -279,6 +278,8 @@ class ColorChangeButton extends SidebarButton {
 				'violet': rgb(1, 0, 1)
 			}
 		})
+		this.setAttributes(argsDict)
+
 		this.colors = Object.keys(this.palette)
 		this.label.text = 'color'
 		this.label.view.setAttribute('fill', 'black')
@@ -318,16 +319,19 @@ class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
 
-	constructor(argsDict) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
+		console.log('a', this.text)
+		this.setAttributes(argsDict)
+		console.log('b', this.text)
 		this.creations = argsDict['creations']
 		this.messages = []
 		for (let creation of this.creations) {
 			this.messages.push({creating: creation})
 		}
 		this.outgoingMessage = {creating: 'freehand'}
-		super.update()
-		this.updateLabel()
+		this.update(argsDict)
+		console.log('c', this.label.text)
 	}
 
 	commonButtonUp() {
@@ -337,13 +341,19 @@ class CreativeButton extends SidebarButton {
 
 	updateLabel() {
 		if (this.label == undefined) { return }
+		console.log('a label')
 		if (this.showLabel) {
+		console.log('b label')
 			try {
-				this.label.text = this.creations[this.currentModeIndex]
+				this.text = this.creations[this.currentModeIndex]
+				this.label.update({text: this.text})
+				this.label.redraw()
+				console.log('c label')
 			} catch { }
 		} else {
 			this.label.text = ''
 		}
+
 	}
 }
 

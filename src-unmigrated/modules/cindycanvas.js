@@ -87,7 +87,7 @@ export class CindyCanvas extends LinkableMobject {
 	geometry() { return [] }
 	
 	update(argsDict) { }
-	updateView() { }
+	redraw() { }
 
 	localXMin() { return 0 }
 	localXMax() { return this.width }
@@ -174,7 +174,7 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p2.y = this.startPoint.y
 		this.p4.x = this.startPoint.x
 		this.p4.y = this.endPoint.y
-		this.updateView()
+		this.redraw()
 	}
 
 	dissolveInto(parent) {

@@ -23,7 +23,7 @@ export class Segment extends Polygon {
 	update(argsDict: object = {}) {
 		this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
 		super.update(argsDict)
-		//this.updateView()
+		//this.redraw()
 	}
 
 	drawingStartPoint(): Vertex { return this.startPoint }
@@ -90,7 +90,7 @@ export class Line extends Ray {
 //         this.components = new Vertex(newValue).subtract(this.startPoint)
 //     }
 
-//     updateView() {
+//     redraw() {
 
 //         if (this.view == undefined || this.components == undefined) { return }
 
@@ -109,7 +109,7 @@ export class Line extends Ray {
 //             this.tip.anchor = Vertex.origin()
 //             this.tip.vertices = this.tipPoints()
 //         }
-//         super.updateView()
+//         super.redraw()
 //     }
 
 //     norm2() { return this.components.norm2() }

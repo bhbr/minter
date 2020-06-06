@@ -24,7 +24,7 @@ export class VectorField extends MGroup {
 	set anchoringMode(newValue) {
 		if (newValue == 'start' || newValue == 'center' || newValue == 'end') {
 			this._anchoringMode = newValue
-			this.updateView()
+			this.redraw()
 		}
 	}
 
@@ -40,7 +40,7 @@ export class VectorField extends MGroup {
 		return anchors
 	}
 
-	updateView() {
+	redraw() {
 		for (let v of this.submobjects) {
 			v.components = this.fieldFunction(v.samplingPoint)
 			if (this.anchoringMode == 'start') {
@@ -53,7 +53,7 @@ export class VectorField extends MGroup {
 			if (v.norm2() > 4 * this.samplingLength**2) { v.hide() }
 				else { v.show() }
 		}
-		super.updateView()
+		super.redraw()
 	}
 
 }

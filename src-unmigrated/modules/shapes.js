@@ -42,7 +42,7 @@ export class Circle extends CurvedShape {
 		}
 		this.bezierPoints = newBezierPoints
 
-		// do NOT update the view, because updateView calls updateBezierPoints
+		// do NOT update the view, because redraw calls updateBezierPoints
 	}
 
 	rightEdge() {

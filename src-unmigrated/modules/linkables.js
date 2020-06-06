@@ -28,7 +28,7 @@ export class InputList extends RoundedRectangle {
 			width: 150,
 			height: this.getHeight()
 		})
-		this.updateView()
+		this.redraw()
 		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listInputNames.length; i++) {
 			let name = this.listInputNames[i]
@@ -62,7 +62,7 @@ export class OutputList extends RoundedRectangle {
 			width: 150,
 			height: this.getHeight()
 		})
-		this.updateView()
+		this.redraw()
 		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
