@@ -72,14 +72,14 @@ class SidebarButton extends Circle {
 			messages: [],
 			radius: buttonRadius
 		})
-		this.update(argsDict)
+		this.update(argsDict, false)
 
 		this.updateModeIndex(0)
 		this.label = new TextLabel({text: this.text})
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.label.anchor = Vertex.origin()
 		this.add(this.label)
-		this.update()
+		this.update({}, false)
 
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
@@ -133,7 +133,6 @@ class SidebarButton extends Circle {
 		this.previousIndex = this.currentModeIndex
 		this.messagePaper(this.messages[0])
 		this.update()
-		this.redraw()
 	}
 	
 	buttonDownByPointer(e: LocatedEvent) {
@@ -160,7 +159,6 @@ class SidebarButton extends Circle {
 			document.removeEventListener('keyup', this.boundButtonUpByKey)
 			document.addEventListener('keydown', this.boundButtonDownByKey)
 			this.commonButtonUp()
-
 		}
 	}
 
@@ -173,7 +171,6 @@ class SidebarButton extends Circle {
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update()
-		this.redraw()
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
 	}
@@ -200,8 +197,8 @@ class SidebarButton extends Circle {
 		}
 	}
 
-	update(argsDict: object = {}) {
-		super.update(argsDict)
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, redraw)
 		this.updateLabel()
 	}
 	
@@ -213,8 +210,6 @@ class SidebarButton extends Circle {
 		if (withMessage as boolean) { this.messagePaper(message) }
  
 		this.update()
-		this.redraw()
-		
 	}
 	
 	selectNextOption() {
@@ -251,11 +246,9 @@ class SidebarButton extends Circle {
 		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
 
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
-		this.update({ midPoint: newMidpoint })
 		
 		this.updateModeIndex(newIndex, true)
-		this.redraw()
-
+		this.update({ midPoint: newMidpoint })
 	}
 	
 }
@@ -307,13 +300,12 @@ class ColorChangeButton extends SidebarButton {
 
 	commonButtonUp() {
 		this.radius = buttonRadius
-		this.update()
+		this.update({}, false)
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
 		this.messagePaper(this.outgoingMessage)
 		this.update()
-		this.redraw()
 	}
 
 	buttonDrag(e) {
@@ -336,7 +328,6 @@ class CreativeButton extends SidebarButton {
 		}
 		this.outgoingMessage = {creating: 'freehand'}
 		this.update(argsDict)
-		this.redraw()
 	}
 
 	commonButtonUp() {
@@ -350,7 +341,6 @@ class CreativeButton extends SidebarButton {
 			try {
 				this.text = this.creations[this.currentModeIndex]
 				this.label.update({text: this.text})
-				this.label.redraw()
 			} catch { }
 		} else {
 			this.label.text = ''
@@ -392,7 +382,6 @@ class DragButton extends ToggleButton {
 		this.label2.anchor = new Vertex(0, 2)
 		this.add(this.label2)
 		this.update()
-		this.redraw()
 	}
 
 	updateLabel() {
@@ -408,7 +397,6 @@ class LinkButton extends ToggleButton {
 		super(argsDict)
 		this.label.text = 'link'
 		this.update()
-		this.redraw()
 	}
 }
 
@@ -454,7 +442,7 @@ let dragButton = new DragButton({
 })
 dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
-dragButton.redraw()
+//dragButton.redraw()
 sidebar.appendChild(dragButton.view)
 
 let linkButton = new LinkButton({
@@ -465,7 +453,7 @@ let linkButton = new LinkButton({
 	locationIndex: 5
 })
 linkButton.label.view.setAttribute('fill', 'black')
-linkButton.redraw()
+//linkButton.redraw()
 sidebar.appendChild(linkButton.view)
 
 let colorButton = new ColorChangeButton({

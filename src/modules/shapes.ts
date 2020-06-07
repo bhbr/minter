@@ -69,10 +69,10 @@ export class TwoPointCircle extends Circle {
 		this.radius = this.midPoint.subtract(this.outerPoint).norm()
 	}
 
-	update(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw = true) {
 		try { this.radius = this.midPoint.subtract(this.outerPoint).norm() }
 		catch { }
-		super.update(argsDict)
+		super.update(argsDict, redraw)
 	}
 
 }
@@ -124,13 +124,13 @@ export class Rectangle extends Polygon {
 		this.setAttributes(argsDict)
 	}
 
-	update(argsDict: object) {
+	update(argsDict: object, redraw = true) {
 		try {
 			this.p2.x = this.width
 			this.p3.x = this.width
 			this.p3.y = this.height
 			this.p4.y = this.height
-			super.update(argsDict)
+			super.update(argsDict, redraw)
 		} catch { }
 	}
 

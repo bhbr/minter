@@ -65,8 +65,8 @@ export class BoxSlider extends LinkableMobject {
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	update(argsDict: object = {}) {
-		super.update(argsDict)
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, redraw = false)
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
 		try {
@@ -76,6 +76,7 @@ export class BoxSlider extends LinkableMobject {
 			this.label.text = this.value.toPrecision(3).toString()
 			this.label.anchor.copyFrom(new Vertex(this.width/2, this.height/2))
 		} catch { }
+		if (redraw) { this.redraw() }
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
@@ -88,7 +89,6 @@ export class BoxSlider extends LinkableMobject {
 		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
 		this.value = Math.max(Math.min(this.value, this.max), this.min)
 		this.update()
-		this.redraw()
 	}
 
 }

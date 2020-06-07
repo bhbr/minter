@@ -728,7 +728,7 @@ var Sidebar = (function (exports) {
         globalVertices() {
             return this.relativeVertices();
         }
-        update(argsDict = {}) {
+        update(argsDict = {}, redraw = true) {
             this.setAttributes(argsDict);
             this.transform.anchorAt(this.anchor);
             this.updateSubmobs();
@@ -742,13 +742,16 @@ var Sidebar = (function (exports) {
                 }
                 dep.target.update();
             }
+            if (redraw) {
+                this.redraw();
+            }
         }
         updateSubmobs() {
             for (let submob of this.children || []) {
-                submob.update();
+                submob.update({}, false);
             }
         }
-        redrawSubmobs() {
+        redrawSubmobs(redraw = true) {
             for (let submob of this.children || []) {
                 submob.redraw();
                 submob.redrawSubmobs();
@@ -1096,8 +1099,8 @@ var Sidebar = (function (exports) {
     class CurvedShape extends VMobject {
         updateBezierPoints() { }
         // implemented by subclasses
-        update(argsDict = {}) {
-            super.update(argsDict);
+        update(argsDict = {}, redraw = true) {
+            super.update(argsDict, redraw);
             this.updateBezierPoints();
         }
         globalBezierPoints() {
@@ -1160,7 +1163,6 @@ var Sidebar = (function (exports) {
             this.view.setAttribute('y', '0');
             this.view.setAttribute('stroke-width', '0');
             this.update(argsDict);
-            this.redraw();
         }
         redraw() {
             this.view.textContent = this.text;
@@ -1278,12 +1280,12 @@ var Sidebar = (function (exports) {
             this.view.style['pointer-events'] = 'none';
             this.radius = this.midPoint.subtract(this.outerPoint).norm();
         }
-        update(argsDict = {}) {
+        update(argsDict = {}, redraw = true) {
             try {
                 this.radius = this.midPoint.subtract(this.outerPoint).norm();
             }
             catch (_a) { }
-            super.update(argsDict);
+            super.update(argsDict, redraw);
         }
     }
     class Rectangle extends Polygon {
@@ -1300,13 +1302,13 @@ var Sidebar = (function (exports) {
             this.vertices = [this.p1, this.p2, this.p3, this.p4];
             this.setAttributes(argsDict);
         }
-        update(argsDict) {
+        update(argsDict, redraw = true) {
             try {
                 this.p2.x = this.width;
                 this.p3.x = this.width;
                 this.p3.y = this.height;
                 this.p4.y = this.height;
-                super.update(argsDict);
+                super.update(argsDict, redraw);
             }
             catch (_a) { }
         }
@@ -1368,10 +1370,9 @@ var Sidebar = (function (exports) {
         components() {
             return this.endPoint.subtract(this.startPoint);
         }
-        update(argsDict = {}) {
+        update(argsDict = {}, redraw = true) {
             this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()];
-            super.update(argsDict);
-            //this.redraw()
+            super.update(argsDict, redraw);
         }
         drawingStartPoint() { return this.startPoint; }
         drawingEndPoint() { return this.endPoint; }
@@ -1505,6 +1506,7 @@ var Sidebar = (function (exports) {
         }
         updateFromTip(q) {
             this.updateWithLines(q);
+            this.redraw();
         }
         dissolveInto(superMobject) {
             superMobject.remove(this);
@@ -1974,7 +1976,7 @@ var Sidebar = (function (exports) {
             this.line.update();
             this.endPoint.copyFrom(q);
         }
-        update(argsDict) {
+        update(argsDict, redraw = true) {
             if (this.startHook != undefined && this.startBullet != undefined) {
                 this.startBullet.centerAt(this.startHook.center(this.superMobject), this.superMobject);
             }
@@ -1987,7 +1989,7 @@ var Sidebar = (function (exports) {
                     endPoint: this.endHook.center(this.superMobject)
                 });
             }
-            super.update(argsDict);
+            super.update(argsDict, redraw);
         }
     }
     class LinkableMobject extends Mobject {
@@ -2133,7 +2135,7 @@ var Sidebar = (function (exports) {
             this.core = this.paper.callCindyJS(argsDict);
         }
         geometry() { return []; }
-        update(argsDict) { }
+        update(argsDict, redraw = true) { }
         redraw() { }
         localXMin() { return 0; }
         localXMax() { return this.width; }
@@ -2169,7 +2171,7 @@ var Sidebar = (function (exports) {
             }
             return ret;
         }
-        update(argsDict = {}) {
+        update(argsDict = {}, redraw = true) {
             let l = 0.1 * (this.wavelength || 1);
             let f = 10 * (this.frequency || 1);
             if (this.core != undefined) {
@@ -2178,7 +2180,7 @@ var Sidebar = (function (exports) {
             // if (this.drawScript != undefined) {
             // 	this.drawScript.textContent = this.drawCode()
             // }
-            super.update(argsDict);
+            super.update(argsDict, redraw);
         }
     }
     class DrawnRectangle extends CreatedMobject {
@@ -2265,8 +2267,8 @@ var Sidebar = (function (exports) {
         normalizedValue() {
             return (this.value - this.min) / (this.max - this.min);
         }
-        update(argsDict = {}) {
-            super.update(argsDict);
+        update(argsDict = {}, redraw = true) {
+            super.update(argsDict, redraw = false);
             let a = this.normalizedValue();
             if (isNaN(a)) {
                 return;
@@ -2279,6 +2281,9 @@ var Sidebar = (function (exports) {
                 this.label.anchor.copyFrom(new Vertex(this.width / 2, this.height / 2));
             }
             catch (_a) { }
+            if (redraw) {
+                this.redraw();
+            }
         }
         selfHandlePointerDown(e) {
             this.scrubStartingPoint = pointerEventVertex(e);
@@ -2289,7 +2294,6 @@ var Sidebar = (function (exports) {
             this.value = this.valueBeforeScrubbing - scrubVector.y / this.height * (this.max - this.min);
             this.value = Math.max(Math.min(this.value, this.max), this.min);
             this.update();
-            this.redraw();
         }
     }
     // export class Slider extends Mobject {
@@ -2508,6 +2512,7 @@ var Sidebar = (function (exports) {
             this.protoSlider.filledBar.update({
                 fillColor: Color.gray(0.5)
             });
+            this.redraw();
         }
         dissolveInto(superMobject) {
             superMobject.remove(this);

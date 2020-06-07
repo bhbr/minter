@@ -20,10 +20,9 @@ export class Segment extends Polygon {
 		return this.endPoint.subtract(this.startPoint)
 	}
 
-	update(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw = true) {
 		this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-		super.update(argsDict)
-		//this.redraw()
+		super.update(argsDict, redraw)
 	}
 
 	drawingStartPoint(): Vertex { return this.startPoint }

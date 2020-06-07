@@ -46,7 +46,7 @@ export class CreatedBoxSlider extends CreatedMobject {
 		this.protoSlider.filledBar.update({
 			fillColor: Color.gray(0.5)
 		})
-
+		this.redraw()
 	}
 
 	dissolveInto(superMobject: Mobject) {

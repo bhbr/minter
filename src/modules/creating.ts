@@ -75,6 +75,7 @@ export class Freehand extends CreatedMobject {
 	
 	updateFromTip(q: Vertex) {
 		this.updateWithLines(q)
+		this.redraw()
 	}
 
 	dissolveInto(superMobject: Mobject) {

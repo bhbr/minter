@@ -305,7 +305,7 @@ export class LinkLine extends CreatedMobject {
 		this.endPoint.copyFrom(q)
 	}
 
-	update(argsDict: object) {
+	update(argsDict: object, redraw = true) {
 		if (this.startHook != undefined && this.startBullet != undefined) {
 			this.startBullet.centerAt(this.startHook.center(this.superMobject), this.superMobject)
 		}
@@ -319,7 +319,7 @@ export class LinkLine extends CreatedMobject {
 				endPoint: this.endHook.center(this.superMobject)
 			})
 		}
-		super.update(argsDict)
+		super.update(argsDict, redraw)
 	}
 }
 

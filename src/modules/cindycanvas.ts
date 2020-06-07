@@ -98,7 +98,7 @@ export class CindyCanvas extends LinkableMobject {
 
 	geometry(): Array<any> { return [] }
 	
-	update(argsDict: object) { }
+	update(argsDict: object, redraw = true) { }
 	redraw() { }
 
 	localXMin(): number { return 0 }
@@ -146,7 +146,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 		return ret
 	}
 
-	update(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw = true) {
 		let l: number = 0.1 * (this.wavelength || 1)
 		let f: number = 10 * (this.frequency || 1)
 		if (this.core != undefined) {
@@ -155,7 +155,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 		// if (this.drawScript != undefined) {
 		// 	this.drawScript.textContent = this.drawCode()
 		// }
-		super.update(argsDict)
+		super.update(argsDict, redraw)
 	}
 }
 

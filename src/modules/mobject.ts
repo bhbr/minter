@@ -346,7 +346,7 @@ export class Mobject {
 		return this.relativeVertices()
 	}
 
-	update(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw = true) {
 		this.setAttributes(argsDict)
 		this.transform.anchorAt(this.anchor)
 		this.updateSubmobs()
@@ -360,16 +360,17 @@ export class Mobject {
 			}
 			dep.target.update()
 		}
+		if (redraw) { this.redraw() }
 
 	}
 
 	updateSubmobs() {
 		for (let submob of this.children || []) {
-			submob.update()
+			submob.update({}, false)
 		}
 	}
 
-	redrawSubmobs() {
+	redrawSubmobs(redraw = true) {
 		for (let submob of this.children || []) {
 			submob.redraw()
 			submob.redrawSubmobs()
@@ -802,8 +803,8 @@ export class CurvedShape extends VMobject {
 	updateBezierPoints() { }
 	// implemented by subclasses
 
-	update(argsDict: object = {}) {
-		super.update(argsDict)
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, redraw)
 		this.updateBezierPoints()
 	}
 
@@ -877,7 +878,6 @@ export class TextLabel extends Mobject {
 		this.view.setAttribute('y', '0')
 		this.view.setAttribute('stroke-width', '0')
 		this.update(argsDict)
-		this.redraw()
 	}
 
 	redraw() {
