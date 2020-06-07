@@ -359,7 +359,6 @@ var Sidebar = (function (exports) {
         let hex_b = (Math.round(b * 255)).toString(16).padStart(2, '0');
         return '#' + hex_r + hex_g + hex_b;
     }
-    function gray(x) { return rgb(x, x, x); }
     function pointerEventPageLocation(e) {
         let t = null;
         let sidebarWidth = 0;
@@ -415,6 +414,50 @@ var Sidebar = (function (exports) {
             this.inputName = argsDict['inputName']; // may be undefined
         }
     }
+    class Color {
+        constructor(r, g, b, a = 1) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+            this.alpha = a;
+        }
+        brighten(factor) {
+            return new Color(factor * this.red, factor * this.green, factor * this.blue, this.alpha);
+        }
+        toHex() {
+            let hex_r = (Math.round(this.red * 255)).toString(16).padStart(2, '0');
+            let hex_g = (Math.round(this.green * 255)).toString(16).padStart(2, '0');
+            let hex_b = (Math.round(this.blue * 255)).toString(16).padStart(2, '0');
+            let hex_a = '';
+            if (this.alpha != 1) {
+                hex_a = (Math.round(this.alpha * 255)).toString(16).padStart(2, '0');
+            }
+            return '#' + hex_r + hex_g + hex_b + hex_a;
+        }
+        toCSS() {
+            return `rgb(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`;
+        }
+        static fromHex(hex) {
+            let r = parseInt('0x' + hex.slice(1, 2)) / 255;
+            let g = parseInt('0x' + hex.slice(3, 2)) / 255;
+            let b = parseInt('0x' + hex.slice(5, 2)) / 255;
+            let a = 1;
+            if (hex.length > 7) {
+                a = parseInt('0x' + hex.slice(7, 2)) / 255;
+            }
+            return new Color(r, g, b, a);
+        }
+        static gray(x) { return new Color(x, x, x); }
+        static black() { return Color.gray(0); }
+        static white() { return Color.gray(1); }
+        static red() { return new Color(1, 0, 0); }
+        static orange() { return new Color(1, 0.5, 0); }
+        static yellow() { return new Color(1, 1, 0); }
+        static green() { return new Color(0, 1, 0); }
+        static blue() { return new Color(0, 0, 1); }
+        static indigo() { return new Color(0.5, 0, 1); }
+        static violet() { return new Color(1, 0, 1); }
+    }
     class Mobject {
         constructor(argsDict = {}) {
             this.children = [];
@@ -432,9 +475,9 @@ var Sidebar = (function (exports) {
                 vertices: [],
                 children: [],
                 dependencies: [],
-                fillColor: rgb(1, 1, 1),
+                fillColor: Color.white(),
                 fillOpacity: 1,
-                strokeColor: rgb(1, 1, 1),
+                strokeColor: Color.white(),
                 strokeWidth: 1,
                 passAlongEvents: false,
                 visible: true,
@@ -1008,9 +1051,9 @@ var Sidebar = (function (exports) {
             this.path['mobject'] = this;
             this.view.appendChild(this.path); // why not just add?
             this.setAttributes({
-                fillColor: rgb(1, 1, 1),
+                fillColor: Color.white(),
                 fillOpacity: 0.5,
-                strokeColor: rgb(1, 1, 1),
+                strokeColor: Color.white(),
                 strokeWidth: 1
             });
             this.update(argsDict);
@@ -1024,9 +1067,9 @@ var Sidebar = (function (exports) {
                 return;
             }
             this.path.setAttribute('d', pathString);
-            this.path.style['fill'] = this.fillColor;
+            this.path.style['fill'] = this.fillColor.toHex();
             this.path.style['fill-opacity'] = this.fillOpacity.toString();
-            this.path.style['stroke'] = this.strokeColor;
+            this.path.style['stroke'] = this.strokeColor.toHex();
             this.path.style['stroke-width'] = this.strokeWidth.toString();
             this.redrawSubmobs();
         }
@@ -1053,6 +1096,10 @@ var Sidebar = (function (exports) {
     class CurvedShape extends VMobject {
         updateBezierPoints() { }
         // implemented by subclasses
+        update(argsDict = {}) {
+            super.update(argsDict);
+            this.updateBezierPoints();
+        }
         globalBezierPoints() {
             return this.globalTransform().appliedTo(this.bezierPoints);
         }
@@ -1100,7 +1147,7 @@ var Sidebar = (function (exports) {
             this.setAttributes({
                 text: '',
                 textAnchor: 'middle',
-                color: rgb(1, 1, 1)
+                color: Color.white()
             });
             this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             this.view['mobject'] = this;
@@ -1111,6 +1158,7 @@ var Sidebar = (function (exports) {
             this.view.setAttribute('font-size', '12');
             this.view.setAttribute('x', '0');
             this.view.setAttribute('y', '0');
+            this.view.setAttribute('stroke-width', '0');
             this.update(argsDict);
             this.redraw();
         }
@@ -1118,8 +1166,11 @@ var Sidebar = (function (exports) {
             this.view.textContent = this.text;
             this.view.setAttribute('x', this.globalTransform().e.toString());
             this.view.setAttribute('y', this.globalTransform().f.toString());
-            this.view.setAttribute('fill', this.color);
-            this.view.setAttribute('stroke', this.color);
+            if (this.color == undefined) {
+                this.color = Color.white();
+            }
+            this.view.setAttribute('fill', this.color.toHex());
+            this.view.setAttribute('stroke', this.color.toHex());
             this.redrawSubmobs();
         }
     }
@@ -1220,8 +1271,8 @@ var Sidebar = (function (exports) {
         constructor(argsDict) {
             super(argsDict);
             this.setAttributes({
-                strokeColor: rgb(1, 1, 1),
-                fillColor: rgb(1, 1, 1),
+                strokeColor: Color.white(),
+                fillColor: Color.white(),
                 fillOpacity: 0
             });
             this.view.style['pointer-events'] = 'none';
@@ -1410,7 +1461,7 @@ var Sidebar = (function (exports) {
         constructor(argsDict = {}) {
             super(argsDict);
             this.setAttributes({
-                strokeColor: rgb(1, 1, 1)
+                strokeColor: Color.white()
             });
         }
         updateWithPoints(q) {
@@ -1471,7 +1522,7 @@ var Sidebar = (function (exports) {
                 midPoint: Vertex.origin()
             });
             this.setAttributes({
-                fillColor: rgb(1, 1, 1),
+                fillColor: Color.white(),
                 fillOpacity: 1.0
             });
         }
@@ -1602,7 +1653,7 @@ var Sidebar = (function (exports) {
         constructor(argsDict) {
             super(argsDict);
             this.setDefaults({
-                strokeColor: rgb(1, 1, 1)
+                strokeColor: Color.white()
             });
             this.setAttributes({
                 strokeWidth: 1,
@@ -1673,7 +1724,7 @@ var Sidebar = (function (exports) {
             this.setAttributes({
                 radius: 10,
                 fillOpacity: 0,
-                strokeColor: rgb(1, 1, 1)
+                strokeColor: Color.white()
             });
         }
     }
@@ -1683,7 +1734,7 @@ var Sidebar = (function (exports) {
             this.setDefaults({ listInputNames: [] });
             this.setAttributes({
                 cornerRadius: 30,
-                fillColor: rgb(1, 1, 1),
+                fillColor: Color.white(),
                 fillOpacity: 0.1,
                 width: 150,
                 height: this.getHeight()
@@ -1717,7 +1768,7 @@ var Sidebar = (function (exports) {
             this.setDefaults({ listOutputNames: [] });
             this.setAttributes({
                 cornerRadius: 30,
-                fillColor: rgb(1, 1, 1),
+                fillColor: Color.white(),
                 fillOpacity: 0.3,
                 width: 150,
                 height: this.getHeight()
@@ -2142,10 +2193,10 @@ var Sidebar = (function (exports) {
             this.bottom = new Segment({ startPoint: this.p3, endPoint: this.p4 });
             this.left = new Segment({ startPoint: this.p1, endPoint: this.p4 });
             this.right = new Segment({ startPoint: this.p2, endPoint: this.p3 });
-            this.top.strokeColor = rgb(1, 1, 1);
-            this.bottom.strokeColor = rgb(1, 1, 1);
-            this.left.strokeColor = rgb(1, 1, 1);
-            this.right.strokeColor = rgb(1, 1, 1);
+            this.top.strokeColor = Color.white();
+            this.bottom.strokeColor = Color.white();
+            this.left.strokeColor = Color.white();
+            this.right.strokeColor = Color.white();
             this.add(this.top);
             this.add(this.bottom);
             this.add(this.left);
@@ -2182,7 +2233,7 @@ var Sidebar = (function (exports) {
                 value: 0.6,
                 height: 200,
                 width: 50,
-                strokeColor: rgb(1, 1, 1)
+                strokeColor: Color.white()
             });
             this.setAttributes({
                 draggable: true,
@@ -2190,12 +2241,12 @@ var Sidebar = (function (exports) {
                 outputNames: ['value']
             });
             this.setAttributes({
-                fillColor: argsDict['backgroundColor'] || rgb(1, 1, 1)
+                fillColor: argsDict['backgroundColor'] || Color.white()
             });
             this.outerBar = new Rectangle({
                 width: this.width,
                 height: this.height,
-                fillColor: rgb(0, 0, 0),
+                fillColor: Color.black(),
                 fillOpacity: 1,
                 strokeColor: this.strokeColor
             });
@@ -2203,7 +2254,7 @@ var Sidebar = (function (exports) {
             this.filledBar = new Rectangle({
                 width: this.width,
                 height: this.normalizedValue() * this.height,
-                fillColor: argsDict['fillColor'] || gray(0.5)
+                fillColor: argsDict['fillColor'] || Color.gray(0.5)
             });
             this.add(this.filledBar);
             this.label = new TextLabel({ text: this.value.toString() });
@@ -2430,7 +2481,7 @@ var Sidebar = (function (exports) {
             this.setAttributes({
                 width: 50,
                 height: 0,
-                fillColor: rgb(0, 0, 0)
+                fillColor: Color.black()
             });
             this.setDefaults({ startPoint: Vertex.origin() });
             this.anchor = this.startPoint;
@@ -2439,23 +2490,23 @@ var Sidebar = (function (exports) {
                 value: 0.5,
                 width: this.width,
                 height: 0,
-                fillColor: rgb(0, 0, 0)
+                fillColor: Color.black()
             });
             this.protoSlider.filledBar.update({
                 width: this.width,
-                fillColor: gray(0.5)
+                fillColor: Color.gray(0.5)
             });
             this.add(this.protoSlider);
         }
         updateFromTip(q) {
             this.update({
-                fillColor: gray(0)
+                fillColor: Color.black()
             });
             this.protoSlider.update({
                 height: q.y - this.startPoint.y,
             });
             this.protoSlider.filledBar.update({
-                fillColor: gray(0.5)
+                fillColor: Color.gray(0.5)
             });
         }
         dissolveInto(superMobject) {
@@ -2500,7 +2551,7 @@ var Sidebar = (function (exports) {
             this.visibleCreation = visibleCreation;
             this.creations[visibleCreation].show();
             if (visibleCreation == 'cindy') {
-                this.creations[visibleCreation].strokeColor = rgb(1, 1, 1);
+                this.creations[visibleCreation].strokeColor = Color.white();
             }
         }
         dissolveInto(superMobject) {
@@ -2535,6 +2586,10 @@ var Sidebar = (function (exports) {
         }
         changeColorByName(newColorName) {
             let newColor = this.colorPalette[newColorName];
+            this.changeColor(newColor);
+        }
+        changeColorByHex(newColorHex) {
+            let newColor = Color.fromHex(newColorHex);
             this.changeColor(newColor);
         }
         changeColor(newColor) {
@@ -2645,7 +2700,7 @@ var Sidebar = (function (exports) {
                     }
                     break;
                 case 'color':
-                    this.changeColor(value);
+                    this.changeColorByHex(value);
                     break;
                 case 'drag':
                     this.setDragging(value);
@@ -2812,9 +2867,15 @@ var Sidebar = (function (exports) {
     const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true });
     let c = new Circle({ anchor: new Vertex(100, 100), radius: 25 });
     c.anchor = new Vertex(300, 400);
-    c.fillColor = rgb(1, 0, 1);
+    c.fillColor = Color.violet();
     c.redraw();
-    paper.add(c);
+    //paper.add(c)
+    let t = new TextLabel({
+        text: "blablub",
+        anchor: new Vertex(100, 100),
+        color: Color.red()
+    });
+    paper.add(t);
 
     exports.Paper = Paper;
     exports.paper = paper;

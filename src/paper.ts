@@ -1,6 +1,6 @@
-import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
+import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
 import { Vertex } from './modules/transform'
-import { Mobject, MGroup } from './modules/mobject'
+import { Color, Mobject, MGroup } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
@@ -21,7 +21,7 @@ export class Paper extends LinkableMobject {
 	snappablePoints: Array<FreePoint>
 	creationStartPoint: Vertex
 	colorPalette: object
-	currentColor: string
+	currentColor: Color
 	creationGroup: CreationGroup
 	geometricObjects: Array<Mobject>
 	dependencyMap: DependencyMap
@@ -42,25 +42,25 @@ export class Paper extends LinkableMobject {
 		this.geometricObjects = []
 
 		this.colorPalette = {
-			'black': rgb(0, 0, 0),
-			'white': rgb(1, 1, 1),
-			'red': rgb(1, 0, 0),
-			'orange': rgb(1, 0.5, 0),
-			'yellow': rgb(1, 1, 0),
-			'green': rgb(0, 1, 0),
-			'blue': rgb(0, 0, 1),
-			'indigo': rgb(0.5, 0, 1),
-			'violet': rgb(1, 0, 1)
+			'black': Color.black(),
+			'white': Color.white(),
+			'red': Color.red(),
+			'orange': Color.orange(),
+			'yellow': Color.yellow(),
+			'green': Color.green(),
+			'blue': Color.blue(),
+			'indigo': Color.indigo(),
+			'violet': Color.violet()
 		}
 		this.currentColor = this.colorPalette['white']
 	}
 
 	changeColorByName(newColorName: string) {
-		let newColor: string = this.colorPalette[newColorName]
+		let newColor: Color = this.colorPalette[newColorName]
 		this.changeColor(newColor)
 	}
 
-	changeColor(newColor: string) {
+	changeColor(newColor: Color) {
 		this.currentColor = newColor
 		if (this.creationGroup == undefined) { return }
 		this.creationGroup.strokeColor = this.currentColor
@@ -152,7 +152,7 @@ export class Paper extends LinkableMobject {
 	handleMessage(message: object) {
 		if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
-		let value: string | boolean | number = Object.values(message)[0]
+		let value: string | boolean | number | Color = Object.values(message)[0]
 		if (value == "true") { value = true }
 		if (value == "false") { value = false }
 
@@ -168,7 +168,7 @@ export class Paper extends LinkableMobject {
 			}
 			break
 		case 'color':
-			this.changeColor(value as string)
+			this.changeColor(value as Color)
 			break
 		case 'drag':
 			this.setDragging(value as boolean)
@@ -345,6 +345,8 @@ export class Paper extends LinkableMobject {
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
 let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
+c.update()
+c.redraw()
 paper.add(c)
 
 

@@ -1,10 +1,9 @@
 
-import { rgb, gray } from './helpers'
 import { Vertex } from './transform'
 import { CreatedMobject } from './creating'
 import { BoxSlider } from './slider'
 import { WaveCindyCanvas } from './cindycanvas'
-import { Mobject } from './mobject'
+import { Mobject, Color } from './mobject'
 
 
 export class CreatedBoxSlider extends CreatedMobject {
@@ -18,7 +17,7 @@ export class CreatedBoxSlider extends CreatedMobject {
 		this.setAttributes({
 			width: 50,
 			height: 0,
-			fillColor: rgb(0, 0, 0)
+			fillColor: Color.black()
 		})
 		this.setDefaults({ startPoint: Vertex.origin() })
 		this.anchor = this.startPoint
@@ -27,25 +26,25 @@ export class CreatedBoxSlider extends CreatedMobject {
 			value: 0.5,
 			width: this.width,
 			height: 0,
-			fillColor: rgb(0, 0, 0)
+			fillColor: Color.black()
 		})
 		this.protoSlider.filledBar.update({
 			width: this.width,
-			fillColor: gray(0.5)
+			fillColor: Color.gray(0.5)
 		})
 		this.add(this.protoSlider)
 	}
 
 	updateFromTip(q: Vertex) {
 		this.update({ // This shouldn't be necessary, fix
-			fillColor: gray(0)
+			fillColor: Color.black()
 		})
 		this.protoSlider.update({
 			height: q.y - this.startPoint.y,
 			//fillColor: gray(0.5) // This shouldn't be necessary, fix
 		})
 		this.protoSlider.filledBar.update({
-			fillColor: gray(0.5)
+			fillColor: Color.gray(0.5)
 		})
 
 	}

@@ -1,6 +1,6 @@
 import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
 import { Vertex, Translation } from './modules/transform'
-import { Mobject, MGroup, TextLabel } from './modules/mobject'
+import { Color, Mobject, MGroup, TextLabel } from './modules/mobject'
 import { Circle } from './modules/shapes'
 import { Segment } from './modules/arrows'
 import { Paper } from './paper'
@@ -34,7 +34,7 @@ class SidebarButton extends Circle {
 	
 	currentModeIndex: number
 	previousIndex: number
-	_baseColor: string
+	_baseColor: Color
 	_locationIndex: number
 	optionSpacing: number
 	touchStart: Vertex
@@ -61,7 +61,8 @@ class SidebarButton extends Circle {
 		this.setAttributes({
 			currentModeIndex: 0,
 			previousIndex: 0,
-			baseColor: rgb(1, 1, 1),
+			baseColor: Color.white(),
+			strokeWidth: 0,
 			locationIndex: 0,
 			optionSpacing: 25,
 			active: false,
@@ -90,27 +91,28 @@ class SidebarButton extends Circle {
 		
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
+
+		console.log(this.properties())
+		console.log(this.fillColor)
+		this.redraw()
 	}
+
+	numberOfIndices(): number { return this.messages.length }
 	
-	get baseColor(): string { return this._baseColor }
-	set baseColor(newColor: string) {
+	get baseColor(): Color { return this._baseColor }
+	set baseColor(newColor: Color) {
+		console.log('setting baseColor to', newColor.toCSS())
 		this._baseColor = newColor
 		this.fillColor = newColor
-
 	}
 	
 	get locationIndex(): number { return this._locationIndex }
 	set locationIndex(newIndex: number) {
 		this._locationIndex = newIndex
 		this.anchor = buttonCenter(this._locationIndex)
-		
-	}
-	
-	static brighten(color: Array<number>, factor: number) {
-		return rgb(factor*color[0], factor*color[1], factor*color[2])
 	}
 
-	colorForIndex(i: number) {
+	colorForIndex(i: number): Color {
 		return this.baseColor
 	}
 	
@@ -134,6 +136,7 @@ class SidebarButton extends Circle {
 		this.previousIndex = this.currentModeIndex
 		this.messagePaper(this.messages[0])
 		this.update()
+		this.redraw()
 	}
 	
 	buttonDownByPointer(e: LocatedEvent) {
@@ -145,7 +148,6 @@ class SidebarButton extends Circle {
 		addPointerMove(this.view, this.boundButtonDrag)
 		this.touchStart = pointerEventVertex(e)
 	}
-	
 
 	buttonUpByPointer(e: LocatedEvent) {
 		e.preventDefault()
@@ -171,9 +173,10 @@ class SidebarButton extends Circle {
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.midPoint.copyFrom(newMidpoint)
 
-		this.update()
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
+		this.update()
+		this.redraw()
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
 	}
@@ -213,6 +216,8 @@ class SidebarButton extends Circle {
 		if (withMessage as boolean) { this.messagePaper(message) }
  
 		this.update()
+		this.redraw()
+		
 	}
 	
 	selectNextOption() {
@@ -249,10 +254,11 @@ class SidebarButton extends Circle {
 		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
 
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
-		this.midPoint.copyFrom(newMidpoint)
-
-		this.updateModeIndex(newIndex, true)
+		this.update({ midPoint: newMidpoint })
 		
+		this.updateModeIndex(newIndex, true)
+		this.redraw()
+
 	}
 	
 }
@@ -260,27 +266,27 @@ class SidebarButton extends Circle {
 class ColorChangeButton extends SidebarButton {
 
 	palette: object
-	colors: Array<string>
+	colorNames: Array<string>
 
 	constructor(argsDict: object = {}) {
 		super()
 		this.setAttributes({
 			optionSpacing: 15,
-			showLabel: false,
+			showLabel: true,
 			palette: {
-				'white': rgb(1, 1, 1),
-				'red': rgb(1, 0, 0),
-				'orange': rgb(1, 0.5, 0),
-				'yellow': rgb(1, 1, 0),
-				'green': rgb(0, 1, 0),
-				'blue': rgb(0, 0, 1),
-				'indigo': rgb(0.5, 0, 1),
-				'violet': rgb(1, 0, 1)
+				'white': Color.white(),
+				'red': Color.red(),
+				'orange': Color.orange(),
+				'yellow': Color.yellow(),
+				'green': Color.green(),
+				'blue': Color.blue(),
+				'indigo': Color.indigo(),
+				'violet': Color.violet()
 			}
 		})
 		this.setAttributes(argsDict)
 
-		this.colors = Object.keys(this.palette)
+		this.colorNames = Object.keys(this.palette)
 		this.label.text = 'color'
 		this.label.view.setAttribute('fill', 'black')
 
@@ -288,10 +294,12 @@ class ColorChangeButton extends SidebarButton {
 			this.messages.push({color: value})
 		}
 		this.outgoingMessage = {}
+		this.update()
+		this.redraw()
 	}
 
-	colorForIndex(i) {
-		return this.palette[this.colors[i]]
+	colorForIndex(i): Color {
+		return this.palette[this.colorNames[i]]
 	}
 
 	updateLabel() {
@@ -307,6 +315,8 @@ class ColorChangeButton extends SidebarButton {
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
 		this.messagePaper(this.outgoingMessage)
+		this.update()
+		this.redraw()
 	}
 
 	buttonDrag(e) {
@@ -321,9 +331,7 @@ class CreativeButton extends SidebarButton {
 
 	constructor(argsDict: object = {}) {
 		super()
-		console.log('a', this.text)
 		this.setAttributes(argsDict)
-		console.log('b', this.text)
 		this.creations = argsDict['creations']
 		this.messages = []
 		for (let creation of this.creations) {
@@ -331,7 +339,7 @@ class CreativeButton extends SidebarButton {
 		}
 		this.outgoingMessage = {creating: 'freehand'}
 		this.update(argsDict)
-		console.log('c', this.label.text)
+		this.redraw()
 	}
 
 	commonButtonUp() {
@@ -341,14 +349,11 @@ class CreativeButton extends SidebarButton {
 
 	updateLabel() {
 		if (this.label == undefined) { return }
-		console.log('a label')
 		if (this.showLabel) {
-		console.log('b label')
 			try {
 				this.text = this.creations[this.currentModeIndex]
 				this.label.update({text: this.text})
 				this.label.redraw()
-				console.log('c label')
 			} catch { }
 		} else {
 			this.label.text = ''
@@ -386,10 +391,11 @@ class DragButton extends ToggleButton {
 		this.label2.view.setAttribute('font-family', 'Times')
 		this.label2.view.setAttribute('font-size', this.fontSize.toString())
 		this.label2.view.setAttribute('transform', 'rotate(90, 51, 237.5)')
-		this.label2.color = rgb(1, 1, 1)
+		this.label2.color = Color.white()
 		this.label2.anchor = new Vertex(0, 2)
 		this.add(this.label2)
 		this.update()
+		this.redraw()
 	}
 
 	updateLabel() {
@@ -405,6 +411,7 @@ class LinkButton extends ToggleButton {
 		super(argsDict)
 		this.label.text = 'link'
 		this.update()
+		this.redraw()
 	}
 }
 
@@ -412,62 +419,65 @@ class LinkButton extends ToggleButton {
 let lineButton = new CreativeButton({
 	creations: ['segment', 'ray', 'line'],
 	key: 'q',
+	baseColor: Color.gray(0.2),
 	locationIndex: 0
 })
-lineButton.baseColor = gray(0.2)
 sidebar.appendChild(lineButton.view)
 
 let circleButton = new CreativeButton({
 	creations: ['circle'],
 	key: 'w',
+	baseColor: Color.gray(0.4),
 	locationIndex: 1
 })
-circleButton.baseColor = gray(0.4)
 sidebar.appendChild(circleButton.view)
 
 let sliderButton = new CreativeButton({
 	creations: ['slider'],
 	key: 'e',
+	baseColor: Color.gray(0.6),
 	locationIndex: 2
 })
-sliderButton.baseColor = gray(0.4)
 sidebar.appendChild(sliderButton.view)
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
 	key: 'r',
+	baseColor: Color.gray(0.2),
 	locationIndex: 3
 })
-cindyButton.baseColor = gray(0.6)
 sidebar.appendChild(cindyButton.view)
   
 let dragButton = new DragButton({
 	messages: [{drag: true}],
 	outgoingMessage: {drag: false},
 	key: 't',
+	baseColor: Color.gray(0.6),
 	locationIndex: 4
 })
-dragButton.baseColor = gray(0.8)
 dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
+dragButton.redraw()
 sidebar.appendChild(dragButton.view)
 
 let linkButton = new LinkButton({
 	messages: [{toggleLinks: true}],
 	outgoingMessage: {toggleLinks: false},
 	key: 'z',
+	baseColor: Color.gray(0.2),
 	locationIndex: 5
 })
-linkButton.baseColor = gray(0.3)
 linkButton.label.view.setAttribute('fill', 'black')
+linkButton.redraw()
 sidebar.appendChild(linkButton.view)
 
 let colorButton = new ColorChangeButton({
 	key: 'a',
+	baseColor: Color.white(),
 	modeSpacing: 15,
-	locationIndex: 6
+	locationIndex: 6,
+	fillOpacity: 1
 })
-colorButton.baseColor = gray(1.0)
 sidebar.appendChild(colorButton.view)
 
 

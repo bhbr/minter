@@ -1,6 +1,6 @@
-import { rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './helpers'
+import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './helpers'
 import { Vertex } from './transform'
-import { Mobject, MGroup } from './mobject'
+import { Color, Mobject, MGroup } from './mobject'
 import { Circle, TwoPointCircle } from './shapes'
 import { Segment, Ray, Line } from './arrows'
 
@@ -27,7 +27,7 @@ export class Freehand extends CreatedMobject {
 	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.setAttributes({
-			strokeColor: rgb(1, 1, 1)
+			strokeColor: Color.white()
 		})
 	}
 	
@@ -98,7 +98,7 @@ export class Point extends Circle {
 			midPoint: Vertex.origin()
 		})
 		this.setAttributes({
-			fillColor: rgb(1, 1, 1),
+			fillColor: Color.white(),
 			fillOpacity: 1.0
 		})
 	}
@@ -277,7 +277,7 @@ export class DrawnCircle extends CreatedMobject {
 		super(argsDict)
 		
 		this.setDefaults({
-			strokeColor: rgb(1, 1, 1)
+			strokeColor: Color.white()
 		})
 		this.setAttributes({
 			strokeWidth: 1,

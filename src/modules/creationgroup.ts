@@ -1,9 +1,9 @@
 import { CreatedMobject, Freehand, DrawnSegment, DrawnRay, DrawnLine, DrawnCircle } from './creating'
 import { DrawnRectangle } from './cindycanvas'
 import { CreatedBoxSlider } from './createdslider'
-import { rgb } from './helpers'
 import { LinkableMobject } from './linkables'
 import { Vertex } from './transform'
+import { Color } from './mobject'
 
 export class CreationGroup extends CreatedMobject {
 
@@ -42,7 +42,7 @@ export class CreationGroup extends CreatedMobject {
 		this.creations[visibleCreation].show()
 
 		if (visibleCreation == 'cindy') {
-			this.creations[visibleCreation].strokeColor = rgb(1, 1, 1)
+			this.creations[visibleCreation].strokeColor = Color.white()
 		}
 	}
 

@@ -1,6 +1,6 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
 import { Vertex, Transform } from './modules/transform'
-import { Mobject, MGroup } from './modules/mobject'
+import { Color, Mobject, MGroup, TextLabel } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
@@ -21,7 +21,7 @@ export class Paper extends LinkableMobject {
 	snappablePoints: Array<FreePoint>
 	creationStartPoint: Vertex
 	colorPalette: object
-	currentColor: string
+	currentColor: Color
 	creationGroup: CreationGroup
 	geometricObjects: Array<Mobject>
 	dependencyMap: DependencyMap
@@ -56,11 +56,16 @@ export class Paper extends LinkableMobject {
 	}
 
 	changeColorByName(newColorName: string) {
-		let newColor: string = this.colorPalette[newColorName]
+		let newColor: Color = this.colorPalette[newColorName]
 		this.changeColor(newColor)
 	}
 
-	changeColor(newColor: string) {
+	changeColorByHex(newColorHex: string) {
+		let newColor: Color = Color.fromHex(newColorHex)
+		this.changeColor(newColor)
+	}
+
+	changeColor(newColor: Color) {
 		this.currentColor = newColor
 		if (this.creationGroup == undefined) { return }
 		this.creationGroup.strokeColor = this.currentColor
@@ -168,7 +173,7 @@ export class Paper extends LinkableMobject {
 			}
 			break
 		case 'color':
-			this.changeColor(value as string)
+			this.changeColorByHex(value as string)
 			break
 		case 'drag':
 			this.setDragging(value as boolean)
@@ -346,11 +351,16 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 
 let c = new Circle({anchor: new Vertex(100, 100), radius: 25})
 c.anchor = new Vertex(300, 400)
-c.fillColor = rgb(1, 0, 1)
+c.fillColor = Color.violet()
 c.redraw()
-paper.add(c)
+//paper.add(c)
 
-
+let t = new TextLabel({
+	text: "blablub",
+	anchor: new Vertex(100, 100),
+	color: Color.red()	
+})
+paper.add(t)
 
 
 

@@ -1,7 +1,7 @@
 import { Vertex } from './transform'
-import { Polygon, CurvedShape, MGroup } from './mobject'
+import { Polygon, CurvedShape, Color, MGroup } from './mobject'
 import { Segment } from './arrows'
-import { rgb, gray, pointerEventVertex } from './helpers'
+import { gray, pointerEventVertex } from './helpers'
 
 
 
@@ -61,8 +61,8 @@ export class TwoPointCircle extends Circle {
 	constructor(argsDict: object) {
 		super(argsDict)
 		this.setAttributes({
-			strokeColor: rgb(1, 1, 1),
-			fillColor: rgb(1, 1, 1),
+			strokeColor: Color.white(),
+			fillColor: Color.white(),
 			fillOpacity: 0
 		})
 		this.view.style['pointer-events'] = 'none'

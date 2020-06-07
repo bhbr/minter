@@ -2,8 +2,7 @@ import { LinkableMobject } from './linkables'
 import { Vertex } from './transform'
 import { Segment } from './arrows'
 import { CreatedMobject } from './creating'
-import { rgb } from './helpers'
-import { Mobject } from './mobject'
+import { Mobject, Color } from './mobject'
 import { Paper } from '../paper'
 
 
@@ -184,10 +183,10 @@ export class DrawnRectangle extends CreatedMobject {
 		this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
 		this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
 		this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
-		this.top.strokeColor = rgb(1, 1, 1)
-		this.bottom.strokeColor = rgb(1, 1, 1)
-		this.left.strokeColor = rgb(1, 1, 1)
-		this.right.strokeColor = rgb(1, 1, 1)
+		this.top.strokeColor = Color.white()
+		this.bottom.strokeColor = Color.white()
+		this.left.strokeColor = Color.white()
+		this.right.strokeColor = Color.white()
 		this.add(this.top)
 		this.add(this.bottom)
 		this.add(this.left)

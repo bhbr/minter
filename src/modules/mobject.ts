@@ -1,5 +1,5 @@
 import { Vertex, Transform } from './transform'
-import { remove, logInto, stringFromPoint, rgb, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './helpers'
+import { remove, logInto, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './helpers'
 
 export class Dependency {
 
@@ -16,6 +16,62 @@ export class Dependency {
 	}
 }
 
+export class Color {
+
+	red: number
+	green: number
+	blue: number
+	alpha: number
+
+	constructor(r, g, b, a = 1) {
+		this.red = r
+		this.green = g
+		this.blue = b
+		this.alpha = a
+	}
+
+	brighten(factor: number): Color {
+		return new Color(factor*this.red, factor*this.green, factor*this.blue, this.alpha)
+	}
+
+	toHex(): string {
+		let hex_r: string = (Math.round(this.red*255)).toString(16).padStart(2, '0')
+		let hex_g: string = (Math.round(this.green*255)).toString(16).padStart(2, '0')
+		let hex_b: string = (Math.round(this.blue*255)).toString(16).padStart(2, '0')
+		let hex_a: string = ''
+		if (this.alpha != 1) {
+			hex_a = (Math.round(this.alpha*255)).toString(16).padStart(2, '0')
+		}
+		return '#' + hex_r + hex_g + hex_b + hex_a
+	}
+
+	toCSS(): string {
+		return `rgb(${255*this.red}, ${255*this.green}, ${255*this.blue}, ${this.alpha})`
+	}
+
+	static fromHex(hex: string): Color {
+		let r: number = parseInt('0x' + hex.slice(1, 2))/255
+		let g: number = parseInt('0x' + hex.slice(3, 2))/255
+		let b: number = parseInt('0x' + hex.slice(5, 2))/255
+		let a: number = 1
+		if (hex.length > 7) {
+			a = parseInt('0x' + hex.slice(7, 2))/255
+		}
+		return new Color(r, g, b, a)
+	}
+
+	static gray(x): Color { return new Color(x, x, x) }
+	static black(): Color { return Color.gray(0) }
+	static white(): Color { return Color.gray(1) }
+
+	static red(): Color { return new Color(1, 0, 0) }
+	static orange(): Color { return new Color(1, 0.5, 0) }
+	static yellow(): Color { return new Color(1, 1, 0) }
+	static green(): Color { return new Color(0, 1, 0) }
+	static blue(): Color { return new Color(0, 0, 1) }
+	static indigo(): Color { return new Color(0.5, 0, 1) }
+	static violet(): Color { return new Color(1, 0, 1) }
+}
 
 export class Mobject {
 
@@ -23,9 +79,9 @@ export class Mobject {
 	view: HTMLElement | SVGElement
 	_parent: Mobject
 
-	fillColor: string
+	fillColor: Color
 	fillOpacity: number
-	strokeColor: string
+	strokeColor: Color
 	strokeWidth: number
 
 	_transform: Transform
@@ -77,9 +133,9 @@ export class Mobject {
 			vertices: [],
 			children: [],
 			dependencies: [],
-			fillColor: rgb(1, 1, 1),
+			fillColor: Color.white(),
 			fillOpacity: 1,
-			strokeColor: rgb(1, 1, 1),
+			strokeColor: Color.white(),
 			strokeWidth: 1,
 			passAlongEvents: false, // to event target
 			visible: true,
@@ -674,9 +730,9 @@ export class VMobject extends Mobject {
 		this.path['mobject'] = this
 		this.view.appendChild(this.path) // why not just add?
 		this.setAttributes({
-			fillColor: rgb(1, 1, 1),
+			fillColor: Color.white(),
 			fillOpacity: 0.5,
-			strokeColor: rgb(1, 1, 1),
+			strokeColor: Color.white(),
 			strokeWidth: 1
 		})
 		this.update(argsDict)
@@ -687,9 +743,9 @@ export class VMobject extends Mobject {
 		let pathString: string = this.pathString()
 		if (pathString.includes("NaN")) { return }
 		this.path.setAttribute('d', pathString)
-		this.path.style['fill'] = this.fillColor
+		this.path.style['fill'] = this.fillColor.toHex()
 		this.path.style['fill-opacity'] = this.fillOpacity.toString()
-		this.path.style['stroke'] = this.strokeColor
+		this.path.style['stroke'] = this.strokeColor.toHex()
 		this.path.style['stroke-width'] = this.strokeWidth.toString()
 		this.redrawSubmobs()
 	}
@@ -746,6 +802,11 @@ export class CurvedShape extends VMobject {
 	updateBezierPoints() { }
 	// implemented by subclasses
 
+	update(argsDict: object = {}) {
+		super.update(argsDict)
+		this.updateBezierPoints()
+	}
+
 	globalBezierPoints(): Array<Vertex> {
 		return this.globalTransform().appliedTo(this.bezierPoints)
 	}
@@ -796,14 +857,14 @@ export class TextLabel extends Mobject {
 
 	text: string
 	textAnchor: string
-	color: string
+	color: Color
 
 	constructor(argsDict: object = {}) {
 		super()
 		this.setAttributes({
 			text: '',
 			textAnchor: 'middle',
-			color: rgb(1, 1, 1)
+			color: Color.white()
 		})
 		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 		this.view['mobject'] = this
@@ -814,6 +875,7 @@ export class TextLabel extends Mobject {
 		this.view.setAttribute('font-size', '12')
 		this.view.setAttribute('x', '0')
 		this.view.setAttribute('y', '0')
+		this.view.setAttribute('stroke-width', '0')
 		this.update(argsDict)
 		this.redraw()
 	}
@@ -822,8 +884,11 @@ export class TextLabel extends Mobject {
 		this.view.textContent = this.text
 		this.view.setAttribute('x', this.globalTransform().e.toString())
 		this.view.setAttribute('y', this.globalTransform().f.toString())
-		this.view.setAttribute('fill', this.color)
-		this.view.setAttribute('stroke', this.color)
+		
+		if (this.color == undefined) { this.color = Color.white() }
+
+		this.view.setAttribute('fill', this.color.toHex())
+		this.view.setAttribute('stroke', this.color.toHex())
 		
 		this.redrawSubmobs()
 	}

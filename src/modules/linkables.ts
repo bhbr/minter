@@ -1,7 +1,7 @@
 import { Vertex } from './transform'
-import { Dependency, Mobject, MGroup, TextLabel } from './mobject'
+import { Dependency, Color, Mobject, MGroup, TextLabel } from './mobject'
 import { Circle, RoundedRectangle } from './shapes'
-import { rgb, pointerEventVertex, LocatedEvent } from './helpers'
+import { pointerEventVertex, LocatedEvent } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
@@ -17,7 +17,7 @@ export class LinkBullet extends Circle {
 		this.setAttributes({        
 			radius: 10,
 			fillOpacity: 0,
-			strokeColor: rgb(1, 1, 1)
+			strokeColor: Color.white()
 		})
 	}
 }
@@ -34,7 +34,7 @@ export class InputList extends RoundedRectangle {
 		this.setDefaults({listInputNames: []})
 		this.setAttributes({
 			cornerRadius: 30,
-			fillColor: rgb(1, 1, 1),
+			fillColor: Color.white(),
 			fillOpacity: 0.1,
 			width: 150,
 			height: this.getHeight()
@@ -73,7 +73,7 @@ export class OutputList extends RoundedRectangle {
 		this.setDefaults({listOutputNames: []})
 		this.setAttributes({
 			cornerRadius: 30,
-			fillColor: rgb(1, 1, 1),
+			fillColor: Color.white(),
 			fillOpacity: 0.3,
 			width: 150,
 			height: this.getHeight()

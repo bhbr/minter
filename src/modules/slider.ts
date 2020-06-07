@@ -1,6 +1,6 @@
-import { rgb, gray, pointerEventVertex, LocatedEvent } from './helpers'
+import { pointerEventVertex, LocatedEvent } from './helpers'
 import { Vertex } from './transform'
-import { Mobject, MGroup, TextLabel, Polygon } from './mobject'
+import { Color, Mobject, MGroup, TextLabel, Polygon } from './mobject'
 import { Line } from './arrows'
 import { Circle, Rectangle } from './shapes'
 import { LinkableMobject } from './linkables'
@@ -29,7 +29,7 @@ export class BoxSlider extends LinkableMobject {
 			value: 0.6,
 			height: 200,
 			width: 50,
-			strokeColor: rgb(1, 1, 1)
+			strokeColor: Color.white()
 		})
 		this.setAttributes({
 			draggable: true,
@@ -37,13 +37,13 @@ export class BoxSlider extends LinkableMobject {
 			outputNames: ['value']
 		})
 		this.setAttributes({
-			fillColor: argsDict['backgroundColor'] || rgb(1, 1, 1)
+			fillColor: argsDict['backgroundColor'] || Color.white()
 		})
 
 		this.outerBar = new Rectangle({
 			width: this.width,
 			height: this.height,
-			fillColor: rgb(0, 0, 0),
+			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeColor: this.strokeColor
 		})
@@ -52,7 +52,7 @@ export class BoxSlider extends LinkableMobject {
 		this.filledBar = new Rectangle({
 			width: this.width,
 			height: this.normalizedValue() * this.height,
-			fillColor: argsDict['fillColor'] || gray(0.5)
+			fillColor: argsDict['fillColor'] || Color.gray(0.5)
 		})
 		this.add(this.filledBar)
 		this.label = new TextLabel({text: this.value.toString()})
