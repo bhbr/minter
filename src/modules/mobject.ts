@@ -76,7 +76,7 @@ export class Color {
 export class Mobject {
 
 	eventTarget: Mobject
-	view: HTMLElement | SVGElement
+	view: SVGElement
 	_parent: Mobject
 
 	fillColor: Color
@@ -123,7 +123,8 @@ export class Mobject {
 	constructor(argsDict: object = {}) {
 		this.eventTarget = null
 		if (argsDict['view'] == undefined) {
-			this.view = document.createElement('div') // placeholder
+			//this.view = document.createElement('div') // placeholder
+			this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		} else {
 			this.view = argsDict['view']
 		}
@@ -370,7 +371,8 @@ export class Mobject {
 		}
 	}
 
-	redrawSubmobs(redraw = true) {
+	redrawSubmobs() {
+		console.log(this.constructor.name + '.redrawSubmobs')
 		for (let submob of this.children || []) {
 			submob.redraw()
 			submob.redrawSubmobs()
@@ -710,6 +712,7 @@ export class MGroup extends Mobject {
 	}
 
 	redraw() {
+		console.log('MGroup.redraw')
 		this.redrawSubmobs()
 	}
 
@@ -719,7 +722,6 @@ export class MGroup extends Mobject {
 
 export class VMobject extends Mobject {
 
-	view: SVGElement
 	path: SVGElement // child of view
 	vertices: Array<Vertex>
 
@@ -730,6 +732,7 @@ export class VMobject extends Mobject {
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.path['mobject'] = this
 		this.view.appendChild(this.path) // why not just add?
+		this.view.setAttribute('class', this.constructor.name)
 		this.setAttributes({
 			fillColor: Color.white(),
 			fillOpacity: 0.5,
@@ -770,7 +773,7 @@ export class Polygon extends VMobject {
 	pathString(): string {
 		let pathString: string = ''
 		for (let point of this.vertices) {
-			if (point.isNaN()) {
+			if (point == undefined || point.isNaN()) {
 				pathString = ''
 				return pathString
 			}
@@ -813,6 +816,7 @@ export class CurvedShape extends VMobject {
 	}
 
 	redraw() {
+		console.log(this.constructor.name + '.redraw')
 		this.updateBezierPoints()
 		super.redraw()
 	}

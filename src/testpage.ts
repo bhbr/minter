@@ -1,6 +1,6 @@
 import { rgb, addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
 import { Vertex, Transform } from './modules/transform'
-import { Color, Mobject, MGroup, TextLabel } from './modules/mobject'
+import { Color, Mobject, MGroup, VMobject, TextLabel } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
@@ -349,18 +349,48 @@ export class Paper extends LinkableMobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-let c = new Circle({anchor: new Vertex(100, 100), radius: 25})
-c.anchor = new Vertex(300, 400)
-c.fillColor = Color.violet()
-c.redraw()
+// let c = new Circle({anchor: new Vertex(100, 100), radius: 25})
+// c.anchor = new Vertex(300, 400)
+// c.fillColor = Color.violet()
+// c.redraw()
 //paper.add(c)
 
-let t = new TextLabel({
-	text: "blablub",
-	anchor: new Vertex(100, 100),
-	color: Color.red()	
+// let t = new TextLabel({
+// 	text: "blablub",
+// 	anchor: new Vertex(100, 100),
+// 	color: Color.red()	
+// })
+// paper.add(t)
+
+// let s = new Segment({
+// 	startPoint: new Vertex(100, 100),
+// 	endPoint: new Vertex(200, 300)
+// })
+// paper.add(s)
+
+
+let m = new MGroup()
+let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
+let r = new Rectangle({
+	anchor: new Vertex(0, 0),
+	width: 50,
+	height: 50,
+	fillColor: Color.green()
 })
-paper.add(t)
+m.add(c)
+m.add(r)
+paper.add(m)
+
+
+
+
+
+
+
+
+
+
+
 
 
 

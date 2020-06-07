@@ -344,11 +344,6 @@ export class Paper extends LinkableMobject {
 
 export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
 
-let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
-c.update()
-c.redraw()
-paper.add(c)
-
 
 
 

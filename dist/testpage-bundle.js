@@ -464,7 +464,8 @@ var Sidebar = (function (exports) {
             this.snappablePoints = []; // workaround, don't ask
             this.eventTarget = null;
             if (argsDict['view'] == undefined) {
-                this.view = document.createElement('div'); // placeholder
+                //this.view = document.createElement('div') // placeholder
+                this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             }
             else {
                 this.view = argsDict['view'];
@@ -751,7 +752,8 @@ var Sidebar = (function (exports) {
                 submob.update({}, false);
             }
         }
-        redrawSubmobs(redraw = true) {
+        redrawSubmobs() {
+            console.log(this.constructor.name + '.redrawSubmobs');
             for (let submob of this.children || []) {
                 submob.redraw();
                 submob.redrawSubmobs();
@@ -1042,6 +1044,7 @@ var Sidebar = (function (exports) {
             this.update(argsDict);
         }
         redraw() {
+            console.log('MGroup.redraw');
             this.redrawSubmobs();
         }
     }
@@ -1053,6 +1056,7 @@ var Sidebar = (function (exports) {
             this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             this.path['mobject'] = this;
             this.view.appendChild(this.path); // why not just add?
+            this.view.setAttribute('class', this.constructor.name);
             this.setAttributes({
                 fillColor: Color.white(),
                 fillOpacity: 0.5,
@@ -1085,7 +1089,7 @@ var Sidebar = (function (exports) {
         pathString() {
             let pathString = '';
             for (let point of this.vertices) {
-                if (point.isNaN()) {
+                if (point == undefined || point.isNaN()) {
                     pathString = '';
                     return pathString;
                 }
@@ -1107,6 +1111,7 @@ var Sidebar = (function (exports) {
             return this.globalTransform().appliedTo(this.bezierPoints);
         }
         redraw() {
+            console.log(this.constructor.name + '.redraw');
             this.updateBezierPoints();
             super.redraw();
         }
@@ -2870,17 +2875,33 @@ var Sidebar = (function (exports) {
         }
     }
     const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true });
-    let c = new Circle({ anchor: new Vertex(100, 100), radius: 25 });
-    c.anchor = new Vertex(300, 400);
-    c.fillColor = Color.violet();
-    c.redraw();
+    // let c = new Circle({anchor: new Vertex(100, 100), radius: 25})
+    // c.anchor = new Vertex(300, 400)
+    // c.fillColor = Color.violet()
+    // c.redraw()
     //paper.add(c)
-    let t = new TextLabel({
-        text: "blablub",
-        anchor: new Vertex(100, 100),
-        color: Color.red()
+    // let t = new TextLabel({
+    // 	text: "blablub",
+    // 	anchor: new Vertex(100, 100),
+    // 	color: Color.red()	
+    // })
+    // paper.add(t)
+    // let s = new Segment({
+    // 	startPoint: new Vertex(100, 100),
+    // 	endPoint: new Vertex(200, 300)
+    // })
+    // paper.add(s)
+    let m = new MGroup();
+    let c = new Circle({ anchor: new Vertex(100, 100), radius: 75 });
+    let r = new Rectangle({
+        anchor: new Vertex(0, 0),
+        width: 50,
+        height: 50,
+        fillColor: Color.green()
     });
-    paper.add(t);
+    m.add(c);
+    m.add(r);
+    paper.add(m);
 
     exports.Paper = Paper;
     exports.paper = paper;

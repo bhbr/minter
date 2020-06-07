@@ -11,7 +11,6 @@ export class CindyCanvas extends LinkableMobject {
 	paper: Paper
 	width: number
 	height: number
-	view: HTMLElement
 	csView: HTMLCanvasElement
 	initScript: HTMLScriptElement
 	drawScript: HTMLScriptElement
