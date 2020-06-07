@@ -92,8 +92,6 @@ class SidebarButton extends Circle {
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
-		console.log(this.properties())
-		console.log(this.fillColor)
 		this.redraw()
 	}
 
@@ -101,7 +99,6 @@ class SidebarButton extends Circle {
 	
 	get baseColor(): Color { return this._baseColor }
 	set baseColor(newColor: Color) {
-		console.log('setting baseColor to', newColor.toCSS())
 		this._baseColor = newColor
 		this.fillColor = newColor
 	}
