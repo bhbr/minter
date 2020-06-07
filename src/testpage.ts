@@ -381,24 +381,35 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 // m.add(r)
 // paper.add(m)
 
+let p = new Vertex(100, 100)
+let q = new Vertex(200, 200)
+let fp = new FreePoint({anchor: p})
+let fq = new FreePoint({anchor: q})
+paper.add(fp)
+paper.add(fq)
 
-// let p = new FreePoint({anchor: new Vertex(100, 100)})
-// let q = new FreePoint({anchor: new Vertex(200, 200)})
-// let s = new Segment({
-// 	startPoint: p.midPoint,
-// 	endPoint: q.midPoint
-// })
-// p.addDependent(s)
-// q.addDependent(s)
-// paper.add(p)
-// paper.add(q)
-// paper.add(s)
+let s = new Segment({
+	startPoint: fp.midPoint,
+	endPoint: fq.midPoint
+})
+fp.addDependent(s)
+fq.addDependent(s)
+paper.add(s)
 
+let c = new TwoPointCircle({
+	midPoint: fp.midPoint,
+	outerPoint: fq.midPoint
+})
+fp.addDependency('midPoint', c, 'midPoint')
+fq.addDependency('midPoint', c, 'outerPoint')
+paper.add(c)
 
-
-
-
-
+let sl = new BoxSlider({
+	anchor: new Vertex(400, 50),
+	height: 200
+})
+paper.add(sl)
+console.log(sl.outerBar.globalVertices(), sl.outerBar.pathString())
 
 
 

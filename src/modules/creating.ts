@@ -129,11 +129,9 @@ export class DrawnArrow extends CreatedMobject {
 		this.startFreePoint = new FreePoint({
 			midPoint: this.startPoint
 		})
-		this.startFreePoint.addDependent(this)
 		this.endFreePoint = new FreePoint({
 			midPoint: this.endPoint
 		})
-		this.endFreePoint.addDependent(this)
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
 		
@@ -142,7 +140,6 @@ export class DrawnArrow extends CreatedMobject {
 	updateFromTip(q: Vertex) {
 		this.endPoint.copyFrom(q)
 		this.endFreePoint.midPoint.copyFrom(q)
-		this.endFreePoint.update()
 		this.update()
 	}
 
@@ -189,6 +186,7 @@ export class DrawnSegment extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.segment)
+		this.update()
 	}
 
 	dissolveInto(superMobject: Mobject) {
@@ -219,16 +217,15 @@ export class DrawnRay extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint,
 		})
 		this.add(this.ray)
-		this.startFreePoint.addDependent(this.ray)
-		this.endFreePoint.addDependent(this.ray)
+		this.update()
 	}
 
 	dissolveInto(superMobject: Mobject) {
 		super.dissolveInto(superMobject)
 		superMobject.remove(this.ray)
 		this.ray = new Ray({
-			startPoint: this.startPoint,
-			endPoint: this.endPoint,
+			startPoint: this.startFreePoint.midPoint,
+			endPoint: this.endFreePoint.midPoint,
 			strokeColor: this.strokeColor
 		})
 		this.startFreePoint.addDependent(this.ray)
@@ -250,22 +247,20 @@ export class DrawnLine extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.line)
-		this.startFreePoint.addDependent(this.line)
-		this.endFreePoint.addDependent(this.line)
+		this.update()
 	}
 
 	dissolveInto(superMobject: Mobject) {
 		super.dissolveInto(superMobject)
 		superMobject.remove(this.line)
 		this.line = new Line({
-			startPoint: this.startPoint,
-			endPoint: this.endPoint,
+			startPoint: this.startFreePoint.midPoint,
+			endPoint: this.endFreePoint.midPoint,
 			strokeColor: this.strokeColor
 		})
 		this.startFreePoint.addDependent(this.line)
 		this.endFreePoint.addDependent(this.line)
 		superMobject.add(this.line)
-
 	}
 
 
@@ -300,21 +295,19 @@ export class DrawnCircle extends CreatedMobject {
 			midPoint: this.outerPoint
 		})
 		this.circle = new TwoPointCircle({
-			midPoint: this.midPoint,
-			outerPoint: this.outerPoint,
+			midPoint: this.freeMidpoint.midPoint,
+			outerPoint: this.freeOuterPoint.midPoint,
 			fillOpacity: 0
 		})
 		this.add(this.freeMidpoint)
 		this.add(this.freeOuterPoint)
 		this.add(this.circle)
 
-		this.freeMidpoint.addDependent(this.circle)
-		this.freeOuterPoint.addDependent(this.circle)
-
 	}
 
 	updateFromTip(q: Vertex) {
 		this.outerPoint.copyFrom(q)
+		this.freeOuterPoint.midPoint.copyFrom(q)
 		this.update()
 	}
 
@@ -347,12 +340,12 @@ export class DrawnCircle extends CreatedMobject {
 		
 		paper.remove(this.circle)
 		this.circle = new TwoPointCircle({
-			midPoint: this.midPoint,
-			outerPoint: this.outerPoint
+			midPoint: this.freeMidpoint.midPoint,
+			outerPoint: this.freeOuterPoint.midPoint
 		})
 		this.circle.strokeColor = this.strokeColor
-		this.freeMidpoint.addDependent(this.circle)
-		this.freeOuterPoint.addDependent(this.circle)
+		this.freeMidpoint.addDependency('midPoint', this.circle, 'midPoint')
+		this.freeOuterPoint.addDependency('midPoint', this.circle, 'outerPoint')
 		paper.add(this.circle)
 
 	}

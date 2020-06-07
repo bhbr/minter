@@ -115,6 +115,9 @@ var Sidebar = (function (exports) {
             return `matrix(${this.a}, ${this.b}, ${this.c}, ${this.d}, ${this.e}, ${this.f})`;
         }
         appliedToVertex(v) {
+            if (v == undefined) {
+                return undefined;
+            }
             let newX = this.a * v.x + this.b * v.y + this.e;
             let newY = this.c * v.x + this.d * v.y + this.f;
             return new Vertex(newX, newY);
@@ -520,14 +523,12 @@ var Sidebar = (function (exports) {
         }
         get anchor() { return this._anchor; }
         set anchor(newValue) {
-            if (this._anchor == undefined) {
-                this._anchor = newValue;
-            }
-            else {
-                this._anchor.copyFrom(newValue);
-            }
+            this._anchor = newValue;
             this.transform.anchorAt(newValue);
             this.update();
+        }
+        moveAnchorTo(newAnchor) {
+            this.anchor.copyFrom(newAnchor);
         }
         selfHandlePointerDown(e) { }
         selfHandlePointerMove(e) { }
@@ -567,7 +568,6 @@ var Sidebar = (function (exports) {
                 t = t.parentElement;
             }
             if (t == this.view) {
-                console.log('target (a):', this);
                 return this;
             }
             let targetViewChain = [t];
@@ -579,13 +579,11 @@ var Sidebar = (function (exports) {
             t = targetViewChain.pop();
             while (t != undefined) {
                 if (t['mobject'] != undefined) {
-                    console.log('target (b):', t['mobject']);
                     return t['mobject'];
                 }
                 t = targetViewChain.pop();
             }
             // if all of this fails, you need to handle the event yourself
-            console.log('target (c):', this);
             return this;
         }
         pointerDown(e) {
@@ -1094,7 +1092,7 @@ var Sidebar = (function (exports) {
     class Polygon extends VMobject {
         pathString() {
             let pathString = '';
-            for (let point of this.vertices) {
+            for (let point of this.globalVertices()) {
                 if (point == undefined || point.isNaN()) {
                     pathString = '';
                     return pathString;
@@ -1280,14 +1278,15 @@ var Sidebar = (function (exports) {
         }
     }
     class TwoPointCircle extends Circle {
-        constructor(argsDict) {
-            super(argsDict);
+        constructor(argsDict = {}) {
+            super();
             this.setAttributes({
                 strokeColor: Color.white(),
                 fillColor: Color.white(),
                 fillOpacity: 0
             });
             this.view.style['pointer-events'] = 'none';
+            this.update(argsDict);
             this.radius = this.midPoint.subtract(this.outerPoint).norm();
         }
         update(argsDict = {}, redraw = true) {
@@ -1557,18 +1556,15 @@ var Sidebar = (function (exports) {
             this.startFreePoint = new FreePoint({
                 midPoint: this.startPoint
             });
-            this.startFreePoint.addDependent(this);
             this.endFreePoint = new FreePoint({
                 midPoint: this.endPoint
             });
-            this.endFreePoint.addDependent(this);
             this.add(this.startFreePoint);
             this.add(this.endFreePoint);
         }
         updateFromTip(q) {
             this.endPoint.copyFrom(q);
             this.endFreePoint.midPoint.copyFrom(q);
-            this.endFreePoint.update();
             this.update();
         }
         dissolveInto(paper) {
@@ -1604,6 +1600,7 @@ var Sidebar = (function (exports) {
                 endPoint: this.endFreePoint.midPoint
             });
             this.add(this.segment);
+            this.update();
         }
         dissolveInto(superMobject) {
             super.dissolveInto(superMobject);
@@ -1626,15 +1623,14 @@ var Sidebar = (function (exports) {
                 endPoint: this.endFreePoint.midPoint,
             });
             this.add(this.ray);
-            this.startFreePoint.addDependent(this.ray);
-            this.endFreePoint.addDependent(this.ray);
+            this.update();
         }
         dissolveInto(superMobject) {
             super.dissolveInto(superMobject);
             superMobject.remove(this.ray);
             this.ray = new Ray({
-                startPoint: this.startPoint,
-                endPoint: this.endPoint,
+                startPoint: this.startFreePoint.midPoint,
+                endPoint: this.endFreePoint.midPoint,
                 strokeColor: this.strokeColor
             });
             this.startFreePoint.addDependent(this.ray);
@@ -1650,15 +1646,14 @@ var Sidebar = (function (exports) {
                 endPoint: this.endFreePoint.midPoint
             });
             this.add(this.line);
-            this.startFreePoint.addDependent(this.line);
-            this.endFreePoint.addDependent(this.line);
+            this.update();
         }
         dissolveInto(superMobject) {
             super.dissolveInto(superMobject);
             superMobject.remove(this.line);
             this.line = new Line({
-                startPoint: this.startPoint,
-                endPoint: this.endPoint,
+                startPoint: this.startFreePoint.midPoint,
+                endPoint: this.endFreePoint.midPoint,
                 strokeColor: this.strokeColor
             });
             this.startFreePoint.addDependent(this.line);
@@ -1686,18 +1681,17 @@ var Sidebar = (function (exports) {
                 midPoint: this.outerPoint
             });
             this.circle = new TwoPointCircle({
-                midPoint: this.midPoint,
-                outerPoint: this.outerPoint,
+                midPoint: this.freeMidpoint.midPoint,
+                outerPoint: this.freeOuterPoint.midPoint,
                 fillOpacity: 0
             });
             this.add(this.freeMidpoint);
             this.add(this.freeOuterPoint);
             this.add(this.circle);
-            this.freeMidpoint.addDependent(this.circle);
-            this.freeOuterPoint.addDependent(this.circle);
         }
         updateFromTip(q) {
             this.outerPoint.copyFrom(q);
+            this.freeOuterPoint.midPoint.copyFrom(q);
             this.update();
         }
         dissolveInto(paper) {
@@ -1725,12 +1719,12 @@ var Sidebar = (function (exports) {
             paper.add(this.freeOuterPoint);
             paper.remove(this.circle);
             this.circle = new TwoPointCircle({
-                midPoint: this.midPoint,
-                outerPoint: this.outerPoint
+                midPoint: this.freeMidpoint.midPoint,
+                outerPoint: this.freeOuterPoint.midPoint
             });
             this.circle.strokeColor = this.strokeColor;
-            this.freeMidpoint.addDependent(this.circle);
-            this.freeOuterPoint.addDependent(this.circle);
+            this.freeMidpoint.addDependency('midPoint', this.circle, 'midPoint');
+            this.freeOuterPoint.addDependency('midPoint', this.circle, 'outerPoint');
             paper.add(this.circle);
         }
     }
@@ -2008,12 +2002,13 @@ var Sidebar = (function (exports) {
         }
     }
     class LinkableMobject extends Mobject {
-        constructor(argsDict) {
-            super(argsDict);
+        constructor(argsDict = {}) {
+            super();
             this.setDefaults({
                 inputNames: [],
                 outputNames: [] // linkable parameters
             });
+            this.update(argsDict);
         }
         dependenciesBetweenChildren() {
             let deps = [];
@@ -2243,7 +2238,7 @@ var Sidebar = (function (exports) {
 
     class BoxSlider extends LinkableMobject {
         constructor(argsDict = {}) {
-            super(argsDict);
+            super();
             this.setDefaults({
                 min: 0,
                 max: 1,
@@ -2277,7 +2272,9 @@ var Sidebar = (function (exports) {
             this.label = new TextLabel({ text: this.value.toString() });
             this.label.anchor = new Vertex(this.width / 2, this.height / 2);
             this.add(this.label);
-            this.update();
+            this.update(argsDict);
+            console.log('outer bar:', this.outerBar.anchor);
+            console.log('filled bar:', this.filledBar.anchor);
         }
         normalizedValue() {
             return (this.value - this.min) / (this.max - this.min);
@@ -2289,11 +2286,13 @@ var Sidebar = (function (exports) {
                 return;
             }
             try {
+                delete argsDict['anchor']; // so it does not propagate to the outer bar in the next line
                 this.outerBar.update(argsDict);
                 this.filledBar.anchor.y = this.height - this.filledBar.height;
                 this.filledBar.update({ height: a * this.height });
-                this.label.text = this.value.toPrecision(3).toString();
-                this.label.anchor.copyFrom(new Vertex(this.width / 2, this.height / 2));
+                this.label.update({
+                    text: this.value.toPrecision(3).toString()
+                });
             }
             catch (_a) { }
             if (redraw) {
@@ -2912,17 +2911,32 @@ var Sidebar = (function (exports) {
     // m.add(c)
     // m.add(r)
     // paper.add(m)
-    // let p = new FreePoint({anchor: new Vertex(100, 100)})
-    // let q = new FreePoint({anchor: new Vertex(200, 200)})
-    // let s = new Segment({
-    // 	startPoint: p.midPoint,
-    // 	endPoint: q.midPoint
-    // })
-    // p.addDependent(s)
-    // q.addDependent(s)
-    // paper.add(p)
-    // paper.add(q)
-    // paper.add(s)
+    let p = new Vertex(100, 100);
+    let q = new Vertex(200, 200);
+    let fp = new FreePoint({ anchor: p });
+    let fq = new FreePoint({ anchor: q });
+    paper.add(fp);
+    paper.add(fq);
+    let s = new Segment({
+        startPoint: fp.midPoint,
+        endPoint: fq.midPoint
+    });
+    fp.addDependent(s);
+    fq.addDependent(s);
+    paper.add(s);
+    let c = new TwoPointCircle({
+        midPoint: fp.midPoint,
+        outerPoint: fq.midPoint
+    });
+    fp.addDependency('midPoint', c, 'midPoint');
+    fq.addDependency('midPoint', c, 'outerPoint');
+    paper.add(c);
+    let sl = new BoxSlider({
+        anchor: new Vertex(400, 50),
+        height: 200
+    });
+    paper.add(sl);
+    console.log(sl.outerBar.globalVertices(), sl.outerBar.pathString());
 
     exports.Paper = Paper;
     exports.paper = paper;

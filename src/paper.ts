@@ -348,6 +348,3 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 
 
 
-
-
-

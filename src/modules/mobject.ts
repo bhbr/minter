@@ -114,10 +114,13 @@ export class Mobject {
 
 	get anchor(): Vertex { return this._anchor }
 	set anchor(newValue: Vertex) {
-		if (this._anchor == undefined) { this._anchor = newValue }
-		else { this._anchor.copyFrom(newValue) }
+		this._anchor = newValue
 		this.transform.anchorAt(newValue)
 		this.update()
+	}
+
+	moveAnchorTo(newAnchor: Vertex) {
+		this.anchor.copyFrom(newAnchor)
 	}
 
 	constructor(argsDict: object = {}) {
@@ -206,7 +209,6 @@ export class Mobject {
 		let t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement }
 		if (t == this.view) {
-			console.log('target (a):', this)
 			return this
 		}
 		let targetViewChain: Array<Element> = [t]
@@ -218,13 +220,11 @@ export class Mobject {
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
-				console.log('target (b):', t['mobject'])
 				return t['mobject']
 			}
 			t = targetViewChain.pop() 
 		}
 		// if all of this fails, you need to handle the event yourself
-		console.log('target (c):', this)
 		return this
 	}
 
@@ -782,7 +782,7 @@ export class Polygon extends VMobject {
 
 	pathString(): string {
 		let pathString: string = ''
-		for (let point of this.vertices) {
+		for (let point of this.globalVertices()) {
 			if (point == undefined || point.isNaN()) {
 				pathString = ''
 				return pathString

@@ -58,14 +58,15 @@ export class TwoPointCircle extends Circle {
 
 	outerPoint: Vertex
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setAttributes({
 			strokeColor: Color.white(),
 			fillColor: Color.white(),
 			fillOpacity: 0
 		})
 		this.view.style['pointer-events'] = 'none'
+		this.update(argsDict)
 		this.radius = this.midPoint.subtract(this.outerPoint).norm()
 	}
 

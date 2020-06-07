@@ -198,7 +198,7 @@ class SidebarButton extends Circle {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, redraw)
+		super.update(argsDict,)
 		this.updateLabel()
 	}
 	

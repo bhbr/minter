@@ -150,6 +150,7 @@ export class Transform {
 	}
 
 	appliedToVertex(v: Vertex): Vertex {
+		if (v == undefined) { return undefined }
 		let newX: number = this.a * v.x + this.b * v.y + this.e
 		let newY: number = this.c * v.x + this.d * v.y + this.f
 		return new Vertex(newX, newY)

@@ -330,12 +330,13 @@ export class LinkableMobject extends Mobject {
 	dependencyMap: DependencyMap
 	cindys: Array<CindyCanvas>
 
-	constructor(argsDict) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({
 			inputNames: [],  // linkable parameters
 			outputNames: [] // linkable parameters
 		})
+		this.update(argsDict)
 	}
 
 	dependenciesBetweenChildren(): Array<Dependency> {

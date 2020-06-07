@@ -22,7 +22,7 @@ export class BoxSlider extends LinkableMobject {
 	label: TextLabel
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.setDefaults({
 			min: 0,
 			max: 1,
@@ -58,7 +58,9 @@ export class BoxSlider extends LinkableMobject {
 		this.label = new TextLabel({text: this.value.toString()})
 		this.label.anchor = new Vertex(this.width/2, this.height/2)
 		this.add(this.label)
-		this.update()
+		this.update(argsDict)
+		console.log('outer bar:', this.outerBar.anchor)
+		console.log('filled bar:', this.filledBar.anchor)
 	}
 
 	normalizedValue(): number {
@@ -70,11 +72,13 @@ export class BoxSlider extends LinkableMobject {
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
 		try {
+			delete argsDict['anchor'] // so it does not propagate to the outer bar in the next line
 			this.outerBar.update(argsDict)
 			this.filledBar.anchor.y = this.height - this.filledBar.height
 			this.filledBar.update({ height: a * this.height })
-			this.label.text = this.value.toPrecision(3).toString()
-			this.label.anchor.copyFrom(new Vertex(this.width/2, this.height/2))
+			this.label.update({
+				text: this.value.toPrecision(3).toString()
+			})
 		} catch { }
 		if (redraw) { this.redraw() }
 	}
