@@ -369,19 +369,30 @@ export const paper = new Paper({ view: document.querySelector('#paper'), passAlo
 // paper.add(s)
 
 
-let m = new MGroup()
-let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
-let r = new Rectangle({
-	anchor: new Vertex(0, 0),
-	width: 50,
-	height: 50,
-	fillColor: Color.green()
-})
-m.add(c)
-m.add(r)
-paper.add(m)
+// let m = new MGroup()
+// let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
+// let r = new Rectangle({
+// 	anchor: new Vertex(0, 0),
+// 	width: 50,
+// 	height: 50,
+// 	fillColor: Color.green()
+// })
+// m.add(c)
+// m.add(r)
+// paper.add(m)
 
 
+// let p = new FreePoint({anchor: new Vertex(100, 100)})
+// let q = new FreePoint({anchor: new Vertex(200, 200)})
+// let s = new Segment({
+// 	startPoint: p.midPoint,
+// 	endPoint: q.midPoint
+// })
+// p.addDependent(s)
+// q.addDependent(s)
+// paper.add(p)
+// paper.add(q)
+// paper.add(s)
 
 
 

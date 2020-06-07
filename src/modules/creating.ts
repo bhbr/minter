@@ -92,7 +92,7 @@ export class Point extends Circle {
 
 	radius: number = 5
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.view.setAttribute('class', this.constructor.name)
 		this.setDefaults({
@@ -107,11 +107,12 @@ export class Point extends Circle {
 }
 
 export class FreePoint extends Point {
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setAttributes({
 			draggable: true
 		})
+		this.update(argsDict)
 		this.enableDragging()
 	}
 }
@@ -121,16 +122,18 @@ export class DrawnArrow extends CreatedMobject {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.endPoint = this.endPoint || this.startPoint.copy()
 		this.passAlongEvents = true
 		this.startFreePoint = new FreePoint({
 			midPoint: this.startPoint
 		})
+		this.startFreePoint.addDependent(this)
 		this.endFreePoint = new FreePoint({
 			midPoint: this.endPoint
 		})
+		this.endFreePoint.addDependent(this)
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
 		
@@ -138,6 +141,8 @@ export class DrawnArrow extends CreatedMobject {
 
 	updateFromTip(q: Vertex) {
 		this.endPoint.copyFrom(q)
+		this.endFreePoint.midPoint.copyFrom(q)
+		this.endFreePoint.update()
 		this.update()
 	}
 
@@ -176,7 +181,7 @@ export class DrawnSegment extends DrawnArrow {
 
 	segment: Segment
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 
 		super(argsDict)
 		this.segment = new Segment({
@@ -190,8 +195,8 @@ export class DrawnSegment extends DrawnArrow {
 		super.dissolveInto(superMobject)
 		superMobject.remove(this.segment)
 		this.segment = new Segment({
-			startPoint: this.startPoint,
-			endPoint: this.endPoint,
+			startPoint: this.startFreePoint.midPoint,
+			endPoint: this.endFreePoint.midPoint,
 			strokeColor: this.strokeColor,
 		})
 
@@ -207,7 +212,7 @@ export class DrawnRay extends DrawnArrow {
 
 	ray: Ray
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.ray = new Ray({
 			startPoint: this.startFreePoint.midPoint,
@@ -238,7 +243,7 @@ export class DrawnLine extends DrawnArrow {
 
 	line: Line
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.line = new Line({
 			startPoint: this.startFreePoint.midPoint,
@@ -274,7 +279,7 @@ export class DrawnCircle extends CreatedMobject {
 	freeOuterPoint: FreePoint
 	circle: TwoPointCircle
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super(argsDict)
 		
 		this.setDefaults({

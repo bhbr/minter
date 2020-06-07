@@ -567,6 +567,7 @@ var Sidebar = (function (exports) {
                 t = t.parentElement;
             }
             if (t == this.view) {
+                console.log('target (a):', this);
                 return this;
             }
             let targetViewChain = [t];
@@ -578,10 +579,13 @@ var Sidebar = (function (exports) {
             t = targetViewChain.pop();
             while (t != undefined) {
                 if (t['mobject'] != undefined) {
+                    console.log('target (b):', t['mobject']);
                     return t['mobject'];
                 }
                 t = targetViewChain.pop();
             }
+            // if all of this fails, you need to handle the event yourself
+            console.log('target (c):', this);
             return this;
         }
         pointerDown(e) {
@@ -749,11 +753,12 @@ var Sidebar = (function (exports) {
         }
         updateSubmobs() {
             for (let submob of this.children || []) {
-                submob.update({}, false);
+                if (!this.dependsOn(submob)) { // prevent dependency loops
+                    submob.update({}, false);
+                }
             }
         }
         redrawSubmobs() {
-            console.log(this.constructor.name + '.redrawSubmobs');
             for (let submob of this.children || []) {
                 submob.redraw();
                 submob.redrawSubmobs();
@@ -845,6 +850,9 @@ var Sidebar = (function (exports) {
             return otherMobject.allDependents().includes(this);
         }
         addDependency(outputName, target, inputName) {
+            if (this.dependsOn(target)) {
+                throw 'Circular dependency!';
+            }
             let dep = new Dependency({
                 source: this,
                 outputName: outputName,
@@ -1044,7 +1052,6 @@ var Sidebar = (function (exports) {
             this.update(argsDict);
         }
         redraw() {
-            console.log('MGroup.redraw');
             this.redrawSubmobs();
         }
     }
@@ -1052,7 +1059,6 @@ var Sidebar = (function (exports) {
         constructor(argsDict = {}) {
             super();
             this.vertices = [];
-            this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
             this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             this.path['mobject'] = this;
             this.view.appendChild(this.path); // why not just add?
@@ -1111,7 +1117,6 @@ var Sidebar = (function (exports) {
             return this.globalTransform().appliedTo(this.bezierPoints);
         }
         redraw() {
-            console.log(this.constructor.name + '.redraw');
             this.updateBezierPoints();
             super.redraw();
         }
@@ -1521,7 +1526,7 @@ var Sidebar = (function (exports) {
         }
     }
     class Point extends Circle {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.radius = 5;
             this.view.setAttribute('class', this.constructor.name);
@@ -1535,30 +1540,35 @@ var Sidebar = (function (exports) {
         }
     }
     class FreePoint extends Point {
-        constructor(argsDict) {
-            super(argsDict);
+        constructor(argsDict = {}) {
+            super();
             this.setAttributes({
                 draggable: true
             });
+            this.update(argsDict);
             this.enableDragging();
         }
     }
     class DrawnArrow extends CreatedMobject {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.endPoint = this.endPoint || this.startPoint.copy();
             this.passAlongEvents = true;
             this.startFreePoint = new FreePoint({
                 midPoint: this.startPoint
             });
+            this.startFreePoint.addDependent(this);
             this.endFreePoint = new FreePoint({
                 midPoint: this.endPoint
             });
+            this.endFreePoint.addDependent(this);
             this.add(this.startFreePoint);
             this.add(this.endFreePoint);
         }
         updateFromTip(q) {
             this.endPoint.copyFrom(q);
+            this.endFreePoint.midPoint.copyFrom(q);
+            this.endFreePoint.update();
             this.update();
         }
         dissolveInto(paper) {
@@ -1587,7 +1597,7 @@ var Sidebar = (function (exports) {
         }
     }
     class DrawnSegment extends DrawnArrow {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.segment = new Segment({
                 startPoint: this.startFreePoint.midPoint,
@@ -1599,8 +1609,8 @@ var Sidebar = (function (exports) {
             super.dissolveInto(superMobject);
             superMobject.remove(this.segment);
             this.segment = new Segment({
-                startPoint: this.startPoint,
-                endPoint: this.endPoint,
+                startPoint: this.startFreePoint.midPoint,
+                endPoint: this.endFreePoint.midPoint,
                 strokeColor: this.strokeColor,
             });
             this.startFreePoint.addDependent(this.segment);
@@ -1609,7 +1619,7 @@ var Sidebar = (function (exports) {
         }
     }
     class DrawnRay extends DrawnArrow {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.ray = new Ray({
                 startPoint: this.startFreePoint.midPoint,
@@ -1633,7 +1643,7 @@ var Sidebar = (function (exports) {
         }
     }
     class DrawnLine extends DrawnArrow {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.line = new Line({
                 startPoint: this.startFreePoint.midPoint,
@@ -1657,7 +1667,7 @@ var Sidebar = (function (exports) {
         }
     }
     class DrawnCircle extends CreatedMobject {
-        constructor(argsDict) {
+        constructor(argsDict = {}) {
             super(argsDict);
             this.setDefaults({
                 strokeColor: Color.white()
@@ -2891,17 +2901,28 @@ var Sidebar = (function (exports) {
     // 	endPoint: new Vertex(200, 300)
     // })
     // paper.add(s)
-    let m = new MGroup();
-    let c = new Circle({ anchor: new Vertex(100, 100), radius: 75 });
-    let r = new Rectangle({
-        anchor: new Vertex(0, 0),
-        width: 50,
-        height: 50,
-        fillColor: Color.green()
-    });
-    m.add(c);
-    m.add(r);
-    paper.add(m);
+    // let m = new MGroup()
+    // let c = new Circle({anchor: new Vertex(100, 100), radius: 75})
+    // let r = new Rectangle({
+    // 	anchor: new Vertex(0, 0),
+    // 	width: 50,
+    // 	height: 50,
+    // 	fillColor: Color.green()
+    // })
+    // m.add(c)
+    // m.add(r)
+    // paper.add(m)
+    // let p = new FreePoint({anchor: new Vertex(100, 100)})
+    // let q = new FreePoint({anchor: new Vertex(200, 200)})
+    // let s = new Segment({
+    // 	startPoint: p.midPoint,
+    // 	endPoint: q.midPoint
+    // })
+    // p.addDependent(s)
+    // q.addDependent(s)
+    // paper.add(p)
+    // paper.add(q)
+    // paper.add(s)
 
     exports.Paper = Paper;
     exports.paper = paper;

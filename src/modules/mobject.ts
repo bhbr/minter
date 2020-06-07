@@ -205,7 +205,10 @@ export class Mobject {
 	eventTargetMobject(e: LocatedEvent): Mobject {
 		let t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement }
-		if (t == this.view) { return this }
+		if (t == this.view) {
+			console.log('target (a):', this)
+			return this
+		}
 		let targetViewChain: Array<Element> = [t]
 		while (t != undefined && t != this.view) {
 			t = t.parentElement
@@ -214,9 +217,14 @@ export class Mobject {
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
-			if (t['mobject'] != undefined) { return t['mobject'] }
+			if (t['mobject'] != undefined) {
+				console.log('target (b):', t['mobject'])
+				return t['mobject']
+			}
 			t = targetViewChain.pop() 
 		}
+		// if all of this fails, you need to handle the event yourself
+		console.log('target (c):', this)
 		return this
 	}
 
@@ -367,12 +375,13 @@ export class Mobject {
 
 	updateSubmobs() {
 		for (let submob of this.children || []) {
-			submob.update({}, false)
+			if (!this.dependsOn(submob)) { // prevent dependency loops
+				submob.update({}, false)
+			}
 		}
 	}
 
 	redrawSubmobs() {
-		console.log(this.constructor.name + '.redrawSubmobs')
 		for (let submob of this.children || []) {
 			submob.redraw()
 			submob.redrawSubmobs()
@@ -475,6 +484,9 @@ export class Mobject {
 
 
 	addDependency(outputName: string, target: Mobject, inputName: string) {
+		if (this.dependsOn(target)) {
+			throw 'Circular dependency!'
+		}
 		let dep = new Dependency({
 			source: this,
 			outputName: outputName,
@@ -712,7 +724,6 @@ export class MGroup extends Mobject {
 	}
 
 	redraw() {
-		console.log('MGroup.redraw')
 		this.redrawSubmobs()
 	}
 
@@ -728,7 +739,6 @@ export class VMobject extends Mobject {
 	constructor(argsDict: object = {}) {
 		super()
 		this.vertices = []
-		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.path['mobject'] = this
 		this.view.appendChild(this.path) // why not just add?
@@ -816,7 +826,6 @@ export class CurvedShape extends VMobject {
 	}
 
 	redraw() {
-		console.log(this.constructor.name + '.redraw')
 		this.updateBezierPoints()
 		super.redraw()
 	}
