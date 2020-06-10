@@ -309,6 +309,7 @@ export class Mobject {
 			} else {
 				if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
 				else { this[key] = value }
+				//this[key] = value
 			}
 		}
 	}

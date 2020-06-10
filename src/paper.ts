@@ -113,7 +113,6 @@ export class Paper extends LinkableMobject {
 	// }
 
 	startDragging(e: LocatedEvent) {
-		console.log('startDragging')
 		this.draggedMobject = this.eventTargetMobject(e)
 		if (this.draggedMobject == this) {
 			// check if we hit a CindyCanvas
@@ -217,7 +216,6 @@ export class Paper extends LinkableMobject {
 
 
 	startCreating(e: LocatedEvent) {
-		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		for (let fp of this.snappablePoints) {
 			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
@@ -286,10 +284,8 @@ export class Paper extends LinkableMobject {
 		this.creationGroup.dissolveInto(this)
 
 		if (this.creationGroup.visibleCreation == 'segment') {
-			console.log('segment')
 			let segment: Segment = this.creationGroup.creations['segment'].segment
 			for (let geomob of this.geometricObjects) {
-				console.log('some object')
 				if (geomob instanceof Circle) {
 					let arr = this.arrowCircleIntersections(segment, geomob)
 					let p1 = new Point({midPoint: arr[0], fillOpacity: 0.2})

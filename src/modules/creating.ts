@@ -126,7 +126,6 @@ export class DrawnArrow extends CreatedMobject {
 
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		console.log(this, this.startPoint)
 		this.endPoint = this.endPoint || this.startPoint.copy()
 		this.passAlongEvents = true
 		this.startFreePoint = new FreePoint({
@@ -182,13 +181,14 @@ export class DrawnSegment extends DrawnArrow {
 	segment: Segment
 
 	constructor(argsDict: object = {}) {
-		console.log(argsDict)
 		super(argsDict)
 		this.segment = new Segment({
 			startPoint: this.startFreePoint.midPoint,
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.segment)
+		this.startFreePoint.addDependency('midPoint', this.segment, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.segment, 'endPoint')
 		this.update(argsDict)
 	}
 
@@ -198,14 +198,12 @@ export class DrawnSegment extends DrawnArrow {
 		this.segment = new Segment({
 			startPoint: this.startFreePoint.midPoint,
 			endPoint: this.endFreePoint.midPoint,
-			strokeColor: this.strokeColor,
+			strokeColor: this.strokeColor
 		})
-
-		this.startFreePoint.addDependent(this.segment)
-		this.endFreePoint.addDependent(this.segment)
 		superMobject.add(this.segment)
 
-
+		this.startFreePoint.addDependency('midPoint', this.segment, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.segment, 'endPoint')
 	}
 }
 
@@ -219,6 +217,8 @@ export class DrawnRay extends DrawnArrow {
 			startPoint: this.startFreePoint.midPoint,
 			endPoint: this.endFreePoint.midPoint,
 		})
+		this.startFreePoint.addDependency('midPoint', this.ray, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.ray, 'endPoint')
 		this.add(this.ray)
 		this.update(argsDict)
 	}
@@ -231,9 +231,10 @@ export class DrawnRay extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint,
 			strokeColor: this.strokeColor
 		})
-		this.startFreePoint.addDependent(this.ray)
-		this.endFreePoint.addDependent(this.ray)
+		this.startFreePoint.addDependency('midPoint', this.ray, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.ray, 'endPoint')
 		superMobject.add(this.ray)
+		this.ray.update() // necessary for some reason
 
 	}
 }
@@ -250,6 +251,8 @@ export class DrawnLine extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.line)
+		this.startFreePoint.addDependency('midPoint', this.line, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.line, 'endPoint')
 		this.update(argsDict)
 	}
 
@@ -261,11 +264,11 @@ export class DrawnLine extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint,
 			strokeColor: this.strokeColor
 		})
-		this.startFreePoint.addDependent(this.line)
-		this.endFreePoint.addDependent(this.line)
+		this.startFreePoint.addDependency('midPoint', this.line, 'startPoint')
+		this.endFreePoint.addDependency('midPoint', this.line, 'endPoint')
 		superMobject.add(this.line)
+		this.line.update()
 	}
-
 
 }
 
