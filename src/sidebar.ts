@@ -10,7 +10,6 @@ if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper')
 	paper = paperView['mobject'] as Paper
 }
-console.log(paper)
 
 let sidebar: HTMLElement = document.querySelector('#sidebar')
 
@@ -327,7 +326,6 @@ class CreativeButton extends SidebarButton {
 		for (let creation of this.creations) {
 			this.messages.push({creating: creation})
 		}
-		console.log(this.messages)
 		this.outgoingMessage = {creating: 'freehand'}
 		this.update(argsDict)
 	}

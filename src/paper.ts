@@ -87,31 +87,6 @@ export class Paper extends LinkableMobject {
 		}
 	}
 
-	// pointerDown(e: LocatedEvent) {
-	// 	if (this.passAlongEvents) {
-	// 		this.startCreating(e)
-	// 	} else {
-	// 		this.startDragging(e)
-	// 	}
-	// }
-
-	// pointerMove(e: LocatedEvent) {
-	// 	if (this.passAlongEvents) {
-	// 		this.creativeMove(e)
-	// 	} else {
-	// 		this.dragging(e)
-	// 	}
-	// }
-
-
-	// pointerUp(e: LocatedEvent) {
-	// 	if (this.passAlongEvents) {
-	// 		this.endCreating(e)
-	// 	} else {
-	// 		this.endDragging(e)
-	// 	}
-	// }
-
 	startDragging(e: LocatedEvent) {
 		this.draggedMobject = this.eventTargetMobject(e)
 		if (this.draggedMobject == this) {
@@ -217,15 +192,18 @@ export class Paper extends LinkableMobject {
 
 	startCreating(e: LocatedEvent) {
 		this.creationStartPoint = pointerEventVertex(e)
+		let drawFreehand = true
 		for (let fp of this.snappablePoints) {
 			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
 				this.creationStartPoint = fp.midPoint
+				drawFreehand = false
 			}
 		}
 
 		this.creationGroup = new CreationGroup({
 			startPoint: this.creationStartPoint,
-			visibleCreation: this.visibleCreation
+			visibleCreation: this.visibleCreation,
+			drawFreehand: drawFreehand
 		})
 		this.creationGroup.strokeColor = this.currentColor
 		this.creationGroup.fillColor = this.currentColor
@@ -370,7 +348,5 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	passAlongEvents: true
 })
-
-
 
 

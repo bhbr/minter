@@ -18,7 +18,7 @@ export class CindyCanvas extends LinkableMobject {
 	points: Array<Array<number>>
 	
 	constructor(argsDict: object = {}) {
-		super()
+		super(argsDict)
 		this.paper = argsDict['paper']
 		this.anchor = argsDict['anchor']
 		this.width = argsDict['width']
@@ -29,19 +29,21 @@ export class CindyCanvas extends LinkableMobject {
 		// this.mainScript.setAttribute('src', 'CindyJS/build/js/Cindy.js')
 		// this.mainScript.onload = this.createCore.bind(this)
 
-		this.view.style['position'] = 'absolute'
-		this.view.style['left'] =  this.anchor.x + 'px'
-		this.view.style['top'] = this.anchor.y + 'px'
-
 		this.csView = document.createElement('canvas')
 		let canvasID: string = 'CSCanvas' // + this.paper.cindyPorts.length
 		this.csView.setAttribute('id', canvasID)
-		this.view.appendChild(this.csView)
-		
+		//this.view.appendChild(this.csView)
+		document.querySelector('#paper-container').appendChild(this.csView)
+		this.csView.style['position'] = 'absolute'
+		document.querySelector('#paper-container').insertBefore(this.csView, this.paper.view)
+
+		this.csView.style['left'] =  this.anchor.x + 'px'
+		this.csView.style['top'] = this.anchor.y + 'px'
+
 		this.draggable = true
 		this.view.style['pointer-events'] = 'auto'
 		
-		document.querySelector('#paper-container').insertBefore(this.view, document.querySelector('#paper-console'))
+		//document.querySelector('#paper-container').insertBefore(this.csView, document.querySelector('#paper-console'))
 		//document.head.appendChild(this.mainScript)
 
 
@@ -155,7 +157,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 		// if (this.drawScript != undefined) {
 		// 	this.drawScript.textContent = this.drawCode()
 		// }
-		super.update(argsDict, redraw)
+		super.update(argsDict, false) //redraw)
 	}
 }
 
@@ -180,9 +182,19 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p3 = this.endPoint
 		this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
 		this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
-		this.bottom = new Segment({startPoint: this.p3, endPoint: this.p4})
+		this.bottom = new Segment({startPoint: this.p4, endPoint: this.p3})
 		this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
 		this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
+
+		this.addDependency('p1', this.top, 'startPoint')
+		this.addDependency('p2', this.top, 'endPoint')
+		this.addDependency('p4', this.bottom, 'startPoint')
+		this.addDependency('p3', this.bottom, 'endPoint')
+		this.addDependency('p1', this.left, 'startPoint')
+		this.addDependency('p4', this.left, 'endPoint')
+		this.addDependency('p2', this.right, 'startPoint')
+		this.addDependency('p3', this.right, 'endPoint')
+
 		this.top.strokeColor = Color.white()
 		this.bottom.strokeColor = Color.white()
 		this.left.strokeColor = Color.white()
@@ -191,6 +203,7 @@ export class DrawnRectangle extends CreatedMobject {
 		this.add(this.bottom)
 		this.add(this.left)
 		this.add(this.right)
+		this.update(argsDict)
 	}
 
 	updateFromTip(q: Vertex) {
@@ -199,7 +212,7 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p2.y = this.startPoint.y
 		this.p4.x = this.startPoint.x
 		this.p4.y = this.endPoint.y
-		this.redraw()
+		this.update()
 	}
 
 	dissolveInto(parent: Mobject) {

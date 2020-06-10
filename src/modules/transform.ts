@@ -179,7 +179,6 @@ export class Transform {
 	}
 
 	set anchor(newValue: Vertex) {
-		//console.log('old anchor:', this._anchor, 'new anchor:', newValue)
 		this.e = newValue[0]
 		this.f = newValue[1]
 		if (this._anchor != undefined) {

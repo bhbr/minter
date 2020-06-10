@@ -9,6 +9,7 @@ export class CreationGroup extends CreatedMobject {
 
 	creations: object
 	visibleCreation: string = 'freehand'
+	drawFreehand: boolean = true
 
 	constructor(argsDict) {
 		super(argsDict)
@@ -39,7 +40,9 @@ export class CreationGroup extends CreatedMobject {
 			mob.hide()
 		}
 		this.visibleCreation = visibleCreation
-		this.creations[visibleCreation].show()
+		if (!(visibleCreation == 'freehand' && !this.drawFreehand)) {
+			this.creations[visibleCreation].show()
+		}
 
 		if (visibleCreation == 'cindy') {
 			this.creations[visibleCreation].strokeColor = Color.white()

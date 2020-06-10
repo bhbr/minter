@@ -22,7 +22,6 @@ export class Segment extends Polygon {
 
 	update(argsDict: object = {}, redraw = true) {
 		this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-		//console.log(this.vertices, redraw)
 		super.update(argsDict, redraw)
 	}
 
