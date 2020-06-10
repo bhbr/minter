@@ -32,10 +32,9 @@ export class Paper extends LinkableMobject {
 	dragIOListAnchorStart: Vertex
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.children = []
 		this.cindys = []
-		this.setDragging(false)
 		this.visibleCreation = 'freehand'
 		this.cindyPorts = []
 		this.snappablePoints = []
@@ -53,6 +52,9 @@ export class Paper extends LinkableMobject {
 			'violet': Color.violet()
 		}
 		this.currentColor = this.colorPalette['white']
+		this.setDragging(false)
+		this.update(argsDict)
+
 	}
 
 	changeColorByName(newColorName: string) {
@@ -85,8 +87,33 @@ export class Paper extends LinkableMobject {
 		}
 	}
 
+	// pointerDown(e: LocatedEvent) {
+	// 	if (this.passAlongEvents) {
+	// 		this.startCreating(e)
+	// 	} else {
+	// 		this.startDragging(e)
+	// 	}
+	// }
+
+	// pointerMove(e: LocatedEvent) {
+	// 	if (this.passAlongEvents) {
+	// 		this.creativeMove(e)
+	// 	} else {
+	// 		this.dragging(e)
+	// 	}
+	// }
+
+
+	// pointerUp(e: LocatedEvent) {
+	// 	if (this.passAlongEvents) {
+	// 		this.endCreating(e)
+	// 	} else {
+	// 		this.endDragging(e)
+	// 	}
+	// }
 
 	startDragging(e: LocatedEvent) {
+		console.log('startDragging')
 		this.draggedMobject = this.eventTargetMobject(e)
 		if (this.draggedMobject == this) {
 			// check if we hit a CindyCanvas
@@ -190,6 +217,7 @@ export class Paper extends LinkableMobject {
 
 
 	startCreating(e: LocatedEvent) {
+		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		for (let fp of this.snappablePoints) {
 			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
@@ -342,8 +370,10 @@ export class Paper extends LinkableMobject {
 
 }
 
-export const paper = new Paper({ view: document.querySelector('#paper'), passAlongEvents: true })
-
+export const paper = new Paper({
+	view: document.querySelector('#paper'),
+	passAlongEvents: true
+})
 
 
 

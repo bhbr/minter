@@ -8,7 +8,7 @@ import { Color } from './mobject'
 export class CreationGroup extends CreatedMobject {
 
 	creations: object
-	visibleCreation: string
+	visibleCreation: string = 'freehand'
 
 	constructor(argsDict) {
 		super(argsDict)
@@ -24,7 +24,7 @@ export class CreationGroup extends CreatedMobject {
 		for (let creation of Object.values(this.creations)) {
 			this.add(creation)
 		}
-		this.update()
+		this.update(argsDict)
 
 	}
 

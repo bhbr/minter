@@ -17,8 +17,8 @@ export class CindyCanvas extends LinkableMobject {
 	core: any
 	points: Array<Array<number>>
 	
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.paper = argsDict['paper']
 		this.anchor = argsDict['anchor']
 		this.width = argsDict['width']
@@ -72,6 +72,7 @@ export class CindyCanvas extends LinkableMobject {
 		document.body.appendChild(this.drawScript)
 
 		this.createCore()
+		this.update(argsDict)
 
 	}
 

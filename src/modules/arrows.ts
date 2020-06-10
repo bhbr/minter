@@ -7,13 +7,13 @@ export class Segment extends Polygon {
 	endPoint: Vertex
 	vertices: Array<Vertex>
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin(),
 		})
-		this.update()
+		this.update(argsDict)
 	}
 
 	components(): Vertex {

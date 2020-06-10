@@ -12,8 +12,8 @@ export class CreatedBoxSlider extends CreatedMobject {
 	width: number
 	height: number
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setAttributes({
 			width: 50,
 			height: 0,
@@ -33,6 +33,8 @@ export class CreatedBoxSlider extends CreatedMobject {
 			fillColor: Color.gray(0.5)
 		})
 		this.add(this.protoSlider)
+
+		this.update(argsDict)
 	}
 
 	updateFromTip(q: Vertex) {

@@ -156,16 +156,29 @@ export class Mobject {
 		this.boundPointerUp = this.pointerUp.bind(this)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
 		addPointerDown(this.view, this.boundPointerDown)
-
+		
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
 		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
 		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+
 		this.disableDragging()
 
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
+	}
+
+	setView(newView: SVGElement){
+		if (this.view.parentNode) {
+			this.view.parentNode.removeChild(this.view)
+		}
+		this.view = newView
+		this.view['mobject'] = this
+		if (this.superMobject) {
+			this.superMobject.view.appendChild(this.view)
+		}
+		addPointerDown(this.view, this.boundPointerDown)
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) { }
@@ -356,6 +369,10 @@ export class Mobject {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
+		if (argsDict['view']) {
+			this.setView(argsDict['view'])
+			delete argsDict['view']
+		}
 		this.setAttributes(argsDict)
 		this.transform.anchorAt(this.anchor)
 		this.updateSubmobs()
@@ -765,7 +782,7 @@ export class VMobject extends Mobject {
 	}
 
 	pathString(): string {
-		console.log('please subclass pathString')
+		console.warn('please subclass pathString')
 		return ''
 	}
 

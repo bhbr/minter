@@ -10,6 +10,7 @@ if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper')
 	paper = paperView['mobject'] as Paper
 }
+console.log(paper)
 
 let sidebar: HTMLElement = document.querySelector('#sidebar')
 
@@ -77,6 +78,7 @@ class SidebarButton extends Circle {
 		this.updateModeIndex(0)
 		this.label = new TextLabel({text: this.text})
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
+		this.label.view.setAttribute('color', Color.white().toHex())
 		this.label.anchor = Vertex.origin()
 		this.add(this.label)
 		this.update({}, false)
@@ -285,7 +287,6 @@ class ColorChangeButton extends SidebarButton {
 		}
 		this.outgoingMessage = {}
 		this.update()
-		this.redraw()
 	}
 
 	colorForIndex(i): Color {
@@ -326,6 +327,7 @@ class CreativeButton extends SidebarButton {
 		for (let creation of this.creations) {
 			this.messages.push({creating: creation})
 		}
+		console.log(this.messages)
 		this.outgoingMessage = {creating: 'freehand'}
 		this.update(argsDict)
 	}
@@ -369,8 +371,8 @@ class DragButton extends ToggleButton {
 
 	label2: TextLabel
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.label.text = '↕︎'
 		this.setAttributes({ fontSize: 25 })
 		this.label.view.setAttribute('font-family', 'Times')
@@ -381,7 +383,7 @@ class DragButton extends ToggleButton {
 		this.label2.color = Color.white()
 		this.label2.anchor = new Vertex(0, 2)
 		this.add(this.label2)
-		this.update()
+		this.update(argsDict)
 	}
 
 	updateLabel() {
@@ -393,10 +395,10 @@ class DragButton extends ToggleButton {
 }
 
 class LinkButton extends ToggleButton {
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.label.text = 'link'
-		this.update()
+		this.update(argsDict)
 	}
 }
 
@@ -442,7 +444,6 @@ let dragButton = new DragButton({
 })
 dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
-//dragButton.redraw()
 sidebar.appendChild(dragButton.view)
 
 let linkButton = new LinkButton({
@@ -452,8 +453,6 @@ let linkButton = new LinkButton({
 	baseColor: Color.gray(0.2),
 	locationIndex: 5
 })
-linkButton.label.view.setAttribute('fill', 'black')
-//linkButton.redraw()
 sidebar.appendChild(linkButton.view)
 
 let colorButton = new ColorChangeButton({

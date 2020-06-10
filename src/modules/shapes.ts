@@ -15,7 +15,7 @@ export class Circle extends CurvedShape {
 			radius: 10,
 			midPoint: Vertex.origin()
 		})
-		this.setAttributes(argsDict)
+		this.update(argsDict)
 	}
 
 	// midPoint is a synonym for anchor
@@ -84,12 +84,15 @@ export class Ellipse extends CurvedShape {
 	minorAxis: number
 	tilt: number
 	
-	constructor(midPoint, majorAxis, minorAxis, tilt) {
+	constructor(argsDict: object = {}) {
 		super()
-		this.midPoint = midPoint
-		this.majorAxis = majorAxis
-		this.minorAxis = minorAxis
-		this.tilt = tilt
+		this.setAttributes({
+			midpoint: Vertex.origin(),
+			majorAxis: 200,
+			minorAxis: 100,
+			tilt: 0
+		})
+		this.update(argsDict)
 
 	}
 
@@ -111,7 +114,7 @@ export class Rectangle extends Polygon {
 	p3: Vertex
 	p4: Vertex
 
-	constructor(argsDict: object) {
+	constructor(argsDict: object = {}) {
 		super()
 		this.setDefaults({
 			width: 100,
@@ -122,10 +125,10 @@ export class Rectangle extends Polygon {
 		this.p3 = new Vertex([this.width, this.height])
 		this.p4 = new Vertex([0, this.height])
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-		this.setAttributes(argsDict)
+		this.update(argsDict)
 	}
 
-	update(argsDict: object, redraw = true) {
+	update(argsDict: object = {}, redraw = true) {
 		try {
 			this.p2.x = this.width
 			this.p3.x = this.width
@@ -151,8 +154,8 @@ export class RoundedRectangle extends CurvedShape {
 	p4: Vertex
 	cornerRadius: number
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({
 			width: 100,
 			height: 100,
@@ -162,7 +165,7 @@ export class RoundedRectangle extends CurvedShape {
 		this.p2 = new Vertex([this.width, 0])
 		this.p3 = new Vertex([this.width, this.height])
 		this.p4 = new Vertex([0, this.height])
-		this.updateBezierPoints()
+		this.update(argsDict)
 	}
 
 	updateBezierPoints() {

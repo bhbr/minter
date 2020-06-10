@@ -98,33 +98,33 @@ export function pointerEventVertex(e: LocatedEvent) {
 }
 
 
-export function addPointerDown(element: Element, method: (Event) => void) {
+export function addPointerDown(element: SVGElement, method: (Event) => void) {
 	element.addEventListener('touchstart', method, { capture: true })
 	element.addEventListener('mousedown', method, { capture: true })
 }
 
-export function removePointerDown(element: Element, method: (Event) => void) {
+export function removePointerDown(element: SVGElement, method: (Event) => void) {
 	element.removeEventListener('touchstart', method, { capture: true })
 	element.removeEventListener('mousedown', method, { capture: true })
 }
 
-export function addPointerMove(element: Element, method: (Event) => void) {
+export function addPointerMove(element: SVGElement, method: (Event) => void) {
 	element.addEventListener('touchmove', method, { capture: true })
 	element.addEventListener('mousemove', method, { capture: true })
 }
 
-export function removePointerMove(element: Element, method: (Event) => void) {
+export function removePointerMove(element: SVGElement, method: (Event) => void) {
 	element.removeEventListener('touchmove', method, { capture: true })
 	element.removeEventListener('mousemove', method, { capture: true })
 }
 
-export function addPointerUp(element: Element, method: (Event) => void) {
+export function addPointerUp(element: SVGElement, method: (Event) => void) {
 	element.addEventListener('touchend', method, { capture: true })
 	element.addEventListener('mouseup', method, { capture: true })
 	element.addEventListener('pointerup', method, { capture: true })
 }
 
-export function removePointerUp(element: Element, method: (Event) => void) {
+export function removePointerUp(element: SVGElement, method: (Event) => void) {
 	element.removeEventListener('touchend', method, { capture: true })
 	element.removeEventListener('mouseup', method, { capture: true })
 	element.removeEventListener('pointerup', method, { capture: true })

@@ -8,7 +8,7 @@ export class CreatedMobject extends MGroup {
 
 	startPoint: Vertex
 	endPoint: Vertex
-	visible: boolean
+	visible: boolean = true
 	
 	dissolveInto(superMobject: Mobject) {
 		superMobject.remove(this)
@@ -25,10 +25,11 @@ export class CreatedMobject extends MGroup {
 export class Freehand extends CreatedMobject {
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.setAttributes({
 			strokeColor: Color.white()
 		})
+		this.update(argsDict)
 	}
 	
 	updateWithPoints(q) {
@@ -93,7 +94,7 @@ export class Point extends Circle {
 	radius: number = 5
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.view.setAttribute('class', this.constructor.name)
 		this.setDefaults({
 			midPoint: Vertex.origin()
@@ -102,6 +103,7 @@ export class Point extends Circle {
 			fillColor: Color.white(),
 			fillOpacity: 1.0
 		})
+		this.update(argsDict)
 	}
 
 }
@@ -124,6 +126,7 @@ export class DrawnArrow extends CreatedMobject {
 
 	constructor(argsDict: object = {}) {
 		super(argsDict)
+		console.log(this, this.startPoint)
 		this.endPoint = this.endPoint || this.startPoint.copy()
 		this.passAlongEvents = true
 		this.startFreePoint = new FreePoint({
@@ -134,7 +137,7 @@ export class DrawnArrow extends CreatedMobject {
 		})
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
-		
+		this.update(argsDict)
 	}
 
 	updateFromTip(q: Vertex) {
@@ -179,14 +182,14 @@ export class DrawnSegment extends DrawnArrow {
 	segment: Segment
 
 	constructor(argsDict: object = {}) {
-
+		console.log(argsDict)
 		super(argsDict)
 		this.segment = new Segment({
 			startPoint: this.startFreePoint.midPoint,
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.segment)
-		this.update()
+		this.update(argsDict)
 	}
 
 	dissolveInto(superMobject: Mobject) {
@@ -217,7 +220,7 @@ export class DrawnRay extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint,
 		})
 		this.add(this.ray)
-		this.update()
+		this.update(argsDict)
 	}
 
 	dissolveInto(superMobject: Mobject) {
@@ -247,7 +250,7 @@ export class DrawnLine extends DrawnArrow {
 			endPoint: this.endFreePoint.midPoint
 		})
 		this.add(this.line)
-		this.update()
+		this.update(argsDict)
 	}
 
 	dissolveInto(superMobject: Mobject) {
@@ -302,6 +305,7 @@ export class DrawnCircle extends CreatedMobject {
 		this.add(this.freeMidpoint)
 		this.add(this.freeOuterPoint)
 		this.add(this.circle)
+		this.update(argsDict)
 
 	}
 
