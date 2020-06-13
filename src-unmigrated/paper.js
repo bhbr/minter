@@ -45,9 +45,10 @@ class Paper extends LinkableMobject {
 	changeColor(newColor) {
 		this.currentColor = newColor
 		if (this.creationGroup == undefined) { return }
-		this.creationGroup.setStrokeColor(this.currentColor)
-		this.creationGroup.setfillColor(this.currentColor)
-		this.creationGroup.update()
+		this.creationGroup.update({
+			strokeColor: this.currentColor,
+			fillColor: this.currentColor
+		})
 	}
 
 	setDragging(flag) {

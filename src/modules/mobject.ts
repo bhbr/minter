@@ -143,7 +143,7 @@ export class Mobject {
 			strokeWidth: 1,
 			passAlongEvents: false, // to event target
 			visible: true,
-			draggable: false // by outside forces, that is
+			draggable: true // by outside forces, that is
 		}
 		Object.assign(defaults, argsDict)
 		this.setAttributes(defaults)
@@ -889,6 +889,7 @@ export class TextLabel extends Mobject {
 
 	text: string
 	textAnchor: string
+	textAlign: string
 	color: Color
 
 	constructor(argsDict: object = {}) {
@@ -896,12 +897,12 @@ export class TextLabel extends Mobject {
 		this.setAttributes({
 			text: '',
 			textAnchor: 'middle',
+			textAlign: 'center',
 			color: Color.white()
 		})
 		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
 		this.view['mobject'] = this
 		this.view.setAttribute('class', this.constructor.name + ' unselectable')
-		this.view.setAttribute('text-anchor', this.textAnchor)
 		this.view.setAttribute('alignment-baseline', 'middle')
 		this.view.setAttribute('font-family', 'Helvetica')
 		this.view.setAttribute('font-size', '12')
@@ -922,6 +923,12 @@ export class TextLabel extends Mobject {
 		this.view.setAttribute('stroke', this.color.toHex())
 		
 		this.redrawSubmobs()
+	}
+
+	update(argsDict = {}, redraw = true) {
+		this.view.setAttribute('text-anchor', this.textAnchor)
+		this.view.setAttribute('text-align', this.textAlign)
+		super.update(argsDict, redraw)
 	}
 
 }

@@ -4,6 +4,8 @@ import { Segment } from './arrows'
 import { CreatedMobject } from './creating'
 import { Mobject, Color } from './mobject'
 import { Paper } from '../paper'
+import { LocatedEvent } from './helpers'
+import { Rectangle } from './shapes'
 
 
 export class CindyCanvas extends LinkableMobject {
@@ -11,6 +13,7 @@ export class CindyCanvas extends LinkableMobject {
 	paper: Paper
 	width: number
 	height: number
+	frame: Rectangle
 	csView: HTMLCanvasElement
 	initScript: HTMLScriptElement
 	drawScript: HTMLScriptElement
@@ -29,6 +32,16 @@ export class CindyCanvas extends LinkableMobject {
 		// this.mainScript.setAttribute('src', 'CindyJS/build/js/Cindy.js')
 		// this.mainScript.onload = this.createCore.bind(this)
 
+		this.frame = new Rectangle({
+			anchor: this.anchor,
+			width: this.width,
+			height: this.height,
+			strokeColor: Color.white(),
+			strokeWidth: 1,
+			fillOpacity: 0.5
+		})
+		this.add(this.frame)
+
 		this.csView = document.createElement('canvas')
 		let canvasID: string = 'CSCanvas' // + this.paper.cindyPorts.length
 		this.csView.setAttribute('id', canvasID)
@@ -41,7 +54,7 @@ export class CindyCanvas extends LinkableMobject {
 		this.csView.style['top'] = this.anchor.y + 'px'
 
 		this.draggable = true
-		this.view.style['pointer-events'] = 'auto'
+		//this.view.style['pointer-events'] = 'auto'
 		
 		//document.querySelector('#paper-container').insertBefore(this.csView, document.querySelector('#paper-console'))
 		//document.head.appendChild(this.mainScript)
@@ -100,7 +113,17 @@ export class CindyCanvas extends LinkableMobject {
 
 	geometry(): Array<any> { return [] }
 	
-	update(argsDict: object, redraw = true) { }
+	update(argsDict: object, redraw = true) {
+		super.update(argsDict, false)
+		if (this.csView == undefined) { return }
+		let parent = this.csView.parentElement
+		console.log(parent.getAttribute('id'))
+		if (parent.getAttribute('id').startsWith('CSCanvas')) {
+			console.log(parent, this.anchor)
+			parent.style.left =  this.anchor.x + "px"
+			parent.style.top = this.anchor.y + "px"
+		}
+	}
 	redraw() { }
 
 	localXMin(): number { return 0 }
@@ -108,6 +131,9 @@ export class CindyCanvas extends LinkableMobject {
 	localYMin(): number { return 0 }
 	localYMax(): number { return this.height }
 
+	pointerDown(e: LocatedEvent) {
+		console.log('pointerDown here!')
+	}
 }
 
 
@@ -154,11 +180,9 @@ export class WaveCindyCanvas extends CindyCanvas {
 		if (this.core != undefined) {
 			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
 		}
-		// if (this.drawScript != undefined) {
-		// 	this.drawScript.textContent = this.drawCode()
-		// }
-		super.update(argsDict, false) //redraw)
+		super.update(argsDict, false)
 	}
+
 }
 
 
@@ -227,5 +251,16 @@ export class DrawnRectangle extends CreatedMobject {
 		}) // auto-adds to parent
 		cindy.update()
 	}
+
 	
 }
+
+
+
+
+
+
+
+
+
+

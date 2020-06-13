@@ -27,7 +27,8 @@ export class Freehand extends CreatedMobject {
 	constructor(argsDict: object = {}) {
 		super()
 		this.setAttributes({
-			strokeColor: Color.white()
+			strokeColor: Color.white(),
+			draggable: false
 		})
 		this.update(argsDict)
 	}

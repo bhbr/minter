@@ -74,7 +74,7 @@ export class Paper extends LinkableMobject {
 		this.passAlongEvents = !flag
 		for (let c of this.cindys) {
 			c.draggable = flag
-			c.view.style['pointer-events'] = (flag ? 'none' : 'auto')
+			c.csView.parentElement.style['pointer-events'] = (flag ? 'none' : 'auto')
 		}
 		if (flag) {
 			this.selfHandlePointerDown = this.startDragging
@@ -97,10 +97,6 @@ export class Paper extends LinkableMobject {
 				let p2: boolean = (p.y > c.anchor.y)
 				let p3: boolean = (p.x < c.anchor.x + c.width)
 				let p4: boolean = (p.y < c.anchor.y + c.height)
-				log(p1)
-				log(p2)
-				log(p3)
-				log(p4)
 				if (p1 && p2 && p3 && p4) {
 					this.draggedMobject = c
 					break
@@ -113,6 +109,7 @@ export class Paper extends LinkableMobject {
 		}
 		this.dragPointStart = pointerEventVertex(e)
 		this.dragAnchorStart = this.draggedMobject.anchor.copy()
+
 		
 		this.draggedIOList = undefined
 		if (this.dependencyMap == undefined) { return }
@@ -129,14 +126,8 @@ export class Paper extends LinkableMobject {
 		if (this.draggedMobject == undefined) { return }
 		let dragPoint = pointerEventVertex(e)
 		let dr = dragPoint.subtract(this.dragPointStart)
-
-		this.draggedMobject.anchor.copyFrom(this.dragAnchorStart.add(dr))
-		
-		if (this.draggedMobject instanceof CindyCanvas) {
-			this.draggedMobject.view.style.left =  this.draggedMobject.anchor.x + "px"
-			this.draggedMobject.view.style.top = this.draggedMobject.anchor.y + "px"
-		}
-		this.draggedMobject.update()
+		let newAnchor: Vertex = this.dragAnchorStart.add(dr)
+		this.draggedMobject.update({ anchor: newAnchor })
 
 		if (this.dependencyMap == undefined) { return }
 		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))
@@ -194,7 +185,7 @@ export class Paper extends LinkableMobject {
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.snappablePoints) {
-			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 10) {
+			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 20) {
 				this.creationStartPoint = fp.midPoint
 				drawFreehand = false
 			}
@@ -249,7 +240,7 @@ export class Paper extends LinkableMobject {
 		let p: Vertex = pointerEventVertex(e)
 		for (let fq of this.snappablePoints) {
 			let q: Vertex = fq.anchor
-			if (p.subtract(q).norm() < 10) {
+			if (p.subtract(q).norm() < 20) {
 				p = q
 				break
 			}
@@ -280,10 +271,6 @@ export class Paper extends LinkableMobject {
 	}
 
 	addCindy(cindyCanvas: CindyCanvas) {
-		// document.querySelector('#paper-container').insertBefore(
-		// 	cindyCanvas.view, document.querySelector('#paper-console')
-		// )
-		// document.body.appendChild(cindyCanvas.script)
 		this.cindys.push(cindyCanvas)
 	}
 
@@ -348,5 +335,19 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	passAlongEvents: true
 })
+
+let c = new WaveCindyCanvas({
+	anchor: new Vertex(200, 200),
+	width: 300,
+	height: 200,
+	paper: paper
+})
+
+paper.add(c)
+
+
+
+
+
 
 

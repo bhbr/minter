@@ -1,5 +1,5 @@
 import { Vertex } from './transform'
-import { Dependency, Color, Mobject, MGroup, TextLabel } from './mobject'
+import { Dependency, Color, Mobject, VMobject, MGroup, TextLabel } from './mobject'
 import { Circle, RoundedRectangle } from './shapes'
 import { pointerEventVertex, LocatedEvent } from './helpers'
 import { CreatedMobject } from './creating'
@@ -15,7 +15,7 @@ export class LinkBullet extends Circle {
 	constructor(argsDict: object) {
 		super(argsDict)
 		this.setAttributes({        
-			radius: 10,
+			radius: 7,
 			fillOpacity: 0,
 			strokeColor: Color.white()
 		})
@@ -33,9 +33,10 @@ export class InputList extends RoundedRectangle {
 		super(argsDict)
 		this.setDefaults({listInputNames: []})
 		this.setAttributes({
-			cornerRadius: 30,
+			cornerRadius: 20,
 			fillColor: Color.white(),
 			fillOpacity: 0.1,
+			strokeWidth: 0,
 			width: 150,
 			height: this.getHeight()
 		})
@@ -44,9 +45,13 @@ export class InputList extends RoundedRectangle {
 		for (let i = 0; i < this.listInputNames.length; i++) {
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
-			let t = new TextLabel({text: name, textAnchor: 'left'})
+			let t = new TextLabel({
+				text: name,
+				textAnchor: 'left',
+				textAlign: 'left'
+			})
 			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(25, 0)
+			t.anchor = c.anchor.translatedBy(15, 0)
 			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
@@ -72,9 +77,10 @@ export class OutputList extends RoundedRectangle {
 		super(argsDict)
 		this.setDefaults({listOutputNames: []})
 		this.setAttributes({
-			cornerRadius: 30,
+			cornerRadius: 20,
 			fillColor: Color.white(),
 			fillOpacity: 0.3,
+			strokeWidth: 0,
 			width: 150,
 			height: this.getHeight()
 		})
@@ -83,9 +89,13 @@ export class OutputList extends RoundedRectangle {
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
-			let t = new TextLabel({text: name, textAnchor: 'left'})
+			let t = new TextLabel({
+				text: name,
+				textAnchor: 'left',
+				textAlign: 'left'
+			})
 			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(25, 0)
+			t.anchor = c.anchor.translatedBy(15, 0)
 			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
@@ -268,7 +278,7 @@ export class LinkLine extends CreatedMobject {
 		super(argsDict)
 		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
-			radius: 8,
+			radius: 5,
 			fillOpacity: 1,
 			anchor: this.startPoint
 		})
@@ -278,7 +288,7 @@ export class LinkLine extends CreatedMobject {
 			strokeWidth: 3
 		})
 		this.endBullet = new Circle({
-			radius: 8,
+			radius: 5,
 			fillOpacity: 1,
 			anchor: this.startPoint.copy()
 		})

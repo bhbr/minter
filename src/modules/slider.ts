@@ -33,7 +33,6 @@ export class BoxSlider extends LinkableMobject {
 		})
 		this.setAttributes({
 			draggable: true,
-			//outputs: ['value'],
 			outputNames: ['value']
 		})
 		this.setAttributes({
@@ -75,7 +74,8 @@ export class BoxSlider extends LinkableMobject {
 			this.filledBar.anchor.y = this.height - this.filledBar.height
 			this.filledBar.update({ height: a * this.height })
 			this.label.update({
-				text: this.value.toPrecision(3).toString()
+				text: this.value.toPrecision(3).toString(),
+				anchor: new Vertex(this.width/2, this.height/2)
 			})
 		} catch { }
 		if (redraw) { this.redraw() }
