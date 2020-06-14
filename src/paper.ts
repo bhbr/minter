@@ -228,16 +228,18 @@ export class Paper extends LinkableMobject {
 			this.geometricObjects.push(mobject)
 		}
 
-		let arrow: Arrow = undefined
+		let geomob: Arrow | Circle = undefined
 		if (this.creationGroup.visibleCreation == 'segment') {
-			arrow = this.creationGroup.creations['segment'].segment
+			geomob = this.creationGroup.creations['segment'].segment
 		} else if (this.creationGroup.visibleCreation == 'ray') {
-			arrow = this.creationGroup.creations['ray'].ray
+			geomob = this.creationGroup.creations['ray'].ray
 		} else if (this.creationGroup.visibleCreation == 'line') {
-			arrow = this.creationGroup.creations['line'].line
+			geomob = this.creationGroup.creations['line'].line
+		} else if (this.creationGroup.visibleCreation == 'circle') {
+			geomob = this.creationGroup.creations['circle'].circle
 		}
-		if (arrow != undefined) {
-			this.intersectWithRest(arrow)
+		if (geomob != undefined) {
+			this.intersectWithRest(geomob)
 		}
 
 		this.remove(this.creationGroup)
@@ -245,25 +247,18 @@ export class Paper extends LinkableMobject {
 	}
 
 
-	intersectWithRest(arrow: Arrow) {
-		for (let geomob of this.geometricObjects) {
-			if (geomob instanceof Circle) {
-				let p1 = new IntersectionPoint({
-					geomob1: arrow,
-					geomob2: geomob,
-					index: 0
+	intersectWithRest(geomob1: Arrow | Circle) {
+		for (let geomob2 of this.geometricObjects) {
+			if (geomob1 == geomob2) { continue }
+			for (let i = 0; i < 2; i++) {
+				let p: IntersectionPoint = new IntersectionPoint({
+					geomob1: geomob1,
+					geomob2: geomob2,
+					index: i
 				})
-				this.add(p1)
-				let p2 = new IntersectionPoint({
-					geomob1: arrow,
-					geomob2: geomob,
-					index: 1
-				})
-				this.add(p2)
-				arrow.addDependent(p1)
-				arrow.addDependent(p2)
-				geomob.addDependent(p1)
-				geomob.addDependent(p2)
+				this.add(p)
+				geomob1.addDependent(p)
+				geomob2.addDependent(p)
 			}
 		}
 	}
