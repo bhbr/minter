@@ -65,9 +65,10 @@ export class Paper extends LinkableMobject {
 	changeColor(newColor: Color) {
 		this.currentColor = newColor
 		if (this.creationGroup == undefined) { return }
-		this.creationGroup.strokeColor = this.currentColor
-		this.creationGroup.fillColor = this.currentColor
-		this.creationGroup.update()
+		this.creationGroup.update({
+			strokeColor: this.currentColor,
+			fillColor: this.currentColor
+		})
 	}
 
 	setDragging(flag: boolean) {
@@ -194,46 +195,16 @@ export class Paper extends LinkableMobject {
 		this.creationGroup = new CreationGroup({
 			startPoint: this.creationStartPoint,
 			visibleCreation: this.visibleCreation,
-			drawFreehand: drawFreehand
+			drawFreehand: drawFreehand,
+			strokeColor: this.currentColor,
+			fillColor: this.currentColor
 		})
-		this.creationGroup.strokeColor = this.currentColor
-		this.creationGroup.fillColor = this.currentColor
+		this.addDependency('currentColor',
+			this.creationGroup, 'strokeColor')
+		this.addDependency('currentColor',
+			this.creationGroup, 'fillColor')
 		this.add(this.creationGroup)
 		this.changeVisibleCreation(this.visibleCreation)
-	}
-
-	arrowCircleIntersections(arrow: Segment | Ray | Line,
-		circle: Circle): Array<Vertex> {
-		let A: Vertex = arrow.startPoint
-		let B: Vertex = arrow.endPoint
-		let C: Vertex = circle.midPoint
-		let r: number = circle.radius
-
-		let a: number = A.subtract(B).norm2()
-		let b: number = -2 * A.subtract(B).dot(B.add(C))
-		let c: number = B.add(C).norm2() - r**2
-		let d = b**2 - 4*a*c
-
-		if (d >= 0) {	
-			let l1 = (-b - d**0.5)/(2*a)
-			let l2 = (-b + d**0.5)/(2*a)
-			let P1: Vertex = A.multiply(l1).add(B.multiply(1 - l1))
-			let P2: Vertex = A.multiply(l2).add(B.multiply(1 - l2))
-			let intersections: Array<Vertex> = [P1, P2]
-			if (A instanceof Segment) {
-				if (l1 < 0 || l1 > 1) { P1 = new Vertex(NaN, NaN) }
-				if (l2 < 0 || l2 > 1) { P2 = new Vertex(NaN, NaN) }
-			} else if (A instanceof Ray) {
-				if (l1 < 0) { P1 = new Vertex(NaN, NaN) }
-				if (l2 < 0) { P2 = new Vertex(NaN, NaN) }
-			}
-			return intersections
-		} else {
-			let P1 = new Vertex(NaN, NaN)
-			let P2 = new Vertex(NaN, NaN)
-			return [P1, P2]
-		}
-
 	}
 
 	creativeMove(e: LocatedEvent) {
@@ -245,7 +216,6 @@ export class Paper extends LinkableMobject {
 				break
 			}
 		}
-
 		this.creationGroup.updateFromTip(p)
 	}
 
@@ -329,21 +299,46 @@ export class Paper extends LinkableMobject {
 		this.redrawSubmobs()
 	}
 
+	arrowCircleIntersections(arrow: Segment | Ray | Line,
+		circle: Circle): Array<Vertex> {
+		let A: Vertex = arrow.startPoint
+		let B: Vertex = arrow.endPoint
+		let C: Vertex = circle.midPoint
+		let r: number = circle.radius
+
+		let a: number = A.subtract(B).norm2()
+		let b: number = -2 * A.subtract(B).dot(B.add(C))
+		let c: number = B.add(C).norm2() - r**2
+		let d = b**2 - 4*a*c
+
+		if (d >= 0) {
+			let l1 = (-b - d**0.5)/(2*a)
+			let l2 = (-b + d**0.5)/(2*a)
+			let P1: Vertex = A.multiply(l1).add(B.multiply(1 - l1))
+			let P2: Vertex = A.multiply(l2).add(B.multiply(1 - l2))
+			let intersections: Array<Vertex> = [P1, P2]
+			if (A instanceof Segment) {
+				if (l1 < 0 || l1 > 1) { P1 = new Vertex(NaN, NaN) }
+				if (l2 < 0 || l2 > 1) { P2 = new Vertex(NaN, NaN) }
+			} else if (A instanceof Ray) {
+				if (l1 < 0) { P1 = new Vertex(NaN, NaN) }
+				if (l2 < 0) { P2 = new Vertex(NaN, NaN) }
+			}
+			return intersections
+		} else {
+			let P1 = new Vertex(NaN, NaN)
+			let P2 = new Vertex(NaN, NaN)
+			return [P1, P2]
+		}
+
+	}
+
 }
 
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	passAlongEvents: true
 })
-
-let c = new WaveCindyCanvas({
-	anchor: new Vertex(200, 200),
-	width: 300,
-	height: 200,
-	paper: paper
-})
-
-paper.add(c)
 
 
 

@@ -70,6 +70,7 @@ export class CindyCanvas extends LinkableMobject {
 		})
 
 		this.points = [[0.4, 0.4], [0.3, 0.8]]
+
 		this.paper.add(this)
 		//this.update()
 		
@@ -117,9 +118,7 @@ export class CindyCanvas extends LinkableMobject {
 		super.update(argsDict, false)
 		if (this.csView == undefined) { return }
 		let parent = this.csView.parentElement
-		console.log(parent.getAttribute('id'))
 		if (parent.getAttribute('id').startsWith('CSCanvas')) {
-			console.log(parent, this.anchor)
 			parent.style.left =  this.anchor.x + "px"
 			parent.style.top = this.anchor.y + "px"
 		}
@@ -131,9 +130,6 @@ export class CindyCanvas extends LinkableMobject {
 	localYMin(): number { return 0 }
 	localYMax(): number { return this.height }
 
-	pointerDown(e: LocatedEvent) {
-		console.log('pointerDown here!')
-	}
 }
 
 
@@ -146,7 +142,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 		super(argsDict)
 		this.setDefaults({
 			wavelength: 1,
-			frequency: 1
+			frequency: 0
 		})
 		this.inputNames = ['wavelength', 'frequency']
 		this.update(argsDict)

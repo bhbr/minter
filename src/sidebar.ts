@@ -278,7 +278,7 @@ class ColorChangeButton extends SidebarButton {
 		this.setAttributes(argsDict)
 
 		this.colorNames = Object.keys(this.palette)
-		this.label.text = 'color'
+		this.label.text = ''
 		this.label.view.setAttribute('fill', 'black')
 
 		for (let value of Object.values(this.palette)) {
@@ -296,6 +296,14 @@ class ColorChangeButton extends SidebarButton {
 		if (this.label == undefined) { return }
 		let f: number = this.active ? buttonScaleFactor : 1
 		this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+	}
+
+	commonButtonDown() {
+		if (this.active) { return }
+		this.active = true
+		this.radius = buttonRadius * buttonScaleFactor
+		this.previousIndex = this.currentModeIndex
+		this.update()
 	}
 
 	commonButtonUp() {

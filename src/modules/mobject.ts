@@ -146,6 +146,7 @@ export class Mobject {
 			draggable: true // by outside forces, that is
 		}
 		Object.assign(defaults, argsDict)
+		
 		this.setAttributes(defaults)
 		this.view['mobject'] = this
 		this.view.setAttribute('class', this.constructor.name)
@@ -798,6 +799,8 @@ export class VMobject extends Mobject {
 
 export class Polygon extends VMobject {
 
+	closed: boolean = true
+
 	pathString(): string {
 		let pathString: string = ''
 		for (let point of this.globalVertices()) {
@@ -808,7 +811,9 @@ export class Polygon extends VMobject {
 			let prefix: string = (pathString == '') ? 'M' : 'L'
 			pathString += prefix + stringFromPoint(point)
 		}
-		pathString += 'Z'
+		if (this.closed) {
+			pathString += 'Z'
+		}
 		return pathString
 	}
 	
