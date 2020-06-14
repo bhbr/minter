@@ -2,8 +2,8 @@ import { addPointerDown, remove, removePointerDown, addPointerMove, removePointe
 import { Vertex } from './modules/transform'
 import { Color, Mobject, MGroup } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
-import { Segment, Ray, Line } from './modules/arrows'
-import { Point, FreePoint } from './modules/creating'
+import { Arrow, Segment, Ray, Line } from './modules/arrows'
+import { Point, FreePoint, IntersectionPoint } from './modules/creating'
 import { CindyCanvas, WaveCindyCanvas, DrawnRectangle } from './modules/cindycanvas'
 import { CreationGroup } from './modules/creationgroup'
 import { BoxSlider } from './modules/slider'
@@ -220,24 +220,52 @@ export class Paper extends LinkableMobject {
 	}
 
 	endCreating(e: LocatedEvent) {
+
 		this.creationGroup.dissolveInto(this)
+		let mobject: Mobject = this.children[this.children.length - 1]
+		
+		if (mobject instanceof Segment || mobject instanceof Ray || mobject instanceof Line || mobject instanceof TwoPointCircle) {
+			this.geometricObjects.push(mobject)
+		}
 
+		let arrow: Arrow = undefined
 		if (this.creationGroup.visibleCreation == 'segment') {
-			let segment: Segment = this.creationGroup.creations['segment'].segment
-			for (let geomob of this.geometricObjects) {
-				if (geomob instanceof Circle) {
-					let arr = this.arrowCircleIntersections(segment, geomob)
-					let p1 = new Point({midPoint: arr[0], fillOpacity: 0.2})
-					let p2 = new Point({midPoint: arr[1], fillOpacity: 0.2})
-					this.add(p1)
-					this.add(p2)
-				}
-			}
-
+			arrow = this.creationGroup.creations['segment'].segment
+		} else if (this.creationGroup.visibleCreation == 'ray') {
+			arrow = this.creationGroup.creations['ray'].ray
+		} else if (this.creationGroup.visibleCreation == 'line') {
+			arrow = this.creationGroup.creations['line'].line
+		}
+		if (arrow != undefined) {
+			this.intersectWithRest(arrow)
 		}
 
 		this.remove(this.creationGroup)
 		this.creationGroup = undefined
+	}
+
+
+	intersectWithRest(arrow: Arrow) {
+		for (let geomob of this.geometricObjects) {
+			if (geomob instanceof Circle) {
+				let p1 = new IntersectionPoint({
+					geomob1: arrow,
+					geomob2: geomob,
+					index: 0
+				})
+				this.add(p1)
+				let p2 = new IntersectionPoint({
+					geomob1: arrow,
+					geomob2: geomob,
+					index: 1
+				})
+				this.add(p2)
+				arrow.addDependent(p1)
+				arrow.addDependent(p2)
+				geomob.addDependent(p1)
+				geomob.addDependent(p2)
+			}
+		}
 	}
 
 	addCindy(cindyCanvas: CindyCanvas) {
@@ -268,9 +296,6 @@ export class Paper extends LinkableMobject {
 		} else {
 			super.add(mobject)
 		}
-		if (mobject instanceof Segment || mobject instanceof Ray || mobject instanceof Line || mobject instanceof TwoPointCircle) {
-			this.geometricObjects.push(mobject)
-		}
 	}
 
 	remove(mobject: Mobject) {
@@ -297,40 +322,6 @@ export class Paper extends LinkableMobject {
 
 	redraw() {
 		this.redrawSubmobs()
-	}
-
-	arrowCircleIntersections(arrow: Segment | Ray | Line,
-		circle: Circle): Array<Vertex> {
-		let A: Vertex = arrow.startPoint
-		let B: Vertex = arrow.endPoint
-		let C: Vertex = circle.midPoint
-		let r: number = circle.radius
-
-		let a: number = A.subtract(B).norm2()
-		let b: number = -2 * A.subtract(B).dot(B.add(C))
-		let c: number = B.add(C).norm2() - r**2
-		let d = b**2 - 4*a*c
-
-		if (d >= 0) {
-			let l1 = (-b - d**0.5)/(2*a)
-			let l2 = (-b + d**0.5)/(2*a)
-			let P1: Vertex = A.multiply(l1).add(B.multiply(1 - l1))
-			let P2: Vertex = A.multiply(l2).add(B.multiply(1 - l2))
-			let intersections: Array<Vertex> = [P1, P2]
-			if (A instanceof Segment) {
-				if (l1 < 0 || l1 > 1) { P1 = new Vertex(NaN, NaN) }
-				if (l2 < 0 || l2 > 1) { P2 = new Vertex(NaN, NaN) }
-			} else if (A instanceof Ray) {
-				if (l1 < 0) { P1 = new Vertex(NaN, NaN) }
-				if (l2 < 0) { P2 = new Vertex(NaN, NaN) }
-			}
-			return intersections
-		} else {
-			let P1 = new Vertex(NaN, NaN)
-			let P2 = new Vertex(NaN, NaN)
-			return [P1, P2]
-		}
-
 	}
 
 }

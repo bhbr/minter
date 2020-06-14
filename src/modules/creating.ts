@@ -2,7 +2,7 @@ import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, a
 import { Vertex } from './transform'
 import { Color, Mobject, MGroup, Polygon } from './mobject'
 import { Circle, TwoPointCircle } from './shapes'
-import { Segment, Ray, Line } from './arrows'
+import { Arrow, Segment, Ray, Line } from './arrows'
 
 export class CreatedMobject extends MGroup {
 
@@ -297,7 +297,6 @@ export class DrawnCircle extends CreatedMobject {
 		this.midPoint = this.midPoint || this.startPoint.copy()
 		this.outerPoint = this.outerPoint || this.startPoint.copy()
 		this.passAlongEvents = true
-		console.log('filling:', this.fillColor)
 		this.freeMidpoint = new FreePoint({
 			midPoint: this.midPoint,
 			strokeColor: this.strokeColor,
@@ -372,11 +371,76 @@ export class DrawnCircle extends CreatedMobject {
 	}
 
 	update(argsDict: object = {}, redraw: boolean = true) {
-		console.log(argsDict)
 		super.update(argsDict, redraw)
 	}
 
 
+}
+
+
+export class IntersectionPoint extends Point {
+
+	geomob1: Arrow | Circle
+	geomob2: Arrow | Circle
+	index: number
+	fillOpacity: number = 0
+
+	constructor(argsDict: object = {}) {
+		super(argsDict)
+		this.update(argsDict)
+	}
+
+	update(argsDict: object = {}, redraw : boolean = true) {
+		console.log('updating IntersectionPoint')
+		let anchor: Vertex = this.intersectionCoords()
+		if (anchor.isNaN()) {
+			argsDict['strokeWidth'] = 0
+		} else {
+			argsDict['strokeWidth'] = 1
+			if (!this.anchor.equals(anchor)) {
+				console.log('setting IntersectionPoint.anchor')
+				this.anchor = anchor
+			}
+		}
+		super.update(argsDict, redraw)
+	}
+
+	intersectionCoords(): Vertex {
+		if (this.geomob1 instanceof Arrow && this.geomob2 instanceof Circle) {
+			return this.arrowCircleIntersection(this.geomob1, this.geomob2 as Circle, this.index)
+		} else if (this.geomob2 instanceof Arrow && this.geomob1 instanceof Circle) {
+			return this.arrowCircleIntersection(this.geomob2, this.geomob1 as Circle, this.index)
+		} else {
+			return new Vertex(NaN, NaN)
+		}
+	}
+
+	arrowCircleIntersection(arrow: Arrow, circle: Circle, index: number): Vertex {
+		let A: Vertex = arrow.startPoint
+		let B: Vertex = arrow.endPoint
+		let C: Vertex = circle.midPoint
+		let r: number = circle.radius
+
+		let a: number = A.subtract(B).norm2()
+		let b: number = 2 * C.subtract(A).dot(A.subtract(B))
+		let c: number = C.subtract(A).norm2() - r**2
+		let d = b**2 - 4*a*c
+
+		if (d >= 0) {
+			let l = (-b + (index == 0 ? -1 : 1) * d**0.5)/(2*a)
+			let P: Vertex = A.add(B.subtract(A).multiply(l))
+			if (arrow.constructor.name == 'Segment') {
+				if (l < 0 || l > 1) { P = new Vertex(NaN, NaN) }
+			} else if (arrow.constructor.name == 'Ray') {
+				if (l < 0) { P = new Vertex(NaN, NaN) }
+			}
+			return P
+		} else {
+			let P = new Vertex(NaN, NaN)
+			return P
+		}
+
+	}
 }
 
 

@@ -39,6 +39,10 @@ export class Vertex extends Array {
 		return (this.subtract(otherVertex).norm() < tolerance)
 	}
 
+	equals(otherVertex: Vertex): boolean {
+		return this.closeTo(otherVertex, 1e-6)
+	}
+
 	copyFrom(otherVertex: Vertex) {
 		this.x = otherVertex.x
 		this.y = otherVertex.y

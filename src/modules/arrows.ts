@@ -1,11 +1,12 @@
 import { Vertex, Scaling, Translation, Rotation } from './transform'
 import { MGroup, Polygon } from './mobject'
 
-export class Segment extends Polygon {
-
+export class Arrow extends Polygon {
 	startPoint: Vertex
 	endPoint: Vertex
-	vertices: Array<Vertex>
+}
+
+export class Segment extends Arrow {
 
 	constructor(argsDict: object = {}) {
 		super()
