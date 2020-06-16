@@ -35,6 +35,7 @@ export class Vertex extends Array {
 	norm(): number { return Math.sqrt(this.norm2()) }
 
 	closeTo(otherVertex: Vertex, tolerance: number): boolean {
+		if (this.isNaN() || otherVertex.isNaN()) { return false }
 		if (!tolerance) { tolerance = 1 }
 		return (this.subtract(otherVertex).norm() < tolerance)
 	}

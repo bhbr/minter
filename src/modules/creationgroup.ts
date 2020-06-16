@@ -4,6 +4,7 @@ import { CreatedBoxSlider } from './createdslider'
 import { LinkableMobject } from './linkables'
 import { Vertex } from './transform'
 import { Color } from './mobject'
+import { Paper } from '../paper'
 
 export class CreationGroup extends CreatedMobject {
 
@@ -57,10 +58,10 @@ export class CreationGroup extends CreatedMobject {
 		}
 	}
 
-	dissolveInto(superMobject: LinkableMobject) {
-		superMobject.remove(this)
-		this.creations[this.visibleCreation].dissolveInto(superMobject)
-		superMobject.updateIOList()
+	dissolveInto(paper: Paper) {
+		paper.remove(this)
+		this.creations[this.visibleCreation].dissolveInto(paper)
+		paper.updateIOList()
 	}
 
 	update(argsDict: object = {}, redraw: boolean = true) {

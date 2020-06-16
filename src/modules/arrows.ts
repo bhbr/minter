@@ -22,8 +22,11 @@ export class Segment extends Arrow {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		this.vertices = [this.drawingStartPoint(), this.drawingEndPoint()]
-		super.update(argsDict, redraw)
+		super.update(argsDict, false)
+		let p: Vertex = this.drawingStartPoint()
+		let q: Vertex = this.drawingEndPoint()
+		this.vertices = [p, q]
+		this.redraw()
 	}
 
 	drawingStartPoint(): Vertex { return this.startPoint }

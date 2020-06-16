@@ -86,9 +86,9 @@ export class Mobject {
 
 	_transform: Transform
 	_anchor: Vertex
-	vertices: Array<Vertex>
+	vertices: Array<Vertex> = []
 	children: Array<Mobject> = []
-	dependencies: Array<Dependency>
+	dependencies: Array<Dependency> = []
 	snappablePoints: Array<any> = [] // workaround, don't ask
 
 	passAlongEvents: boolean // to event target
@@ -436,6 +436,15 @@ export class Mobject {
 		submob.parent = undefined
 	}
 
+	show() {
+		this.visible = true
+		if (this.view != undefined) {
+			this.view.style["visibility"] = "visible"
+		}
+		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+		this.redraw()
+	}
+
 	hide() {
 		this.visible = false
 		if (this.view != undefined) {
@@ -445,13 +454,20 @@ export class Mobject {
 		this.redraw()
 	}
 
-	show() {
-		this.visible = true
-		if (this.view != undefined) {
-			this.view.style["visibility"] = "visible"
+
+
+	recursiveShow() {
+		this.show()
+		for (let depmob of this.allDependents()) {
+			depmob.show()
 		}
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-		this.redraw()
+	}
+
+	recursiveHide() {
+		this.hide()
+		for (let depmob of this.allDependents()) {
+			depmob.hide()
+		}
 	}
 
 	centerAt(newCenter: Vertex, frame: Mobject) {
@@ -772,15 +788,17 @@ export class VMobject extends Mobject {
 	}
 
 	redraw() {
-		if (this.path == undefined || this.vertices.length == 0) { return }
+		if (this.path == undefined) { return }
 		let pathString: string = this.pathString()
 		if (pathString.includes("NaN")) { return }
 		this.path.setAttribute('d', pathString)
-		this.path.style['fill'] = this.fillColor.toHex()
-		this.path.style['fill-opacity'] = this.fillOpacity.toString()
-		this.path.style['stroke'] = this.strokeColor.toHex()
-		this.path.style['stroke-width'] = this.strokeWidth.toString()
-		this.redrawSubmobs()
+		try {
+			this.path.style['fill'] = this.fillColor.toHex()
+			this.path.style['fill-opacity'] = this.fillOpacity.toString()
+			this.path.style['stroke'] = this.strokeColor.toHex()
+			this.path.style['stroke-width'] = this.strokeWidth.toString()
+			this.redrawSubmobs()
+		} catch {}
 	}
 
 	pathString(): string {
@@ -803,7 +821,9 @@ export class Polygon extends VMobject {
 
 	pathString(): string {
 		let pathString: string = ''
-		for (let point of this.globalVertices()) {
+		let v = this.globalVertices()
+		if (v.length == 0) { return '' }
+		for (let point of v) {
 			if (point == undefined || point.isNaN()) {
 				pathString = ''
 				return pathString

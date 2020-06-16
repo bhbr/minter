@@ -3,11 +3,12 @@ import { Vertex } from './modules/transform'
 import { Color, Mobject, MGroup } from './modules/mobject'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Arrow, Segment, Ray, Line } from './modules/arrows'
-import { Point, FreePoint, IntersectionPoint } from './modules/creating'
+import { Point, FreePoint } from './modules/creating'
 import { CindyCanvas, WaveCindyCanvas, DrawnRectangle } from './modules/cindycanvas'
 import { CreationGroup } from './modules/creationgroup'
 import { BoxSlider } from './modules/slider'
 import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
+import { Construction } from './modules/construction'
 
 declare var CindyJS: any
 
@@ -18,18 +19,18 @@ export class Paper extends LinkableMobject {
 	visibleCreation: string
 	cindys: Array<CindyCanvas>
 	cindyPorts: Array<object>
-	snappablePoints: Array<FreePoint>
+	snappablePoints: Array<Point>
 	creationStartPoint: Vertex
 	colorPalette: object
 	currentColor: Color
 	creationGroup: CreationGroup
-	geometricObjects: Array<Mobject>
 	dependencyMap: DependencyMap
 	draggedMobject: Mobject
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 	draggedIOList: IOList
 	dragIOListAnchorStart: Vertex
+	construction: Construction
 
 	constructor(argsDict: object = {}) {
 		super()
@@ -38,7 +39,7 @@ export class Paper extends LinkableMobject {
 		this.visibleCreation = 'freehand'
 		this.cindyPorts = []
 		this.snappablePoints = []
-		this.geometricObjects = []
+		this.construction = new Construction()
 
 		this.colorPalette = {
 			'black': Color.black(),
@@ -54,6 +55,7 @@ export class Paper extends LinkableMobject {
 		this.currentColor = this.colorPalette['white']
 		this.setDragging(false)
 		this.update(argsDict)
+		this.add(this.construction)
 
 	}
 
@@ -183,9 +185,10 @@ export class Paper extends LinkableMobject {
 
 
 	startCreating(e: LocatedEvent) {
+		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
-		for (let fp of this.snappablePoints) {
+		for (let fp of this.construction.points) {
 			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 20) {
 				this.creationStartPoint = fp.midPoint
 				drawFreehand = false
@@ -199,6 +202,7 @@ export class Paper extends LinkableMobject {
 			strokeColor: this.currentColor,
 			fillColor: this.currentColor
 		})
+		
 		this.addDependency('currentColor',
 			this.creationGroup, 'strokeColor')
 		this.addDependency('currentColor',
@@ -209,59 +213,25 @@ export class Paper extends LinkableMobject {
 
 	creativeMove(e: LocatedEvent) {
 		let p: Vertex = pointerEventVertex(e)
-		for (let fq of this.snappablePoints) {
-			let q: Vertex = fq.anchor
-			if (p.subtract(q).norm() < 20) {
-				p = q
-				break
+		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
+			// snap to existing points
+			for (let fq of this.construction.points) {
+				let q: Vertex = fq.anchor
+				if (p.subtract(q).norm() < 10) {
+					p = q
+					break
+				}
 			}
 		}
 		this.creationGroup.updateFromTip(p)
 	}
 
 	endCreating(e: LocatedEvent) {
-
 		this.creationGroup.dissolveInto(this)
-		let mobject: Mobject = this.children[this.children.length - 1]
-		
-		if (mobject instanceof Segment || mobject instanceof Ray || mobject instanceof Line || mobject instanceof TwoPointCircle) {
-			this.geometricObjects.push(mobject)
-		}
-
-		let geomob: Arrow | Circle = undefined
-		if (this.creationGroup.visibleCreation == 'segment') {
-			geomob = this.creationGroup.creations['segment'].segment
-		} else if (this.creationGroup.visibleCreation == 'ray') {
-			geomob = this.creationGroup.creations['ray'].ray
-		} else if (this.creationGroup.visibleCreation == 'line') {
-			geomob = this.creationGroup.creations['line'].line
-		} else if (this.creationGroup.visibleCreation == 'circle') {
-			geomob = this.creationGroup.creations['circle'].circle
-		}
-		if (geomob != undefined) {
-			this.intersectWithRest(geomob)
-		}
-
-		this.remove(this.creationGroup)
 		this.creationGroup = undefined
 	}
 
 
-	intersectWithRest(geomob1: Arrow | Circle) {
-		for (let geomob2 of this.geometricObjects) {
-			if (geomob1 == geomob2) { continue }
-			for (let i = 0; i < 2; i++) {
-				let p: IntersectionPoint = new IntersectionPoint({
-					geomob1: geomob1,
-					geomob2: geomob2,
-					index: i
-				})
-				this.add(p)
-				geomob1.addDependent(p)
-				geomob2.addDependent(p)
-			}
-		}
-	}
 
 	addCindy(cindyCanvas: CindyCanvas) {
 		this.cindys.push(cindyCanvas)
@@ -273,21 +243,9 @@ export class Paper extends LinkableMobject {
 		cindyCanvas.drawScript.remove()
 	}
 
-	addFreePoint(fp: FreePoint) {
-		this.snappablePoints.push(fp)
-		super.add(fp)
-	}
-
-	removeFreePoint(fp: FreePoint) {
-		remove(this.snappablePoints, fp)
-		super.remove(fp)
-	}
-
 	add(mobject: Mobject) {
 		if (mobject instanceof CindyCanvas) {
 			this.addCindy(mobject)
-		} else if (mobject instanceof FreePoint) {
-			this.addFreePoint(mobject)
 		} else {
 			super.add(mobject)
 		}
@@ -296,8 +254,6 @@ export class Paper extends LinkableMobject {
 	remove(mobject: Mobject) {
 		if (mobject instanceof CindyCanvas) {
 			this.removeCindy(mobject)
-		} else if (mobject instanceof FreePoint) {
-			this.removeFreePoint(mobject)
 		} else {
 			super.remove(mobject)
 		}
