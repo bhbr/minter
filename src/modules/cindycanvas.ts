@@ -236,11 +236,12 @@ export class DrawnRectangle extends CreatedMobject {
 	}
 
 	dissolveInto(parent: Mobject) {
-		let w: number = this.p2.x - this.p1.x
-		let h: number = this.p3.y - this.p1.y
+		let w: number = Math.abs(this.p3.x - this.p1.x)
+		let h: number = Math.abs(this.p3.y - this.p1.y)
+		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
 		let cindy = new WaveCindyCanvas({
 			paper: parent,
-			anchor: this.p1,
+			anchor: topLeft,
 			width: w,
 			height: h,
 			wavelength: 0.1

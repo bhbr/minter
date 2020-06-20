@@ -53,7 +53,6 @@ export class IntersectionPoint extends Point {
 	}
 
 	arrowCircleIntersection(arrow: Arrow, circle: Circle, index: number): Vertex {
-		console.log('arrow circle', index)
 		let A: Vertex = arrow.startPoint
 		let B: Vertex = arrow.endPoint
 		let C: Vertex = circle.midPoint
@@ -91,8 +90,8 @@ export class IntersectionPoint extends Point {
 		this.mu = (AB.y*AC.x - AB.x*AC.y)/det
 		let Q: Vertex = A.add(AB.multiply(this.lambda))
 
-		let intersectionFlag1: boolean = (arrow1.constructor.name == 'Segment' && this.lambda > 0 && this.lambda < 1) || (arrow1.constructor.name == 'Ray' && this.lambda > 0) || (arrow1.constructor.name == 'Line')
-		let intersectionFlag2: boolean = (arrow2.constructor.name == 'Segment' && this.mu > 0 && this.mu < 1) || (arrow2.constructor.name == 'Ray' && this.mu > 0) || (arrow2.constructor.name == 'Line')
+		let intersectionFlag1: boolean = (arrow1.constructor.name == 'Segment' && this.lambda >= 0 && this.lambda <= 1) || (arrow1.constructor.name == 'Ray' && this.lambda >= 0) || (arrow1.constructor.name == 'Line')
+		let intersectionFlag2: boolean = (arrow2.constructor.name == 'Segment' && this.mu >= 0 && this.mu <= 1) || (arrow2.constructor.name == 'Ray' && this.mu >= 0) || (arrow2.constructor.name == 'Line')
 
 		return (intersectionFlag1 && intersectionFlag2) ? Q : new Vertex(NaN, NaN)
 
@@ -186,7 +185,6 @@ export class Construction extends LinkableMobject {
 	addPoint(p: Point): boolean {
 		for (let q of this.points) {
 			if (p.midPoint.equals(q.midPoint)) {
-				console.log(p, q)
 				return false
 			}
 		}
@@ -201,9 +199,7 @@ export class Construction extends LinkableMobject {
 		for (let geomob2 of this.constructedMobjects) {
 			if (geomob1 == geomob2) { continue }
 			let nbPoints: number = (geomob1 instanceof Arrow && geomob2 instanceof Arrow) ? 1 : 2
-			console.log(geomob1, geomob2, nbPoints)
 			for (let i = 0; i < nbPoints; i++) {
-				console.log('loop', i)
 				let p: IntersectionPoint = new IntersectionPoint({
 					geomob1: geomob1,
 					geomob2: geomob2,

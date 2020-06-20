@@ -98,6 +98,8 @@ export class Mobject {
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 
+	//boundUpdate: (argsDict: object, redraw: boolean) => ()
+
 	get opacity(): number { return this.fillOpacity }
 	set opacity(newValue: number) { this.fillOpacity = newValue }
 
@@ -157,12 +159,15 @@ export class Mobject {
 		this.boundPointerUp = this.pointerUp.bind(this)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
 		addPointerDown(this.view, this.boundPointerDown)
+
+		//this.boundUpdate = this.update.bind(this)
 		
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
 		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
 		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
 
 		this.disableDragging()
+
 
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
@@ -382,7 +387,7 @@ export class Mobject {
 		for (let dep of this.dependencies || []) {
 			let outputName: any = this[dep.outputName] // may be undefined
 			if (typeof outputName === 'function') {
-				dep.target[dep.inputName] = outputName()
+				dep.target[dep.inputName] = outputName.bind(this)()
 			} else if (outputName != undefined && outputName != null) {
 				dep.target[dep.inputName] = outputName
 			}
@@ -759,6 +764,7 @@ export class MGroup extends Mobject {
 	}
 
 	redraw() {
+		if (this.anchor.isNaN()) { return }
 		this.redrawSubmobs()
 	}
 
@@ -788,6 +794,7 @@ export class VMobject extends Mobject {
 	}
 
 	redraw() {
+		if (this.anchor.isNaN()) { return }
 		if (this.path == undefined) { return }
 		let pathString: string = this.pathString()
 		if (pathString.includes("NaN")) { return }
@@ -938,6 +945,7 @@ export class TextLabel extends Mobject {
 	}
 
 	redraw() {
+		if (this.anchor.isNaN()) { return }
 		this.view.textContent = this.text
 		this.view.setAttribute('x', this.globalTransform().e.toString())
 		this.view.setAttribute('y', this.globalTransform().f.toString())

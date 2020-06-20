@@ -9,6 +9,7 @@ import { CreationGroup } from './modules/creationgroup'
 import { BoxSlider } from './modules/slider'
 import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
 import { Construction } from './modules/construction'
+import { Pendulum } from './modules/pendulum'
 
 declare var CindyJS: any
 
@@ -281,6 +282,27 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	passAlongEvents: true
 })
+
+// let p = new Pendulum({
+// 	anchor: new Vertex(300, 150),
+// 	length: 100,
+// 	initialAngle: 2 * Math.PI / 8
+// })
+// paper.add(p)
+// p.run()
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -441,12 +441,20 @@ let cindyButton = new CreativeButton({
 })
 sidebar.appendChild(cindyButton.view)
   
+let pendulumButton = new CreativeButton({
+	creations: ['pendulum'],
+	key: 't',
+	baseColor: Color.gray(0.4),
+	locationIndex: 4
+})
+sidebar.appendChild(pendulumButton.view)
+  
 let dragButton = new DragButton({
 	messages: [{drag: true}],
 	outgoingMessage: {drag: false},
-	key: 't',
+	key: 'a',
 	baseColor: Color.gray(0.6),
-	locationIndex: 4
+	locationIndex: 5
 })
 dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
@@ -455,17 +463,17 @@ sidebar.appendChild(dragButton.view)
 let linkButton = new LinkButton({
 	messages: [{toggleLinks: true}],
 	outgoingMessage: {toggleLinks: false},
-	key: 'z',
+	key: 's',
 	baseColor: Color.gray(0.2),
-	locationIndex: 5
+	locationIndex: 6
 })
 sidebar.appendChild(linkButton.view)
 
 let colorButton = new ColorChangeButton({
-	key: 'a',
+	key: 'd',
 	baseColor: Color.white(),
 	modeSpacing: 15,
-	locationIndex: 6,
+	locationIndex: 7,
 	fillOpacity: 1
 })
 sidebar.appendChild(colorButton.view)
