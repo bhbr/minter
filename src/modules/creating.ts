@@ -3,7 +3,7 @@ import { Vertex } from './transform'
 import { Color, Mobject, MGroup, Polygon } from './mobject'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
-import { LocatedEvent } from './helpers'
+import { LocatedEvent, paperLog } from './helpers'
 import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
@@ -24,6 +24,7 @@ export class CreatedMobject extends MGroup {
 		for (let submob of this.children) {
 			paper.add(submob)
 		}
+		paperLog('dissolving CreatedMobject')
 	}
 
 	updateFromTip(q: Vertex) {

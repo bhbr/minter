@@ -1,5 +1,5 @@
 import { Vertex, Transform } from './transform'
-import { remove, logInto, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './helpers'
+import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog } from './helpers'
 
 export class Dependency {
 
@@ -540,11 +540,11 @@ export class Mobject {
 		this.addDependency(null, target, null)
 	}
 
-	// empty methods as workaround (don't ask)
+	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
 	localXMin(): number {
-		let xMin = Infinity
+		let xMin: number = Infinity
 		if (this.vertices != undefined) {
 			for (let p of this.vertices) { xMin = Math.min(xMin, p.x) }
 		}
@@ -557,7 +557,7 @@ export class Mobject {
 	}
 
 	localXMax(): number {
-		let xMax = -Infinity
+		let xMax: number = -Infinity
 		if (this.vertices != undefined) {
 			for (let p of this.vertices) { xMax = Math.max(xMax, p.x) }
 		}
@@ -570,7 +570,7 @@ export class Mobject {
 	}
 
 	localYMin(): number {
-		let yMin = Infinity
+		let yMin: number = Infinity
 		if (this.vertices != undefined) {
 			for (let p of this.vertices) { yMin = Math.min(yMin, p.y) }
 		}
@@ -583,7 +583,7 @@ export class Mobject {
 	}
 
 	localYMax(): number {
-		let yMax = -Infinity
+		let yMax: number = -Infinity
 		if (this instanceof MGroup) {
 
 		}

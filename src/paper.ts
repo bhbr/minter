@@ -13,8 +13,6 @@ import { Pendulum } from './modules/pendulum'
 
 declare var CindyJS: any
 
-let log = function(msg: any) { } // logInto(msg.toString(), 'paper-console')
-
 export class Paper extends LinkableMobject {
 
 	visibleCreation: string
@@ -283,13 +281,7 @@ export const paper = new Paper({
 	passAlongEvents: true
 })
 
-// let p = new Pendulum({
-// 	anchor: new Vertex(300, 150),
-// 	length: 100,
-// 	initialAngle: 2 * Math.PI / 8
-// })
-// paper.add(p)
-// p.run()
+logInto('created paper', 'paper-console')
 
 
 

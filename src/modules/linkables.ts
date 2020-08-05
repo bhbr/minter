@@ -1,10 +1,13 @@
 import { Vertex } from './transform'
 import { Dependency, Color, Mobject, VMobject, MGroup, TextLabel } from './mobject'
 import { Circle, RoundedRectangle } from './shapes'
-import { pointerEventVertex, LocatedEvent } from './helpers'
+import { pointerEventVertex, LocatedEvent, paperLog } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
+
+const BULLET_SIZE: number = 10
+const SNAPPING_DISTANCE: number = 10
 
 export class LinkBullet extends Circle {
 
@@ -15,7 +18,7 @@ export class LinkBullet extends Circle {
 	constructor(argsDict: object) {
 		super(argsDict)
 		this.setAttributes({        
-			radius: 7,
+			radius: BULLET_SIZE,
 			fillOpacity: 0,
 			strokeColor: Color.white()
 		})
@@ -164,21 +167,27 @@ export class DependencyMap extends MGroup {
 
 	selfHandlePointerUp(e: LocatedEvent) {
 		let line: LinkLine = this.editedLinkLine
-		let tcircle: Circle = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e) as Circle
-		// actually this is the Circle that we dragged, not the LinkBullet we snapped it to
+		let tcircle: any = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
+
 		let tl: LinkBullet = null
-		for (let iol of this.children) {
-			if (!(iol instanceof IOList)) { continue }
-			for (let b of iol.inputList.children) {
-				if (!(b instanceof LinkBullet)) { continue }
-					let bc = b.globalCenter()
-					let tc = tcircle.globalCenter()
-				if (bc.x == tc.x && bc.y == tc.y) {
-					tl = b
-					break
+		if (tcircle.constructor.name == 'Circle') {
+			// actually this is the Circle that we dragged, not the LinkBullet we snapped it to
+			for (let iol of this.children) {
+				if (!(iol instanceof IOList)) { continue }
+				for (let b of iol.inputList.children) {
+					if (!(b instanceof LinkBullet)) { continue }
+						let bc = b.globalCenter()
+						let tc = (tcircle as Circle).globalCenter()
+					if (bc.x == tc.x && bc.y == tc.y) {
+						tl = b
+						break
+					}
 				}
 			}
+		} else {
+			tl = tcircle as LinkBullet
 		}
+
 		line.target = tl.mobject
 		line.endHook = tl
 		line.dissolveInto(this)
@@ -190,7 +199,7 @@ export class DependencyMap extends MGroup {
 
 	snapInput(p: Vertex): Vertex {
 		for (let [loc, mobject, inputName] of this.inputLocations()) {
-			if (p.closeTo(loc, 5)) { return loc }
+			if (p.closeTo(loc, SNAPPING_DISTANCE)) { return loc }
 		}
 		return p
 	}
@@ -198,7 +207,7 @@ export class DependencyMap extends MGroup {
 
 	snapOutput(p: Vertex): Vertex {
 		for (let [loc, mobject, outputName] of this.outputLocations()) {
-			if (p.closeTo(loc, 5)) { return loc }
+			if (p.closeTo(loc, SNAPPING_DISTANCE)) { return loc }
 		}
 		return p
 	}
@@ -231,14 +240,14 @@ export class DependencyMap extends MGroup {
 
 	getInputFromVertex(p: Vertex): [Mobject, string] {
 		for (let [loc, mobject, inputName] of this.inputLocations()) {
-			if (p.closeTo(loc, 5)) { return [mobject, inputName] }
+			if (p.closeTo(loc, SNAPPING_DISTANCE)) { return [mobject, inputName] }
 		}
 		return [null, null]
 	}
 
 	getOutputFromVertex(p: Vertex): [Mobject, string] {
 		for (let [loc, mobject, outputName] of this.outputLocations()) {
-			if (p.closeTo(loc, 5)) { return [mobject, outputName] }
+			if (p.closeTo(loc, SNAPPING_DISTANCE)) { return [mobject, outputName] }
 		}
 		return [null, null]
 	}
@@ -278,7 +287,7 @@ export class LinkLine extends CreatedMobject {
 		super(argsDict)
 		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
-			radius: 5,
+			radius: BULLET_SIZE - 2,
 			fillOpacity: 1,
 			anchor: this.startPoint
 		})
@@ -288,7 +297,7 @@ export class LinkLine extends CreatedMobject {
 			strokeWidth: 3
 		})
 		this.endBullet = new Circle({
-			radius: 5,
+			radius: BULLET_SIZE - 2,
 			fillOpacity: 1,
 			anchor: this.startPoint.copy()
 		})
@@ -303,6 +312,7 @@ export class LinkLine extends CreatedMobject {
 			fromPoint: this.startPoint,
 			toPoint: this.endPoint
 		})
+		paperLog('dissolving LinkLine')
 		//super.dissolveInto(superMobject)
 	}
 

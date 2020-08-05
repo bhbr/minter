@@ -142,6 +142,8 @@ export function logInto(obj: any, id: string) {
 	//newLine.scrollIntoView()
 }
 
+export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console') }
+
 
 
 
