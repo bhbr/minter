@@ -3,3 +3,6 @@ paper-bundle.js
 sidebar-bundle.js
 *.js
 CindyJS/
+lib/
+dist/
+.DS_Store

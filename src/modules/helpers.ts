@@ -98,33 +98,33 @@ export function pointerEventVertex(e: LocatedEvent) {
 }
 
 
-export function addPointerDown(element: SVGElement, method: (Event) => void) {
+export function addPointerDown(element: HTMLElement, method: (Event) => void) {
 	element.addEventListener('touchstart', method, { capture: true })
 	element.addEventListener('mousedown', method, { capture: true })
 }
 
-export function removePointerDown(element: SVGElement, method: (Event) => void) {
+export function removePointerDown(element: HTMLElement, method: (Event) => void) {
 	element.removeEventListener('touchstart', method, { capture: true })
 	element.removeEventListener('mousedown', method, { capture: true })
 }
 
-export function addPointerMove(element: SVGElement, method: (Event) => void) {
+export function addPointerMove(element: HTMLElement, method: (Event) => void) {
 	element.addEventListener('touchmove', method, { capture: true })
 	element.addEventListener('mousemove', method, { capture: true })
 }
 
-export function removePointerMove(element: SVGElement, method: (Event) => void) {
+export function removePointerMove(element: HTMLElement, method: (Event) => void) {
 	element.removeEventListener('touchmove', method, { capture: true })
 	element.removeEventListener('mousemove', method, { capture: true })
 }
 
-export function addPointerUp(element: SVGElement, method: (Event) => void) {
+export function addPointerUp(element: HTMLElement, method: (Event) => void) {
 	element.addEventListener('touchend', method, { capture: true })
 	element.addEventListener('mouseup', method, { capture: true })
 	element.addEventListener('pointerup', method, { capture: true })
 }
 
-export function removePointerUp(element: SVGElement, method: (Event) => void) {
+export function removePointerUp(element: HTMLElement, method: (Event) => void) {
 	element.removeEventListener('touchend', method, { capture: true })
 	element.removeEventListener('mouseup', method, { capture: true })
 	element.removeEventListener('pointerup', method, { capture: true })
@@ -135,9 +135,8 @@ export function logInto(obj: any, id: string) {
 	let newLine: HTMLElement = document.createElement('p')
 	newLine.innerText = msg
 	let myConsole: HTMLElement = document.querySelector('#' + id)
-	myConsole.appendChild(newLine)
 	
-	// Neither of these lines does what it is supposed to. I give up
+	// Neither of these lines does what it is claimed to. I give up
 	//myConsole.scrollTop = console.scrollHeight
 	//newLine.scrollIntoView()
 }

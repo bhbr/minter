@@ -280,12 +280,16 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	passAlongEvents: true
 })
+paper.view.style.backgroundColor = Color.black().toCSS()
 
-logInto('created paper', 'paper-console')
+let c = new Circle({
+	midPoint: new Vertex(100, 100),
+	radius: 50,
+})
 
+paper.add(c)
 
-
-
+console.log(paper)
 
 
 

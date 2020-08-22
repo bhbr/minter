@@ -76,13 +76,16 @@ export class Color {
 export class Mobject {
 
 	eventTarget: Mobject
-	view: SVGElement
+	view: HTMLElement
 	_parent: Mobject
 
 	fillColor: Color
 	fillOpacity: number
 	strokeColor: Color
 	strokeWidth: number
+
+	viewWidth: number
+	viewHeight: number
 
 	_transform: Transform
 	_anchor: Vertex
@@ -97,6 +100,8 @@ export class Mobject {
 
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
+
+	drawBorder: boolean = true
 
 	//boundUpdate: (argsDict: object, redraw: boolean) => ()
 
@@ -127,18 +132,15 @@ export class Mobject {
 
 	constructor(argsDict: object = {}) {
 		this.eventTarget = null
-		if (argsDict['view'] == undefined) {
-			//this.view = document.createElement('div') // placeholder
-			this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-		} else {
-			this.view = argsDict['view']
-		}
+
 		let defaults: object = {
 			transform: Transform.identity(),
 			anchor: Vertex.origin(),
 			vertices: [],
 			children: [],
 			dependencies: [],
+			viewWidth: 100,
+			viewHeight: 100,
 			fillColor: Color.white(),
 			fillOpacity: 1,
 			strokeColor: Color.white(),
@@ -150,8 +152,17 @@ export class Mobject {
 		Object.assign(defaults, argsDict)
 		
 		this.setAttributes(defaults)
-		this.view['mobject'] = this
-		this.view.setAttribute('class', this.constructor.name)
+
+		if (argsDict['view'] == undefined) {
+			let defaultView: HTMLElement = document.createElement('div')
+			defaultView.style.width = this.viewWidth.toString() + 'px'
+			defaultView.style.height = this.viewHeight.toString() + 'px'
+			defaultView.style.backgroundColor = Color.black().toCSS()
+			this.setView(defaultView) // placeholder
+			//this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		} else {
+			this.setView(argsDict['view'])
+		}
 		this.show()
 
 		this.boundPointerDown = this.pointerDown.bind(this)
@@ -168,15 +179,13 @@ export class Mobject {
 
 		this.disableDragging()
 
-
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
-
 	}
 
-	setView(newView: SVGElement){
-		if (this.view.parentNode) {
+	setView(newView: HTMLElement){
+		if (this.view && this.view.parentNode) {
 			this.view.parentNode.removeChild(this.view)
 		}
 		this.view = newView
@@ -185,6 +194,18 @@ export class Mobject {
 			this.superMobject.view.appendChild(this.view)
 		}
 		addPointerDown(this.view, this.boundPointerDown)
+		let width: number = parseInt(this.view.style['width'].slice(0, -2)) // remove "px"
+		if (width) { this.viewWidth = width }
+		let height: number = parseInt(this.view.style['height'].slice(0, -2)) // remove "px"
+		if (height) { this.viewHeight = height }
+		this.view.setAttribute('class', this.constructor.name)
+		this.view.style.position = 'absolute'
+		if (this.drawBorder) {
+			this.view.style.borderColor = Color.red().toCSS()
+			this.view.style.borderWidth = "1px"
+			this.view.style.borderStyle = "dashed"
+		}
+	
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) { }
@@ -365,16 +386,6 @@ export class Mobject {
 		return this.relativeTransform()
 	}
 
-	relativeVertices(frame?: Mobject): Array<Vertex> {
-		let returnValue: Array<Vertex> = this.relativeTransform(frame).appliedTo(this.vertices)
-		if (returnValue == undefined) { return [] }
-		else { return returnValue }
-	}
-
-	globalVertices(): Array<Vertex> {
-		return this.relativeVertices()
-	}
-
 	update(argsDict: object = {}, redraw = true) {
 		if (argsDict['view']) {
 			this.setView(argsDict['view'])
@@ -382,6 +393,8 @@ export class Mobject {
 		}
 		this.setAttributes(argsDict)
 		this.transform.anchorAt(this.anchor)
+		if (this.viewWidth) { this.view.style['width'] = this.viewWidth.toString() + 'px' }
+		if (this.viewHeight) { this.view.style['height'] = this.viewHeight.toString() + 'px' }
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
@@ -427,6 +440,7 @@ export class Mobject {
 	}
 
 	add(submob: Mobject) {
+
 		if (submob.parent != this) { submob.parent = this }
 		if (!this.children.includes(submob)) {
 			this.children.push(submob)
@@ -543,63 +557,14 @@ export class Mobject {
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
-	localXMin(): number {
-		let xMin: number = Infinity
-		if (this.vertices != undefined) {
-			for (let p of this.vertices) { xMin = Math.min(xMin, p.x) }
-		}
-		if (this.children != undefined) {
-			for (let mob of this.children) {
-				xMin = Math.min(xMin, mob.localXMin() + mob.anchor.x)
-			}
-		}
-		return xMin
-	}
+	localXMin(): number { return 0 }
+	localXMax(): number { return this.viewWidth }
+	localYMin(): number { return 0 }
+	localYMax(): number { return this.viewHeight }
 
-	localXMax(): number {
-		let xMax: number = -Infinity
-		if (this.vertices != undefined) {
-			for (let p of this.vertices) { xMax = Math.max(xMax, p.x) }
-		}
-		if (this.children != undefined) {
-			for (let mob of this.children) {
-				xMax = Math.max(xMax, mob.localXMax() + mob.anchor.x)
-			}
-		}
-		return xMax
-	}
+	properWidth(): number { return this.localXMax() - this.localXMin() }
+	properHeight(): number { return this.localYMax() - this.localYMin() }
 
-	localYMin(): number {
-		let yMin: number = Infinity
-		if (this.vertices != undefined) {
-			for (let p of this.vertices) { yMin = Math.min(yMin, p.y) }
-		}
-		if (this.children != undefined) {
-			for (let mob of this.children) {
-				yMin = Math.min(yMin, mob.localYMin() + mob.anchor.y)
-			}
-		}
-		return yMin
-	}
-
-	localYMax(): number {
-		let yMax: number = -Infinity
-		if (this instanceof MGroup) {
-
-		}
-		if (this.vertices != undefined) {
-			for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
-		}
-		if (this.children != undefined) {
-			for (let mob of this.children) {
-				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
-			}
-		}
-		return yMax
-	}
-
-	getWidth(): number { return this.localXMax() - this.localXMin() }
-	getHeight(): number { return this.localYMax() - this.localYMin() }
 
 	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
 	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
@@ -774,15 +739,19 @@ export class MGroup extends Mobject {
 
 export class VMobject extends Mobject {
 
+	svg: SVGSVGElement
 	path: SVGElement // child of view
 	vertices: Array<Vertex>
 
 	constructor(argsDict: object = {}) {
 		super()
 		this.vertices = []
+		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		this.svg['mobject'] = this
 		this.path['mobject'] = this
-		this.view.appendChild(this.path) // why not just add?
+		this.view.appendChild(this.svg) // why not just add?
+		this.svg.appendChild(this.path) // why not just add?
 		this.view.setAttribute('class', this.constructor.name)
 		this.setAttributes({
 			fillColor: Color.white(),
@@ -813,6 +782,71 @@ export class VMobject extends Mobject {
 		return ''
 	}
 
+	relativeVertices(frame?: Mobject): Array<Vertex> {
+		let returnValue: Array<Vertex> = this.relativeTransform(frame).appliedTo(this.vertices)
+		if (returnValue == undefined) { return [] }
+		else { return returnValue }
+	}
+
+	globalVertices(): Array<Vertex> {
+		return this.relativeVertices()
+	}
+
+
+	localXMin(): number {
+		let xMin: number = Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { xMin = Math.min(xMin, p.x) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				xMin = Math.min(xMin, mob.localXMin() + mob.anchor.x)
+			}
+		}
+		return xMin
+	}
+
+	localXMax(): number {
+		let xMax: number = -Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { xMax = Math.max(xMax, p.x) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				xMax = Math.max(xMax, mob.localXMax() + mob.anchor.x)
+			}
+		}
+		return xMax
+	}
+
+	localYMin(): number {
+		let yMin: number = Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { yMin = Math.min(yMin, p.y) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				yMin = Math.min(yMin, mob.localYMin() + mob.anchor.y)
+			}
+		}
+		return yMin
+	}
+
+	localYMax(): number {
+		let yMax: number = -Infinity
+		if (this instanceof MGroup) {
+
+		}
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
+			}
+		}
+		return yMax
+	}
 }
 
 
@@ -920,6 +954,7 @@ export class CurvedShape extends VMobject {
 export class TextLabel extends Mobject {
 
 	text: string
+	textView: SVGTextElement
 	textAnchor: string
 	textAlign: string
 	color: Color
@@ -932,35 +967,37 @@ export class TextLabel extends Mobject {
 			textAlign: 'center',
 			color: Color.white()
 		})
-		this.view = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-		this.view['mobject'] = this
 		this.view.setAttribute('class', this.constructor.name + ' unselectable')
-		this.view.setAttribute('alignment-baseline', 'middle')
-		this.view.setAttribute('font-family', 'Helvetica')
-		this.view.setAttribute('font-size', '12')
 		this.view.setAttribute('x', '0')
 		this.view.setAttribute('y', '0')
-		this.view.setAttribute('stroke-width', '0')
+		this.textView = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+		this.textView['mobject'] = this
+		this.textView.setAttribute('alignment-baseline', 'middle')
+		this.textView.setAttribute('font-family', 'Helvetica')
+		this.textView.setAttribute('font-size', '12')
+		this.textView.setAttribute('stroke-width', '0')
 		this.update(argsDict)
 	}
 
 	redraw() {
 		if (this.anchor.isNaN()) { return }
-		this.view.textContent = this.text
-		this.view.setAttribute('x', this.globalTransform().e.toString())
-		this.view.setAttribute('y', this.globalTransform().f.toString())
-		
 		if (this.color == undefined) { this.color = Color.white() }
-
-		this.view.setAttribute('fill', this.color.toHex())
-		this.view.setAttribute('stroke', this.color.toHex())
+		if (this.textView) { this.textView.textContent = this.text }
+		if (this.view) {
+			this.view.setAttribute('x', this.globalTransform().e.toString())
+			this.view.setAttribute('y', this.globalTransform().f.toString())
+			this.view.setAttribute('fill', this.color.toHex())
+			this.view.setAttribute('stroke', this.color.toHex())
+		}
 		
 		this.redrawSubmobs()
 	}
 
 	update(argsDict = {}, redraw = true) {
-		this.view.setAttribute('text-anchor', this.textAnchor)
-		this.view.setAttribute('text-align', this.textAlign)
+		if (this.textView) {
+			this.textView.setAttribute('text-anchor', this.textAnchor)
+			this.textView.setAttribute('text-align', this.textAlign)
+		}
 		super.update(argsDict, redraw)
 	}
 
