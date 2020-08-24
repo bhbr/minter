@@ -13,24 +13,15 @@
     
   </head>
 
-  <body>
-      
-      <div class="row">
-        <div class="column" width="100px" height="800px">
-            <div class='svg-container sidebar-container' width='100px' height='600px'>
-                <div id='sidebar' style="width: 100px; height: 600px"></div>
-                <!--<p id='sidebar-console' width='200px' height='200px' style='background-color: red; color: white; white-space: pre;'>sidebar console</p>-->
-            </div>
+  <body style="background: black;">
+
+        <div id='sidebar' style="float: left; display: inline;">
         </div>
-        <div class="column" width="800px" height="600px">
-            <div id='paper-container' class='svg-container paper-container' width='800px' height='600px'>
-           
-                <div id='paper' style="width: 800px; height: 600px">
-                </div>
-                <!--<p id='paper-console' width='600px' height='200px' style='background-color: green; color: white; white-space: pre;'>paper console</p>-->
-            </div>
+        <!--<p id='sidebar-console' width='200px' height='200px' style='background-color: red; color: white; white-space: pre;'>sidebar console</p>-->
+    
+        <div id='paper' style="float: left; display: inline;">
         </div>
-    </div>
+        <!--<p id='paper-console' width='600px' height='200px' style='background-color: green; color: white; white-space: pre;'>paper console</p>-->
     
     <script type="module" src='../lib/paper.js'></script>
     <script type="module" src='../lib/sidebar.js'></script>

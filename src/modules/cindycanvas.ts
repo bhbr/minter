@@ -46,9 +46,9 @@ export class CindyCanvas extends LinkableMobject {
 		let canvasID: string = 'CSCanvas' // + this.paper.cindyPorts.length
 		this.csView.setAttribute('id', canvasID)
 		//this.view.appendChild(this.csView)
-		document.querySelector('#paper-container').appendChild(this.csView)
+		this.paper.view.appendChild(this.csView)
 		this.csView.style['position'] = 'absolute'
-		document.querySelector('#paper-container').insertBefore(this.csView, this.paper.view)
+		this.paper.view.insertBefore(this.csView, this.paper.view)
 
 		this.csView.style['left'] =  this.anchor.x + 'px'
 		this.csView.style['top'] = this.anchor.y + 'px'
@@ -56,9 +56,8 @@ export class CindyCanvas extends LinkableMobject {
 		this.draggable = true
 		//this.view.style['pointer-events'] = 'auto'
 		
-		//document.querySelector('#paper-container').insertBefore(this.csView, document.querySelector('#paper-console'))
+		//this.paper.insertBefore(this.csView, document.querySelector('#paper-console'))
 		//document.head.appendChild(this.mainScript)
-
 
 		this.paper.cindyPorts.push({
 			id: canvasID,

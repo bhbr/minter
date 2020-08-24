@@ -60,6 +60,8 @@ export class Color {
 		return new Color(r, g, b, a)
 	}
 
+	static clear(): Color { return new Color(0, 0, 0, 0) }
+
 	static gray(x): Color { return new Color(x, x, x) }
 	static black(): Color { return Color.gray(0) }
 	static white(): Color { return Color.gray(1) }
@@ -101,7 +103,7 @@ export class Mobject {
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 
-	drawBorder: boolean = true
+	drawBorder: boolean = false
 
 	//boundUpdate: (argsDict: object, redraw: boolean) => ()
 
@@ -136,11 +138,11 @@ export class Mobject {
 		let defaults: object = {
 			transform: Transform.identity(),
 			anchor: Vertex.origin(),
+			viewWidth: 100,
+			viewHeight: 100,
 			vertices: [],
 			children: [],
 			dependencies: [],
-			viewWidth: 100,
-			viewHeight: 100,
 			fillColor: Color.white(),
 			fillOpacity: 1,
 			strokeColor: Color.white(),
@@ -149,20 +151,18 @@ export class Mobject {
 			visible: true,
 			draggable: true // by outside forces, that is
 		}
-		Object.assign(defaults, argsDict)
-		
-		this.setAttributes(defaults)
+
+		this.update(defaults, false)
 
 		if (argsDict['view'] == undefined) {
 			let defaultView: HTMLElement = document.createElement('div')
-			defaultView.style.width = this.viewWidth.toString() + 'px'
-			defaultView.style.height = this.viewHeight.toString() + 'px'
-			defaultView.style.backgroundColor = Color.black().toCSS()
 			this.setView(defaultView) // placeholder
-			//this.view = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		} else {
 			this.setView(argsDict['view'])
 		}
+
+		this.update(argsDict, false)
+
 		this.show()
 
 		this.boundPointerDown = this.pointerDown.bind(this)
@@ -182,10 +182,15 @@ export class Mobject {
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
+
+		this.update()
 	}
 
-	setView(newView: HTMLElement){
+	setView(newView: HTMLElement) {
+		if (newView === this.view) { return }
 		if (this.view && this.view.parentNode) {
+			console.log("removing", this.view)
+			console.log("adding", newView)
 			this.view.parentNode.removeChild(this.view)
 		}
 		this.view = newView
@@ -194,18 +199,24 @@ export class Mobject {
 			this.superMobject.view.appendChild(this.view)
 		}
 		addPointerDown(this.view, this.boundPointerDown)
-		let width: number = parseInt(this.view.style['width'].slice(0, -2)) // remove "px"
-		if (width) { this.viewWidth = width }
-		let height: number = parseInt(this.view.style['height'].slice(0, -2)) // remove "px"
-		if (height) { this.viewHeight = height }
+		this.positionView()
+
 		this.view.setAttribute('class', this.constructor.name)
 		this.view.style.position = 'absolute'
+		this.view.style.overflow = 'visible'
 		if (this.drawBorder) {
-			this.view.style.borderColor = Color.red().toCSS()
+			this.view.style.borderColor = Color.green().toCSS()
 			this.view.style.borderWidth = "1px"
 			this.view.style.borderStyle = "dashed"
 		}
-	
+	}
+
+	positionView() {
+		if (!this.parent || !this.view || !this.anchor) { return }
+		this.view.style['width'] = this.viewWidth.toString() + 'px'
+		this.view.style['height'] = this.viewHeight.toString() + 'px'
+		this.view.style['x'] = this.globalAnchor().x.toString() + 'px'
+		this.view.style['y'] = this.globalAnchor().y.toString() + 'px'
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) { }
@@ -393,8 +404,6 @@ export class Mobject {
 		}
 		this.setAttributes(argsDict)
 		this.transform.anchorAt(this.anchor)
-		if (this.viewWidth) { this.view.style['width'] = this.viewWidth.toString() + 'px' }
-		if (this.viewHeight) { this.view.style['height'] = this.viewHeight.toString() + 'px' }
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
@@ -406,7 +415,10 @@ export class Mobject {
 			}
 			dep.target.update()
 		}
-		if (redraw) { this.redraw() }
+		if (this.view && redraw) {
+			this.positionView()
+			this.redraw()
+		}
 
 	}
 
@@ -473,8 +485,6 @@ export class Mobject {
 		this.redraw()
 	}
 
-
-
 	recursiveShow() {
 		this.show()
 		for (let depmob of this.allDependents()) {
@@ -512,9 +522,6 @@ export class Mobject {
 		this.dragPointStart = undefined
 		this.dragAnchorStart = undefined
 	}
-
-
-
 
 	dependents(): Array<Mobject> {
 		let dep: Array<Mobject> = []
@@ -564,7 +571,6 @@ export class Mobject {
 
 	properWidth(): number { return this.localXMax() - this.localXMin() }
 	properHeight(): number { return this.localYMax() - this.localYMin() }
-
 
 	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
 	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
@@ -674,6 +680,7 @@ export class Mobject {
 	globalBottomCenter(): Vertex { return this.bottomCenter(this.getPaper()) }
 	globalCenter(): Vertex { return this.center(this.getPaper()) }
 
+	globalAnchor(): Vertex { return this.parent.globalTransform().appliedTo(this.anchor) }
 
 
 	// createPopover(e) {
@@ -752,7 +759,11 @@ export class VMobject extends Mobject {
 		this.path['mobject'] = this
 		this.view.appendChild(this.svg) // why not just add?
 		this.svg.appendChild(this.path) // why not just add?
-		this.view.setAttribute('class', this.constructor.name)
+		this.view.setAttribute('class', this.constructor.name + " mobject-div")
+		this.svg.setAttribute('class', "mobject-svg")
+		this.svg.style.overflow = 'visible'
+		this.svg.style.width = "1px"
+		this.svg.style.height = "1px"
 		this.setAttributes({
 			fillColor: Color.white(),
 			fillOpacity: 0.5,

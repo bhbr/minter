@@ -278,16 +278,18 @@ export class Paper extends LinkableMobject {
 
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
-	passAlongEvents: true
+	anchor: new Vertex(200, 0), // this is a temporary workaround
+	passAlongEvents: true,
+	viewWidth: 800,
+	viewHeight: 600
 })
-paper.view.style.backgroundColor = Color.black().toCSS()
 
 let c = new Circle({
 	midPoint: new Vertex(100, 100),
 	radius: 50,
 })
-
 paper.add(c)
+paper.view.style.display = "inline"
 
 console.log(paper)
 

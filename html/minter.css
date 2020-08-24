@@ -5,7 +5,7 @@ body {
 
 button {
   border: 0;
-  background: rgba(150,150,150,0.6);
+  background: rgba(150, 150, 150, 0.6);
   text-shadow: 1px 1px 1px white;
   border: 1px solid #999;
   position: absolute;
@@ -14,16 +14,14 @@ button {
   left: 2px;
 }
 
-.svg-container {
-    display: inline-block;
-    position: relative;
+.mobject-div {
+    position: absolute;
     vertical-align: top;
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 1);
+    overflow: visible;
+    display: inline;
 }
 
-.svg {
-    display: inline-block;
+.mobject-svg {
     position: absolute;
     top: 0;
     left: 0;
@@ -37,11 +35,6 @@ button {
     -ms-user-select: none;
     user-select: none;
     cursor: pointer;
-}
-
-
-.sidebar-container {
-  float: left;
 }
 
 

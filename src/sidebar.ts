@@ -11,7 +11,9 @@ if (isTouchDevice === false) {
 	paper = paperView['mobject'] as Paper
 }
 
-let sidebar: HTMLElement = document.querySelector('#sidebar')
+let sidebar = new Mobject({
+	view: document.querySelector('#sidebar')
+})
 
 let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
@@ -70,7 +72,9 @@ class SidebarButton extends Circle {
 			text: 'text',
 			fontSize: 12,
 			messages: [],
-			radius: buttonRadius
+			radius: buttonRadius,
+			viewWidth: 200,
+			viewHeight: 600
 		})
 		this.update(argsDict, false)
 
@@ -415,7 +419,7 @@ let lineButton = new CreativeButton({
 	baseColor: Color.gray(0.2),
 	locationIndex: 0
 })
-sidebar.appendChild(lineButton.view)
+sidebar.add(lineButton)
 
 let circleButton = new CreativeButton({
 	creations: ['circle'],
@@ -423,7 +427,7 @@ let circleButton = new CreativeButton({
 	baseColor: Color.gray(0.4),
 	locationIndex: 1
 })
-sidebar.appendChild(circleButton.view)
+sidebar.add(circleButton)
 
 let sliderButton = new CreativeButton({
 	creations: ['slider'],
@@ -431,7 +435,7 @@ let sliderButton = new CreativeButton({
 	baseColor: Color.gray(0.6),
 	locationIndex: 2
 })
-sidebar.appendChild(sliderButton.view)
+sidebar.add(sliderButton)
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
@@ -439,7 +443,7 @@ let cindyButton = new CreativeButton({
 	baseColor: Color.gray(0.2),
 	locationIndex: 3
 })
-sidebar.appendChild(cindyButton.view)
+sidebar.add(cindyButton)
   
 let pendulumButton = new CreativeButton({
 	creations: ['pendulum'],
@@ -447,7 +451,7 @@ let pendulumButton = new CreativeButton({
 	baseColor: Color.gray(0.4),
 	locationIndex: 4
 })
-sidebar.appendChild(pendulumButton.view)
+sidebar.add(pendulumButton)
   
 let dragButton = new DragButton({
 	messages: [{drag: true}],
@@ -458,7 +462,7 @@ let dragButton = new DragButton({
 })
 dragButton.label.view.setAttribute('fill', 'black')
 dragButton.label2.view.setAttribute('fill', 'black')
-sidebar.appendChild(dragButton.view)
+sidebar.add(dragButton)
 
 let linkButton = new LinkButton({
 	messages: [{toggleLinks: true}],
@@ -467,7 +471,7 @@ let linkButton = new LinkButton({
 	baseColor: Color.gray(0.2),
 	locationIndex: 6
 })
-sidebar.appendChild(linkButton.view)
+sidebar.add(linkButton)
 
 let colorButton = new ColorChangeButton({
 	key: 'd',
@@ -476,7 +480,7 @@ let colorButton = new ColorChangeButton({
 	locationIndex: 7,
 	fillOpacity: 1
 })
-sidebar.appendChild(colorButton.view)
+sidebar.add(colorButton)
 
 
 let creating: boolean = false
