@@ -183,14 +183,13 @@ export class Mobject {
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
+		this.positionView()
 		this.update()
 	}
 
 	setView(newView: HTMLElement) {
 		if (newView === this.view) { return }
 		if (this.view && this.view.parentNode) {
-			console.log("removing", this.view)
-			console.log("adding", newView)
 			this.view.parentNode.removeChild(this.view)
 		}
 		this.view = newView
@@ -202,7 +201,7 @@ export class Mobject {
 		this.positionView()
 
 		this.view.setAttribute('class', this.constructor.name)
-		this.view.style.position = 'absolute'
+		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to tits parent
 		this.view.style.overflow = 'visible'
 		if (this.drawBorder) {
 			this.view.style.borderColor = Color.green().toCSS()
@@ -213,10 +212,11 @@ export class Mobject {
 
 	positionView() {
 		if (!this.parent || !this.view || !this.anchor) { return }
+		console.log(this)
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
 		this.view.style['height'] = this.viewHeight.toString() + 'px'
-		this.view.style['x'] = this.globalAnchor().x.toString() + 'px'
-		this.view.style['y'] = this.globalAnchor().y.toString() + 'px'
+		this.view.style['left'] = this.anchor.x.toString() + 'px'
+		this.view.style['top'] = this.anchor.y.toString() + 'px'
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) { }
@@ -416,7 +416,6 @@ export class Mobject {
 			dep.target.update()
 		}
 		if (this.view && redraw) {
-			this.positionView()
 			this.redraw()
 		}
 
@@ -452,7 +451,6 @@ export class Mobject {
 	}
 
 	add(submob: Mobject) {
-
 		if (submob.parent != this) { submob.parent = this }
 		if (!this.children.includes(submob)) {
 			this.children.push(submob)
@@ -775,6 +773,7 @@ export class VMobject extends Mobject {
 
 	redraw() {
 		if (this.anchor.isNaN()) { return }
+		this.positionView()
 		if (this.path == undefined) { return }
 		let pathString: string = this.pathString()
 		if (pathString.includes("NaN")) { return }
@@ -800,7 +799,7 @@ export class VMobject extends Mobject {
 	}
 
 	globalVertices(): Array<Vertex> {
-		return this.relativeVertices()
+		return this.relativeVertices() // uses default frame = paper
 	}
 
 
@@ -873,7 +872,8 @@ export class Polygon extends VMobject {
 
 	pathString(): string {
 		let pathString: string = ''
-		let v = this.globalVertices()
+		//let v = this.globalVertices()
+		let v = this.vertices
 		if (v.length == 0) { return '' }
 		for (let point of v) {
 			if (point == undefined || point.isNaN()) {
@@ -926,7 +926,8 @@ export class CurvedShape extends VMobject {
 	}
 
 	pathString(): string {
-		let points: Array<Vertex> = this.globalBezierPoints()
+		//let points: Array<Vertex> = this.globalBezierPoints()
+		let points: Array<Vertex> = this.bezierPoints
 		if (points == undefined || points.length == 0) { return '' }
 
 		// there should be 3n+1 points
@@ -995,8 +996,10 @@ export class TextLabel extends Mobject {
 		if (this.color == undefined) { this.color = Color.white() }
 		if (this.textView) { this.textView.textContent = this.text }
 		if (this.view) {
-			this.view.setAttribute('x', this.globalTransform().e.toString())
-			this.view.setAttribute('y', this.globalTransform().f.toString())
+			//this.view.setAttribute('x', this.globalTransform().e.toString())
+			//this.view.setAttribute('y', this.globalTransform().f.toString())
+			this.view.setAttribute('x', this.anchor.toString())
+			this.view.setAttribute('y', this.anchor.toString())
 			this.view.setAttribute('fill', this.color.toHex())
 			this.view.setAttribute('stroke', this.color.toHex())
 		}

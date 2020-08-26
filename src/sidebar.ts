@@ -97,6 +97,10 @@ class SidebarButton extends Circle {
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
+		paper.view.style.left = this.viewWidth.toString() + "px"
+		// we cannot just update paper with a new anchor
+		// bc it is not a VMobject
+
 		this.redraw()
 	}
 
