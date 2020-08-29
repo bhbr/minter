@@ -125,7 +125,6 @@ export class Mobject {
 	set anchor(newValue: Vertex) {
 		this._anchor = newValue
 		this.transform.anchorAt(newValue)
-		this.update()
 	}
 
 	moveAnchorTo(newAnchor: Vertex) {
@@ -162,15 +161,13 @@ export class Mobject {
 		}
 
 		this.update(argsDict, false)
-
-		this.show()
+		//this.show()
 
 		this.boundPointerDown = this.pointerDown.bind(this)
 		this.boundPointerMove = this.pointerMove.bind(this)
 		this.boundPointerUp = this.pointerUp.bind(this)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
 		addPointerDown(this.view, this.boundPointerDown)
-
 		//this.boundUpdate = this.update.bind(this)
 		
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -185,12 +182,16 @@ export class Mobject {
 
 		this.positionView()
 		this.update()
+
 	}
 
 	setView(newView: HTMLElement) {
 		if (newView === this.view) { return }
 		if (this.view && this.view.parentNode) {
 			this.view.parentNode.removeChild(this.view)
+		}
+		if (this.view) {
+			removePointerDown(this.view, this.boundPointerDown)
 		}
 		this.view = newView
 		this.view['mobject'] = this
@@ -200,7 +201,7 @@ export class Mobject {
 		addPointerDown(this.view, this.boundPointerDown)
 		this.positionView()
 
-		this.view.setAttribute('class', this.constructor.name)
+		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
 		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to tits parent
 		this.view.style.overflow = 'visible'
 		if (this.drawBorder) {
@@ -212,7 +213,6 @@ export class Mobject {
 
 	positionView() {
 		if (!this.parent || !this.view || !this.anchor) { return }
-		console.log(this)
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
 		this.view.style['height'] = this.viewHeight.toString() + 'px'
 		this.view.style['left'] = this.anchor.x.toString() + 'px'
@@ -225,7 +225,9 @@ export class Mobject {
 	savedSelfHandlePointerDown(e: LocatedEvent) { }
 	savedSelfHandlePointerMove(e: LocatedEvent) { }
 	savedSelfHandlePointerUp(e: LocatedEvent) { }
-	boundPointerDown(e: LocatedEvent) { }
+	boundPointerDown(e: LocatedEvent) {
+		console.log('boundPointerDown')
+	}
 	boundPointerMove(e: LocatedEvent) { }
 	boundPointerUp(e: LocatedEvent) { }
 	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
@@ -258,7 +260,7 @@ export class Mobject {
 
 	eventTargetMobject(e: LocatedEvent): Mobject {
 		let t: Element = e.target as Element
-		if (t.tagName == 'path') { t = t.parentElement }
+		if (t.tagName == 'path') { t = t.parentElement.parentElement }
 		if (t == this.view) {
 			return this
 		}
@@ -267,25 +269,29 @@ export class Mobject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
+		//console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
+				//console.log(t, t['mobject'])
 				return t['mobject']
 			}
-			t = targetViewChain.pop() 
+			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
 		return this
 	}
 
 	pointerDown(e: LocatedEvent) {
+		console.log('pointerDown on', this)
 		e.stopPropagation()
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
 		this.eventTarget = this.boundEventTargetMobject(e)
+		console.log(this, this.eventTarget)
 		if (this.eventTarget != this && this.passAlongEvents) {
 			this.eventTarget.pointerDown(e)
 		} else {
@@ -340,14 +346,13 @@ export class Mobject {
 	}
 
 	setAttributes(argsDict: object = {}) {
-		for (let [key, value] of Object.entries(argsDict)) {
+			for (let [key, value] of Object.entries(argsDict)) {
 			let setter: any = this.setter(key)
 			if (setter != undefined) {
 				setter.call(this, value)
 			} else {
 				if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
 				else { this[key] = value }
-				//this[key] = value
 			}
 		}
 	}
@@ -756,12 +761,10 @@ export class VMobject extends Mobject {
 		this.svg['mobject'] = this
 		this.path['mobject'] = this
 		this.view.appendChild(this.svg) // why not just add?
-		this.svg.appendChild(this.path) // why not just add?
+		this.svg.appendChild(this.path)
 		this.view.setAttribute('class', this.constructor.name + " mobject-div")
 		this.svg.setAttribute('class', "mobject-svg")
 		this.svg.style.overflow = 'visible'
-		this.svg.style.width = "1px"
-		this.svg.style.height = "1px"
 		this.setAttributes({
 			fillColor: Color.white(),
 			fillOpacity: 0.5,
@@ -772,7 +775,7 @@ export class VMobject extends Mobject {
 	}
 
 	redraw() {
-		if (this.anchor.isNaN()) { return }
+		if (!this.anchor || this.anchor.isNaN()) { return }
 		this.positionView()
 		if (this.path == undefined) { return }
 		let pathString: string = this.pathString()
@@ -857,6 +860,14 @@ export class VMobject extends Mobject {
 		}
 		return yMax
 	}
+
+	// update(argsDict: object = {}, redraw = true) {
+	// 	super.update(argsDict, redraw)
+	// 	try {
+	// 		this.svg.style.width = (this.localXMax() - this.localXMin()).toString() + 'px'
+	// 		this.svg.style.height = (this.localYMax() - this.localYMin()).toString() + 'px'
+	// 	} catch {}
+	// }
 }
 
 

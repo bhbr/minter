@@ -11,10 +11,6 @@ if (isTouchDevice === false) {
 	paper = paperView['mobject'] as Paper
 }
 
-let sidebar = new Mobject({
-	view: document.querySelector('#sidebar')
-})
-
 let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
 interface Window { webkit?: any }
@@ -31,6 +27,22 @@ const buttonYOffset: number = 50
 const buttonSpacing: number = 12.5
 const buttonRadius: number = 25
 const buttonScaleFactor: number = 1.3
+
+class Sidebar extends Mobject {
+	constructor(argsDict = {}) {
+		super()
+		this.setDefaults({
+			viewWidth: 200,
+			viewHeight: 600
+		})
+		this.setView(document.querySelector('#sidebar'))
+		paper.view.style.left = this.viewWidth.toString() + "px"
+		// we cannot just update paper with a new anchor
+		// bc it is not a VMobject
+		super.update(argsDict, false)
+	}
+}
+let sidebar = new Sidebar()
 
 class SidebarButton extends Circle {
 	
@@ -73,8 +85,8 @@ class SidebarButton extends Circle {
 			fontSize: 12,
 			messages: [],
 			radius: buttonRadius,
-			viewWidth: 200,
-			viewHeight: 600
+			viewWidth: buttonRadius,
+			viewHeight: buttonRadius
 		})
 		this.update(argsDict, false)
 
@@ -96,10 +108,6 @@ class SidebarButton extends Circle {
 		
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
-
-		paper.view.style.left = this.viewWidth.toString() + "px"
-		// we cannot just update paper with a new anchor
-		// bc it is not a VMobject
 
 		this.redraw()
 	}

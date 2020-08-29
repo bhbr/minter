@@ -30,6 +30,7 @@ export class Paper extends LinkableMobject {
 	draggedIOList: IOList
 	dragIOListAnchorStart: Vertex
 	construction: Construction
+	background: Rectangle
 
 	constructor(argsDict: object = {}) {
 		super()
@@ -54,6 +55,23 @@ export class Paper extends LinkableMobject {
 		this.currentColor = this.colorPalette['white']
 		this.setDragging(false)
 		this.update(argsDict)
+		
+		
+		this.background = new Rectangle({
+			fillColor: Color.black(),
+			fillOpacity: 1,
+			width: this.viewWidth,
+			height: this.viewHeight,
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight,
+			passAlongEvents: true
+		})
+		this.add(this.background)
+
+		this.construction.update({
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight
+		})
 		this.add(this.construction)
 
 	}
@@ -90,6 +108,7 @@ export class Paper extends LinkableMobject {
 	}
 
 	startDragging(e: LocatedEvent) {
+		console.log('startDragging')
 		this.draggedMobject = this.eventTargetMobject(e)
 		if (this.draggedMobject == this) {
 			// check if we hit a CindyCanvas
@@ -285,22 +304,29 @@ export const paper = new Paper({
 })
 
 let c = new Circle({
-	midPoint: new Vertex(100, 100),
-	radius: 50,
+	radius: 100,
+	anchor: new Vertex(200, 300)
 })
+
+let s = new BoxSlider({
+	anchor: new Vertex(200, 300),
+	height: 150
+})
+
+let r = new Rectangle({
+	anchor: new Vertex(150, 150),
+	fillColor: Color.red(),
+	fillOpacity: 1,
+	width: 220,
+	height: 150,
+	viewWidth: 220,
+	viewHeight: 150,
+	passAlongEvents: true
+})
+
 paper.add(c)
-paper.view.style.display = "inline"
-
-console.log(paper)
-
-
-
-
-
-
-
-
-
+paper.add(s)
+//paper.add(r)
 
 
 

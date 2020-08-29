@@ -1,6 +1,7 @@
 body {
   width: 100%;
   margin: 0 auto;
+  position: absolute;
 }
 
 button {
@@ -15,16 +16,17 @@ button {
 }
 
 .mobject-div {
+    display: block;
     position: absolute;
-    vertical-align: top;
     overflow: visible;
-    display: inline;
+    border: 1px dashed green;
 }
 
 .mobject-svg {
     position: absolute;
-    top: 0;
-    left: 0;
+    display: block;
+    width: inherit;
+    height: inherit;
 }
 
 .unselectable {

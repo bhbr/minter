@@ -421,6 +421,7 @@ export class LinkableMobject extends Mobject {
 	}
 
 	redraw() {
+		this.positionView()
 		this.redrawSubmobs()
 	}
 

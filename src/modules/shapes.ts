@@ -126,16 +126,19 @@ export class Rectangle extends Polygon {
 		this.p4 = new Vertex([0, this.height])
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
 		this.update(argsDict)
+		console.log(this.width, this.height, this.vertices, this.pathString())
 	}
 
 	update(argsDict: object = {}, redraw = true) {
 		try {
-			this.p2.x = this.width
-			this.p3.x = this.width
-			this.p3.y = this.height
-			this.p4.y = this.height
+			this.p2.x = argsDict['width'] || this.width
+			this.p3.x = argsDict['width'] || this.width
+			this.p3.y = argsDict['height'] || this.height
+			this.p4.y = argsDict['height'] || this.height
+			this.viewWidth = argsDict['width'] || this.width
+			this.viewHeight = argsDict['height'] || this.height
 			super.update(argsDict, redraw)
-		} catch { }
+		} catch {}
 	}
 
 	
