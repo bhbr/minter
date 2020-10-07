@@ -1,4 +1,4 @@
-import { Vertex, Scaling, Translation, Rotation } from './transform'
+import { Vertex, Transform } from './vertex-transform'
 import { MGroup, Polygon } from './mobject'
 
 export class Arrow extends Polygon {

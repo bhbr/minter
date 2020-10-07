@@ -1,4 +1,4 @@
-import { Vertex } from './transform'
+import { Vertex } from './vertex-transform'
 
 export const isTouchDevice: boolean = 'ontouchstart' in document.documentElement
 
@@ -145,8 +145,18 @@ export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console
 
 
 
-
-
+// https://www.typescriptlang.org/docs/handbook/mixins.html
+export function applyMixins(derivedCtor: any, constructors: any[]) {
+  constructors.forEach((baseCtor) => {
+    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
+      Object.defineProperty(
+        derivedCtor.prototype,
+        name,
+        Object.getOwnPropertyDescriptor(baseCtor.prototype, name)
+      );
+    });
+  });
+}
 
 
 

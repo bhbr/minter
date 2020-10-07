@@ -1,0 +1,158 @@
+
+A Mobject has a view, which is a div.
+ - viewWidth → view's width attr
+The div contains some other HTMLElement as the view implementation.
+
+VMobject: it contains an svg (which contains a path)
+CindyCanvas: it contains a canvas
+
+The update method adjusts the mob's state and redraws its view. It assumes all state has been set, so it should not be used in the constructor. Not even at the end, bc it might return to a subclass constructor!
+
+Any property that changes other mobjects or the view should be changed via update only, not a setter. Only use a setter for a property that maps directly onto one of these:
+
+- parent
+- top/left ↔︎ anchor
+- width/height ↔︎ viewWidth/viewHeight
+- opacity
+- strokeWidth
+- strokeColor
+- fillOpacity
+- fillColor
+- transform
+
+
+
+A constructor should:
+- set raw properties, to default or given values
+- create submobs according to state
+- not redraw
+
+The first draw call of a mob should be triggered when it is being added. Not just to any mob, but a mob in the view hierarchy (some ancestor is the HTML body (not just paper, bc of the sidebar)).
+
+The div has a width and height (via style) so we can easily draw a border around it. They can be updated. The svg of a VMobject inherits them (use the actual value inherit').
+
+A Mobject's div position is always absolute.
+
+
+
+ExtendedObject
+
+properties
+setter
+setAttributes
+
+
+Frame: ExtendedObject
+
+anchor
+transform
+view
+viewWidth
+viewHeight
+xMin etc.
+
+
+
+
+Mobject: Frame
+
+superMobject
+submobjects (formerly children)
+visible
+drawBorder
+opacity
+backgroundColor
+add
+remove
+show: does a redraw
+hide
+recursiveShow
+recursiveHide
+
+update: updates the state of itself, submobs and dependents, redrawing optional
+redraw: redraws itself and submobs
+updateSubmobs
+redrawSubmobs
+
+
+
+
+InteractiveMobject: Mobject
+
+selfHandlePointerDown etc.
+eventTargetMobject
+passAlongEvents
+
+
+LinkedMobject: Mobject
+
+dependents
+allDependents
+dependsOn
+addDependency
+addDependent
+
+
+
+
+LinkableMobject: LinkedMobject
+
+
+
+
+MGroup: Mobject
+
+VMobject: Mobject
+
+svg
+path
+vertices
+
+
+
+
+Polygon: VMobject
+
+CurvedShape: VMobject
+
+
+
+
+
+InteractiveVMobject: VMobject, InteractiveMobject
+
+can recognize whether clicked on path or svg
+
+
+
+
+
+DraggableMobject: Mobject, not? InteractiveMobject
+
+Paper handles the dragging bc of spillover
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

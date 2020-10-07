@@ -1,84 +1,12 @@
-import { Vertex, Transform } from './transform'
+import { Vertex, Transform } from './vertex-transform'
+import { Color } from './color'
+import { Dependency } from './dependency'
+import { Frame } from './frame'
 import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog } from './helpers'
 
-export class Dependency {
-
-	source: Mobject
-	outputName: string
-	target: Mobject
-	inputName: string
-
-	constructor(argsDict: object = {}) {
-		this.source = argsDict['source']
-		this.outputName = argsDict['outputName'] // may be undefined
-		this.target = argsDict['target']
-		this.inputName = argsDict['inputName'] // may be undefined
-	}
-}
-
-export class Color {
-
-	red: number
-	green: number
-	blue: number
-	alpha: number
-
-	constructor(r, g, b, a = 1) {
-		this.red = r
-		this.green = g
-		this.blue = b
-		this.alpha = a
-	}
-
-	brighten(factor: number): Color {
-		return new Color(factor*this.red, factor*this.green, factor*this.blue, this.alpha)
-	}
-
-	toHex(): string {
-		let hex_r: string = (Math.round(this.red*255)).toString(16).padStart(2, '0')
-		let hex_g: string = (Math.round(this.green*255)).toString(16).padStart(2, '0')
-		let hex_b: string = (Math.round(this.blue*255)).toString(16).padStart(2, '0')
-		let hex_a: string = ''
-		if (this.alpha != 1) {
-			hex_a = (Math.round(this.alpha*255)).toString(16).padStart(2, '0')
-		}
-		return '#' + hex_r + hex_g + hex_b + hex_a
-	}
-
-	toCSS(): string {
-		return `rgb(${255*this.red}, ${255*this.green}, ${255*this.blue}, ${this.alpha})`
-	}
-
-	static fromHex(hex: string): Color {
-		let r: number = parseInt('0x' + hex.slice(1, 2))/255
-		let g: number = parseInt('0x' + hex.slice(3, 2))/255
-		let b: number = parseInt('0x' + hex.slice(5, 2))/255
-		let a: number = 1
-		if (hex.length > 7) {
-			a = parseInt('0x' + hex.slice(7, 2))/255
-		}
-		return new Color(r, g, b, a)
-	}
-
-	static clear(): Color { return new Color(0, 0, 0, 0) }
-
-	static gray(x): Color { return new Color(x, x, x) }
-	static black(): Color { return Color.gray(0) }
-	static white(): Color { return Color.gray(1) }
-
-	static red(): Color { return new Color(1, 0, 0) }
-	static orange(): Color { return new Color(1, 0.5, 0) }
-	static yellow(): Color { return new Color(1, 1, 0) }
-	static green(): Color { return new Color(0, 1, 0) }
-	static blue(): Color { return new Color(0, 0, 1) }
-	static indigo(): Color { return new Color(0.5, 0, 1) }
-	static violet(): Color { return new Color(1, 0, 1) }
-}
-
-export class Mobject {
+export class Mobject extends Frame {
 
 	eventTarget: Mobject
-	view: HTMLElement
 	_parent: Mobject
 
 	fillColor: Color
@@ -110,28 +38,8 @@ export class Mobject {
 	get opacity(): number { return this.fillOpacity }
 	set opacity(newValue: number) { this.fillOpacity = newValue }
 
-	get transform(): Transform {
-		if (this._transform == undefined) {
-			this._transform = Transform.identity()
-		}
-		return this._transform
-	}
-	set transform(newValue: Transform) {
-		if (this._transform == undefined) { this._transform = newValue }
-		else { this._transform.copyFrom(newValue) }
-	}
-
-	get anchor(): Vertex { return this._anchor }
-	set anchor(newValue: Vertex) {
-		this._anchor = newValue
-		this.transform.anchorAt(newValue)
-	}
-
-	moveAnchorTo(newAnchor: Vertex) {
-		this.anchor.copyFrom(newAnchor)
-	}
-
 	constructor(argsDict: object = {}) {
+		super()
 		this.eventTarget = null
 
 		let defaults: object = {
@@ -154,7 +62,7 @@ export class Mobject {
 		this.update(defaults, false)
 
 		if (argsDict['view'] == undefined) {
-			let defaultView: HTMLElement = document.createElement('div')
+			let defaultView: HTMLDivElement = document.createElement('div')
 			this.setView(defaultView) // placeholder
 		} else {
 			this.setView(argsDict['view'])
@@ -185,7 +93,7 @@ export class Mobject {
 
 	}
 
-	setView(newView: HTMLElement) {
+	setView(newView: HTMLDivElement) {
 		if (newView === this.view) { return }
 		if (this.view && this.view.parentNode) {
 			this.view.parentNode.removeChild(this.view)
@@ -322,49 +230,15 @@ export class Mobject {
 		this.eventTarget = null
 	}
 
-	properties(): Array<string> {
-		let obj: object = this
-		let properties: Array<string> = []
-		while (obj.constructor.name != 'Object') {
-			properties.push(...Object.getOwnPropertyNames(obj))
-			obj = Object.getPrototypeOf(obj)
-		}
-		return properties
-	}
-
-	setter(key: string): any {
-		let descriptor: any = undefined
-		if (this.properties().includes(key)) {
-			let obj: object = this
-			while (obj.constructor.name != 'Object' && descriptor == undefined) {
-				descriptor = Object.getOwnPropertyDescriptor(obj, key)
-				obj = Object.getPrototypeOf(obj)
-			}
-		}
-		if (descriptor != undefined) { return descriptor.set }
-		else { return undefined }
-	}
-
-	setAttributes(argsDict: object = {}) {
-			for (let [key, value] of Object.entries(argsDict)) {
-			let setter: any = this.setter(key)
-			if (setter != undefined) {
-				setter.call(this, value)
-			} else {
-				if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-				else { this[key] = value }
-			}
-		}
-	}
-
-	// flagged for deletion
-	setDefaults(argsDict: object = {}) {
-		for (let [key, value] of Object.entries(argsDict)) {
-			if (this[key] != undefined) { continue }
-			if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-			else { this[key] = value }
-		}
-	}
+	
+	// // flagged for deletion
+	// setDefaults(argsDict: object = {}) {
+	// 	for (let [key, value] of Object.entries(argsDict)) {
+	// 		if (this[key] != undefined) { continue }
+	// 		if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
+	// 		else { this[key] = value }
+	// 	}
+	// }
 
 	get parent(): Mobject { return this._parent }
 	set parent(newValue: Mobject) {
@@ -376,31 +250,7 @@ export class Mobject {
 		else { this.hide() }
 	}
 
-	relativeTransform(frame?: Mobject): Transform {
-		let t = Transform.identity()
-		let mob: Mobject = this
-		if (mob.constructor.name == 'CindyCanvas') {
-			if (frame == this) {
-				return t
-			} else if (frame == (this.getPaper())) {
-				t.e = this.anchor.x
-				t.f = this.anchor.y
-				return t
-			} else {
-				throw 'Cannot compute property of CindyCanvas for this frame'
-			}
-		}
-		while (mob && mob.transform instanceof Transform) {
-			if (mob == frame) { break }
-			t.leftComposeWith(mob.transform)
-			mob = mob.parent
-		}
-		return t
-	}
 
-	globalTransform(): Transform {
-		return this.relativeTransform()
-	}
 
 	update(argsDict: object = {}, redraw = true) {
 		if (argsDict['view']) {
@@ -408,7 +258,7 @@ export class Mobject {
 			delete argsDict['view']
 		}
 		this.setAttributes(argsDict)
-		this.transform.anchorAt(this.anchor)
+		this.transform.anchor = this.anchor
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
@@ -502,13 +352,6 @@ export class Mobject {
 		}
 	}
 
-	centerAt(newCenter: Vertex, frame: Mobject) {
-		if (!frame) { frame = this }
-		let dr: Vertex = newCenter.subtract(this.center(frame))
-		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
-		this.redraw()
-	}
-
 	startSelfDragging(e: LocatedEvent) {
 		this.dragPointStart = pointerEventVertex(e)
 		this.dragAnchorStart = this.anchor.copy()
@@ -567,123 +410,131 @@ export class Mobject {
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
+	relativeTransform(frame?: Frame): Transform {
+		if (!frame) { return this.transform }
+		let mob: Mobject = this
+		let t: Transform = this.transform
+		while (mob != frame) {
+			mob = mob.parent
+			t.rightComposeWith(mob.transform)
+		}
+		return t
+	}
+
 	localXMin(): number { return 0 }
 	localXMax(): number { return this.viewWidth }
 	localYMin(): number { return 0 }
 	localYMax(): number { return this.viewHeight }
 
-	properWidth(): number { return this.localXMax() - this.localXMin() }
-	properHeight(): number { return this.localYMax() - this.localYMin() }
+	localMidX(): number { return (this.localXMin() + this.localXMax()) / 2 }
+	localMidY(): number { return (this.localYMin() + this.localYMax()) / 2 }
 
 	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
 	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
 	localLLCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMax()) }
 	localLRCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMax()) }
 
-	localMidX(): number { return (this.localXMin() + this.localXMax())/2 }
-	localMidY(): number { return (this.localYMin() + this.localYMax())/2 }
-
 	localLeftCenter(): Vertex { return new Vertex(this.localXMin(), this.localMidY()) }
 	localRightCenter(): Vertex { return new Vertex(this.localXMax(), this.localMidY()) }
 	localTopCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMin()) }
 	localBottomCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMax()) }
 
-	localCenter(): Vertex {
-		return new Vertex(this.localMidX(), this.localMidY())
-	}
+	localCenter(): Vertex { return new Vertex(this.localMidX(), this.localMidY()) }
 
-	xMin(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localXMin())
-	}
+	// xMin(frame?: Frame): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localXMin())
+	// }
 
-	xMax(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localXMax())
-	}
+	// xMax(frame?: Mobject): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localXMax())
+	// }
 
-	yMin(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localYMin())
-	}
+	// yMin(frame?: Mobject): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localYMin())
+	// }
 
-	yMax(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localYMax())
-	}
+	// yMax(frame?: Mobject): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localYMax())
+	// }
 
-	ulCorner(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localULCorner())
-	}
+	// ulCorner(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localULCorner())
+	// }
 
-	urCorner(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localURCorner())
-	}
+	// urCorner(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localURCorner())
+	// }
 
-	llCorner(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localLLCorner())
-	}
+	// llCorner(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localLLCorner())
+	// }
 
-	lrCorner(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localLRCorner())
-	}
+	// lrCorner(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localLRCorner())
+	// }
 
-	midX(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.midX())
-	}
+	// midX(frame?: Mobject): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localMidX())
+	// }
 
-	midY(frame?: Mobject): number {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.midY())
-	}
+	// midY(frame?: Mobject): number {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localMidY())
+	// }
 
-	leftCenter(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localLeftCenter())
-	}
+	// leftCenter(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localLeftCenter())
+	// }
 
-	rightCenter(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localRightCenter())
-	}
+	// rightCenter(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localRightCenter())
+	// }
 
-	topCenter(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localTopCenter())
-	}
+	// topCenter(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localTopCenter())
+	// }
 
-	bottomCenter(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localBottomCenter())
-	}
+	// bottomCenter(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localBottomCenter())
+	// }
 
-	center(frame?: Mobject): Vertex {
-		if (!frame) { frame = this }
-		return this.relativeTransform(frame).appliedTo(this.localCenter())
-	}
+	// center(frame?: Mobject): Vertex {
+	// 	if (!frame) { frame = this }
+	// 	return this.relativeTransform(frame).appliedTo(this.localCenter())
+	// }
 
-	globalXMin(): number { return this.xMin(this.getPaper()) }
-	globalXMax(): number { return this.xMax(this.getPaper()) }
-	globalYMin(): number { return this.yMin(this.getPaper()) }
-	globalYMax(): number { return this.yMax(this.getPaper()) }
-	globalULCorner(): Vertex { return this.ulCorner(this.getPaper()) }
-	globalURCorner(): Vertex { return this.urCorner(this.getPaper()) }
-	globalLLCorner(): Vertex { return this.llCorner(this.getPaper()) }
-	globalLRCorner(): Vertex { return this.lrCorner(this.getPaper()) }
-	globalMidX(): number { return this.midX(this.getPaper()) }
-	globalMidY(): number { return this.midY(this.getPaper()) }
-	globalLeftCenter(): Vertex { return this.leftCenter(this.getPaper()) }
-	globalRightCenter(): Vertex { return this.rightCenter(this.getPaper()) }
-	globalTopCenter(): Vertex { return this.topCenter(this.getPaper()) }
-	globalBottomCenter(): Vertex { return this.bottomCenter(this.getPaper()) }
-	globalCenter(): Vertex { return this.center(this.getPaper()) }
+	// globalTransform(): Transform { return this.relativeTransform(paper) }
 
-	globalAnchor(): Vertex { return this.parent.globalTransform().appliedTo(this.anchor) }
+	// globalXMin(): number { return this.xMin(this.getPaper()) }
+	// globalXMax(): number { return this.xMax(this.getPaper()) }
+	// globalYMin(): number { return this.yMin(this.getPaper()) }
+	// globalYMax(): number { return this.yMax(this.getPaper()) }
+	// globalULCorner(): Vertex { return this.ulCorner(this.getPaper()) }
+	// globalURCorner(): Vertex { return this.urCorner(this.getPaper()) }
+	// globalLLCorner(): Vertex { return this.llCorner(this.getPaper()) }
+	// globalLRCorner(): Vertex { return this.lrCorner(this.getPaper()) }
+	// globalMidX(): number { return this.midX(this.getPaper()) }
+	// globalMidY(): number { return this.midY(this.getPaper()) }
+	// globalLeftCenter(): Vertex { return this.leftCenter(this.getPaper()) }
+	// globalRightCenter(): Vertex { return this.rightCenter(this.getPaper()) }
+	// globalTopCenter(): Vertex { return this.topCenter(this.getPaper()) }
+	// globalBottomCenter(): Vertex { return this.bottomCenter(this.getPaper()) }
+	// globalCenter(): Vertex { return this.center(this.getPaper()) }
+
+	// globalAnchor(): Vertex { return this.parent.globalTransform().appliedTo(this.anchor) }
 
 
 	// createPopover(e) {
@@ -796,7 +647,7 @@ export class VMobject extends Mobject {
 	}
 
 	relativeVertices(frame?: Mobject): Array<Vertex> {
-		let returnValue: Array<Vertex> = this.relativeTransform(frame).appliedTo(this.vertices)
+		let returnValue: Array<Vertex> = this.relativeTransform(frame).appliedToVertices(this.vertices)
 		if (returnValue == undefined) { return [] }
 		else { return returnValue }
 	}
@@ -927,9 +778,9 @@ export class CurvedShape extends VMobject {
 		this.updateBezierPoints()
 	}
 
-	globalBezierPoints(): Array<Vertex> {
-		return this.globalTransform().appliedTo(this.bezierPoints)
-	}
+	// globalBezierPoints(): Array<Vertex> {
+	// 	return this.globalTransform().appliedTo(this.bezierPoints)
+	// }
 
 	redraw() {
 		this.updateBezierPoints()

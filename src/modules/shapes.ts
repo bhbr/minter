@@ -1,5 +1,6 @@
-import { Vertex } from './transform'
-import { Polygon, CurvedShape, Color, MGroup } from './mobject'
+import { Vertex } from './vertex-transform'
+import { Color } from './color'
+import { Polygon, CurvedShape, MGroup } from './mobject'
 import { Segment } from './arrows'
 import { gray, pointerEventVertex } from './helpers'
 

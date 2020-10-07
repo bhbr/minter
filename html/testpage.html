@@ -10,37 +10,11 @@
     <body>
          <div id='paper-container' class='svg-container paper-container' width='1166px' height='1024px'>
                   
-                       <div class='mobject-div' id='paper' style='width: 300px; height: 200px; background-color: orange; fill: green; stroke: red; fill-opacity: 1.0; stroke-opacity: 0.2; stroke-width: 5; opacity: 0.5;'>
-                        <svg class='mobject-svg' id='svg' style='width: inherit; height: inherit;'>
-                          <path id='path' d='M10 20L50 70L90 40L20 80Z'></path>
-                        </svg>
-                        
-                        <div class='mobject-div' id='subpaper' style='width: 100px; height: 50px; transform: matrix(1,0,1,1,50,50); background-color: teal;'>
-                        
-                       </div>
+                       <div class='mobject-div' id='paper'>
                        </div>
                        <!--<p id='paper-console' width='600px' height='600px' style='background-color: green; color: white; white-space: pre;'>paper console</p>-->
         </div>
-        
-        <script type='text/javascript'>
-          let paper = document.getElementById('paper')
-          let svg = document.getElementById('svg')
-          let path = document.getElementById('path')
-          let subpaper = document.getElementById('subpaper')
-          paper.addEventListener('click', function(e) {
-            console.log("clicked on paper", e.target)
-          })
-          svg.addEventListener('click', function(e) {
-            let p = svg.createSVGPoint()
-            p.x = e.clientX
-            p.y = e.clientY
-            let onSVG = path.isPointInFill(p)
-            console.log("clicked on svg", onSVG)
-          })
-          subpaper.addEventListener('click', function(e) {
-            console.log("clicked on subpaper", e.target)
-          })
-        </script>
 
+        <script src='../dist/testpage-bundle.js'></script>
     </body>
 </html>
