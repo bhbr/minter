@@ -120,7 +120,7 @@ export class Mobject extends Frame {
 	}
 
 	positionView() {
-		if (!this.parent || !this.view || !this.anchor) { return }
+		if (!this.view || !this.anchor) { return }
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
 		this.view.style['height'] = this.viewHeight.toString() + 'px'
 		this.view.style['left'] = this.anchor.x.toString() + 'px'
@@ -133,9 +133,7 @@ export class Mobject extends Frame {
 	savedSelfHandlePointerDown(e: LocatedEvent) { }
 	savedSelfHandlePointerMove(e: LocatedEvent) { }
 	savedSelfHandlePointerUp(e: LocatedEvent) { }
-	boundPointerDown(e: LocatedEvent) {
-		console.log('boundPointerDown')
-	}
+	boundPointerDown(e: LocatedEvent) { }
 	boundPointerMove(e: LocatedEvent) { }
 	boundPointerUp(e: LocatedEvent) { }
 	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
@@ -192,14 +190,14 @@ export class Mobject extends Frame {
 	}
 
 	pointerDown(e: LocatedEvent) {
-		console.log('pointerDown on', this)
+		//console.log('pointerDown on', this)
 		e.stopPropagation()
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
 		this.eventTarget = this.boundEventTargetMobject(e)
-		console.log(this, this.eventTarget)
+		//console.log(this, this.eventTarget)
 		if (this.eventTarget != this && this.passAlongEvents) {
 			this.eventTarget.pointerDown(e)
 		} else {
@@ -271,6 +269,7 @@ export class Mobject extends Frame {
 			dep.target.update()
 		}
 		if (this.view && redraw) {
+			this.positionView()
 			this.redraw()
 		}
 
