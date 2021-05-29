@@ -68,6 +68,7 @@ export class Paper extends LinkableMobject {
 			passAlongEvents: true
 		})
 		this.add(this.background)
+		console.log(this.background)
 
 		this.construction.update({
 			viewWidth: this.viewWidth,
@@ -325,9 +326,9 @@ let r = new Rectangle({
 	passAlongEvents: true
 })
 
-paper.add(c)
-paper.add(s)
-//paper.add(r)
+// paper.add(c)
+// paper.add(s)
+// paper.add(r)
 
 
 

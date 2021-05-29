@@ -15,8 +15,11 @@ def add_import_extensions(file):
 	with open(file, 'w') as fh:
 		fh.writelines(new_code_lines)
 
-for subdir, dirs, files in os.walk('../lib'):
-	for file in files:
-		filepath = subdir + os.sep + file
-		if (filepath.endswith('.js')):
-			add_import_extensions(filepath)
+def add_import_extensions_in_dir(dir):
+	for subdir, dirs, files in os.walk(dir):
+		for file in files:
+			filepath = subdir + os.sep + file
+			if (filepath.endswith('.js')):
+				add_import_extensions(filepath)
+
+add_import_extensions_in_dir('../lib')

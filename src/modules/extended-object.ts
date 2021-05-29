@@ -1,6 +1,9 @@
 export class ExtendedObject {
 
+	passedByValue: boolean
+
 	constructor(argsDict: object = {}) {
+		this.passedByValue = false
 		this.setAttributes(argsDict)
 		if (argsDict['scale'] != undefined) {
 		}
@@ -35,9 +38,12 @@ export class ExtendedObject {
 			if (setter != undefined) {
 				setter.call(this, value)
 			} else {
-				if (this[key] != undefined && this[key].constructor.name == 'Vertex')
-					{ this[key].copyFrom(value) }
-				else {
+				if (value.passedByValue) {
+					if (this[key] == undefined) {
+						this[key] = new value.constructor()
+					}
+					this[key].copyFrom(value) 
+				} else {
 					this[key] = value
 				}
 			}

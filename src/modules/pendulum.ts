@@ -73,7 +73,7 @@ export class Pendulum extends LinkableMobject {
 	}
 
 	run() {
-		window.setInterval( function(){this.update()}.bind(this), 10)
+		window.setInterval(function(){this.update()}.bind(this), 10)
 	}
 
 }

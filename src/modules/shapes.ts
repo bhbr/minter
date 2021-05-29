@@ -127,7 +127,6 @@ export class Rectangle extends Polygon {
 		this.p4 = new Vertex([0, this.height])
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
 		this.update(argsDict)
-		console.log(this.width, this.height, this.vertices, this.pathString())
 	}
 
 	update(argsDict: object = {}, redraw = true) {

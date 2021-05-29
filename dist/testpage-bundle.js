@@ -3,6 +3,7 @@
 
     class ExtendedObject {
         constructor(argsDict = {}) {
+            this.passedByValue = false;
             this.setAttributes(argsDict);
             if (argsDict['scale'] != undefined) ;
         }
@@ -38,7 +39,10 @@
                     setter.call(this, value);
                 }
                 else {
-                    if (this[key] != undefined && this[key].constructor.name == 'Vertex') {
+                    if (value.passedByValue) {
+                        if (this[key] == undefined) {
+                            this[key] = new value.constructor();
+                        }
                         this[key].copyFrom(value);
                     }
                     else {
@@ -68,6 +72,7 @@
     class Vertex extends Array {
         constructor(arg1, arg2) {
             super();
+            this.passedByValue = true;
             if (arg1 == undefined) {
                 this.x = 0;
                 this.y = 0;
@@ -846,6 +851,9 @@
         toCSS() {
             return `rgb(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`;
         }
+        withAlpha(a, premultiplied = false) {
+            return new Color(this.red, this.green, this.blue, premultiplied ? a * this.alpha : a);
+        }
         static fromHex(hex) {
             let r = parseInt('0x' + hex.slice(1, 2)) / 255;
             let g = parseInt('0x' + hex.slice(3, 2)) / 255;
@@ -1169,13 +1177,13 @@
             return this;
         }
         pointerDown(e) {
-            //console.log('pointerDown on', this)
+            console.log('pointerDown on', this);
             e.stopPropagation();
             removePointerDown(this.view, this.boundPointerDown);
             addPointerMove(this.view, this.boundPointerMove);
             addPointerUp(this.view, this.boundPointerUp);
             this.eventTarget = this.boundEventTargetMobject(e);
-            //console.log(this, this.eventTarget)
+            console.log('event target on ', this, 'is', this.eventTarget);
             if (this.eventTarget != this && this.passAlongEvents) {
                 this.eventTarget.pointerDown(e);
             }
@@ -1205,14 +1213,6 @@
             }
             this.eventTarget = null;
         }
-        // // flagged for deletion
-        // setDefaults(argsDict: object = {}) {
-        // 	for (let [key, value] of Object.entries(argsDict)) {
-        // 		if (this[key] != undefined) { continue }
-        // 		if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-        // 		else { this[key] = value }
-        // 	}
-        // }
         get parent() { return this._parent; }
         set parent(newValue) {
             this.view.remove();
@@ -1265,7 +1265,13 @@
             }
         }
         redraw() {
-            console.warn('Please subclass Mobject.redraw for class', this.constructor.name);
+            if (!this.anchor) {
+                return;
+            }
+            if (this.anchor.isNaN()) {
+                return;
+            }
+            this.redrawSubmobs();
         }
         get submobjects() { return this.children; }
         set submobjects(newValue) {

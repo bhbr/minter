@@ -32,6 +32,10 @@ export class Color {
 		return `rgb(${255*this.red}, ${255*this.green}, ${255*this.blue}, ${this.alpha})`
 	}
 
+	withAlpha(a: number, premultiplied: boolean = false): Color {
+		return new Color(this.red, this.green, this.blue, premultiplied ? a * this.alpha : a)
+	}
+
 	static fromHex(hex: string): Color {
 		let r: number = parseInt('0x' + hex.slice(1, 2))/255
 		let g: number = parseInt('0x' + hex.slice(3, 2))/255

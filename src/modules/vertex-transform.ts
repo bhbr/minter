@@ -6,8 +6,11 @@ export const DEGREES = TAU/360
 
 export class Vertex extends Array {
 
+	passedByValue: boolean
+
 	constructor(arg1?: number | Vertex | Array<number>, arg2?: number) {
 		super()
+		this.passedByValue = true
 		if (arg1 == undefined) {
 			this.x = 0
 			this.y = 0

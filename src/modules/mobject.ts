@@ -190,14 +190,14 @@ export class Mobject extends Frame {
 	}
 
 	pointerDown(e: LocatedEvent) {
-		//console.log('pointerDown on', this)
+		console.log('pointerDown on', this)
 		e.stopPropagation()
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
 		this.eventTarget = this.boundEventTargetMobject(e)
-		//console.log(this, this.eventTarget)
+		console.log('event target on ', this, 'is', this.eventTarget)
 		if (this.eventTarget != this && this.passAlongEvents) {
 			this.eventTarget.pointerDown(e)
 		} else {
@@ -227,16 +227,6 @@ export class Mobject extends Frame {
 		}
 		this.eventTarget = null
 	}
-
-	
-	// // flagged for deletion
-	// setDefaults(argsDict: object = {}) {
-	// 	for (let [key, value] of Object.entries(argsDict)) {
-	// 		if (this[key] != undefined) { continue }
-	// 		if (this[key] instanceof Vertex) { this[key].copyFrom(value) }
-	// 		else { this[key] = value }
-	// 	}
-	// }
 
 	get parent(): Mobject { return this._parent }
 	set parent(newValue: Mobject) {
@@ -291,7 +281,9 @@ export class Mobject extends Frame {
 	}
 
 	redraw() {
-		console.warn('Please subclass Mobject.redraw for class', this.constructor.name)
+		if (!this.anchor) { return }
+		if (this.anchor.isNaN()) { return }
+		this.redrawSubmobs()
 	}
 
 	get submobjects(): Array<Mobject> { return this.children }
@@ -586,11 +578,6 @@ export class MGroup extends Mobject {
 			this.add(submob)
 		}
 		this.update(argsDict)
-	}
-
-	redraw() {
-		if (this.anchor.isNaN()) { return }
-		this.redrawSubmobs()
 	}
 
 }
