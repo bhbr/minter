@@ -2,6 +2,8 @@
 import { ExtendedObject } from '../modules/extended-object'
 import { Vertex, Transform } from '../modules/vertex-transform'
 
+// testing whether objects get created properly
+// esp. passing properties by value (Vertex, Transform) of by reference (anything else)
 
 class MyExtObject extends ExtendedObject {
 	
@@ -27,10 +29,23 @@ export function ExtendedObjectTest() {
 		array: arr
 	})
 
-	eobj.vertex.x = 7
-	eobj.transform.scale = -1
-	eobj.array.push('c')
+	// testing which changes will stick to the original objects
+	eobj.vertex.x = 7 // shouldn't affect v
+	eobj.transform.scale = -1 // should affect t
+	eobj.array.push('c') // should affect array
 
 	console.log(v, t, arr, eobj)
 
 }
+
+class MyExtObject2 extends MyExtObject {
+
+	vertex = new Vertex(7, 8)
+	blip: number = 1
+
+}
+
+let eobj2 = new MyExtObject2()
+console.log(eobj2.vertex, eobj2.blip, eobj2)
+
+

@@ -19,7 +19,11 @@ button {
     display: block;
     position: absolute;
     overflow: visible;
-    border: 1px dashed green;
+    border: 1px green;
+    border-top-style: solid;
+    border-left-style: dotted;
+    border-bottom-style: dashed;
+    border-right-style: dashed;
 }
 
 .mobject-svg {

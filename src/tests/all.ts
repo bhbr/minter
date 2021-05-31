@@ -1,3 +1,5 @@
-import { ExtendedObjectTest } from './extended-object'
+import { ExtendedObjectTest } from './extended-object-test'
+import { FrameTest } from './frame-test'
 
-ExtendedObjectTest()
+//ExtendedObjectTest()
+FrameTest()

@@ -1,4 +1,5 @@
 import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
+import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup, TextLabel } from './modules/mobject'
 import { Color } from './modules/color'
@@ -34,11 +35,11 @@ class Sidebar extends Mobject {
 	constructor(argsDict = {}) {
 		super()
 		this.setDefaults({
-			viewWidth: 200,
-			viewHeight: 600
+			_width: 200,
+			_height: 600
 		})
 		this.setView(document.querySelector('#sidebar'))
-		paper.view.style.left = this.viewWidth.toString() + "px"
+		paper.view.style.left = this._width.toString() + "px"
 		// we cannot just update paper with a new anchor
 		// bc it is not a VMobject
 		super.update(argsDict, false)
@@ -87,8 +88,8 @@ class SidebarButton extends Circle {
 			fontSize: 12,
 			messages: [],
 			radius: buttonRadius,
-			viewWidth: buttonRadius,
-			viewHeight: buttonRadius
+			_width: buttonRadius,
+			_height: buttonRadius
 		})
 		this.update(argsDict, false)
 
@@ -434,6 +435,7 @@ let lineButton = new CreativeButton({
 	locationIndex: 0
 })
 sidebar.add(lineButton)
+lineButton.redraw()
 
 let circleButton = new CreativeButton({
 	creations: ['circle'],
@@ -495,6 +497,7 @@ let colorButton = new ColorChangeButton({
 	fillOpacity: 1
 })
 sidebar.add(colorButton)
+
 
 
 let creating: boolean = false

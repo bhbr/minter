@@ -61,18 +61,18 @@ export class Paper extends LinkableMobject {
 		this.background = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
+			width: this._width,
+			height: this._height,
+			_width: this._width,
+			_height: this._height,
 			passAlongEvents: true
 		})
 		this.add(this.background)
 		console.log(this.background)
 
 		this.construction.update({
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
+			_width: this._width,
+			_height: this._height
 		})
 		this.add(this.construction)
 
@@ -301,8 +301,8 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	anchor: new Vertex(200, 0), // this is a temporary workaround
 	passAlongEvents: true,
-	viewWidth: 800,
-	viewHeight: 600
+	_width: 800,
+	_height: 600
 })
 
 let c = new Circle({
@@ -321,8 +321,8 @@ let r = new Rectangle({
 	fillOpacity: 1,
 	width: 220,
 	height: 150,
-	viewWidth: 220,
-	viewHeight: 150,
+	_width: 220,
+	_height: 150,
 	passAlongEvents: true
 })
 

@@ -12,6 +12,8 @@ def single_line_adder(line):
 def add_import_extensions(file):
 	with open(file, 'r') as fh:
 		new_code_lines = [single_line_adder(line) for line in fh.readlines()]
+	if (len(new_code_lines) == 0):
+		return
 	with open(file, 'w') as fh:
 		fh.writelines(new_code_lines)
 
