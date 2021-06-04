@@ -6,14 +6,15 @@ import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePoin
 
 export class Mobject extends ExtendedObject {
 
+	// position and hierarchy
 	transform: Transform
 	_parent: Mobject
 	_width: number
 	_height: number
-
-	view?: HTMLDivElement
 	children: Array<Mobject>
 
+	// view and style
+	view?: HTMLDivElement
 	fillColor: Color
 	fillOpacity: number
 	strokeColor: Color
@@ -21,37 +22,39 @@ export class Mobject extends ExtendedObject {
 	visible: boolean
 	drawBorder: boolean
 
+	// dependency
 	dependencies: Array<Dependency> = []
 
+	// interactivity
 	eventTarget?: Mobject
 	passAlongEvents: boolean // to event target
+	previousPassAlongEvents: boolean // stored copy while temporarily set to false when draggable
 	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
-
 	snappablePoints: Array<any> = [] // workaround, don't ask
-
 	dragPointStart: Vertex
 	dragAnchorStart: Vertex
 
-
-	get opacity(): number { return this.fillOpacity }
-	set opacity(newValue: number) { this.fillOpacity = newValue }
 
 	constructor(argsDict: object = {}) {
 		super()
 
 		this.setDefaults({
+			transform: Transform.identity(),
 			_width: 100,
 			_height: 100,
-			transform: Transform.identity(),
-			anchor: Vertex.origin(),
+			children: [],
+
 			fillColor: Color.white(),
 			fillOpacity: 1,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
 			visible: true,
 			drawBorder: false,
+
 			dependencies: [],
-			children: []
+
+			passAlongEvents: true,
+			draggable: false
 		})
 
 		this.setView(document.createElement('div'))
@@ -79,6 +82,8 @@ export class Mobject extends ExtendedObject {
 	}
 
 
+	// position and hierarchy
+
 	get anchor(): Vertex {
 		return this.transform?.anchor
 	}
@@ -101,327 +106,10 @@ export class Mobject extends ExtendedObject {
 	}
 
 
-	setView(newView: HTMLDivElement) {
-		if (newView === this.view) { return }
-		this.view?.parentNode?.removeChild(this.view)
-
-		if (this.view) { // TODO: move
-			removePointerDown(this.view, this.boundPointerDown)
-		}
-
-		this.view = newView
-		this.view['mobject'] = this
-		if (this.superMobject) {
-			this.superMobject.view.appendChild(this.view)
-		}
-		addPointerDown(this.view, this.boundPointerDown) // TODO: move
-		this.positionView()
-
-		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
-		this.view.style.transformOrigin = 'top left'
-		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
-		this.view.style.overflow = 'visible'
-	}
-
-	positionView() {
-		if (!this.view) { return }
-		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
-		this.view.style['transform'] = this.transform.asString()
-		this.view.style['width'] = this._width.toString() + 'px'
-		this.view.style['height'] = this._height.toString() + 'px'
-		this.view.style['left'] = this.anchor.x.toString() + 'px'
-		this.view.style['top'] = this.anchor.y.toString() + 'px'
-	}
-
-
-
-	getPaper(): Mobject {
-		let p: Mobject = this
-		while (p != undefined && p.constructor.name != 'Paper') {
-			p = p.parent
-		}
-		return p
-	}
-
-	get superMobject(): Mobject { return this.parent }
-	set superMobject(newValue: Mobject) { this.parent = newValue }
-
-	get parent(): Mobject { return this._parent }
-	set parent(newValue: Mobject) {
-		this.view?.remove()
-		this._parent = newValue
-		if (newValue == undefined) { return }
-		newValue.add(this)
-		if (this.parent.visible) { this.show() }
-		else { this.hide() }
-	}
-
-
-	update(argsDict: object = {}, redraw = true) {
-
-		// a new view should be set before anything else
-		if (argsDict['view']) {
-			this.setView(argsDict['view'])
-			delete argsDict['view']
-		}
-		this.setAttributes(argsDict)
-		this.transform.anchor = this.anchor
-		this.updateSubmobs()
-
-		for (let dep of this.dependencies || []) {
-			let outputName: any = this[dep.outputName] // may be undefined
-			if (typeof outputName === 'function') {
-				dep.target[dep.inputName] = outputName.bind(this)()
-			} else if (outputName != undefined && outputName != null) {
-				dep.target[dep.inputName] = outputName
-			}
-			dep.target.update()
-		}
-
-		if (this.view && redraw) {
-			this.positionView()
-			this.redraw()
-		}
-
-	}
-
-	updateSubmobs() {
-		for (let submob of this.children || []) {
-			if (!this.dependsOn(submob)) { // prevent dependency loops
-				submob.update({}, false)
-			}
-		}
-	}
-
-	redrawSelf() {
-		this.positionView()
-	}
-
-	redraw() {
-		if (!this.visible || !this.parent) { return }
-		this.redrawSelf()
-		this.redrawSubmobs()
-	}
-
-	redrawSubmobs() {
-		for (let submob of this.children || []) {
-			submob.redraw()
-		}
-	}
-
-	get submobjects(): Array<Mobject> { return this.children }
-	set submobjects(newValue: Array<Mobject>) {
-		this.children = newValue
-	}
-
-	get submobs(): Array<Mobject> { return this.submobjects }
-	set submobs(newValue: Array<Mobject>) {
-		this.submobs = newValue
-	}
-
-	add(submob: Mobject) {
-		if (submob.parent != this) { submob.parent = this }
-		if (!this.children.includes(submob)) {
-			this.children.push(submob)
-		}
-		this.view.append(submob.view)
-		submob.redraw()
-	}
-
-	remove(submob: Mobject) {
-		submob.view.remove()
-		remove(this.children, submob)
-		submob.parent = undefined
-	}
-
-	show() {
-		if (!this.view) { return }
-		this.visible = true
-		this.view.style["visibility"] = "visible"
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-		this.redraw()
-	}
-
-	hide() {
-		if (!this.view) { return }
-		this.visible = false
-		this.view.style["visibility"] = "hidden"
-		for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
-		this.redraw()
-	}
-
-	recursiveShow() {
-		this.show()
-		for (let depmob of this.allDependents()) {
-			depmob.show()
-		}
-	}
-
-	recursiveHide() {
-		this.hide()
-		for (let depmob of this.allDependents()) {
-			depmob.hide()
-		}
-	}
-
-
-	dependents(): Array<Mobject> {
-		let dep: Array<Mobject> = []
-		for (let d of this.dependencies) {
-			dep.push(d.target)
-		}
-		return dep
-	}
-
-	allDependents(): Array<Mobject> {
-		let dep: Array<Mobject> = this.dependents()
-		for (let mob of dep) {
-			dep.push(...mob.allDependents())
-		}
-		return dep
-	}
-
-	dependsOn(otherMobject: Mobject): boolean {
-		return otherMobject.allDependents().includes(this)
-	}
-
-
-	addDependency(outputName: string, target: Mobject, inputName: string) {
-		if (this.dependsOn(target)) {
-			throw 'Circular dependency!'
-		}
-		let dep = new Dependency({
-			source: this,
-			outputName: outputName,
-			target: target,
-			inputName: inputName
-		})
-		this.dependencies.push(dep)
-	}
-
-	addDependent(target: Mobject) {
-		this.addDependency(null, target, null)
-	}
-
-	// empty method as workaround (don't ask)
-	removeFreePoint(fp: any) { }
-
-
-	selfHandlePointerDown(e: LocatedEvent) { }
-	selfHandlePointerMove(e: LocatedEvent) { }
-	selfHandlePointerUp(e: LocatedEvent) { }
-	savedSelfHandlePointerDown(e: LocatedEvent) { }
-	savedSelfHandlePointerMove(e: LocatedEvent) { }
-	savedSelfHandlePointerUp(e: LocatedEvent) { }
-	boundPointerDown(e: LocatedEvent) { }
-	boundPointerMove(e: LocatedEvent) { }
-	boundPointerUp(e: LocatedEvent) { }
-	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
-
-
-	enableDragging() {
-		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-		this.selfHandlePointerDown = this.startSelfDragging
-		this.selfHandlePointerMove = this.selfDragging
-		this.selfHandlePointerUp = this.endSelfDragging
-	}
-
-	disableDragging() {
-		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
-		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
-		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
-	}
-
-	eventTargetMobject(e: LocatedEvent): Mobject {
-		let t: Element = e.target as Element
-		if (t.tagName == 'path') { t = t.parentElement.parentElement }
-		if (t == this.view) {
-			return this
-		}
-		let targetViewChain: Array<Element> = [t]
-		while (t != undefined && t != this.view) {
-			t = t.parentElement
-			targetViewChain.push(t)
-		}
-		//console.log(targetViewChain)
-		t = targetViewChain.pop()
-		t = targetViewChain.pop()
-		while (t != undefined) {
-			if (t['mobject'] != undefined) {
-				//console.log(t, t['mobject'])
-				return t['mobject']
-			}
-			t = targetViewChain.pop()
-		}
-		// if all of this fails, you need to handle the event yourself
-		return this
-	}
-
-	pointerDown(e: LocatedEvent) {
-		console.log('pointerDown on', this)
-		e.stopPropagation()
-		removePointerDown(this.view, this.boundPointerDown)
-		addPointerMove(this.view, this.boundPointerMove)
-		addPointerUp(this.view, this.boundPointerUp)
-
-		this.eventTarget = this.boundEventTargetMobject(e)
-		console.log('event target on ', this, 'is', this.eventTarget)
-		if (this.eventTarget != this && this.passAlongEvents) {
-			this.eventTarget.pointerDown(e)
-		} else {
-			this.selfHandlePointerDown(e)
-		}
-	}
-
-	pointerMove(e: LocatedEvent) {
-		e.stopPropagation()
-		if (this.eventTarget != this && this.passAlongEvents) {
-			this.eventTarget.pointerMove(e)
-		} else {
-			this.selfHandlePointerMove(e)
-		}
-	}
-
-	pointerUp(e: LocatedEvent) {
-		e.stopPropagation()
-		removePointerMove(this.view, this.boundPointerMove)
-		removePointerUp(this.view, this.boundPointerUp)
-		addPointerDown(this.view, this.boundPointerDown)
-
-		if (this.eventTarget != this && this.passAlongEvents) {
-			this.eventTarget.pointerUp(e)
-		} else {
-			this.selfHandlePointerUp(e)
-		}
-		this.eventTarget = null
-	}
-
-
-	startSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.anchor
-	}
-
-	selfDragging(e: LocatedEvent) {
-		let dragPoint: Vertex = pointerEventVertex(e)
-		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
-		this.anchor = this.dragAnchorStart.add(dr)
-		this.update()
-	}
-
-	endSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = undefined
-		this.dragAnchorStart = undefined
-	}
-
-
 
 	relativeTransform(frame?: Mobject): Transform {
 		let t = Transform.identity()
-		let mob: Mobject = this
-		if (mob.constructor.name == 'CindyCanvas') {
+		if (this.constructor.name == 'CindyCanvas') {
 			if (frame == this) {
 				return t
 			} else if (frame.constructor.name == 'Paper') {
@@ -431,6 +119,7 @@ export class Mobject extends ExtendedObject {
 				throw 'Cannot compute property of CindyCanvas for this frame'
 			}
 		}
+		let mob: Mobject = this
 		while (mob && mob.transform instanceof Transform) {
 			if (mob == frame) { break }
 			t.leftComposeWith(mob.transform)
@@ -482,6 +171,359 @@ export class Mobject extends ExtendedObject {
 	}
 
 
+
+
+
+	get superMobject(): Mobject { return this.parent }
+	set superMobject(newValue: Mobject) { this.parent = newValue }
+
+	get parent(): Mobject { return this._parent }
+	set parent(newValue: Mobject) {
+		this.view?.remove()
+		this._parent = newValue
+		if (newValue == undefined) { return }
+		newValue.add(this)
+		if (this.parent.visible) { this.show() }
+		else { this.hide() }
+	}
+
+
+	get submobjects(): Array<Mobject> { return this.children }
+	set submobjects(newValue: Array<Mobject>) {
+		this.children = newValue
+	}
+
+	get submobs(): Array<Mobject> { return this.submobjects }
+	set submobs(newValue: Array<Mobject>) {
+		this.submobs = newValue
+	}
+
+
+
+	// view and style
+
+	get opacity(): number { return this.fillOpacity }
+	set opacity(newValue: number) { this.fillOpacity = newValue }
+
+	setView(newView: HTMLDivElement) {
+		if (newView === this.view) { return }
+		this.view?.parentNode?.removeChild(this.view)
+
+		if (this.view) {
+			removePointerDown(this.view, this.boundPointerDown)
+		}
+
+		this.view = newView
+		this.view['mobject'] = this
+		if (this.superMobject) {
+			this.superMobject.view.appendChild(this.view)
+		}
+		addPointerDown(this.view, this.boundPointerDown) // TODO: move
+		this.positionView()
+
+		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
+		this.view.style.transformOrigin = 'top left'
+		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
+		this.view.style.overflow = 'visible'
+	}
+
+	positionView() {
+		if (!this.view) { return }
+		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
+		this.view.style['transform'] = this.transform.asString()
+		this.view.style['width'] = this._width.toString() + 'px'
+		this.view.style['height'] = this._height.toString() + 'px'
+		this.view.style['left'] = this.anchor.x.toString() + 'px'
+		this.view.style['top'] = this.anchor.y.toString() + 'px'
+	}
+
+	add(submob: Mobject) {
+		if (submob.parent != this) { submob.parent = this }
+		if (!this.children.includes(submob)) {
+			this.children.push(submob)
+		}
+		this.view.append(submob.view)
+		submob.redraw()
+	}
+
+	remove(submob: Mobject) {
+		submob.view.remove()
+		remove(this.children, submob)
+		submob.parent = undefined
+	}
+
+	redrawSelf() {
+		console.warn('please subclass redrawSelf')
+	}
+
+	redrawSubmobs() {
+		for (let submob of this.children || []) {
+			submob.redraw()
+		}
+	}
+
+	redraw(recursive = true) {
+		if (!this.visible || !this.parent) { return }
+		this.positionView()
+		this.redrawSelf()
+		if (recursive) { this.redrawSubmobs() }
+	}
+
+
+	getPaper(): Mobject {
+		let p: Mobject = this
+		while (p != undefined && p.constructor.name != 'Paper') {
+			p = p.parent
+		}
+		return p
+	}
+
+
+
+
+	show() {
+		if (!this.view) { return }
+		this.visible = true
+		this.view.style["visibility"] = "visible"
+		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+		this.redraw()
+	}
+
+	hide() {
+		if (!this.view) { return }
+		this.visible = false
+		this.view.style["visibility"] = "hidden"
+		for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
+		this.redraw()
+	}
+
+	recursiveShow() {
+		this.show()
+		for (let depmob of this.allDependents()) {
+			depmob.show()
+		}
+	}
+
+	recursiveHide() {
+		this.hide()
+		for (let depmob of this.allDependents()) {
+			depmob.hide()
+		}
+	}
+
+
+
+
+
+	// dependency
+
+	dependents(): Array<Mobject> {
+		let dep: Array<Mobject> = []
+		for (let d of this.dependencies) {
+			dep.push(d.target)
+		}
+		return dep
+	}
+
+	allDependents(): Array<Mobject> {
+		let dep: Array<Mobject> = this.dependents()
+		for (let mob of dep) {
+			dep.push(...mob.allDependents())
+		}
+		return dep
+	}
+
+	dependsOn(otherMobject: Mobject): boolean {
+		return otherMobject.allDependents().includes(this)
+	}
+
+
+	addDependency(outputName: string, target: Mobject, inputName: string) {
+		if (this.dependsOn(target)) {
+			throw 'Circular dependency!'
+		}
+		let dep = new Dependency({
+			source: this,
+			outputName: outputName,
+			target: target,
+			inputName: inputName
+		})
+		this.dependencies.push(dep)
+	}
+
+	addDependent(target: Mobject) {
+		this.addDependency(null, target, null)
+	}
+
+
+
+	update(argsDict: object = {}, redraw = true) {
+
+		// a new view should be set before anything else
+		if (argsDict['view']) {
+			this.setView(argsDict['view'])
+			delete argsDict['view']
+		}
+		this.setAttributes(argsDict)
+		this.transform.anchor = this.anchor
+		this.updateSubmobs()
+
+		for (let dep of this.dependencies || []) {
+			let outputName: any = this[dep.outputName] // may be undefined
+			if (typeof outputName === 'function') {
+				dep.target[dep.inputName] = outputName.bind(this)()
+			} else if (outputName != undefined && outputName != null) {
+				dep.target[dep.inputName] = outputName
+			}
+			dep.target.update()
+		}
+
+		if (this.view && redraw) {
+			this.redraw()
+		}
+
+	}
+
+
+	updateSubmobs() {
+		for (let submob of this.children || []) {
+			if (!this.dependsOn(submob)) { // prevent dependency loops
+				submob.update({}, false)
+			}
+		}
+	}
+
+
+
+
+
+	// interactivity
+
+	// empty method as workaround (don't ask)
+	removeFreePoint(fp: any) { }
+
+
+	selfHandlePointerDown(e: LocatedEvent) { console.log('old') }
+	selfHandlePointerMove(e: LocatedEvent) { }
+	selfHandlePointerUp(e: LocatedEvent) { }
+	savedSelfHandlePointerDown(e: LocatedEvent) { }
+	savedSelfHandlePointerMove(e: LocatedEvent) { }
+	savedSelfHandlePointerUp(e: LocatedEvent) { }
+	boundPointerDown(e: LocatedEvent) { }
+	boundPointerMove(e: LocatedEvent) { }
+	boundPointerUp(e: LocatedEvent) { }
+	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
+
+
+	enableDragging() {
+		console.log('enabling dragging')
+		this.previousPassAlongEvents = this.passAlongEvents
+		this.passAlongEvents = false
+		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
+		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
+		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+		this.selfHandlePointerDown = this.startSelfDragging
+		this.selfHandlePointerMove = this.selfDragging
+		this.selfHandlePointerUp = this.endSelfDragging
+	}
+
+	disableDragging() {
+		console.log('disabling dragging')
+		this.passAlongEvents = this.previousPassAlongEvents
+		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
+		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
+		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
+	}
+
+	eventTargetMobject(e: LocatedEvent): Mobject {
+		let t: Element = e.target as Element
+		if (t.tagName == 'path') { t = t.parentElement.parentElement }
+		if (t == this.view) {
+			return this
+		}
+		let targetViewChain: Array<Element> = [t]
+		while (t != undefined && t != this.view) {
+			t = t.parentElement
+			targetViewChain.push(t)
+		}
+		//console.log(targetViewChain)
+		t = targetViewChain.pop()
+		t = targetViewChain.pop()
+		while (t != undefined) {
+			if (t['mobject'] != undefined) {
+				//console.log(t, t['mobject'])
+				return t['mobject']
+			}
+			t = targetViewChain.pop()
+		}
+		// if all of this fails, you need to handle the event yourself
+		return this
+	}
+
+	pointerDown(e: LocatedEvent) {
+		console.log('pointerDown on', this)
+		e.stopPropagation()
+		removePointerDown(this.view, this.boundPointerDown)
+		addPointerMove(this.view, this.boundPointerMove)
+		addPointerUp(this.view, this.boundPointerUp)
+
+		this.eventTarget = this.boundEventTargetMobject(e)
+		console.log('event target on ', this, 'is', this.eventTarget)
+		if (this.eventTarget != this && this.passAlongEvents) {
+			console.log('passing on')
+			this.eventTarget.pointerDown(e)
+		} else {
+			console.log('handling myself')
+			this.selfHandlePointerDown(e)
+		}
+	}
+
+	pointerMove(e: LocatedEvent) {
+		e.stopPropagation()
+		if (this.eventTarget != this && this.passAlongEvents) {
+			this.eventTarget.pointerMove(e)
+		} else {
+			this.selfHandlePointerMove(e)
+		}
+	}
+
+	pointerUp(e: LocatedEvent) {
+		e.stopPropagation()
+		removePointerMove(this.view, this.boundPointerMove)
+		removePointerUp(this.view, this.boundPointerUp)
+		addPointerDown(this.view, this.boundPointerDown)
+
+		if (this.eventTarget != this && this.passAlongEvents) {
+			this.eventTarget.pointerUp(e)
+		} else {
+			this.selfHandlePointerUp(e)
+		}
+		this.eventTarget = null
+	}
+
+
+	startSelfDragging(e: LocatedEvent) {
+		console.log('start self-dragging')
+		this.dragPointStart = pointerEventVertex(e)
+		this.dragAnchorStart = this.anchor
+	}
+
+	selfDragging(e: LocatedEvent) {
+		console.log('self-dragging')
+		let dragPoint: Vertex = pointerEventVertex(e)
+		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
+		this.anchor = this.dragAnchorStart.add(dr)
+		this.update()
+	}
+
+	endSelfDragging(e: LocatedEvent) {
+		this.dragPointStart = undefined
+		this.dragAnchorStart = undefined
+	}
+
+
+
+
 }
 
 
@@ -504,7 +546,7 @@ export class MGroup extends Mobject {
 export class VMobject extends Mobject {
 
 	svg: SVGSVGElement
-	path?: SVGElement // child of view
+	path: SVGElement // child of view
 	vertices: Array<Vertex>
 
 	constructor(argsDict: object = {}) {
@@ -524,10 +566,8 @@ export class VMobject extends Mobject {
 	}
 
 	redrawSelf() {
-		super.redrawSelf()
-		if (this.path == undefined) { return }
 		let pathString: string = this.pathString()
-		if (pathString.includes("NaN")) { return }
+		if (pathString.includes('NaN')) { return }
 
 		this.path.setAttribute('d', pathString)
 		this.path.style['fill'] = this.fillColor.toHex()
@@ -677,9 +717,9 @@ export class CurvedShape extends VMobject {
 	// 	return this.globalTransform().appliedTo(this.bezierPoints)
 	// }
 
-	redraw() {
+	redrawSelf() {
 		this.updateBezierPoints()
-		super.redraw()
+		super.redrawSelf()
 	}
 
 	pathString(): string {
@@ -748,7 +788,7 @@ export class TextLabel extends Mobject {
 		this.update(argsDict)
 	}
 
-	redraw() {
+	redrawSelf() {
 		if (this.anchor.isNaN()) { return }
 		if (this.color == undefined) { this.color = Color.white() }
 		if (this.textView) { this.textView.textContent = this.text }
@@ -760,8 +800,6 @@ export class TextLabel extends Mobject {
 			this.view.setAttribute('fill', this.color.toHex())
 			this.view.setAttribute('stroke', this.color.toHex())
 		}
-		
-		this.redrawSubmobs()
 	}
 
 	update(argsDict = {}, redraw = true) {

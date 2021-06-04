@@ -2,57 +2,51 @@ import { LinkableMobject } from './linkables'
 import { Vertex } from './vertex-transform'
 import { Segment } from './arrows'
 import { CreatedMobject } from './creating'
-import { Mobject } from './mobject'
+import { Mobject } from './mobject'
 import { Color } from './color'
-import { Paper } from '../paper'
-import { LocatedEvent } from './helpers'
+import { Paper } from '../paper'
+import { LocatedEvent } from './helpers'
 import { Rectangle } from './shapes'
 
+declare var CindyJS: any
 
 export class CindyCanvas extends LinkableMobject {
 
-	paper: Paper
-	width: number
-	height: number
-	frame: Rectangle
-	csView: HTMLCanvasElement
-	initScript: HTMLScriptElement
-	drawScript: HTMLScriptElement
+	port: object
+	id: string
+	//canvas: HTMLCanvasElement
 	core: any
 	points: Array<Array<number>>
 	
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		this.paper = argsDict['paper']
-		this.anchor = argsDict['anchor']
-		this.width = argsDict['width']
-		this.height = argsDict['height']
+		console.log(this.id)
+		// this.paper = argsDict['paper']
+		// this.anchor = argsDict['anchor']
+		// this._width = argsDict['width']
+		// this._height = argsDict['height']
 
-		// this.mainScript = document.createElement('script')
-		// this.mainScript.setAttribute('type', 'text/javascript')
-		// this.mainScript.setAttribute('src', 'CindyJS/build/js/Cindy.js')
-		// this.mainScript.onload = this.createCore.bind(this)
+		// this.frame = new Rectangle({
+		// 	anchor: this.anchor,
+		// 	width: this._width,
+		// 	height: this._height,
+		// 	strokeColor: Color.white(),
+		// 	strokeWidth: 1,
+		// 	fillOpacity: 0.5
+		// })
+		// this.add(this.frame)
 
-		this.frame = new Rectangle({
-			anchor: this.anchor,
-			width: this.width,
-			height: this.height,
-			strokeColor: Color.white(),
-			strokeWidth: 1,
-			fillOpacity: 0.5
-		})
-		this.add(this.frame)
+		// this.canvas = document.createElement('canvas')
+		// this.canvas.setAttribute('width', `100px`)
+		// this.canvas.setAttribute('height', `100px`)
+		// this.view.appendChild(this.canvas)
 
-		this.csView = document.createElement('canvas')
-		let canvasID: string = 'CSCanvas' // + this.paper.cindyPorts.length
-		this.csView.setAttribute('id', canvasID)
-		//this.view.appendChild(this.csView)
-		this.paper.view.appendChild(this.csView)
-		this.csView.style['position'] = 'absolute'
-		this.paper.view.insertBefore(this.csView, this.paper.view)
+		//this.paper.view.appendChild(this.csView)
+		//this.csView.style['position'] = 'absolute'
+		//this.paper.view.insertBefore(this.csView, this.paper.view)
 
-		this.csView.style['left'] =  this.anchor.x + 'px'
-		this.csView.style['top'] = this.anchor.y + 'px'
+		//this.csView.style['left'] =  this.anchor.x + 'px'
+		//this.csView.style['top'] = this.anchor.y + 'px'
 
 		this.draggable = true
 		//this.view.style['pointer-events'] = 'auto'
@@ -60,39 +54,29 @@ export class CindyCanvas extends LinkableMobject {
 		//this.paper.insertBefore(this.csView, document.querySelector('#paper-console'))
 		//document.head.appendChild(this.mainScript)
 
-		this.paper.cindyPorts.push({
-			id: canvasID,
-			width: this.width,
-			height: this.height,
+		this.view.id = this.id
+
+		this.port = {
+			id: this.id,
+			width: this._width,
+			height: this._height,
 			transform: [{
-			  visibleRect: [0, 1, 1, 0]
+				visibleRect: [0, 1, 1, 0]
 			}]
-		})
+		}
 
-		this.points = [[0.4, 0.4], [0.3, 0.8]]
+		this.points = []
 
-		this.paper.add(this)
+		//this.paper.add(this)
 		//this.update()
-		
-		this.initScript = document.createElement('script')
-		this.initScript.setAttribute('type', 'text/x-cindyscript')
-		this.initScript.setAttribute('id', 'csinit')
-		this.initScript.textContent = this.initCode()
-
-		this.drawScript = document.createElement('script')
-		this.drawScript.setAttribute('type', 'text/x-cindyscript')
-		this.drawScript.setAttribute('id', 'csdraw')
-		this.drawScript.textContent = this.drawCode()
-
-		document.body.appendChild(this.initScript)
-		document.body.appendChild(this.drawScript)
-
-		this.createCore()
-		this.update(argsDict)
+		//this.update(argsDict)
 
 	}
 
-	getPaper(): Paper { return this.paper }
+
+
+
+	//getPaper(): Paper { return this.paper }
 
 	initCode() {
 		return `resetclock();`
@@ -102,33 +86,59 @@ export class CindyCanvas extends LinkableMobject {
 		return `drawcmd();`
 	}
 
-	createCore() {
+
+	goLive() {
+		let initScript = document.createElement('script')
+		initScript.setAttribute('type', 'text/x-cindyscript')
+		initScript.setAttribute('id', `${this.id}init`)
+		initScript.textContent = this.initCode()
+		document.body.appendChild(initScript)
+		console.log(initScript)
+
+		let drawScript = document.createElement('script')
+		drawScript.setAttribute('type', 'text/x-cindyscript')
+		drawScript.setAttribute('id', `${this.id}draw`)
+		drawScript.textContent = this.drawCode()
+		document.body.appendChild(drawScript)
+		console.log(drawScript, this.view)
+
+		//this.port['element'] = this.view
+
 		let argsDict: object = {
-			scripts: "cs*",
-			autoplay: true,
-			ports: this.paper.cindyPorts,
+			scripts: `${this.id}*`,
+			animation: { autoplay: true },
+			ports: [this.port],
 			geometry: this.geometry()
 		}
-		this.core = this.paper.callCindyJS(argsDict)
+		console.log('doc now:', document)
+		this.core = CindyJS.newInstance(argsDict)
+		document.addEventListener('DOMContentLoaded', function(e: Event) {
+			this.core.startup()
+			this.core.started = true
+			this.core.play()
+			setTimeout(function() { console.log(this.core) }.bind(this), 1000)
+		}.bind(this))
+		
 	}
 
 	geometry(): Array<any> { return [] }
 	
-	update(argsDict: object, redraw = true) {
-		super.update(argsDict, false)
-		if (this.csView == undefined) { return }
-		let parent = this.csView.parentElement
-		if (parent.getAttribute('id').startsWith('CSCanvas')) {
-			parent.style.left =  this.anchor.x + "px"
-			parent.style.top = this.anchor.y + "px"
-		}
-	}
-	redraw() { }
+	// update(argsDict: object, redraw = true) {
+	// 	super.update(argsDict, false)
+	// 	if (this.csView == undefined) { return }
+	// 	let parent = this.csView.parentElement
+	// 	if (parent.getAttribute('id').startsWith('CSCanvas')) {
+	// 		parent.style.left =  this.anchor.x + "px"
+	// 		parent.style.top = this.anchor.y + "px"
+	// 	}
+	// }
+	
+	//redraw() { }
 
 	localXMin(): number { return 0 }
-	localXMax(): number { return this.width }
+	localXMax(): number { return this._width }
 	localYMin(): number { return 0 }
-	localYMax(): number { return this.height }
+	localYMax(): number { return this._height }
 
 }
 
@@ -141,22 +151,22 @@ export class WaveCindyCanvas extends CindyCanvas {
 	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.setDefaults({
+			//points: [[0.4, 0.4], [0.3, 0.8]],
 			wavelength: 1,
 			frequency: 0
 		})
 		this.inputNames = ['wavelength', 'frequency']
+
 		this.update(argsDict)
 	}
 
 	initCode(): string {
-		let l = 0.1*(this.wavelength || 1)
-		let f = 10*(this.frequency || 1)
-		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););` + super.initCode()
+		let l = 0.1*(this.wavelength || 1)
+		let f = 10*(this.frequency || 1)
+		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, (0.2, 0.4), ${l}, ${f}) + W(#, (0.6, 0.8), ${l}, ${f}),0)););` + super.initCode()
 	}
 
 	drawCode(): string {
-		let l = 0.1*(this.wavelength || 1)
-		let f = 10*(this.frequency || 1)
 		return `drawcmd();`
 	}
 
@@ -171,10 +181,10 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		let l: number = 0.1 * (this.wavelength || 1)
-		let f: number = 10 * (this.frequency || 1)
-		if (this.core != undefined) {
-			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
+		let l: number = 0.1 * (this.wavelength || 1)
+		let f: number = 10 * (this.frequency || 1)
+		if (this.core != undefined && this.points.length > 0) {
+			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, (0.2, 0,4), ${l}, ${f}) + W(#, (0.6, 0.8), ${l}, ${f}),0)););`)
 		}
 		super.update(argsDict, false)
 	}

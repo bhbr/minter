@@ -5,7 +5,6 @@ import { Color } from './modules/color'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Arrow, Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
-import { CindyCanvas, WaveCindyCanvas, DrawnRectangle } from './modules/cindycanvas'
 import { CreationGroup } from './modules/creationgroup'
 import { BoxSlider } from './modules/slider'
 import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
@@ -17,7 +16,6 @@ declare var CindyJS: any
 export class Paper extends LinkableMobject {
 
 	visibleCreation: string
-	cindys: Array<CindyCanvas>
 	cindyPorts: Array<object>
 	snappablePoints: Array<Point>
 	creationStartPoint: Vertex
@@ -36,9 +34,7 @@ export class Paper extends LinkableMobject {
 	constructor(argsDict: object = {}) {
 		super()
 		this.children = []
-		this.cindys = []
 		this.visibleCreation = 'freehand'
-		this.cindyPorts = []
 		this.snappablePoints = []
 		this.construction = new Construction()
 
@@ -94,10 +90,6 @@ export class Paper extends LinkableMobject {
 
 	setDragging(flag: boolean) {
 		this.passAlongEvents = !flag
-		for (let c of this.cindys) {
-			c.draggable = flag
-			c.csView.parentElement.style['pointer-events'] = (flag ? 'none' : 'auto')
-		}
 		if (flag) {
 			this.selfHandlePointerDown = this.startDragging
 			this.selfHandlePointerMove = this.dragging
@@ -118,8 +110,8 @@ export class Paper extends LinkableMobject {
 				let p: Vertex = pointerEventVertex(e)
 				let p1: boolean = (p.x > c.anchor.x)
 				let p2: boolean = (p.y > c.anchor.y)
-				let p3: boolean = (p.x < c.anchor.x + c.width)
-				let p4: boolean = (p.y < c.anchor.y + c.height)
+				let p3: boolean = (p.x < c.anchor.x + c._width)
+				let p4: boolean = (p.y < c.anchor.y + c._height)
 				if (p1 && p2 && p3 && p4) {
 					this.draggedMobject = c
 					break
@@ -252,33 +244,6 @@ export class Paper extends LinkableMobject {
 	}
 
 
-
-	addCindy(cindyCanvas: CindyCanvas) {
-		this.cindys.push(cindyCanvas)
-	}
-
-	removeCindy(cindyCanvas: CindyCanvas) {
-		cindyCanvas.view.remove()
-		cindyCanvas.initScript.remove()
-		cindyCanvas.drawScript.remove()
-	}
-
-	add(mobject: Mobject) {
-		if (mobject instanceof CindyCanvas) {
-			this.addCindy(mobject)
-		} else {
-			super.add(mobject)
-		}
-	}
-
-	remove(mobject: Mobject) {
-		if (mobject instanceof CindyCanvas) {
-			this.removeCindy(mobject)
-		} else {
-			super.remove(mobject)
-		}
-	}
-
 	showAllLinks() {
 		this.showLinksOfSubmobs()
 	}
@@ -287,9 +252,6 @@ export class Paper extends LinkableMobject {
 		this.hideLinksOfSubmobs()
 	}
 
-	callCindyJS(argsDict: object) {
-		return CindyJS(argsDict)
-	}
 
 	redraw() {
 		this.redrawSubmobs()
