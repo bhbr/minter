@@ -1,7 +1,8 @@
 import { ExtendedObjectTest } from './extended-object-test'
-import { FrameTest, CircleTest, CindyTest } from './frame-test'
+import { MobjectTest, CircleTest, CindyTest, TextTest } from './mobject-tests'
 
 //ExtendedObjectTest()
-//FrameTest()
-//CircleTest()
+// MobjectTest()
+// CircleTest()
 CindyTest()
+// TextTest()

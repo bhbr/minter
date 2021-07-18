@@ -374,21 +374,21 @@ let lineButton = new CreativeButton({
 lineButton.baseColor = gray(0.2)
 sidebar.add(lineButton)
 
-let circleButton = new CreativeButton({
-	creations: ['circle'],
-	key: 'w',
-	locationIndex: 1
-})
-circleButton.baseColor = gray(0.4)
-sidebar.add(circleButton)
+// let circleButton = new CreativeButton({
+// 	creations: ['circle'],
+// 	key: 'w',
+// 	locationIndex: 1
+// })
+// circleButton.baseColor = gray(0.4)
+// sidebar.add(circleButton)
 
-let sliderButton = new CreativeButton({
-	creations: ['slider'],
-	key: 'e',
-	locationIndex: 2
-})
-sliderButton.baseColor = gray(0.4)
-sidebar.add(sliderButton)
+// let sliderButton = new CreativeButton({
+// 	creations: ['slider'],
+// 	key: 'e',
+// 	locationIndex: 2
+// })
+// sliderButton.baseColor = gray(0.4)
+// sidebar.add(sliderButton)
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
@@ -398,34 +398,34 @@ let cindyButton = new CreativeButton({
 cindyButton.baseColor = gray(0.6)
 sidebar.add(cindyButton)
   
-let dragButton = new DragButton({
-	messages: [{drag: true}],
-	outgoingMessage: {drag: false},
-	key: 't',
-	locationIndex: 4
-})
-dragButton.baseColor = gray(0.8)
-dragButton.label.view.setAttribute('fill', 'black')
-dragButton.label2.view.setAttribute('fill', 'black')
-sidebar.add(dragButton)
+// let dragButton = new DragButton({
+// 	messages: [{drag: true}],
+// 	outgoingMessage: {drag: false},
+// 	key: 't',
+// 	locationIndex: 4
+// })
+// dragButton.baseColor = gray(0.8)
+// dragButton.label.view.setAttribute('fill', 'black')
+// dragButton.label2.view.setAttribute('fill', 'black')
+// sidebar.add(dragButton)
 
-let linkButton = new LinkButton({
-	messages: [{toggleLinks: true}],
-	outgoingMessage: {toggleLinks: false},
-	key: 'z',
-	locationIndex: 5
-})
-linkButton.baseColor = gray(0.3)
-linkButton.label.view.setAttribute('fill', 'black')
-sidebar.add(linkButton)
+// let linkButton = new LinkButton({
+// 	messages: [{toggleLinks: true}],
+// 	outgoingMessage: {toggleLinks: false},
+// 	key: 'z',
+// 	locationIndex: 5
+// })
+// linkButton.baseColor = gray(0.3)
+// linkButton.label.view.setAttribute('fill', 'black')
+// sidebar.add(linkButton)
 
-let colorButton = new ColorChangeButton({
-	key: 'a',
-	modeSpacing: 15,
-	locationIndex: 6
-})
-colorButton.baseColor = gray(1.0)
-sidebar.add(colorButton)
+// let colorButton = new ColorChangeButton({
+// 	key: 'a',
+// 	modeSpacing: 15,
+// 	locationIndex: 6
+// })
+// colorButton.baseColor = gray(1.0)
+// sidebar.add(colorButton)
 
 
 let creating = false

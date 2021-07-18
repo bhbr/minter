@@ -967,16 +967,15 @@
             this.snappablePoints = []; // workaround, don't ask
             this.setDefaults({
                 transform: Transform.identity(),
-                _width: 100,
-                _height: 100,
+                viewWidth: 100,
+                viewHeight: 100,
                 children: [],
-                fillColor: Color.white(),
-                fillOpacity: 1,
-                strokeColor: Color.white(),
-                strokeWidth: 1,
                 visible: true,
+                opacity: 1.0,
                 drawBorder: false,
                 dependencies: [],
+                interactive: false,
+                vetoOnStopPropagation: false,
                 passAlongEvents: true,
                 draggable: false
             });
@@ -1013,8 +1012,20 @@
             this.anchor = newAnchor;
         }
         centerAt(newCenter, frame) {
-            let dr = newCenter.subtract(this.anchor); // this.center(frame)
+            if (!frame) {
+                frame = this;
+            }
+            let dr = newCenter.subtract(this.center(frame));
+            let oldAnchor = this.anchor.copy();
             this.anchor = this.anchor.translatedBy(dr[0], dr[1]);
+            if (this.constructor.name != 'TextLabel') {
+                return;
+            }
+            console.log('old center:', this.center(frame));
+            console.log('new center:', newCenter);
+            console.log('translating anchor by', dr);
+            console.log('old anchor:', this.anchor);
+            console.log('new anchor:', this.anchor);
         }
         relativeTransform(frame) {
             let t = Transform.identity();
@@ -1044,9 +1055,9 @@
             return this.relativeTransform();
         }
         localXMin() { return 0; }
-        localXMax() { return this._width; }
+        localXMax() { return this.viewWidth; }
         localYMin() { return 0; }
-        localYMax() { return this._height; }
+        localYMax() { return this.viewHeight; }
         localULCorner() { return new Vertex(this.localXMin(), this.localYMin()); }
         localURCorner() { return new Vertex(this.localXMax(), this.localYMin()); }
         localLLCorner() { return new Vertex(this.localXMin(), this.localYMax()); }
@@ -1071,6 +1082,10 @@
         }
         globalCenter() {
             return this.globalTransform().appliedTo(this.localCenter());
+        }
+        get midPoint() { return this.localCenter(); }
+        set midPoint(newValue) {
+            this.centerAt(newValue);
         }
         get superMobject() { return this.parent; }
         set superMobject(newValue) { this.parent = newValue; }
@@ -1099,8 +1114,18 @@
             this.submobs = newValue;
         }
         // view and style
-        get opacity() { return this.fillOpacity; }
-        set opacity(newValue) { this.fillOpacity = newValue; }
+        get opacity() { return this._opacity; }
+        set opacity(newValue) {
+            this._opacity = newValue;
+            if (this.view) {
+                this.view.style.opacity = `${newValue}`;
+            }
+        }
+        get backgroundColor() { return this._backgroundColor; }
+        set backgroundColor(newValue) {
+            this._backgroundColor = newValue;
+            this.view.style.backgroundColor = newValue.toHex();
+        }
         setView(newView) {
             var _a, _b;
             if (newView === this.view) {
@@ -1126,10 +1151,11 @@
             if (!this.view) {
                 return;
             }
+            console.log("positioning");
             this.view.style.border = this.drawBorder ? '1px dashed green' : 'none';
             this.view.style['transform'] = this.transform.asString();
-            this.view.style['width'] = this._width.toString() + 'px';
-            this.view.style['height'] = this._height.toString() + 'px';
+            this.view.style['width'] = this.viewWidth.toString() + 'px';
+            this.view.style['height'] = this.viewHeight.toString() + 'px';
             this.view.style['left'] = this.anchor.x.toString() + 'px';
             this.view.style['top'] = this.anchor.y.toString() + 'px';
         }
@@ -1148,9 +1174,7 @@
             remove(this.children, submob);
             submob.parent = undefined;
         }
-        redrawSelf() {
-            console.warn('please subclass redrawSelf');
-        }
+        redrawSelf() { }
         redrawSubmobs() {
             for (let submob of this.children || []) {
                 submob.redraw();
@@ -1284,7 +1308,6 @@
         boundPointerUp(e) { }
         boundEventTargetMobject(e) { return this; }
         enableDragging() {
-            console.log('enabling dragging');
             this.previousPassAlongEvents = this.passAlongEvents;
             this.passAlongEvents = false;
             this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
@@ -1295,14 +1318,13 @@
             this.selfHandlePointerUp = this.endSelfDragging;
         }
         disableDragging() {
-            console.log('disabling dragging');
             this.passAlongEvents = this.previousPassAlongEvents;
             this.selfHandlePointerDown = this.savedSelfHandlePointerDown;
             this.selfHandlePointerMove = this.savedSelfHandlePointerMove;
             this.selfHandlePointerUp = this.savedSelfHandlePointerUp;
         }
         eventTargetMobject(e) {
-            let t = e.target;
+            var t = e.target;
             if (t.tagName == 'path') {
                 t = t.parentElement.parentElement;
             }
@@ -1314,13 +1336,13 @@
                 t = t.parentElement;
                 targetViewChain.push(t);
             }
-            //console.log(targetViewChain)
+            console.log(targetViewChain);
             t = targetViewChain.pop();
             t = targetViewChain.pop();
             while (t != undefined) {
                 if (t['mobject'] != undefined) {
-                    //console.log(t, t['mobject'])
-                    return t['mobject'];
+                    let r = t['mobject'];
+                    return r;
                 }
                 t = targetViewChain.pop();
             }
@@ -1328,37 +1350,48 @@
             return this;
         }
         pointerDown(e) {
-            console.log('pointerDown on', this);
+            this.eventTarget = this.boundEventTargetMobject(e);
+            if (this.eventTarget.vetoOnStopPropagation) {
+                return;
+            }
             e.stopPropagation();
             removePointerDown(this.view, this.boundPointerDown);
             addPointerMove(this.view, this.boundPointerMove);
             addPointerUp(this.view, this.boundPointerUp);
-            this.eventTarget = this.boundEventTargetMobject(e);
-            console.log('event target on ', this, 'is', this.eventTarget);
-            if (this.eventTarget != this && this.passAlongEvents) {
-                console.log('passing on');
+            //console.log('event target on ', this, 'is', this.eventTarget)
+            if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+                //console.log('passing on')
                 this.eventTarget.pointerDown(e);
             }
             else {
-                console.log('handling myself');
+                //console.log(`handling myself, and I am a ${this.constructor.name}`)
                 this.selfHandlePointerDown(e);
             }
         }
         pointerMove(e) {
+            //console.log("event target:", this.eventTarget)
+            if (this.eventTarget.vetoOnStopPropagation) {
+                return;
+            }
             e.stopPropagation();
-            if (this.eventTarget != this && this.passAlongEvents) {
+            if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+                //console.log("here?")
                 this.eventTarget.pointerMove(e);
             }
             else {
+                //console.log("or here?")
                 this.selfHandlePointerMove(e);
             }
         }
         pointerUp(e) {
+            if (this.eventTarget.vetoOnStopPropagation) {
+                return;
+            }
             e.stopPropagation();
             removePointerMove(this.view, this.boundPointerMove);
             removePointerUp(this.view, this.boundPointerUp);
             addPointerDown(this.view, this.boundPointerDown);
-            if (this.eventTarget != this && this.passAlongEvents) {
+            if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
                 this.eventTarget.pointerUp(e);
             }
             else {
@@ -1367,16 +1400,15 @@
             this.eventTarget = null;
         }
         startSelfDragging(e) {
-            console.log('start self-dragging');
             this.dragPointStart = pointerEventVertex(e);
             this.dragAnchorStart = this.anchor;
         }
         selfDragging(e) {
-            console.log('self-dragging');
             let dragPoint = pointerEventVertex(e);
             let dr = dragPoint.subtract(this.dragPointStart);
-            this.anchor = this.dragAnchorStart.add(dr);
-            this.update();
+            this.update({
+                anchor: this.dragAnchorStart.add(dr)
+            }, true);
         }
         endSelfDragging(e) {
             this.dragPointStart = undefined;
@@ -1396,6 +1428,12 @@
             this.view.setAttribute('class', this.constructor.name + ' mobject-div');
             this.svg.setAttribute('class', 'mobject-svg');
             this.svg.style.overflow = 'visible';
+            this.setDefaults({
+                fillColor: Color.white(),
+                fillOpacity: 0.5,
+                strokeColor: Color.white(),
+                strokeWidth: 1,
+            });
             this.update(argsDict);
         }
         redrawSelf() {
@@ -1478,6 +1516,9 @@
                 for (let mob of this.children) {
                     yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y);
                 }
+            }
+            if (this.constructor.name == 'CreativeButton') {
+                console.log('yMax =', yMax);
             }
             return yMax;
         }
@@ -1592,10 +1633,15 @@
             });
             this.update(argsDict);
         }
-        // midPoint is a synonym for anchor
-        get midPoint() { return this.anchor; }
-        set midPoint(newValue) {
-            this.anchor = newValue; // updates automatically
+        get radius() { return this._radius; }
+        set radius(newValue) {
+            let dr = newValue - this.radius;
+            this.anchor.translateBy(-dr, -dr);
+            this._radius = newValue;
+            this.update({
+                viewWidth: 2 * newValue,
+                viewHeight: 2 * newValue
+            });
         }
         area() { return Math.PI * this.radius ** 2; }
         updateBezierPoints() {
@@ -1617,11 +1663,12 @@
                     newBezierPoints.push(rightControlPoint);
                 }
             }
-            this.bezierPoints = newBezierPoints;
+            let translatedBezierPoints = [];
+            for (let i = 0; i < newBezierPoints.length; i++) {
+                translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius));
+            }
+            this.bezierPoints = translatedBezierPoints;
             // do NOT update the view, because redraw calls updateBezierPoints
-        }
-        rightEdge() {
-            return new Vertex(this.radius, 0);
         }
     }
 

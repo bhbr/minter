@@ -2,11 +2,12 @@ import { LinkableMobject } from './linkables'
 import { Point, FreePoint, DrawnSegment, DrawnRay, DrawnLine, DrawnCircle, DrawnArrow } from './creating'
 import { Arrow, Segment, Ray, Line } from './arrows'
 import { Circle, TwoPointCircle } from './shapes'
-import { CreatedMobject } from './creating'
+import { CreatedMobject } from './creating'
 import { Vertex } from './vertex-transform'
-import { Color } from './color'
+import { Color } from './color'
+import { LocatedEvent, pointerEventVertex } from './helpers'
 
-export type ConstructedMobject = Arrow | TwoPointCircle
+export type ConstructedMobject = Arrow | TwoPointCircle
 
 
 export class IntersectionPoint extends Point {
@@ -138,12 +139,13 @@ export class Construction extends LinkableMobject {
 		this.points = []
 		this.constructedMobjects = []
 		this.passAlongEvents = true
+		this.interactive = true
 		super.update(argsDict)
 	}
 
 
 
-	integrate(mob: DrawnArrow | DrawnCircle) {
+	integrate(mob: DrawnArrow | DrawnCircle) {
 		let p1: Point = this.pointForVertex(mob.startPoint)
 		let p2: Point = this.pointForVertex(mob.endPoint)
 
@@ -213,10 +215,6 @@ export class Construction extends LinkableMobject {
 			}
 		}
 	}
-
-
-
-
 
 
 

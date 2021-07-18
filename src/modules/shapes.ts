@@ -8,7 +8,7 @@ import { gray, pointerEventVertex } from './helpers'
 
 export class Circle extends CurvedShape {
 
-	radius: number
+	_radius: number
 	
 	constructor(argsDict: object = {}) {
 		super()
@@ -19,10 +19,15 @@ export class Circle extends CurvedShape {
 		this.update(argsDict)
 	}
 
-	// midPoint is a synonym for anchor
-	get midPoint(): Vertex { return this.anchor }
-	set midPoint(newValue: Vertex) {
-		this.anchor = newValue // updates automatically
+	get radius(): number { return this._radius }
+	set radius(newValue: number) {
+		let dr: number = newValue - this.radius
+		this.anchor.translateBy(-dr, -dr)
+		this._radius = newValue
+		this.update({
+			viewWidth: 2 * newValue,
+			viewHeight: 2 * newValue
+		})
 	}
 
 	area(): number { return Math.PI * this.radius ** 2 }
@@ -44,13 +49,13 @@ export class Circle extends CurvedShape {
 			newBezierPoints.push(anchorPoint)
 			if (i != n) { newBezierPoints.push(rightControlPoint) }
 		}
-		this.bezierPoints = newBezierPoints
+		let translatedBezierPoints = []
+		for (let i = 0; i < newBezierPoints.length; i++) {
+			translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius))
+		}
+		this.bezierPoints = translatedBezierPoints
 
 		// do NOT update the view, because redraw calls updateBezierPoints
-	}
-
-	rightEdge(): Vertex {
-		return new Vertex(this.radius, 0)
 	}
 
 }
@@ -135,8 +140,8 @@ export class Rectangle extends Polygon {
 			this.p3.x = argsDict['width'] || this.width
 			this.p3.y = argsDict['height'] || this.height
 			this.p4.y = argsDict['height'] || this.height
-			this._width = argsDict['width'] || this.width
-			this._height = argsDict['height'] || this.height
+			this.viewWidth = argsDict['width'] || this.width
+			this.viewHeight = argsDict['height'] || this.height
 			super.update(argsDict, redraw)
 		} catch {}
 	}

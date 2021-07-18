@@ -1,0 +1,88 @@
+import { Mobject, TextLabel } from '../modules/mobject'
+import { Circle } from '../modules/shapes'
+import { paper } from '../paper'
+import { DEGREES } from '../modules/math'
+import { Vertex, Transform } from '../modules/vertex-transform'
+import { Color } from '../modules/color'
+import { WaveCindyCanvas } from '../modules/cindycanvas'
+
+export function MobjectTest() {
+
+	let f = new Mobject({
+		viewWidth: 200,
+		viewHeight: 200,
+		backgroundColor: Color.gray(0.25),
+		opacity: 0.5,
+		transform: new Transform({angle: 5 * DEGREES}),
+		anchor: new Vertex(100, 100),
+		drawBorder: true,
+		interactive: true
+	})
+	paper.add(f)
+
+	f.update({
+		anchor: new Vertex(200, 200)
+	})
+
+	f.redraw()
+
+	let c = new Circle({
+		midPoint: new Vertex(50, 150),
+		radius: 50,
+		fillColor: Color.orange(),
+		opacity: 1.0,
+		interactive: true
+	})
+	f.add(c)
+	f.enableDragging()
+
+	console.log(f)
+}
+
+export function CircleTest() {
+
+	let c = new Circle({
+		midPoint: new Vertex(100, 100),
+		radius: 50
+	})
+	paper.add(c)
+	c.redraw()
+}
+
+export function CindyTest() {
+
+	let cv = new WaveCindyCanvas({
+		points: [[0.4, 0.4], [0.3, 0.8]],
+		anchor: new Vertex(50, 50),
+		id: 'wave'
+	})
+
+	paper.add(cv)
+	cv.startUp()
+
+	let cv2 = new WaveCindyCanvas({
+		points: [[0.1, 0.9], [0.5, 0.4]],
+		anchor: new Vertex(200, 50),
+		id: 'newwave'
+	})
+
+	paper.add(cv2)
+	cv2.startUp()
+	cv2.enableDragging()
+	cv2.disableDragging()
+	
+}
+
+export function TextTest() {
+	let t = new TextLabel({
+		text: 'test',
+		horizontalAlign: 'center',
+		verticalAlign: 'bottom',
+		drawBorder: true,
+		color: Color.white()
+	})
+	paper.add(t)
+}
+
+
+

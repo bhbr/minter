@@ -79,7 +79,7 @@ export function removeLongPress(element: Element) {
 
 export type LocatedEvent = PointerEvent | MouseEvent | TouchEvent
 
-export function pointerEventPageLocation(e: LocatedEvent) {
+export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
 	let t: MouseEvent | Touch = null
 	let sidebarWidth: number = 0
 	try {
@@ -93,7 +93,7 @@ export function pointerEventPageLocation(e: LocatedEvent) {
 }
 
 
-export function pointerEventVertex(e: LocatedEvent) {
+export function pointerEventVertex(e: LocatedEvent): Vertex {
 	return new Vertex(pointerEventPageLocation(e))
 }
 

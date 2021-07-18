@@ -9,17 +9,15 @@ export class Mobject extends ExtendedObject {
 	// position and hierarchy
 	transform: Transform
 	_parent: Mobject
-	_width: number
-	_height: number
+	viewWidth: number
+	viewHeight: number
 	children: Array<Mobject>
 
 	// view and style
 	view?: HTMLDivElement
-	fillColor: Color
-	fillOpacity: number
-	strokeColor: Color
-	strokeWidth: number
 	visible: boolean
+	_opacity: number
+	_backgroundColor: Color
 	drawBorder: boolean
 
 	// dependency
@@ -27,6 +25,8 @@ export class Mobject extends ExtendedObject {
 
 	// interactivity
 	eventTarget?: Mobject
+	vetoOnStopPropagation: boolean
+	interactive: boolean
 	passAlongEvents: boolean // to event target
 	previousPassAlongEvents: boolean // stored copy while temporarily set to false when draggable
 	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
@@ -40,19 +40,18 @@ export class Mobject extends ExtendedObject {
 
 		this.setDefaults({
 			transform: Transform.identity(),
-			_width: 100,
-			_height: 100,
+			viewWidth: 100,
+			viewHeight: 100,
 			children: [],
 
-			fillColor: Color.white(),
-			fillOpacity: 1,
-			strokeColor: Color.white(),
-			strokeWidth: 1,
 			visible: true,
+			opacity: 1.0,
 			drawBorder: false,
 
 			dependencies: [],
 
+			interactive: false,
+			vetoOnStopPropagation: false,
 			passAlongEvents: true,
 			draggable: false
 		})
@@ -99,12 +98,18 @@ export class Mobject extends ExtendedObject {
 		this.anchor = newAnchor
 	}
 
-	centerAt(newCenter: Vertex, frame: Mobject) {
+	centerAt(newCenter: Vertex, frame?: Mobject) {
 		if (!frame) { frame = this }
-		let dr: Vertex = newCenter.subtract(this.anchor) // this.center(frame)
+		let dr: Vertex = newCenter.subtract(this.center(frame))
+		let oldAnchor: Vertex = this.anchor.copy()
 		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
+		if (this.constructor.name != 'TextLabel') { return }
+		console.log('old center:', this.center(frame))
+		console.log('new center:', newCenter)
+		console.log('translating anchor by', dr)
+		console.log('old anchor:', this.anchor)
+		console.log('new anchor:', this.anchor)
 	}
-
 
 
 	relativeTransform(frame?: Mobject): Transform {
@@ -133,9 +138,9 @@ export class Mobject extends ExtendedObject {
 	}
 
 	localXMin(): number { return 0 }
-	localXMax(): number { return this._width }
+	localXMax(): number { return this.viewWidth }
 	localYMin(): number { return 0 }
-	localYMax(): number { return this._height }
+	localYMax(): number { return this.viewHeight }
 
 	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
 	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
@@ -171,6 +176,11 @@ export class Mobject extends ExtendedObject {
 	}
 
 
+	get midPoint(): Vertex { return this.localCenter() }
+	set midPoint(newValue: Vertex) {
+		this.centerAt(newValue)
+	}
+
 
 
 
@@ -202,8 +212,19 @@ export class Mobject extends ExtendedObject {
 
 	// view and style
 
-	get opacity(): number { return this.fillOpacity }
-	set opacity(newValue: number) { this.fillOpacity = newValue }
+	get opacity(): number { return this._opacity }
+	set opacity(newValue: number) {
+		this._opacity = newValue
+		if (this.view) {
+			this.view.style.opacity = `${newValue}`
+		}
+	}
+
+	get backgroundColor(): Color { return this._backgroundColor }
+	set backgroundColor(newValue: Color) {
+		this._backgroundColor = newValue
+		this.view.style.backgroundColor = newValue.toHex()
+	}
 
 	setView(newView: HTMLDivElement) {
 		if (newView === this.view) { return }
@@ -229,10 +250,11 @@ export class Mobject extends ExtendedObject {
 
 	positionView() {
 		if (!this.view) { return }
+		console.log("positioning")
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		this.view.style['transform'] = this.transform.asString()
-		this.view.style['width'] = this._width.toString() + 'px'
-		this.view.style['height'] = this._height.toString() + 'px'
+		this.view.style['width'] = this.viewWidth.toString() + 'px'
+		this.view.style['height'] = this.viewHeight.toString() + 'px'
 		this.view.style['left'] = this.anchor.x.toString() + 'px'
 		this.view.style['top'] = this.anchor.y.toString() + 'px'
 	}
@@ -252,9 +274,7 @@ export class Mobject extends ExtendedObject {
 		submob.parent = undefined
 	}
 
-	redrawSelf() {
-		console.warn('please subclass redrawSelf')
-	}
+	redrawSelf() { }
 
 	redrawSubmobs() {
 		for (let submob of this.children || []) {
@@ -263,7 +283,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 	redraw(recursive = true) {
-		if (!this.visible || !this.parent) { return }
+		if (!this.visible || !this.parent) { return }
 		this.positionView()
 		this.redrawSelf()
 		if (recursive) { this.redrawSubmobs() }
@@ -402,7 +422,6 @@ export class Mobject extends ExtendedObject {
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
-
 	selfHandlePointerDown(e: LocatedEvent) { console.log('old') }
 	selfHandlePointerMove(e: LocatedEvent) { }
 	selfHandlePointerUp(e: LocatedEvent) { }
@@ -416,7 +435,6 @@ export class Mobject extends ExtendedObject {
 
 
 	enableDragging() {
-		console.log('enabling dragging')
 		this.previousPassAlongEvents = this.passAlongEvents
 		this.passAlongEvents = false
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -428,7 +446,6 @@ export class Mobject extends ExtendedObject {
 	}
 
 	disableDragging() {
-		console.log('disabling dragging')
 		this.passAlongEvents = this.previousPassAlongEvents
 		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
 		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
@@ -436,7 +453,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 	eventTargetMobject(e: LocatedEvent): Mobject {
-		let t: Element = e.target as Element
+		var t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement.parentElement }
 		if (t == this.view) {
 			return this
@@ -446,13 +463,13 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		//console.log(targetViewChain)
+		console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
-				//console.log(t, t['mobject'])
-				return t['mobject']
+				let r: Mobject = t['mobject']
+				return r
 			}
 			t = targetViewChain.pop()
 		}
@@ -461,39 +478,46 @@ export class Mobject extends ExtendedObject {
 	}
 
 	pointerDown(e: LocatedEvent) {
-		console.log('pointerDown on', this)
+		this.eventTarget = this.boundEventTargetMobject(e)
+		if (this.eventTarget.vetoOnStopPropagation) { return }
+
 		e.stopPropagation()
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
-		this.eventTarget = this.boundEventTargetMobject(e)
-		console.log('event target on ', this, 'is', this.eventTarget)
-		if (this.eventTarget != this && this.passAlongEvents) {
-			console.log('passing on')
+		//console.log('event target on ', this, 'is', this.eventTarget)
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+			//console.log('passing on')
 			this.eventTarget.pointerDown(e)
 		} else {
-			console.log('handling myself')
+			//console.log(`handling myself, and I am a ${this.constructor.name}`)
 			this.selfHandlePointerDown(e)
 		}
 	}
 
 	pointerMove(e: LocatedEvent) {
+		//console.log("event target:", this.eventTarget)
+		if (this.eventTarget.vetoOnStopPropagation) { return }
 		e.stopPropagation()
-		if (this.eventTarget != this && this.passAlongEvents) {
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+			//console.log("here?")
 			this.eventTarget.pointerMove(e)
 		} else {
+			//console.log("or here?")
 			this.selfHandlePointerMove(e)
 		}
 	}
 
 	pointerUp(e: LocatedEvent) {
+		if (this.eventTarget.vetoOnStopPropagation) { return }
+
 		e.stopPropagation()
 		removePointerMove(this.view, this.boundPointerMove)
 		removePointerUp(this.view, this.boundPointerUp)
 		addPointerDown(this.view, this.boundPointerDown)
 
-		if (this.eventTarget != this && this.passAlongEvents) {
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
 			this.eventTarget.pointerUp(e)
 		} else {
 			this.selfHandlePointerUp(e)
@@ -503,17 +527,17 @@ export class Mobject extends ExtendedObject {
 
 
 	startSelfDragging(e: LocatedEvent) {
-		console.log('start self-dragging')
 		this.dragPointStart = pointerEventVertex(e)
 		this.dragAnchorStart = this.anchor
 	}
 
 	selfDragging(e: LocatedEvent) {
-		console.log('self-dragging')
 		let dragPoint: Vertex = pointerEventVertex(e)
 		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
-		this.anchor = this.dragAnchorStart.add(dr)
-		this.update()
+		
+		this.update({
+			anchor: this.dragAnchorStart.add(dr)
+		}, true)
 	}
 
 	endSelfDragging(e: LocatedEvent) {
@@ -549,6 +573,11 @@ export class VMobject extends Mobject {
 	path: SVGElement // child of view
 	vertices: Array<Vertex>
 
+	fillColor: Color
+	fillOpacity: number
+	strokeColor: Color
+	strokeWidth: number
+
 	constructor(argsDict: object = {}) {
 		super()
 		this.vertices = []
@@ -562,6 +591,12 @@ export class VMobject extends Mobject {
 		this.svg.setAttribute('class', 'mobject-svg')
 		this.svg.style.overflow = 'visible'
 
+		this.setDefaults({
+			fillColor: Color.white(),
+			fillOpacity: 0.5,
+			strokeColor: Color.white(),
+			strokeWidth: 1,
+		})
 		this.update(argsDict)
 	}
 
@@ -643,6 +678,9 @@ export class VMobject extends Mobject {
 			for (let mob of this.children) {
 				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
 			}
+		}
+		if (this.constructor.name == 'CreativeButton') {
+			console.log('yMax =', yMax)
 		}
 		return yMax
 	}
@@ -763,51 +801,60 @@ export class CurvedShape extends VMobject {
 export class TextLabel extends Mobject {
 
 	text: string
-	textView: SVGTextElement
-	textAnchor: string
-	textAlign: string
-	color: Color
+	horizontalAlign: string // 'left' | 'center' | 'right'
+	verticalAlign: string // 'top' | 'center' | 'bottom'
+	color?: Color
 
 	constructor(argsDict: object = {}) {
 		super()
-		this.setAttributes({
-			text: '',
-			textAnchor: 'middle',
-			textAlign: 'center',
+		this.setDefaults({
+			text: 'text',
+			horizontalAlign: 'center',
+			verticalAlign: 'center',
 			color: Color.white()
 		})
-		this.view.setAttribute('class', this.constructor.name + ' unselectable')
-		this.view.setAttribute('x', '0')
-		this.view.setAttribute('y', '0')
-		this.textView = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-		this.textView['mobject'] = this
-		this.textView.setAttribute('alignment-baseline', 'middle')
-		this.textView.setAttribute('font-family', 'Helvetica')
-		this.textView.setAttribute('font-size', '12')
-		this.textView.setAttribute('stroke-width', '0')
+		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
+		this.view.style.display = 'flex'
+		this.view.style.fontFamily = 'Helvetica'
+		this.view.style.fontSize = '10px'
+
 		this.update(argsDict)
 	}
 
 	redrawSelf() {
 		if (this.anchor.isNaN()) { return }
 		if (this.color == undefined) { this.color = Color.white() }
-		if (this.textView) { this.textView.textContent = this.text }
-		if (this.view) {
-			//this.view.setAttribute('x', this.globalTransform().e.toString())
-			//this.view.setAttribute('y', this.globalTransform().f.toString())
-			this.view.setAttribute('x', this.anchor.toString())
-			this.view.setAttribute('y', this.anchor.toString())
-			this.view.setAttribute('fill', this.color.toHex())
-			this.view.setAttribute('stroke', this.color.toHex())
-		}
+
 	}
 
-	update(argsDict = {}, redraw = true) {
-		if (this.textView) {
-			this.textView.setAttribute('text-anchor', this.textAnchor)
-			this.textView.setAttribute('text-align', this.textAlign)
-		}
+	update(argsDict: object = {}, redraw = true) {
 		super.update(argsDict, redraw)
+		this.view.innerHTML = this.text
+		this.view.style.color = (this.color ?? Color.white()).toHex()
+		switch (this.verticalAlign) {
+		case 'top':
+			this.view.style.alignItems = 'flex-start'
+			break
+		case 'center':
+			this.view.style.alignItems = 'center'
+			break
+		case 'bottom':
+			console.log('here')
+			this.view.style.alignItems = 'flex-end'
+			break
+		}
+		switch (this.horizontalAlign) {
+		case 'left':
+			this.view.style.justifyContent = 'flex-start'
+			break
+		case 'center':
+			this.view.style.justifyContent = 'center'
+			break
+		case 'right':
+			this.view.style.justifyContent = 'flex-end'
+			break
+		}
+
 	}
 
 }

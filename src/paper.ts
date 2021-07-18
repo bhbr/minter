@@ -51,24 +51,25 @@ export class Paper extends LinkableMobject {
 		}
 		this.currentColor = this.colorPalette['white']
 		this.setDragging(false)
+		this.interactive = true
 		this.update(argsDict)
 		
 		
 		this.background = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,
-			width: this._width,
-			height: this._height,
-			_width: this._width,
-			_height: this._height,
+			width: this.viewWidth,
+			height: this.viewHeight,
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight,
 			passAlongEvents: true
 		})
 		this.add(this.background)
 		console.log(this.background)
 
 		this.construction.update({
-			_width: this._width,
-			_height: this._height
+			viewWidth: 0, //this.viewWidth,
+			viewHeight: 0 //this.viewHeight
 		})
 		this.add(this.construction)
 
@@ -110,8 +111,8 @@ export class Paper extends LinkableMobject {
 				let p: Vertex = pointerEventVertex(e)
 				let p1: boolean = (p.x > c.anchor.x)
 				let p2: boolean = (p.y > c.anchor.y)
-				let p3: boolean = (p.x < c.anchor.x + c._width)
-				let p4: boolean = (p.y < c.anchor.y + c._height)
+				let p3: boolean = (p.x < c.anchor.x + c.viewWidth)
+				let p4: boolean = (p.y < c.anchor.y + c.viewHeight)
 				if (p1 && p2 && p3 && p4) {
 					this.draggedMobject = c
 					break
@@ -159,7 +160,7 @@ export class Paper extends LinkableMobject {
 	handleMessage(message: object) {
 		if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
-		let value: string | boolean | number | Color = Object.values(message)[0]
+		let value: string | boolean | number | Color = Object.values(message)[0]
 		if (value == "true") { value = true }
 		if (value == "false") { value = false }
 
@@ -181,7 +182,7 @@ export class Paper extends LinkableMobject {
 			this.setDragging(value as boolean)
 			break
 		case 'toggleLinks':
-			if (value == 1 || value == '1') { this.showAllLinks() }
+			if (value == 1 || value == '1') { this.showAllLinks() }
 			else { this.hideAllLinks() }
 			break
 		}
@@ -198,6 +199,7 @@ export class Paper extends LinkableMobject {
 
 	startCreating(e: LocatedEvent) {
 		console.log('startCreating')
+		return
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.construction.points) {
@@ -224,6 +226,7 @@ export class Paper extends LinkableMobject {
 	}
 
 	creativeMove(e: LocatedEvent) {
+		return
 		let p: Vertex = pointerEventVertex(e)
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
@@ -239,6 +242,7 @@ export class Paper extends LinkableMobject {
 	}
 
 	endCreating(e: LocatedEvent) {
+		return
 		this.creationGroup.dissolveInto(this)
 		this.creationGroup = undefined
 	}
@@ -252,19 +256,14 @@ export class Paper extends LinkableMobject {
 		this.hideLinksOfSubmobs()
 	}
 
-
-	redraw() {
-		this.redrawSubmobs()
-	}
-
 }
 
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	anchor: new Vertex(200, 0), // this is a temporary workaround
 	passAlongEvents: true,
-	_width: 800,
-	_height: 600
+	viewWidth: 800,
+	viewHeight: 600
 })
 
 let c = new Circle({
@@ -283,8 +282,8 @@ let r = new Rectangle({
 	fillOpacity: 1,
 	width: 220,
 	height: 150,
-	_width: 220,
-	_height: 150,
+	viewWidth: 220,
+	viewHeight: 150,
 	passAlongEvents: true
 })
 

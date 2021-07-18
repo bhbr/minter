@@ -14,52 +14,23 @@ export class CindyCanvas extends LinkableMobject {
 
 	port: object
 	id: string
-	//canvas: HTMLCanvasElement
 	core: any
 	points: Array<Array<number>>
 	
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		console.log(this.id)
-		// this.paper = argsDict['paper']
-		// this.anchor = argsDict['anchor']
-		// this._width = argsDict['width']
-		// this._height = argsDict['height']
-
-		// this.frame = new Rectangle({
-		// 	anchor: this.anchor,
-		// 	width: this._width,
-		// 	height: this._height,
-		// 	strokeColor: Color.white(),
-		// 	strokeWidth: 1,
-		// 	fillOpacity: 0.5
-		// })
-		// this.add(this.frame)
-
-		// this.canvas = document.createElement('canvas')
-		// this.canvas.setAttribute('width', `100px`)
-		// this.canvas.setAttribute('height', `100px`)
-		// this.view.appendChild(this.canvas)
-
-		//this.paper.view.appendChild(this.csView)
-		//this.csView.style['position'] = 'absolute'
-		//this.paper.view.insertBefore(this.csView, this.paper.view)
-
-		//this.csView.style['left'] =  this.anchor.x + 'px'
-		//this.csView.style['top'] = this.anchor.y + 'px'
 
 		this.draggable = true
-		//this.view.style['pointer-events'] = 'auto'
-		
-		//this.paper.insertBefore(this.csView, document.querySelector('#paper-console'))
-		//document.head.appendChild(this.mainScript)
-
+		this.interactive = true
+		this.passAlongEvents = true
+		this.vetoOnStopPropagation = true
+		this.view.style['pointer-events'] = 'auto'
 		this.view.id = this.id
 
 		this.port = {
 			id: this.id,
-			width: this._width,
-			height: this._height,
+			width: this.viewWidth,
+			height: this.viewHeight,
 			transform: [{
 				visibleRect: [0, 1, 1, 0]
 			}]
@@ -67,16 +38,8 @@ export class CindyCanvas extends LinkableMobject {
 
 		this.points = []
 
-		//this.paper.add(this)
-		//this.update()
-		//this.update(argsDict)
-
 	}
 
-
-
-
-	//getPaper(): Paper { return this.paper }
 
 	initCode() {
 		return `resetclock();`
@@ -87,20 +50,18 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 
-	goLive() {
+	setup() {
 		let initScript = document.createElement('script')
 		initScript.setAttribute('type', 'text/x-cindyscript')
 		initScript.setAttribute('id', `${this.id}init`)
 		initScript.textContent = this.initCode()
 		document.body.appendChild(initScript)
-		console.log(initScript)
 
 		let drawScript = document.createElement('script')
 		drawScript.setAttribute('type', 'text/x-cindyscript')
 		drawScript.setAttribute('id', `${this.id}draw`)
 		drawScript.textContent = this.drawCode()
 		document.body.appendChild(drawScript)
-		console.log(drawScript, this.view)
 
 		//this.port['element'] = this.view
 
@@ -110,36 +71,48 @@ export class CindyCanvas extends LinkableMobject {
 			ports: [this.port],
 			geometry: this.geometry()
 		}
-		console.log('doc now:', document)
 		this.core = CindyJS.newInstance(argsDict)
-		document.addEventListener('DOMContentLoaded', function(e: Event) {
-			this.core.startup()
-			this.core.started = true
-			this.core.play()
-			setTimeout(function() { console.log(this.core) }.bind(this), 1000)
-		}.bind(this))
-		
+	}
+
+	startUp() {
+		if (document.readyState === 'complete') {
+			this.startNow()
+		} else {
+			document.addEventListener('DOMContentLoaded', function(e: Event) { this.startNow(); }.bind(this))
+		}
+	}
+
+	startNow() {
+		this.core.startup()
+		this.core.started = true
+		this.core.play()
+		setTimeout(function() { console.log('core:', this.core) }.bind(this), 1000)
 	}
 
 	geometry(): Array<any> { return [] }
-	
-	// update(argsDict: object, redraw = true) {
-	// 	super.update(argsDict, false)
-	// 	if (this.csView == undefined) { return }
-	// 	let parent = this.csView.parentElement
-	// 	if (parent.getAttribute('id').startsWith('CSCanvas')) {
-	// 		parent.style.left =  this.anchor.x + "px"
-	// 		parent.style.top = this.anchor.y + "px"
-	// 	}
-	// }
-	
-	//redraw() { }
 
 	localXMin(): number { return 0 }
-	localXMax(): number { return this._width }
+	localXMax(): number { return this.viewWidth }
 	localYMin(): number { return 0 }
-	localYMax(): number { return this._height }
+	localYMax(): number { return this.viewHeight }
 
+	canvas(): HTMLCanvasElement {
+		for (let child of this.view.children) {
+			if (child instanceof HTMLCanvasElement) {
+				return child
+			}
+		}
+	}
+
+	enableDragging() {
+		super.enableDragging()
+		this.vetoOnStopPropagation = false
+	}
+
+	disableDragging() {
+		super.disableDragging()
+		this.vetoOnStopPropagation = true
+	}
 }
 
 
@@ -151,19 +124,19 @@ export class WaveCindyCanvas extends CindyCanvas {
 	constructor(argsDict: object = {}) {
 		super(argsDict)
 		this.setDefaults({
-			//points: [[0.4, 0.4], [0.3, 0.8]],
 			wavelength: 1,
 			frequency: 0
 		})
 		this.inputNames = ['wavelength', 'frequency']
 
 		this.update(argsDict)
+		this.setup()
 	}
 
 	initCode(): string {
 		let l = 0.1*(this.wavelength || 1)
 		let f = 10*(this.frequency || 1)
-		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, (0.2, 0.4), ${l}, ${f}) + W(#, (0.6, 0.8), ${l}, ${f}),0)););` + super.initCode()
+		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););` + super.initCode()
 	}
 
 	drawCode(): string {
@@ -181,12 +154,12 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		let l: number = 0.1 * (this.wavelength || 1)
-		let f: number = 10 * (this.frequency || 1)
 		if (this.core != undefined && this.points.length > 0) {
-			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, (0.2, 0,4), ${l}, ${f}) + W(#, (0.6, 0.8), ${l}, ${f}),0)););`)
+			let l: number = 0.1 * (this.wavelength || 1)
+			let f: number = 10 * (this.frequency || 1)
+			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
 		}
-		super.update(argsDict, false)
+		super.update(argsDict, redraw)
 	}
 
 }
@@ -249,14 +222,16 @@ export class DrawnRectangle extends CreatedMobject {
 		let w: number = Math.abs(this.p3.x - this.p1.x)
 		let h: number = Math.abs(this.p3.y - this.p1.y)
 		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
-		let cindy = new WaveCindyCanvas({
-			paper: parent,
+
+		let cv = new WaveCindyCanvas({
 			anchor: topLeft,
-			width: w,
-			height: h,
-			wavelength: 0.1
-		}) // auto-adds to parent
-		cindy.update()
+			viewWidth: w,
+			viewHeight: h,
+			id: `wave-${w}x${h}`
+		})
+
+		parent.add(cv)
+		cv.startUp()
 	}
 
 	

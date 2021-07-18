@@ -26,15 +26,15 @@ export function ExtendedObjectTest() {
 	let eobj = new MyExtObject({
 		vertex: v,
 		transform: t,
-		array: arr
+		array: a
 	})
 
 	// testing which changes will stick to the original objects
 	eobj.vertex.x = 7 // shouldn't affect v
-	eobj.transform.scale = -1 // should affect t
-	eobj.array.push('c') // should affect array
+	eobj.transform.scale = -1 // shouldn't affect t
+	eobj.array.push('c') // should affect a
 
-	console.log(v, t, arr, eobj)
+	console.log(v, t, a, eobj)
 
 }
 

@@ -15,8 +15,8 @@ export class CreatedMobject extends MGroup {
 
 	constructor(argsDict: object = {}) {
 		super()
+		this.interactive = true
 		this.update(argsDict)
-
 	}
 	
 	dissolveInto(paper: Paper) {
@@ -34,7 +34,24 @@ export class CreatedMobject extends MGroup {
 
 }
 
-export class Freehand extends CreatedMobject {
+class DrawnMobject extends CreatedMobject {
+	penStrokeColor: Color
+	penStrokeWidth: number
+	penFillColor: Color
+	penFillOpacity: number
+
+	constructor(argsDict: object = {}) {
+		super(argsDict)
+		this.setDefaults({
+			penStrokeColor: Color.white(),
+			penStrokeWidth: 1.0,
+			penFillColor: Color.white(),
+			penFillOpacity: 0.0
+		})
+	}
+}
+
+export class Freehand extends DrawnMobject {
 
 	line: Polygon = new Polygon()
 
@@ -42,16 +59,14 @@ export class Freehand extends CreatedMobject {
 		super()
 		this.add(this.line)
 		this.setAttributes({
-			strokeColor: Color.white(),
-			fillOpacity: 0,
 			draggable: false
 		})
 		this.line.update({
 			closed: false,
-			strokeColor: this.strokeColor,
-			fillOpacity: this.fillOpacity
+			strokeColor: this.penStrokeColor,
+			opacity: 1.0
 		})
-		this.addDependency('strokeColor', this.line, 'strokeColor')
+		this.addDependency('penStrokeColor', this.line, 'strokeColor')
 		this.update(argsDict)
 	}
 	
@@ -69,7 +84,7 @@ export class Freehand extends CreatedMobject {
 			let y: number = p.y + step * unitVector.y + 0.5 * Math.random()
 			let newPoint: Vertex = new Vertex([x, y])
 			let c = new Circle({radius: 2})
-			c.fillColor = this.strokeColor
+			c.fillColor = this.penStrokeColor
 			c.midPoint = new Vertex(newPoint)
 			this.add(c)
 		}
@@ -101,8 +116,6 @@ export class Freehand extends CreatedMobject {
 
 export class Point extends Circle {
 
-	radius: number = 5
-
 	constructor(argsDict: object = {}) {
 		super()
 		this.view.setAttribute('class', this.constructor.name)
@@ -110,6 +123,7 @@ export class Point extends Circle {
 			midPoint: Vertex.origin()
 		})
 		this.setAttributes({
+			radius: 7.0,
 			fillColor: Color.white(),
 			fillOpacity: 1.0
 		})
@@ -122,14 +136,15 @@ export class FreePoint extends Point {
 	constructor(argsDict: object = {}) {
 		super()
 		this.setAttributes({
-			draggable: true
+			draggable: true,
+			interactive: true
 		})
 		this.update(argsDict)
 		this.enableDragging()
 	}
 }
 
-export class DrawnArrow extends CreatedMobject {
+export class DrawnArrow extends DrawnMobject {
 
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
@@ -144,10 +159,10 @@ export class DrawnArrow extends CreatedMobject {
 		this.endFreePoint = new FreePoint({
 			midPoint: this.endPoint
 		})
-		this.addDependency('strokeColor', this.startFreePoint, 'strokeColor')
-		this.addDependency('fillColor', this.startFreePoint, 'fillColor')
-		this.addDependency('strokeColor', this.endFreePoint, 'strokeColor')
-		this.addDependency('fillColor', this.endFreePoint, 'fillColor')
+		this.addDependency('penStrokeColor', this.startFreePoint, 'strokeColor')
+		this.addDependency('penFillColor', this.startFreePoint, 'fillColor')
+		this.addDependency('penStrokeColor', this.endFreePoint, 'strokeColor')
+		this.addDependency('penFillColor', this.endFreePoint, 'fillColor')
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
 		this.update(argsDict)
@@ -197,7 +212,7 @@ export class DrawnRay extends DrawnArrow {
 		})
 		this.startFreePoint.addDependency('midPoint', this.ray, 'startPoint')
 		this.endFreePoint.addDependency('midPoint', this.ray, 'endPoint')
-		this.addDependency('strokeColor', this.ray, 'strokeColor')
+		this.addDependency('penStrokeColor', this.ray, 'strokeColor')
 		this.add(this.ray)
 		this.update(argsDict)
 	}
@@ -218,15 +233,15 @@ export class DrawnLine extends DrawnArrow {
 		this.add(this.line)
 		this.startFreePoint.addDependency('midPoint', this.line, 'startPoint')
 		this.endFreePoint.addDependency('midPoint', this.line, 'endPoint')
-		this.addDependency('strokeColor', this.line, 'strokeColor')
+		this.addDependency('penStrokeColor', this.line, 'strokeColor')
 		this.update(argsDict)
 	}
 
 }
 
-export class DrawnCircle extends CreatedMobject {
+export class DrawnCircle extends DrawnMobject {
 
-	midPoint: Vertex
+	//midPoint: Vertex
 	outerPoint: Vertex
 	freeMidpoint: FreePoint
 	freeOuterPoint: FreePoint
@@ -245,13 +260,13 @@ export class DrawnCircle extends CreatedMobject {
 		this.passAlongEvents = true
 		this.freeMidpoint = new FreePoint({
 			midPoint: this.midPoint,
-			strokeColor: this.strokeColor,
-			fillColor: this.fillColor
+			strokeColor: this.penStrokeColor,
+			fillColor: this.penFillColor
 		})
 		this.freeOuterPoint = new FreePoint({
 			midPoint: this.outerPoint,
-			strokeColor: this.strokeColor,
-			fillColor: this.fillColor
+			strokeColor: this.penStrokeColor,
+			fillColor: this.penFillColor
 		})
 		this.circle = new TwoPointCircle({
 			midPoint: this.freeMidpoint.midPoint,

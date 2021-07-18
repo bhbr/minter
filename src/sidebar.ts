@@ -5,7 +5,7 @@ import { Mobject, MGroup, TextLabel } from './modules/mobject'
 import { Color } from './modules/color'
 import { Circle } from './modules/shapes'
 import { Segment } from './modules/arrows'
-import { Paper } from './paper'
+import { Paper } from './paper'
 
 let paper: Paper = null
 if (isTouchDevice === false) {
@@ -24,8 +24,8 @@ function buttonCenter(index: number): Vertex {
 
 
 
-const buttonXOffset: number = 50
-const buttonYOffset: number = 50
+const buttonXOffset: number = 25
+const buttonYOffset: number = 25
 const buttonSpacing: number = 12.5
 const buttonRadius: number = 25
 const buttonScaleFactor: number = 1.3
@@ -35,11 +35,12 @@ class Sidebar extends Mobject {
 	constructor(argsDict = {}) {
 		super()
 		this.setDefaults({
-			_width: 200,
-			_height: 600
+			viewWidth: 200,
+			viewHeight: 600
 		})
+		this.interactive = true
 		this.setView(document.querySelector('#sidebar'))
-		paper.view.style.left = this._width.toString() + "px"
+		paper.view.style.left = this.viewWidth.toString() + "px"
 		// we cannot just update paper with a new anchor
 		// bc it is not a VMobject
 		super.update(argsDict, false)
@@ -75,6 +76,8 @@ class SidebarButton extends Circle {
 
 	constructor(argsDict: object = {}) {
 		super()
+
+
 		this.setAttributes({
 			currentModeIndex: 0,
 			previousIndex: 0,
@@ -88,17 +91,22 @@ class SidebarButton extends Circle {
 			fontSize: 12,
 			messages: [],
 			radius: buttonRadius,
-			_width: buttonRadius,
-			_height: buttonRadius
+			viewWidth: 2 * buttonRadius,
+			viewHeight: 2 * buttonRadius,
+			interactive: true
 		})
+
+		this.label = new TextLabel({
+			viewWidth: 2 * this.radius,
+			viewHeight: 2 * this.radius
+		})
+		this.label.view.setAttribute('font-size', this.fontSize?.toString() ?? '12')
+		this.label.view.setAttribute('color', Color.white().toHex())
+		this.add(this.label)
+
 		this.update(argsDict, false)
 
 		this.updateModeIndex(0)
-		this.label = new TextLabel({text: this.text})
-		this.label.view.setAttribute('font-size', this.fontSize.toString())
-		this.label.view.setAttribute('color', Color.white().toHex())
-		this.label.anchor = Vertex.origin()
-		this.add(this.label)
 		this.update({}, false)
 
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
@@ -112,7 +120,11 @@ class SidebarButton extends Circle {
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
+		this.addDependency('midPoint', this.label, 'midPoint')
+
 		this.redraw()
+		console.log('localCenter:', this.localCenter())
+		console.log('midPoint:', this.label.midPoint)
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -134,6 +146,7 @@ class SidebarButton extends Circle {
 	}
 	
 	buttonDownByKey(e: KeyboardEvent) {
+		console.log('buttonDownByKey')
 		e.preventDefault()
 		e.stopPropagation()
 		document.addEventListener('keyup', this.boundButtonUpByKey)
@@ -147,12 +160,15 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
+		console.log('commonButtonDown')
 		if (this.active) { return }
-		this.active = true
-		this.radius = buttonRadius * buttonScaleFactor
-		this.previousIndex = this.currentModeIndex
 		this.messagePaper(this.messages[0])
-		this.update()
+		this.active = true
+		this.update({
+			//radius: buttonRadius * buttonScaleFactor,
+			transform: new Transform({scale: 1.2, anchor: this.localCenter()}),
+			previousIndex: this.currentModeIndex
+		})
 	}
 	
 	buttonDownByPointer(e: LocatedEvent) {
@@ -183,14 +199,16 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonUp() {
-		this.radius = buttonRadius
 		let dx: number = this.currentModeIndex * this.optionSpacing
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
-		this.midPoint.copyFrom(newMidpoint)
 
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
-		this.update()
+		this.update({
+			//radius: buttonRadius,
+			transform: new Transform({scale: 1.0, anchor: this.localCenter()}), // identity does not work, weirdly enough
+			midPoint: newMidpoint
+		})
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
 	}
@@ -205,8 +223,14 @@ class SidebarButton extends Circle {
 
 	updateLabel() {
 		if (this.label == undefined) { return }
+		this.label.update({
+			viewWidth: 2 * this.radius,
+			viewHeight: 2 * this.radius
+		})
+
 		let f = this.active ? buttonScaleFactor : 1
-		this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+		let fs = f * (this.fontSize ?? 12)
+		this.label.view?.setAttribute('font-size', fs.toString())
 		if (this.showLabel) {
 			try {
 				let msg = this.messages[this.currentModeIndex]
@@ -218,7 +242,7 @@ class SidebarButton extends Circle {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict,)
+		super.update(argsDict)
 		this.updateLabel()
 	}
 	
@@ -311,12 +335,6 @@ class ColorChangeButton extends SidebarButton {
 		return this.palette[this.colorNames[i]]
 	}
 
-	updateLabel() {
-		if (this.label == undefined) { return }
-		let f: number = this.active ? buttonScaleFactor : 1
-		this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
-	}
-
 	commonButtonDown() {
 		if (this.active) { return }
 		this.active = true
@@ -394,29 +412,14 @@ class ToggleButton extends SidebarButton {
 
 class DragButton extends ToggleButton {
 
-	label2: TextLabel
-
 	constructor(argsDict: object = {}) {
 		super()
 		this.label.text = '↕︎'
-		this.setAttributes({ fontSize: 25 })
+		this.setAttributes({ fontSize: 50 })
 		this.label.view.setAttribute('font-family', 'Times')
-		this.label2 = new TextLabel({text: this.text})
-		this.label2.view.setAttribute('font-family', 'Times')
-		this.label2.view.setAttribute('font-size', this.fontSize.toString())
-		this.label2.view.setAttribute('transform', 'rotate(90, 51, 237.5)')
-		this.label2.color = Color.white()
-		this.label2.anchor = new Vertex(0, 2)
-		this.add(this.label2)
 		this.update(argsDict)
 	}
 
-	updateLabel() {
-		super.updateLabel()
-		if (this.label2 == undefined) { return }
-		let f: number = this.active ? buttonScaleFactor : 1
-		this.label2.view.setAttribute('font-size', (f * this.fontSize).toString())
-	}
 }
 
 class LinkButton extends ToggleButton {
@@ -435,7 +438,6 @@ let lineButton = new CreativeButton({
 	locationIndex: 0
 })
 sidebar.add(lineButton)
-lineButton.redraw()
 
 let circleButton = new CreativeButton({
 	creations: ['circle'],
@@ -445,13 +447,13 @@ let circleButton = new CreativeButton({
 })
 sidebar.add(circleButton)
 
-let sliderButton = new CreativeButton({
-	creations: ['slider'],
-	key: 'e',
-	baseColor: Color.gray(0.6),
-	locationIndex: 2
-})
-sidebar.add(sliderButton)
+// let sliderButton = new CreativeButton({
+// 	creations: ['slider'],
+// 	key: 'e',
+// 	baseColor: Color.gray(0.6),
+// 	locationIndex: 2
+// })
+// sidebar.add(sliderButton)
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
@@ -461,42 +463,41 @@ let cindyButton = new CreativeButton({
 })
 sidebar.add(cindyButton)
   
-let pendulumButton = new CreativeButton({
-	creations: ['pendulum'],
-	key: 't',
-	baseColor: Color.gray(0.4),
-	locationIndex: 4
-})
-sidebar.add(pendulumButton)
+// let pendulumButton = new CreativeButton({
+// 	creations: ['pendulum'],
+// 	key: 't',
+// 	baseColor: Color.gray(0.4),
+// 	locationIndex: 4
+// })
+// sidebar.add(pendulumButton)
   
-let dragButton = new DragButton({
-	messages: [{drag: true}],
-	outgoingMessage: {drag: false},
-	key: 'a',
-	baseColor: Color.gray(0.6),
-	locationIndex: 5
-})
-dragButton.label.view.setAttribute('fill', 'black')
-dragButton.label2.view.setAttribute('fill', 'black')
-sidebar.add(dragButton)
+// let dragButton = new DragButton({
+// 	messages: [{drag: true}],
+// 	outgoingMessage: {drag: false},
+// 	key: 'a',
+// 	baseColor: Color.gray(0.6),
+// 	locationIndex: 5
+// })
+// dragButton.label.view.setAttribute('fill', 'black')
+// sidebar.add(dragButton)
 
-let linkButton = new LinkButton({
-	messages: [{toggleLinks: true}],
-	outgoingMessage: {toggleLinks: false},
-	key: 's',
-	baseColor: Color.gray(0.2),
-	locationIndex: 6
-})
-sidebar.add(linkButton)
+// let linkButton = new LinkButton({
+// 	messages: [{toggleLinks: true}],
+// 	outgoingMessage: {toggleLinks: false},
+// 	key: 's',
+// 	baseColor: Color.gray(0.2),
+// 	locationIndex: 6
+// })
+// sidebar.add(linkButton)
 
-let colorButton = new ColorChangeButton({
-	key: 'd',
-	baseColor: Color.white(),
-	modeSpacing: 15,
-	locationIndex: 7,
-	fillOpacity: 1
-})
-sidebar.add(colorButton)
+// let colorButton = new ColorChangeButton({
+// 	key: 'd',
+// 	baseColor: Color.white(),
+// 	modeSpacing: 15,
+// 	locationIndex: 7,
+// 	fillOpacity: 1
+// })
+// sidebar.add(colorButton)
 
 
 

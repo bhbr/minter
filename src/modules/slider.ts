@@ -45,7 +45,7 @@ export class BoxSlider extends LinkableMobject {
 			height: this.height,
 			fillColor: Color.black(),
 			fillOpacity: 1,
-			strokeColor: this.strokeColor
+			strokeColor: Color.white()
 		})
 		this.add(this.outerBar)
 
