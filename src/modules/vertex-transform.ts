@@ -123,7 +123,6 @@ export class Vertex extends Array {
 
 export class Transform extends ExtendedObject {
 
-	passedByValue: boolean
 	anchor: Vertex
 	angle: number
 	scale: number
@@ -147,10 +146,10 @@ export class Transform extends ExtendedObject {
 	det(): number { return this.scale ** 2 }
 
 	asString(): string {
-		let str1: string = this.anchor.isZero() ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px)`
+		let str1: string = `` // this.anchor.isZero() ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px)`
 		let str2: string = this.scale == 1 ? `` : `scale(${this.scale})`
 		let str3: string = this.angle == 0 ? `` : `rotate(${this.angle/DEGREES}deg)`
-		let str4: string = this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`
+		let str4: string = `` // this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`
 		let str5: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
 		
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `)
@@ -183,14 +182,13 @@ export class Transform extends ExtendedObject {
 	copyFrom(t: Transform) { this.setAttributes(t) }
 
 	rightComposedWith(t: Transform): Transform {
-		let v: Vertex = t.shift.subtract(this.anchor)
-		let sx: number = this.scale * (Math.cos(this.angle) * v.x - Math.sin(this.angle) * v.y) + this.shift.x
-		let sy: number = this.scale * (Math.sin(this.angle) * v.x + Math.cos(this.angle) * v.y) + this.shift.y
+		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)
+		let w: Vertex = this.shift.add(this.anchor).subtract(t.anchor)
 		return new Transform({
 			anchor: t.anchor,
 			scale: this.scale * t.scale,
 			angle: this.angle + t.angle,
-			shift: new Vertex(sx, sy)
+			shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
 		})
 	}
 

@@ -199,10 +199,10 @@
         static identity() { return new Transform(); }
         det() { return this.scale ** 2; }
         asString() {
-            let str1 = this.anchor.isZero() ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px)`;
+            let str1 = ``; // this.anchor.isZero() ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px)`
             let str2 = this.scale == 1 ? `` : `scale(${this.scale})`;
             let str3 = this.angle == 0 ? `` : `rotate(${this.angle / DEGREES}deg)`;
-            let str4 = this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`;
+            let str4 = ``; // this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`
             let str5 = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`;
             return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `);
         }
@@ -225,14 +225,13 @@
         copy() { return Object.assign({}, this); }
         copyFrom(t) { this.setAttributes(t); }
         rightComposedWith(t) {
-            let v = t.shift.subtract(this.anchor);
-            let sx = this.scale * (Math.cos(this.angle) * v.x - Math.sin(this.angle) * v.y) + this.shift.x;
-            let sy = this.scale * (Math.sin(this.angle) * v.x + Math.cos(this.angle) * v.y) + this.shift.y;
+            let v = t.shift.add(t.anchor).subtract(this.anchor);
+            let w = this.shift.add(this.anchor).subtract(t.anchor);
             return new Transform({
                 anchor: t.anchor,
                 scale: this.scale * t.scale,
                 angle: this.angle + t.angle,
-                shift: new Vertex(sx, sy)
+                shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
             });
         }
         rightComposeWith(t) {
@@ -999,8 +998,7 @@
         }
         // position and hierarchy
         get anchor() {
-            var _a;
-            return (_a = this.transform) === null || _a === void 0 ? void 0 : _a.anchor;
+            return this.transform.anchor;
         }
         set anchor(newValue) {
             if (!this.transform) {
@@ -1008,82 +1006,93 @@
             }
             this.transform.anchor = newValue;
         }
-        moveAnchorTo(newAnchor) {
-            this.anchor = newAnchor;
-        }
         centerAt(newCenter, frame) {
-            if (!frame) {
-                frame = this;
-            }
+            // If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+            frame = frame || this.parent || this;
             let dr = newCenter.subtract(this.center(frame));
             let oldAnchor = this.anchor.copy();
             this.anchor = this.anchor.translatedBy(dr[0], dr[1]);
-            if (this.constructor.name != 'TextLabel') {
-                return;
-            }
-            console.log('old center:', this.center(frame));
-            console.log('new center:', newCenter);
-            console.log('translating anchor by', dr);
-            console.log('old anchor:', this.anchor);
-            console.log('new anchor:', this.anchor);
         }
         relativeTransform(frame) {
+            // If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+            frame = frame || this.parent || this;
             let t = Transform.identity();
-            if (this.constructor.name == 'CindyCanvas') {
-                if (frame == this) {
-                    return t;
-                }
-                else if (frame.constructor.name == 'Paper') {
-                    t.shift = this.anchor;
-                    return t;
-                }
-                else {
-                    throw 'Cannot compute property of CindyCanvas for this frame';
-                }
-            }
             let mob = this;
             while (mob && mob.transform instanceof Transform) {
                 if (mob == frame) {
                     break;
                 }
+                t.leftComposeWith(new Transform({ shift: mob.anchor }));
                 t.leftComposeWith(mob.transform);
                 mob = mob.parent;
             }
             return t;
         }
-        globalTransform() {
-            return this.relativeTransform();
+        transformLocalPoint(point, frame) {
+            let t = this.relativeTransform(frame);
+            return t.appliedTo(point);
         }
-        localXMin() { return 0; }
-        localXMax() { return this.viewWidth; }
-        localYMin() { return 0; }
-        localYMax() { return this.viewHeight; }
-        localULCorner() { return new Vertex(this.localXMin(), this.localYMin()); }
-        localURCorner() { return new Vertex(this.localXMax(), this.localYMin()); }
-        localLLCorner() { return new Vertex(this.localXMin(), this.localYMax()); }
-        localLRCorner() { return new Vertex(this.localXMax(), this.localYMax()); }
-        localMidX() { return (this.localXMin() + this.localXMax()) / 2; }
-        localMidY() { return (this.localYMin() + this.localYMax()) / 2; }
-        localLeftCenter() { return new Vertex(this.localXMin(), this.localMidY()); }
-        localRightCenter() { return new Vertex(this.localXMax(), this.localMidY()); }
-        localTopCenter() { return new Vertex(this.localMidX(), this.localYMin()); }
-        localBottomCenter() { return new Vertex(this.localMidX(), this.localYMax()); }
-        localCenter() {
-            return new Vertex(this.localMidX(), this.localMidY());
+        // The following geometric properties are first computed from the view frame.
+        // The versions without "view" in the name can be overriden by subclasses,
+        // e. g. SVGMobjects.
+        viewULCorner(frame) {
+            return this.transformLocalPoint(Vertex.origin(), frame);
         }
-        center(frame) {
-            return this.relativeTransform(frame).appliedTo(this.localCenter());
+        viewURCorner(frame) {
+            return this.transformLocalPoint(new Vertex(this.viewWidth, 0), frame);
         }
-        topCenter(frame) {
-            return this.relativeTransform(frame).appliedTo(this.localTopCenter());
+        viewLLCorner(frame) {
+            return this.transformLocalPoint(new Vertex(0, this.viewHeight), frame);
         }
-        bottomCenter(frame) {
-            return this.relativeTransform(frame).appliedTo(this.localBottomCenter());
+        viewLRCorner(frame) {
+            return this.transformLocalPoint(new Vertex(this.viewWidth, this.viewHeight), frame);
         }
-        globalCenter() {
-            return this.globalTransform().appliedTo(this.localCenter());
+        viewXMin(frame) { return this.viewULCorner(frame).x; }
+        viewXMax(frame) { return this.viewLRCorner(frame).x; }
+        viewYMin(frame) { return this.viewULCorner(frame).y; }
+        viewYMax(frame) { return this.viewLRCorner(frame).y; }
+        viewCenter(frame) {
+            return this.transformLocalPoint(new Vertex(this.viewWidth / 2, this.viewHeight / 2), frame);
         }
-        get midPoint() { return this.localCenter(); }
+        viewMidX(frame) { return this.viewCenter(frame).x; }
+        viewMidY(frame) { return this.viewCenter(frame).y; }
+        viewLeftCenter(frame) { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)); }
+        viewRightCenter(frame) { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)); }
+        viewTopCenter(frame) { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)); }
+        viewBottomCenter(frame) { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)); }
+        // Equivalent (by default) versions without "view" in the name
+        ulCorner(frame) { return this.viewULCorner(frame); }
+        urCorner(frame) { return this.viewURCorner(frame); }
+        llCorner(frame) { return this.viewLLCorner(frame); }
+        lrCorner(frame) { return this.viewLRCorner(frame); }
+        xMin(frame) { return this.viewXMin(frame); }
+        xMax(frame) { return this.viewXMax(frame); }
+        yMin(frame) { return this.viewYMin(frame); }
+        yMax(frame) { return this.viewYMax(frame); }
+        center(frame) { return this.viewCenter(frame); }
+        midX(frame) { return this.viewMidX(frame); }
+        midY(frame) { return this.viewMidY(frame); }
+        leftCenter(frame) { return this.viewLeftCenter(frame); }
+        rightCenter(frame) { return this.viewRightCenter(frame); }
+        topCenter(frame) { return this.viewTopCenter(frame); }
+        bottomCenter(frame) { return this.viewBottomCenter(frame); }
+        // Local versions (relative to own coordinate system)
+        localULCorner() { return this.ulCorner(this); }
+        localURCorner() { return this.urCorner(this); }
+        localLLCorner() { return this.llCorner(this); }
+        localLRCorner() { return this.lrCorner(this); }
+        localXMin() { return this.xMin(this); }
+        localXMax() { return this.xMax(this); }
+        localYMin() { return this.yMin(this); }
+        localYMax() { return this.yMax(this); }
+        localCenter() { return this.center(this); }
+        localMidX() { return this.midX(this); }
+        localMidY() { return this.midY(this); }
+        localLeftCenter() { return this.leftCenter(this); }
+        localRightCenter() { return this.rightCenter(this); }
+        localTopCenter() { return this.topCenter(this); }
+        localBottomCenter() { return this.bottomCenter(this); }
+        get midPoint() { return this.center(); }
         set midPoint(newValue) {
             this.centerAt(newValue);
         }
@@ -1151,7 +1160,6 @@
             if (!this.view) {
                 return;
             }
-            console.log("positioning");
             this.view.style.border = this.drawBorder ? '1px dashed green' : 'none';
             this.view.style['transform'] = this.transform.asString();
             this.view.style['width'] = this.viewWidth.toString() + 'px';
@@ -1271,7 +1279,6 @@
                 delete argsDict['view'];
             }
             this.setAttributes(argsDict);
-            this.transform.anchor = this.anchor;
             this.updateSubmobs();
             for (let dep of this.dependencies || []) {
                 let outputName = this[dep.outputName]; // may be undefined
@@ -1430,7 +1437,7 @@
             this.svg.style.overflow = 'visible';
             this.setDefaults({
                 fillColor: Color.white(),
-                fillOpacity: 0.5,
+                fillOpacity: 0,
                 strokeColor: Color.white(),
                 strokeWidth: 1,
             });
@@ -1516,9 +1523,6 @@
                 for (let mob of this.children) {
                     yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y);
                 }
-            }
-            if (this.constructor.name == 'CreativeButton') {
-                console.log('yMax =', yMax);
             }
             return yMax;
         }
@@ -1628,20 +1632,24 @@
         constructor(argsDict = {}) {
             super();
             this.setDefaults({
-                radius: 10,
-                midPoint: Vertex.origin()
+                radius: 10
             });
             this.update(argsDict);
         }
         get radius() { return this._radius; }
         set radius(newValue) {
-            let dr = newValue - this.radius;
-            this.anchor.translateBy(-dr, -dr);
+            if (this.parent) {
+                this.anchor.copyFrom(this.midPoint.translatedBy(-newValue, -newValue));
+            }
             this._radius = newValue;
             this.update({
                 viewWidth: 2 * newValue,
                 viewHeight: 2 * newValue
             });
+        }
+        get midPoint() { return this.anchor.translatedBy(this.radius, this.radius); }
+        set midPoint(newValue) {
+            this.anchor.copyFrom(newValue.translatedBy(-this.radius, -this.radius));
         }
         area() { return Math.PI * this.radius ** 2; }
         updateBezierPoints() {

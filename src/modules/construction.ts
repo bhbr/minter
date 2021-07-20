@@ -21,19 +21,20 @@ export class IntersectionPoint extends Point {
 
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		this.anchor.x = NaN
-		this.anchor.y = NaN
 		this.update(argsDict)
+		this.update({
+			midPoint: new Vertex(NaN, NaN)
+		})
 	}
 
 	update(argsDict: object = {}, redraw : boolean = true) {
-		let anchor: Vertex = this.intersectionCoords()
-		if (anchor.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
+		let mp: Vertex = this.intersectionCoords()
+		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
-			if (!this.anchor.equals(anchor)) {
-				super.update({anchor: anchor})
+			if (!this.midPoint.equals(mp)) {
+				super.update({midPoint: mp})
 			}
 		}
 		super.update(argsDict, redraw)
@@ -67,7 +68,7 @@ export class IntersectionPoint extends Point {
 		this.lambda = (-b + (index == 0 ? -1 : 1) * d**0.5)/(2*a)
 		let P: Vertex = A.add(B.subtract(A).multiply(this.lambda))
 		if (arrow.constructor.name == 'Segment') {
-			if (this.lambda < 0 || this.lambda > 1) { P = new Vertex(NaN, NaN) }
+			if (this.lambda < 0 || this.lambda > 1) { P = new Vertex(NaN, NaN) }
 		} else if (arrow.constructor.name == 'Ray') {
 			if (this.lambda < 0) { P = new Vertex(NaN, NaN) }
 		}
@@ -178,7 +179,7 @@ export class Construction extends LinkableMobject {
 		for (let p of this.points) {
 			if (p.midPoint.equals(v)) { return p }
 		}
-		let p: FreePoint = new FreePoint({anchor: v})
+		let p: FreePoint = new FreePoint({midPoint: v})
 		this.addPoint(p)
 		return p
 	}

@@ -65,7 +65,6 @@ export class Paper extends LinkableMobject {
 			passAlongEvents: true
 		})
 		this.add(this.background)
-		console.log(this.background)
 
 		this.construction.update({
 			viewWidth: 0, //this.viewWidth,
@@ -199,7 +198,6 @@ export class Paper extends LinkableMobject {
 
 	startCreating(e: LocatedEvent) {
 		console.log('startCreating')
-		return
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.construction.points) {
@@ -210,23 +208,20 @@ export class Paper extends LinkableMobject {
 		}
 
 		this.creationGroup = new CreationGroup({
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight,
 			startPoint: this.creationStartPoint,
 			visibleCreation: this.visibleCreation,
 			drawFreehand: drawFreehand,
-			strokeColor: this.currentColor,
-			fillColor: this.currentColor
+			strokeColor: this.currentColor
 		})
 		
-		this.addDependency('currentColor',
-			this.creationGroup, 'strokeColor')
-		this.addDependency('currentColor',
-			this.creationGroup, 'fillColor')
+		this.addDependency('currentColor', this.creationGroup, 'strokeColor')
 		this.add(this.creationGroup)
 		this.changeVisibleCreation(this.visibleCreation)
 	}
 
 	creativeMove(e: LocatedEvent) {
-		return
 		let p: Vertex = pointerEventVertex(e)
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
@@ -242,7 +237,6 @@ export class Paper extends LinkableMobject {
 	}
 
 	endCreating(e: LocatedEvent) {
-		return
 		this.creationGroup.dissolveInto(this)
 		this.creationGroup = undefined
 	}

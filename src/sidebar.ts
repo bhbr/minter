@@ -123,8 +123,6 @@ class SidebarButton extends Circle {
 		this.addDependency('midPoint', this.label, 'midPoint')
 
 		this.redraw()
-		console.log('localCenter:', this.localCenter())
-		console.log('midPoint:', this.label.midPoint)
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -146,7 +144,6 @@ class SidebarButton extends Circle {
 	}
 	
 	buttonDownByKey(e: KeyboardEvent) {
-		console.log('buttonDownByKey')
 		e.preventDefault()
 		e.stopPropagation()
 		document.addEventListener('keyup', this.boundButtonUpByKey)
@@ -160,7 +157,6 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
-		console.log('commonButtonDown')
 		if (this.active) { return }
 		this.messagePaper(this.messages[0])
 		this.active = true

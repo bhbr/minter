@@ -9,12 +9,16 @@ import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
 
-	startPoint: Vertex = Vertex.origin()
-	endPoint: Vertex = Vertex.origin()
+	startPoint: Vertex
+	endPoint: Vertex
 	visible: boolean = true
 
 	constructor(argsDict: object = {}) {
 		super()
+		this.setDefaults({
+			startPoint: Vertex.origin(),
+			endPoint: Vertex.origin()
+		})
 		this.interactive = true
 		this.update(argsDict)
 	}
@@ -25,7 +29,7 @@ export class CreatedMobject extends MGroup {
 		for (let submob of this.children) {
 			paper.add(submob)
 		}
-		paperLog('dissolving CreatedMobject')
+		console.log('dissolving CreatedMobject')
 	}
 
 	updateFromTip(q: Vertex) {
@@ -35,6 +39,7 @@ export class CreatedMobject extends MGroup {
 }
 
 class DrawnMobject extends CreatedMobject {
+
 	penStrokeColor: Color
 	penStrokeWidth: number
 	penFillColor: Color
@@ -119,9 +124,9 @@ export class Point extends Circle {
 	constructor(argsDict: object = {}) {
 		super()
 		this.view.setAttribute('class', this.constructor.name)
-		this.setDefaults({
-			midPoint: Vertex.origin()
-		})
+		if (!this.midPoint || this.midPoint.isNaN()) {
+			this.update({ midPoint: Vertex.origin() })
+		}
 		this.setAttributes({
 			radius: 7.0,
 			fillColor: Color.white(),
@@ -151,26 +156,26 @@ export class DrawnArrow extends DrawnMobject {
 
 	constructor(argsDict: object = {}) {
 		super(argsDict)
-		this.endPoint = this.endPoint || this.startPoint.copy()
+		this.endPoint = this.startPoint.copy()
 		this.passAlongEvents = true
-		this.startFreePoint = new FreePoint({
-			midPoint: this.startPoint
-		})
-		this.endFreePoint = new FreePoint({
-			midPoint: this.endPoint
-		})
+		this.startFreePoint = new FreePoint()
+		this.endFreePoint = new FreePoint()
 		this.addDependency('penStrokeColor', this.startFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.startFreePoint, 'fillColor')
 		this.addDependency('penStrokeColor', this.endFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.endFreePoint, 'fillColor')
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
+		this.addDependency('startPoint', this.startFreePoint, 'midPoint')
+		this.addDependency('endPoint', this.endFreePoint, 'midPoint')
+		this.startFreePoint.update({ midPoint: this.startPoint })
+		this.endFreePoint.update({ midPoint: this.endPoint })
+		console.log('end point:', this.endPoint)
 		this.update(argsDict)
 	}
 
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
-		this.endFreePoint.midPoint.copyFrom(q)
 		this.update()
 	}
 
@@ -194,7 +199,7 @@ export class DrawnSegment extends DrawnArrow {
 		this.add(this.segment)
 		this.startFreePoint.addDependency('midPoint', this.segment, 'startPoint')
 		this.endFreePoint.addDependency('midPoint', this.segment, 'endPoint')
-		this.addDependency('strokeColor', this.segment, 'strokeColor')
+		this.addDependency('penStrokeColor', this.segment, 'strokeColor')
 		this.update(argsDict)
 	}
 
@@ -241,7 +246,6 @@ export class DrawnLine extends DrawnArrow {
 
 export class DrawnCircle extends DrawnMobject {
 
-	//midPoint: Vertex
 	outerPoint: Vertex
 	freeMidpoint: FreePoint
 	freeOuterPoint: FreePoint
@@ -277,11 +281,11 @@ export class DrawnCircle extends DrawnMobject {
 		this.add(this.freeOuterPoint)
 		this.add(this.circle)
 
-		this.addDependency('strokeColor', this.freeMidpoint, 'strokeColor')
-		this.addDependency('fillColor', this.freeMidpoint, 'fillColor')
-		this.addDependency('strokeColor', this.freeOuterPoint, 'strokeColor')
-		this.addDependency('fillColor', this.freeOuterPoint, 'fillColor')
-		this.addDependency('strokeColor', this.circle, 'strokeColor')
+		this.addDependency('penStrokeColor', this.freeMidpoint, 'strokeColor')
+		this.addDependency('penFillColor', this.freeMidpoint, 'fillColor')
+		this.addDependency('penStrokeColor', this.freeOuterPoint, 'strokeColor')
+		this.addDependency('penFillColor', this.freeOuterPoint, 'fillColor')
+		this.addDependency('penStrokeColor', this.circle, 'strokeColor')
 		this.update(argsDict)
 
 	}

@@ -5,6 +5,19 @@ import { DEGREES } from '../modules/math'
 import { Vertex, Transform } from '../modules/vertex-transform'
 import { Color } from '../modules/color'
 import { WaveCindyCanvas } from '../modules/cindycanvas'
+import { Point, FreePoint } from '../modules/creating'
+
+export function TransformTest() {
+	console.log("creating new circle")
+	let c = new Circle({
+		midPoint: new Vertex(300, 50)
+	})
+	paper.add(c)
+	c.update({
+		midPoint: new Vertex(100, 20)
+	})
+
+}
 
 export function MobjectTest() {
 
@@ -83,6 +96,24 @@ export function TextTest() {
 	})
 	paper.add(t)
 }
+
+export function FreePointTest() {
+
+	let p = new Point()
+	console.log('p:', p.anchor)
+	paper.add(p)
+	p.update({ midPoint: Vertex.origin() })
+
+}
+
+
+
+
+
+
+
+
+
 
 
 

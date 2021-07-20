@@ -84,7 +84,7 @@ export class Mobject extends ExtendedObject {
 	// position and hierarchy
 
 	get anchor(): Vertex {
-		return this.transform?.anchor
+		return this.transform.anchor
 	}
 
 	set anchor(newValue: Vertex) {
@@ -94,92 +94,121 @@ export class Mobject extends ExtendedObject {
 		this.transform.anchor = newValue
 	}
 
-	moveAnchorTo(newAnchor: Vertex) {
-		this.anchor = newAnchor
-	}
-
 	centerAt(newCenter: Vertex, frame?: Mobject) {
-		if (!frame) { frame = this }
+		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+		frame = frame || this.parent || this
 		let dr: Vertex = newCenter.subtract(this.center(frame))
 		let oldAnchor: Vertex = this.anchor.copy()
 		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
-		if (this.constructor.name != 'TextLabel') { return }
-		console.log('old center:', this.center(frame))
-		console.log('new center:', newCenter)
-		console.log('translating anchor by', dr)
-		console.log('old anchor:', this.anchor)
-		console.log('new anchor:', this.anchor)
 	}
 
 
 	relativeTransform(frame?: Mobject): Transform {
+		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+		frame = frame || this.parent || this
 		let t = Transform.identity()
-		if (this.constructor.name == 'CindyCanvas') {
-			if (frame == this) {
-				return t
-			} else if (frame.constructor.name == 'Paper') {
-				t.shift = this.anchor
-				return t
-			} else {
-				throw 'Cannot compute property of CindyCanvas for this frame'
-			}
-		}
 		let mob: Mobject = this
 		while (mob && mob.transform instanceof Transform) {
 			if (mob == frame) { break }
+			t.leftComposeWith(new Transform({ shift: mob.anchor }))
 			t.leftComposeWith(mob.transform)
 			mob = mob.parent
 		}
 		return t
 	}
 
-	globalTransform(): Transform {
-		return this.relativeTransform()
+	transformLocalPoint(point: Vertex, frame?: Mobject): Vertex {
+		let t = this.relativeTransform(frame)
+		return t.appliedTo(point)
+
 	}
 
-	localXMin(): number { return 0 }
-	localXMax(): number { return this.viewWidth }
-	localYMin(): number { return 0 }
-	localYMax(): number { return this.viewHeight }
+	// The following geometric properties are first computed from the view frame.
+	// The versions without "view" in the name can be overriden by subclasses,
+	// e. g. SVGMobjects.
 
-	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
-	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
-	localLLCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMax()) }
-	localLRCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMax()) }
-
-	localMidX(): number { return (this.localXMin() + this.localXMax())/2 }
-	localMidY(): number { return (this.localYMin() + this.localYMax())/2 }
-
-	localLeftCenter(): Vertex { return new Vertex(this.localXMin(), this.localMidY()) }
-	localRightCenter(): Vertex { return new Vertex(this.localXMax(), this.localMidY()) }
-	localTopCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMin()) }
-	localBottomCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMax()) }
-
-	localCenter(): Vertex {
-		return new Vertex(this.localMidX(), this.localMidY())
+	viewULCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(Vertex.origin(), frame)
 	}
 
-	center(frame: Mobject): Vertex {
-		return this.relativeTransform(frame).appliedTo(this.localCenter())
+	viewURCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth, 0), frame)
 	}
 
-	topCenter(frame: Mobject): Vertex {
-		return this.relativeTransform(frame).appliedTo(this.localTopCenter())
+	viewLLCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(0, this.viewHeight), frame)
 	}
 
-	bottomCenter(frame: Mobject): Vertex {
-		return this.relativeTransform(frame).appliedTo(this.localBottomCenter())
+	viewLRCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth, this.viewHeight), frame)
 	}
 
-	globalCenter(): Vertex {
-		return this.globalTransform().appliedTo(this.localCenter())
+	viewXMin(frame?: Mobject): number { return this.viewULCorner(frame).x }
+	viewXMax(frame?: Mobject): number { return this.viewLRCorner(frame).x }
+	viewYMin(frame?: Mobject): number { return this.viewULCorner(frame).y }
+	viewYMax(frame?: Mobject): number { return this.viewLRCorner(frame).y }
+
+	viewCenter(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth/2, this.viewHeight/2), frame)
 	}
 
+	viewMidX(frame?: Mobject): number { return this.viewCenter(frame).x }
+	viewMidY(frame?: Mobject): number { return this.viewCenter(frame).y }
 
-	get midPoint(): Vertex { return this.localCenter() }
+	viewLeftCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)) }
+	viewRightCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)) }
+	viewTopCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
+	viewBottomCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
+
+	// Equivalent (by default) versions without "view" in the name
+
+	ulCorner(frame?: Mobject): Vertex { return this.viewULCorner(frame) }
+	urCorner(frame?: Mobject): Vertex { return this.viewURCorner(frame) }
+	llCorner(frame?: Mobject): Vertex { return this.viewLLCorner(frame) }
+	lrCorner(frame?: Mobject): Vertex { return this.viewLRCorner(frame) }
+
+	xMin(frame?: Mobject): number { return this.viewXMin(frame) }
+	xMax(frame?: Mobject): number { return this.viewXMax(frame) }
+	yMin(frame?: Mobject): number { return this.viewYMin(frame) }
+	yMax(frame?: Mobject): number { return this.viewYMax(frame) }
+
+	center(frame?: Mobject): Vertex { return this.viewCenter(frame) }
+
+	midX(frame?: Mobject): number { return this.viewMidX(frame) }
+	midY(frame?: Mobject): number { return this.viewMidY(frame) }
+
+	leftCenter(frame?: Mobject): Vertex { return this.viewLeftCenter(frame) }
+	rightCenter(frame?: Mobject): Vertex { return this.viewRightCenter(frame) }
+	topCenter(frame?: Mobject): Vertex { return this.viewTopCenter(frame) }
+	bottomCenter(frame?: Mobject): Vertex { return this.viewBottomCenter(frame) }
+
+	// Local versions (relative to own coordinate system)
+
+	localULCorner(): Vertex { return this.ulCorner(this) }
+	localURCorner(): Vertex { return this.urCorner(this) }
+	localLLCorner(): Vertex { return this.llCorner(this) }
+	localLRCorner(): Vertex { return this.lrCorner(this) }
+
+	localXMin(): number { return this.xMin(this) }
+	localXMax(): number { return this.xMax(this) }
+	localYMin(): number { return this.yMin(this) }
+	localYMax(): number { return this.yMax(this) }
+
+	localCenter(): Vertex { return this.center(this) }
+
+	localMidX(): number { return this.midX(this) }
+	localMidY(): number { return this.midY(this) }
+
+	localLeftCenter(): Vertex { return this.leftCenter(this) }
+	localRightCenter(): Vertex { return this.rightCenter(this) }
+	localTopCenter(): Vertex { return this.topCenter(this) }
+	localBottomCenter(): Vertex { return this.bottomCenter(this) }
+
+	get midPoint(): Vertex { return this.center() }
 	set midPoint(newValue: Vertex) {
 		this.centerAt(newValue)
 	}
+
 
 
 
@@ -250,7 +279,6 @@ export class Mobject extends ExtendedObject {
 
 	positionView() {
 		if (!this.view) { return }
-		console.log("positioning")
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		this.view.style['transform'] = this.transform.asString()
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
@@ -385,7 +413,6 @@ export class Mobject extends ExtendedObject {
 			delete argsDict['view']
 		}
 		this.setAttributes(argsDict)
-		this.transform.anchor = this.anchor
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
@@ -593,7 +620,7 @@ export class VMobject extends Mobject {
 
 		this.setDefaults({
 			fillColor: Color.white(),
-			fillOpacity: 0.5,
+			fillOpacity: 0,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
 		})
@@ -602,7 +629,7 @@ export class VMobject extends Mobject {
 
 	redrawSelf() {
 		let pathString: string = this.pathString()
-		if (pathString.includes('NaN')) { return }
+		if (pathString.includes('NaN')) { return }
 
 		this.path.setAttribute('d', pathString)
 		this.path.style['fill'] = this.fillColor.toHex()
@@ -678,9 +705,6 @@ export class VMobject extends Mobject {
 			for (let mob of this.children) {
 				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
 			}
-		}
-		if (this.constructor.name == 'CreativeButton') {
-			console.log('yMax =', yMax)
 		}
 		return yMax
 	}

@@ -178,8 +178,8 @@ export class DependencyMap extends MGroup {
 				if (!(iol instanceof IOList)) { continue }
 				for (let b of iol.inputList.children) {
 					if (!(b instanceof LinkBullet)) { continue }
-						let bc = b.globalCenter()
-						let tc = (tcircle as Circle).globalCenter()
+					let bc = b.center(this.parent)
+					let tc = (tcircle as Circle).center(this.parent)
 					if (bc.x == tc.x && bc.y == tc.y) {
 						tl = b
 						break
@@ -280,7 +280,7 @@ export class LinkLine extends CreatedMobject {
 	startHook: LinkBullet
 	endHook: LinkBullet
 	line: Segment
-	startPoint: Vertex
+	//startPoint: Vertex
 	source: LinkableMobject
 	inputName: string
 	target: Mobject

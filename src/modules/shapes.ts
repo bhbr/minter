@@ -13,21 +13,26 @@ export class Circle extends CurvedShape {
 	constructor(argsDict: object = {}) {
 		super()
 		this.setDefaults({
-			radius: 10,
-			midPoint: Vertex.origin()
+			radius: 10
 		})
 		this.update(argsDict)
 	}
 
 	get radius(): number { return this._radius }
 	set radius(newValue: number) {
-		let dr: number = newValue - this.radius
-		this.anchor.translateBy(-dr, -dr)
+		if (this.parent) {
+			this.anchor.copyFrom(this.midPoint.translatedBy(-newValue, -newValue))
+		}
 		this._radius = newValue
 		this.update({
 			viewWidth: 2 * newValue,
 			viewHeight: 2 * newValue
 		})
+	}
+
+	get midPoint(): Vertex { return this.anchor.translatedBy(this.radius, this.radius) }
+	set midPoint(newValue: Vertex) {
+		this.anchor.copyFrom(newValue.translatedBy(-this.radius, -this.radius))
 	}
 
 	area(): number { return Math.PI * this.radius ** 2 }
