@@ -449,7 +449,7 @@ export class Mobject extends ExtendedObject {
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
-	selfHandlePointerDown(e: LocatedEvent) { console.log('old') }
+	selfHandlePointerDown(e: LocatedEvent) { }
 	selfHandlePointerMove(e: LocatedEvent) { }
 	selfHandlePointerUp(e: LocatedEvent) { }
 	savedSelfHandlePointerDown(e: LocatedEvent) { }
@@ -490,17 +490,19 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		console.log(targetViewChain)
+		//console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
 				let r: Mobject = t['mobject']
+				console.log('event target mob:', r)
 				return r
 			}
 			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
+		console.log('event target mob:', this)
 		return this
 	}
 

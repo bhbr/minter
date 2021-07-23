@@ -226,7 +226,7 @@ export class Paper extends LinkableMobject {
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
 			for (let fq of this.construction.points) {
-				let q: Vertex = fq.anchor
+				let q: Vertex = fq.midpoint
 				if (p.subtract(q).norm() < 10) {
 					p = q
 					break

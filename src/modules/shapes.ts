@@ -33,10 +33,8 @@ export class Circle extends CurvedShape {
 			argsDict['anchor'] = m.translatedBy(-r, -r)
 		}
 
-		if (argsDict['radius'] != undefined) {
-			argsDict['viewWidth'] = 2 * argsDict['radius']
-			argsDict['viewHeight'] = 2 * argsDict['radius']
-		}
+		argsDict['viewWidth'] = 2 * r
+		argsDict['viewHeight'] = 2 * r
 
 		super.update(argsDict, redraw)
 	}

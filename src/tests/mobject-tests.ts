@@ -130,7 +130,7 @@ export function TextTest() {
 
 export function FreePointTest() {
 
-	let p = new Point()
+	let p = new FreePoint()
 	console.log('p:', p.anchor)
 	paper.add(p)
 	p.update({ midpoint: Vertex.origin() })

@@ -287,6 +287,10 @@ export class DrawnCircle extends DrawnMobject {
 		this.addDependency('penStrokeColor', this.freeOuterPoint, 'strokeColor')
 		this.addDependency('penFillColor', this.freeOuterPoint, 'fillColor')
 		this.addDependency('penStrokeColor', this.circle, 'strokeColor')
+
+		this.freeMidpoint.addDependency('midpoint', this.circle, 'midpoint')
+		this.freeOuterPoint.addDependency('midpoint', this.circle, 'outerPoint')
+
 		this.update(argsDict)
 
 	}

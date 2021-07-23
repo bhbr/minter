@@ -20,11 +20,11 @@ export class IntersectionPoint extends Point {
 	mu: number = NaN
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.update(argsDict)
-		this.update({
+		super()
+		this.setDefaults({
 			midpoint: new Vertex(NaN, NaN)
 		})
+		this.update(argsDict)
 	}
 
 	update(argsDict: object = {}, redraw : boolean = true) {
@@ -34,7 +34,7 @@ export class IntersectionPoint extends Point {
 		} else {
 			this.recursiveShow()
 			if (!this.midpoint.equals(mp)) {
-				super.update({midpoint: mp})
+				argsDict['midpoint'] = mp
 			}
 		}
 		super.update(argsDict, redraw)

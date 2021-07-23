@@ -1302,7 +1302,7 @@
         // interactivity
         // empty method as workaround (don't ask)
         removeFreePoint(fp) { }
-        selfHandlePointerDown(e) { console.log('old'); }
+        selfHandlePointerDown(e) { }
         selfHandlePointerMove(e) { }
         selfHandlePointerUp(e) { }
         savedSelfHandlePointerDown(e) { }
@@ -1341,17 +1341,19 @@
                 t = t.parentElement;
                 targetViewChain.push(t);
             }
-            console.log(targetViewChain);
+            //console.log(targetViewChain)
             t = targetViewChain.pop();
             t = targetViewChain.pop();
             while (t != undefined) {
                 if (t['mobject'] != undefined) {
                     let r = t['mobject'];
+                    console.log('event target mob:', r);
                     return r;
                 }
                 t = targetViewChain.pop();
             }
             // if all of this fails, you need to handle the event yourself
+            console.log('event target mob:', this);
             return this;
         }
         pointerDown(e) {
@@ -1655,10 +1657,8 @@
                 let m = argsDict['midpoint'] || this.midpoint;
                 argsDict['anchor'] = m.translatedBy(-r, -r);
             }
-            if (argsDict['radius'] != undefined) {
-                argsDict['viewWidth'] = 2 * argsDict['radius'];
-                argsDict['viewHeight'] = 2 * argsDict['radius'];
-            }
+            argsDict['viewWidth'] = 2 * r;
+            argsDict['viewHeight'] = 2 * r;
             super.update(argsDict, redraw);
         }
         updateBezierPoints() {
