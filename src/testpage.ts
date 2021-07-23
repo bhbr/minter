@@ -12,7 +12,7 @@ import { Color } from './modules/color'
 // f.redraw()
 
 let c = new Circle({
-	midPoint: new Vertex(50, 50),
+	midpoint: new Vertex(50, 50),
 	radius: 60,
 	fillColor: Color.green(),
 	fillOpacity: 1,

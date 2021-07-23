@@ -8,34 +8,38 @@ import { gray, pointerEventVertex } from './helpers'
 
 export class Circle extends CurvedShape {
 
-	_radius: number
-	
+	midpoint: Vertex
+	radius: number
+
 	constructor(argsDict: object = {}) {
 		super()
 		this.setDefaults({
+			midpoint: Vertex.origin(),
 			radius: 10
 		})
-		this.update(argsDict)
-	}
-
-	get radius(): number { return this._radius }
-	set radius(newValue: number) {
-		if (this.parent) {
-			this.anchor.copyFrom(this.midPoint.translatedBy(-newValue, -newValue))
+		if (this.constructor.name == 'Circle') {
+			this.update(argsDict)
 		}
-		this._radius = newValue
-		this.update({
-			viewWidth: 2 * newValue,
-			viewHeight: 2 * newValue
-		})
 	}
 
-	get midPoint(): Vertex { return this.anchor.translatedBy(this.radius, this.radius) }
-	set midPoint(newValue: Vertex) {
-		this.anchor.copyFrom(newValue.translatedBy(-this.radius, -this.radius))
-	}
+	update(argsDict: object = {}, redraw = true) {
 
-	area(): number { return Math.PI * this.radius ** 2 }
+		let r = argsDict['radius'] || this.radius
+		let a = argsDict['anchor']
+		if (a != undefined) {
+			argsDict['midpoint'] = a.translatedBy(r, r)
+		} else {
+			let m = argsDict['midpoint'] || this.midpoint
+			argsDict['anchor'] = m.translatedBy(-r, -r)
+		}
+
+		if (argsDict['radius'] != undefined) {
+			argsDict['viewWidth'] = 2 * argsDict['radius']
+			argsDict['viewHeight'] = 2 * argsDict['radius']
+		}
+
+		super.update(argsDict, redraw)
+	}
 
 	updateBezierPoints() {
 		let newBezierPoints: Array<Vertex> = []
@@ -68,7 +72,7 @@ export class Circle extends CurvedShape {
 export class TwoPointCircle extends Circle {
 
 	outerPoint: Vertex
-
+	
 	constructor(argsDict: object = {}) {
 		super()
 		this.setAttributes({
@@ -76,14 +80,23 @@ export class TwoPointCircle extends Circle {
 			fillColor: Color.white(),
 			fillOpacity: 0
 		})
+		this.setDefaults({
+			outerPoint: Vertex.origin()
+		})
 		this.view.style['pointer-events'] = 'none'
-		this.update(argsDict)
-		this.radius = this.midPoint.subtract(this.outerPoint).norm()
+
+		if (this.constructor.name == 'TwoPointCircle') {
+			this.update(argsDict)
+		}
 	}
 
+
 	update(argsDict: object = {}, redraw = true) {
-		try { this.radius = this.midPoint.subtract(this.outerPoint).norm() }
-		catch { }
+
+		let p = argsDict['midpoint'] || this.midpoint
+		let q = argsDict['outerPoint'] || this.outerPoint
+		let r = p.subtract(q).norm()
+		argsDict['radius'] = r
 		super.update(argsDict, redraw)
 	}
 
@@ -107,8 +120,8 @@ export class Ellipse extends CurvedShape {
 
 	}
 
-	get midPoint(): Vertex { return this.anchor }
-	set midPoint(newValue: Vertex) { this.anchor = newValue }
+	get midpoint(): Vertex { return this.anchor }
+	set midpoint(newValue: Vertex) { this.anchor = newValue }
 
 
 }

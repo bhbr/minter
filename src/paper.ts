@@ -201,8 +201,8 @@ export class Paper extends LinkableMobject {
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.construction.points) {
-			if (this.creationStartPoint.subtract(fp.midPoint).norm() < 20) {
-				this.creationStartPoint = fp.midPoint
+			if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
+				this.creationStartPoint = fp.midpoint
 				drawFreehand = false
 			}
 		}

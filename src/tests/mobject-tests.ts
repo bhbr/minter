@@ -1,5 +1,5 @@
 import { Mobject, TextLabel } from '../modules/mobject'
-import { Circle } from '../modules/shapes'
+import { Circle, TwoPointCircle } from '../modules/shapes'
 import { paper } from '../paper'
 import { DEGREES } from '../modules/math'
 import { Vertex, Transform } from '../modules/vertex-transform'
@@ -10,11 +10,11 @@ import { Point, FreePoint } from '../modules/creating'
 export function TransformTest() {
 	console.log("creating new circle")
 	let c = new Circle({
-		midPoint: new Vertex(300, 50)
+		midpoint: new Vertex(300, 50)
 	})
 	paper.add(c)
 	c.update({
-		midPoint: new Vertex(100, 20)
+		midpoint: new Vertex(100, 20)
 	})
 
 }
@@ -40,7 +40,7 @@ export function MobjectTest() {
 	f.redraw()
 
 	let c = new Circle({
-		midPoint: new Vertex(50, 150),
+		midpoint: new Vertex(50, 150),
 		radius: 50,
 		fillColor: Color.orange(),
 		opacity: 1.0,
@@ -53,13 +53,44 @@ export function MobjectTest() {
 }
 
 export function CircleTest() {
-
+	let p = new Vertex(100, 100)
+	let r = 75
 	let c = new Circle({
-		midPoint: new Vertex(100, 100),
-		radius: 50
+		midpoint: p,
+		radius: r,
+		drawBorder: true
 	})
 	paper.add(c)
-	c.redraw()
+	c.update({
+		radius: 25,
+		midpoint: Vertex.origin()
+	})
+	console.log(c)
+}
+
+export function DrawCircleTest() {
+
+	let midpoint = new Vertex(100, 100)
+	let outerPoint = new Vertex(200, 200)
+
+	let freeMidpoint = new FreePoint({
+		midpoint: midpoint,
+	})
+	let freeOuterPoint = new FreePoint({
+		midpoint: outerPoint,
+	})
+	let circle = new TwoPointCircle({
+		midpoint: freeMidpoint.midpoint,
+		outerPoint: freeOuterPoint.midpoint,
+		fillOpacity: 0,
+		drawBorder: true
+	})
+	freeMidpoint.addDependency('midpoint', circle, 'midpoint')
+	freeOuterPoint.addDependency('midpoint', circle, 'outerPoint')
+
+	paper.add(freeMidpoint)
+	paper.add(freeOuterPoint)
+	paper.add(circle)
 }
 
 export function CindyTest() {
@@ -102,7 +133,7 @@ export function FreePointTest() {
 	let p = new Point()
 	console.log('p:', p.anchor)
 	paper.add(p)
-	p.update({ midPoint: Vertex.origin() })
+	p.update({ midpoint: Vertex.origin() })
 
 }
 

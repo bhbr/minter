@@ -23,7 +23,7 @@ export class IntersectionPoint extends Point {
 		super(argsDict)
 		this.update(argsDict)
 		this.update({
-			midPoint: new Vertex(NaN, NaN)
+			midpoint: new Vertex(NaN, NaN)
 		})
 	}
 
@@ -33,8 +33,8 @@ export class IntersectionPoint extends Point {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
-			if (!this.midPoint.equals(mp)) {
-				super.update({midPoint: mp})
+			if (!this.midpoint.equals(mp)) {
+				super.update({midpoint: mp})
 			}
 		}
 		super.update(argsDict, redraw)
@@ -57,7 +57,7 @@ export class IntersectionPoint extends Point {
 	arrowCircleIntersection(arrow: Arrow, circle: Circle, index: number): Vertex {
 		let A: Vertex = arrow.startPoint
 		let B: Vertex = arrow.endPoint
-		let C: Vertex = circle.midPoint
+		let C: Vertex = circle.midpoint
 		let r: number = circle.radius
 
 		let a: number = A.subtract(B).norm2()
@@ -101,8 +101,8 @@ export class IntersectionPoint extends Point {
 
 	circleCircleIntersection(circle1: Circle, circle2: Circle, index: number) {
 
-		let A: Vertex = circle1.midPoint
-		let B: Vertex = circle2.midPoint
+		let A: Vertex = circle1.midpoint
+		let B: Vertex = circle2.midpoint
 		let r1: number = circle1.radius
 		let r2: number = circle2.radius
 
@@ -153,20 +153,20 @@ export class Construction extends LinkableMobject {
 		let cm: ConstructedMobject
 		if (mob instanceof DrawnSegment) {
 			cm = mob.segment
-			p1.addDependency('midPoint', cm, 'startPoint')
-			p2.addDependency('midPoint', cm, 'endPoint')
+			p1.addDependency('midpoint', cm, 'startPoint')
+			p2.addDependency('midpoint', cm, 'endPoint')
 		} else if (mob instanceof DrawnRay) {
 			cm = mob.ray
-			p1.addDependency('midPoint', cm, 'startPoint')
-			p2.addDependency('midPoint', cm, 'endPoint')
+			p1.addDependency('midpoint', cm, 'startPoint')
+			p2.addDependency('midpoint', cm, 'endPoint')
 		} else if (mob instanceof DrawnLine) {
 			cm = mob.line
-			p1.addDependency('midPoint', cm, 'startPoint')
-			p2.addDependency('midPoint', cm, 'endPoint')
+			p1.addDependency('midpoint', cm, 'startPoint')
+			p2.addDependency('midpoint', cm, 'endPoint')
 		} else if (mob instanceof DrawnCircle) {
 			cm = mob.circle
-			p1.addDependency('midPoint', cm, 'midPoint')
-			p2.addDependency('midPoint', cm, 'outerPoint')
+			p1.addDependency('midpoint', cm, 'midpoint')
+			p2.addDependency('midpoint', cm, 'outerPoint')
 		}
 		this.add(cm)
 		this.intersectWithRest(cm)
@@ -177,9 +177,9 @@ export class Construction extends LinkableMobject {
 
 	pointForVertex(v: Vertex): Point {
 		for (let p of this.points) {
-			if (p.midPoint.equals(v)) { return p }
+			if (p.midpoint.equals(v)) { return p }
 		}
-		let p: FreePoint = new FreePoint({midPoint: v})
+		let p: FreePoint = new FreePoint({midpoint: v})
 		this.addPoint(p)
 		return p
 	}
@@ -187,7 +187,7 @@ export class Construction extends LinkableMobject {
 
 	addPoint(p: Point): boolean {
 		for (let q of this.points) {
-			if (p.midPoint.equals(q.midPoint)) {
+			if (p.midpoint.equals(q.midpoint)) {
 				return false
 			}
 		}

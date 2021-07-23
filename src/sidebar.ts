@@ -120,7 +120,7 @@ class SidebarButton extends Circle {
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
-		this.addDependency('midPoint', this.label, 'midPoint')
+		this.addDependency('midpoint', this.label, 'midpoint')
 
 		this.redraw()
 	}
@@ -203,7 +203,7 @@ class SidebarButton extends Circle {
 		this.update({
 			//radius: buttonRadius,
 			transform: new Transform({scale: 1.0, anchor: this.localCenter()}), // identity does not work, weirdly enough
-			midPoint: newMidpoint
+			midpoint: newMidpoint
 		})
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
@@ -255,7 +255,7 @@ class SidebarButton extends Circle {
 	selectNextOption() {
 		if (this.currentModeIndex == this.messages.length - 1) { return }
 		let dx: number = this.optionSpacing * (this.currentModeIndex + 1)
-		this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.updateModeIndex(this.currentModeIndex + 1, true)
 	}
 	
@@ -263,7 +263,7 @@ class SidebarButton extends Circle {
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
 		let dx: number = this.optionSpacing * (this.currentModeIndex - 1)
-		this.midPoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.updateModeIndex(this.currentModeIndex - 1, true)
 	}
 	
@@ -288,7 +288,7 @@ class SidebarButton extends Circle {
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		
 		this.updateModeIndex(newIndex, true)
-		this.update({ midPoint: newMidpoint })
+		this.update({ midpoint: newMidpoint })
 	}
 	
 }
@@ -443,13 +443,13 @@ let circleButton = new CreativeButton({
 })
 sidebar.add(circleButton)
 
-// let sliderButton = new CreativeButton({
-// 	creations: ['slider'],
-// 	key: 'e',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 2
-// })
-// sidebar.add(sliderButton)
+let sliderButton = new CreativeButton({
+	creations: ['slider'],
+	key: 'e',
+	baseColor: Color.gray(0.6),
+	locationIndex: 2
+})
+sidebar.add(sliderButton)
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],

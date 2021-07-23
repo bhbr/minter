@@ -68,7 +68,7 @@ export class Pendulum extends LinkableMobject {
 			endPoint: newEndPoint
 		}, redraw = redraw)
 		this.weight.update({
-			midPoint: newEndPoint
+			midpoint: newEndPoint
 		}, redraw = redraw)
 	}
 

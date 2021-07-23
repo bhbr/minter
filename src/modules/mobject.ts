@@ -57,8 +57,6 @@ export class Mobject extends ExtendedObject {
 		})
 
 		this.setView(document.createElement('div'))
-		this.update(argsDict)
-		this.positionView()
 
 		this.eventTarget = null
 		this.boundPointerDown = this.pointerDown.bind(this)
@@ -77,6 +75,11 @@ export class Mobject extends ExtendedObject {
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
+
+		if (this.constructor.name =='Mobject') {
+			this.update()
+			this.positionView()
+		}
 
 	}
 
@@ -204,10 +207,6 @@ export class Mobject extends ExtendedObject {
 	localTopCenter(): Vertex { return this.topCenter(this) }
 	localBottomCenter(): Vertex { return this.bottomCenter(this) }
 
-	get midPoint(): Vertex { return this.center() }
-	set midPoint(newValue: Vertex) {
-		this.centerAt(newValue)
-	}
 
 
 
@@ -412,6 +411,7 @@ export class Mobject extends ExtendedObject {
 			this.setView(argsDict['view'])
 			delete argsDict['view']
 		}
+
 		this.setAttributes(argsDict)
 		this.updateSubmobs()
 
@@ -586,7 +586,9 @@ export class MGroup extends Mobject {
 		for (let submob of this.children) {
 			this.add(submob)
 		}
-		this.update(argsDict)
+		if (this.constructor.name == 'MGroup') {
+			this.update(argsDict)
+		}
 	}
 
 }
@@ -624,7 +626,9 @@ export class VMobject extends Mobject {
 			strokeColor: Color.white(),
 			strokeWidth: 1,
 		})
-		this.update(argsDict)
+		if (this.constructor.name == 'VMobject') {
+			this.update(argsDict)
+		}
 	}
 
 	redrawSelf() {
@@ -729,6 +733,13 @@ export class Polygon extends VMobject {
 
 	closed: boolean = true
 
+	constructor(argsDict: object = {}) {
+		super()
+		if (this.constructor.name == 'Polygon') {
+			this.update(argsDict)
+		}
+	}
+
 	pathString(): string {
 		let pathString: string = ''
 		//let v = this.globalVertices()
@@ -766,6 +777,13 @@ export class Polygon extends VMobject {
 export class CurvedShape extends VMobject {
 
 	_bezierPoints: Array<Vertex>
+
+	constructor(argsDict: object = {}) {
+		super()
+		if (this.constructor.name == 'CurvedShape') {
+			this.update(argsDict)
+		}
+	}
 
 	updateBezierPoints() { }
 	// implemented by subclasses
@@ -842,7 +860,9 @@ export class TextLabel extends Mobject {
 		this.view.style.fontFamily = 'Helvetica'
 		this.view.style.fontSize = '10px'
 
-		this.update(argsDict)
+		if (this.constructor.name == 'TextLabel') {
+			this.update(argsDict)
+		}
 	}
 
 	redrawSelf() {

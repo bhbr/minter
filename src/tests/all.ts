@@ -1,10 +1,13 @@
 import { ExtendedObjectTest } from './extended-object-test'
-import { MobjectTest, TransformTest, CircleTest, CindyTest, TextTest, FreePointTest } from './mobject-tests'
+import { MobjectTest, TransformTest, CircleTest, DrawCircleTest, CindyTest, TextTest, FreePointTest } from './mobject-tests'
+import { OOPTest } from './oop'
 
 // ExtendedObjectTest()
 // TransformTest()
 // MobjectTest()
-// CircleTest()
+CircleTest()
+// DrawCircleTest()
 // CindyTest()
 // TextTest()
-FreePointTest()
+// FreePointTest()
+// OOPTest()

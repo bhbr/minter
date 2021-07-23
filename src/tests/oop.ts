@@ -1,36 +1,49 @@
 
-class F {
-	constructor() { }
-}
-
-class G extends F {
-	constructor() {
-		super()
-	}
-}
-
 
 export class A {
-	_parent: F
-	constructor() { this._parent = new F() }
-
-	get parent(): F { return this._parent }
-	set parent(newValue: F) { this._parent = newValue }
-
-	blib(f: F): F { return f }
+	value: number
 }
 
-export class B extends A {
-	_parent: G
-	constructor() {
+export class B {
+	a1: A
+
+	constructor(argsDict = {}) {
+		console.log('B.constructor')
+		this.a1 = new A()
+		if (this.constructor.name == 'B') {
+			this.update(argsDict)
+		}
+	}
+
+	update(argsDict = {}) {
+		console.log('B.update')
+		this.a1.value = argsDict['value1']
+	}
+}
+
+export class C extends B {
+	a2: A
+
+	constructor(argsDict = {}) {
+		console.log('C.constructor')
 		super()
-		this._parent = new G()
-	}
-	get pparent(): G { return this.parent as G }
-	set pparent(newValue: G) {
-		this.parent = newValue
+		this.a2 = new A()
+		if (this.constructor.name == 'C') {
+			this.update(argsDict)
+		}
 	}
 
-	blib(f: G): G { return super.blib(f) as G }
-
+	update(argsDict = {}) {
+		console.log('C.update')
+		super.update(argsDict)
+		this.a2.value = argsDict['value2']
+	}
 }
+
+export function OOPTest() {
+	let c = new C({value1: 1, value2: 2})
+	console.log(c)
+}
+
+
+

@@ -979,8 +979,6 @@
                 draggable: false
             });
             this.setView(document.createElement('div'));
-            this.update(argsDict);
-            this.positionView();
             this.eventTarget = null;
             this.boundPointerDown = this.pointerDown.bind(this);
             this.boundPointerMove = this.pointerMove.bind(this);
@@ -995,6 +993,10 @@
             // this.boundCreatePopover = this.createPopover.bind(this)
             // this.boundDismissPopover = this.dismissPopover.bind(this)
             // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
+            if (this.constructor.name == 'Mobject') {
+                this.update();
+                this.positionView();
+            }
         }
         // position and hierarchy
         get anchor() {
@@ -1092,10 +1094,6 @@
         localRightCenter() { return this.rightCenter(this); }
         localTopCenter() { return this.topCenter(this); }
         localBottomCenter() { return this.bottomCenter(this); }
-        get midPoint() { return this.center(); }
-        set midPoint(newValue) {
-            this.centerAt(newValue);
-        }
         get superMobject() { return this.parent; }
         set superMobject(newValue) { this.parent = newValue; }
         get parent() { return this._parent; }
@@ -1441,7 +1439,9 @@
                 strokeColor: Color.white(),
                 strokeWidth: 1,
             });
-            this.update(argsDict);
+            if (this.constructor.name == 'VMobject') {
+                this.update(argsDict);
+            }
         }
         redrawSelf() {
             let pathString = this.pathString();
@@ -1528,6 +1528,12 @@
         }
     }
     class CurvedShape extends VMobject {
+        constructor(argsDict = {}) {
+            super();
+            if (this.constructor.name == 'CurvedShape') {
+                this.update(argsDict);
+            }
+        }
         updateBezierPoints() { }
         // implemented by subclasses
         update(argsDict = {}, redraw = true) {
@@ -1632,26 +1638,29 @@
         constructor(argsDict = {}) {
             super();
             this.setDefaults({
+                midpoint: Vertex.origin(),
                 radius: 10
             });
-            this.update(argsDict);
-        }
-        get radius() { return this._radius; }
-        set radius(newValue) {
-            if (this.parent) {
-                this.anchor.copyFrom(this.midPoint.translatedBy(-newValue, -newValue));
+            if (this.constructor.name == 'Circle') {
+                this.update(argsDict);
             }
-            this._radius = newValue;
-            this.update({
-                viewWidth: 2 * newValue,
-                viewHeight: 2 * newValue
-            });
         }
-        get midPoint() { return this.anchor.translatedBy(this.radius, this.radius); }
-        set midPoint(newValue) {
-            this.anchor.copyFrom(newValue.translatedBy(-this.radius, -this.radius));
+        update(argsDict = {}, redraw = true) {
+            let r = argsDict['radius'] || this.radius;
+            let a = argsDict['anchor'];
+            if (a != undefined) {
+                argsDict['midpoint'] = a.translatedBy(r, r);
+            }
+            else {
+                let m = argsDict['midpoint'] || this.midpoint;
+                argsDict['anchor'] = m.translatedBy(-r, -r);
+            }
+            if (argsDict['radius'] != undefined) {
+                argsDict['viewWidth'] = 2 * argsDict['radius'];
+                argsDict['viewHeight'] = 2 * argsDict['radius'];
+            }
+            super.update(argsDict, redraw);
         }
-        area() { return Math.PI * this.radius ** 2; }
         updateBezierPoints() {
             let newBezierPoints = [];
             let n = 8;
@@ -1687,7 +1696,7 @@
     // })
     // f.redraw()
     let c = new Circle({
-        midPoint: new Vertex(50, 50),
+        midpoint: new Vertex(50, 50),
         radius: 60,
         fillColor: Color.green(),
         fillOpacity: 1,
