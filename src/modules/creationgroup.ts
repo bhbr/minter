@@ -15,7 +15,7 @@ export class CreationGroup extends CreatedMobject {
 	strokeColor: Color
 
 	constructor(argsDict) {
-		super(argsDict)
+		super()
 		this.setDefaults({
 			strokeColor: Color.white()
 		})
@@ -23,11 +23,11 @@ export class CreationGroup extends CreatedMobject {
 		this.creations = { }
 		this.creations['freehand'] = new Freehand()
 		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint })
-		//this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
-		// this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
+		this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
+		this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
 		this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
-		//this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
-		//this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
+		this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
+		this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
 		//this.creations['pendulum'] = new CreatedPendulum({startPoint: this.startPoint})
 
 		for (let mob of Object.values(this.creations)) {
@@ -39,8 +39,10 @@ export class CreationGroup extends CreatedMobject {
 		for (let creation of Object.values(this.creations)) {
 			this.add(creation)
 		}
-		this.update(argsDict)
 
+		if (this.constructor.name == "CreationGroup") {
+			this.update(argsDict)
+		}
 	}
 
 	updateFromTip(q: Vertex) {

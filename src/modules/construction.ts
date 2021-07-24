@@ -24,7 +24,10 @@ export class IntersectionPoint extends Point {
 		this.setDefaults({
 			midpoint: new Vertex(NaN, NaN)
 		})
-		this.update(argsDict)
+
+		if (this.constructor.name == "IntersectionPoint") {
+			this.update(argsDict)
+		}
 	}
 
 	update(argsDict: object = {}, redraw : boolean = true) {
@@ -141,7 +144,10 @@ export class Construction extends LinkableMobject {
 		this.constructedMobjects = []
 		this.passAlongEvents = true
 		this.interactive = true
-		super.update(argsDict)
+
+		if (this.constructor.name == "Construction") {
+			super.update(argsDict)
+		}
 	}
 
 

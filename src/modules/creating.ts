@@ -20,7 +20,10 @@ export class CreatedMobject extends MGroup {
 			endPoint: Vertex.origin()
 		})
 		this.interactive = true
-		this.update(argsDict)
+
+		if (this.constructor.name == "CreatedMobject") {
+			this.update(argsDict)
+		}
 	}
 	
 	dissolveInto(paper: Paper) {
@@ -46,13 +49,17 @@ class DrawnMobject extends CreatedMobject {
 	penFillOpacity: number
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.setDefaults({
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
 			penFillOpacity: 0.0
 		})
+
+		if (this.constructor.name == "DrawnMobject") {
+			this.update(argsDict)
+		}
 	}
 }
 
@@ -72,7 +79,10 @@ export class Freehand extends DrawnMobject {
 			opacity: 1.0
 		})
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
-		this.update(argsDict)
+
+		if (this.constructor.name == "Freehand") {
+			this.update(argsDict)
+		}
 	}
 	
 	updateWithPoints(q) {
@@ -132,7 +142,10 @@ export class Point extends Circle {
 			fillColor: Color.white(),
 			fillOpacity: 1.0
 		})
-		this.update(argsDict)
+
+		if (this.constructor.name == "Point") {
+			this.update(argsDict)
+		}
 	}
 
 }
@@ -144,8 +157,11 @@ export class FreePoint extends Point {
 			draggable: true,
 			interactive: true
 		})
-		this.update(argsDict)
-		this.enableDragging()
+
+		if (this.constructor.name == "FreePoint") {
+			this.update(argsDict)
+			this.enableDragging()
+		}
 	}
 }
 
@@ -155,7 +171,7 @@ export class DrawnArrow extends DrawnMobject {
 	endFreePoint: FreePoint
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.endPoint = this.startPoint.copy()
 		this.passAlongEvents = true
 		this.startFreePoint = new FreePoint()
@@ -171,7 +187,10 @@ export class DrawnArrow extends DrawnMobject {
 		this.startFreePoint.update({ midpoint: this.startPoint })
 		this.endFreePoint.update({ midpoint: this.endPoint })
 		console.log('end point:', this.endPoint)
-		this.update(argsDict)
+
+		if (this.constructor.name == "DrawnArrow") {
+			this.update(argsDict)
+		}
 	}
 
 	updateFromTip(q: Vertex) {
@@ -191,7 +210,7 @@ export class DrawnSegment extends DrawnArrow {
 	segment: Segment
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.segment = new Segment({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint
@@ -200,7 +219,10 @@ export class DrawnSegment extends DrawnArrow {
 		this.startFreePoint.addDependency('midpoint', this.segment, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.segment, 'endPoint')
 		this.addDependency('penStrokeColor', this.segment, 'strokeColor')
-		this.update(argsDict)
+
+		if (this.constructor.name == "DrawnSegment") {
+			this.update(argsDict)
+		}
 	}
 
 }
@@ -210,7 +232,7 @@ export class DrawnRay extends DrawnArrow {
 	ray: Ray
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.ray = new Ray({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint,
@@ -219,7 +241,10 @@ export class DrawnRay extends DrawnArrow {
 		this.endFreePoint.addDependency('midpoint', this.ray, 'endPoint')
 		this.addDependency('penStrokeColor', this.ray, 'strokeColor')
 		this.add(this.ray)
-		this.update(argsDict)
+
+		if (this.constructor.name == "DrawnRay") {
+			this.update(argsDict)
+		}
 	}
 
 }
@@ -230,7 +255,7 @@ export class DrawnLine extends DrawnArrow {
 	line: Line
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		this.line = new Line({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint
@@ -239,7 +264,10 @@ export class DrawnLine extends DrawnArrow {
 		this.startFreePoint.addDependency('midpoint', this.line, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.line, 'endPoint')
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
-		this.update(argsDict)
+
+		if (this.constructor.name == "DrawnLine") {
+			this.update(argsDict)
+		}
 	}
 
 }
@@ -253,7 +281,7 @@ export class DrawnCircle extends DrawnMobject {
 	circle: TwoPointCircle
 
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 		
 		this.setAttributes({
 			strokeWidth: 1,
@@ -291,8 +319,9 @@ export class DrawnCircle extends DrawnMobject {
 		this.freeMidpoint.addDependency('midpoint', this.circle, 'midpoint')
 		this.freeOuterPoint.addDependency('midpoint', this.circle, 'outerPoint')
 
-		this.update(argsDict)
-
+		if (this.constructor.name == "DrawnCircle") {
+			this.update(argsDict)
+		}
 	}
 
 	updateFromTip(q: Vertex) {

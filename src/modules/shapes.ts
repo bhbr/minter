@@ -114,8 +114,9 @@ export class Ellipse extends CurvedShape {
 			minorAxis: 100,
 			tilt: 0
 		})
-		this.update(argsDict)
-
+		if (this.constructor.name == "Ellipse") {
+			this.update(argsDict)
+		}
 	}
 
 	get midpoint(): Vertex { return this.anchor }
@@ -147,7 +148,10 @@ export class Rectangle extends Polygon {
 		this.p3 = new Vertex([this.width, this.height])
 		this.p4 = new Vertex([0, this.height])
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-		this.update(argsDict)
+
+		if (this.constructor.name == "Rectangle") {
+			this.update(argsDict)
+		}
 	}
 
 	update(argsDict: object = {}, redraw = true) {
@@ -162,7 +166,9 @@ export class Rectangle extends Polygon {
 		} catch {}
 	}
 
-	
+	getWidth(): number { return this.width }
+	getHeight(): number { return this.height }
+
 }
 
 
@@ -189,7 +195,10 @@ export class RoundedRectangle extends CurvedShape {
 		this.p2 = new Vertex([this.width, 0])
 		this.p3 = new Vertex([this.width, this.height])
 		this.p4 = new Vertex([0, this.height])
-		this.update(argsDict)
+		
+		if (this.constructor.name == "RoundedRectangle") {
+			this.update(argsDict)
+		}
 	}
 
 	updateBezierPoints() {

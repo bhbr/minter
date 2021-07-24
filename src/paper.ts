@@ -52,7 +52,10 @@ export class Paper extends LinkableMobject {
 		this.currentColor = this.colorPalette['white']
 		this.setDragging(false)
 		this.interactive = true
-		this.update(argsDict)
+
+		if (this.constructor.name == "Paper") {
+			this.update(argsDict)
+		}
 		
 		
 		this.background = new Rectangle({

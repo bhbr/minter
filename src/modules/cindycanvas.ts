@@ -18,7 +18,7 @@ export class CindyCanvas extends LinkableMobject {
 	points: Array<Array<number>>
 	
 	constructor(argsDict: object = {}) {
-		super(argsDict)
+		super()
 
 		this.draggable = true
 		this.interactive = true
@@ -37,6 +37,10 @@ export class CindyCanvas extends LinkableMobject {
 		}
 
 		this.points = []
+
+		if (this.constructor.name == "CindyCanvas") {
+			this.update(argsDict)
+		}
 
 	}
 
@@ -129,8 +133,10 @@ export class WaveCindyCanvas extends CindyCanvas {
 		})
 		this.inputNames = ['wavelength', 'frequency']
 
-		this.update(argsDict)
-		this.setup()
+		if (this.constructor.name == "CondyCanvas") {
+			this.update(argsDict)
+			this.setup()
+		}
 	}
 
 	initCode(): string {
@@ -178,7 +184,7 @@ export class DrawnRectangle extends CreatedMobject {
 	right: Segment
 
 	constructor(argsDict: object) {
-		super(argsDict)
+		super()
 		this.endPoint = this.endPoint || this.startPoint.copy()
 		this.p1 = this.startPoint
 		this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
@@ -206,7 +212,10 @@ export class DrawnRectangle extends CreatedMobject {
 		this.add(this.bottom)
 		this.add(this.left)
 		this.add(this.right)
-		this.update(argsDict)
+
+		if (this.constructor.name == "DrawnRectangle") {
+			this.update(argsDict)
+		}
 	}
 
 	updateFromTip(q: Vertex) {
@@ -227,6 +236,7 @@ export class DrawnRectangle extends CreatedMobject {
 			anchor: topLeft,
 			viewWidth: w,
 			viewHeight: h,
+			points: [[0.4, 0.4], [0.3, 0.8]],
 			id: `wave-${w}x${h}`
 		})
 
