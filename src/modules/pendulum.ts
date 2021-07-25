@@ -63,13 +63,14 @@ export class Pendulum extends LinkableMobject {
 		if (this.fixture == undefined) { return }
 
 		let angle: number = argsDict['initialAngle'] || this.angle()
-		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(angle).scaledBy(this.length)
+		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.length)
 		this.string.update({
 			endPoint: newEndPoint
 		}, redraw = redraw)
 		this.weight.update({
 			midpoint: newEndPoint
-		}, redraw = redraw)
+		}, redraw = true)
+		console.log(this.weight.midpoint)
 	}
 
 	run() {
