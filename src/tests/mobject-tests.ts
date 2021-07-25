@@ -125,9 +125,7 @@ export function TextTest() {
 		drawBorder: true,
 		color: Color.white()
 	})
-	paper.addDependency('localCenter', t, 'center')
 	paper.add(t)
-	paper.update()
 }
 
 export function FreePointTest() {

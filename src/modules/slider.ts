@@ -34,17 +34,11 @@ export class BoxSlider extends LinkableMobject {
 		})
 		this.setAttributes({
 			draggable: true,
-			interactive: true,
-			outputNames: ['value'],
-			drawBorder: true,
-			viewWidth: this.width,
-			viewHeight: this.height,
+			outputNames: ['value']
+		})
+		this.setAttributes({
 			fillColor: argsDict['backgroundColor'] || Color.white()
 		})
-
-		if (this.constructor.name == "BoxSlider") {
-			this.update(argsDict)
-		}
 
 		this.outerBar = new Rectangle({
 			width: this.width,
@@ -58,23 +52,13 @@ export class BoxSlider extends LinkableMobject {
 		this.filledBar = new Rectangle({
 			width: this.width,
 			height: this.normalizedValue() * this.height,
-			fillColor: argsDict['fillColor'] || Color.gray(0.5),
-			fillOpacity: 1
+			fillColor: argsDict['fillColor'] || Color.gray(0.5)
 		})
 		this.add(this.filledBar)
 		this.label = new TextLabel({text: this.value.toString()})
-		this.addDependency('localCenter', this.label, 'center')
-		let labelWidth = 30
-		let labelHeight = 15
-		this.label.update({
-			viewWidth: labelWidth,
-			viewHeight: labelHeight,
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
-			drawBorder: true
-		})
+		this.label.anchor = new Vertex(this.width/2, this.height/2)
 		this.add(this.label)
-
+		this.update(argsDict)
 	}
 
 	normalizedValue(): number {
@@ -82,20 +66,17 @@ export class BoxSlider extends LinkableMobject {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		if (argsDict['height'] != undefined) {
-			argsDict['viewHeight'] = argsDict['height']
-		}
-		super.update(argsDict, redraw = true)
+		super.update(argsDict, redraw = false)
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
 		try {
-			// anchor should already have been set above, so:
 			delete argsDict['anchor'] // so it does not propagate to the outer bar in the next line
 			this.outerBar.update(argsDict)
-			this.filledBar.anchor.copyFrom(new Vertex(0, this.height - this.filledBar.height))
+			this.filledBar.anchor.y = this.height - this.filledBar.height
 			this.filledBar.update({ height: a * this.height })
 			this.label.update({
-				text: this.value.toPrecision(3).toString()
+				text: this.value.toPrecision(3).toString(),
+				anchor: new Vertex(this.width/2, this.height/2)
 			})
 		} catch { }
 		if (redraw) { this.redraw() }
@@ -108,11 +89,9 @@ export class BoxSlider extends LinkableMobject {
 
 	selfHandlePointerMove(e: LocatedEvent) {
 		let scrubVector: Vertex = pointerEventVertex(e).subtract(this.scrubStartingPoint)
-		var v = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
-		v = Math.max(Math.min(v, this.max), this.min)
-		this.update({
-			value: v
-		})
+		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
+		this.value = Math.max(Math.min(this.value, this.max), this.min)
+		this.update()
 	}
 
 }
@@ -123,13 +102,10 @@ export class ValueBox extends Rectangle {
 	valueLabel: TextLabel
 
 	constructor(argsDict: object = {}) {
-		super()
+		super(argsDict)
 		this.valueLabel = new TextLabel()
 		this.add(this.valueLabel)
-		
-		if (this.constructor.name == "ValueBox") {
-			this.update(argsDict)
-		}
+		this.redraw()
 	}
 
 }

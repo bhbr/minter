@@ -8,6 +8,6 @@ import { OOPTest } from './oop'
 // CircleTest()
 // DrawCircleTest()
 // CindyTest()
-// TextTest()
+TextTest()
 // FreePointTest()
-OOPTest()
+// OOPTest()

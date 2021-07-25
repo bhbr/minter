@@ -14,9 +14,7 @@ export class Segment extends Arrow {
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin(),
 		})
-		if (this.constructor.name == "Segment") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 
 	components(): Vertex {
@@ -41,28 +39,15 @@ export class Segment extends Arrow {
 
 export class Ray extends Segment {
 
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == "Ray") {
-			this.update(argsDict)
-		}
-	}
-
 	drawingEndPoint(): Vertex {
 		if (this.startPoint == this.endPoint) { return this.endPoint }
 		return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
 	}
 
+
 }
 
 export class Line extends Ray {
-
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == "Line") {
-			this.update(argsDict)
-		}
-	}
 
 	drawingStartPoint(): Vertex {
 		if (this.startPoint == this.endPoint) { return this.startPoint }

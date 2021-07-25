@@ -18,8 +18,7 @@ export class CreatedBoxSlider extends CreatedMobject {
 		this.setAttributes({
 			width: 50,
 			height: 0,
-			fillColor: Color.black(),
-			drawBorder: true
+			fillColor: Color.black()
 		})
 		this.setDefaults({ startPoint: Vertex.origin() })
 		this.anchor = this.startPoint
@@ -36,9 +35,7 @@ export class CreatedBoxSlider extends CreatedMobject {
 		})
 		this.add(this.protoSlider)
 
-		if (this.constructor.name == "CreatedBoxSlider") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 
 	updateFromTip(q: Vertex) {
@@ -57,16 +54,13 @@ export class CreatedBoxSlider extends CreatedMobject {
 
 	dissolveInto(superMobject: Mobject) {
 		superMobject.remove(this)
-		this.remove(this.protoSlider)
 		superMobject.add(this.protoSlider)
-		console.log('anchor', this.anchor)
 		this.protoSlider.update({
 			anchor: this.anchor
 		})
-		console.log('anchor', this.protoSlider.anchor)
-		//this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) })
+		this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) })
 		this.protoSlider.label.update({
-			center: this.protoSlider.localCenter()
+			anchor: new Vertex(this.protoSlider.width/2, this.protoSlider.height/2)
 		})
 
 	}

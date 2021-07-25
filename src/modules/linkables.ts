@@ -18,16 +18,12 @@ export class LinkBullet extends Circle {
 	outputName: string
 
 	constructor(argsDict: object) {
-		super()
+		super(argsDict)
 		this.setAttributes({        
 			radius: BULLET_SIZE,
 			fillOpacity: 0,
 			strokeColor: Color.white()
 		})
-
-		if (this.constructor.name == "LinkBullet") {
-			this.update(argsDict)
-		}
 	}
 }
 
@@ -39,7 +35,7 @@ export class InputList extends RoundedRectangle {
 	mobject: Mobject
 
 	constructor(argsDict: object) {
-		super()
+		super(argsDict)
 		this.setDefaults({listInputNames: []})
 		this.setAttributes({
 			cornerRadius: 20,
@@ -49,15 +45,7 @@ export class InputList extends RoundedRectangle {
 			width: 150,
 			height: this.getHeight()
 		})
-
-		if (this.constructor.name == "InputList") {
-			this.update(argsDict)
-			this.setupBullets()
-		}
-	}
-
-	setupBullets() {
-
+		this.redraw()
 		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listInputNames.length; i++) {
 			let name = this.listInputNames[i]
@@ -73,10 +61,8 @@ export class InputList extends RoundedRectangle {
 			this.add(c)
 			this.add(t)
 		}
-
 	}
 
-	// still necessary?
 	getHeight(): number {
 		let l: number = this.listInputNames.length
 		if (l == 0) { return 0 }
@@ -93,7 +79,7 @@ export class OutputList extends RoundedRectangle {
 	mobject: Mobject
 
 	constructor(argsDict) {
-		super()
+		super(argsDict)
 		this.setDefaults({listOutputNames: []})
 		this.setAttributes({
 			cornerRadius: 20,
@@ -103,15 +89,7 @@ export class OutputList extends RoundedRectangle {
 			width: 150,
 			height: this.getHeight()
 		})
-
-		if (this.constructor.name == "OutputList") {
-			this.update(argsDict)
-			this.setupBullets()
-		}
-	}
-
-	setupBullets() {
-
+		this.redraw()
 		this.bulletLocationDict = {}
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
@@ -129,7 +107,6 @@ export class OutputList extends RoundedRectangle {
 		}
 	}
 
-	// still necessary?
 	getHeight(): number {
 		let l: number = this.listOutputNames.length
 		if (l == 0) { return 0 }
@@ -144,15 +121,12 @@ export class IOList extends MGroup {
 	mobject: Mobject
 
 	constructor(argsDict) {
-		super()
+		super(argsDict)
 		this.inputList = new InputList(argsDict)
 		this.outputList = new OutputList(argsDict)
 		this.add(this.inputList)
 		this.add(this.outputList)
 		// positioning is handled by parent
-		if (this.constructor.name == "IOList") {
-			this.update(argsDict)
-		}
 	}
 }
 
@@ -165,12 +139,8 @@ export class DependencyMap extends MGroup {
 	mobject: Mobject
 
 	constructor(argsDict) {
-		super()
+		super(argsDict)
 		this.linkLines = []
-		if (this.constructor.name == "DependencyMap") {
-			this.update(argsDict)
-		}
-
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
@@ -179,7 +149,7 @@ export class DependencyMap extends MGroup {
 		if (t instanceof LinkBullet) {
 			let tl = t as LinkBullet
 			this.editedLinkLine = new LinkLine({
-				startPoint: tl.getCenter(this),
+				startPoint: tl.center(this),
 				source: tl.mobject,
 				inputName: t.inputName,
 				startHook: tl,
@@ -208,8 +178,8 @@ export class DependencyMap extends MGroup {
 				if (!(iol instanceof IOList)) { continue }
 				for (let b of iol.inputList.children) {
 					if (!(b instanceof LinkBullet)) { continue }
-					let bc = b.getCenter(this.parent)
-					let tc = (tcircle as Circle).getCenter(this.parent)
+					let bc = b.center(this.parent)
+					let tc = (tcircle as Circle).center(this.parent)
 					if (bc.x == tc.x && bc.y == tc.y) {
 						tl = b
 						break
@@ -316,14 +286,7 @@ export class LinkLine extends CreatedMobject {
 	target: Mobject
 
 	constructor(argsDict) {
-		super()
-		if (this.constructor.name == "LinkLine") {
-			this.update(argsDict)
-			this.setupPoints()
-		}
-	}
-
-	setupPoints() {
+		super(argsDict)
 		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
 			radius: BULLET_SIZE - 2,
@@ -343,6 +306,7 @@ export class LinkLine extends CreatedMobject {
 		this.add(this.startBullet)
 		this.add(this.line)
 		this.add(this.endBullet)
+
 	}
 
 	dissolveInto(superMobject: Mobject) {
@@ -365,16 +329,16 @@ export class LinkLine extends CreatedMobject {
 
 	update(argsDict: object = {}, redraw = true) {
 		if (this.startHook != undefined && this.startBullet != undefined) {
-			this.startBullet.centerAt(this.startHook.getCenter(this.superMobject), this.superMobject)
+			this.startBullet.centerAt(this.startHook.center(this.superMobject), this.superMobject)
 		}
 
 		if (this.endHook != undefined && this.endBullet != undefined) {
-			this.endBullet.centerAt(this.endHook.getCenter(this.superMobject), this.superMobject)
+			this.endBullet.centerAt(this.endHook.center(this.superMobject), this.superMobject)
 		}
 		if (this.line != undefined) {
 			this.line.update({
-				startPoint: this.startHook.getCenter(this.superMobject),
-				endPoint: this.endHook.getCenter(this.superMobject)
+				startPoint: this.startHook.center(this.superMobject),
+				endPoint: this.endHook.center(this.superMobject)
 			})
 		}
 		super.update(argsDict, redraw)
@@ -394,9 +358,7 @@ export class LinkableMobject extends Mobject {
 			inputNames: [],  // linkable parameters
 			outputNames: [] // linkable parameters
 		})
-		if (this.constructor.name == "LinkableMobject") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 
 	dependenciesBetweenChildren(): Array<Dependency> {

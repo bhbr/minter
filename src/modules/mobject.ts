@@ -38,8 +38,6 @@ export class Mobject extends ExtendedObject {
 	constructor(argsDict: object = {}) {
 		super()
 
-		this.setView(document.createElement('div'))
-
 		this.setDefaults({
 			transform: Transform.identity(),
 			viewWidth: 100,
@@ -58,6 +56,7 @@ export class Mobject extends ExtendedObject {
 			draggable: false
 		})
 
+		this.setView(document.createElement('div'))
 
 		this.eventTarget = null
 		this.boundPointerDown = this.pointerDown.bind(this)
@@ -79,6 +78,7 @@ export class Mobject extends ExtendedObject {
 
 		if (this.constructor.name =='Mobject') {
 			this.update()
+			this.positionView()
 		}
 
 	}
@@ -100,7 +100,7 @@ export class Mobject extends ExtendedObject {
 	centerAt(newCenter: Vertex, frame?: Mobject) {
 		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
 		frame = frame || this.parent || this
-		let dr: Vertex = newCenter.subtract(this.getCenter(frame))
+		let dr: Vertex = newCenter.subtract(this.center(frame))
 		let oldAnchor: Vertex = this.anchor.copy()
 		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
 	}
@@ -151,15 +151,12 @@ export class Mobject extends ExtendedObject {
 	viewYMin(frame?: Mobject): number { return this.viewULCorner(frame).y }
 	viewYMax(frame?: Mobject): number { return this.viewLRCorner(frame).y }
 
-	getViewCenter(frame?: Mobject): Vertex {
+	viewCenter(frame?: Mobject): Vertex {
 		return this.transformLocalPoint(new Vertex(this.viewWidth/2, this.viewHeight/2), frame)
 	}
 
-	getWidth(): number { return this.viewWidth }
-	getHeight(): number { return this.viewHeight }
-
-	viewMidX(frame?: Mobject): number { return this.getViewCenter(frame).x }
-	viewMidY(frame?: Mobject): number { return this.getViewCenter(frame).y }
+	viewMidX(frame?: Mobject): number { return this.viewCenter(frame).x }
+	viewMidY(frame?: Mobject): number { return this.viewCenter(frame).y }
 
 	viewLeftCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)) }
 	viewRightCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)) }
@@ -178,14 +175,7 @@ export class Mobject extends ExtendedObject {
 	yMin(frame?: Mobject): number { return this.viewYMin(frame) }
 	yMax(frame?: Mobject): number { return this.viewYMax(frame) }
 
-	getCenter(frame?: Mobject): Vertex { return this.getViewCenter(frame) }
-
-	get center(): Vertex { return this.getCenter(this.parent) }
-	set center(newValue: Vertex) {
-		this.anchor.copyFrom(
-			newValue.translatedBy(-this.getWidth()/2, -this.getHeight()/2)
-		)
-	}
+	center(frame?: Mobject): Vertex { return this.viewCenter(frame) }
 
 	midX(frame?: Mobject): number { return this.viewMidX(frame) }
 	midY(frame?: Mobject): number { return this.viewMidY(frame) }
@@ -207,7 +197,7 @@ export class Mobject extends ExtendedObject {
 	localYMin(): number { return this.yMin(this) }
 	localYMax(): number { return this.yMax(this) }
 
-	localCenter(): Vertex { return this.getCenter(this) }
+	localCenter(): Vertex { return this.center(this) }
 
 	localMidX(): number { return this.midX(this) }
 	localMidY(): number { return this.midY(this) }
@@ -415,9 +405,6 @@ export class Mobject extends ExtendedObject {
 
 
 	update(argsDict: object = {}, redraw = true) {
-
-		if (Object.keys(argsDict).length == 0) { return }
-		// This prevents premature and redundant updating within constructors
 
 		// a new view should be set before anything else
 		if (argsDict['view']) {
@@ -728,44 +715,13 @@ export class VMobject extends Mobject {
 		return yMax
 	}
 
-	getWidth(): number { return this.localXMax() - this.localXMin() }
-	getHeight(): number { return this.localYMax() - this.localYMin() }
-
-	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin()) }
-	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin()) }
-	localLLCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMax()) }
-	localLRCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMax()) }
-
-	localMidX(): number { return (this.localXMin() + this.localXMax())/2 }
-	localMidY(): number { return (this.localYMin() + this.localYMax())/2 }
-
-	localCenter(): Vertex { return new Vertex(this.localMidX(), this.localMidY()) }
-
-	localLeftCenter(): Vertex { return new Vertex(this.localXMin(), this.localMidY()) }
-	localRightCenter(): Vertex { return new Vertex(this.localXMax(), this.localMidY()) }
-	localTopCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMin()) }
-	localBottomCenter(): Vertex { return new Vertex(this.localMidY(), this.localYMax()) }
-
-	ulCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localULCorner(), frame) }
-	urCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localURCorner(), frame) }
-	llCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLLCorner(), frame) }
-	lrCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLRCorner(), frame) }
-
-	xMin(frame?: Mobject): number { return this.ulCorner(frame).x }
-	xMax(frame?: Mobject): number { return this.lrCorner(frame).x }
-	yMin(frame?: Mobject): number { return this.ulCorner(frame).y }
-	yMax(frame?: Mobject): number { return this.lrCorner(frame).y }
-
-	getCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localCenter(), frame) }
-
-	midX(frame?: Mobject): number { return this.getCenter(frame).x }
-	midY(frame?: Mobject): number { return this.getCenter(frame).y }
-
-	leftCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLeftCenter(), frame) }
-	rightCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
-	topCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localTopCenter(), frame) }
-	bottomCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localBottomCenter(), frame) }
-
+	// update(argsDict: object = {}, redraw = true) {
+	// 	super.update(argsDict, redraw)
+	// 	try {
+	// 		this.svg.style.width = (this.localXMax() - this.localXMin()).toString() + 'px'
+	// 		this.svg.style.height = (this.localYMax() - this.localYMin()).toString() + 'px'
+	// 	} catch {}
+	// }
 }
 
 
@@ -891,7 +847,6 @@ export class TextLabel extends Mobject {
 	text: string
 	horizontalAlign: string // 'left' | 'center' | 'right'
 	verticalAlign: string // 'top' | 'center' | 'bottom'
-	fontSize: number
 	color?: Color
 
 	constructor(argsDict: object = {}) {
@@ -900,13 +855,12 @@ export class TextLabel extends Mobject {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
-			fontSize: 10,
 			color: Color.white()
 		})
 		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
 		this.view.style.display = 'flex'
 		this.view.style.fontFamily = 'Helvetica'
-		this.view.style.fontSize = `${this.fontSize}px`
+		this.view.style.fontSize = '10px'
 
 		if (this.constructor.name == 'TextLabel') {
 			this.update(argsDict)
@@ -916,7 +870,6 @@ export class TextLabel extends Mobject {
 	redrawSelf() {
 		if (this.anchor.isNaN()) { return }
 		if (this.color == undefined) { this.color = Color.white() }
-		this.view.style.fontSize = `${this.fontSize}px`
 
 	}
 

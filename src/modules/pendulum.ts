@@ -48,9 +48,8 @@ export class Pendulum extends LinkableMobject {
 
 		this.outputNames = ['angle']
 
-		if (this.constructor.name == "Pendulum") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
+
 	}
 
 	angle() {
@@ -87,13 +86,12 @@ export class CreatedPendulum extends CreatedMobject {
 	constructor(argsDict: object = {}) {
 
 		super()
-		if (this.constructor.name == "CreatedPendulum") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 		this.pendulum = new Pendulum({
 			anchor: this.startPoint
 		})
 		this.add(this.pendulum)
+		this.update(argsDict)
 
 	}
 

@@ -4,20 +4,18 @@ export class A {
 	value: number
 }
 
-export class Z {}
-
-export class B extends Z {
+export class B {
 	a1: A
 
-	constructor(argsDict: object = {}) {
+	constructor(argsDict = {}) {
 		console.log('B.constructor')
-		super()
 		this.a1 = new A()
-		this.update(argsDict)
+		if (this.constructor.name == 'B') {
+			this.update(argsDict)
+		}
 	}
 
-	update(argsDict: object = {}) {
-		if (Object.keys(argsDict).length == 0) { return }
+	update(argsDict = {}) {
 		console.log('B.update')
 		this.a1.value = argsDict['value1']
 	}
@@ -26,14 +24,16 @@ export class B extends Z {
 export class C extends B {
 	a2: A
 
-	constructor(argsDict: object = {}) {
+	constructor(argsDict = {}) {
 		console.log('C.constructor')
-		console.log(Object.keys(argsDict))
 		super()
 		this.a2 = new A()
+		if (this.constructor.name == 'C') {
+			this.update(argsDict)
+		}
 	}
 
-	update(argsDict: object = {}) {
+	update(argsDict = {}) {
 		console.log('C.update')
 		super.update(argsDict)
 		this.a2.value = argsDict['value2']

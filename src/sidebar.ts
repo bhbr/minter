@@ -24,11 +24,11 @@ function buttonCenter(index: number): Vertex {
 
 
 
-const buttonXOffset: number = 50
-const buttonYOffset: number = 50
+const buttonXOffset: number = 25
+const buttonYOffset: number = 25
 const buttonSpacing: number = 12.5
 const buttonRadius: number = 25
-const buttonScaleFactor: number = 1.2
+const buttonScaleFactor: number = 1.3
 
 class Sidebar extends Mobject {
 	
@@ -43,9 +43,7 @@ class Sidebar extends Mobject {
 		paper.view.style.left = this.viewWidth.toString() + "px"
 		// we cannot just update paper with a new anchor
 		// bc it is not a VMobject
-		if (this.constructor.name == "Sidebar") {
-			this.update(argsDict, false)
-		}
+		super.update(argsDict, false)
 	}
 }
 let sidebar = new Sidebar()
@@ -55,7 +53,7 @@ class SidebarButton extends Circle {
 	currentModeIndex: number
 	previousIndex: number
 	_baseColor: Color
-	locationIndex: number
+	_locationIndex: number
 	optionSpacing: number
 	touchStart: Vertex
 	active: boolean
@@ -79,20 +77,22 @@ class SidebarButton extends Circle {
 	constructor(argsDict: object = {}) {
 		super()
 
+
 		this.setAttributes({
 			currentModeIndex: 0,
 			previousIndex: 0,
 			baseColor: Color.white(),
 			strokeWidth: 0,
-			fillOpacity: 1,
 			locationIndex: 0,
 			optionSpacing: 25,
 			active: false,
 			showLabel: true,
 			text: 'text',
-			fontSize: 10,
+			fontSize: 12,
 			messages: [],
 			radius: buttonRadius,
+			viewWidth: 2 * buttonRadius,
+			viewHeight: 2 * buttonRadius,
 			interactive: true
 		})
 
@@ -100,14 +100,11 @@ class SidebarButton extends Circle {
 			viewWidth: 2 * this.radius,
 			viewHeight: 2 * this.radius
 		})
-
 		this.label.view.setAttribute('font-size', this.fontSize?.toString() ?? '12')
 		this.label.view.setAttribute('color', Color.white().toHex())
 		this.add(this.label)
 
-		if (this.constructor.name == "SidebarButton") {
-			this.update(argsDict, false)
-		}
+		this.update(argsDict, false)
 
 		this.updateModeIndex(0)
 		this.update({}, false)
@@ -123,8 +120,7 @@ class SidebarButton extends Circle {
 		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
-		this.addDependency('localCenter', this.label, 'center')
-		this.addDependency('fontSize', this.label, 'fontSize')
+		this.addDependency('midpoint', this.label, 'midpoint')
 
 		this.redraw()
 	}
@@ -137,6 +133,12 @@ class SidebarButton extends Circle {
 		this.fillColor = newColor
 	}
 	
+	get locationIndex(): number { return this._locationIndex }
+	set locationIndex(newIndex: number) {
+		this._locationIndex = newIndex
+		this.anchor = buttonCenter(this._locationIndex)
+	}
+
 	colorForIndex(i: number): Color {
 		return this.baseColor
 	}
@@ -159,9 +161,9 @@ class SidebarButton extends Circle {
 		this.messagePaper(this.messages[0])
 		this.active = true
 		this.update({
-			radius: buttonRadius * buttonScaleFactor,
-			previousIndex: this.currentModeIndex,
-			fontSize: this.fontSize * buttonScaleFactor
+			//radius: buttonRadius * buttonScaleFactor,
+			transform: new Transform({scale: 1.2, anchor: this.localCenter()}),
+			previousIndex: this.currentModeIndex
 		})
 	}
 	
@@ -199,10 +201,11 @@ class SidebarButton extends Circle {
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update({
-			radius: buttonRadius,
-			midpoint: newMidpoint,
-			fontSize: this.fontSize / buttonScaleFactor
+			//radius: buttonRadius,
+			transform: new Transform({scale: 1.0, anchor: this.localCenter()}), // identity does not work, weirdly enough
+			midpoint: newMidpoint
 		})
+		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
 	}
 
@@ -235,7 +238,6 @@ class SidebarButton extends Circle {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		argsDict['midpoint'] = buttonCenter(this.locationIndex)
 		super.update(argsDict)
 		this.updateLabel()
 	}
@@ -322,10 +324,7 @@ class ColorChangeButton extends SidebarButton {
 			this.messages.push({color: value})
 		}
 		this.outgoingMessage = {}
-
-		if (this.constructor.name == "ColorChangeButton") {
-			this.update(argsDict)
-		}
+		this.update()
 	}
 
 	colorForIndex(i): Color {
@@ -369,10 +368,7 @@ class CreativeButton extends SidebarButton {
 			this.messages.push({creating: creation})
 		}
 		this.outgoingMessage = {creating: 'freehand'}
-
-		if (this.constructor.name == "CreativeButton") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 
 	commonButtonUp() {
@@ -397,13 +393,6 @@ class CreativeButton extends SidebarButton {
 
 class ToggleButton extends SidebarButton {
 
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == "ToggleButton") {
-			this.update(argsDict)
-		}
-	}
-
 	commonButtonUp() {
 		this.currentModeIndex = 0
 		super.commonButtonUp()
@@ -424,9 +413,7 @@ class DragButton extends ToggleButton {
 		this.label.text = '↕︎'
 		this.setAttributes({ fontSize: 50 })
 		this.label.view.setAttribute('font-family', 'Times')
-		if (this.constructor.name == "DragButton") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 
 }
@@ -435,9 +422,7 @@ class LinkButton extends ToggleButton {
 	constructor(argsDict: object = {}) {
 		super()
 		this.label.text = 'link'
-		if (this.constructor.name == "LinkButton") {
-			this.update(argsDict)
-		}
+		this.update(argsDict)
 	}
 }
 
@@ -458,21 +443,21 @@ let circleButton = new CreativeButton({
 })
 sidebar.add(circleButton)
 
-let cindyButton = new CreativeButton({
-	creations: ['cindy'],
+let sliderButton = new CreativeButton({
+	creations: ['slider'],
 	key: 'e',
 	baseColor: Color.gray(0.6),
 	locationIndex: 2
 })
-sidebar.add(cindyButton)
+sidebar.add(sliderButton)
 
-let sliderButton = new CreativeButton({
-	creations: ['slider'],
+let cindyButton = new CreativeButton({
+	creations: ['cindy'],
 	key: 'r',
 	baseColor: Color.gray(0.2),
 	locationIndex: 3
 })
-sidebar.add(sliderButton)
+sidebar.add(cindyButton)
   
 // let pendulumButton = new CreativeButton({
 // 	creations: ['pendulum'],
