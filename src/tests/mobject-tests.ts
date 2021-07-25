@@ -115,6 +115,8 @@ export function CindyTest() {
 	cv2.startUp()
 	cv2.enableDragging()
 	cv2.disableDragging()
+
+	paper.setDragging(true)
 	
 }
 

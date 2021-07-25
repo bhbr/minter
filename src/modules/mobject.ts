@@ -529,6 +529,7 @@ export class Mobject extends ExtendedObject {
 		//console.log("event target:", this.eventTarget)
 		if (this.eventTarget.vetoOnStopPropagation) { return }
 		e.stopPropagation()
+
 		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
 			//console.log("here?")
 			this.eventTarget.pointerMove(e)
@@ -561,6 +562,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 	selfDragging(e: LocatedEvent) {
+		console.log('selfDragging')
 		let dragPoint: Vertex = pointerEventVertex(e)
 		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
 		

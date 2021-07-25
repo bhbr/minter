@@ -897,6 +897,7 @@
     }
 
     const isTouchDevice = 'ontouchstart' in document.documentElement;
+    const DRAW_BORDER = true;
     function stringFromPoint(point) {
         let x = point[0], y = point[1];
         return `${x} ${y}`;
@@ -971,7 +972,7 @@
                 children: [],
                 visible: true,
                 opacity: 1.0,
-                drawBorder: false,
+                drawBorder: DRAW_BORDER,
                 dependencies: [],
                 interactive: false,
                 vetoOnStopPropagation: false,
@@ -1411,6 +1412,7 @@
             this.dragAnchorStart = this.anchor;
         }
         selfDragging(e) {
+            console.log('selfDragging');
             let dragPoint = pointerEventVertex(e);
             let dr = dragPoint.subtract(this.dragPointStart);
             this.update({

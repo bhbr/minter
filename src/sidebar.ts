@@ -525,4 +525,3 @@ colorButton.update({
 
 let creating: boolean = false
 
-

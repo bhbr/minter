@@ -10,6 +10,7 @@ import { BoxSlider } from './modules/slider'
 import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
 import { Construction } from './modules/construction'
 import { Pendulum } from './modules/pendulum'
+import { CindyCanvas } from './modules/cindycanvas'
 
 declare var CindyJS: any
 
@@ -94,10 +95,21 @@ export class Paper extends LinkableMobject {
 			this.selfHandlePointerDown = this.startDragging
 			this.selfHandlePointerMove = this.dragging
 			this.selfHandlePointerUp = this.endDragging
+			for (let submob of this.submobjects) {
+				if (submob instanceof CindyCanvas) {
+					console.log('unvetoed')
+					submob.vetoOnStopPropagation = false
+				}
+			}
 		} else {
 			this.selfHandlePointerDown = this.startCreating
 			this.selfHandlePointerMove = this.creativeMove
 			this.selfHandlePointerUp = this.endCreating
+			for (let submob of this.submobjects) {
+				if (submob instanceof CindyCanvas) {
+					submob.vetoOnStopPropagation = true
+				}
+			}
 		}
 	}
 
@@ -118,6 +130,7 @@ export class Paper extends LinkableMobject {
 				}
 			}
 		}
+		console.log('dragged:', this.draggedMobject)
 		if (this.draggedMobject == this || !this.draggedMobject.draggable) {
 			this.draggedMobject = undefined
 			return
@@ -141,8 +154,12 @@ export class Paper extends LinkableMobject {
 		if (this.draggedMobject == undefined) { return }
 		let dragPoint = pointerEventVertex(e)
 		let dr = dragPoint.subtract(this.dragPointStart)
+		console.log(this.dragAnchorStart)
 		let newAnchor: Vertex = this.dragAnchorStart.add(dr)
 		this.draggedMobject.update({ anchor: newAnchor })
+		this.draggedMobject.view.style.left = `${newAnchor.x}px`
+		this.draggedMobject.view.style.top = `${newAnchor.y}px`
+		console.log(this.draggedMobject)
 
 		if (this.dependencyMap == undefined) { return }
 		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))

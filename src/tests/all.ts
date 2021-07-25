@@ -11,4 +11,4 @@ import { OOPTest } from './oop'
 // TextTest()
 // FreePointTest()
 // OOPTest()
-// SliderTest()
+SliderTest()
