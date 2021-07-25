@@ -34,6 +34,7 @@ export class BoxSlider extends LinkableMobject {
 		})
 		this.setAttributes({
 			draggable: true,
+			interactive: true,
 			outputNames: ['value']
 		})
 		this.setAttributes({
@@ -52,11 +53,19 @@ export class BoxSlider extends LinkableMobject {
 		this.filledBar = new Rectangle({
 			width: this.width,
 			height: this.normalizedValue() * this.height,
-			fillColor: argsDict['fillColor'] || Color.gray(0.5)
+			fillColor: argsDict['fillColor'] || Color.gray(0.5),
+			fillOpacity: 1
 		})
 		this.add(this.filledBar)
-		this.label = new TextLabel({text: this.value.toString()})
-		this.label.anchor = new Vertex(this.width/2, this.height/2)
+		this.label = new TextLabel({
+			text: this.value.toString(),
+			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
+			viewWidth: this.width,
+			viewHeight: 25,
+			horizontalAlign: 'center',
+			verticalAlign: 'center'
+		})
+
 		this.add(this.label)
 		this.update(argsDict)
 	}
@@ -66,17 +75,29 @@ export class BoxSlider extends LinkableMobject {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
+		if (this.width != undefined) {
+			argsDict['viewWidth'] = this.width
+		}
+		if (this.height != undefined) {
+			argsDict['viewHeight'] = this.height
+		}
 		super.update(argsDict, redraw = false)
+		this.viewHeight = this.height
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
 		try {
 			delete argsDict['anchor'] // so it does not propagate to the outer bar in the next line
 			this.outerBar.update(argsDict)
-			this.filledBar.anchor.y = this.height - this.filledBar.height
-			this.filledBar.update({ height: a * this.height })
+			this.outerBar.update({
+				height: this.height
+			})
+			this.filledBar.update({
+				height: a * this.height,
+				anchor:  new Vertex(0, this.height - a * this.height)
+			})
 			this.label.update({
 				text: this.value.toPrecision(3).toString(),
-				anchor: new Vertex(this.width/2, this.height/2)
+				anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
 			})
 		} catch { }
 		if (redraw) { this.redraw() }

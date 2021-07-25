@@ -6,6 +6,7 @@ import { Vertex, Transform } from '../modules/vertex-transform'
 import { Color } from '../modules/color'
 import { WaveCindyCanvas } from '../modules/cindycanvas'
 import { Point, FreePoint } from '../modules/creating'
+import { BoxSlider } from '../modules/slider'
 
 export function TransformTest() {
 	console.log("creating new circle")
@@ -137,7 +138,13 @@ export function FreePointTest() {
 
 }
 
-
+export function SliderTest() {
+	let s = new BoxSlider({
+		anchor: new Vertex(100, 100),
+		height: 150
+	})
+	paper.add(s)
+}
 
 
 

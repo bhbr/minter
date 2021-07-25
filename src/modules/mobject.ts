@@ -2,7 +2,7 @@ import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Dependency } from './dependency'
 import { ExtendedObject } from './extended-object'
-import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog } from './helpers'
+import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog, DRAW_BORDER } from './helpers'
 
 export class Mobject extends ExtendedObject {
 
@@ -46,7 +46,7 @@ export class Mobject extends ExtendedObject {
 
 			visible: true,
 			opacity: 1.0,
-			drawBorder: false,
+			drawBorder: DRAW_BORDER,
 
 			dependencies: [],
 

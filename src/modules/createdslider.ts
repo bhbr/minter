@@ -54,13 +54,13 @@ export class CreatedBoxSlider extends CreatedMobject {
 
 	dissolveInto(superMobject: Mobject) {
 		superMobject.remove(this)
-		superMobject.add(this.protoSlider)
 		this.protoSlider.update({
 			anchor: this.anchor
 		})
-		this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) })
+		superMobject.add(this.protoSlider)
+		this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) })
 		this.protoSlider.label.update({
-			anchor: new Vertex(this.protoSlider.width/2, this.protoSlider.height/2)
+			anchor: new Vertex(this.protoSlider.width/2 - this.protoSlider.label.viewWidth/2, this.protoSlider.height/2 - this.protoSlider.label.viewHeight/2)
 		})
 
 	}

@@ -227,6 +227,7 @@ export class DrawnRectangle extends CreatedMobject {
 			anchor: topLeft,
 			viewWidth: w,
 			viewHeight: h,
+			points: [[0.4, 0.4], [0.3, 0.8]],
 			id: `wave-${w}x${h}`
 		})
 

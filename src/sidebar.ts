@@ -18,14 +18,14 @@ let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-consol
 interface Window { webkit?: any }
 
 function buttonCenter(index: number): Vertex {
-	let y: number = buttonYOffset + index * (buttonSpacing + 2 * buttonRadius)
-	return new Vertex(buttonXOffset, y)
+	let y: number = buttonCenterX + index * (buttonSpacing + 2 * buttonRadius)
+	return new Vertex(buttonCenterX, y)
 }
 
 
 
-const buttonXOffset: number = 25
-const buttonYOffset: number = 25
+const buttonCenterX: number = 50
+const buttonCenterY: number = 50
 const buttonSpacing: number = 12.5
 const buttonRadius: number = 25
 const buttonScaleFactor: number = 1.3
@@ -46,7 +46,9 @@ class Sidebar extends Mobject {
 		super.update(argsDict, false)
 	}
 }
-let sidebar = new Sidebar()
+let sidebar = new Sidebar({
+	viewWidth: 100
+})
 
 class SidebarButton extends Circle {
 	
@@ -93,7 +95,8 @@ class SidebarButton extends Circle {
 			radius: buttonRadius,
 			viewWidth: 2 * buttonRadius,
 			viewHeight: 2 * buttonRadius,
-			interactive: true
+			interactive: true,
+			fillOpacity: 1
 		})
 
 		this.label = new TextLabel({
@@ -434,6 +437,9 @@ let lineButton = new CreativeButton({
 	locationIndex: 0
 })
 sidebar.add(lineButton)
+lineButton.update({
+	midpoint: buttonCenter(0)
+})
 
 let circleButton = new CreativeButton({
 	creations: ['circle'],
@@ -442,6 +448,9 @@ let circleButton = new CreativeButton({
 	locationIndex: 1
 })
 sidebar.add(circleButton)
+circleButton.update({
+	midpoint: buttonCenter(1)
+})
 
 let sliderButton = new CreativeButton({
 	creations: ['slider'],
@@ -450,6 +459,9 @@ let sliderButton = new CreativeButton({
 	locationIndex: 2
 })
 sidebar.add(sliderButton)
+sliderButton.update({
+	midpoint: buttonCenter(2)
+})
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
@@ -458,43 +470,57 @@ let cindyButton = new CreativeButton({
 	locationIndex: 3
 })
 sidebar.add(cindyButton)
+cindyButton.update({
+	midpoint: buttonCenter(3)
+})
   
-// let pendulumButton = new CreativeButton({
-// 	creations: ['pendulum'],
-// 	key: 't',
-// 	baseColor: Color.gray(0.4),
-// 	locationIndex: 4
-// })
-// sidebar.add(pendulumButton)
+let pendulumButton = new CreativeButton({
+	creations: ['pendulum'],
+	key: 't',
+	baseColor: Color.gray(0.4),
+	locationIndex: 4
+})
+sidebar.add(pendulumButton)
+pendulumButton.update({
+	midpoint: buttonCenter(4)
+})
   
-// let dragButton = new DragButton({
-// 	messages: [{drag: true}],
-// 	outgoingMessage: {drag: false},
-// 	key: 'a',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 5
-// })
-// dragButton.label.view.setAttribute('fill', 'black')
-// sidebar.add(dragButton)
+let dragButton = new DragButton({
+	messages: [{drag: true}],
+	outgoingMessage: {drag: false},
+	key: 'a',
+	baseColor: Color.gray(0.6),
+	locationIndex: 5
+})
+dragButton.label.view.setAttribute('fill', 'black')
+sidebar.add(dragButton)
+dragButton.update({
+	midpoint: buttonCenter(5)
+})
 
-// let linkButton = new LinkButton({
-// 	messages: [{toggleLinks: true}],
-// 	outgoingMessage: {toggleLinks: false},
-// 	key: 's',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 6
-// })
-// sidebar.add(linkButton)
+let linkButton = new LinkButton({
+	messages: [{toggleLinks: true}],
+	outgoingMessage: {toggleLinks: false},
+	key: 's',
+	baseColor: Color.gray(0.2),
+	locationIndex: 6
+})
+sidebar.add(linkButton)
+linkButton.update({
+	midpoint: buttonCenter(6)
+})
 
-// let colorButton = new ColorChangeButton({
-// 	key: 'd',
-// 	baseColor: Color.white(),
-// 	modeSpacing: 15,
-// 	locationIndex: 7,
-// 	fillOpacity: 1
-// })
-// sidebar.add(colorButton)
-
+let colorButton = new ColorChangeButton({
+	key: 'd',
+	baseColor: Color.white(),
+	modeSpacing: 15,
+	locationIndex: 7,
+	fillOpacity: 1
+})
+sidebar.add(colorButton)
+colorButton.update({
+	midpoint: buttonCenter(7)
+})
 
 
 let creating: boolean = false
