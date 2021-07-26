@@ -18,12 +18,15 @@ export class LinkBullet extends Circle {
 	outputName: string
 
 	constructor(argsDict: object) {
-		super(argsDict)
+		super()
 		this.setAttributes({        
 			radius: BULLET_SIZE,
 			fillOpacity: 0,
 			strokeColor: Color.white()
 		})
+		if (this.constructor.name == 'LinkBullet') {
+			this.update(argsDict)
+		}
 	}
 }
 
@@ -34,8 +37,8 @@ export class InputList extends RoundedRectangle {
 	bulletLocationDict: object
 	mobject: Mobject
 
-	constructor(argsDict: object) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({listInputNames: []})
 		this.setAttributes({
 			cornerRadius: 20,
@@ -47,7 +50,9 @@ export class InputList extends RoundedRectangle {
 		})
 		this.redraw()
 		this.bulletLocationDict = {}
+		console.log('list:', this.listInputNames)
 		for (let i = 0; i < this.listInputNames.length; i++) {
+			console.log('here')
 			let name = this.listInputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, inputName: name})
 			let t = new TextLabel({
@@ -55,18 +60,29 @@ export class InputList extends RoundedRectangle {
 				textAnchor: 'left',
 				textAlign: 'left'
 			})
-			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(15, 0)
-			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
+			c.update({ anchor: new Vertex([40, 3 + 25 * (i + 1)]) })
+			t.update({ anchor: c.anchor.translatedBy(15, 0) })
+			console.log(c.anchor)
+			this.bulletLocationDict[name] = c.parent.transformLocalPoint(c.anchor, t.getPaper())
+		}
+		if (this.constructor.name == 'InputList') {
+			this.update(argsDict)
 		}
 	}
 
 	getHeight(): number {
-		let l: number = this.listInputNames.length
-		if (l == 0) { return 0 }
+		if (this.listInputNames == undefined) { return 0 }
+		if (this.listInputNames.length == 0) { return 0 }
 		else { return 40 + 25 * this.listInputNames.length }
+	}
+
+	update(argsDict: object = {}, redraw = true) {
+		console.log('listInputNames:', this.listInputNames)
+		console.log(this.getHeight())
+		argsDict['height'] = this.getHeight()
+		super.update(argsDict, redraw)
 	}
 }
 
@@ -78,8 +94,8 @@ export class OutputList extends RoundedRectangle {
 	bulletLocationDict: object
 	mobject: Mobject
 
-	constructor(argsDict) {
-		super(argsDict)
+	constructor(argsDict: object = {}) {
+		super()
 		this.setDefaults({listOutputNames: []})
 		this.setAttributes({
 			cornerRadius: 20,
@@ -89,8 +105,24 @@ export class OutputList extends RoundedRectangle {
 			width: 150,
 			height: this.getHeight()
 		})
+		console.log(this.height)
 		this.redraw()
 		this.bulletLocationDict = {}
+		
+		if (this.constructor.name == 'OutputList') {
+			this.update(argsDict)
+		}
+	}
+
+	getHeight(): number {
+		if (this.listOutputNames == undefined) { return 0 }
+		if (this.listOutputNames.length == 0) { return 0 }
+		else {
+			return 40 + 25 * this.listOutputNames.length
+		}
+	}
+
+	updateBulletList() {
 		for (let i = 0; i < this.listOutputNames.length; i++) {
 			let name = this.listOutputNames[i]
 			let c = new LinkBullet({mobject: this.mobject, outputName: name})
@@ -99,19 +131,22 @@ export class OutputList extends RoundedRectangle {
 				textAnchor: 'left',
 				textAlign: 'left'
 			})
-			c.anchor = new Vertex([40, 3 + 25 * (i + 1)])
-			t.anchor = c.anchor.translatedBy(15, 0)
 			this.bulletLocationDict[name] = c.anchor
 			this.add(c)
 			this.add(t)
+			c.update({ anchor: new Vertex([40, 3 + 25 * (i + 1)]) })
+			t.update({ anchor: c.anchor.translatedBy(15, 0) })
 		}
 	}
 
-	getHeight(): number {
-		let l: number = this.listOutputNames.length
-		if (l == 0) { return 0 }
-		else { return 40 + 25 * this.listOutputNames.length }
+	update(argsDict: object = {}, redraw = true) {
+		console.log('listOutputNames:', this.listOutputNames)
+		console.log(this.getHeight())
+		argsDict['height'] = this.getHeight()
+		super.update(argsDict, redraw)
+		this.updateBulletList()
 	}
+
 }
 
 export class IOList extends MGroup {
@@ -121,12 +156,15 @@ export class IOList extends MGroup {
 	mobject: Mobject
 
 	constructor(argsDict) {
-		super(argsDict)
+		super()
 		this.inputList = new InputList(argsDict)
 		this.outputList = new OutputList(argsDict)
 		this.add(this.inputList)
 		this.add(this.outputList)
 		// positioning is handled by parent
+		if (this.constructor.name == 'IOList') {
+			this.update(argsDict)
+		}
 	}
 }
 
@@ -139,8 +177,11 @@ export class DependencyMap extends MGroup {
 	mobject: Mobject
 
 	constructor(argsDict) {
-		super(argsDict)
+		super()
 		this.linkLines = []
+		if (this.constructor.name == 'DependencyMap') {
+			this.update(argsDict)
+		}
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
@@ -286,7 +327,7 @@ export class LinkLine extends CreatedMobject {
 	target: Mobject
 
 	constructor(argsDict) {
-		super(argsDict)
+		super()
 		this.endPoint = this.startPoint.copy()
 		this.startBullet = new Circle({
 			radius: BULLET_SIZE - 2,
@@ -306,6 +347,9 @@ export class LinkLine extends CreatedMobject {
 		this.add(this.startBullet)
 		this.add(this.line)
 		this.add(this.endBullet)
+		if (this.constructor.name == 'LinkLine') {
+			this.update(argsDict)
+		}
 
 	}
 
@@ -354,11 +398,21 @@ export class LinkableMobject extends Mobject {
 
 	constructor(argsDict: object = {}) {
 		super()
-		this.setDefaults({
+
+		//// defaults
+		let initialArgs = {
 			inputNames: [],  // linkable parameters
-			outputNames: [] // linkable parameters
-		})
-		this.update(argsDict)
+			outputNames: [], // linkable parameters
+			cindys: []
+		}
+		Object.assign(initialArgs, argsDict)
+
+		//// updating
+		if (this.constructor.name == 'LinkableMobject') {
+			this.update(initialArgs)
+		} else {
+			this.setAttributes(initialArgs)
+		}
 	}
 
 	dependenciesBetweenChildren(): Array<Dependency> {
@@ -380,6 +434,7 @@ export class LinkableMobject extends Mobject {
 		for (let submob of this.children) {
 			this.createIOListForMobject(submob)
 		}
+		console.log(this.cindys)
 		for (let submob of this.cindys) {
 			this.createIOListForMobject(submob)
 		}
@@ -397,10 +452,10 @@ export class LinkableMobject extends Mobject {
 		this.dependencyMap.add(ioList)
 		let p1: Vertex = ioList.inputList.bottomCenter(this)
 		let p2: Vertex = submob.topCenter(this)
-		ioList.inputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] - 10)
+		ioList.inputList.update({ anchor: ioList.inputList.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] - 10)})
 		p1 = ioList.outputList.topCenter(this)
 		p2 = submob.bottomCenter(this)
-		ioList.outputList.anchor.translateBy(p2[0] - p1[0], p2[1] - p1[1] + 10)
+		ioList.outputList.update({ anchor: ioList.outputList.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] + submob.viewHeight + 10)})
 		ioList.update()
 	}
 
@@ -422,6 +477,10 @@ export class LinkableMobject extends Mobject {
 		}
 	}
 
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, redraw)
+		this.updateIOList()
+	}
 }
 
 

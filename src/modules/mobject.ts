@@ -8,7 +8,7 @@ export class Mobject extends ExtendedObject {
 
 	// position and hierarchy
 	transform: Transform
-	_parent: Mobject
+	_parent?: Mobject
 	viewWidth: number
 	viewHeight: number
 	children: Array<Mobject>
@@ -16,29 +16,30 @@ export class Mobject extends ExtendedObject {
 	// view and style
 	view?: HTMLDivElement
 	visible: boolean
-	_opacity: number
-	_backgroundColor: Color
+	opacity: number
+	backgroundColor: Color
 	drawBorder: boolean
 
 	// dependency
-	dependencies: Array<Dependency> = []
+	dependencies: Array<Dependency>
 
 	// interactivity
 	eventTarget?: Mobject
 	vetoOnStopPropagation: boolean
 	interactive: boolean
 	passAlongEvents: boolean // to event target
-	previousPassAlongEvents: boolean // stored copy while temporarily set to false when draggable
+	previousPassAlongEvents?: boolean // stored copy while temporarily set to false when draggable
 	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
-	snappablePoints: Array<any> = [] // workaround, don't ask
-	dragPointStart: Vertex
-	dragAnchorStart: Vertex
+	snappablePoints: Array<any> // workaround, don't ask
+	dragPointStart?: Vertex
+	dragAnchorStart?: Vertex
 
 
 	constructor(argsDict: object = {}) {
 		super()
 
-		this.setDefaults({
+		//// defaults
+		let initialArgs = {
 			transform: Transform.identity(),
 			viewWidth: 100,
 			viewHeight: 100,
@@ -46,6 +47,7 @@ export class Mobject extends ExtendedObject {
 
 			visible: true,
 			opacity: 1.0,
+			backgroundColor: Color.clear(),
 			drawBorder: DRAW_BORDER,
 
 			dependencies: [],
@@ -53,9 +55,12 @@ export class Mobject extends ExtendedObject {
 			interactive: false,
 			vetoOnStopPropagation: false,
 			passAlongEvents: true,
-			draggable: false
-		})
+			draggable: false,
+			snappablePoints: []
+		}
+		Object.assign(initialArgs, argsDict)
 
+		//// state-independent setup
 		this.setView(document.createElement('div'))
 
 		this.eventTarget = null
@@ -76,10 +81,13 @@ export class Mobject extends ExtendedObject {
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
-		if (this.constructor.name =='Mobject') {
-			this.update()
-			this.positionView()
+		//// updating
+		if (this.constructor.name == 'Mobject') {
+			this.update(initialArgs)
+		} else {
+			this.setAttributes(initialArgs)
 		}
+		//// no state-dependent setup
 
 	}
 
@@ -215,6 +223,7 @@ export class Mobject extends ExtendedObject {
 	get superMobject(): Mobject { return this.parent }
 	set superMobject(newValue: Mobject) { this.parent = newValue }
 
+	// move to update?
 	get parent(): Mobject { return this._parent }
 	set parent(newValue: Mobject) {
 		this.view?.remove()
@@ -240,19 +249,19 @@ export class Mobject extends ExtendedObject {
 
 	// view and style
 
-	get opacity(): number { return this._opacity }
-	set opacity(newValue: number) {
-		this._opacity = newValue
-		if (this.view) {
-			this.view.style.opacity = `${newValue}`
-		}
-	}
+	// get opacity(): number { return this._opacity }
+	// set opacity(newValue: number) {
+	// 	this._opacity = newValue
+	// 	if (this.view) {
+	// 		this.view.style.opacity = `${newValue}`
+	// 	}
+	// }
 
-	get backgroundColor(): Color { return this._backgroundColor }
-	set backgroundColor(newValue: Color) {
-		this._backgroundColor = newValue
-		this.view.style.backgroundColor = newValue.toHex()
-	}
+	// get backgroundColor(): Color { return this._backgroundColor }
+	// set backgroundColor(newValue: Color) {
+	// 	this._backgroundColor = newValue
+	// 	this.view.style.backgroundColor = newValue.toHex()
+	// }
 
 	setView(newView: HTMLDivElement) {
 		if (newView === this.view) { return }
@@ -268,7 +277,7 @@ export class Mobject extends ExtendedObject {
 			this.superMobject.view.appendChild(this.view)
 		}
 		addPointerDown(this.view, this.boundPointerDown) // TODO: move
-		this.positionView()
+		//this.positionView()
 
 		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
 		this.view.style.transformOrigin = 'top left'
@@ -282,8 +291,10 @@ export class Mobject extends ExtendedObject {
 		this.view.style['transform'] = this.transform.asString()
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
 		this.view.style['height'] = this.viewHeight.toString() + 'px'
-		this.view.style['left'] = this.anchor.x.toString() + 'px'
-		this.view.style['top'] = this.anchor.y.toString() + 'px'
+		if (this.anchor != undefined) {
+			this.view.style['left'] = this.anchor.x.toString() + 'px'
+			this.view.style['top'] = this.anchor.y.toString() + 'px'
+		}
 	}
 
 	add(submob: Mobject) {
@@ -310,8 +321,10 @@ export class Mobject extends ExtendedObject {
 	}
 
 	redraw(recursive = true) {
-		if (!this.visible || !this.parent) { return }
+		if (!this.view) { return }
 		this.positionView()
+		this.view.style['background-color'] = this.backgroundColor.toCSS()
+		//if (!this.visible || !this.parent) { return }
 		this.redrawSelf()
 		if (recursive) { this.redrawSubmobs() }
 	}
@@ -413,6 +426,7 @@ export class Mobject extends ExtendedObject {
 		}
 
 		this.setAttributes(argsDict)
+		//this.positionView()
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
@@ -425,7 +439,7 @@ export class Mobject extends ExtendedObject {
 			dep.target.update()
 		}
 
-		if (this.view && redraw) {
+		if (this.constructor.name == 'Mobject' && redraw) {
 			this.redraw()
 		}
 
@@ -473,7 +487,9 @@ export class Mobject extends ExtendedObject {
 	}
 
 	disableDragging() {
-		this.passAlongEvents = this.previousPassAlongEvents
+		if (this.previousPassAlongEvents != undefined) {
+			this.passAlongEvents = this.previousPassAlongEvents
+		}
 		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
 		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
 		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
@@ -496,13 +512,13 @@ export class Mobject extends ExtendedObject {
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
 				let r: Mobject = t['mobject']
-				console.log('event target mob:', r)
+				//console.log('event target mob:', r)
 				return r
 			}
 			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
-		console.log('event target mob:', this)
+		//console.log('event target mob:', this)
 		return this
 	}
 
@@ -587,11 +603,22 @@ export class MGroup extends Mobject {
 
 	constructor(argsDict: object = {}) {
 		super()
+		if (this.constructor.name == 'MGroup') {
+			this.update(argsDict)
+		} else {
+			this.setAttributes(argsDict)
+		}
+		
+		// children may have been set as a constructor args
 		for (let submob of this.children) {
 			this.add(submob)
 		}
-		if (this.constructor.name == 'MGroup') {
-			this.update(argsDict)
+	}
+
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, false)
+		if (this.constructor.name == 'MGroup' && redraw) {
+			this.redraw()
 		}
 	}
 
@@ -613,6 +640,17 @@ export class VMobject extends Mobject {
 
 	constructor(argsDict: object = {}) {
 		super()
+
+		//// defaults
+		let initialArgs = {
+			fillColor: Color.white(),
+			fillOpacity: 0,
+			strokeColor: Color.white(),
+			strokeWidth: 1,
+		}
+		Object.assign(initialArgs, argsDict)
+
+		//// state-independent setup
 		this.vertices = []
 		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
@@ -624,15 +662,14 @@ export class VMobject extends Mobject {
 		this.svg.setAttribute('class', 'mobject-svg')
 		this.svg.style.overflow = 'visible'
 
-		this.setDefaults({
-			fillColor: Color.white(),
-			fillOpacity: 0,
-			strokeColor: Color.white(),
-			strokeWidth: 1,
-		})
+		//// updating
 		if (this.constructor.name == 'VMobject') {
-			this.update(argsDict)
+			this.update(initialArgs)
+		} else {
+			this.setAttributes(initialArgs)
 		}
+
+		//// no state-dependent setup
 	}
 
 	redrawSelf() {
@@ -717,13 +754,47 @@ export class VMobject extends Mobject {
 		return yMax
 	}
 
-	// update(argsDict: object = {}, redraw = true) {
-	// 	super.update(argsDict, redraw)
-	// 	try {
-	// 		this.svg.style.width = (this.localXMax() - this.localXMin()).toString() + 'px'
-	// 		this.svg.style.height = (this.localYMax() - this.localYMin()).toString() + 'px'
-	// 	} catch {}
-	// }
+	localULCorner(): Vertex {
+		return new Vertex(this.localXMin(), this.localYMin())
+	}
+
+	getWidth(): number { return this.localXMax() - this.localXMin() }
+	getHeight(): number { return this.localYMax() - this.localYMin() }
+
+	update(argsDict: object = {}, redraw = true) {
+		super.update(argsDict, false)
+		if (this.constructor.name == 'VMobject' && redraw) {
+			this.redraw()
+		}
+	}
+
+	adjustFrame() {
+		let shift = new Transform({ shift: this.localULCorner() })
+		let inverseShift = shift.inverse()
+		let updateDict: object = {}
+		for (let [key, value] of Object.entries(this)) {
+			var newValue: any
+			if (value instanceof Vertex) {
+				newValue = inverseShift.appliedTo(value)
+			} else if (value instanceof Array && value.length > 0) {
+				newValue = []
+				if (!(value[0] instanceof Vertex)) { continue }
+				for (let v of value) {
+					newValue.push(inverseShift.appliedTo(v))
+				}
+			} else {
+				continue
+			}
+			updateDict[key] = newValue
+		}
+
+		updateDict['anchor'] = shift.appliedTo(this.anchor)
+		updateDict['viewWidth'] = this.getWidth()
+		updateDict['viewHeight'] = this.getHeight()
+		console.log(updateDict)
+		this.update(updateDict)
+
+	}
 }
 
 
@@ -741,6 +812,8 @@ export class Polygon extends VMobject {
 		super()
 		if (this.constructor.name == 'Polygon') {
 			this.update(argsDict)
+		} else {
+			this.setAttributes(argsDict)
 		}
 	}
 
@@ -786,6 +859,8 @@ export class CurvedShape extends VMobject {
 		super()
 		if (this.constructor.name == 'CurvedShape') {
 			this.update(argsDict)
+		} else {
+			this.setAttributes(argsDict)
 		}
 	}
 
@@ -853,19 +928,25 @@ export class TextLabel extends Mobject {
 
 	constructor(argsDict: object = {}) {
 		super()
-		this.setDefaults({
+		let initialArgs = {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			color: Color.white()
-		})
+		}
+		Object.assign(initialArgs, argsDict)
+
+		//// state-independent setup
 		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
 		this.view.style.display = 'flex'
 		this.view.style.fontFamily = 'Helvetica'
 		this.view.style.fontSize = '10px'
 
+		//// updating
 		if (this.constructor.name == 'TextLabel') {
-			this.update(argsDict)
+			this.update(initialArgs)
+		} else {
+			this.setAttributes(initialArgs)
 		}
 	}
 
@@ -876,7 +957,9 @@ export class TextLabel extends Mobject {
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, redraw)
+		super.update(argsDict, false)
+
+		//// internal dependencies
 		this.view.innerHTML = this.text
 		this.view.style.color = (this.color ?? Color.white()).toHex()
 		switch (this.verticalAlign) {
@@ -901,6 +984,10 @@ export class TextLabel extends Mobject {
 		case 'right':
 			this.view.style.justifyContent = 'flex-end'
 			break
+		}
+
+		if (this.constructor.name == 'TextLabel' && redraw) {
+			this.redraw()
 		}
 
 	}

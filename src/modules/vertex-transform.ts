@@ -162,6 +162,16 @@ export class Transform extends ExtendedObject {
 	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
 	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
 
+	inverse(): Transform {
+		let t = new Transform({
+			anchor: this.anchor,
+			angle: -this.angle,
+			scale: 1/this.scale
+		})
+		t.shift = t.appliedTo(this.shift).opposite()
+		return t
+	}
+
 	appliedTo(p: Vertex): Vertex {
 		return new Vertex(
 			this.a() * p.x + this.b() * p.y + this.e(),

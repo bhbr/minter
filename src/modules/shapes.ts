@@ -138,28 +138,48 @@ export class Rectangle extends Polygon {
 
 	constructor(argsDict: object = {}) {
 		super()
-		this.setDefaults({
+
+		//// defaults
+		let initialArgs = {
 			width: 100,
 			height: 100
-		})
+		}
+		Object.assign(initialArgs, argsDict)
+
+		//// state-independent setup
 		this.p1 = Vertex.origin()
-		this.p2 = new Vertex([this.width, 0])
-		this.p3 = new Vertex([this.width, this.height])
-		this.p4 = new Vertex([0, this.height])
+		this.p2 = Vertex.origin()
+		this.p3 = Vertex.origin()
+		this.p4 = Vertex.origin()
 		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-		this.update(argsDict)
+
+		//// updating
+		if (this.constructor.name == 'Rectangle') {
+			this.update(initialArgs)
+		} else {
+			this.setAttributes(initialArgs)
+		}
+
+		//// no state-dependent setup
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		try {
-			this.p2.x = argsDict['width'] || this.width
-			this.p3.x = argsDict['width'] || this.width
-			this.p3.y = argsDict['height'] || this.height
-			this.p4.y = argsDict['height'] || this.height
-			this.viewWidth = argsDict['width'] || this.width
-			this.viewHeight = argsDict['height'] || this.height
-			super.update(argsDict, redraw)
-		} catch {}
+		super.update(argsDict, false)
+
+		//// internal dependencies
+		this.viewWidth = this.width
+		this.viewHeight = this.height
+
+		this.p2.x = this.width
+		this.p3.x = this.width
+		this.p3.y = this.height
+		this.p4.y = this.height
+
+		//// redraw
+		if (this.constructor.name == 'Rectangle' && redraw) {
+			this.redraw()
+		}
+
 	}
 
 	
@@ -219,6 +239,12 @@ export class RoundedRectangle extends CurvedShape {
 				this.p1, p12
 			]
 		} catch { }
+	}
+
+	update(argsDict: object = {}, redraw = true) {
+		argsDict['viewWidth'] = argsDict['width'] || this.width
+		argsDict['viewHeight'] = argsDict['height'] || this.height
+		super.update(argsDict, redraw)
 	}
 
 }

@@ -20,30 +20,30 @@ export class BoxSlider extends LinkableMobject {
 	width: number
 	outerBar: Rectangle
 	filledBar: Rectangle
+	fillColor: Color
 	label: TextLabel
 
 	constructor(argsDict: object = {}) {
 		super()
-		this.setDefaults({
+
+		//// defaults
+		let initialArgs = {
 			min: 0,
 			max: 1,
 			value: 0.6,
 			height: 200,
 			width: 50,
-			strokeColor: Color.white()
-		})
-		this.setAttributes({
+			strokeColor: Color.white(),
 			draggable: true,
 			interactive: true,
-			outputNames: ['value']
-		})
-		this.setAttributes({
-			fillColor: argsDict['backgroundColor'] || Color.white()
-		})
+			outputNames: ['value'],
+			fillColor: Color.gray(0.5)
+		}
+		Object.assign(initialArgs, argsDict)
 
+
+		//// state-independent setup
 		this.outerBar = new Rectangle({
-			width: this.width,
-			height: this.height,
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeColor: Color.white()
@@ -51,56 +51,76 @@ export class BoxSlider extends LinkableMobject {
 		this.add(this.outerBar)
 
 		this.filledBar = new Rectangle({
-			width: this.width,
-			height: this.normalizedValue() * this.height,
-			fillColor: argsDict['fillColor'] || Color.gray(0.5),
-			fillOpacity: 1
+			fillOpacity: 0.5
 		})
 		this.add(this.filledBar)
+
 		this.label = new TextLabel({
-			text: this.value.toString(),
-			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
-			viewWidth: this.width,
 			viewHeight: 25,
 			horizontalAlign: 'center',
 			verticalAlign: 'center'
 		})
-
 		this.add(this.label)
-		this.update(argsDict)
+		
+		//// updating
+		if (this.constructor.name == 'BoxSlider') {
+			this.update(initialArgs)
+
+			//// state-dependent setup
+			this.outerBar.update({
+				width: this.width,
+				fillColor: this.backgroundColor
+			})
+			this.filledBar.update({
+				fillColor: this.fillColor
+			})
+			this.label.update({
+				viewWidth: this.width
+			})
+
+		} else {
+			this.setAttributes(initialArgs)
+		}
 	}
+
 
 	normalizedValue(): number {
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
 	update(argsDict: object = {}, redraw = true) {
-		if (this.width != undefined) {
-			argsDict['viewWidth'] = this.width
-		}
-		if (this.height != undefined) {
-			argsDict['viewHeight'] = this.height
-		}
 		super.update(argsDict, redraw = false)
+
+		//// internal dependencies
+		this.viewWidth = this.width
 		this.viewHeight = this.height
+		this.positionView()
+
+
+		//// updating submobs
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
-		try {
-			delete argsDict['anchor'] // so it does not propagate to the outer bar in the next line
-			this.outerBar.update(argsDict)
-			this.outerBar.update({
-				height: this.height
-			})
-			this.filledBar.update({
-				height: a * this.height,
-				anchor:  new Vertex(0, this.height - a * this.height)
-			})
-			this.label.update({
-				text: this.value.toPrecision(3).toString(),
-				anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
-			})
-		} catch { }
-		if (redraw) { this.redraw() }
+
+		this.outerBar.update({
+			width: this.width,
+			height: this.height
+		})
+
+		this.filledBar.update({
+			width: this.width,
+			height: a * this.height,
+			anchor:  new Vertex(0, this.height - a * this.height)
+		})
+
+		this.label.update({
+			text: this.value.toPrecision(3).toString(),
+			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2)
+		})
+
+		//// redraw
+		if (this.constructor.name == 'BoxSlider' && redraw) {
+			this.redraw()
+		}
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {

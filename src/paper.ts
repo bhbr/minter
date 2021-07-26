@@ -37,7 +37,7 @@ export class Paper extends LinkableMobject {
 		this.children = []
 		this.visibleCreation = 'freehand'
 		this.snappablePoints = []
-		this.construction = new Construction()
+		//this.construction = new Construction()
 
 		this.colorPalette = {
 			'black': Color.black(),
@@ -53,26 +53,32 @@ export class Paper extends LinkableMobject {
 		this.currentColor = this.colorPalette['white']
 		this.setDragging(false)
 		this.interactive = true
-		this.update(argsDict)
 		
 		
 		this.background = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
 			passAlongEvents: true
 		})
+
 		this.add(this.background)
 
-		this.construction.update({
-			viewWidth: 0, //this.viewWidth,
-			viewHeight: 0 //this.viewHeight
-		})
-		this.add(this.construction)
+		// this.construction.update({
+		// 	viewWidth: 0, //this.viewWidth,
+		// 	viewHeight: 0 //this.viewHeight
+		// })
+		// this.add(this.construction)
 
+		if (this.constructor.name == 'Paper') {
+			this.update(argsDict)
+
+			this.background.update({
+				width: this.viewWidth,
+				height: this.viewHeight,
+				viewWidth: this.viewWidth,
+				viewHeight: this.viewHeight
+			})
+		}
 	}
 
 	changeColorByName(newColorName: string) {
@@ -95,22 +101,27 @@ export class Paper extends LinkableMobject {
 			this.selfHandlePointerDown = this.startDragging
 			this.selfHandlePointerMove = this.dragging
 			this.selfHandlePointerUp = this.endDragging
-			for (let submob of this.submobjects) {
-				if (submob instanceof CindyCanvas) {
-					console.log('unvetoed')
-					submob.vetoOnStopPropagation = false
-				}
+			for (let submob of this.getCindys()) {
+				submob.vetoOnStopPropagation = false
 			}
 		} else {
 			this.selfHandlePointerDown = this.startCreating
 			this.selfHandlePointerMove = this.creativeMove
 			this.selfHandlePointerUp = this.endCreating
-			for (let submob of this.submobjects) {
-				if (submob instanceof CindyCanvas) {
-					submob.vetoOnStopPropagation = true
-				}
+			for (let submob of this.getCindys()) {
+				submob.vetoOnStopPropagation = true
 			}
 		}
+	}
+
+	getCindys(): Array<CindyCanvas> {
+		let ret: Array<CindyCanvas> = []
+		for (let submob of this.submobs) {
+			if (submob instanceof CindyCanvas) {
+				ret.push(submob)
+			}
+		}
+		return ret
 	}
 
 	startDragging(e: LocatedEvent) {
@@ -217,12 +228,12 @@ export class Paper extends LinkableMobject {
 		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
-		for (let fp of this.construction.points) {
-			if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
-				this.creationStartPoint = fp.midpoint
-				drawFreehand = false
-			}
-		}
+		// for (let fp of this.construction.points) {
+		// 	if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
+		// 		this.creationStartPoint = fp.midpoint
+		// 		drawFreehand = false
+		// 	}
+		// }
 
 		this.creationGroup = new CreationGroup({
 			viewWidth: this.viewWidth,
@@ -242,13 +253,13 @@ export class Paper extends LinkableMobject {
 		let p: Vertex = pointerEventVertex(e)
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
-			for (let fq of this.construction.points) {
-				let q: Vertex = fq.midpoint
-				if (p.subtract(q).norm() < 10) {
-					p = q
-					break
-				}
-			}
+			// for (let fq of this.construction.points) {
+			// 	let q: Vertex = fq.midpoint
+			// 	if (p.subtract(q).norm() < 10) {
+			// 		p = q
+			// 		break
+			// 	}
+			// }
 		}
 		this.creationGroup.updateFromTip(p)
 	}
@@ -277,26 +288,26 @@ export const paper = new Paper({
 	viewHeight: 600
 })
 
-let c = new Circle({
-	radius: 100,
-	anchor: new Vertex(200, 300)
-})
+// let c = new Circle({
+// 	radius: 100,
+// 	anchor: new Vertex(200, 300)
+// })
 
-let s = new BoxSlider({
-	anchor: new Vertex(200, 300),
-	height: 150
-})
+// let s = new BoxSlider({
+// 	anchor: new Vertex(200, 300),
+// 	height: 150
+// })
 
-let r = new Rectangle({
-	anchor: new Vertex(150, 150),
-	fillColor: Color.red(),
-	fillOpacity: 1,
-	width: 220,
-	height: 150,
-	viewWidth: 220,
-	viewHeight: 150,
-	passAlongEvents: true
-})
+// let r = new Rectangle({
+// 	anchor: new Vertex(150, 150),
+// 	fillColor: Color.red(),
+// 	fillOpacity: 1,
+// 	width: 220,
+// 	height: 150,
+// 	viewWidth: 220,
+// 	viewHeight: 150,
+// 	passAlongEvents: true
+// })
 
 // paper.add(c)
 // paper.add(s)

@@ -1,5 +1,6 @@
 import { Mobject, TextLabel } from '../modules/mobject'
 import { Circle, TwoPointCircle } from '../modules/shapes'
+import { Segment } from '../modules/arrows'
 import { paper } from '../paper'
 import { DEGREES } from '../modules/math'
 import { Vertex, Transform } from '../modules/vertex-transform'
@@ -40,14 +41,21 @@ export function MobjectTest() {
 
 	f.redraw()
 
-	let c = new Circle({
-		midpoint: new Vertex(50, 150),
-		radius: 50,
-		fillColor: Color.orange(),
-		opacity: 1.0,
-		interactive: true
+	// let c = new Circle({
+	// 	midpoint: new Vertex(50, 150),
+	// 	radius: 50,
+	// 	fillColor: Color.orange(),
+	// 	opacity: 1.0,
+	// 	interactive: true
+	// })
+	// f.add(c)
+
+	let l = new Segment({
+		startPoint: new Vertex(100, 0),
+		endPoint: new Vertex(150, 50)
 	})
-	f.add(c)
+	f.add(l)
+	l.adjustFrame()
 	f.enableDragging()
 
 	console.log(f)
@@ -115,8 +123,6 @@ export function CindyTest() {
 	cv2.startUp()
 	cv2.enableDragging()
 	cv2.disableDragging()
-
-	paper.setDragging(true)
 	
 }
 
@@ -141,11 +147,14 @@ export function FreePointTest() {
 }
 
 export function SliderTest() {
+
 	let s = new BoxSlider({
 		anchor: new Vertex(100, 100),
 		height: 150
 	})
 	paper.add(s)
+
+	//paper.showAllLinks()
 }
 
 

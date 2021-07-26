@@ -1,15 +1,21 @@
 
 constructor:
 	- call super without args
-	- create submobs
-		- we cannot rely on any state here!
+	- //updatables: ...
+	- assign default args (not with update!)
+	- setup independent of state
+		- mainly creating submobs
 		- submobs can only have default state here
 		- submobs will need to get adjusted in update
-	- give default values to stateful properties
-	- if final constructor: update with args
+		- internal linking
+	- if final constructor: update(argsDict)
+	- remaining setup dependent on state
+		- things that will get set once and can't be updated
+		- e. g. creating more submobs
 
 update:
-	- super.update
+	- //check if all args are updatable
+	- super.update without redraw
 	- custom updating (internal dependencies)
 	- update submobs and dependents
 	- if final update: redraw

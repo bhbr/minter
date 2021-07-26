@@ -4,7 +4,7 @@ import { OOPTest } from './oop'
 
 // ExtendedObjectTest()
 // TransformTest()
-// MobjectTest()
+MobjectTest()
 // CircleTest()
 // DrawCircleTest()
 // CindyTest()
