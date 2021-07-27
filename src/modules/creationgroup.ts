@@ -13,12 +13,14 @@ export class CreationGroup extends CreatedMobject {
 	visibleCreation: string = 'freehand'
 	drawFreehand: boolean = true
 	penColor: Color
+	penTip?: Vertex
 
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			penColor: Color.white(),
-			startPoint: Vertex.origin()
+			startPoint: Vertex.origin(),
+			penTip: null
 		})
 	}
 
@@ -52,9 +54,12 @@ export class CreationGroup extends CreatedMobject {
 	}
 
 	updateFromTip(q: Vertex) {
-		for (let creation of Object.values(this.creations)) {
-			creation.updateFromTip(q)
+		this.creations['freehand'].updateFromTip(q)
+		if (this.visibleCreation != 'freehand') {
+			this.creations[this.visibleCreation].updateFromTip(q)
 		}
+		this.penTip = q
+
 	}
 
 	setVisibleCreation(visibleCreation: string) {
@@ -62,19 +67,23 @@ export class CreationGroup extends CreatedMobject {
 			mob.hide()
 		}
 		this.visibleCreation = visibleCreation
+		if (this.penTip) {
+			this.creations[this.visibleCreation].updateFromTip(this.penTip)
+		}
 		if (!(visibleCreation == 'freehand' && !this.drawFreehand)) {
 			this.creations[visibleCreation].show()
 		}
 
-		if (visibleCreation == 'cindy') {
-			this.creations[visibleCreation].strokeColor = Color.white()
-		}
+		// if (visibleCreation == 'cindy') {
+		// 	this.creations[visibleCreation].strokeColor = Color.white()
+		// }
 	}
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
 		this.creations[this.visibleCreation].dissolveInto(paper)
 		paper.updateIOList()
+		this.penTip = null
 	}
 
 	updateModel(argsDict: object = {}) {
