@@ -17,13 +17,23 @@ export class CindyCanvas extends LinkableMobject {
 	core: any
 	points: Array<Array<number>>
 	
-	constructor(argsDict: object = {}) {
-		super(argsDict)
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			draggable: true,
+			interactive: true,
+			passAlongEvents: true,
+			vetoOnStopPropagation: true
+		})
+	}
 
-		this.draggable = true
-		this.interactive = true
-		this.passAlongEvents = true
-		this.vetoOnStopPropagation = true
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			points: []
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.view.style['pointer-events'] = 'auto'
 		this.view.id = this.id
 
@@ -35,8 +45,6 @@ export class CindyCanvas extends LinkableMobject {
 				visibleRect: [0, 1, 1, 0]
 			}]
 		}
-
-		this.points = []
 
 	}
 
@@ -50,7 +58,7 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 
-	setup() {
+	cindySetup() {
 		let initScript = document.createElement('script')
 		initScript.setAttribute('type', 'text/x-cindyscript')
 		initScript.setAttribute('id', `${this.id}init`)
@@ -91,11 +99,6 @@ export class CindyCanvas extends LinkableMobject {
 
 	geometry(): Array<any> { return [] }
 
-	localXMin(): number { return 0 }
-	localXMax(): number { return this.viewWidth }
-	localYMin(): number { return 0 }
-	localYMax(): number { return this.viewHeight }
-
 	canvas(): HTMLCanvasElement {
 		for (let child of this.view.children) {
 			if (child instanceof HTMLCanvasElement) {
@@ -121,16 +124,22 @@ export class WaveCindyCanvas extends CindyCanvas {
 	wavelength: number
 	frequency: number
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.setDefaults({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			wavelength: 1,
 			frequency: 0
 		})
-		this.inputNames = ['wavelength', 'frequency']
+	}
 
-		this.update(argsDict)
-		this.setup()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			inputNames: ['wavelength', 'frequency']
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.cindySetup()
 	}
 
 	initCode(): string {
@@ -153,13 +162,15 @@ export class WaveCindyCanvas extends CindyCanvas {
 		return ret
 	}
 
-	update(argsDict: object = {}, redraw = true) {
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+
 		if (this.core != undefined && this.points.length > 0) {
 			let l: number = 0.1 * (this.wavelength || 1)
 			let f: number = 10 * (this.frequency || 1)
 			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
 		}
-		super.update(argsDict, redraw)
+
 	}
 
 }
@@ -177,18 +188,16 @@ export class DrawnRectangle extends CreatedMobject {
 	left: Segment
 	right: Segment
 
-	constructor(argsDict: object) {
-		super(argsDict)
-		this.endPoint = this.endPoint || this.startPoint.copy()
-		this.p1 = this.startPoint
-		this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
-		this.p3 = this.endPoint
-		this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
-		this.top = new Segment({startPoint: this.p1, endPoint: this.p2})
-		this.bottom = new Segment({startPoint: this.p4, endPoint: this.p3})
-		this.left = new Segment({startPoint: this.p1, endPoint: this.p4})
-		this.right = new Segment({startPoint: this.p2, endPoint: this.p3})
+	statelessSetup() {
+		super.statelessSetup()
+		this.top = new Segment({ strokeColor: Color.white() })
+		this.bottom = new Segment({ strokeColor: Color.white() })
+		this.left = new Segment({ strokeColor: Color.white() })
+		this.right = new Segment({ strokeColor: Color.white() })
+	}
 
+	statefulSetup() {
+		super.statefulSetup()
 		this.addDependency('p1', this.top, 'startPoint')
 		this.addDependency('p2', this.top, 'endPoint')
 		this.addDependency('p4', this.bottom, 'startPoint')
@@ -197,16 +206,23 @@ export class DrawnRectangle extends CreatedMobject {
 		this.addDependency('p4', this.left, 'endPoint')
 		this.addDependency('p2', this.right, 'startPoint')
 		this.addDependency('p3', this.right, 'endPoint')
+		
+		this.endPoint = this.endPoint || this.startPoint.copy()
+		this.p1 = this.startPoint
+		this.p2 = new Vertex(this.endPoint.x, this.startPoint.y)
+		this.p3 = this.endPoint
+		this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
 
-		this.top.strokeColor = Color.white()
-		this.bottom.strokeColor = Color.white()
-		this.left.strokeColor = Color.white()
-		this.right.strokeColor = Color.white()
+		this.top.setAttributes({startPoint: this.p1, endPoint: this.p2})
+		this.bottom.setAttributes({startPoint: this.p4, endPoint: this.p3})
+		this.left.setAttributes({startPoint: this.p1, endPoint: this.p4})
+		this.right.setAttributes({startPoint: this.p2, endPoint: this.p3})
+
 		this.add(this.top)
 		this.add(this.bottom)
 		this.add(this.left)
 		this.add(this.right)
-		this.update(argsDict)
+
 	}
 
 	updateFromTip(q: Vertex) {

@@ -21,13 +21,11 @@ export class BoxSlider extends LinkableMobject {
 	outerBar: Rectangle
 	filledBar: Rectangle
 	fillColor: Color
+	barFillColor: Color
 	label: TextLabel
 
-	constructor(argsDict: object = {}) {
-		super()
-
-		//// defaults
-		let initialArgs = {
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			min: 0,
 			max: 1,
 			value: 0.6,
@@ -36,60 +34,46 @@ export class BoxSlider extends LinkableMobject {
 			strokeColor: Color.white(),
 			draggable: true,
 			interactive: true,
+			passAlongEvents: false,
 			outputNames: ['value'],
-			fillColor: Color.gray(0.5)
-		}
-		Object.assign(initialArgs, argsDict)
+			fillColor: Color.black(),
+			barFillColor: Color.gray(0.5)
+		})
+	}
 
-
+	statelessSetup() {
 		//// state-independent setup
 		this.outerBar = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeColor: Color.white()
 		})
-		this.add(this.outerBar)
 
 		this.filledBar = new Rectangle({
 			fillOpacity: 0.5
 		})
-		this.add(this.filledBar)
 
 		this.label = new TextLabel({
 			viewHeight: 25,
 			horizontalAlign: 'center',
 			verticalAlign: 'center'
 		})
-		this.add(this.label)
-		
-		//// updating
-		if (this.constructor.name == 'BoxSlider') {
-			this.update(initialArgs)
-
-			//// state-dependent setup
-			this.outerBar.update({
-				width: this.width,
-				fillColor: this.backgroundColor
-			})
-			this.filledBar.update({
-				fillColor: this.fillColor
-			})
-			this.label.update({
-				viewWidth: this.width
-			})
-
-		} else {
-			this.setAttributes(initialArgs)
-		}
 	}
 
+	statefulSetup() {
+		super.statefulSetup()
+		this.add(this.outerBar)
+		this.add(this.filledBar)
+		this.add(this.label)
+
+	}
 
 	normalizedValue(): number {
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, redraw = false)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -103,24 +87,23 @@ export class BoxSlider extends LinkableMobject {
 
 		this.outerBar.update({
 			width: this.width,
-			height: this.height
-		})
+			height: this.height,
+			fillColor: this.backgroundColor
+		}, false)
 
 		this.filledBar.update({
 			width: this.width,
 			height: a * this.height,
-			anchor:  new Vertex(0, this.height - a * this.height)
-		})
+			anchor:  new Vertex(0, this.height - a * this.height),
+			fillColor: this.barFillColor
+		}, false)
 
 		this.label.update({
 			text: this.value.toPrecision(3).toString(),
-			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2)
-		})
+			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
+			viewWidth: this.width
+		}, false)
 
-		//// redraw
-		if (this.constructor.name == 'BoxSlider' && redraw) {
-			this.redraw()
-		}
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
@@ -139,14 +122,24 @@ export class BoxSlider extends LinkableMobject {
 
 
 export class ValueBox extends Rectangle {
-	value: number = 0
+
+	value: number
 	valueLabel: TextLabel
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			value: 0
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
 		this.valueLabel = new TextLabel()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.add(this.valueLabel)
-		this.redraw()
 	}
 
 }

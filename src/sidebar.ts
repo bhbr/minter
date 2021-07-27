@@ -2,18 +2,20 @@ import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePoi
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup, TextLabel } from './modules/mobject'
-import { Color } from './modules/color'
+import { Color, COLOR_PALETTE } from './modules/color'
 import { Circle } from './modules/shapes'
 import { Segment } from './modules/arrows'
 import { Paper } from './paper'
 
-let paper: Paper = null
+var paper: Paper = null
+
 if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper')
 	paper = paperView['mobject'] as Paper
 }
 
-let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
+
+//let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
 interface Window { webkit?: any }
 
@@ -32,23 +34,15 @@ const buttonScaleFactor: number = 1.3
 
 class Sidebar extends Mobject {
 	
-	constructor(argsDict = {}) {
-		super()
-		this.setDefaults({
-			viewWidth: 200,
-			viewHeight: 600
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			viewWidth: 150,
+			viewHeight: 600,
+			interactive: true
 		})
-		this.interactive = true
-		this.setView(document.querySelector('#sidebar'))
-		paper.view.style.left = this.viewWidth.toString() + "px"
-		// we cannot just update paper with a new anchor
-		// bc it is not a VMobject
-		super.update(argsDict, false)
 	}
+
 }
-// let sidebar = new Sidebar({
-// 	viewWidth: 100
-// })
 
 class SidebarButton extends Circle {
 	
@@ -76,17 +70,20 @@ class SidebarButton extends Circle {
 	boundButtonDrag(e: LocatedEvent) { }
 
 
-	constructor(argsDict: object = {}) {
-		super()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			strokeWidth: 0,
+			optionSpacing: 25,
+			interactive: true
+		})
+	}
 
-
-		this.setAttributes({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			currentModeIndex: 0,
 			previousIndex: 0,
 			baseColor: Color.white(),
-			strokeWidth: 0,
 			locationIndex: 0,
-			optionSpacing: 25,
 			active: false,
 			showLabel: true,
 			text: 'text',
@@ -95,22 +92,13 @@ class SidebarButton extends Circle {
 			radius: buttonRadius,
 			viewWidth: 2 * buttonRadius,
 			viewHeight: 2 * buttonRadius,
-			interactive: true,
 			fillOpacity: 1
 		})
+	}
 
-		this.label = new TextLabel({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius
-		})
-		this.label.view.setAttribute('font-size', this.fontSize?.toString() ?? '12')
-		this.label.view.setAttribute('color', Color.white().toHex())
-		this.add(this.label)
-
-		this.update(argsDict, false)
-
-		this.updateModeIndex(0)
-		this.update({}, false)
+	statelessSetup() {
+		super.statelessSetup()
+		this.label = new TextLabel()
 
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
@@ -120,12 +108,25 @@ class SidebarButton extends Circle {
 		this.boundCommonButtonDown = this.commonButtonDown.bind(this)
 		this.boundButtonDrag = this.buttonDrag.bind(this)
 		
-		addPointerDown(this.view, this.boundButtonDownByPointer)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
-		this.addDependency('midpoint', this.label, 'midpoint')
 
-		this.redraw()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		addPointerDown(this.view, this.boundButtonDownByPointer)
+		this.add(this.label)
+		this.addDependency('midpoint', this.label, 'midpoint')
+		this.updateModeIndex(0)
+		this.label.update({
+			viewWidth: 2 * this.radius,
+			viewHeight: 2 * this.radius,
+			text: this.text
+		}, false)
+		this.label.view.style['font-size'] = `${this.fontSize ?? 12}px`
+		this.label.view.style['color'] = Color.white().toHex()
+
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -240,8 +241,8 @@ class SidebarButton extends Circle {
 		}
 	}
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 		this.updateLabel()
 	}
 	
@@ -298,40 +299,40 @@ class SidebarButton extends Circle {
 
 class ColorChangeButton extends SidebarButton {
 
-	palette: object
 	colorNames: Array<string>
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setAttributes({
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
 			optionSpacing: 15,
-			showLabel: true,
-			palette: {
-				'white': Color.white(),
-				'red': Color.red(),
-				'orange': Color.orange(),
-				'yellow': Color.yellow(),
-				'green': Color.green(),
-				'blue': Color.blue(),
-				'indigo': Color.indigo(),
-				'violet': Color.violet()
-			}
+			showLabel: false
 		})
-		this.setAttributes(argsDict)
+	}
 
-		this.colorNames = Object.keys(this.palette)
-		this.label.text = ''
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			showLabel: true
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
+		this.outgoingMessage = {}
+
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+
+		this.colorNames = Object.keys(COLOR_PALETTE)
 		this.label.view.setAttribute('fill', 'black')
 
-		for (let value of Object.values(this.palette)) {
-			this.messages.push({color: value})
+		for (let name of this.colorNames) {
+			this.messages.push({color: name})
 		}
-		this.outgoingMessage = {}
-		this.update()
 	}
 
 	colorForIndex(i): Color {
-		return this.palette[this.colorNames[i]]
+		return COLOR_PALETTE[this.colorNames[i]]
 	}
 
 	commonButtonDown() {
@@ -348,11 +349,12 @@ class ColorChangeButton extends SidebarButton {
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
+		this.label.update({text: ''})
 		this.messagePaper(this.outgoingMessage)
 		this.update()
 	}
 
-	buttonDrag(e) {
+	buttonDrag(e: LocatedEvent) {
 		super.buttonDrag(e)
 		this.remove(this.label)
 	}
@@ -362,16 +364,18 @@ class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setAttributes(argsDict)
-		this.creations = argsDict['creations']
+	statelessSetup() {
+		super.statelessSetup()
 		this.messages = []
+		this.outgoingMessage = {creating: 'freehand'}
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		for (let creation of this.creations) {
 			this.messages.push({creating: creation})
 		}
-		this.outgoingMessage = {creating: 'freehand'}
-		this.update(argsDict)
+
 	}
 
 	commonButtonUp() {
@@ -387,7 +391,7 @@ class CreativeButton extends SidebarButton {
 				this.label.update({text: this.text})
 			} catch { }
 		} else {
-			this.label.text = ''
+			this.label.update({text: ''})
 		}
 
 	}
@@ -411,116 +415,132 @@ class ToggleButton extends SidebarButton {
 
 class DragButton extends ToggleButton {
 
-	constructor(argsDict: object = {}) {
-		super()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			fontSize: 25
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.label.view.style['font-family'] = 'Times'
+		this.label.view.style['font-size'] = `${this.fontSize}px`
 		this.label.text = '↕︎'
-		this.setAttributes({ fontSize: 50 })
-		this.label.view.setAttribute('font-family', 'Times')
-		this.update(argsDict)
+
 	}
 
 }
 
 class LinkButton extends ToggleButton {
-	constructor(argsDict: object = {}) {
-		super()
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.label.text = 'link'
-		this.update(argsDict)
 	}
 }
 
 
-// let lineButton = new CreativeButton({
-// 	creations: ['segment', 'ray', 'line'],
-// 	key: 'q',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 0
-// })
-// sidebar.add(lineButton)
-// lineButton.update({
-// 	midpoint: buttonCenter(0)
-// })
+let sidebar = new Sidebar({
+	view: document.querySelector('#sidebar')
+})
 
-// let circleButton = new CreativeButton({
-// 	creations: ['circle'],
-// 	key: 'w',
-// 	baseColor: Color.gray(0.4),
-// 	locationIndex: 1
-// })
-// sidebar.add(circleButton)
-// circleButton.update({
-// 	midpoint: buttonCenter(1)
-// })
+console.log(sidebar)
 
-// let sliderButton = new CreativeButton({
-// 	creations: ['slider'],
-// 	key: 'e',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 2
-// })
-// sidebar.add(sliderButton)
-// sliderButton.update({
-// 	midpoint: buttonCenter(2)
-// })
+paper.view.style.left = sidebar.viewWidth.toString() + "px"
 
-// let cindyButton = new CreativeButton({
-// 	creations: ['cindy'],
-// 	key: 'r',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 3
-// })
-// sidebar.add(cindyButton)
-// cindyButton.update({
-// 	midpoint: buttonCenter(3)
-// })
+
+
+let lineButton = new CreativeButton({
+	creations: ['segment', 'ray', 'line'],
+	key: 'q',
+	baseColor: Color.gray(0.2),
+	locationIndex: 0
+})
+sidebar.add(lineButton)
+lineButton.update({
+	midpoint: buttonCenter(0)
+})
+
+let circleButton = new CreativeButton({
+	creations: ['circle'],
+	key: 'w',
+	baseColor: Color.gray(0.4),
+	locationIndex: 1
+})
+sidebar.add(circleButton)
+circleButton.update({
+	midpoint: buttonCenter(1)
+})
+
+let sliderButton = new CreativeButton({
+	creations: ['slider'],
+	key: 'e',
+	baseColor: Color.gray(0.6),
+	locationIndex: 2
+})
+sidebar.add(sliderButton)
+sliderButton.update({
+	midpoint: buttonCenter(2)
+})
+
+let cindyButton = new CreativeButton({
+	creations: ['cindy'],
+	key: 'r',
+	baseColor: Color.gray(0.2),
+	locationIndex: 3
+})
+sidebar.add(cindyButton)
+cindyButton.update({
+	midpoint: buttonCenter(3)
+})
   
-// let pendulumButton = new CreativeButton({
-// 	creations: ['pendulum'],
-// 	key: 't',
-// 	baseColor: Color.gray(0.4),
-// 	locationIndex: 4
-// })
-// sidebar.add(pendulumButton)
-// pendulumButton.update({
-// 	midpoint: buttonCenter(4)
-// })
+let pendulumButton = new CreativeButton({
+	creations: ['pendulum'],
+	key: 't',
+	baseColor: Color.gray(0.4),
+	locationIndex: 4
+})
+sidebar.add(pendulumButton)
+pendulumButton.update({
+	midpoint: buttonCenter(4)
+})
   
-// let dragButton = new DragButton({
-// 	messages: [{drag: true}],
-// 	outgoingMessage: {drag: false},
-// 	key: 'a',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 5
-// })
-// dragButton.label.view.setAttribute('fill', 'black')
-// sidebar.add(dragButton)
-// dragButton.update({
-// 	midpoint: buttonCenter(5)
-// })
+let dragButton = new DragButton({
+	messages: [{drag: true}],
+	outgoingMessage: {drag: false},
+	key: 'a',
+	baseColor: Color.gray(0.6),
+	locationIndex: 5
+})
+dragButton.label.view.setAttribute('fill', 'black')
+sidebar.add(dragButton)
+dragButton.update({
+	midpoint: buttonCenter(5)
+})
 
-// let linkButton = new LinkButton({
-// 	messages: [{toggleLinks: true}],
-// 	outgoingMessage: {toggleLinks: false},
-// 	key: 's',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 6
-// })
-// sidebar.add(linkButton)
-// linkButton.update({
-// 	midpoint: buttonCenter(6)
-// })
+let linkButton = new LinkButton({
+	messages: [{toggleLinks: true}],
+	outgoingMessage: {toggleLinks: false},
+	key: 's',
+	baseColor: Color.gray(0.2),
+	locationIndex: 6
+})
+sidebar.add(linkButton)
+linkButton.update({
+	midpoint: buttonCenter(6)
+})
 
-// let colorButton = new ColorChangeButton({
-// 	key: 'd',
-// 	baseColor: Color.white(),
-// 	modeSpacing: 15,
-// 	locationIndex: 7,
-// 	fillOpacity: 1
-// })
-// sidebar.add(colorButton)
-// colorButton.update({
-// 	midpoint: buttonCenter(7)
-// })
+let colorButton = new ColorChangeButton({
+	key: 'd',
+	baseColor: Color.white(),
+	modeSpacing: 15,
+	locationIndex: 7,
+	fillOpacity: 1
+})
+sidebar.add(colorButton)
+colorButton.update({
+	midpoint: buttonCenter(7)
+})
 
 
 let creating: boolean = false

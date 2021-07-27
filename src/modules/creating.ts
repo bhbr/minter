@@ -13,16 +13,19 @@ export class CreatedMobject extends MGroup {
 	endPoint: Vertex
 	visible: boolean = true
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setDefaults({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin()
 		})
-		this.interactive = true
-		this.update(argsDict)
 	}
-	
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			interactive: true
+		})
+	}
+
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
 		if (!this.visible) { return }
@@ -45,9 +48,8 @@ class DrawnMobject extends CreatedMobject {
 	penFillColor: Color
 	penFillOpacity: number
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.setDefaults({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
@@ -58,23 +60,31 @@ class DrawnMobject extends CreatedMobject {
 
 export class Freehand extends DrawnMobject {
 
-	line: Polygon = new Polygon()
+	line: Polygon
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.add(this.line)
-		this.setAttributes({
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
 			draggable: false
 		})
-		this.line.update({
-			closed: false,
-			strokeColor: this.penStrokeColor,
-			opacity: 1.0
-		})
-		this.addDependency('penStrokeColor', this.line, 'strokeColor')
-		this.update(argsDict)
 	}
 	
+	statelessSetup() {
+		super.statelessSetup()
+		this.line = new Polygon({
+			closed: false,
+			opacity: 1.0
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.addDependency('penStrokeColor', this.line, 'strokeColor')
+		this.line.update({
+			strokeColor: this.penStrokeColor
+		})
+		this.add(this.line)
+	}
+
 	updateWithPoints(q) {
 		let nbDrawnPoints: number = this.children.length
 		let p = null
@@ -109,6 +119,18 @@ export class Freehand extends DrawnMobject {
 	}
 
 	dissolveInto(superMobject: Mobject) {
+		this.line.adjustFrame()
+
+		let dr = this.line.anchor
+		this.line.update({
+			anchor: Vertex.origin()
+		})
+		this.update({
+			anchor: this.anchor.translatedBy(dr),
+			viewWidth: this.line.getWidth(),
+			viewHeight: this.line.getHeight()
+		})
+
 		superMobject.remove(this)
 		if (this.visible) {
 			superMobject.add(this)
@@ -121,30 +143,40 @@ export class Freehand extends DrawnMobject {
 
 export class Point extends Circle {
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.view.setAttribute('class', this.constructor.name)
-		if (!this.midpoint || this.midpoint.isNaN()) {
-			this.update({ midpoint: Vertex.origin() })
-		}
-		this.setAttributes({
-			radius: 7.0,
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			radius: 7.0
+		})
+	}
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			fillColor: Color.white(),
 			fillOpacity: 1.0
 		})
-		this.update(argsDict)
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		if (!this.midpoint || this.midpoint.isNaN()) {
+			this.update({ midpoint: Vertex.origin() }, false)
+		}
+
 	}
 
 }
 
 export class FreePoint extends Point {
-	constructor(argsDict: object = {}) {
-		super()
-		this.setAttributes({
+
+	fixedArgs() {
+		return Object.assign(super.fixedArgs(), {
 			draggable: true,
 			interactive: true
 		})
-		this.update(argsDict)
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.enableDragging()
 	}
 }
@@ -154,24 +186,34 @@ export class DrawnArrow extends DrawnMobject {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.endPoint = this.startPoint.copy()
-		this.passAlongEvents = true
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			passAlongEvents: true
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
+
 		this.startFreePoint = new FreePoint()
 		this.endFreePoint = new FreePoint()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.add(this.startFreePoint)
+		this.add(this.endFreePoint)
+		this.endPoint = this.startPoint.copy()
 		this.addDependency('penStrokeColor', this.startFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.startFreePoint, 'fillColor')
 		this.addDependency('penStrokeColor', this.endFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.endFreePoint, 'fillColor')
-		this.add(this.startFreePoint)
-		this.add(this.endFreePoint)
 		this.addDependency('startPoint', this.startFreePoint, 'midpoint')
 		this.addDependency('endPoint', this.endFreePoint, 'midpoint')
 		this.startFreePoint.update({ midpoint: this.startPoint })
 		this.endFreePoint.update({ midpoint: this.endPoint })
-		console.log('end point:', this.endPoint)
-		this.update(argsDict)
+		
+
 	}
 
 	updateFromTip(q: Vertex) {
@@ -190,18 +232,23 @@ export class DrawnSegment extends DrawnArrow {
 
 	segment: Segment
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.segment = new Segment({
+	statelessSetup() {
+		super.statelessSetup()
+		this.segment = new Segment()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.add(this.segment)
+		this.segment.update({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint
-		})
-		this.add(this.segment)
+		} ,false)
 		this.startFreePoint.addDependency('midpoint', this.segment, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.segment, 'endPoint')
 		this.addDependency('penStrokeColor', this.segment, 'strokeColor')
-		this.update(argsDict)
 	}
+
 
 }
 
@@ -209,17 +256,21 @@ export class DrawnRay extends DrawnArrow {
 
 	ray: Ray
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.ray = new Ray({
+	statelessSetup() {
+		super.statelessSetup()
+		this.ray = new Ray()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.add(this.ray)
+		this.ray.update({
 			startPoint: this.startFreePoint.midpoint,
-			endPoint: this.endFreePoint.midpoint,
-		})
+			endPoint: this.endFreePoint.midpoint
+		} ,false)
 		this.startFreePoint.addDependency('midpoint', this.ray, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.ray, 'endPoint')
 		this.addDependency('penStrokeColor', this.ray, 'strokeColor')
-		this.add(this.ray)
-		this.update(argsDict)
 	}
 
 }
@@ -229,18 +280,23 @@ export class DrawnLine extends DrawnArrow {
 
 	line: Line
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.line = new Line({
+	statelessSetup() {
+		super.statelessSetup()
+		this.line = new Line()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.add(this.line)
+		this.line.update({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint
-		})
-		this.add(this.line)
+		} ,false)
 		this.startFreePoint.addDependency('midpoint', this.line, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.line, 'endPoint')
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
-		this.update(argsDict)
 	}
+
 
 }
 
@@ -252,32 +308,30 @@ export class DrawnCircle extends DrawnMobject {
 	freeOuterPoint: FreePoint
 	circle: TwoPointCircle
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		
-		this.setAttributes({
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 1,
-			fillOpacity: 0
+			fillOpacity: 0,
+			passAlongEvents: true
 		})
+	}
+
+
+	statelessSetup() {
+		super.statelessSetup()
+		this.freeMidpoint = new FreePoint()
+		this.freeOuterPoint = new FreePoint()
+		this.circle = new TwoPointCircle()
+
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 
 		this.midpoint = this.midpoint || this.startPoint.copy()
 		this.outerPoint = this.outerPoint || this.startPoint.copy()
-		this.passAlongEvents = true
-		this.freeMidpoint = new FreePoint({
-			midpoint: this.midpoint,
-			strokeColor: this.penStrokeColor,
-			fillColor: this.penFillColor
-		})
-		this.freeOuterPoint = new FreePoint({
-			midpoint: this.outerPoint,
-			strokeColor: this.penStrokeColor,
-			fillColor: this.penFillColor
-		})
-		this.circle = new TwoPointCircle({
-			midpoint: this.freeMidpoint.midpoint,
-			outerPoint: this.freeOuterPoint.midpoint,
-			fillOpacity: 0
-		})
+
 		this.add(this.freeMidpoint)
 		this.add(this.freeOuterPoint)
 		this.add(this.circle)
@@ -291,8 +345,22 @@ export class DrawnCircle extends DrawnMobject {
 		this.freeMidpoint.addDependency('midpoint', this.circle, 'midpoint')
 		this.freeOuterPoint.addDependency('midpoint', this.circle, 'outerPoint')
 
-		this.update(argsDict)
 
+		this.freeMidpoint.update({
+			midpoint: this.midpoint,
+			strokeColor: this.penStrokeColor,
+			fillColor: this.penFillColor
+		}, false)
+		this.freeOuterPoint.update({
+			midpoint: this.outerPoint,
+			strokeColor: this.penStrokeColor,
+			fillColor: this.penFillColor
+		}, false)
+		this.circle.update({
+			midpoint: this.freeMidpoint.midpoint,
+			outerPoint: this.freeOuterPoint.midpoint,
+			fillOpacity: 0
+		}, false)
 	}
 
 	updateFromTip(q: Vertex) {

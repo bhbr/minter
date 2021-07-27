@@ -2,11 +2,11 @@ export class ExtendedObject {
 
 	passedByValue: boolean
 
-	constructor(argsDict: object = {}) {
+	constructor(argsDict: object = {}, superCall = true) {
 		this.passedByValue = false
 		this.setAttributes(argsDict)
 	}
-	
+
 	properties(): Array<string> {
 		let obj: object = this
 		let properties: Array<string> = []
@@ -37,8 +37,15 @@ export class ExtendedObject {
 	setAttributes(argsDict: object = {}) {
 		for (let [key, value] of Object.entries(argsDict)) {
 			let setter: any = this.setter(key)
+			
 			if (setter != undefined) {
+				
+				if (Object.keys(this.fixedArgs()).includes(key)) {
+					console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
+					continue
+				}
 				setter.call(this, value)
+				
 			} else {
 				// we have an as-of-yet unknown property
 				if (value != undefined && value.passedByValue) {
@@ -54,6 +61,11 @@ export class ExtendedObject {
 			}
 		}
 	}
+
+
+	fixedArgs(): object { return {} }
+
+
 
 	assureProperty(key: string, cons: any) {
 		if (this[key] == undefined) { this[key] = new cons() }

@@ -19,15 +19,13 @@ export class IntersectionPoint extends Point {
 	lambda: number = NaN
 	mu: number = NaN
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setDefaults({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			midpoint: new Vertex(NaN, NaN)
 		})
-		this.update(argsDict)
 	}
 
-	update(argsDict: object = {}, redraw : boolean = true) {
+	updateModel(argsDict: object = {}) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
@@ -37,7 +35,9 @@ export class IntersectionPoint extends Point {
 				argsDict['midpoint'] = mp
 			}
 		}
-		super.update(argsDict, redraw)
+		super.updateModel(argsDict)
+
+
 	}
 
 	intersectionCoords(): Vertex {
@@ -135,15 +135,20 @@ export class Construction extends LinkableMobject {
 	freePoints: Array<FreePoint>
 	constructedMobjects: Array<ConstructedMobject>
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.points = []
-		this.constructedMobjects = []
-		this.passAlongEvents = true
-		this.interactive = true
-		super.update(argsDict)
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			points: [],
+			constructedMobjects: []
+		})
 	}
 
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			passAlongEvents: true,
+			interactive: true
+		})
+	}
 
 
 	integrate(mob: DrawnArrow | DrawnCircle) {
@@ -171,8 +176,8 @@ export class Construction extends LinkableMobject {
 		this.add(cm)
 		this.intersectWithRest(cm)
 		this.constructedMobjects.push(cm)
-		p1.update()
-		p2.update()
+		p1.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})
+		p2.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})
 	}
 
 	pointForVertex(v: Vertex): Point {

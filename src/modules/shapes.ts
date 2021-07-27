@@ -11,18 +11,14 @@ export class Circle extends CurvedShape {
 	midpoint: Vertex
 	radius: number
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setDefaults({
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			midpoint: Vertex.origin(),
 			radius: 10
 		})
-		if (this.constructor.name == 'Circle') {
-			this.update(argsDict)
-		}
 	}
 
-	update(argsDict: object = {}, redraw = true) {
+	updateModel(argsDict: object = {}) {
 
 		let r = argsDict['radius'] || this.radius
 		let a = argsDict['anchor']
@@ -36,7 +32,7 @@ export class Circle extends CurvedShape {
 		argsDict['viewWidth'] = 2 * r
 		argsDict['viewHeight'] = 2 * r
 
-		super.update(argsDict, redraw)
+		super.updateModel(argsDict)
 	}
 
 	updateBezierPoints() {
@@ -70,32 +66,29 @@ export class Circle extends CurvedShape {
 export class TwoPointCircle extends Circle {
 
 	outerPoint: Vertex
-	
-	constructor(argsDict: object = {}) {
-		super()
-		this.setAttributes({
+
+	defaultArgs() {
+		return Object.assign(super.defaultArgs(), {
 			strokeColor: Color.white(),
 			fillColor: Color.white(),
-			fillOpacity: 0
-		})
-		this.setDefaults({
+			fillOpacity: 0,
 			outerPoint: Vertex.origin()
 		})
-		this.view.style['pointer-events'] = 'none'
-
-		if (this.constructor.name == 'TwoPointCircle') {
-			this.update(argsDict)
-		}
 	}
 
 
-	update(argsDict: object = {}, redraw = true) {
+	statefulSetup() {
+		super.statefulSetup()
+		this.view.style['pointer-events'] = 'none'
+	}
+
+	updateModel(argsDict: object = {}) {
 
 		let p = argsDict['midpoint'] || this.midpoint
 		let q = argsDict['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
 		argsDict['radius'] = r
-		super.update(argsDict, redraw)
+		super.updateModel(argsDict)
 	}
 
 }
@@ -105,22 +98,14 @@ export class Ellipse extends CurvedShape {
 	majorAxis: number
 	minorAxis: number
 	tilt: number
-	
-	constructor(argsDict: object = {}) {
-		super()
-		this.setAttributes({
-			midpoint: Vertex.origin(),
+
+	defaultArgs() {
+		return Object.assign(super.defaultArgs(), {
 			majorAxis: 200,
 			minorAxis: 100,
 			tilt: 0
 		})
-		this.update(argsDict)
-
 	}
-
-	get midpoint(): Vertex { return this.anchor }
-	set midpoint(newValue: Vertex) { this.anchor = newValue }
-
 
 }
 
@@ -136,35 +121,25 @@ export class Rectangle extends Polygon {
 	p3: Vertex
 	p4: Vertex
 
-	constructor(argsDict: object = {}) {
-		super()
 
-		//// defaults
-		let initialArgs = {
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			width: 100,
-			height: 100
-		}
-		Object.assign(initialArgs, argsDict)
-
-		//// state-independent setup
-		this.p1 = Vertex.origin()
-		this.p2 = Vertex.origin()
-		this.p3 = Vertex.origin()
-		this.p4 = Vertex.origin()
-		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-
-		//// updating
-		if (this.constructor.name == 'Rectangle') {
-			this.update(initialArgs)
-		} else {
-			this.setAttributes(initialArgs)
-		}
-
-		//// no state-dependent setup
+			height: 100,
+			p1: Vertex.origin(),
+			p2: Vertex.origin(),
+			p3: Vertex.origin(),
+			p4: Vertex.origin()
+		})
 	}
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, false)
+	statefulSetup() {
+		super.statefulSetup()
+		this.vertices = [this.p1, this.p2, this.p3, this.p4]
+	}
+
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -174,11 +149,6 @@ export class Rectangle extends Polygon {
 		this.p3.x = this.width
 		this.p3.y = this.height
 		this.p4.y = this.height
-
-		//// redraw
-		if (this.constructor.name == 'Rectangle' && redraw) {
-			this.redraw()
-		}
 
 	}
 
@@ -198,18 +168,14 @@ export class RoundedRectangle extends CurvedShape {
 	p4: Vertex
 	cornerRadius: number
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.setDefaults({
-			width: 100,
-			height: 100,
-			cornerRadius: 10
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			cornerRadius: 10,
+			p1: Vertex.origin(),
+			p2: Vertex.origin(),
+			p3: Vertex.origin(),
+			p4: Vertex.origin()
 		})
-		this.p1 = Vertex.origin()
-		this.p2 = new Vertex([this.width, 0])
-		this.p3 = new Vertex([this.width, this.height])
-		this.p4 = new Vertex([0, this.height])
-		this.update(argsDict)
 	}
 
 	updateBezierPoints() {
@@ -241,10 +207,19 @@ export class RoundedRectangle extends CurvedShape {
 		} catch { }
 	}
 
-	update(argsDict: object = {}, redraw = true) {
-		argsDict['viewWidth'] = argsDict['width'] || this.width
-		argsDict['viewHeight'] = argsDict['height'] || this.height
-		super.update(argsDict, redraw)
+
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+
+		//// internal dependencies
+		this.viewWidth = this.width
+		this.viewHeight = this.height
+
+		this.p2.x = this.width
+		this.p3.x = this.width
+		this.p3.y = this.height
+		this.p4.y = this.height
+
 	}
 
 }

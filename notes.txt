@@ -22,3 +22,64 @@ update:
 
 getter/setter only for properties that don't require new state
 
+
+
+Mobject subclassing:
+	- defaultArgs()
+	- statelessSetup()
+	- statefulSetup()
+	- updateModel()
+
+
+export class SubClass extends Mobject {
+	
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), { 
+			// default values pertaining to the subclass go here
+		})
+	}
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), { 
+			// immutable values pertaining to the subclass go here
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
+		// custom setup that does not depend on any properties
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		// custom setup that does depend on properties
+		// in particular things that will never change
+		// such as internal dependencies that are as passed by reference
+	}
+
+	updateModel(argsDict) {
+		super.updateModel(argsDict)
+		// custom updating goes here
+		// internal dependencies that are passed by value
+		// redrawing is handled elsewhere
+	}
+
+	redrawSelf() {
+		super.redrawSelf()
+		// custom drawing if necessary
+	}
+
+}
+
+
+usage:
+
+let m = new SubClass({...})
+
+m.update({...}, redraw = false)
+m.update({...})
+m.update()
+
+
+
+

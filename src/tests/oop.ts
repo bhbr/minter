@@ -42,7 +42,7 @@ export class C extends B {
 
 export function OOPTest() {
 	let c = new C({value1: 1, value2: 2})
-	console.log(c)
+	console.log(c.constructor.prototype)
 }
 
 

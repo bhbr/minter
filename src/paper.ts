@@ -1,7 +1,7 @@
 import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
 import { Vertex } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
-import { Color } from './modules/color'
+import { Color, COLOR_PALETTE } from './modules/color'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Arrow, Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
@@ -18,71 +18,73 @@ export class Paper extends LinkableMobject {
 
 	visibleCreation: string
 	cindyPorts: Array<object>
-	snappablePoints: Array<Point>
+	//snappablePoints: Array<Point>
 	creationStartPoint: Vertex
-	colorPalette: object
 	currentColor: Color
 	creationGroup: CreationGroup
-	dependencyMap: DependencyMap
+	//dependencyMap: DependencyMap
 	draggedMobject: Mobject
-	dragPointStart: Vertex
-	dragAnchorStart: Vertex
+	//dragPointStart: Vertex
+	//dragAnchorStart: Vertex
 	draggedIOList: IOList
 	dragIOListAnchorStart: Vertex
 	construction: Construction
 	background: Rectangle
 
-	constructor(argsDict: object = {}) {
-		super()
-		this.children = []
-		this.visibleCreation = 'freehand'
-		this.snappablePoints = []
-		//this.construction = new Construction()
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			children: [],
+			visibleCreation: 'freehand',
+			snappablePoints: [],
+		})
+	}
 
-		this.colorPalette = {
-			'black': Color.black(),
-			'white': Color.white(),
-			'red': Color.red(),
-			'orange': Color.orange(),
-			'yellow': Color.yellow(),
-			'green': Color.green(),
-			'blue': Color.blue(),
-			'indigo': Color.indigo(),
-			'violet': Color.violet()
-		}
-		this.currentColor = this.colorPalette['white']
-		this.setDragging(false)
-		this.interactive = true
-		
-		
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			interactive: true,
+			draggable: false
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
+		this.currentColor = COLOR_PALETTE['white']
 		this.background = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,
+			strokeWidth: 0,
 			passAlongEvents: true
 		})
 
+
+		this.construction = new Construction()
+		console.log(this.construction)
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.setDragging(false)
 		this.add(this.background)
+		this.add(this.construction)
+		this.construction.update({
+			viewWidth: 0, //this.viewWidth,
+			viewHeight: 0 //this.viewHeight
+		}, false)
+	}
 
-		// this.construction.update({
-		// 	viewWidth: 0, //this.viewWidth,
-		// 	viewHeight: 0 //this.viewHeight
-		// })
-		// this.add(this.construction)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 
-		if (this.constructor.name == 'Paper') {
-			this.update(argsDict)
-
-			this.background.update({
-				width: this.viewWidth,
-				height: this.viewHeight,
-				viewWidth: this.viewWidth,
-				viewHeight: this.viewHeight
-			})
-		}
+		this.background.updateModel({
+			width: this.viewWidth,
+			height: this.viewHeight,
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight
+		})
 	}
 
 	changeColorByName(newColorName: string) {
-		let newColor: Color = this.colorPalette[newColorName]
+		let newColor: Color = COLOR_PALETTE[newColorName]
 		this.changeColor(newColor)
 	}
 
@@ -90,8 +92,7 @@ export class Paper extends LinkableMobject {
 		this.currentColor = newColor
 		if (this.creationGroup == undefined) { return }
 		this.creationGroup.update({
-			strokeColor: this.currentColor,
-			fillColor: this.currentColor
+			penColor: this.currentColor
 		})
 	}
 
@@ -187,7 +188,7 @@ export class Paper extends LinkableMobject {
 	handleMessage(message: object) {
 		if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
-		let value: string | boolean | number | Color = Object.values(message)[0]
+		let value: string | boolean | number = Object.values(message)[0]
 		if (value == "true") { value = true }
 		if (value == "false") { value = false }
 
@@ -203,7 +204,7 @@ export class Paper extends LinkableMobject {
 			}
 			break
 		case 'color':
-			this.changeColor(value as Color)
+			this.changeColor(COLOR_PALETTE[value as string] as Color)
 			break
 		case 'drag':
 			this.setDragging(value as boolean)
@@ -228,12 +229,12 @@ export class Paper extends LinkableMobject {
 		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
-		// for (let fp of this.construction.points) {
-		// 	if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
-		// 		this.creationStartPoint = fp.midpoint
-		// 		drawFreehand = false
-		// 	}
-		// }
+		for (let fp of this.construction.points) {
+			if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
+				this.creationStartPoint = fp.midpoint
+				drawFreehand = false
+			}
+		}
 
 		this.creationGroup = new CreationGroup({
 			viewWidth: this.viewWidth,
@@ -241,7 +242,7 @@ export class Paper extends LinkableMobject {
 			startPoint: this.creationStartPoint,
 			visibleCreation: this.visibleCreation,
 			drawFreehand: drawFreehand,
-			strokeColor: this.currentColor
+			penColor: this.currentColor
 		})
 		
 		this.addDependency('currentColor', this.creationGroup, 'strokeColor')
@@ -253,13 +254,13 @@ export class Paper extends LinkableMobject {
 		let p: Vertex = pointerEventVertex(e)
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
-			// for (let fq of this.construction.points) {
-			// 	let q: Vertex = fq.midpoint
-			// 	if (p.subtract(q).norm() < 10) {
-			// 		p = q
-			// 		break
-			// 	}
-			// }
+			for (let fq of this.construction.points) {
+				let q: Vertex = fq.midpoint
+				if (p.subtract(q).norm() < 10) {
+					p = q
+					break
+				}
+			}
 		}
 		this.creationGroup.updateFromTip(p)
 	}

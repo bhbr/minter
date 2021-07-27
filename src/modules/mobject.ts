@@ -4,6 +4,7 @@ import { Dependency } from './dependency'
 import { ExtendedObject } from './extended-object'
 import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog, DRAW_BORDER } from './helpers'
 
+
 export class Mobject extends ExtendedObject {
 
 	// position and hierarchy
@@ -35,11 +36,24 @@ export class Mobject extends ExtendedObject {
 	dragAnchorStart?: Vertex
 
 
-	constructor(argsDict: object = {}) {
-		super()
+	constructor(argsDict: object = {}, superCall = false) {
+		super({}, true)
 
-		//// defaults
-		let initialArgs = {
+		let initialArgs = this.defaultArgs()
+		Object.assign(initialArgs, argsDict)
+		Object.assign(initialArgs, this.fixedArgs())
+
+		this.statelessSetup()
+		//// updating
+		if (!superCall) {
+			this.setAttributes(initialArgs)
+			this.statefulSetup()
+			this.update()
+		}
+	}
+
+	defaultArgs(): object {
+		return {
 			transform: Transform.identity(),
 			viewWidth: 100,
 			viewHeight: 100,
@@ -56,19 +70,25 @@ export class Mobject extends ExtendedObject {
 			vetoOnStopPropagation: false,
 			passAlongEvents: true,
 			draggable: false,
-			snappablePoints: []
-		}
-		Object.assign(initialArgs, argsDict)
+			snappablePoints: [],
 
+			view: document.createElement('div')
+		}
+	}
+
+	fixedArgs(): object {
+		return {}
+	}
+
+
+	statelessSetup() {
 		//// state-independent setup
-		this.setView(document.createElement('div'))
 
 		this.eventTarget = null
 		this.boundPointerDown = this.pointerDown.bind(this)
 		this.boundPointerMove = this.pointerMove.bind(this)
 		this.boundPointerUp = this.pointerUp.bind(this)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
-		addPointerDown(this.view, this.boundPointerDown)
 		//this.boundUpdate = this.update.bind(this)
 		
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -81,16 +101,13 @@ export class Mobject extends ExtendedObject {
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
 		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
 
-		//// updating
-		if (this.constructor.name == 'Mobject') {
-			this.update(initialArgs)
-		} else {
-			this.setAttributes(initialArgs)
-		}
-		//// no state-dependent setup
 
 	}
 
+	statefulSetup() {
+		this.setupView()
+		addPointerDown(this.view, this.boundPointerDown)
+	}
 
 	// position and hierarchy
 
@@ -169,7 +186,7 @@ export class Mobject extends ExtendedObject {
 	viewLeftCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)) }
 	viewRightCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)) }
 	viewTopCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
-	viewBottomCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
+	viewBottomCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMax(frame)) }
 
 	// Equivalent (by default) versions without "view" in the name
 
@@ -249,29 +266,9 @@ export class Mobject extends ExtendedObject {
 
 	// view and style
 
-	// get opacity(): number { return this._opacity }
-	// set opacity(newValue: number) {
-	// 	this._opacity = newValue
-	// 	if (this.view) {
-	// 		this.view.style.opacity = `${newValue}`
-	// 	}
-	// }
 
-	// get backgroundColor(): Color { return this._backgroundColor }
-	// set backgroundColor(newValue: Color) {
-	// 	this._backgroundColor = newValue
-	// 	this.view.style.backgroundColor = newValue.toHex()
-	// }
+	setupView() {
 
-	setView(newView: HTMLDivElement) {
-		if (newView === this.view) { return }
-		this.view?.parentNode?.removeChild(this.view)
-
-		if (this.view) {
-			removePointerDown(this.view, this.boundPointerDown)
-		}
-
-		this.view = newView
 		this.view['mobject'] = this
 		if (this.superMobject) {
 			this.superMobject.view.appendChild(this.view)
@@ -299,6 +296,9 @@ export class Mobject extends ExtendedObject {
 
 	add(submob: Mobject) {
 		if (submob.parent != this) { submob.parent = this }
+		if (this.children == undefined) {
+			console.error(`Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in statefulSetup()`)
+		}
 		if (!this.children.includes(submob)) {
 			this.children.push(submob)
 		}
@@ -321,12 +321,16 @@ export class Mobject extends ExtendedObject {
 	}
 
 	redraw(recursive = true) {
-		if (!this.view) { return }
-		this.positionView()
-		this.view.style['background-color'] = this.backgroundColor.toCSS()
-		//if (!this.visible || !this.parent) { return }
-		this.redrawSelf()
-		if (recursive) { this.redrawSubmobs() }
+		try {
+			if (!this.view) { return }
+			this.positionView()
+			this.view.style['background-color'] = this.backgroundColor.toCSS()
+			//if (!this.visible || !this.parent) { return }
+			this.redrawSelf()
+			if (recursive) { this.redrawSubmobs() }
+		} catch {
+			console.warn(`Unsuccessfully tried to draw ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 
@@ -342,19 +346,27 @@ export class Mobject extends ExtendedObject {
 
 
 	show() {
-		if (!this.view) { return }
-		this.visible = true
-		this.view.style["visibility"] = "visible"
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-		this.redraw()
+		try {
+			if (!this.view) { return }
+			this.visible = true
+			this.view.style["visibility"] = "visible"
+			for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+			this.redraw()
+		} catch {
+			console.warn(`Unsuccessfully tried to show ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 	hide() {
-		if (!this.view) { return }
-		this.visible = false
-		this.view.style["visibility"] = "hidden"
-		for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
-		this.redraw()
+		try {
+			if (!this.view) { return }
+			this.visible = false
+			this.view.style["visibility"] = "hidden"
+			for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
+			this.redraw()
+		} catch {
+			console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 	recursiveShow() {
@@ -415,15 +427,15 @@ export class Mobject extends ExtendedObject {
 		this.addDependency(null, target, null)
 	}
 
-
-
-	update(argsDict: object = {}, redraw = true) {
-
-		// a new view should be set before anything else
-		if (argsDict['view']) {
-			this.setView(argsDict['view'])
-			delete argsDict['view']
+	initialUpdate(argsDict: object = {}, superCall = false) {
+		if (superCall) {
+			this.setAttributes(argsDict)
+		} else {
+			this.update(argsDict)
 		}
+	}
+
+	updateModel(argsDict: object = {}) {
 
 		this.setAttributes(argsDict)
 		//this.positionView()
@@ -439,12 +451,16 @@ export class Mobject extends ExtendedObject {
 			dep.target.update()
 		}
 
-		if (this.constructor.name == 'Mobject' && redraw) {
+	}
+
+	update(argsDict: object = {}, redraw = true) {
+		this.updateModel(argsDict)
+
+		if (redraw) {
 			this.redraw()
 		}
 
 	}
-
 
 	updateSubmobs() {
 		for (let submob of this.children || []) {
@@ -542,15 +558,15 @@ export class Mobject extends ExtendedObject {
 	}
 
 	pointerMove(e: LocatedEvent) {
-		//console.log("event target:", this.eventTarget)
+		//console.log(this, "event target:", this.eventTarget)
 		if (this.eventTarget.vetoOnStopPropagation) { return }
 		e.stopPropagation()
 
 		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-			//console.log("here?")
+			//console.log("passing on")
 			this.eventTarget.pointerMove(e)
 		} else {
-			//console.log("or here?")
+			//console.log(`handling myself, and I am a ${this.constructor.name}`)
 			this.selfHandlePointerMove(e)
 		}
 	}
@@ -593,32 +609,17 @@ export class Mobject extends ExtendedObject {
 	}
 
 
-
-
 }
 
 
 
 export class MGroup extends Mobject {
 
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == 'MGroup') {
-			this.update(argsDict)
-		} else {
-			this.setAttributes(argsDict)
-		}
-		
+	statefulSetup() {
+		super.statefulSetup()
 		// children may have been set as a constructor args
 		for (let submob of this.children) {
 			this.add(submob)
-		}
-	}
-
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, false)
-		if (this.constructor.name == 'MGroup' && redraw) {
-			this.redraw()
 		}
 	}
 
@@ -638,38 +639,32 @@ export class VMobject extends Mobject {
 	strokeColor: Color
 	strokeWidth: number
 
-	constructor(argsDict: object = {}) {
-		super()
 
-		//// defaults
-		let initialArgs = {
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			fillColor: Color.white(),
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
-		}
-		Object.assign(initialArgs, argsDict)
+		})
+	}
 
-		//// state-independent setup
+	statelessSetup() {
+		super.statelessSetup()
 		this.vertices = []
 		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.svg['mobject'] = this
 		this.path['mobject'] = this
-		this.view.appendChild(this.svg) // why not just add?
 		this.svg.appendChild(this.path)
-		this.view.setAttribute('class', this.constructor.name + ' mobject-div')
 		this.svg.setAttribute('class', 'mobject-svg')
 		this.svg.style.overflow = 'visible'
+	}
 
-		//// updating
-		if (this.constructor.name == 'VMobject') {
-			this.update(initialArgs)
-		} else {
-			this.setAttributes(initialArgs)
-		}
-
-		//// no state-dependent setup
+	statefulSetup() {
+		super.statefulSetup()
+		this.view.appendChild(this.svg) // why not just add?
+		this.view.setAttribute('class', this.constructor.name + ' mobject-div')
 	}
 
 	redrawSelf() {
@@ -761,13 +756,6 @@ export class VMobject extends Mobject {
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, false)
-		if (this.constructor.name == 'VMobject' && redraw) {
-			this.redraw()
-		}
-	}
-
 	adjustFrame() {
 		let shift = new Transform({ shift: this.localULCorner() })
 		let inverseShift = shift.inverse()
@@ -806,15 +794,12 @@ export class VMobject extends Mobject {
 
 export class Polygon extends VMobject {
 
-	closed: boolean = true
+	closed: boolean
 
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == 'Polygon') {
-			this.update(argsDict)
-		} else {
-			this.setAttributes(argsDict)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			closed: true
+		})
 	}
 
 	pathString(): string {
@@ -855,20 +840,11 @@ export class CurvedShape extends VMobject {
 
 	_bezierPoints: Array<Vertex>
 
-	constructor(argsDict: object = {}) {
-		super()
-		if (this.constructor.name == 'CurvedShape') {
-			this.update(argsDict)
-		} else {
-			this.setAttributes(argsDict)
-		}
-	}
-
 	updateBezierPoints() { }
 	// implemented by subclasses
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, redraw)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 		this.updateBezierPoints()
 	}
 
@@ -876,10 +852,10 @@ export class CurvedShape extends VMobject {
 	// 	return this.globalTransform().appliedTo(this.bezierPoints)
 	// }
 
-	redrawSelf() {
-		this.updateBezierPoints()
-		super.redrawSelf()
-	}
+	// redrawSelf() {
+	// 	this.updateBezierPoints()
+	// 	super.redrawSelf()
+	// }
 
 	pathString(): string {
 		//let points: Array<Vertex> = this.globalBezierPoints()
@@ -926,38 +902,32 @@ export class TextLabel extends Mobject {
 	verticalAlign: string // 'top' | 'center' | 'bottom'
 	color?: Color
 
-	constructor(argsDict: object = {}) {
-		super()
-		let initialArgs = {
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			color: Color.white()
-		}
-		Object.assign(initialArgs, argsDict)
+		})
+	}
 
-		//// state-independent setup
+	statefulSetup() {
+		super.statefulSetup()
 		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
 		this.view.style.display = 'flex'
 		this.view.style.fontFamily = 'Helvetica'
 		this.view.style.fontSize = '10px'
-
-		//// updating
-		if (this.constructor.name == 'TextLabel') {
-			this.update(initialArgs)
-		} else {
-			this.setAttributes(initialArgs)
-		}
 	}
 
 	redrawSelf() {
 		if (this.anchor.isNaN()) { return }
 		if (this.color == undefined) { this.color = Color.white() }
-
+		super.redrawSelf()
 	}
 
-	update(argsDict: object = {}, redraw = true) {
-		super.update(argsDict, false)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 
 		//// internal dependencies
 		this.view.innerHTML = this.text
@@ -970,7 +940,6 @@ export class TextLabel extends Mobject {
 			this.view.style.alignItems = 'center'
 			break
 		case 'bottom':
-			console.log('here')
 			this.view.style.alignItems = 'flex-end'
 			break
 		}
@@ -984,10 +953,6 @@ export class TextLabel extends Mobject {
 		case 'right':
 			this.view.style.justifyContent = 'flex-end'
 			break
-		}
-
-		if (this.constructor.name == 'TextLabel' && redraw) {
-			this.redraw()
 		}
 
 	}

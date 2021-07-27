@@ -1,5 +1,5 @@
 import { Mobject, TextLabel } from '../modules/mobject'
-import { Circle, TwoPointCircle } from '../modules/shapes'
+import { Circle, TwoPointCircle, Rectangle } from '../modules/shapes'
 import { Segment } from '../modules/arrows'
 import { paper } from '../paper'
 import { DEGREES } from '../modules/math'
@@ -59,6 +59,19 @@ export function MobjectTest() {
 	f.enableDragging()
 
 	console.log(f)
+
+	let r = new Rectangle({
+		width: 200,
+		height: 50,
+		anchor: new Vertex(150, 150),
+		backgroundColor: Color.blue(),
+		fillColor: Color.orange(),
+		fillOpacity: 1,
+		strokeColor: Color.green()
+	})
+
+	paper.add(r)
+	console.log(r)
 }
 
 export function CircleTest() {
@@ -158,6 +171,28 @@ export function SliderTest() {
 }
 
 
+export function LinkTest() {
+
+	let s = new BoxSlider({
+		anchor: new Vertex(100, 100),
+		height: 150
+	})
+	paper.add(s)
+
+	let c = new WaveCindyCanvas({
+		anchor: new Vertex(300, 100),
+		viewWidth: 100,
+		viewHeight: 100,
+		points: [[0.4, 0.4], [0.3, 0.8]],
+		id: `wavey`
+	})
+	paper.add(c)
+	c.startUp()
+
+	paper.showLinksOfSubmobs()
+
+
+}
 
 
 

@@ -62,3 +62,15 @@ export class Color {
 	static violet(): Color { return new Color(1, 0, 1) }
 
 }
+
+
+export const COLOR_PALETTE: object = {
+				'white': Color.white(),
+				'red': Color.red(),
+				'orange': Color.orange(),
+				'yellow': Color.yellow(),
+				'green': Color.green(),
+				'blue': Color.blue(),
+				'indigo': Color.indigo(),
+				'violet': Color.violet()
+			}

@@ -12,17 +12,25 @@ export class CreationGroup extends CreatedMobject {
 	creations: object
 	visibleCreation: string = 'freehand'
 	drawFreehand: boolean = true
-	strokeColor: Color
+	penColor: Color
 
-	constructor(argsDict) {
-		super(argsDict)
-		this.setDefaults({
-			strokeColor: Color.white()
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			penColor: Color.white(),
+			startPoint: Vertex.origin()
 		})
-		this.startPoint = argsDict['startPoint'] || Vertex.origin()
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
 		this.creations = { }
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.creations['freehand'] = new Freehand()
-		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint })
+		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint})
 		this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
 		this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
 		this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
@@ -31,7 +39,8 @@ export class CreationGroup extends CreatedMobject {
 		this.creations['pendulum'] = new CreatedPendulum({startPoint: this.startPoint})
 
 		for (let mob of Object.values(this.creations)) {
-			this.addDependency('strokeColor', mob, 'penStrokeColor')
+			this.addDependency('penColor', mob, 'penStrokeColor')
+			this.addDependency('penColor', mob, 'penFillColor')
 			mob.update()
 		}
 
@@ -39,7 +48,6 @@ export class CreationGroup extends CreatedMobject {
 		for (let creation of Object.values(this.creations)) {
 			this.add(creation)
 		}
-		this.update(argsDict)
 
 	}
 
@@ -69,21 +77,21 @@ export class CreationGroup extends CreatedMobject {
 		paper.updateIOList()
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 		if (this.creations == undefined) { return }
 		let sc = argsDict['strokeColor']
 		if (sc != undefined) {
 			for (let mob of Object.values(this.creations)) {
-				mob.update({ strokeColor: sc }, redraw)
+				mob.updateModel({ strokeColor: sc })
 			}
 		}
 		let fc = argsDict['fillColor']
 		if (fc != undefined) {
 			for (let mob of Object.values(this.creations)) {
-				mob.update({ fillColor: fc }, redraw)
+				mob.updateModel({ fillColor: fc })
 			}
 		}
-		super.update(argsDict, redraw)
 	}
 
 
