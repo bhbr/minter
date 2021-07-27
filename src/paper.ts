@@ -281,12 +281,17 @@ export class Paper extends LinkableMobject {
 
 }
 
+var paperAnchor = Vertex.origin()
+if (isTouchDevice === false) {
+	paperAnchor = new Vertex(150, 0)
+}
+
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
-	anchor: new Vertex(200, 0), // this is a temporary workaround
+	anchor: paperAnchor,
 	passAlongEvents: true,
-	viewWidth: 800,
-	viewHeight: 600
+	viewWidth: 1250,
+	viewHeight: 1200
 })
 
 // let c = new Circle({

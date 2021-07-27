@@ -25,3 +25,4 @@ lib/paper.js
 lib/sidebar.js
 lib/testpage.js
 src/.DS_Store
+*.js

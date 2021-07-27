@@ -522,7 +522,7 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		//console.log(targetViewChain)
+		console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
@@ -547,12 +547,12 @@ export class Mobject extends ExtendedObject {
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
-		//console.log('event target on ', this, 'is', this.eventTarget)
+		console.log('event target on ', this, 'is', this.eventTarget)
 		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-			//console.log('passing on')
+			console.log('passing on')
 			this.eventTarget.pointerDown(e)
 		} else {
-			//console.log(`handling myself, and I am a ${this.constructor.name}`)
+			console.log(`handling myself, and I am a ${this.constructor.name}`)
 			this.selfHandlePointerDown(e)
 		}
 	}

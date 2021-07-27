@@ -3,7 +3,7 @@ import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup, TextLabel } from './modules/mobject'
 import { Color, COLOR_PALETTE } from './modules/color'
-import { Circle } from './modules/shapes'
+import { Circle, Rectangle } from './modules/shapes'
 import { Segment } from './modules/arrows'
 import { Paper } from './paper'
 
@@ -15,7 +15,7 @@ if (isTouchDevice === false) {
 }
 
 
-//let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
+let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
 interface Window { webkit?: any }
 
@@ -33,13 +33,35 @@ const buttonRadius: number = 25
 const buttonScaleFactor: number = 1.3
 
 class Sidebar extends Mobject {
+
+	background: Rectangle
 	
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
-			viewHeight: 600,
+			viewHeight: 1024,
 			interactive: true
 		})
+	}
+
+	statelessSetup() {
+		this.background = new Rectangle({
+			fillColor: Color.black(),
+			fillOpacity: 1,
+			strokeWidth: 0,
+			passAlongEvents: true
+		})
+		super.statelessSetup()
+	}
+
+	statefulSetup() {
+		this.add(this.background)
+		this.background.update({
+			width: this.viewWidth,
+			height: this.viewHeight
+		})
+		super.statefulSetup()
+
 	}
 
 }
@@ -63,11 +85,6 @@ class SidebarButton extends Circle {
 
 	boundButtonUpByKey(e: KeyboardEvent) { }
 	boundButtonDownByKey(e: KeyboardEvent) { }
-	boundButtonUpByPointer(e: LocatedEvent) { }
-	boundButtonDownByPointer(e: LocatedEvent) { }
-	boundCommonButtonUp() { }
-	boundCommonButtonDown() { }
-	boundButtonDrag(e: LocatedEvent) { }
 
 
 	fixedArgs(): object {
@@ -102,20 +119,14 @@ class SidebarButton extends Circle {
 
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
-		this.boundButtonUpByPointer = this.buttonUpByPointer.bind(this)
-		this.boundButtonDownByPointer = this.buttonDownByPointer.bind(this)
-		this.boundCommonButtonUp = this.commonButtonUp.bind(this)
-		this.boundCommonButtonDown = this.commonButtonDown.bind(this)
-		this.boundButtonDrag = this.buttonDrag.bind(this)
 		
 		document.addEventListener('keydown', this.boundButtonDownByKey)
-
 
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
-		addPointerDown(this.view, this.boundButtonDownByPointer)
+		addPointerDown(this.view, this.boundPointerDown) // this.boundButtonDownByPointer)
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
@@ -124,7 +135,8 @@ class SidebarButton extends Circle {
 			viewHeight: 2 * this.radius,
 			text: this.text
 		}, false)
-		this.label.view.style['font-size'] = `${this.fontSize ?? 12}px`
+		let fontSize = this.fontSize ?? 12
+		this.label.view.style['font-size'] = `${fontSize}px`
 		this.label.view.style['color'] = Color.white().toHex()
 
 	}
@@ -161,32 +173,37 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
+		console.log("button down")
 		if (this.active) { return }
 		this.messagePaper(this.messages[0])
 		this.active = true
+		let c = this.localCenter()
+		let t = new Transform({shift: c})
+		t.rightComposeWith(new Transform({scale: 1.2}))
+		t.rightComposeWith(new Transform({shift: c}).inverse())
+		// I know this is ugly, transform anchor doesn't work properly
 		this.update({
-			//radius: buttonRadius * buttonScaleFactor,
-			transform: new Transform({scale: 1.2, anchor: this.localCenter()}),
+			transform: t,
 			previousIndex: this.currentModeIndex
 		})
 	}
 	
-	buttonDownByPointer(e: LocatedEvent) {
+	selfHandlePointerDown(e: LocatedEvent) {
 		e.preventDefault()
 		e.stopPropagation()
 		this.commonButtonDown()
-		removePointerDown(this.view, this.boundButtonDownByPointer)
-		addPointerUp(this.view, this.boundButtonUpByPointer)
-		addPointerMove(this.view, this.boundButtonDrag)
+		removePointerDown(this.view, this.boundPointerDown)
+		addPointerUp(this.view, this.boundPointerUp)
+		addPointerMove(this.view, this.boundPointerMove)
 		this.touchStart = pointerEventVertex(e)
 	}
 
-	buttonUpByPointer(e: LocatedEvent) {
+	selfHandlePointerUp(e: LocatedEvent) {
 		e.preventDefault()
 		e.stopPropagation()
-		removePointerUp(this.view, this.boundButtonUpByPointer)
-		addPointerDown(this.view, this.boundButtonDownByPointer)
-		removePointerMove(this.view, this.boundButtonDrag)
+		removePointerUp(this.view, this.boundPointerUp)
+		addPointerDown(this.view, this.boundPointerDown)
+		removePointerMove(this.view, this.boundPointerMove)
 		this.commonButtonUp()
 	}
 	
@@ -271,7 +288,8 @@ class SidebarButton extends Circle {
 		this.updateModeIndex(this.currentModeIndex - 1, true)
 	}
 	
-	buttonDrag(e: LocatedEvent) {
+	//buttonDrag(e: LocatedEvent) {
+	selfHandlePointerMove(e: LocatedEvent) {
 		if (e != null) {
 			e.preventDefault()
 			e.stopPropagation()
@@ -354,8 +372,10 @@ class ColorChangeButton extends SidebarButton {
 		this.update()
 	}
 
-	buttonDrag(e: LocatedEvent) {
-		super.buttonDrag(e)
+//	buttonDrag(e: LocatedEvent) {
+	selfHandlePointerMove(e: LocatedEvent) {
+//		super.buttonDrag(e)
+		super.selfHandlePointerMove(e)
 		this.remove(this.label)
 	}
 }
@@ -426,7 +446,6 @@ class DragButton extends ToggleButton {
 		this.label.view.style['font-family'] = 'Times'
 		this.label.view.style['font-size'] = `${this.fontSize}px`
 		this.label.text = '↕︎'
-
 	}
 
 }
@@ -446,7 +465,7 @@ let sidebar = new Sidebar({
 
 console.log(sidebar)
 
-paper.view.style.left = sidebar.viewWidth.toString() + "px"
+//paper.view.style.left = sidebar.viewWidth.toString() + "px"
 
 
 
