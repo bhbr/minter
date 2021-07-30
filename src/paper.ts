@@ -30,12 +30,17 @@ export class Paper extends LinkableMobject {
 	dragIOListAnchorStart: Vertex
 	construction: Construction
 	background: Rectangle
+	isPanning: boolean
+	panLocation?: Vertex
+	oldShift?: Vertex
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			children: [],
 			visibleCreation: 'freehand',
 			snappablePoints: [],
+			isPanning: false,
+			oldShift: Vertex.origin()
 		})
 	}
 
@@ -225,8 +230,51 @@ export class Paper extends LinkableMobject {
 			if (value == 1 || value == '1') { this.showAllLinks() }
 			else { this.hideAllLinks() }
 			break
+		case 'pan':
+			this.setPanning(value as boolean)
 		}
 
+	}
+
+
+	setPanning(flag: boolean) {
+		this.isPanning = flag
+		this.passAlongEvents = !flag
+		if (flag) {
+			this.selfHandlePointerDown = this.startPanning
+			this.selfHandlePointerMove = this.panning
+			this.selfHandlePointerUp = this.endPanning
+			for (let submob of this.getCindys()) {
+				submob.vetoOnStopPropagation = false
+			}
+		} else {
+			this.selfHandlePointerDown = this.startCreating
+			this.selfHandlePointerMove = this.creativeMove
+			this.selfHandlePointerUp = this.endCreating
+			for (let submob of this.getCindys()) {
+				submob.vetoOnStopPropagation = true
+			}
+		}
+	}
+
+	startPanning(e: LocatedEvent) {
+		this.panLocation = pointerEventVertex(e)
+	}
+
+	panning(e: LocatedEvent) {
+		let dx = pointerEventVertex(e).subtract(this.panLocation)
+		for (let submob of this.submobs) {
+			if (submob == this.background) { continue }
+			submob.transform.shift = this.oldShift.add(dx)
+			submob.redraw()
+		}
+	}
+
+	endPanning(e: LocatedEvent) {
+		this.panLocation = null
+		if (this.submobs.length > 1) {
+			this.oldShift = this.submobs[1].transform.shift
+		}
 	}
 
 	changeVisibleCreation(newVisibleCreation: string) {

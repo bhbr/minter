@@ -67,7 +67,8 @@ export class Freehand extends DrawnMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			draggable: false
+			draggable: false,
+			fillOpacity: 0
 		})
 	}
 	
@@ -75,7 +76,8 @@ export class Freehand extends DrawnMobject {
 		super.statelessSetup()
 		this.line = new Polygon({
 			closed: false,
-			opacity: 1.0
+			opacity: 1.0,
+			fillOpacity: 0
 		})
 	}
 
