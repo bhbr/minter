@@ -62,6 +62,7 @@ export class Pendulum extends LinkableMobject {
 			fixtureHeight: 10,
 			weightRadius: 10,
 			mass: 1,
+			period: 2000,
 			initialSpeed: 0,
 			outputNames: ['angle']
 		})
@@ -83,9 +84,14 @@ export class Pendulum extends LinkableMobject {
 	updateModel(argsDict: object = {}) {
 
 		super.updateModel(argsDict)
-		//if (this.fixture == undefined) { return }
 
-		let angle: number = argsDict['initialAngle'] || this.angle()
+		let maybeAngle: any = argsDict['initialAngle']
+		var angle: number = 0
+		if (typeof maybeAngle != 'number') { angle = this.angle() }
+		else {
+			angle = maybeAngle as number
+			if (isNaN(angle)) { this.angle() }
+		}
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.length)
 		this.string.updateModel({
 			endPoint: newEndPoint
@@ -133,7 +139,7 @@ export class CreatedPendulum extends CreatedMobject {
 	dissolveInto(paper: Paper) {
 		super.dissolveInto(paper)
 		this.pendulum.update({
-			initialTime: Date.now()
+			initialTime: Date.now(),
 		})
 		this.pendulum.run()
 	}
