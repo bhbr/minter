@@ -442,11 +442,11 @@ export class Mobject extends ExtendedObject {
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {
-			let outputName: any = this[dep.outputName] // may be undefined
-			if (typeof outputName === 'function') {
-				dep.target[dep.inputName] = outputName.bind(this)()
-			} else if (outputName != undefined && outputName != null) {
-				dep.target[dep.inputName] = outputName
+			let outputValue: any = this[dep.outputName] // may be undefined
+			if (typeof outputValue === 'function') {
+				dep.target[dep.inputName] = outputValue.bind(this)()
+			} else if (outputValue !== undefined && outputValue !== null) {
+				dep.target[dep.inputName] = outputValue
 			}
 			dep.target.update()
 		}
@@ -522,7 +522,7 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		console.log(targetViewChain)
+		//console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
@@ -547,12 +547,12 @@ export class Mobject extends ExtendedObject {
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
-		console.log('event target on ', this, 'is', this.eventTarget)
+		//console.log('event target on ', this, 'is', this.eventTarget)
 		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-			console.log('passing on')
+			//console.log('passing on')
 			this.eventTarget.pointerDown(e)
 		} else {
-			console.log(`handling myself, and I am a ${this.constructor.name}`)
+			//console.log(`handling myself, and I am a ${this.constructor.name}`)
 			this.selfHandlePointerDown(e)
 		}
 	}
@@ -643,7 +643,7 @@ export class VMobject extends Mobject {
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			fillColor: Color.white(),
-			fillOpacity: 0,
+			fillOpacity: 0.5,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
 		})

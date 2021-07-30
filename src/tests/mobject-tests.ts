@@ -1,5 +1,5 @@
 import { Mobject, TextLabel } from '../modules/mobject'
-import { Circle, TwoPointCircle, Rectangle } from '../modules/shapes'
+import { Circle, TwoPointCircle, Rectangle, RoundedRectangle } from '../modules/shapes'
 import { Segment } from '../modules/arrows'
 import { paper } from '../paper'
 import { DEGREES } from '../modules/math'
@@ -8,6 +8,7 @@ import { Color } from '../modules/color'
 import { WaveCindyCanvas } from '../modules/cindycanvas'
 import { Point, FreePoint } from '../modules/creating'
 import { BoxSlider } from '../modules/slider'
+import { Boolean, ToggleableBoolean, NotBoolean } from '../modules/boolean'
 
 export function TransformTest() {
 	console.log("creating new circle")
@@ -79,15 +80,14 @@ export function CircleTest() {
 	let r = 75
 	let c = new Circle({
 		midpoint: p,
-		radius: r,
-		drawBorder: true
+		radius: r
 	})
 	paper.add(c)
 	c.update({
 		radius: 25,
-		midpoint: Vertex.origin()
+		anchor: Vertex.origin()
 	})
-	console.log(c)
+	// console.log(c)
 }
 
 export function DrawCircleTest() {
@@ -192,6 +192,40 @@ export function LinkTest() {
 	paper.showLinksOfSubmobs()
 
 
+}
+
+export function BooleanTest() {
+
+	// let r = new RoundedRectangle({
+	// 	width: 400,
+	// 	height: 50,
+	// 	cornerRadius: 50,
+	// 	anchor: new Vertex(50, 50)
+	// })
+	// paper.add(r)
+	// console.log(r.cornerRadius)
+
+	// let b = new Boolean({
+	// 	anchor: new Vertex(100, 100),
+	// 	state: null
+	// })
+	// paper.add(b)
+	// console.log(b.pill.cornerRadius)
+
+	let tb = new ToggleableBoolean({
+		anchor: new Vertex(300, 100),
+		state: false
+	})
+	paper.add(tb)
+
+	let nb = new NotBoolean({
+		argument: tb,
+		anchor: new Vertex(300, 150)
+	})
+
+	paper.add(nb)
+
+	tb.addDependency('state', nb, 'argument')
 }
 
 
