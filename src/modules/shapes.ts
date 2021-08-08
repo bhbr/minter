@@ -1,7 +1,7 @@
 import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Polygon, CurvedShape, MGroup } from './mobject'
-import { Segment } from './arrows'
+//import { Segment } from './arrows'
 import { gray, pointerEventVertex } from './helpers'
 import { TAU } from './math'
 
@@ -9,14 +9,15 @@ import { TAU } from './math'
 
 export class Circle extends CurvedShape {
 
-	//midpoint: Vertex
-	_radius: number
+	_radius = 50
+	anchor = new Vertex(-this.radius, -this.radius)
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			midpoint: Vertex.origin(),
-			radius: 10
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
 	get midpoint(): Vertex { return this.anchor.translatedBy(this.radius, this.radius )}
@@ -37,13 +38,11 @@ export class Circle extends CurvedShape {
 		this.midpoint = oldMidpoint // this moves the anchor so that the midpoint stays the same
 	}
 
-	updateModel(argsDict: object = {}) {
-
-		let r = argsDict['radius'] || this.radius
-		argsDict['viewWidth'] = 2 * r
-		argsDict['viewHeight'] = 2 * r
-
-		super.updateModel(argsDict)
+	updateSelf(args = {}) {
+		let r = args['radius'] || this.radius
+		args['viewWidth'] = 2 * r
+		args['viewHeight'] = 2 * r
+		super.updateSelf(args)
 	}
 
 	updateBezierPoints() {
@@ -68,55 +67,45 @@ export class Circle extends CurvedShape {
 			translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius))
 		}
 		this.bezierPoints = translatedBezierPoints
-
-		// do NOT update the view, because redraw calls updateBezierPoints
 	}
 
 }
 
 export class TwoPointCircle extends Circle {
 
-	outerPoint: Vertex
+	outerPoint = Vertex.origin()
+	fillOpacity = 0
 
-	defaultArgs() {
-		return Object.assign(super.defaultArgs(), {
-			strokeColor: Color.white(),
-			fillColor: Color.white(),
-			fillOpacity: 0,
-			outerPoint: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.view.style['pointer-events'] = 'none'
 	}
 
-	updateModel(argsDict: object = {}) {
-
-		let p = argsDict['midpoint'] || this.midpoint
-		let q = argsDict['outerPoint'] || this.outerPoint
+	updateSelf(args = {}) {
+		let p = args['midpoint'] || this.midpoint
+		let q = args['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
-		argsDict['radius'] = r
-		super.updateModel(argsDict)
+		args['radius'] = r
+		super.updateSelf(args)
 	}
 
 }
 
 export class Ellipse extends CurvedShape {
 
-	majorAxis: number
-	minorAxis: number
-	tilt: number
+	majorAxis = 200
+	minorAxis = 100
+	tilt = 0
 
-	defaultArgs() {
-		return Object.assign(super.defaultArgs(), {
-			majorAxis: 200,
-			minorAxis: 100,
-			tilt: 0
-		})
-	}
+	constructor(args = {}) { super(args) }
 
 }
 
@@ -125,32 +114,24 @@ export class Ellipse extends CurvedShape {
 
 export class Rectangle extends Polygon {
 
-	width: number
-	height: number
-	p1: Vertex
-	p2: Vertex
-	p3: Vertex
-	p4: Vertex
-
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			width: 100,
-			height: 100,
-			p1: Vertex.origin(),
-			p2: Vertex.origin(),
-			p3: Vertex.origin(),
-			p4: Vertex.origin()
-		})
+	width = 200
+	height = 100
+	p1 = Vertex.origin()
+	p2 = new Vertex(this.width, 0)
+	p3 = new Vertex(this.width, this.height)
+	p4 = new Vertex(0, this.height)
+	vertices = [this.p1, this.p2, this.p3, this.p4]
+	
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-	}
-
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args = {}) {
+		super.updateSelf(args)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -171,22 +152,20 @@ export class Rectangle extends Polygon {
 
 export class RoundedRectangle extends CurvedShape {
 
-	width: number
-	height: number
-	p1: Vertex
-	p2: Vertex
-	p3: Vertex
-	p4: Vertex
-	cornerRadius: number
+	width = 200
+	height = 100
+	cornerRadius = 10
+	p1 = Vertex.origin()
+	p2 = Vertex.origin()
+	p3 = Vertex.origin()
+	p4 = Vertex.origin()
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			cornerRadius: 10,
-			p1: Vertex.origin(),
-			p2: Vertex.origin(),
-			p3: Vertex.origin(),
-			p4: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
 	quarterArc(): Array<Vertex> {
@@ -240,15 +219,17 @@ export class RoundedRectangle extends CurvedShape {
 	}
 
 
-	updateModel(argsDict: object = {}) {
-		let cr = argsDict['cornerRadius'] || this.cornerRadius
-		let w = argsDict['width'] || this.width
-		let h = argsDict['height'] || this.height
+	updateSelf(args: object = {}) {
+
+		// check if corner radius is not too large
+		let cr = args['cornerRadius'] || this.cornerRadius
+		let w = args['width'] || this.width
+		let h = args['height'] || this.height
 		let r = Math.min(cr, Math.min(w, h)/2)
 
-		argsDict['cornerRadius'] = r
+		args['cornerRadius'] = r
 
-		super.updateModel(argsDict)
+		super.updateSelf(args)
 
 		//// internal dependencies
 		this.viewWidth = this.width

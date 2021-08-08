@@ -19,23 +19,30 @@ export class IntersectionPoint extends Point {
 	lambda: number = NaN
 	mu: number = NaN
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			midpoint: new Vertex(NaN, NaN)
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	updateModel(argsDict: object = {}) {
+	setup() {
+		super.setup()
+		this.midpoint = new Vertex(NaN, NaN)
+	}
+
+	updateSelf(args: object = {}) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
 			if (!this.midpoint.equals(mp)) {
-				argsDict['midpoint'] = mp
+				args['midpoint'] = mp
 			}
 		}
-		super.updateModel(argsDict)
+		super.updateSelf(args)
 
 
 	}
@@ -131,25 +138,19 @@ export class IntersectionPoint extends Point {
 
 export class Construction extends LinkableMobject {
 	
-	points: Array<Point>
-	freePoints: Array<FreePoint>
-	constructedMobjects: Array<ConstructedMobject>
+	points: Array<Point> = []
+	freePoints: Array<FreePoint> = []
+	constructedMobjects: Array<ConstructedMobject> = []
+	readonly passAlongEvents = true
+	readonly interactive = true
 
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			points: [],
-			constructedMobjects: []
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			passAlongEvents: true,
-			interactive: true
-		})
-	}
-
 
 	integrate(mob: DrawnArrow | DrawnCircle) {
 		let p1: Point = this.pointForVertex(mob.startPoint)
@@ -200,8 +201,6 @@ export class Construction extends LinkableMobject {
 		this.points.push(p)
 		return true
 	}
-
-
 
 	intersectWithRest(geomob1: ConstructedMobject) {
 		for (let geomob2 of this.constructedMobjects) {

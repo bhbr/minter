@@ -26,17 +26,3 @@ lib/sidebar.js
 lib/testpage.js
 src/.DS_Store
 *.js
-dist/testpage-bundle.js
-lib/modules/arrows.js
-lib/modules/cindycanvas.js
-lib/modules/construction.js
-lib/modules/createdslider.js
-lib/modules/creating.js
-lib/modules/creationgroup.js
-lib/modules/helpers.js
-lib/modules/linkables.js
-lib/modules/mobject.js
-lib/modules/shapes.js
-lib/modules/slider.js
-lib/paper.js
-lib/sidebar.js

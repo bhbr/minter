@@ -2,6 +2,7 @@ import { Mobject, TextLabel } from '../modules/mobject'
 import { Circle, TwoPointCircle, Rectangle, RoundedRectangle } from '../modules/shapes'
 import { Segment } from '../modules/arrows'
 import { paper } from '../paper'
+import { LocatedEvent, xMax } from '../modules/helpers'
 import { DEGREES } from '../modules/math'
 import { Vertex, Transform } from '../modules/vertex-transform'
 import { Color } from '../modules/color'
@@ -11,14 +12,49 @@ import { BoxSlider } from '../modules/slider'
 import { Boolean, ToggleableBoolean, NotBoolean } from '../modules/boolean'
 
 export function TransformTest() {
-	console.log("creating new circle")
-	let c = new Circle({
-		midpoint: new Vertex(300, 50)
+
+	let r = new Rectangle({
+		anchor: new Vertex(100, 50),
+		width: 150,
+		height: 100,
+		interactive: true
 	})
-	paper.add(c)
-	c.update({
-		midpoint: new Vertex(100, 20)
+
+	let r2 = new Rectangle({
+		anchor: new Vertex(10, 10),
+		width: 30,
+		height: 20,
+		fillColor: Color.orange(),
+		transform: new Transform({
+			angle: 15 * DEGREES
+		})
 	})
+
+	r.add(r2)
+	paper.add(r)
+	let c = r.localTopCenter()
+
+	let t0 = r.transform
+	let t1 = new Transform({
+		angle: 10 * DEGREES,
+		anchor: c
+	})
+
+	r.selfHandlePointerDown = function(e: LocatedEvent) {
+		r.update({
+			transform: t1
+		})
+	}
+
+	r.selfHandlePointerUp = function(e: LocatedEvent) {
+		r.update({
+			transform: Transform.identity()
+		})
+	}
+
+	let vertices = [new Vertex(1, 2), new Vertex(3, 4)]
+	let m = xMax(vertices)
+	console.log(m)
 
 }
 
@@ -40,16 +76,14 @@ export function MobjectTest() {
 		anchor: new Vertex(200, 200)
 	})
 
-	f.redraw()
-
-	// let c = new Circle({
-	// 	midpoint: new Vertex(50, 150),
-	// 	radius: 50,
-	// 	fillColor: Color.orange(),
-	// 	opacity: 1.0,
-	// 	interactive: true
-	// })
-	// f.add(c)
+	let c = new Circle({
+		midpoint: new Vertex(50, 150),
+		radius: 50,
+		fillColor: Color.orange(),
+		opacity: 1.0,
+		interactive: true
+	})
+	f.add(c)
 
 	let l = new Segment({
 		startPoint: new Vertex(100, 0),
@@ -196,21 +230,21 @@ export function LinkTest() {
 
 export function BooleanTest() {
 
-	// let r = new RoundedRectangle({
-	// 	width: 400,
-	// 	height: 50,
-	// 	cornerRadius: 50,
-	// 	anchor: new Vertex(50, 50)
-	// })
-	// paper.add(r)
-	// console.log(r.cornerRadius)
+	let r = new RoundedRectangle({
+		width: 400,
+		height: 50,
+		cornerRadius: 50,
+		anchor: new Vertex(50, 50)
+	})
+	paper.add(r)
+	console.log(r.cornerRadius)
 
-	// let b = new Boolean({
-	// 	anchor: new Vertex(100, 100),
-	// 	state: null
-	// })
-	// paper.add(b)
-	// console.log(b.pill.cornerRadius)
+	let b = new Boolean({
+		anchor: new Vertex(100, 100),
+		state: null
+	})
+	paper.add(b)
+	console.log(b.pill.cornerRadius)
 
 	let tb = new ToggleableBoolean({
 		anchor: new Vertex(300, 100),

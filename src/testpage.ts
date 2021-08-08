@@ -4,12 +4,12 @@ import { Mobject } from './modules/mobject'
 import { Circle } from './modules/shapes'
 import { Color } from './modules/color'
 
-// let f = new Mobject({
-// 	anchor: new Vertex(200, 100),
-// 	viewWidth: 150,
-// 	viewHeight: 50
-// })
-// f.redraw()
+let m = new Mobject({
+	anchor: new Vertex(200, 100),
+	viewWidth: 250,
+	viewHeight: 150,
+	backgroundColor: Color.red()
+})
 
 let c = new Circle({
 	midpoint: new Vertex(50, 50),
@@ -18,6 +18,7 @@ let c = new Circle({
 	fillOpacity: 1,
 	strokeColor: Color.red()
 })
-c.redraw()
 
-document.querySelector('#paper').appendChild(c.view)
+m.add(c)
+
+document.querySelector('#paper').appendChild(m.view)

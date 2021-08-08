@@ -1,84 +1,157 @@
 
-constructor:
-	- call super without args
-	- //updatables: ...
-	- assign default args (not with update!)
-	- setup independent of state
-		- mainly creating submobs
-		- submobs can only have default state here
-		- submobs will need to get adjusted in update
-		- internal linking
-	- if final constructor: update(argsDict)
-	- remaining setup dependent on state
-		- things that will get set once and can't be updated
-		- e. g. creating more submobs
 
-update:
-	- //check if all args are updatable
-	- super.update without redraw
-	- custom updating (internal dependencies)
-	- update submobs and dependents
-	- if final update: redraw
+
+
+
+properties
+readonly props
+// incl. objects, fully constructed with default values
 
 getter/setter only for properties that don't require new state
 
 
-
-Mobject subclassing:
-	- defaultArgs()
-	- statelessSetup()
-	- statefulSetup()
-	- updateModel()
-
-
-export class SubClass extends Mobject {
-	
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), { 
-			// default values pertaining to the subclass go here
-		})
+// Mobject
+constructor(args, superCall = false) {
+	super({}, true)
+	if !superCall {
+		setup() // initial stuff, incl. internal dependencies
+		update(args, true) // incl. setters
 	}
+}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), { 
-			// immutable values pertaining to the subclass go here
-		})
-	}
+// Subclasses need no constructor
 
-	statelessSetup() {
-		super.statelessSetup()
-		// custom setup that does not depend on any properties
-	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		// custom setup that does depend on properties
-		// in particular things that will never change
-		// such as internal dependencies that are as passed by reference
-	}
-
-	updateModel(argsDict) {
-		super.updateModel(argsDict)
-		// custom updating goes here
-		// internal dependencies that are passed by value
-		// redrawing is handled elsewhere
-	}
-
-	redrawSelf() {
-		super.redrawSelf()
-		// custom drawing if necessary
-	}
-
+// Mobject
+update(args, redraw = true) {
+	updateSelf(args)
+	updateSubmobs()
+	updateDependents()
+	redraw()
 }
 
 
-usage:
+updateSelf(args) {
+	setAttributes(args)
+}
+
+
+
+redraw() {
+	redrawSelf()
+	redrawSubmobs()
+	redrawDependents()
+}
+
+
+
+setAttributes(args) {
+	for (let [key, value] in Object.entries(args)) {
+		let attr = this[key]
+		if (attr.passByValue) {
+			if (attr.copyFrom != undefined) {
+				attr.copyFrom(value)
+			} else {
+				console.error('Need to implement copyFrom!')
+			}
+		} else {
+			attr = value
+		}
+	}
+}
+
+
+//// Subclasses ////
+
+// properties
+// incl. mobjects that depend on properties (readonly or not)
+
+
+// this boilerplate constructor is necessary
+// whenever we declare new properties or reset existing ones
+constructor(args = {}, superCall = false) {
+	super({}, true)
+	if (!superCall) {
+		this.setup()
+		this.update(args)
+	}
+}
+
+setup() {
+	super.setup()
+	// custom setup
+	// incl. updating properties that are expected to be set just once (?)
+}
+
+updateSelf(args) {
+	super.updateSelf(args, redraw)
+	// custom updating
+	// incl. those mobjects that do not depend on readonly properties alone
+}
+
+redrawSelf() {
+	super.redrawSelf()
+	// custom drawing
+}
+
 
 let m = new SubClass({...})
 
 m.update({...}, redraw = false)
 m.update({...})
 m.update()
+
+
+
+
+Mobjects always have a .view that is an HTML div
+The mob's .anchor is the position of the top left (for now) corner in the superview
+
+The view's width and height are the mob's .viewWidth and .viewHeight (this is bc we'd like to save "width" and "height" for e. g. Rectangles etc.)
+
+A mob also has a transform, consisting of a rotation and scaling around the anchor (no shifting!).
+
+The
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

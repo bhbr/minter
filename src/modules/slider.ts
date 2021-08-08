@@ -11,57 +11,46 @@ import { LinkableMobject } from './linkables'
 
 export class BoxSlider extends LinkableMobject {
 
-	min: number
-	max: number
-	value: number
-	valueBeforeScrubbing: number
-	scrubStartingPoint: Vertex
-	height: number
-	width: number
-	outerBar: Rectangle
-	filledBar: Rectangle
-	fillColor: Color
-	barFillColor: Color
-	label: TextLabel
+	min = 0
+	max = 1
+	value = 0.6
+	valueBeforeScrubbing = this.value
+	scrubStartingPoint?: Vertex = null
+	height = 200
+	width = 50
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			min: 0,
-			max: 1,
-			value: 0.6,
-			height: 200,
-			width: 50,
-			strokeColor: Color.white(),
-			draggable: true,
-			interactive: true,
-			passAlongEvents: false,
-			outputNames: ['value'],
-			fillColor: Color.black(),
-			barFillColor: Color.gray(0.5)
-		})
+	readonly strokeColor = Color.white()
+	readonly draggable = true
+	readonly interactive = true
+	readonly passAlongEvents = false
+	readonly outputNames = ['value']
+	readonly fillColor = Color.black()
+	readonly barFillColor = Color.gray(0.5)
+
+	outerBar = new Rectangle({
+		fillColor: Color.black(),
+		fillOpacity: 1,
+		strokeColor: Color.white()
+	})
+	filledBar = new Rectangle({
+		fillOpacity: 0.5
+	})
+	label = new TextLabel({
+		viewHeight: 25,
+		horizontalAlign: 'center',
+		verticalAlign: 'center'
+	})
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statelessSetup() {
-		//// state-independent setup
-		this.outerBar = new Rectangle({
-			fillColor: Color.black(),
-			fillOpacity: 1,
-			strokeColor: Color.white()
-		})
-
-		this.filledBar = new Rectangle({
-			fillOpacity: 0.5
-		})
-
-		this.label = new TextLabel({
-			viewHeight: 25,
-			horizontalAlign: 'center',
-			verticalAlign: 'center'
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.outerBar)
 		this.add(this.filledBar)
 		this.add(this.label)
@@ -72,14 +61,11 @@ export class BoxSlider extends LinkableMobject {
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args: object = {}) {
+		args['viewWidth'] = args['width'] ?? this.width
+		args['viewHeight'] = args['height'] ?? this.height
 
-		//// internal dependencies
-		this.viewWidth = this.width
-		this.viewHeight = this.height
-		this.positionView()
-
+		super.updateSelf(args)
 
 		//// updating submobs
 		let a: number = this.normalizedValue()
@@ -123,22 +109,19 @@ export class BoxSlider extends LinkableMobject {
 
 export class ValueBox extends Rectangle {
 
-	value: number
-	valueLabel: TextLabel
+	value = 0
+	valueLabel = new TextLabel()
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			value: 0
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.valueLabel = new TextLabel()
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.valueLabel)
 	}
 
