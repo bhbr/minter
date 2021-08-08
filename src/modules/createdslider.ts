@@ -9,26 +9,22 @@ import { Color } from './color'
 
 export class CreatedBoxSlider extends CreatedMobject {
 
-	protoSlider: BoxSlider
-	width: number
-	height: number
+	protoSlider = new BoxSlider()
+	width = 50
+	height = 0
+	fillColor = Color.black()
+	startPoint = Vertex.origin()
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			width: 50,
-			height: 0,
-			fillColor: Color.black(),
-			startPoint: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.protoSlider = new BoxSlider()
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.protoSlider)
 		this.anchor = this.startPoint
 		this.protoSlider.update({

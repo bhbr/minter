@@ -8,72 +8,45 @@ import { Paper } from '../paper'
 
 export class Pendulum extends LinkableMobject {
 
-	length: number
-	mass: number
-	period: number
-	initialAngle: number
-	initialSpeed: number
-	initialTime: number
+	length = 100
+	mass = 1
+	period = 500 * this.length ** 0.5 // ms
+	initialAngle = 0
+	initialSpeed = 0
+	initialTime = Date.now()
+	readonly fixtureWidth = 50
+	readonly fixtureHeight = 10
+	readonly outputNames: Array<string> = ['angle']
 
-	fixtureWidth: number
-	fixtureHeight: number
-	weightRadius: number
+	fixture = new Rectangle({
+		width: this.fixtureWidth,
+		height: this.fixtureHeight,
+		anchor: new Vertex(-this.fixtureWidth/2, -this.fixtureHeight),
+		fillColor: Color.white(),
+		fillOpacity: 1
+	})
 
-	fixture: Rectangle
-	string: Segment
-	weight: Circle
-
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.fixture = new Rectangle({
+	string = new Segment()
+	weight = new Circle({
 			fillColor: Color.white(),
-			fillOpacity: 1
+			fillOpacity: 1,
+			radius: 10
 		})
-		this.string = new Segment()
-		this.weight = new Circle({
-			fillColor: Color.white(),
-			fillOpacity: 1
-		})
-		this.initialTime = Date.now()
-		this.period = 500 * this.length ** 0.5 // ms
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.fixture)
 		this.add(this.string)
 		this.add(this.weight)
-		this.fixture.update({
-			width: this.fixtureWidth,
-			height: this.fixtureHeight,
-			anchor: new Vertex(-this.fixtureWidth/2, -this.fixtureHeight)
-		}, false)
 
-		this.weight.update({
-			radius: this.weightRadius
-		})
-
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			fixtureWidth: 50,
-			fixtureHeight: 10,
-			weightRadius: 10,
-			mass: 1,
-			period: 2000,
-			initialSpeed: 0,
-			outputNames: ['angle']
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			length: 100,
-			initialAngle: 0,
-			initialTime: 0
-		})
 	}
 
 	angle() {
@@ -81,11 +54,11 @@ export class Pendulum extends LinkableMobject {
 		return this.initialAngle * Math.cos(2 * Math.PI * dt/this.period)
 	}
 
-	updateModel(argsDict: object = {}) {
+	updateSelf(args: object = {}) {
 
-		super.updateModel(argsDict)
+		super.updateSelf(args)
 
-		let maybeAngle: any = argsDict['initialAngle']
+		let maybeAngle: any = args['initialAngle']
 		var angle: number = 0
 		if (typeof maybeAngle != 'number') { angle = this.angle() }
 		else {
@@ -93,12 +66,12 @@ export class Pendulum extends LinkableMobject {
 			if (isNaN(angle)) { this.angle() }
 		}
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.length)
-		this.string.updateModel({
+		this.string.update({
 			endPoint: newEndPoint
-		})
-		this.weight.updateModel({
+		}, false)
+		this.weight.update({
 			midpoint: newEndPoint
-		})
+		}, false)
 	}
 
 	run() {
@@ -110,19 +83,24 @@ export class Pendulum extends LinkableMobject {
 
 export class CreatedPendulum extends CreatedMobject {
 
-	pendulum: Pendulum
+	pendulum = new Pendulum({
+			anchor: this.startPoint
+		})
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.pendulum = new Pendulum()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.pendulum)
-		this.pendulum.update({
-			anchor: this.startPoint
-		}, false)
+		// this.pendulum.update({
+		// 	anchor: this.startPoint
+		// }, false)
 	}
 
 	updateFromTip(q: Vertex) {

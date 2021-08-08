@@ -7,40 +7,32 @@ import { TextLabel } from './mobject'
 
 export class Boolean extends LinkableMobject {
 
-	state?: boolean // may be null
-	pill: RoundedRectangle
-	falseColor: Color
-	trueColor: Color
-	nullColor: Color
+	state?: boolean = null
+	readonly width = 40
+	readonly height = 25
+	falseColor = Color.red()
+	trueColor = Color.green()
+	nullColor = Color.gray(0.5)
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			state: null
-		})
+	pill = new RoundedRectangle({
+		width: this.width,
+		height: this.height,
+		cornerRadius: this.width/2,
+		fillOpacity: 1
+	})
+
+	readonly outputNames:Array<string> = ["value"]
+	readonly interactive: boolean = false
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			outputNames: ["value"],
-			interactive: false
-		})
-	}
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.falseColor = Color.red()
-		this.trueColor = Color.green()
-		this.nullColor = Color.gray(0.5)
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-		this.pill = new RoundedRectangle({
-			width: 40,
-			height: 25,
-			cornerRadius: 12.5,
-			fillOpacity: 1
-		})
+	setup() {
 		this.add(this.pill)
 	}
 
@@ -54,10 +46,10 @@ export class Boolean extends LinkableMobject {
 		}
 	}
 
-	updateModel(argsDict: object = {}) {
-		this.state = argsDict['state'] ?? this.state
-		this.pill.updateModel({ fillColor: this.currentColor() })
-		super.updateModel(argsDict)
+	updateSelf(args: object = {}) {
+		super.updateSelf(args)
+		//this.state = args['state'] ?? this.state
+		this.pill.updateSelf({ fillColor: this.currentColor() })
 	}
 
 	negation(): boolean {
@@ -70,97 +62,75 @@ export class Boolean extends LinkableMobject {
 
 export class ToggleableBoolean extends Boolean {
 
-	width: number
-	height: number
-	smoothToggleParameter: number
-	leftSide: RoundedRectangle
-	rightSide: RoundedRectangle
-	handle: Circle
+	state = false
+	smoothToggleParameter = 0
+	readonly outputNames: Array<string> = ["value"]
+	readonly interactive = true
+	readonly transitionDuration = 200
 	toggleTransitionStart?: number
-	transitionDuration: number
 	transitionTimerHandle: any
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			state: false,
-			smoothToggleParameter: 0
-		})
-	}
+	leftSide = new RoundedRectangle({
+		height: this.height,
+		width: this.height,
+		cornerRadius: this.height/2,
+		fillOpacity: 1,
+		fillColor: this.trueColor,
+		strokeWidth: 0
+	})
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			width: 40,
-			height: 25,
-			outputNames: ["value"],
-			interactive: true,
-			transitionDuration: 200
-		})
-	}
+	rightSide = new RoundedRectangle({
+		height: this.height,
+		width: this.width,
+		cornerRadius: this.height/2,
+		fillOpacity: 1,
+		fillColor: this.falseColor,
+		strokeWidth: 0
+	})
+	
+	handle = new Circle({
+		radius: this.height/2,
+		fillColor: Color.white(),
+		fillOpacity: 1,
+		midpoint: new Vertex(this.height/2, this.height/2)
+	})	
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.falseColor = Color.red()
-		this.trueColor = Color.green()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
-
+	
 	currentColor(): Color {
 		return this.state ? this.trueColor : this.falseColor
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.pill = new RoundedRectangle({
-			width: this.width,
-			height: this.height,
-			cornerRadius: this.width/2,
-			fillOpacity: 0
-		})
-
-		this.leftSide = new RoundedRectangle({
-			height: this.height,
-			width: this.height,
-			cornerRadius: this.height/2,
-			fillOpacity: 1,
-			fillColor: this.trueColor,
-			strokeWidth: 0
-		})
-		this.rightSide = new RoundedRectangle({
-			height: this.height,
-			width: this.width,
-			cornerRadius: this.height/2,
-			fillOpacity: 1,
-			fillColor: this.falseColor,
-			strokeWidth: 0
-		})
-		this.handle = new Circle({
-			radius: this.height/2,
-			fillColor: Color.white(),
-			fillOpacity: 1,
-			midpoint: new Vertex(this.height/2, this.height/2)
-		})
+	setup() {
+		super.setup()
+		this.pill.fillOpacity = 0
 		this.add(this.rightSide)
 		this.add(this.leftSide)
 		this.add(this.handle)
-		this.add(this.pill)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
-		this.leftSide.updateModel({
+	updateSelf(args: object = {}) {
+		super.updateSelf(args)
+		this.leftSide.update({
 			width: this.smoothToggleParameter*(this.width - this.height) + this.height
 		})
-		this.rightSide.updateModel({
+		this.rightSide.update({
 			width: (1 - this.smoothToggleParameter)*(this.width - this.height) + this.height,
 			anchor: new Vertex(this.smoothToggleParameter*(this.width - this.height), 0)
 		})
-		this.handle.updateModel({
+		this.handle.update({
 			midpoint: new Vertex(this.height/2 + this.smoothToggleParameter*(this.width - this.height), this.height/2)
 		})
 	}
 
 	selfHandlePointerUp(e: LocatedEvent) {
 		if (this.smoothToggleParameter > 0 && this.smoothToggleParameter < 1) { return }
-		console.log("toggling")
 		this.toggle()
 	}
 
@@ -188,50 +158,35 @@ export class ToggleableBoolean extends Boolean {
 
 export class NotBoolean extends Boolean {
 
-	argument: boolean
-	notLabel: TextLabel
+	state = null
+	argument?: boolean = null
+	readonly inputNames: Array<string> = ['argument']
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			inputNames: ['argument']
-		})
-	}
+	notLabel = new TextLabel({
+		text: 'NOT',
+		viewWidth: this.width,
+		viewHeight: this.height,
+		anchor: new Vertex(0, -this.height)
+	})
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			argument: null,
-			state: null
-		})
-	}
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.notLabel = new TextLabel({
-			text: 'NOT',
-			viewWidth: 50,
-			viewHeight: 20
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-		this.add(this.notLabel)
-		this.notLabel.updateModel({
-			anchor: new Vertex((this.notLabel.viewWidth - this.notLabel.viewWidth)/2, -this.notLabel.viewHeight)
-		})
-		this.add(this.notLabel)
-	}
-
-	updateModel(argsDict: object = {}) {
-		console.log(argsDict)
-		var newState = argsDict['argument'] ?? this.argument ?? null
-		if (newState !== null) {
-			newState = !newState
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
 		}
-		console.log('new state:', newState)
-		argsDict['state'] = newState
-		super.updateModel(argsDict)
-		console.log('updating nb to', this.state)
+	}
+
+	setup() {
+		super.setup()
+		this.add(this.notLabel)
+	}
+
+	updateSelf(args: object = {}) {
+		var newState = args['argument'] ?? this.argument ?? null
+		newState = newState ?? !newState // negate only if not null
+		args['state'] = newState
+		super.updateSelf(args)
 	}
 
 

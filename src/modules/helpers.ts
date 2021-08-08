@@ -1,11 +1,11 @@
 import { Vertex } from './vertex-transform'
 
-export const isTouchDevice: boolean = 'ontouchstart' in document.documentElement
-export const DRAW_BORDER: boolean = false
+export const isTouchDevice = 'ontouchstart' in document.documentElement
+export const DRAW_BORDER = true
+export const EVENT_LOGGING = false
 
 export function stringFromPoint(point: Array<number>): string {
-	let x: number = point[0],
-		y: number = point[1]
+	let x = point[0], y = point[1]
 	return `${x} ${y}`
 }
 
@@ -143,6 +143,54 @@ export function logInto(obj: any, id: string) {
 
 export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console') }
 
+
+export function extremeComponent(vertices: Array<Vertex>, index: number, direction: 1 | -1): number {
+	var extremum = -direction * Infinity
+	for (let v of vertices) {
+		extremum = (direction > 0) ? Math.max(extremum, v[index]) : Math.min(extremum, v[index])
+	}
+	return extremum
+}
+
+export function xMin(vertices: Array<Vertex>): number {
+	return extremeComponent(vertices, 0, -1)
+}
+
+export function xMax(vertices: Array<Vertex>): number {
+	return extremeComponent(vertices, 0, 1)
+}
+
+export function yMin(vertices: Array<Vertex>): number {
+	return extremeComponent(vertices, 1, -1)
+}
+
+export function yMax(vertices: Array<Vertex>): number {
+	return extremeComponent(vertices, 1, 1)
+}
+
+export function midX(vertices: Array<Vertex>): number {
+	return (xMin(vertices) + xMax(vertices))/2
+}
+
+export function midY(vertices: Array<Vertex>): number {
+	return (yMin(vertices) + yMax(vertices))/2
+}
+
+export function ulCorner(vertices: Array<Vertex>): Vertex {
+	return new Vertex(xMin(vertices), yMin(vertices))
+}
+
+export function urCorner(vertices: Array<Vertex>): Vertex {
+	return new Vertex(xMax(vertices), yMin(vertices))
+}
+
+export function llCorner(vertices: Array<Vertex>): Vertex {
+	return new Vertex(xMin(vertices), yMax(vertices))
+}
+
+export function lrCorner(vertices: Array<Vertex>): Vertex {
+	return new Vertex(xMax(vertices), yMax(vertices))
+}
 
 
 // https://www.typescriptlang.org/docs/handbook/mixins.html

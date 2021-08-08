@@ -1,29 +1,37 @@
-import { Vertex, Transform } from './vertex-transform'
+import { Vertex } from './vertex-transform'
 import { MGroup, Polygon } from './mobject'
 
 export class Arrow extends Polygon {
-	startPoint: Vertex
-	endPoint: Vertex
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			startPoint: Vertex.origin(),
-			endPoint: Vertex.origin()
-		})
+	startPoint = Vertex.origin()
+	endPoint = Vertex.origin()
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
-
 
 }
 
 export class Segment extends Arrow {
 
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
+	}
 
 	components(): Vertex {
 		return this.endPoint.subtract(this.startPoint)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args: object = {}) {
+		super.updateSelf(args)
 		let p: Vertex = this.drawingStartPoint()
 		let q: Vertex = this.drawingEndPoint()
 		this.vertices = [p, q]

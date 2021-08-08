@@ -12,40 +12,35 @@ declare var CindyJS: any
 
 export class CindyCanvas extends LinkableMobject {
 
-	port: object
-	id: string
+	id = 'default-id'
 	core: any
-	points: Array<Array<number>>
+	points: Array<Array<number>> = []
+	port = {
+		id: this.id,
+		width: this.viewWidth,
+		height: this.viewHeight,
+		transform: [{
+			visibleRect: [0, 1, 1, 0]
+		}]
+	}
+
+	readonly draggable = true
+	readonly interactive = true
+	readonly passAlongEvents = true
+	vetoOnStopPropagation = true
 	
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			draggable: true,
-			interactive: true,
-			passAlongEvents: true,
-			vetoOnStopPropagation: true
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			points: []
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.view.style['pointer-events'] = 'auto'
 		this.view.id = this.id
-
-		this.port = {
-			id: this.id,
-			width: this.viewWidth,
-			height: this.viewHeight,
-			transform: [{
-				visibleRect: [0, 1, 1, 0]
-			}]
-		}
-
 	}
 
 
@@ -58,7 +53,7 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 
-	cindySetup() {
+	cindySetup() { // called in subclasss, maybe move into superclass setup?
 		let initScript = document.createElement('script')
 		initScript.setAttribute('type', 'text/x-cindyscript')
 		initScript.setAttribute('id', `${this.id}init`)
@@ -71,15 +66,13 @@ export class CindyCanvas extends LinkableMobject {
 		drawScript.textContent = this.drawCode()
 		document.body.appendChild(drawScript)
 
-		//this.port['element'] = this.view
-
-		let argsDict: object = {
+		let args: object = {
 			scripts: `${this.id}*`,
 			animation: { autoplay: true },
 			ports: [this.port],
 			geometry: this.geometry()
 		}
-		this.core = CindyJS.newInstance(argsDict)
+		this.core = CindyJS.newInstance(args)
 	}
 
 	startUp() {
@@ -121,24 +114,20 @@ export class CindyCanvas extends LinkableMobject {
 
 export class WaveCindyCanvas extends CindyCanvas {
 
-	wavelength: number
-	frequency: number
+	wavelength = 1
+	frequency = 0
+	readonly inputNames = ['wavelength', 'frequency']
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			wavelength: 1,
-			frequency: 0
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			inputNames: ['wavelength', 'frequency']
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.cindySetup()
 	}
 
@@ -162,8 +151,8 @@ export class WaveCindyCanvas extends CindyCanvas {
 		return ret
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args: object = {}) {
+		super.updateSelf(args)
 
 		if (this.core != undefined && this.points.length > 0) {
 			let l: number = 0.1 * (this.wavelength || 1)
@@ -183,21 +172,21 @@ export class DrawnRectangle extends CreatedMobject {
 	p2: Vertex
 	p3: Vertex
 	p4: Vertex
-	top: Segment
-	bottom: Segment
-	left: Segment
-	right: Segment
+	top = new Segment({ strokeColor: Color.white() })
+	bottom = new Segment({ strokeColor: Color.white() })
+	left = new Segment({ strokeColor: Color.white() })
+	right = new Segment({ strokeColor: Color.white() })
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.top = new Segment({ strokeColor: Color.white() })
-		this.bottom = new Segment({ strokeColor: Color.white() })
-		this.left = new Segment({ strokeColor: Color.white() })
-		this.right = new Segment({ strokeColor: Color.white() })
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.addDependency('p1', this.top, 'startPoint')
 		this.addDependency('p2', this.top, 'endPoint')
 		this.addDependency('p4', this.bottom, 'startPoint')
@@ -213,10 +202,10 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p3 = this.endPoint
 		this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
 
-		this.top.setAttributes({startPoint: this.p1, endPoint: this.p2})
-		this.bottom.setAttributes({startPoint: this.p4, endPoint: this.p3})
-		this.left.setAttributes({startPoint: this.p1, endPoint: this.p4})
-		this.right.setAttributes({startPoint: this.p2, endPoint: this.p3})
+		// this.top.setAttributes({startPoint: this.p1, endPoint: this.p2})
+		// this.bottom.setAttributes({startPoint: this.p4, endPoint: this.p3})
+		// this.left.setAttributes({startPoint: this.p1, endPoint: this.p4})
+		// this.right.setAttributes({startPoint: this.p2, endPoint: this.p3})
 
 		this.add(this.top)
 		this.add(this.bottom)

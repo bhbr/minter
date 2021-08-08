@@ -3,11 +3,10 @@ import { TAU, PI, DEGREES } from './math'
 
 export class Vertex extends Array {
 
-	passedByValue: boolean
+	readonly passedByValue: boolean = true
 
 	constructor(arg1?: number | Vertex | Array<number>, arg2?: number) {
 		super()
-		this.passedByValue = true
 		if (arg1 == undefined) {
 			this.x = 0
 			this.y = 0
@@ -106,6 +105,13 @@ export class Vertex extends Array {
 	opposite(): Vertex { return this.multiply(-1) }
 	subtract(otherVertex: Vertex): Vertex { return this.add(otherVertex.opposite()) }
 
+	midPointWith(otherVertex: Vertex): Vertex {
+		return new Vertex(
+			(this.x + otherVertex.x)/2,
+			(this.y + otherVertex.y)/2
+		)
+	}
+
 	isNaN(): boolean {
 		return (isNaN(this.x) || isNaN(this.y)) 
 	}
@@ -123,22 +129,16 @@ export class Vertex extends Array {
 
 export class Transform extends ExtendedObject {
 
-	anchor: Vertex
-	angle: number
-	scale: number
-	shift: Vertex
+	readonly passedByValue: boolean = true
+	angle = 0
+	scale = 1
+	shift? = Vertex.origin()
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.passedByValue = true
-		this.assureProperty('anchor', Vertex)
-		this.assureProperty('shift', Vertex)
-		this.setDefaults({
-			anchor: Vertex.origin(),
-			angle: 0,
-			scale: 1,
-			shift: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setAttributes(args)
+		}
 	}
 
 	static identity(): Transform { return new Transform() }
@@ -146,25 +146,22 @@ export class Transform extends ExtendedObject {
 	det(): number { return this.scale ** 2 }
 
 	asString(): string {
-		let str1: string = `` // this.anchor.isZero() ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px)`
-		let str2: string = this.scale == 1 ? `` : `scale(${this.scale})`
-		let str3: string = this.angle == 0 ? `` : `rotate(${this.angle/DEGREES}deg)`
-		let str4: string = `` // this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`
-		let str5: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
+		let str1: string = this.scale == 1 ? `` : `scale(${this.scale}) `
+		let str2: string = this.angle == 0 ? `` : `rotate(-${this.angle/DEGREES}deg) ` // CSS convention is clockwise *facepalm*
+		let str3: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
 		
-		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `)
+		return str1 + str2 + str3
 	}
 
 	a(): number { return this.scale * Math.cos(this.angle) }
 	b(): number { return -this.scale * Math.sin(this.angle) }
 	c(): number { return this.scale * Math.sin(this.angle) }
 	d(): number { return this.scale * Math.cos(this.angle) }
-	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
-	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
+	e(): number { return this.shift.x }
+	f(): number { return this.shift.y }
 
 	inverse(): Transform {
 		let t = new Transform({
-			anchor: this.anchor,
 			angle: -this.angle,
 			scale: 1/this.scale
 		})
@@ -192,10 +189,9 @@ export class Transform extends ExtendedObject {
 	copyFrom(t: Transform) { this.setAttributes(t) }
 
 	rightComposedWith(t: Transform): Transform {
-		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)
-		let w: Vertex = this.shift.add(this.anchor).subtract(t.anchor)
+		let v: Vertex = t.shift
+		let w: Vertex = this.shift
 		return new Transform({
-			anchor: t.anchor,
 			scale: this.scale * t.scale,
 			angle: this.angle + t.angle,
 			shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
