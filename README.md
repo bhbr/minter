@@ -1,5 +1,5 @@
 # minter
-INTERactive Math objects
+Interactive math objects
 
 **Minter** is a pen-based user-interface prototype designed in the spirit of other recent work (Chalktalk, Magic Paper). No menus, no modes, just you and your pen on an open canvas building and connecting objects!
 
