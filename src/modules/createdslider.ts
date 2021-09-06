@@ -1,4 +1,3 @@
-
 import { Vertex } from './vertex-transform'
 import { CreatedMobject } from './creating'
 import { BoxSlider } from './slider'

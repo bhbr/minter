@@ -3,7 +3,7 @@ import { RoundedRectangle, Circle } from './shapes'
 import { Color } from './color'
 import { Vertex } from './vertex-transform'
 import { LocatedEvent } from './helpers'
-import { TextLabel } from './mobject'
+import { TextLabel } from './textlabel'
 
 export class Boolean extends LinkableMobject {
 
@@ -46,10 +46,10 @@ export class Boolean extends LinkableMobject {
 		}
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 		//this.state = args['state'] ?? this.state
-		this.pill.updateSelf({ fillColor: this.currentColor() })
+		this.pill.updateSelf({ fillColor: this.currentColor() }, redraw)
 	}
 
 	negation(): boolean {
@@ -115,18 +115,18 @@ export class ToggleableBoolean extends Boolean {
 		this.add(this.handle)
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 		this.leftSide.update({
 			width: this.smoothToggleParameter*(this.width - this.height) + this.height
-		})
+		}, redraw)
 		this.rightSide.update({
 			width: (1 - this.smoothToggleParameter)*(this.width - this.height) + this.height,
 			anchor: new Vertex(this.smoothToggleParameter*(this.width - this.height), 0)
-		})
+		}, redraw)
 		this.handle.update({
 			midpoint: new Vertex(this.height/2 + this.smoothToggleParameter*(this.width - this.height), this.height/2)
-		})
+		}, redraw)
 	}
 
 	selfHandlePointerUp(e: LocatedEvent) {
@@ -182,11 +182,11 @@ export class NotBoolean extends Boolean {
 		this.add(this.notLabel)
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw) {
 		var newState = args['argument'] ?? this.argument ?? null
 		newState = newState ?? !newState // negate only if not null
 		args['state'] = newState
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 	}
 
 

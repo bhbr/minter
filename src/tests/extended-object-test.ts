@@ -1,4 +1,3 @@
-
 import { ExtendedObject } from '../modules/extended-object'
 import { Vertex, Transform } from '../modules/vertex-transform'
 

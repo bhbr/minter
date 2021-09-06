@@ -1,4 +1,3 @@
-
 export class A {
 	value: number = 1 // non-object is mutable property (default arg)
 

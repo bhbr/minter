@@ -27,9 +27,9 @@ export class CreationGroup extends CreatedMobject {
 	setup() {
 		super.setup()
 		this.creations['freehand'] = new Freehand()
-		// this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint})
-		// this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
-		// this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
+		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint})
+		this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
+		this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
 		// this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
 		// this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
 		// this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
@@ -74,18 +74,26 @@ export class CreationGroup extends CreatedMobject {
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
-		this.creations[this.visibleCreation].dissolveInto(paper)
+		let c = this.creations[this.visibleCreation]
+		c.update({anchor: this.anchor})
+		c.dissolveInto(paper)
 		paper.updateIOList()
 		this.penTip = null
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+
+		if (args['anchor'] === undefined && args['startPoint'] != undefined) {
+			args['anchor'] = args['startPoint']
+		}
+		// ^ unless the anchor is set explicitly, use the startPoint for it
+		super.updateSelf(args, redraw)
+
 		if (this.creations == undefined) { return }
 		let sc = args['strokeColor']
 		if (sc != undefined) {
 			for (let mob of Object.values(this.creations) as Array<CreatedMobject>) {
-				mob.update({ strokeColor: sc }, false)
+				mob.update({ strokeColor: sc }, false) // most of them are hidden, the visible one will get redrawn soon enough
 			}
 		}
 		let fc = args['fillColor']

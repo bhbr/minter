@@ -83,7 +83,7 @@ export class Vertex extends Array {
 	}
 
 	rotatedBy(angle: number, center: Vertex = Vertex.origin()): Vertex {
-		return this.imageUnder(new Transform({angle: angle, anchor: center}))
+		return this.imageUnder(new Transform({angle: angle, center: center}))
 	}
 
 	rotateBy(angle: number, center: Vertex = Vertex.origin()) {
@@ -91,7 +91,7 @@ export class Vertex extends Array {
 	}
 
 	scaledBy(scale: number, center: Vertex = Vertex.origin()): Vertex {
-		let s = new Transform({scale: scale, anchor: center})
+		let s = new Transform({scale: scale, center: center})
 		return this.imageUnder(s)
 	}
 
@@ -130,6 +130,7 @@ export class Vertex extends Array {
 export class Transform extends ExtendedObject {
 
 	readonly passedByValue: boolean = true
+	center = Vertex.origin()
 	angle = 0
 	scale = 1
 	shift? = Vertex.origin()
@@ -145,20 +146,35 @@ export class Transform extends ExtendedObject {
 
 	det(): number { return this.scale ** 2 }
 
+	homgeneousTransform(): Transform {
+		return new Transform({
+			center: Vertex.origin(),
+			angle: this.angle,
+			scale: this.scale,
+			shift: Vertex.origin()
+		})
+	}
+
+	offset(): Vertex {
+		return this.center.subtract(this.homgeneousTransform().appliedTo(this.center))
+	}
+
 	asString(): string {
-		let str1: string = this.scale == 1 ? `` : `scale(${this.scale}) `
-		let str2: string = this.angle == 0 ? `` : `rotate(-${this.angle/DEGREES}deg) ` // CSS convention is clockwise *facepalm*
-		let str3: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
+		let a = this.offset()
+		let str1 = this.scale == 1 ? `` : `scale(${this.scale}) `
+		let str2 = this.angle == 0 ? `` : `rotate(-${this.angle/DEGREES}deg) ` // CSS convention is clockwise
+		let str3 = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
+		let str4 = this.center.isZero() ? `` : `translate(${a.x}px,${a.y}px)`
 		
-		return str1 + str2 + str3
+		return str1 + str2 + str3 + str4
 	}
 
 	a(): number { return this.scale * Math.cos(this.angle) }
 	b(): number { return -this.scale * Math.sin(this.angle) }
 	c(): number { return this.scale * Math.sin(this.angle) }
 	d(): number { return this.scale * Math.cos(this.angle) }
-	e(): number { return this.shift.x }
-	f(): number { return this.shift.y }
+	e(): number { return this.shift.x + (this.center.isZero() ? 0 : this.offset().x) }
+	f(): number { return this.shift.y + (this.center.isZero() ? 0 : this.offset().y) }
 
 	inverse(): Transform {
 		let t = new Transform({

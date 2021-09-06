@@ -2,7 +2,7 @@ import { Vertex } from './vertex-transform'
 
 export const isTouchDevice = 'ontouchstart' in document.documentElement
 export const DRAW_BORDER = true
-export const EVENT_LOGGING = false
+export const EVENT_LOGGING = true
 
 export function stringFromPoint(point: Array<number>): string {
 	let x = point[0], y = point[1]

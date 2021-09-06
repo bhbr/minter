@@ -1,6 +1,7 @@
 import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
-import { Polygon, CurvedShape, MGroup } from './mobject'
+import { MGroup } from './mobject'
+import { Polygon, CurvedShape } from './vmobject'
 //import { Segment } from './arrows'
 import { gray, pointerEventVertex } from './helpers'
 import { TAU } from './math'
@@ -38,11 +39,11 @@ export class Circle extends CurvedShape {
 		this.midpoint = oldMidpoint // this moves the anchor so that the midpoint stays the same
 	}
 
-	updateSelf(args = {}) {
+	updateSelf(args = {} ,redraw = true) {
 		let r = args['radius'] || this.radius
 		args['viewWidth'] = 2 * r
 		args['viewHeight'] = 2 * r
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 	}
 
 	updateBezierPoints() {
@@ -89,12 +90,12 @@ export class TwoPointCircle extends Circle {
 		this.view.style['pointer-events'] = 'none'
 	}
 
-	updateSelf(args = {}) {
+	updateSelf(args = {}, redraw =true) {
 		let p = args['midpoint'] || this.midpoint
 		let q = args['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
 		args['radius'] = r
-		super.updateSelf(args)
+		super.updateSelf(args,redraw)
 	}
 
 }
@@ -130,8 +131,8 @@ export class Rectangle extends Polygon {
 		}
 	}
 
-	updateSelf(args = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -219,7 +220,7 @@ export class RoundedRectangle extends CurvedShape {
 	}
 
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {} ,redraw = true) {
 
 		// check if corner radius is not too large
 		let cr = args['cornerRadius'] || this.cornerRadius
@@ -229,7 +230,7 @@ export class RoundedRectangle extends CurvedShape {
 
 		args['cornerRadius'] = r
 
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 
 		//// internal dependencies
 		this.viewWidth = this.width

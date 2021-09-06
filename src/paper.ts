@@ -39,8 +39,6 @@ export class Paper extends LinkableMobject {
 	panLocation?: Vertex = null
 	oldShift = Vertex.origin()
 
-	children: Array<Mobject> = []
-
 	readonly interactive = true
 	readonly draggable = false
 
@@ -58,13 +56,14 @@ export class Paper extends LinkableMobject {
 		this.add(this.background)
 		this.add(this.construction)
 		this.construction.update({
-			viewWidth: 0, //this.viewWidth,
-			viewHeight: 0 //this.viewHeight
-		}, false)
+			backgroundColor: Color.clear(),
+			viewWidth: 0, // this.viewWidth,
+			viewHeight: 0 // this.viewHeight
+		})
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 
 		this.background.update({
 			width: this.viewWidth,
@@ -246,6 +245,7 @@ export class Paper extends LinkableMobject {
 	}
 
 	changeVisibleCreation(newVisibleCreation: string) {
+		console.log('changing visible creation to ', newVisibleCreation)
 		this.visibleCreation = newVisibleCreation
 		if (this.creationGroup != undefined) {
 			this.creationGroup.setVisibleCreation(newVisibleCreation)
@@ -265,6 +265,7 @@ export class Paper extends LinkableMobject {
 		}
 
 		this.creationGroup = new CreationGroup({
+			anchor: this.creationStartPoint,
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
 			startPoint: this.creationStartPoint,
@@ -290,7 +291,7 @@ export class Paper extends LinkableMobject {
 				}
 			}
 		}
-		this.creationGroup.updateFromTip(p)
+		this.creationGroup.updateFromTip(p.subtract(this.creationGroup.anchor))
 	}
 
 	endCreating(e: LocatedEvent) {

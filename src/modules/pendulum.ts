@@ -28,10 +28,10 @@ export class Pendulum extends LinkableMobject {
 
 	string = new Segment()
 	weight = new Circle({
-			fillColor: Color.white(),
-			fillOpacity: 1,
-			radius: 10
-		})
+		fillColor: Color.white(),
+		fillOpacity: 1,
+		radius: 10
+	})
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -54,9 +54,9 @@ export class Pendulum extends LinkableMobject {
 		return this.initialAngle * Math.cos(2 * Math.PI * dt/this.period)
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw = true) {
 
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 
 		let maybeAngle: any = args['initialAngle']
 		var angle: number = 0
@@ -68,7 +68,7 @@ export class Pendulum extends LinkableMobject {
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.length)
 		this.string.update({
 			endPoint: newEndPoint
-		}, false)
+		}, false)    // why false?
 		this.weight.update({
 			midpoint: newEndPoint
 		}, false)
