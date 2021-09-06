@@ -1,6 +1,7 @@
 import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './helpers'
 import { Vertex } from './vertex-transform'
-import { Mobject, MGroup, Polygon } from './mobject'
+import { Mobject, MGroup } from './mobject'
+import { Polygon } from './vmobject'
 import { Color } from './color'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
@@ -30,12 +31,15 @@ export class CreatedMobject extends MGroup {
 		for (let submob of this.children) {
 			console.log(submob)
 			paper.add(submob)
+			submob.adjustFrame()
 		}
 		console.log('dissolving CreatedMobject')
 	}
 
 	updateFromTip(q: Vertex) {
 		this.endPoint.copyFrom(q)
+		this.update()
+		console.log(this.startPoint, this.endPoint)
 	}
 
 }
@@ -113,26 +117,15 @@ export class Freehand extends DrawnMobject {
 	}
 	
 	updateFromTip(q: Vertex) {
+		super.updateFromTip(q)
 		this.updateWithLines(q)
-		this.update()
 	}
 
 	dissolveInto(superMobject: Mobject) {
 
-		// let dr = this.line.anchor
-		// this.line.update({
-		// 	anchor: Vertex.origin()
-		// })
-		// this.update({
-		// 	anchor: this.anchor.translatedBy(dr),
-		// 	viewWidth: this.line.getWidth(),
-		// 	viewHeight: this.line.getHeight()
-		// })
-
 		superMobject.remove(this)
 		if (this.visible) {
 			superMobject.add(this)
-			this.line.adjustFrame()
 			this.adjustFrame()
 		}
 	}

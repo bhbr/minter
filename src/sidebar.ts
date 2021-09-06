@@ -1,7 +1,8 @@
 import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
-import { Mobject, MGroup, TextLabel } from './modules/mobject'
+import { Mobject, MGroup } from './modules/mobject'
+import { TextLabel } from './modules/textlabel'
 import { Color, COLOR_PALETTE } from './modules/color'
 import { Circle, Rectangle } from './modules/shapes'
 import { Segment } from './modules/arrows'
@@ -75,7 +76,7 @@ class SidebarButton extends Circle {
 	active = false
 	showLabel = true
 	text = 'label'
-	messages: Array<object>= []
+	messages: Array<object> = []
 	outgoingMessage = {}
 	key?: string = null
 	_radius = buttonRadius
@@ -156,12 +157,12 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
-		console.log("button down")
 		if (this.active) { return }
+		console.log('messaging paper with', this.messages[0])
 		this.messagePaper(this.messages[0])
 		this.active = true
 		let t = new Transform({
-			anchor: this.localCenter(),
+			center: this.localCenter(),
 			scale: 1.2
 		})
 		this.update({
@@ -240,8 +241,8 @@ class SidebarButton extends Circle {
 		}
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {} ,redraw = true) {
+		super.updateSelf(args, redraw)
 		this.updateLabel()
 	}
 	
@@ -356,6 +357,7 @@ class ColorChangeButton extends SidebarButton {
 class CreativeButton extends SidebarButton {
 
 	creations: Array<string> = []
+	outgoingMessage = {creating: 'freehand'}
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -365,19 +367,17 @@ class CreativeButton extends SidebarButton {
 		}
 	}
 
-	setup() {
-		super.setup()
-		this.messages = []
-		this.outgoingMessage = {creating: 'freehand'}
-		for (let creation of this.creations) {
-			this.messages.push({creating: creation})
-		}
-
-	}
-
 	commonButtonUp() {
 		this.currentModeIndex = 0
 		super.commonButtonUp()
+	}
+
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
+		this.messages = []
+		for (let creation of this.creations) {
+			this.messages.push({creating: creation})
+		}
 	}
 
 	updateLabel() {
@@ -390,7 +390,6 @@ class CreativeButton extends SidebarButton {
 		} else {
 			this.label.update({text: ''})
 		}
-
 	}
 }
 
@@ -451,24 +450,20 @@ let sidebar = new Sidebar({
 	view: document.querySelector('#sidebar')
 })
 
-console.log(sidebar)
-
 paper.view.style.left = sidebar.viewWidth.toString() + "px"
+let creating: boolean = false
 
 
-
-// let lineButton = new CreativeButton({
-// 	creations: ['segment', 'ray', 'line'],
-// 	key: 'q',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 0
-// })
-// sidebar.add(lineButton)
-// lineButton.update({
-// 	midpoint: buttonCenter(0)
-// })
-
-// console.log(lineButton)
+let lineButton = new CreativeButton({
+	creations: ['segment', 'ray', 'line'],
+	key: 'q',
+	baseColor: Color.gray(0.2),
+	locationIndex: 0
+})
+sidebar.add(lineButton)
+lineButton.update({
+	midpoint: buttonCenter(0)
+})
 
 // let circleButton = new CreativeButton({
 // 	creations: ['circle'],
@@ -578,7 +573,4 @@ paper.view.style.left = sidebar.viewWidth.toString() + "px"
 
 
 
-
-
-let creating: boolean = false
 

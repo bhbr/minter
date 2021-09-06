@@ -1,5 +1,6 @@
 import { Vertex } from './vertex-transform'
-import { MGroup, Polygon } from './mobject'
+import { MGroup } from './mobject'
+import { Polygon } from './vmobject'
 
 export class Arrow extends Polygon {
 
@@ -30,11 +31,12 @@ export class Segment extends Arrow {
 		return this.endPoint.subtract(this.startPoint)
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args: object = {}, redraw = true) {
+		super.updateSelf(args, false)
 		let p: Vertex = this.drawingStartPoint()
 		let q: Vertex = this.drawingEndPoint()
 		this.vertices = [p, q]
+		if (redraw) { this.redrawSelf() }
 
 	}
 

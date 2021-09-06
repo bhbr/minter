@@ -1,5 +1,7 @@
 import { Vertex } from './vertex-transform'
-import { Mobject, VMobject, MGroup, TextLabel } from './mobject'
+import { Mobject, MGroup } from './mobject'
+import { VMobject } from './vmobject'
+import { TextLabel } from './textlabel'
 import { Dependency } from './dependency'
 import { Color } from './color'
 import { Circle, RoundedRectangle } from './shapes'
@@ -82,9 +84,9 @@ export class InputList extends RoundedRectangle {
 		else { return 40 + 25 * this.listInputNames.length }
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw = true) {
 		args['height'] = this.getHeight()
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 	}
 }
 
@@ -143,9 +145,9 @@ export class OutputList extends RoundedRectangle {
 		}
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw = true) {
 		args['height'] = this.getHeight()
-		super.updateSelf(args)
+		super.updateSelf(args,redraw)
 	}
 
 }
@@ -178,10 +180,10 @@ export class IOList extends MGroup {
 		this.add(this.outputList)
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
-		this.inputList.update(args, false)
-		this.outputList.update(args, false)
+	updateSelf(args = {}, redraw) {
+		super.updateSelf(args, redraw)
+		this.inputList.update(args, false)  // will get redrawn when shown
+		this.outputList.update(args, false) // will get redrawn when shown
 	}
 }
 
@@ -327,16 +329,16 @@ export class DependencyMap extends MGroup {
 
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw = true) {
 		for (let line of this.linkLines) {
 			line.startBullet.update({
 				midpoint: line.startHook.relativeCenter(this)
-			}, false)
+			}, false) // will get redrawn when shown
 			line.endBullet.update({
 				midpoint: line.endHook.relativeCenter(this)
-			}, false)
+			}, false) // will get redrawn when shown
 		}
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 	}
 
 }
@@ -407,7 +409,7 @@ export class LinkLine extends CreatedMobject {
 		this.update({endPoint: q})
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw) {
 		if (this.startHook != undefined && this.startBullet != undefined) {
 			this.startBullet.centerAt(this.startHook.relativeCenter(this.superMobject), this.superMobject)
 		}
@@ -421,7 +423,7 @@ export class LinkLine extends CreatedMobject {
 				endPoint: this.endHook.relativeCenter(this.superMobject)
 			})
 		}
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 	}
 }
 
@@ -499,8 +501,8 @@ export class LinkableMobject extends Mobject {
 		}
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args ,redraw)
 		this.updateIOList()
 	}
 }

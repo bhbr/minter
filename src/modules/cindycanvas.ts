@@ -151,8 +151,8 @@ export class WaveCindyCanvas extends CindyCanvas {
 		return ret
 	}
 
-	updateSelf(args: object = {}) {
-		super.updateSelf(args)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 
 		if (this.core != undefined && this.points.length > 0) {
 			let l: number = 0.1 * (this.wavelength || 1)

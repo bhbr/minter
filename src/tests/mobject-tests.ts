@@ -1,4 +1,5 @@
-import { Mobject, TextLabel } from '../modules/mobject'
+import { Mobject } from '../modules/mobject'
+import { TextLabel } from '../modules/textlabel'
 import { Circle, TwoPointCircle, Rectangle, RoundedRectangle } from '../modules/shapes'
 import { Segment } from '../modules/arrows'
 import { paper } from '../paper'

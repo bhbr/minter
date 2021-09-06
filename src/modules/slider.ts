@@ -1,7 +1,9 @@
 import { pointerEventVertex, LocatedEvent } from './helpers'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
-import { Mobject, MGroup, TextLabel, Polygon } from './mobject'
+import { Mobject, MGroup } from './mobject'
+import { Polygon } from './vmobject'
+import { TextLabel } from './textlabel'
 import { Line } from './arrows'
 import { Circle, Rectangle } from './shapes'
 import { LinkableMobject } from './linkables'
@@ -61,11 +63,11 @@ export class BoxSlider extends LinkableMobject {
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {} ,redraw = true) {
 		args['viewWidth'] = args['width'] ?? this.width
 		args['viewHeight'] = args['height'] ?? this.height
 
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 
 		//// updating submobs
 		let a: number = this.normalizedValue()

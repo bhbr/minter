@@ -32,7 +32,7 @@ export class IntersectionPoint extends Point {
 		this.midpoint = new Vertex(NaN, NaN)
 	}
 
-	updateSelf(args: object = {}) {
+	updateSelf(args = {}, redraw = true) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
@@ -42,7 +42,7 @@ export class IntersectionPoint extends Point {
 				args['midpoint'] = mp
 			}
 		}
-		super.updateSelf(args)
+		super.updateSelf(args, redraw)
 
 
 	}
@@ -153,8 +153,8 @@ export class Construction extends LinkableMobject {
 	}
 
 	integrate(mob: DrawnArrow | DrawnCircle) {
-		let p1: Point = this.pointForVertex(mob.startPoint)
-		let p2: Point = this.pointForVertex(mob.endPoint)
+		let p1: Point = this.pointForVertex(mob.startPoint.add(mob.anchor))
+		let p2: Point = this.pointForVertex(mob.endPoint.add(mob.anchor))
 
 		let cm: ConstructedMobject
 		if (mob instanceof DrawnSegment) {
@@ -190,7 +190,6 @@ export class Construction extends LinkableMobject {
 		return p
 	}
 
-
 	addPoint(p: Point): boolean {
 		for (let q of this.points) {
 			if (p.midpoint.equals(q.midpoint)) {
@@ -207,7 +206,7 @@ export class Construction extends LinkableMobject {
 			if (geomob1 == geomob2) { continue }
 			let nbPoints: number = (geomob1 instanceof Arrow && geomob2 instanceof Arrow) ? 1 : 2
 			for (let i = 0; i < nbPoints; i++) {
-				let p: IntersectionPoint = new IntersectionPoint({
+				let p = new IntersectionPoint({
 					geomob1: geomob1,
 					geomob2: geomob2,
 					index: i

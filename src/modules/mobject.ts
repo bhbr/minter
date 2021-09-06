@@ -1,27 +1,17 @@
 import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Dependency } from './dependency'
-import { ExtendedObject } from './extended-object'
-import { remove, stringFromPoint, pointerEventVertex } from './helpers'
+import { Frame } from './frame'
+import { pointerEventVertex, LocatedEvent } from './helpers'
+import { DRAW_BORDER, EVENT_LOGGING, paperLog } from './helpers'
 import { addPointerDown, removePointerDown } from './helpers'
 import { addPointerMove, removePointerMove } from './helpers'
-import { addPointerUp, removePointerUp, LocatedEvent } from './helpers'
-import { paperLog, DRAW_BORDER, EVENT_LOGGING } from './helpers'
-import { xMin, xMax, yMin, yMax, midX, midY } from './helpers'
+import { addPointerUp, removePointerUp } from './helpers'
 
-type TransformOriginX = "left" | "center" | "right"
-type TransformOriginY = "top" | "center" | "bottom"
-type TransformOrigin = [TransformOriginY, TransformOriginX]
 
-export class Mobject extends ExtendedObject {
+export class Mobject extends Frame {
 
-	// position and hierarchy
-	anchor = Vertex.origin()
-	_transform = Transform.identity()
-	readonly transformOrigin: TransformOrigin = ["top", "left"] // to be writable later
 	_parent?: Mobject = null
-	viewWidth = 200
-	viewHeight = 200
 	children: Array<Mobject> = []
 
 	// view and style
@@ -36,40 +26,86 @@ export class Mobject extends ExtendedObject {
 
 	// interactivity
 	eventTarget?: Mobject = null
-	vetoOnStopPropagation = false
+	vetoOnStopPropagation = false // for CindyCanvas
 	interactive: boolean = false
-	passAlongEvents = true // to event target
+	passAlongEvents = true // to event target, if interactive but event should be handled by submob
 	previousPassAlongEvents?: boolean = null // stored copy while temporarily set to false when draggable
 	draggable = false // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
 	dragPointStart?: Vertex = null
 	dragAnchorStart?: Vertex = null
 
 
-	get transform(): Transform { return this._transform }
-	set transform(newTransform: Transform) {
-		if (!newTransform.shift.isZero()) {
-			console.warn("A Mobject's transform should not have a shift. Adjust the Mobject's anchor instead.")
-		}
-		this._transform = newTransform
-	}
-
 	constructor(args = {}, superCall = false) {
 		super({}, true)
 		if (!superCall) {
+			if (args['view'] !== undefined) {
+				if (args['view'] instanceof HTMLDivElement) {
+					this.view = args['view']
+				} else {
+					console.error("Only HTMLDivElements can be a Mobject's view")
+				}
+			}
 			this.setup()
 			this.update(args)
 		}
 	}
 
+
+	// hierarchy //
+
+	get superMobject(): Mobject { return this.parent }
+	set superMobject(newValue: Mobject) { this.parent = newValue }
+
+	get parent(): Mobject { return this._parent }
+	set parent(newParent: Mobject) {
+		this.view?.remove()
+		this._parent = newParent
+		if (newParent == null) { return }
+		newParent.add(this)
+		if (this.parent.visible) { this.show() }
+		else { this.hide() }
+	}
+
+	get submobjects(): Array<Mobject> { return this.children }
+	set submobjects(newValue: Array<Mobject>) {
+		this.children = newValue
+	}
+
+	get submobs(): Array<Mobject> { return this.submobjects }
+	set submobs(newValue: Array<Mobject>) {
+		this.submobs = newValue
+	}
+
+
+
+	add(child: Mobject) {
+		super.add(child)
+		this.view.appendChild(child.view)
+		child.update()
+	}
+
+	remove(child: Mobject) {
+		child.view.remove()
+		super.remove(child)
+	}
+
+
+	getPaper(): Mobject {
+		let p: Mobject = this
+		while (p != undefined && p.constructor.name != 'Paper') {
+			p = p.parent
+		}
+		return p
+	}
+
+
+
+
+	// setup //
+
 	setup() {
 		this.setupView()
 		this.setupTouches()
-	}
-
-	tearDownView() {
-		if (!this.view) { return }
-		if (this.superMobject) { this.superMobject.view.removeChild(this.view) }
-		removePointerDown(this.view, this.boundPointerDown)
 	}
 
 	setupView() {
@@ -83,8 +119,14 @@ export class Mobject extends ExtendedObject {
 		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
 		this.view.style.overflow = 'visible'
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
-
 	}
+
+	tearDownView() {
+		if (!this.view) { return }
+		if (this.superMobject) { this.superMobject.view.removeChild(this.view) }
+		removePointerDown(this.view, this.boundPointerDown)
+	}
+
 
 	setupTouches() {
 		this.eventTarget = null
@@ -101,6 +143,7 @@ export class Mobject extends ExtendedObject {
 		this.disableDragging()
 	}
 
+	// updating //
 
 	update(args = {}, redraw = true) {
 		this.updateSelf(args, redraw)
@@ -112,14 +155,13 @@ export class Mobject extends ExtendedObject {
 		if (args['view'] !== undefined) { this.tearDownView() }
 		this.setAttributes(args)
 		if (args['view'] !== undefined) {
-			this.setupView()
-			this.setupTouches()
+			this.setup()
 		}
 		if (redraw) { this.redrawSelf() }
 	}
 
 	updateSubmobs(redraw = true) {
-		for (let submob of this.children || []) {
+		for (let submob of this.submobs || []) {
 			if (!this.dependsOn(submob)) { // prevent dependency loops
 				submob.update({}, redraw)
 			}
@@ -151,290 +193,45 @@ export class Mobject extends ExtendedObject {
 	}
 
 
+	// view and style //
 
-
-
-
-
-
-	centerAt(newCenter: Vertex, frame?: Mobject) {
-		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
-		frame = frame || this.parent || this
-		let dr: Vertex = newCenter.subtract(this.relativeViewCenter(frame))
-		let oldAnchor: Vertex = this.anchor.copy()
-		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
+	show() {
+		if (this.visible) { return }
+		this.redrawSelf()
+		this.visible = true
+		this.view.style['visibility'] = 'visible'
+		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
 	}
 
+	hide() {
+		if (!this.visible) { return }
+		this.visible = false
+		this.view.style['visibility'] = 'hidden'
+		for (let submob of this.children) { submob.hide() } // we have to propagate visibility bc we have to for invisibility
+	}
 
-	transformRelativeTo(frame?: Mobject): Transform {
-		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
-		frame = frame || this.parent || this
-		let t = Transform.identity()
-		let mob: Mobject = this
-		while (mob && mob.transform instanceof Transform) {
-			if (mob == frame) { break }
-			t.leftComposeWith(new Transform({ shift: mob.anchor }))
-			t.leftComposeWith(mob.transform)
-			mob = mob.parent
+	recursiveShow() {
+		this.show()
+		for (let depmob of this.allDependents()) {
+			depmob.show()
 		}
-		return t
 	}
 
-	localPointRelativeTo(point: Vertex, frame?: Mobject): Vertex {
-		let t = this.transformRelativeTo(frame)
-		return t.appliedTo(point)
-	}
-
-
-	localViewXMin(): number { return 0 }
-	localViewXMax(): number { return this.viewWidth }
-	localViewYMin(): number { return 0 }
-	localViewYMax(): number { return this.viewHeight }
-	localViewMidX(): number { return this.viewWidth/2 }
-	localViewMidY(): number { return this.viewHeight/2 }
-
-	localViewULCorner(): Vertex { return new Vertex(this.localViewXMin(), this.localViewYMin()) }
-	localViewURCorner(): Vertex { return new Vertex(this.localViewXMax(), this.localViewYMin()) }
-	localViewLRCorner(): Vertex { return new Vertex(this.localViewXMax(), this.localViewYMax()) }
-	localViewLLCorner(): Vertex { return new Vertex(this.localViewXMin(), this.localViewYMax()) }
-	localViewCorners(): Array<Vertex> { return [this.localViewULCorner(), this.localViewURCorner(), this.localViewLRCorner(), this.localViewLLCorner()] }
-
-	localViewCenter(): Vertex { return new Vertex(this.localViewMidX(), this.localViewMidY()) }
-	localViewTopCenter(): Vertex { return new Vertex(this.localViewMidX(), this.localViewYMin()) }
-	localViewBottomCenter(): Vertex { return new Vertex(this.localViewMidX(), this.localViewYMax()) }
-	localViewLeftCenter(): Vertex { return new Vertex(this.localViewXMin(), this.localViewMidY()) }
-	localViewRightCenter(): Vertex { return new Vertex(this.localViewXMax(), this.localViewMidY()) }
-
-	relativeViewULCorner(frame?: Mobject) { return this.localPointRelativeTo(this.localViewULCorner(), frame) }
-	relativeViewURCorner(frame?: Mobject) { return this.localPointRelativeTo(this.localViewURCorner(), frame) }
-	relativeViewLRCorner(frame?: Mobject) { return this.localPointRelativeTo(this.localViewLRCorner(), frame) }
-	relativeViewLLCorner(frame?: Mobject) { return this.localPointRelativeTo(this.localViewLLCorner(), frame) }
-	relativeViewCorners(frame?: Mobject): Array<Vertex> { return [this.relativeViewULCorner(frame), this.relativeViewURCorner(frame), this.relativeViewLRCorner(frame), this.relativeViewLLCorner(frame)] }
-
-	relativeViewCenter(frame?: Mobject) { return this.localPointRelativeTo(this.localViewCenter(), frame) }
-	relativeViewTopCenter(frame?: Mobject) { return this.localPointRelativeTo(this.localViewTopCenter(), frame) }
-	relativeViewBottomCenter(frame?: Mobject) { return this.localPointRelativeTo(this.localViewBottomCenter(), frame) }
-	relativeViewLeftCenter(frame?: Mobject) { return this.localPointRelativeTo(this.localViewLeftCenter(), frame) }
-	relativeViewRightCenter(frame?: Mobject) { return this.localPointRelativeTo(this.localViewRightCenter(), frame) }
-
-	relativeViewXMin(frame?: Mobject): number { return xMin(this.relativeViewCorners(frame)) }
-	relativeViewXMax(frame?: Mobject): number { return xMax(this.relativeViewCorners(frame)) }
-	relativeViewYMin(frame?: Mobject): number { return yMin(this.relativeViewCorners(frame)) }
-	relativeViewYMax(frame?: Mobject): number { return yMax(this.relativeViewCorners(frame)) }
-	relativeViewMidX(frame?: Mobject): number { return midX(this.relativeViewCorners(frame)) }
-	relativeViewMidY(frame?: Mobject): number { return midY(this.relativeViewCorners(frame)) }
-
-	viewULCorner(): Vertex { return this.relativeViewULCorner() }
-	viewURCorner(): Vertex { return this.relativeViewURCorner() }
-	viewLRCorner(): Vertex { return this.relativeViewLRCorner() }
-	viewLLCorner(): Vertex { return this.relativeViewLLCorner() }
-	viewCorners(): Array<Vertex> { return this.relativeViewCorners() }
-	viewCenter(): Vertex { return this.relativeViewCenter() }
-	viewTopCenter(): Vertex { return this.relativeViewTopCenter() }
-	viewBottomCenter(): Vertex { return this.relativeViewBottomCenter() }
-	viewLeftCenter(): Vertex { return this.relativeViewLeftCenter() }
-	viewRightCenter(): Vertex { return this.relativeViewRightCenter() }
-	viewXMin(): number { return this.relativeViewXMin() }
-	viewXMax(): number { return this.relativeViewXMax() }
-	viewYMin(): number { return this.relativeViewYMin() }
-	viewYMax(): number { return this.relativeViewYMax() }
-	viewMidX(): number { return this.relativeViewMidX() }
-	viewMidY(): number { return this.relativeViewMidY() }
-
-
-
-
-	localExtentXMin(): number { return this.submobjects.length == 0 ? this.localViewXMin() : this.relativeSubmobXMin(this) }
-	localExtentXMax(): number { return this.submobjects.length == 0 ? this.localViewXMax() : this.relativeSubmobXMax(this) }
-	localExtentYMin(): number { return this.submobjects.length == 0 ? this.localViewYMin() : this.relativeSubmobYMin(this) }
-	localExtentYMax(): number { return this.submobjects.length == 0 ? this.localViewYMax() : this.relativeSubmobYMax(this) }
-	localExtentMidX(): number { return (this.localExtentXMin() + this.localExtentXMax())/2 }
-	localExtentMidY(): number { return (this.localExtentYMin() + this.localExtentYMax())/2 }
-
-	localExtentULCorner(): Vertex { return new Vertex(this.localExtentXMin(), this.localExtentYMin()) }
-	localExtentURCorner(): Vertex { return new Vertex(this.localExtentXMax(), this.localExtentYMin()) }
-	localExtentLRCorner(): Vertex { return new Vertex(this.localExtentXMax(), this.localExtentYMax()) }
-	localExtentLLCorner(): Vertex { return new Vertex(this.localExtentXMin(), this.localExtentYMax()) }
-	localExtentCorners(): Array<Vertex> { return [this.localExtentULCorner(), this.localExtentURCorner(), this.localExtentLRCorner(), this.localExtentLLCorner()] }
-
-	localExtentCenter(): Vertex { return new Vertex(this.localExtentMidX(), this.localExtentMidY()) }
-	localExtentTopCenter(): Vertex { return new Vertex(this.localExtentMidX(), this.localExtentYMin()) }
-	localExtentBottomCenter(): Vertex { return new Vertex(this.localExtentMidX(), this.localExtentYMax()) }
-	localExtentLeftCenter(): Vertex { return new Vertex(this.localExtentXMin(), this.localExtentMidY()) }
-	localExtentRightCenter(): Vertex { return new Vertex(this.localExtentXMax(), this.localExtentMidY()) }
-
-
-	relativeExtentULCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentULCorner(), frame) }
-	relativeExtentURCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentURCorner(), frame) }
-	relativeExtentLRCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentLRCorner(), frame) }
-	relativeExtentLLCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentLLCorner(), frame) }
-	relativeExtentCorners(frame?: Mobject) { return [this.relativeExtentULCorner(frame), this.relativeExtentURCorner(frame), this.relativeExtentLRCorner(frame), this.relativeExtentLLCorner(frame)] }
-
-	relativeExtentCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentCenter(), frame) }
-	relativeExtentTopCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentTopCenter(), frame) }
-	relativeExtentBottomCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentBottomCenter(), frame) }
-	relativeExtentLeftCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentLeftCenter(), frame) }
-	relativeExtentRightCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localExtentRightCenter(), frame) }
-
-	relativeExtentXMin(frame?: Mobject): number { return xMin(this.relativeExtentCorners(frame)) }
-	relativeExtentXMax(frame?: Mobject): number { return xMax(this.relativeExtentCorners(frame)) }
-	relativeExtentYMin(frame?: Mobject): number { return yMin(this.relativeExtentCorners(frame)) }
-	relativeExtentYMax(frame?: Mobject): number { return yMax(this.relativeExtentCorners(frame)) }
-	relativeExtentMidX(frame?: Mobject): number { return midX(this.relativeExtentCorners(frame)) }
-	relativeExtentMidY(frame?: Mobject): number { return midY(this.relativeExtentCorners(frame)) }
-
-	extentULCorner(): Vertex { return this.relativeExtentULCorner() }
-	extentURCorner(): Vertex { return this.relativeExtentURCorner() }
-	extentLRCorner(): Vertex { return this.relativeExtentLRCorner() }
-	extentLLCorner(): Vertex { return this.relativeExtentLLCorner() }
-	extentCorners(): Array<Vertex> { return this.relativeExtentCorners() }
-	extentCenter(): Vertex { return this.relativeExtentCenter() }
-	extentTopCenter(): Vertex { return this.relativeExtentTopCenter() }
-	extentBottomCenter(): Vertex { return this.relativeExtentBottomCenter() }
-	extentLeftCenter(): Vertex { return this.relativeExtentLeftCenter() }
-	extentRightCenter(): Vertex { return this.relativeExtentRightCenter() }
-	extentXMin(): number { return this.relativeExtentXMin() }
-	extentXMax(): number { return this.relativeExtentXMax() }
-	extentYMin(): number { return this.relativeExtentYMin() }
-	extentYMax(): number { return this.relativeExtentYMax() }
-	extentMidX(): number { return this.relativeExtentMidX() }
-	extentMidY(): number { return this.relativeExtentMidY() }
-
-	relativeULCorner(frame?: Mobject): Vertex { return this.relativeExtentULCorner(frame) }
-	relativeURCorner(frame?: Mobject): Vertex { return this.relativeExtentURCorner(frame) }
-	relativeLRCorner(frame?: Mobject): Vertex { return this.relativeExtentLRCorner(frame) }
-	relativeLLCorner(frame?: Mobject): Vertex { return this.relativeExtentLLCorner(frame) }
-	relativeCorners(frame?: Mobject): Array<Vertex> { return this.relativeExtentCorners(frame) }
-	relativeCenter(frame?: Mobject): Vertex { return this.relativeExtentCenter(frame) }
-	relativeTopCenter(frame?: Mobject): Vertex { return this.relativeExtentTopCenter(frame) }
-	relativeBottomCenter(frame?: Mobject): Vertex { return this.relativeExtentBottomCenter(frame) }
-	relativeLeftCenter(frame?: Mobject): Vertex { return this.relativeExtentLeftCenter(frame) }
-	relativeRightCenter(frame?: Mobject): Vertex { return this.relativeExtentRightCenter(frame) }
-	relativeXMin(frame?: Mobject): number { return this.relativeExtentXMin(frame) }
-	relativeXMax(frame?: Mobject): number { return this.relativeExtentXMax(frame) }
-	relativeYMin(frame?: Mobject): number { return this.relativeExtentYMin(frame) }
-	relativeYMax(frame?: Mobject): number { return this.relativeExtentYMax(frame) }
-	relativeMidX(frame?: Mobject): number { return this.relativeExtentMidX(frame) }
-	relativeMidY(frame?: Mobject): number { return this.relativeExtentMidY(frame) }
-
-	localULCorner(): Vertex { return this.relativeExtentULCorner(this) }
-	localURCorner(): Vertex { return this.relativeExtentURCorner(this) }
-	localLRCorner(): Vertex { return this.relativeExtentLRCorner(this) }
-	localLLCorner(): Vertex { return this.relativeExtentLLCorner(this) }
-	localCorners(): Array<Vertex> { return this.relativeExtentCorners(this) }
-	localCenter(): Vertex { return this.relativeExtentCenter(this) }
-	localTopCenter(): Vertex { return this.relativeExtentTopCenter(this) }
-	localBottomCenter(): Vertex { return this.relativeExtentBottomCenter(this) }
-	localLeftCenter(): Vertex { return this.relativeExtentLeftCenter(this) }
-	localRightCenter(): Vertex { return this.relativeExtentRightCenter(this) }
-	localXMin(): number { return this.relativeExtentXMin(this) }
-	localXMax(): number { return this.relativeExtentXMax(this) }
-	localYMin(): number { return this.relativeExtentYMin(this) }
-	localYMax(): number { return this.relativeExtentYMax(this) }
-
-
-
-	ulCorner(): Vertex { return this.extentULCorner() }
-	urCorner(): Vertex { return this.extentURCorner() }
-	lrCorner(): Vertex { return this.extentLRCorner() }
-	llCorner(): Vertex { return this.extentLLCorner() }
-	corners(): Array<Vertex> { return this.extentCorners() }
-	center(): Vertex { return this.extentCenter() }
-	topCenter(): Vertex { return this.extentTopCenter() }
-	bottomCenter(): Vertex { return this.extentBottomCenter() }
-	leftCenter(): Vertex { return this.extentLeftCenter() }
-	rightCenter(): Vertex { return this.extentRightCenter() }
-	xMin(): number { return this.extentXMin() }
-	xMax(): number { return this.extentXMax() }
-	yMin(): number { return this.extentYMin() }
-	yMax(): number { return this.extentYMax() }
-
-
-	localSubmobXMin(): number {
-		var ret = Infinity
-		for (let submob of this.submobjects) {
-			ret = Math.min(ret, xMin(submob.relativeExtentCorners(this)))
+	recursiveHide() {
+		this.hide()
+		for (let depmob of this.allDependents()) {
+			depmob.hide()
 		}
-		return ret
-	}
-	localSubmobXMax(): number {
-		var ret = -Infinity
-		for (let submob of this.submobjects) {
-			ret = Math.max(ret, xMax(submob.relativeExtentCorners(this))) }
-		return ret
-	}
-	localSubmobYMin(): number {
-		var ret = Infinity
-		for (let submob of this.submobjects) { ret = Math.min(ret, yMin(submob.relativeExtentCorners(this))) }
-		return ret
-	}
-	localSubmobYMax(): number {
-		var ret = -Infinity
-		for (let submob of this.submobjects) { ret = Math.max(ret, yMax(submob.relativeExtentCorners(this))) }
-		return ret
-	}
-	localSubmobMidX(): number {
-		return (this.localSubmobXMin() + this.localSubmobXMax())/2
-	}
-	localSubmobMidY(): number {
-		return (this.localSubmobYMin() + this.localSubmobYMax())/2
 	}
 
-	localSubmobULCorner(): Vertex { return new Vertex(this.localSubmobXMin(), this.localSubmobYMin()) }
-	localSubmobURCorner(): Vertex { return new Vertex(this.localSubmobXMax(), this.localSubmobYMin()) }
-	localSubmobLLCorner(): Vertex { return new Vertex(this.localSubmobXMin(), this.localSubmobYMax()) }
-	localSubmobLRCorner(): Vertex { return new Vertex(this.localSubmobXMax(), this.localSubmobYMax()) }
-	localSubmobCorners(): Array<Vertex> { return [this.localSubmobULCorner(), this.localSubmobURCorner(), this.localSubmobLRCorner(), this.localSubmobLLCorner()] }
 
-	localSubmobCenter(): Vertex { return new Vertex(this.localSubmobMidX(), this.localSubmobMidY()) }
-	localSubmobTopCenter(): Vertex { return new Vertex(this.localSubmobMidX(), this.localSubmobYMin()) }
-	localSubmobBottomCenter(): Vertex { return new Vertex(this.localSubmobMidX(), this.localSubmobYMax()) }
-	localSubmobLeftCenter(): Vertex { return new Vertex(this.localSubmobXMin(), this.localSubmobMidY()) }
-	localSubmobRightCenter(): Vertex { return new Vertex(this.localSubmobXMax(), this.localSubmobMidY()) }
+	adjustFrame(recursive = true) {
+		if (recursive) {
+			for (let submob of this.submobjects) {
+				submob.adjustFrame(true)
+			}
+		}
 
-	relativeSubmobULCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobULCorner(), frame) }
-	relativeSubmobURCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobURCorner(), frame) }
-	relativeSubmobLLCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobLLCorner(), frame) }
-	relativeSubmobLRCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobLRCorner(), frame) }
-	relativeSubmobCorners(frame?: Mobject): Array<Vertex> { return [this.relativeSubmobULCorner(frame), this.relativeSubmobURCorner(frame), this.relativeSubmobLRCorner(frame), this.relativeSubmobLLCorner(frame)] }
-
-	relativeSubmobCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobCenter(), frame) }
-	relativeSubmobTopCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobTopCenter(), frame) }
-	relativeSubmobBottomCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobBottomCenter(), frame) }
-	relativeSubmobLeftCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobLeftCenter(), frame) }
-	relativeSubmobRightCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localSubmobRightCenter(), frame) }
-
-	relativeSubmobXMin(frame?: Mobject): number { return xMin(this.relativeSubmobCorners(frame)) }
-	relativeSubmobXMax(frame?: Mobject): number { return xMax(this.relativeSubmobCorners(frame)) }
-	relativeSubmobYMin(frame?: Mobject): number { return yMin(this.relativeSubmobCorners(frame)) }
-	relativeSubmobYMax(frame?: Mobject): number { return yMax(this.relativeSubmobCorners(frame)) }
-	relativeSubmobMidX(frame?: Mobject): number { return midX(this.relativeSubmobCorners(frame)) }
-	relativeSubmobMidY(frame?: Mobject): number { return midY(this.relativeSubmobCorners(frame)) }
-
-	submobULCorner(): Vertex { return this.relativeSubmobULCorner() }
-	submobURCorner(): Vertex { return this.relativeSubmobURCorner() }
-	submobLRCorner(): Vertex { return this.relativeSubmobLRCorner() }
-	submobLLCorner(): Vertex { return this.relativeSubmobLLCorner() }
-	submobCorners(): Array<Vertex> { return this.relativeSubmobCorners() }
-	submobCenter(): Vertex { return this.relativeSubmobCenter() }
-	submobTopCenter(): Vertex { return this.relativeSubmobTopCenter() }
-	submobBottomCenter(): Vertex { return this.relativeSubmobBottomCenter() }
-	submobLeftCenter(): Vertex { return this.relativeSubmobLeftCenter() }
-	submobRightCenter(): Vertex { return this.relativeSubmobRightCenter() }
-	submobXMin(): number { return this.relativeSubmobXMin() }
-	submobXMax(): number { return this.relativeSubmobXMax() }
-	submobYMin(): number { return this.relativeSubmobYMin() }
-	submobYMax(): number { return this.relativeSubmobYMax() }
-	submobMidX(): number { return this.relativeSubmobMidX() }
-	submobMidY(): number { return this.relativeSubmobMidY() }
-
-
-
-
-	getWidth(): number { return this.localExtentXMax() - this.localExtentXMin() }
-	getHeight(): number { return this.localExtentYMax() - this.localExtentYMin() }
-
-	adjustFrame() {
 		let v = this.localExtentULCorner()
 		let shift = new Transform({ shift: v })
 		let inverseShift = shift.inverse()
@@ -476,96 +273,8 @@ export class Mobject extends ExtendedObject {
 
 
 
-	get superMobject(): Mobject { return this.parent }
-	set superMobject(newValue: Mobject) { this.parent = newValue }
 
-	// move to update?
-	get parent(): Mobject { return this._parent }
-	set parent(newParent: Mobject) {
-		this.view?.remove()
-		this._parent = newParent
-		if (newParent == undefined) { return }
-		newParent.add(this)
-		if (this.parent.visible) { this.show() }
-		else { this.hide() }
-	}
-
-
-	get submobjects(): Array<Mobject> { return this.children }
-	set submobjects(newValue: Array<Mobject>) {
-		this.children = newValue
-	}
-
-	get submobs(): Array<Mobject> { return this.submobjects }
-	set submobs(newValue: Array<Mobject>) {
-		this.submobs = newValue
-	}
-
-
-
-	// view and style
-
-
-
-	add(submob: Mobject) {
-		if (submob.parent != this) { submob.parent = this }
-		if (this.children == undefined) {
-			console.error(`Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in statefulSetup()`)
-		}
-		if (!this.children.includes(submob)) {
-			this.children.push(submob)
-		}
-		this.view.append(submob.view)
-		submob.update()
-	}
-
-	remove(submob: Mobject) {
-		submob.view.remove()
-		remove(this.children, submob)
-		submob.parent = undefined
-	}
-
-
-	getPaper(): Mobject {
-		let p: Mobject = this
-		while (p != undefined && p.constructor.name != 'Paper') {
-			p = p.parent
-		}
-		return p
-	}
-
-
-
-
-	show() {
-		this.update({visible: true})
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-	}
-
-	hide() {
-		this.update({visible: false}, false)
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
-	}
-
-	recursiveShow() {
-		this.show()
-		for (let depmob of this.allDependents()) {
-			depmob.show()
-		}
-	}
-
-	recursiveHide() {
-		this.hide()
-		for (let depmob of this.allDependents()) {
-			depmob.hide()
-		}
-	}
-
-
-
-
-
-	// dependency
+	// dependencies //
 
 	dependents(): Array<Mobject> {
 		let dep: Array<Mobject> = []
@@ -606,7 +315,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 
-	// interactivity
+	// interactivity //
 
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
@@ -654,19 +363,19 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		//console.log(targetViewChain)
+		console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
 				let r: Mobject = t['mobject']
-				//console.log('event target mob:', r)
+				console.log('event target mob:', r)
 				return r
 			}
 			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
-		//console.log('event target mob:', this)
+		console.log('event target mob:', this)
 		return this
 	}
 
@@ -739,6 +448,60 @@ export class Mobject extends ExtendedObject {
 		this.dragAnchorStart = undefined
 	}
 
+	// aliases: children -> submobs
+	localSubmobXMin(): number { return this.localChildrenXMin() }
+	localSubmobMidX(): number { return this.localChildrenMidX() }
+	localSubmobXMax(): number { return this.localChildrenXMax() }
+	localSubmobYMin(): number { return this.localChildrenYMin() }
+	localSubmobMidY(): number { return this.localChildrenMidY() }
+	localSubmobYMax(): number { return this.localChildrenYMax() }
+	localSubmobULCorner(): Vertex { return this.localChildrenULCorner() }
+	localSubmobURCorner(): Vertex { return this.localChildrenURCorner() }
+	localSubmobLRCorner(): Vertex { return this.localChildrenLRCorner() }
+	localSubmobLLCorner(): Vertex { return this.localChildrenLLCorner() }
+	localSubmobCorners(): Array<Vertex> { return this.localChildrenCorners() }
+	localSubmobCenter(): Vertex { return this.localChildrenCenter() }
+	localSubmobTopCenter(): Vertex { return this.localChildrenTopCenter() }
+	localSubmobLeftCenter(): Vertex { return this.localChildrenLeftCenter() }
+	localSubmobBottomCenter(): Vertex { return this.localChildrenBottomCenter() }
+	localSubmobRightCenter(): Vertex { return this.localChildrenRightCenter() }
+	localSubmobOuterCenters(): Array<Vertex> { return this.localChildrenOuterCenters() }
+	// transformed versions
+	relativeSubmobXMin(frame?: Frame): number { return this.relativeChildrenXMin() }
+	relativeSubmobMidX(frame?: Frame): number { return this.relativeChildrenMidX() }
+	relativeSubmobXMax(frame?: Frame): number { return this.relativeChildrenXMax() }
+	relativeSubmobYMin(frame?: Frame): number { return this.relativeChildrenYMin() }
+	relativeSubmobMidY(frame?: Frame): number { return this.relativeChildrenMidY() }
+	relativeSubmobYMax(frame?: Frame): number { return this.relativeChildrenYMax() }
+	relativeSubmobULCorner(frame?: Frame): Vertex { return this.relativeChildrenULCorner(frame) }
+	relativeSubmobURCorner(frame?: Frame): Vertex { return this.relativeChildrenURCorner(frame) }
+	relativeSubmobLRCorner(frame?: Frame): Vertex { return this.relativeChildrenLRCorner(frame) }
+	relativeSubmobLLCorner(frame?: Frame): Vertex { return this.relativeChildrenLLCorner(frame) }
+	relativeSubmobCorners(frame?: Frame): Array<Vertex> { return this.relativeChildrenCorners(frame) }
+	relativeSubmobCenter(frame?: Frame): Vertex { return this.relativeChildrenCenter(frame) }
+	relativeSubmobTopCenter(frame?: Frame): Vertex { return this.relativeChildrenTopCenter(frame) }
+	relativeSubmobRightCenter(frame?: Frame): Vertex { return this.relativeChildrenRightCenter(frame) }
+	relativeSubmobBottomCenter(frame?: Frame): Vertex { return this.relativeChildrenBottomCenter(frame) }
+	relativeSubmobLeftCenter(frame?: Frame): Vertex { return this.relativeChildrenLeftCenter(frame) }
+	relativeSubmobOuterCenters(frame?: Frame): Array<Vertex> { return this.relativeChildrenOuterCenters(frame) }
+	// default frame
+	submobXMin(): number { return this.childrenXMin() }
+	submobMidX(): number { return this.childrenMidX() }
+	submobXMax(): number { return this.childrenXMax() }
+	submobYMin(): number { return this.childrenYMin() }
+	submobMidY(): number { return this.childrenMidY() }
+	submobYMax(): number { return this.childrenYMax() }
+	submobULCorner(): Vertex { return this.childrenULCorner() }
+	submobURCorner(): Vertex { return this.childrenURCorner() }
+	submobLRCorner(): Vertex { return this.childrenLRCorner() }
+	submobLLCorner(): Vertex { return this.childrenLLCorner() }
+	submobCorners(): Array<Vertex> { return this.childrenCorners() }
+	submobCenter(): Vertex { return this.childrenCenter() }
+	submobTopCenter(): Vertex { return this.childrenTopCenter() }
+	submobRightCenter(): Vertex { return this.childrenRightCenter() }
+	submobBottomCenter(): Vertex { return this.childrenBottomCenter() }
+	submobLeftCenter(): Vertex { return this.childrenLeftCenter() }
+	submobOuterCenters(): Array<Vertex> { return this.childrenOuterCenters() }
 
 }
 
@@ -759,309 +522,8 @@ export class MGroup extends Mobject {
 
 
 
-export class VMobject extends Mobject {
 
-	svg: SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-	path: SVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-	vertices: Array<Vertex> = []
 
-	fillColor = Color.white()
-	fillOpacity = 0.5
-	strokeColor = Color.white()
-	strokeWidth = 1
-
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
-	}
-
-	setup() {
-		super.setup()
-		this.svg['mobject'] = this
-		this.path['mobject'] = this
-		this.svg.appendChild(this.path)
-		this.svg.setAttribute('class', 'mobject-svg')
-		this.svg.style.overflow = 'visible'
-		this.view.appendChild(this.svg) // why not just add?
-		this.view.setAttribute('class', this.constructor.name + ' mobject-div')
-	}
-
-	redrawSelf() {
-		super.redrawSelf()
-		let pathString: string = this.pathString()
-		if (pathString.includes('NaN')) { return }
-
-		this.path.setAttribute('d', pathString)
-		this.path.style['fill'] = this.fillColor.toHex()
-		this.path.style['fill-opacity'] = this.fillOpacity.toString()
-		this.path.style['stroke'] = this.strokeColor.toHex()
-		this.path.style['stroke-width'] = this.strokeWidth.toString()
-	}
-
-	pathString(): string {
-		console.warn('please subclass pathString')
-		return ''
-	}
-
-	relativeVertices(frame?: Mobject): Array<Vertex> {
-		let returnValue: Array<Vertex> = this.transformRelativeTo(frame).appliedToVertices(this.vertices)
-		if (returnValue == undefined) { return [] }
-		else { return returnValue }
-	}
-
-	globalVertices(): Array<Vertex> {
-		return this.relativeVertices() // uses default frame = paper
-	}
-
-	localVerticesXMin(): number { return xMin(this.vertices) }
-	localVerticesXMax(): number { return xMax(this.vertices) }
-	localVerticesYMin(): number { return yMin(this.vertices) }
-	localVerticesYMax(): number { return yMax(this.vertices) }
-	localVerticesMidX(): number { return midX(this.vertices) }
-	localVerticesMidY(): number { return midY(this.vertices) }
-
-	localVerticesULCorner(): Vertex { return new Vertex(this.localVerticesXMin(), this.localVerticesYMin()) }
-	localVerticesURCorner(): Vertex { return new Vertex(this.localVerticesXMax(), this.localVerticesYMin()) }
-	localVerticesLRCorner(): Vertex { return new Vertex(this.localVerticesXMax(), this.localVerticesYMax()) }
-	localVerticesLLCorner(): Vertex { return new Vertex(this.localVerticesXMin(), this.localVerticesYMax()) }
-	localVerticesCorners(): Array<Vertex> { return [this.localVerticesULCorner(), this.localVerticesURCorner(), this.localVerticesLRCorner(), this.localVerticesLLCorner()] }
-
-	localVerticesCenter(): Vertex { return new Vertex(this.localVerticesMidX(), this.localVerticesMidY()) }
-	localVerticesTopCenter(): Vertex { return new Vertex(this.localVerticesMidX(), this.localVerticesYMin()) }
-	localVerticesBottomCenter(): Vertex { return new Vertex(this.localVerticesMidX(), this.localVerticesYMax()) }
-	localVerticesLeftCenter(): Vertex { return new Vertex(this.localVerticesXMin(), this.localVerticesMidY()) }
-	localVerticesRightCenter(): Vertex { return new Vertex(this.localVerticesXMax(), this.localVerticesMidY()) }
-
-	relativeVerticesULCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesULCorner(), frame) }
-	relativeVerticesURCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesURCorner(), frame) }
-	relativeVerticesLRCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesLRCorner(), frame) }
-	relativeVerticesLLCorner(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesLLCorner(), frame) }
-	relativeVerticesCorners(frame?: Mobject): Array<Vertex> { return [this.relativeVerticesULCorner(frame), this.relativeVerticesURCorner(frame), this.relativeVerticesLRCorner(frame), this.relativeVerticesLLCorner(frame)] }
-
-	relativeVerticesCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesCenter(), frame) }
-	relativeVerticesTopCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesTopCenter(), frame) }
-	relativeVerticesBottomCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesBottomCenter(), frame) }
-	relativeVerticesLeftCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesLeftCenter(), frame) }
-	relativeVerticesRightCenter(frame?: Mobject): Vertex { return this.localPointRelativeTo(this.localVerticesRightCenter(), frame) }
-
-	relativeVerticesXMin(frame?: Mobject): number { return xMin(this.relativeVerticesCorners(frame)) }
-	relativeVerticesXMax(frame?: Mobject): number { return xMax(this.relativeVerticesCorners(frame)) }
-	relativeVerticesYMin(frame?: Mobject): number { return yMin(this.relativeVerticesCorners(frame)) }
-	relativeVerticesYMax(frame?: Mobject): number { return yMax(this.relativeVerticesCorners(frame)) }
-	relativeVerticesMidX(frame?: Mobject): number { return midX(this.relativeVerticesCorners(frame)) }
-	relativeVerticesMidY(frame?: Mobject): number { return midY(this.relativeVerticesCorners(frame)) }
-
-	verticesULCorner(): Vertex { return this.relativeVerticesULCorner() }
-	verticesURCorner(): Vertex { return this.relativeVerticesURCorner() }
-	verticesLRCorner(): Vertex { return this.relativeVerticesLRCorner() }
-	verticesLLCorner(): Vertex { return this.relativeVerticesLLCorner() }
-	verticesCorners(): Array<Vertex> { return this.relativeVerticesCorners() }
-	verticesCenter(): Vertex { return this.relativeVerticesCenter() }
-	verticesTopCenter(): Vertex { return this.relativeVerticesTopCenter() }
-	verticesBottomCenter(): Vertex { return this.relativeVerticesBottomCenter() }
-	verticesLeftCenter(): Vertex { return this.relativeVerticesLeftCenter() }
-	verticesRightCenter(): Vertex { return this.relativeVerticesRightCenter() }
-	verticesXMin(): number { return this.relativeVerticesXMin() }
-	verticesXMax(): number { return this.relativeVerticesXMax() }
-	verticesYMin(): number { return this.relativeVerticesYMin() }
-	verticesYMax(): number { return this.relativeVerticesYMax() }
-	verticesMidX(): number { return this.relativeVerticesMidX() }
-	verticesMidY(): number { return this.relativeVerticesMidY() }
-
-
-
-
-	localExtentXMin(): number { return Math.min(this.localVerticesXMin(), this.localSubmobXMin()) }
-	localExtentXMax(): number { return Math.max(this.localVerticesXMax(), this.localSubmobXMax()) }
-	localExtentYMin(): number { return Math.min(this.localVerticesYMin(), this.localSubmobYMin()) }
-	localExtentYMax(): number { return Math.max(this.localVerticesYMax(), this.localSubmobYMax()) }
-	localExtentMidX(): number { return (this.localVerticesXMin() + this.localSubmobXMax())/2 }
-	localExtentMidY(): number { return (this.localVerticesYMin() + this.localSubmobYMax())/2 }
-	
-
-}
-
-
-
-
-
-
-
-
-export class Polygon extends VMobject {
-
-	closed = true
-
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
-	}
-
-	pathString(): string {
-		let pathString: string = ''
-		//let v = this.globalVertices()
-		let v = this.vertices
-		if (v.length == 0) { return '' }
-		for (let point of v) {
-			if (point == undefined || point.isNaN()) {
-				pathString = ''
-				return pathString
-			}
-			let prefix: string = (pathString == '') ? 'M' : 'L'
-			pathString += prefix + stringFromPoint(point)
-		}
-		if (this.closed) {
-			pathString += 'Z'
-		}
-		return pathString
-	}
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-export class CurvedShape extends VMobject {
-
-	_bezierPoints: Array<Vertex> = []
-
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
-	}
-
-	updateBezierPoints() { }
-	// implemented by subclasses
-
-	updateSelf(args = {}) {
-		super.updateSelf(args)
-		this.updateBezierPoints()
-	}
-
-	// globalBezierPoints(): Array<Vertex> {
-	// 	return this.globalTransform().appliedTo(this.bezierPoints)
-	// }
-
-	// redrawSelf() {
-	// 	this.updateBezierPoints()
-	// 	super.redrawSelf()
-	// }
-
-	pathString(): string {
-		//let points: Array<Vertex> = this.globalBezierPoints()
-		let points: Array<Vertex> = this.bezierPoints
-		if (points == undefined || points.length == 0) { return '' }
-
-		// there should be 3n+1 points
-		let nbCurves: number = (points.length - 1)/3
-		if (nbCurves % 1 != 0) { throw 'Incorrect number of Bézier points' }
-
-		let pathString: string = 'M' + stringFromPoint(points[0])
-		for (let i = 0; i < nbCurves; i++) {
-			let point1str: string = stringFromPoint(points[3*i + 1])
-			let point2str: string = stringFromPoint(points[3*i + 2])
-			let point3str: string = stringFromPoint(points[3*i + 3])
-			pathString += 'C' + point1str + ' ' + point2str + ' ' + point3str
-		}
-		pathString += 'Z'
-		return pathString
-	}
-
-
-
-	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
-	set bezierPoints(newValue: Array<Vertex>) {
-		this._bezierPoints = newValue
-		let v: Array<Vertex> = []
-		let i: number = 0
-		for (let p of this.bezierPoints) {
-			if (i % 3 == 1) { v.push(p) }
-			i += 1
-		}
-		this.vertices = v
-	}
-
-}
-
-
-
-
-
-export class TextLabel extends Mobject {
-
-	text = 'text'
-	horizontalAlign = 'center' // 'left' | 'center' | 'right'
-	verticalAlign = 'center' // 'top' | 'center' | 'bottom'
-	color = Color.white()
-	fontSize = 10
-	fontFamily = 'Helvetica'
-
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
-	}
-
-	setup() {
-		super.setup()
-		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
-		this.view.style.display = 'flex'
-		this.view.style.fontFamily = this.fontFamily
-	}
-
-	redrawSelf() {
-		super.redrawSelf()
-		this.view.style.fontSize = `${this.fontSize}px`
-
-		this.view.innerHTML = this.text
-		this.view.style.color = this.color.toHex()
-		switch (this.verticalAlign) {
-		case 'top':
-			this.view.style.alignItems = 'flex-start'
-			break
-		case 'center':
-			this.view.style.alignItems = 'center'
-			break
-		case 'bottom':
-			this.view.style.alignItems = 'flex-end'
-			break
-		}
-		switch (this.horizontalAlign) {
-		case 'left':
-			this.view.style.justifyContent = 'flex-start'
-			break
-		case 'center':
-			this.view.style.justifyContent = 'center'
-			break
-		case 'right':
-			this.view.style.justifyContent = 'flex-end'
-			break
-		}
-	}
-
-
-}
 
 
 
