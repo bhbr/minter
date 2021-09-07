@@ -18,8 +18,8 @@ export class Frame extends ExtendedObject {
 	transform = Transform.identity()
 	readonly transformOrigin: TransformOrigin = ["top", "left"] // to be writable later
 	_parent?: Frame = null
-	viewWidth = 200
-	viewHeight = 300
+	viewWidth = 300
+	viewHeight = 200
 	children: Array<Frame> = []
 
 	// see further below for the meaning of a Frame's extent

@@ -363,19 +363,19 @@ export class Mobject extends Frame {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		console.log(targetViewChain)
+		if (EVENT_LOGGING) { console.log(targetViewChain) }
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			if (t['mobject'] != undefined) {
 				let r: Mobject = t['mobject']
-				console.log('event target mob:', r)
+				if (EVENT_LOGGING) { console.log('event target mob:', r) }
 				return r
 			}
 			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
-		console.log('event target mob:', this)
+		if (EVENT_LOGGING) { console.log('event target mob:', this) }
 		return this
 	}
 
@@ -431,13 +431,12 @@ export class Mobject extends Frame {
 
 	startSelfDragging(e: LocatedEvent) {
 		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.anchor
+		this.dragAnchorStart = this.anchor.copy()
 	}
 
 	selfDragging(e: LocatedEvent) {
 		let dragPoint: Vertex = pointerEventVertex(e)
 		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
-		
 		this.update({
 			anchor: this.dragAnchorStart.add(dr)
 		}, true)
