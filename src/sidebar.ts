@@ -35,7 +35,7 @@ const buttonScaleFactor: number = 1.3
 
 class Sidebar extends Mobject {
 
-	readonly viewWidth = 150
+	readonly viewWidth = 100
 	readonly viewHeight = 1024
 	readonly interactive = true
 	

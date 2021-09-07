@@ -2,7 +2,7 @@ import { Vertex } from './vertex-transform'
 
 export const isTouchDevice = 'ontouchstart' in document.documentElement
 export const DRAW_BORDER = true
-export const EVENT_LOGGING = true
+export const EVENT_LOGGING = false
 
 export function stringFromPoint(point: Array<number>): string {
 	let x = point[0], y = point[1]
@@ -190,6 +190,14 @@ export function llCorner(vertices: Array<Vertex>): Vertex {
 
 export function lrCorner(vertices: Array<Vertex>): Vertex {
 	return new Vertex(xMax(vertices), yMax(vertices))
+}
+
+export function getWidth(vertices: Array<Vertex>): number {
+	return xMax(vertices) - xMin(vertices)
+}
+
+export function getHeight(vertices: Array<Vertex>): number {
+	return yMax(vertices) - yMin(vertices)
 }
 
 

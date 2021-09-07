@@ -174,7 +174,9 @@ export class Construction extends LinkableMobject {
 			p1.addDependency('midpoint', cm, 'midpoint')
 			p2.addDependency('midpoint', cm, 'outerPoint')
 		}
+		cm.anchor = mob.anchor
 		this.add(cm)
+		cm.adjustFrame()
 		this.intersectWithRest(cm)
 		this.constructedMobjects.push(cm)
 		p1.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})

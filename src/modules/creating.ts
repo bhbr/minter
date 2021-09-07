@@ -36,7 +36,6 @@ export class CreatedMobject extends MGroup {
 	updateFromTip(q: Vertex) {
 		this.endPoint.copyFrom(q)
 		this.update()
-		console.log(this.startPoint, this.endPoint)
 	}
 
 }

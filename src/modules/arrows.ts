@@ -1,6 +1,7 @@
 import { Vertex } from './vertex-transform'
 import { MGroup } from './mobject'
 import { Polygon } from './vmobject'
+import { ulCorner, getWidth, getHeight } from './helpers'
 
 export class Arrow extends Polygon {
 
@@ -13,6 +14,19 @@ export class Arrow extends Polygon {
 			this.setup()
 			this.update(args)
 		}
+	}
+
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, false)
+		this.adjustFrame()
+		if (redraw) { this.redrawSelf() }
+	}
+
+	adjustFrame() {
+		let points = [this.startPoint, this.endPoint]
+		this.anchor = ulCorner(points)
+		this.viewWidth = getWidth(points)
+		this.viewHeight = getHeight(points)
 	}
 
 }
@@ -33,8 +47,8 @@ export class Segment extends Arrow {
 
 	updateSelf(args: object = {}, redraw = true) {
 		super.updateSelf(args, false)
-		let p: Vertex = this.drawingStartPoint()
-		let q: Vertex = this.drawingEndPoint()
+		let p: Vertex = this.drawingStartPoint().subtract(this.anchor)
+		let q: Vertex = this.drawingEndPoint().subtract(this.anchor)
 		this.vertices = [p, q]
 		if (redraw) { this.redrawSelf() }
 
