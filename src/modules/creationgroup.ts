@@ -27,13 +27,13 @@ export class CreationGroup extends CreatedMobject {
 	setup() {
 		super.setup()
 		this.creations['freehand'] = new Freehand()
-		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint})
-		this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
-		this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
-		// this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
-		// this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
-		// this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
-		// this.creations['pendulum'] = new CreatedPendulum({startPoint: this.startPoint})
+		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint })
+		this.creations['ray'] = new DrawnRay({ startPoint: this.startPoint })
+		this.creations['line'] = new DrawnLine({ startPoint: this.startPoint })
+		this.creations['circle'] = new DrawnCircle({ startPoint: this.startPoint })
+		this.creations['cindy'] = new DrawnRectangle({ startPoint: this.startPoint })
+		// this.creations['slider'] = new CreatedBoxSlider({ startPoint: this.startPoint })
+		// this.creations['pendulum'] = new CreatedPendulum({ startPoint: this.startPoint })
 
 		for (let creation of Object.values(this.creations) as Array<CreatedMobject>) {
 			this.add(creation)
@@ -67,15 +67,16 @@ export class CreationGroup extends CreatedMobject {
 			this.creations[visibleCreation].show()
 		}
 
-		// if (visibleCreation == 'cindy') {
-		// 	this.creations[visibleCreation].strokeColor = Color.white()
-		// }
+		if (visibleCreation == 'cindy') {
+			this.creations[visibleCreation].show()
+			this.creations[visibleCreation].strokeColor = Color.white()
+		}
 	}
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
 		let c = this.creations[this.visibleCreation]
-		c.update({anchor: this.anchor})
+		c.update({ anchor: this.anchor })
 		c.dissolveInto(paper)
 		paper.updateIOList()
 		this.penTip = null

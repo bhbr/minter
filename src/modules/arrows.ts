@@ -1,12 +1,14 @@
 import { Vertex } from './vertex-transform'
 import { MGroup } from './mobject'
 import { Polygon } from './vmobject'
-import { ulCorner, getWidth, getHeight } from './helpers'
+import { ulCorner, getWidth, getHeight, TouchHandler } from './helpers'
+import { Color } from './color'
 
 export class Arrow extends Polygon {
 
 	startPoint = Vertex.origin()
 	endPoint = Vertex.origin()
+	touchHandler: TouchHandler = "none"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -47,8 +49,10 @@ export class Segment extends Arrow {
 
 	updateSelf(args: object = {}, redraw = true) {
 		super.updateSelf(args, false)
-		let p: Vertex = this.drawingStartPoint().subtract(this.anchor)
-		let q: Vertex = this.drawingEndPoint().subtract(this.anchor)
+		let sp = this.drawingStartPoint()
+		let ep = this.drawingEndPoint()
+		let p = sp.subtract(this.anchor)
+		let q = ep.subtract(this.anchor)
 		this.vertices = [p, q]
 		if (redraw) { this.redrawSelf() }
 

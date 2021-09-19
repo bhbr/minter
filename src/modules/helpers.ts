@@ -4,6 +4,11 @@ export const isTouchDevice = 'ontouchstart' in document.documentElement
 export const DRAW_BORDER = true
 export const EVENT_LOGGING = false
 
+export type TouchHandler = "none" | "auto" | "submob" | "self"
+// self -> stopPropagation and selfHandlerPointerUp/Move/Down
+// target -> stopPropagation and eventTarget.selfHandlerPointerUp/Move/Down
+// auto -> do nothing (others may handle this, e. g. the mob below (TwoPointCircle) or CindyJS)
+
 export function stringFromPoint(point: Array<number>): string {
 	let x = point[0], y = point[1]
 	return `${x} ${y}`
@@ -16,6 +21,10 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 			if (!all) { break }
 		}
 	}
+}
+
+export function customLog(...args: any[]) {
+	if (EVENT_LOGGING) { console.log(...args) }
 }
 
 

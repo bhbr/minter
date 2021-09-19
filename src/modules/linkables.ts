@@ -5,7 +5,7 @@ import { TextLabel } from './textlabel'
 import { Dependency } from './dependency'
 import { Color } from './color'
 import { Circle, RoundedRectangle } from './shapes'
-import { pointerEventVertex, LocatedEvent, paperLog } from './helpers'
+import { pointerEventVertex, LocatedEvent, paperLog, TouchHandler } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
@@ -195,6 +195,7 @@ export class DependencyMap extends MGroup {
 	startMobject?: Mobject = null
 	mobject: Mobject
 	readonly interactive = true
+	touchHandler: TouchHandler = "self"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)

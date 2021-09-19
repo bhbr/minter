@@ -3,7 +3,7 @@ import { Color } from './color'
 import { MGroup } from './mobject'
 import { Polygon, CurvedShape } from './vmobject'
 //import { Segment } from './arrows'
-import { gray, pointerEventVertex } from './helpers'
+import { gray, pointerEventVertex, TouchHandler } from './helpers'
 import { TAU } from './math'
 
 
@@ -76,6 +76,7 @@ export class TwoPointCircle extends Circle {
 
 	outerPoint = Vertex.origin()
 	fillOpacity = 0
+	touchHandler: TouchHandler = "none"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -85,17 +86,12 @@ export class TwoPointCircle extends Circle {
 		}
 	}
 
-	setup() {
-		super.setup()
-		this.view.style['pointer-events'] = 'none'
-	}
-
 	updateSelf(args = {}, redraw =true) {
 		let p = args['midpoint'] || this.midpoint
 		let q = args['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
 		args['radius'] = r
-		super.updateSelf(args,redraw)
+		super.updateSelf(args, redraw)
 	}
 
 }

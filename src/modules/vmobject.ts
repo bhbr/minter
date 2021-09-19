@@ -37,6 +37,10 @@ export class VMobject extends Mobject {
 
 	redrawSelf() {
 		super.redrawSelf()
+
+		this.svg.style.width = `${this.viewWidth + this.strokeWidth}px`
+		this.svg.style.height = `${this.viewHeight + this.strokeWidth}px`
+
 		let pathString: string = this.pathString()
 		if (pathString.includes('NaN')) { return }
 
