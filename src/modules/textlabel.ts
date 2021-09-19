@@ -29,7 +29,7 @@ export class TextLabel extends Mobject {
 		super.redrawSelf()
 		this.view.style.fontSize = `${this.fontSize}px`
 
-		this.view.innerHTML = this.text
+		this.view.textContent = this.text
 		this.view.style.color = this.color.toHex()
 		switch (this.verticalAlign) {
 		case 'top':

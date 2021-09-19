@@ -5,14 +5,14 @@ import { CreatedMobject } from './creating'
 import { Mobject } from './mobject'
 import { Color } from './color'
 import { Paper } from '../paper'
-import { LocatedEvent } from './helpers'
+import { LocatedEvent, TouchHandler } from './helpers'
 import { Rectangle } from './shapes'
 
 declare var CindyJS: any
 
 export class CindyCanvas extends LinkableMobject {
 
-	id = 'default-id'
+	id = `cindycanvas-created-on-${Date.now()}`
 	core: any
 	points: Array<Array<number>> = []
 	port = {
@@ -25,9 +25,7 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 	readonly draggable = true
-	readonly interactive = true
-	readonly passAlongEvents = true
-	vetoOnStopPropagation = true
+	touchHandler: TouchHandler = "auto"
 	
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -39,7 +37,6 @@ export class CindyCanvas extends LinkableMobject {
 
 	setup() {
 		super.setup()
-		this.view.style['pointer-events'] = 'auto'
 		this.view.id = this.id
 	}
 
@@ -53,7 +50,7 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 
-	cindySetup() { // called in subclasss, maybe move into superclass setup?
+	cindySetup() { // called in subclass, maybe move into superclass setup?
 		let initScript = document.createElement('script')
 		initScript.setAttribute('type', 'text/x-cindyscript')
 		initScript.setAttribute('id', `${this.id}init`)
@@ -73,6 +70,7 @@ export class CindyCanvas extends LinkableMobject {
 			geometry: this.geometry()
 		}
 		this.core = CindyJS.newInstance(args)
+		console.log('finished cindySetup')
 	}
 
 	startUp() {
@@ -81,6 +79,7 @@ export class CindyCanvas extends LinkableMobject {
 		} else {
 			document.addEventListener('DOMContentLoaded', function(e: Event) { this.startNow(); }.bind(this))
 		}
+		console.log('finished startUp')
 	}
 
 	startNow() {
@@ -88,6 +87,7 @@ export class CindyCanvas extends LinkableMobject {
 		this.core.started = true
 		this.core.play()
 		setTimeout(function() { console.log('core:', this.core) }.bind(this), 1000)
+		console.log('finished startNow')
 	}
 
 	geometry(): Array<any> { return [] }
@@ -98,6 +98,18 @@ export class CindyCanvas extends LinkableMobject {
 				return child
 			}
 		}
+	}
+
+	redrawSelf() {
+		super.redrawSelf()
+		let c = this.canvas()
+		if (c == undefined) { return }
+		console.log(`resizing canvas from {this.canvas().width} to {this.viewWidth}`)
+		this.canvas().width = this.viewWidth
+		this.canvas().height = this.viewHeight
+		this.view.style.width = `{this.viewWidth}px`
+		this.view.style.height = `{this.viewHeight}px`
+		console.log('finished redrawSelf')
 	}
 
 	enableDragging() {
@@ -121,6 +133,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 	constructor(args = {}, superCall = false) {
 		super({}, true)
 		if (!superCall) {
+			this.points = args['points']
 			this.setup()
 			this.update(args)
 		}
@@ -152,13 +165,16 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	updateSelf(args = {}, redraw = true) {
-		super.updateSelf(args, redraw)
+		super.updateSelf(args, false)
 
 		if (this.core != undefined && this.points.length > 0) {
 			let l: number = 0.1 * (this.wavelength || 1)
 			let f: number = 10 * (this.frequency || 1)
 			this.core.evokeCS(`drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););`)
 		}
+
+		if (redraw) { this.redrawSelf() }
+		console.log('finished updateSelf')
 
 	}
 
@@ -202,11 +218,6 @@ export class DrawnRectangle extends CreatedMobject {
 		this.p3 = this.endPoint
 		this.p4 = new Vertex(this.startPoint.x, this.endPoint.y)
 
-		// this.top.setAttributes({startPoint: this.p1, endPoint: this.p2})
-		// this.bottom.setAttributes({startPoint: this.p4, endPoint: this.p3})
-		// this.left.setAttributes({startPoint: this.p1, endPoint: this.p4})
-		// this.right.setAttributes({startPoint: this.p2, endPoint: this.p3})
-
 		this.add(this.top)
 		this.add(this.bottom)
 		this.add(this.left)
@@ -226,7 +237,8 @@ export class DrawnRectangle extends CreatedMobject {
 	dissolveInto(parent: Mobject) {
 		let w: number = Math.abs(this.p3.x - this.p1.x)
 		let h: number = Math.abs(this.p3.y - this.p1.y)
-		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
+		let relativeTopLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
+		let topLeft = relativeTopLeft.add(this.anchor)
 
 		let cv = new WaveCindyCanvas({
 			anchor: topLeft,
@@ -238,6 +250,7 @@ export class DrawnRectangle extends CreatedMobject {
 
 		parent.add(cv)
 		cv.startUp()
+		cv.redrawSelf()
 	}
 
 	

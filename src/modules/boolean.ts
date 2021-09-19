@@ -2,7 +2,7 @@ import { LinkableMobject } from './linkables'
 import { RoundedRectangle, Circle } from './shapes'
 import { Color } from './color'
 import { Vertex } from './vertex-transform'
-import { LocatedEvent } from './helpers'
+import { LocatedEvent, TouchHandler } from './helpers'
 import { TextLabel } from './textlabel'
 
 export class Boolean extends LinkableMobject {
@@ -69,6 +69,7 @@ export class ToggleableBoolean extends Boolean {
 	readonly transitionDuration = 200
 	toggleTransitionStart?: number
 	transitionTimerHandle: any
+	touchHandler: TouchHandler = "self"
 
 	leftSide = new RoundedRectangle({
 		height: this.height,

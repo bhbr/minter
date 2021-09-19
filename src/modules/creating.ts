@@ -5,7 +5,7 @@ import { Polygon } from './vmobject'
 import { Color } from './color'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
-import { LocatedEvent, paperLog } from './helpers'
+import { LocatedEvent, paperLog, TouchHandler } from './helpers'
 import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
@@ -13,7 +13,6 @@ export class CreatedMobject extends MGroup {
 	startPoint = Vertex.origin()
 	endPoint = Vertex.origin()
 	visible = true
-	readonly interactive = true
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -160,7 +159,7 @@ export class Point extends Circle {
 export class FreePoint extends Point {
 
 	readonly draggable = true
-	readonly interactive = true
+	touchHandler: TouchHandler = "self"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -169,16 +168,10 @@ export class FreePoint extends Point {
 			this.update(args)
 		}
 	}
-
-	setup() {
-		super.setup()
-		this.enableDragging()
-	}
 }
 
 export class DrawnArrow extends DrawnMobject {
 
-	readonly passAlongEvents = true
 	startFreePoint = new FreePoint()
 	endFreePoint = new FreePoint()
 
@@ -309,7 +302,6 @@ export class DrawnCircle extends DrawnMobject {
 	circle = new TwoPointCircle()
 	readonly strokeWidth = 1
 	readonly fillOpacity = 0
-	readonly passAlongEvents = true
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -359,7 +351,7 @@ export class DrawnCircle extends DrawnMobject {
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
 		this.outerPoint.copyFrom(q)
-		this.freeOuterPoint.midpoint.copyFrom(q)
+		this.freeOuterPoint.update({ midpoint: this.outerPoint })
 		this.update()
 	}
 

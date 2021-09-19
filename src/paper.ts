@@ -1,4 +1,4 @@
-import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
+import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent, TouchHandler } from './modules/helpers'
 import { Vertex } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
 import { Color, COLOR_PALETTE } from './modules/color'
@@ -10,7 +10,7 @@ import { BoxSlider } from './modules/slider'
 import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
 import { Construction } from './modules/construction'
 import { Pendulum } from './modules/pendulum'
-import { CindyCanvas } from './modules/cindycanvas'
+import { CindyCanvas, DrawnRectangle } from './modules/cindycanvas'
 
 declare var CindyJS: any
 
@@ -31,13 +31,14 @@ export class Paper extends LinkableMobject {
 	construction = new Construction()
 	background = new Rectangle({
 		fillColor: Color.black(),
-		fillOpacity: 1,
+		fillOpacity: 0,
 		strokeWidth: 0,
-		passAlongEvents: true
+		touchHandler: "none"
 	})
 	isPanning = false
 	panLocation?: Vertex = null
 	oldShift = Vertex.origin()
+	touchHandler: TouchHandler = "submob"
 
 	readonly interactive = true
 	readonly draggable = false
@@ -87,20 +88,20 @@ export class Paper extends LinkableMobject {
 	}
 
 	setDragging(flag: boolean) {
-		this.passAlongEvents = !flag
+		this.touchHandler = flag ? "self" : "submob"
 		if (flag) {
 			this.selfHandlePointerDown = this.startDragging
 			this.selfHandlePointerMove = this.dragging
 			this.selfHandlePointerUp = this.endDragging
 			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = false
+				submob.touchHandler = "self"
 			}
 		} else {
 			this.selfHandlePointerDown = this.startCreating
 			this.selfHandlePointerMove = this.creativeMove
 			this.selfHandlePointerUp = this.endCreating
 			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = true
+				submob.touchHandler = "auto"
 			}
 		}
 	}
@@ -180,11 +181,11 @@ export class Paper extends LinkableMobject {
 		case 'creating':
 				this.changeVisibleCreation(value as string)
 			if (value == 'freehand') {
-				this.passAlongEvents = true
+				this.touchHandler = "submob"
 				break
 			}
 			if (this.creationGroup == undefined) {
-				this.passAlongEvents = false
+				this.touchHandler = "self"
 			}
 			break
 		case 'color':
@@ -206,20 +207,20 @@ export class Paper extends LinkableMobject {
 
 	setPanning(flag: boolean) {
 		this.isPanning = flag
-		this.passAlongEvents = !flag
+		this.touchHandler = flag ? "self" : "submob"
 		if (flag) {
 			this.selfHandlePointerDown = this.startPanning
 			this.selfHandlePointerMove = this.panning
 			this.selfHandlePointerUp = this.endPanning
 			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = false
+				submob.touchHandler = "self"
 			}
 		} else {
 			this.selfHandlePointerDown = this.startCreating
 			this.selfHandlePointerMove = this.creativeMove
 			this.selfHandlePointerUp = this.endCreating
 			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = true
+				submob.touchHandler = "auto"
 			}
 		}
 	}
@@ -299,7 +300,6 @@ export class Paper extends LinkableMobject {
 		this.creationGroup = null
 	}
 
-
 	showAllLinks() {
 		this.showLinksOfSubmobs()
 	}
@@ -322,33 +322,6 @@ export const paper = new Paper({
 	viewWidth: 1250,
 	viewHeight: 1200
 })
-
-// let c = new Circle({
-// 	radius: 100,
-// 	anchor: new Vertex(200, 300)
-// })
-
-// let s = new BoxSlider({
-// 	anchor: new Vertex(200, 300),
-// 	height: 150
-// })
-
-// let r = new Rectangle({
-// 	anchor: new Vertex(150, 150),
-// 	fillColor: Color.red(),
-// 	fillOpacity: 1,
-// 	width: 220,
-// 	height: 150,
-// 	viewWidth: 220,
-// 	viewHeight: 150,
-// 	passAlongEvents: true
-// })
-
-// paper.add(c)
-// paper.add(s)
-// paper.add(r)
-
-
 
 
 

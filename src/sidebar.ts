@@ -1,4 +1,4 @@
-import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
+import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent, TouchHandler } from './modules/helpers'
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
@@ -42,7 +42,7 @@ class Sidebar extends Mobject {
 	background = new Rectangle({
 			width: this.viewWidth,
 			height: this.viewHeight,
-			fillColor: Color.gray(0.15),
+			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
 			passAlongEvents: true
@@ -83,6 +83,7 @@ class SidebarButton extends Circle {
 	viewWidth = 2 * buttonRadius
 	viewHeight = 2 * buttonRadius
 	fillOpacity = 1
+	touchHandler: TouchHandler = "self"
 
 	label = new TextLabel({
 		fontSize: 12,
@@ -222,15 +223,6 @@ class SidebarButton extends Circle {
 	}
 
 	updateLabel() {
-		// if (this.label == undefined) { return }
-		// this.label.update({
-		// 	viewWidth: 2 * this.radius,
-		// 	viewHeight: 2 * this.radius
-		// })
-
-		// let f = this.active ? buttonScaleFactor : 1
-		// let fs = f * (this.fontSize ?? 12)
-		// this.label.view?.setAttribute('font-size', fs.toString())
 		if (this.showLabel) {
 			try { // remove this
 				let msg = this.messages[this.currentModeIndex]
@@ -424,6 +416,8 @@ class DragButton extends ToggleButton {
 		// this.label.text = '↕︎'
 	}
 
+	updateLabel() {}
+
 }
 
 class LinkButton extends ToggleButton {
@@ -465,16 +459,16 @@ lineButton.update({
 	midpoint: buttonCenter(0)
 })
 
-// let circleButton = new CreativeButton({
-// 	creations: ['circle'],
-// 	key: 'w',
-// 	baseColor: Color.gray(0.4),
-// 	locationIndex: 1
-// })
-// sidebar.add(circleButton)
-// circleButton.update({
-// 	midpoint: buttonCenter(1)
-// })
+let circleButton = new CreativeButton({
+	creations: ['circle'],
+	key: 'w',
+	baseColor: Color.gray(0.4),
+	locationIndex: 1
+})
+sidebar.add(circleButton)
+circleButton.update({
+	midpoint: buttonCenter(1)
+})
 
 // let sliderButton = new CreativeButton({
 // 	creations: ['slider'],
@@ -487,16 +481,16 @@ lineButton.update({
 // 	midpoint: buttonCenter(2)
 // })
 
-// let cindyButton = new CreativeButton({
-// 	creations: ['cindy'],
-// 	key: 'r',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 3
-// })
-// sidebar.add(cindyButton)
-// cindyButton.update({
-// 	midpoint: buttonCenter(3)
-// })
+let cindyButton = new CreativeButton({
+	creations: ['cindy'],
+	key: 'r',
+	baseColor: Color.gray(0.2),
+	locationIndex: 3
+})
+sidebar.add(cindyButton)
+cindyButton.update({
+	midpoint: buttonCenter(3)
+})
   
 // let pendulumButton = new CreativeButton({
 // 	creations: ['pendulum'],
@@ -509,18 +503,19 @@ lineButton.update({
 // 	midpoint: buttonCenter(4)
 // })
   
-// let dragButton = new DragButton({
-// 	messages: [{drag: true}],
-// 	outgoingMessage: {drag: false},
-// 	key: 'a',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 5
-// })
-// dragButton.label.view.setAttribute('fill', 'black')
-// sidebar.add(dragButton)
-// dragButton.update({
-// 	midpoint: buttonCenter(5)
-// })
+let dragButton = new DragButton({
+	messages: [{drag: true}],
+	outgoingMessage: {drag: false},
+	key: 'a',
+	baseColor: Color.gray(0.6),
+	locationIndex: 5
+})
+dragButton.label.view.setAttribute('fill', 'black')
+sidebar.add(dragButton)
+dragButton.update({
+	midpoint: buttonCenter(5)
+})
+console.log(dragButton)
 
 // let linkButton = new LinkButton({
 // 	messages: [{toggleLinks: true}],
