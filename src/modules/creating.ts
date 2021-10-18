@@ -5,7 +5,7 @@ import { Polygon } from './vmobject'
 import { Color } from './color'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
-import { LocatedEvent, paperLog, TouchHandler } from './helpers'
+import { LocatedEvent, paperLog, EventHandlingMode } from './helpers'
 import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
@@ -61,7 +61,6 @@ class DrawnMobject extends CreatedMobject {
 
 export class Freehand extends DrawnMobject {
 
-	readonly draggable = false
 	readonly fillOpacity = 0
 	line = new Polygon({
 		closed: false,
@@ -159,7 +158,7 @@ export class Point extends Circle {
 export class FreePoint extends Point {
 
 	readonly draggable = true
-	touchHandler: TouchHandler = "self"
+	eventHandlingMode: EventHandlingMode = "self"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)

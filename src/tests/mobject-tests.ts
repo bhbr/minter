@@ -92,7 +92,7 @@ export function MobjectTest() {
 	})
 	f.add(l)
 	l.adjustFrame()
-	f.enableDragging()
+	f.draggable = true
 
 	console.log(f)
 
@@ -169,8 +169,7 @@ export function CindyTest() {
 
 	paper.add(cv2)
 	cv2.startUp()
-	cv2.enableDragging()
-	cv2.disableDragging()
+	cv2.draggable = true
 	
 }
 

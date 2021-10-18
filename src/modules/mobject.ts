@@ -2,8 +2,8 @@ import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Dependency } from './dependency'
 import { Frame } from './frame'
-import { pointerEventVertex, LocatedEvent, TouchHandler } from './helpers'
-import { DRAW_BORDER, customLog, paperLog } from './helpers'
+import { pointerEventVertex, LocatedEvent, EventHandlingMode } from './helpers'
+import { DRAW_BORDER, paperLog } from './helpers'
 import { addPointerDown, removePointerDown } from './helpers'
 import { addPointerMove, removePointerMove } from './helpers'
 import { addPointerUp, removePointerUp } from './helpers'
@@ -25,10 +25,9 @@ export class Mobject extends Frame {
 
 	// interactivity
 	eventTarget?: Mobject = null
-	vetoOnStopPropagation = false // for CindyCanvas
-	touchHandler: TouchHandler = "submob"
-	previousTouchHandler?: TouchHandler = null
-	draggable = false // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
+	eventHandlingMode: EventHandlingMode = "parent"
+	previousEventHandlingMode?: EventHandlingMode = null
+	draggable: boolean = false
 	dragPointStart?: Vertex = null
 	dragAnchorStart?: Vertex = null
 
@@ -129,20 +128,15 @@ export class Mobject extends Frame {
 		this.boundPointerDown = this.pointerDown.bind(this)
 		this.boundPointerMove = this.pointerMove.bind(this)
 		this.boundPointerUp = this.pointerUp.bind(this)
-		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
+		this.boundLowestTargetedMobject = this.lowestTargetedMobject.bind(this)
 		
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
 		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
 		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
 
-		this.view.style['pointer-events'] = (this.touchHandler == "none") ? "none" : "auto"
+		this.view.style['pointer-events'] = (this.eventHandlingMode == "background") ? "none" : "auto"
 
 		addPointerDown(this.view, this.boundPointerDown)
-		if (this.draggable) {
-			this.enableDragging()
-		} else {
-			this.disableDragging()			
-		}
 
 	}
 
@@ -318,6 +312,46 @@ export class Mobject extends Frame {
 	}
 
 
+	// event targets //
+
+	targetViewChain(e: LocatedEvent): Array<Element> {
+		var t: Element = e.target as Element
+		console.log(t.tagName)
+		if (t.tagName == 'path') { t = t.parentElement.parentElement }
+		if (t.tagName == 'CANVAS') { t = t.parentElement }
+		if (t == this.view) { return [t] }
+
+		let targetViewChain: Array<Element> = [t]
+		while (t != undefined && t != this.view) {
+			t = t.parentElement
+			targetViewChain.push(t)
+		}
+
+		return targetViewChain.reverse()
+	}
+
+	targetMobjectChain(e: LocatedEvent): Array<Mobject> {
+		let viewChain = this.targetViewChain(e)
+		let mobjectChain: Array<Mobject> = []
+		for (let view of viewChain) {
+			let mob = view['mobject']
+			if (mob != undefined) { mobjectChain.push(mob) }
+		}
+		return mobjectChain
+	}
+
+	targetedChild(e: LocatedEvent): Mobject | undefined {
+		let chain = this.targetMobjectChain(e)
+		return chain[1] ?? null
+	}
+
+	lowestTargetedMobject(e: LocatedEvent): Mobject | undefined {
+		let chain = this.targetMobjectChain(e)
+		return chain.pop() ?? null
+	}
+
+
+
 	// interactivity //
 
 	// empty method as workaround (don't ask)
@@ -332,132 +366,94 @@ export class Mobject extends Frame {
 	boundPointerDown(e: LocatedEvent) { }
 	boundPointerMove(e: LocatedEvent) { }
 	boundPointerUp(e: LocatedEvent) { }
-	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
-
-	enableDragging() {
-		//this.previousTouchHandler = this.touchHandler
-		//this.touchHandler = null
-		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-		this.selfHandlePointerDown = this.startSelfDragging
-		this.selfHandlePointerMove = this.selfDragging
-		this.selfHandlePointerUp = this.endSelfDragging
-	}
-
-	disableDragging() {
-		// if (this.previousTouchHandler !== null) {
-		// 	this.touchHandler = this.previousTouchHandler
-		// 	this.previousTouchHandler = null
-		// }
-		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
-		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
-		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
-	}
-
-	eventTargetMobject(e: LocatedEvent): Mobject {
-		var t: Element = e.target as Element
-		console.log(t.tagName)
-		if (t.tagName == 'path') { t = t.parentElement.parentElement }
-		if (t.tagName == 'CANVAS') { t = t.parentElement }
-		if (t == this.view) {
-			return this
-		}
-		let targetViewChain: Array<Element> = [t]
-		while (t != undefined && t != this.view) {
-			t = t.parentElement
-			targetViewChain.push(t)
-		}
-
-		targetViewChain = targetViewChain.reverse()
-		customLog(targetViewChain)
-		t = targetViewChain.pop()
-
-		while (t != undefined) {
-			if (t['mobject'] != undefined) {
-				let r: Mobject = t['mobject']
-				console.log(r, r.touchHandler)
-				if (r.touchHandler == "self" || r.touchHandler == 'auto') {
-					customLog('event target mob:', r)
-					return r
-				}
-			}
-			t = targetViewChain.pop()
-		}
-		// if all of this fails, you need to handle the event yourself
-		customLog('event target mob:', this)
-		return this
-	}
+	boundLowestTargetedMobject(e: LocatedEvent): Mobject { return this }
 
 	pointerDown(e: LocatedEvent) {
-		this.eventTarget = this.boundEventTargetMobject(e)
-		if (this.eventTarget.touchHandler == "auto") { return }
+
+		if (this.draggable) {
+			e.stopPropagation()
+			this.startSelfDragging(e)
+			return
+		}
+
+		this.eventTarget = this.boundLowestTargetedMobject(e)
+		console.log('event target on ', this, 'is', this.eventTarget)
+		if (this.eventTarget.eventHandlingMode == "auto" && !this.eventTarget.draggable) { return }
 		e.stopPropagation()
 
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
-		customLog('event target on ', this, 'is', this.eventTarget)
-		if (this.touchHandler == "self") {
-			customLog(`handling myself, and I am a ${this.constructor.name}`)
+		if (this.eventHandlingMode == "self") {
+			console.log(`handling myself, and I am a ${this.constructor.name}`)
+			this.eventTarget = this
 			this.selfHandlePointerDown(e)
-		} else if (this.touchHandler == "submob") {
+		} else if (this.eventHandlingMode == "child") {
+			console.log(`trying to pass to a child`)
 			if (this.eventTarget == this) {
+				console.log(`no luck, I (a ${this.constructor.name}) have to handle this myself`)
 				this.selfHandlePointerDown(e)
 			} else {
-				customLog('passing on')
-				this.eventTarget.pointerDown(e)
+				console.log('found one')
+				this.eventTarget = this.targetedChild(e) ?? this
+				console.log(this.eventTarget)
+				if (this.eventTarget.draggable) {
+					this.eventTarget.startSelfDragging(e)
+					return
+				}
+				let th = this.eventTarget.eventHandlingMode
+				if (th == "self" || th == "child") {
+					console.log(`passing event down to a ${this.eventTarget.constructor.name}`)
+					this.eventTarget.pointerDown(e)
+				} else if (th == "parent") {
+					console.log(`no luck, the child (a ${this.eventTarget.constructor.name}) can't handle it`)
+					this.eventTarget = this
+					this.selfHandlePointerDown(e)
+				} else {
+					console.log(`${this.eventHandlingMode} `)
+					console.error(`eventHandlingMode badly set on my child, a ${this.eventTarget.constructor.name}`)
+				}
 			}
 		} else {
-			customLog(`${this.touchHandler} `)
-			console.error(`touchHandler badly set on ${this.constructor.name}`)
+			console.log(`${this.eventHandlingMode} `)
+			console.error(`eventHandlingMode badly set on myself, a ${this.constructor.name}`)
 		}
 	}
 
 	pointerMove(e: LocatedEvent) {
-		if (this.touchHandler == "auto") { return }
-		customLog(this, "event target:", this.eventTarget)
+		if (this.eventTarget.draggable) {
+			e.stopPropagation()
+			this.eventTarget.selfDragging(e)
+			return
+		}
+
+		console.log(this, "event target:", this.eventTarget)
+		if (this.eventHandlingMode == "auto") { return }
 		e.stopPropagation()
 
-		if (this.touchHandler == "self") {
-			customLog(`handling myself, and I am a ${this.constructor.name}`)
-			this.selfHandlePointerMove(e)
-		} else if (this.touchHandler == "submob") {
-			if (this.eventTarget == this) {
-				this.selfHandlePointerMove(e)
-			} else {
-				customLog('passing on')
-				this.eventTarget.pointerMove(e)
-			}
-		} else {
-			customLog(`${this.touchHandler} `)
-			console.error(`touchHandler badly set on ${this.constructor.name}`)
-		}
+		if (this.eventTarget == this) { this.selfHandlePointerMove(e) }
+		else { this.eventTarget.pointerMove(e) }
 	}
 
 	pointerUp(e: LocatedEvent) {
-		if (this.touchHandler == "auto") { return }
+		if (this.eventTarget.draggable) {
+			e.stopPropagation()
+			this.eventTarget.endSelfDragging(e)
+			return
+		}
+
+		console.log(this, "event target:", this.eventTarget)
+		if (this.eventHandlingMode == "auto") { return }
 		e.stopPropagation()
 
 		removePointerMove(this.view, this.boundPointerMove)
 		removePointerUp(this.view, this.boundPointerUp)
 		addPointerDown(this.view, this.boundPointerDown)
 
-		if (this.touchHandler == "self") {
-			customLog(`handling myself, and I am a ${this.constructor.name}`)
-			this.selfHandlePointerUp(e)
-		} else if (this.touchHandler == "submob") {
-			if (this.eventTarget == this) {
-				this.selfHandlePointerUp(e)
-			} else {
-				customLog('passing on')
-				this.eventTarget.pointerUp(e)
-			}
-		} else {
-			customLog(`${this.touchHandler} `)
-			console.error(`touchHandler badly set on ${this.constructor.name}`)
-		}
+		if (this.eventTarget == this) { this.selfHandlePointerUp(e) }
+		else { this.eventTarget.pointerUp(e) }
+
 		this.eventTarget = null
 	}
 

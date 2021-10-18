@@ -2,12 +2,14 @@ import { Vertex } from './vertex-transform'
 
 export const isTouchDevice = 'ontouchstart' in document.documentElement
 export const DRAW_BORDER = true
-export const EVENT_LOGGING = false
 
-export type TouchHandler = "none" | "auto" | "submob" | "self"
-// self -> stopPropagation and selfHandlerPointerUp/Move/Down
-// target -> stopPropagation and eventTarget.selfHandlerPointerUp/Move/Down
-// auto -> do nothing (others may handle this, e. g. the mob below (TwoPointCircle) or CindyJS)
+export type EventHandlingMode = "auto" | "drag" | "self" | "child" | "parent" | "background"
+// auto > do nothing, not even stop event bubbling/capturing (e. g. CindyCanvas)
+// drag > drag yourself inside your parent
+// self > selfHandle (e. g. BoxSlider, FreePoint)
+// child > submob handles it unless its handler is "parent" (e. g. Paper)
+// parent > parent handles it (e. g. Rectangle inside BoxSlider)
+// background > background mobject handles it (e. g. TwoPointCircle)
 
 export function stringFromPoint(point: Array<number>): string {
 	let x = point[0], y = point[1]
@@ -23,9 +25,6 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 	}
 }
 
-export function customLog(...args: any[]) {
-	if (EVENT_LOGGING) { console.log(...args) }
-}
 
 
 // replicate RGB(A) notation from CSS

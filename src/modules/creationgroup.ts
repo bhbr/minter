@@ -32,7 +32,7 @@ export class CreationGroup extends CreatedMobject {
 		this.creations['line'] = new DrawnLine({ startPoint: this.startPoint })
 		this.creations['circle'] = new DrawnCircle({ startPoint: this.startPoint })
 		this.creations['cindy'] = new DrawnRectangle({ startPoint: this.startPoint })
-		// this.creations['slider'] = new CreatedBoxSlider({ startPoint: this.startPoint })
+		this.creations['slider'] = new CreatedBoxSlider({ startPoint: this.startPoint })
 		// this.creations['pendulum'] = new CreatedPendulum({ startPoint: this.startPoint })
 
 		for (let creation of Object.values(this.creations) as Array<CreatedMobject>) {
