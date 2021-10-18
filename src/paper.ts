@@ -1,4 +1,4 @@
-import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent, TouchHandler } from './modules/helpers'
+import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent, EventHandlingMode } from './modules/helpers'
 import { Vertex } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
 import { Color, COLOR_PALETTE } from './modules/color'
@@ -23,6 +23,7 @@ export class Paper extends LinkableMobject {
 	currentColor = COLOR_PALETTE['white']
 	creationGroup?: CreationGroup = null
 	dependencyMap = new DependencyMap()
+	readonly draggable = false
 	draggedMobject?: Mobject = null
 	dragPointStart?: Vertex = null
 	dragAnchorStart?: Vertex = null
@@ -33,15 +34,12 @@ export class Paper extends LinkableMobject {
 		fillColor: Color.black(),
 		fillOpacity: 0,
 		strokeWidth: 0,
-		touchHandler: "none"
+		eventHandlingMode: "parent"
 	})
 	isPanning = false
 	panLocation?: Vertex = null
 	oldShift = Vertex.origin()
-	touchHandler: TouchHandler = "submob"
-
-	readonly interactive = true
-	readonly draggable = false
+	eventHandlingMode: EventHandlingMode = "child"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -54,6 +52,7 @@ export class Paper extends LinkableMobject {
 	setup() {
 		super.setup()
 		this.setDragging(false)
+		this.setPanning(false)
 		this.add(this.background)
 		this.add(this.construction)
 		this.construction.update({
@@ -88,21 +87,10 @@ export class Paper extends LinkableMobject {
 	}
 
 	setDragging(flag: boolean) {
-		this.touchHandler = flag ? "self" : "submob"
-		if (flag) {
-			this.selfHandlePointerDown = this.startDragging
-			this.selfHandlePointerMove = this.dragging
-			this.selfHandlePointerUp = this.endDragging
-			for (let submob of this.getCindys()) {
-				submob.touchHandler = "self"
-			}
-		} else {
-			this.selfHandlePointerDown = this.startCreating
-			this.selfHandlePointerMove = this.creativeMove
-			this.selfHandlePointerUp = this.endCreating
-			for (let submob of this.getCindys()) {
-				submob.touchHandler = "auto"
-			}
+		//this.eventHandlingMode = flag ? "self" : "child"
+		for (let submob of this.children) {
+			if (submob == this.background) { continue }
+			submob.draggable = flag
 		}
 	}
 
@@ -117,7 +105,7 @@ export class Paper extends LinkableMobject {
 	}
 
 	startDragging(e: LocatedEvent) {
-		this.draggedMobject = this.eventTargetMobject(e)
+		this.draggedMobject = this.lowestTargetedMobject(e)
 		if (this.draggedMobject == this) {
 			// check if we hit a CindyCanvas
 			for (let c of this.cindys) {
@@ -181,11 +169,11 @@ export class Paper extends LinkableMobject {
 		case 'creating':
 				this.changeVisibleCreation(value as string)
 			if (value == 'freehand') {
-				this.touchHandler = "submob"
+				this.eventHandlingMode = "child"
 				break
 			}
 			if (this.creationGroup == undefined) {
-				this.touchHandler = "self"
+				this.eventHandlingMode = "self"
 			}
 			break
 		case 'color':
@@ -207,20 +195,20 @@ export class Paper extends LinkableMobject {
 
 	setPanning(flag: boolean) {
 		this.isPanning = flag
-		this.touchHandler = flag ? "self" : "submob"
+		this.eventHandlingMode = flag ? "self" : "child"
 		if (flag) {
 			this.selfHandlePointerDown = this.startPanning
 			this.selfHandlePointerMove = this.panning
 			this.selfHandlePointerUp = this.endPanning
 			for (let submob of this.getCindys()) {
-				submob.touchHandler = "self"
+				submob.eventHandlingMode = "self"
 			}
 		} else {
 			this.selfHandlePointerDown = this.startCreating
 			this.selfHandlePointerMove = this.creativeMove
 			this.selfHandlePointerUp = this.endCreating
 			for (let submob of this.getCindys()) {
-				submob.touchHandler = "auto"
+				submob.eventHandlingMode = "auto"
 			}
 		}
 	}
@@ -322,8 +310,5 @@ export const paper = new Paper({
 	viewWidth: 1250,
 	viewHeight: 1200
 })
-
-
-
 
 

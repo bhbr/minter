@@ -4,6 +4,7 @@ import { BoxSlider } from './slider'
 import { WaveCindyCanvas } from './cindycanvas'
 import { Mobject } from './mobject'
 import { Color } from './color'
+import { EventHandlingMode } from './helpers'
 
 
 export class CreatedBoxSlider extends CreatedMobject {
@@ -13,6 +14,7 @@ export class CreatedBoxSlider extends CreatedMobject {
 	height = 0
 	fillColor = Color.black()
 	startPoint = Vertex.origin()
+	eventHandlingMode: EventHandlingMode = "self"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)

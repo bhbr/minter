@@ -5,7 +5,7 @@ import { TextLabel } from './textlabel'
 import { Dependency } from './dependency'
 import { Color } from './color'
 import { Circle, RoundedRectangle } from './shapes'
-import { pointerEventVertex, LocatedEvent, paperLog, TouchHandler } from './helpers'
+import { pointerEventVertex, LocatedEvent, paperLog, EventHandlingMode } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
@@ -195,7 +195,7 @@ export class DependencyMap extends MGroup {
 	startMobject?: Mobject = null
 	mobject: Mobject
 	readonly interactive = true
-	touchHandler: TouchHandler = "self"
+	eventHandlingMode: EventHandlingMode = "self"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -206,21 +206,20 @@ export class DependencyMap extends MGroup {
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
-		let t: Mobject = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
-		// find a better way to handle this!
-		if (t instanceof LinkHook) {
-			let tl = t as LinkHook
-			let llStart = tl.relativeCenter(this)
-			this.editedLinkLine = new LinkLine({
-				startPoint: llStart,
-				source: tl.mobject,
-				inputName: t.outputName,
-				startHook: tl,
-				superMobject: this.superMobject
-			})
-			this.add(this.editedLinkLine)
-			this.startMobject = tl.mobject
-		}
+		let t: Mobject = this.lowestTargetedMobject(e)
+		if (!(t instanceof LinkHook)) { return }
+
+		let tl = t as LinkHook
+		let llStart = tl.relativeCenter(this)
+		this.editedLinkLine = new LinkLine({
+			startPoint: llStart,
+			source: tl.mobject,
+			inputName: t.outputName,
+			startHook: tl,
+			superMobject: this.superMobject
+		})
+		this.add(this.editedLinkLine)
+		this.startMobject = tl.mobject
 	}
 
 	selfHandlePointerMove(e: LocatedEvent) {
@@ -231,7 +230,7 @@ export class DependencyMap extends MGroup {
 
 	selfHandlePointerUp(e: LocatedEvent) {
 		let line: LinkLine = this.editedLinkLine
-		let tcircle: any = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
+		let tcircle: any = this.lowestTargetedMobject(e)
 
 		let tl: LinkHook = null
 		if (tcircle.constructor.name == 'Circle') {

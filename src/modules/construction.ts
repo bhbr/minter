@@ -5,7 +5,7 @@ import { Circle, TwoPointCircle } from './shapes'
 import { CreatedMobject } from './creating'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
-import { LocatedEvent, pointerEventVertex, TouchHandler } from './helpers'
+import { LocatedEvent, pointerEventVertex, EventHandlingMode } from './helpers'
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
@@ -18,7 +18,7 @@ export class IntersectionPoint extends Point {
 	fillOpacity: number = 0
 	lambda: number = NaN
 	mu: number = NaN
-	touchHandler: TouchHandler = "none"
+	eventHandlingMode: EventHandlingMode = "background"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -142,7 +142,7 @@ export class Construction extends LinkableMobject {
 	points: Array<Point> = []
 	freePoints: Array<FreePoint> = []
 	constructedMobjects: Array<ConstructedMobject> = []
-	touchHandler: TouchHandler = "self"
+	eventHandlingMode: EventHandlingMode = "child"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)

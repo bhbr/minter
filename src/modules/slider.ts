@@ -1,4 +1,4 @@
-import { pointerEventVertex, LocatedEvent, TouchHandler } from './helpers'
+import { pointerEventVertex, LocatedEvent, EventHandlingMode } from './helpers'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
 import { Mobject, MGroup } from './mobject'
@@ -20,12 +20,9 @@ export class BoxSlider extends LinkableMobject {
 	scrubStartingPoint?: Vertex = null
 	height = 200
 	width = 50
-	touchHandler: TouchHandler = "self"
+	eventHandlingMode: EventHandlingMode = "self"
 
 	readonly strokeColor = Color.white()
-	readonly draggable = true
-	readonly interactive = true
-	readonly passAlongEvents = false
 	readonly outputNames = ['value']
 	readonly fillColor = Color.black()
 	readonly barFillColor = Color.gray(0.5)

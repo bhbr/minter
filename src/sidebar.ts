@@ -1,4 +1,4 @@
-import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent, TouchHandler } from './modules/helpers'
+import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent, EventHandlingMode } from './modules/helpers'
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
@@ -83,7 +83,7 @@ class SidebarButton extends Circle {
 	viewWidth = 2 * buttonRadius
 	viewHeight = 2 * buttonRadius
 	fillOpacity = 1
-	touchHandler: TouchHandler = "self"
+	eventHandlingMode: EventHandlingMode = "self"
 
 	label = new TextLabel({
 		fontSize: 12,
@@ -470,16 +470,16 @@ circleButton.update({
 	midpoint: buttonCenter(1)
 })
 
-// let sliderButton = new CreativeButton({
-// 	creations: ['slider'],
-// 	key: 'e',
-// 	baseColor: Color.gray(0.6),
-// 	locationIndex: 2
-// })
-// sidebar.add(sliderButton)
-// sliderButton.update({
-// 	midpoint: buttonCenter(2)
-// })
+let sliderButton = new CreativeButton({
+	creations: ['slider'],
+	key: 'e',
+	baseColor: Color.gray(0.6),
+	locationIndex: 2
+})
+sidebar.add(sliderButton)
+sliderButton.update({
+	midpoint: buttonCenter(2)
+})
 
 let cindyButton = new CreativeButton({
 	creations: ['cindy'],
@@ -515,19 +515,18 @@ sidebar.add(dragButton)
 dragButton.update({
 	midpoint: buttonCenter(5)
 })
-console.log(dragButton)
 
-// let linkButton = new LinkButton({
-// 	messages: [{toggleLinks: true}],
-// 	outgoingMessage: {toggleLinks: false},
-// 	key: 's',
-// 	baseColor: Color.gray(0.2),
-// 	locationIndex: 6
-// })
-// sidebar.add(linkButton)
-// linkButton.update({
-// 	midpoint: buttonCenter(6)
-// })
+let linkButton = new LinkButton({
+	messages: [{toggleLinks: true}],
+	outgoingMessage: {toggleLinks: false},
+	key: 's',
+	baseColor: Color.gray(0.2),
+	locationIndex: 6
+})
+sidebar.add(linkButton)
+linkButton.update({
+	midpoint: buttonCenter(6)
+})
 
 // let colorButton = new ColorChangeButton({
 // 	key: 'd',

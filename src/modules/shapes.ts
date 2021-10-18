@@ -3,7 +3,7 @@ import { Color } from './color'
 import { MGroup } from './mobject'
 import { Polygon, CurvedShape } from './vmobject'
 //import { Segment } from './arrows'
-import { gray, pointerEventVertex, TouchHandler } from './helpers'
+import { gray, pointerEventVertex, EventHandlingMode } from './helpers'
 import { TAU } from './math'
 
 
@@ -76,7 +76,7 @@ export class TwoPointCircle extends Circle {
 
 	outerPoint = Vertex.origin()
 	fillOpacity = 0
-	touchHandler: TouchHandler = "none"
+	eventHandlingMode: EventHandlingMode = "background"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)

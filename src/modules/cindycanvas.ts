@@ -5,7 +5,7 @@ import { CreatedMobject } from './creating'
 import { Mobject } from './mobject'
 import { Color } from './color'
 import { Paper } from '../paper'
-import { LocatedEvent, TouchHandler } from './helpers'
+import { LocatedEvent, EventHandlingMode } from './helpers'
 import { Rectangle } from './shapes'
 
 declare var CindyJS: any
@@ -24,8 +24,7 @@ export class CindyCanvas extends LinkableMobject {
 		}]
 	}
 
-	readonly draggable = true
-	touchHandler: TouchHandler = "auto"
+	eventHandlingMode: EventHandlingMode = "auto"
 	
 	constructor(args = {}, superCall = false) {
 		super({}, true)
@@ -112,15 +111,6 @@ export class CindyCanvas extends LinkableMobject {
 		console.log('finished redrawSelf')
 	}
 
-	enableDragging() {
-		super.enableDragging()
-		this.vetoOnStopPropagation = false
-	}
-
-	disableDragging() {
-		super.disableDragging()
-		this.vetoOnStopPropagation = true
-	}
 }
 
 

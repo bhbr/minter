@@ -1,14 +1,14 @@
 import { Vertex } from './vertex-transform'
 import { MGroup } from './mobject'
 import { Polygon } from './vmobject'
-import { ulCorner, getWidth, getHeight, TouchHandler } from './helpers'
+import { ulCorner, getWidth, getHeight, EventHandlingMode } from './helpers'
 import { Color } from './color'
 
 export class Arrow extends Polygon {
 
 	startPoint = Vertex.origin()
 	endPoint = Vertex.origin()
-	touchHandler: TouchHandler = "none"
+	eventHandlingMode: EventHandlingMode = "background"
 
 	constructor(args = {}, superCall = false) {
 		super({}, true)
