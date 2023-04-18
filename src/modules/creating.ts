@@ -28,8 +28,11 @@ export class CreatedMobject extends MGroup {
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
+		console.log('a')
 		if (!this.visible) { return }
+		console.log('b')
 		for (let submob of this.children) {
+			console.log(submob)
 			paper.add(submob)
 		}
 		console.log('dissolving CreatedMobject')

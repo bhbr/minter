@@ -2,7 +2,7 @@
     'use strict';
 
     class ExtendedObject {
-        constructor(argsDict = {}) {
+        constructor(argsDict = {}, superCall = true) {
             this.passedByValue = false;
             this.setAttributes(argsDict);
         }
@@ -39,6 +39,10 @@
             for (let [key, value] of Object.entries(argsDict)) {
                 let setter = this.setter(key);
                 if (setter != undefined) {
+                    if (Object.keys(this.fixedArgs()).includes(key)) {
+                        console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`);
+                        continue;
+                    }
                     setter.call(this, value);
                 }
                 else {
@@ -57,6 +61,7 @@
                 }
             }
         }
+        fixedArgs() { return {}; }
         assureProperty(key, cons) {
             if (this[key] == undefined) {
                 this[key] = new cons();
@@ -212,6 +217,15 @@
         d() { return this.scale * Math.cos(this.angle); }
         e() { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x; }
         f() { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y; }
+        inverse() {
+            let t = new Transform({
+                anchor: this.anchor,
+                angle: -this.angle,
+                scale: 1 / this.scale
+            });
+            t.shift = t.appliedTo(this.shift).opposite();
+            return t;
+        }
         appliedTo(p) {
             return new Vertex(this.a() * p.x + this.b() * p.y + this.e(), this.c() * p.x + this.d() * p.y + this.f());
         }
@@ -886,6 +900,16 @@
         static indigo() { return new Color(0.5, 0, 1); }
         static violet() { return new Color(1, 0, 1); }
     }
+    const COLOR_PALETTE = {
+        'white': Color.white(),
+        'red': Color.red(),
+        'orange': Color.orange(),
+        'yellow': Color.yellow(),
+        'green': Color.green(),
+        'blue': Color.blue(),
+        'indigo': Color.indigo(),
+        'violet': Color.violet()
+    };
 
     class Dependency {
         constructor(argsDict = {}) {
@@ -897,7 +921,7 @@
     }
 
     const isTouchDevice = 'ontouchstart' in document.documentElement;
-    const DRAW_BORDER = true;
+    const DRAW_BORDER = false;
     function stringFromPoint(point) {
         let x = point[0], y = point[1];
         return `${x} ${y}`;
@@ -960,32 +984,48 @@
     }
 
     class Mobject extends ExtendedObject {
-        constructor(argsDict = {}) {
-            super();
-            // dependency
-            this.dependencies = [];
-            this.snappablePoints = []; // workaround, don't ask
-            this.setDefaults({
+        constructor(argsDict = {}, superCall = false) {
+            super({}, true);
+            let initialArgs = this.defaultArgs();
+            Object.assign(initialArgs, argsDict);
+            Object.assign(initialArgs, this.fixedArgs());
+            this.statelessSetup();
+            //// updating
+            if (!superCall) {
+                this.setAttributes(initialArgs);
+                this.statefulSetup();
+                this.update();
+            }
+        }
+        defaultArgs() {
+            return {
                 transform: Transform.identity(),
                 viewWidth: 100,
                 viewHeight: 100,
                 children: [],
                 visible: true,
                 opacity: 1.0,
+                backgroundColor: Color.clear(),
                 drawBorder: DRAW_BORDER,
                 dependencies: [],
                 interactive: false,
                 vetoOnStopPropagation: false,
                 passAlongEvents: true,
-                draggable: false
-            });
-            this.setView(document.createElement('div'));
+                draggable: false,
+                snappablePoints: [],
+                view: document.createElement('div')
+            };
+        }
+        fixedArgs() {
+            return {};
+        }
+        statelessSetup() {
+            //// state-independent setup
             this.eventTarget = null;
             this.boundPointerDown = this.pointerDown.bind(this);
             this.boundPointerMove = this.pointerMove.bind(this);
             this.boundPointerUp = this.pointerUp.bind(this);
             this.boundEventTargetMobject = this.eventTargetMobject.bind(this);
-            addPointerDown(this.view, this.boundPointerDown);
             //this.boundUpdate = this.update.bind(this)
             this.savedSelfHandlePointerDown = this.selfHandlePointerDown;
             this.savedSelfHandlePointerMove = this.selfHandlePointerMove;
@@ -994,10 +1034,10 @@
             // this.boundCreatePopover = this.createPopover.bind(this)
             // this.boundDismissPopover = this.dismissPopover.bind(this)
             // this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
-            if (this.constructor.name == 'Mobject') {
-                this.update();
-                this.positionView();
-            }
+        }
+        statefulSetup() {
+            this.setupView();
+            addPointerDown(this.view, this.boundPointerDown);
         }
         // position and hierarchy
         get anchor() {
@@ -1062,7 +1102,7 @@
         viewLeftCenter(frame) { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)); }
         viewRightCenter(frame) { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)); }
         viewTopCenter(frame) { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)); }
-        viewBottomCenter(frame) { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)); }
+        viewBottomCenter(frame) { return new Vertex(this.viewMidX(frame), this.viewYMax(frame)); }
         // Equivalent (by default) versions without "view" in the name
         ulCorner(frame) { return this.viewULCorner(frame); }
         urCorner(frame) { return this.viewURCorner(frame); }
@@ -1097,6 +1137,7 @@
         localBottomCenter() { return this.bottomCenter(this); }
         get superMobject() { return this.parent; }
         set superMobject(newValue) { this.parent = newValue; }
+        // move to update?
         get parent() { return this._parent; }
         set parent(newValue) {
             var _a;
@@ -1122,34 +1163,13 @@
             this.submobs = newValue;
         }
         // view and style
-        get opacity() { return this._opacity; }
-        set opacity(newValue) {
-            this._opacity = newValue;
-            if (this.view) {
-                this.view.style.opacity = `${newValue}`;
-            }
-        }
-        get backgroundColor() { return this._backgroundColor; }
-        set backgroundColor(newValue) {
-            this._backgroundColor = newValue;
-            this.view.style.backgroundColor = newValue.toHex();
-        }
-        setView(newView) {
-            var _a, _b;
-            if (newView === this.view) {
-                return;
-            }
-            (_b = (_a = this.view) === null || _a === void 0 ? void 0 : _a.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(this.view);
-            if (this.view) {
-                removePointerDown(this.view, this.boundPointerDown);
-            }
-            this.view = newView;
+        setupView() {
             this.view['mobject'] = this;
             if (this.superMobject) {
                 this.superMobject.view.appendChild(this.view);
             }
             addPointerDown(this.view, this.boundPointerDown); // TODO: move
-            this.positionView();
+            //this.positionView()
             this.view.setAttribute('class', 'mobject-div ' + this.constructor.name);
             this.view.style.transformOrigin = 'top left';
             this.view.style.position = 'absolute'; // 'absolute' positions it relative (sic) to its parent
@@ -1163,12 +1183,17 @@
             this.view.style['transform'] = this.transform.asString();
             this.view.style['width'] = this.viewWidth.toString() + 'px';
             this.view.style['height'] = this.viewHeight.toString() + 'px';
-            this.view.style['left'] = this.anchor.x.toString() + 'px';
-            this.view.style['top'] = this.anchor.y.toString() + 'px';
+            if (this.anchor != undefined) {
+                this.view.style['left'] = this.anchor.x.toString() + 'px';
+                this.view.style['top'] = this.anchor.y.toString() + 'px';
+            }
         }
         add(submob) {
             if (submob.parent != this) {
                 submob.parent = this;
+            }
+            if (this.children == undefined) {
+                console.error(`Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in statefulSetup()`);
             }
             if (!this.children.includes(submob)) {
                 this.children.push(submob);
@@ -1188,13 +1213,20 @@
             }
         }
         redraw(recursive = true) {
-            if (!this.visible || !this.parent) {
-                return;
+            try {
+                if (!this.view) {
+                    return;
+                }
+                this.positionView();
+                this.view.style['background-color'] = this.backgroundColor.toCSS();
+                //if (!this.visible || !this.parent) { return }
+                this.redrawSelf();
+                if (recursive) {
+                    this.redrawSubmobs();
+                }
             }
-            this.positionView();
-            this.redrawSelf();
-            if (recursive) {
-                this.redrawSubmobs();
+            catch (_a) {
+                console.warn(`Unsuccessfully tried to draw ${this.constructor.name} (too soon?)`);
             }
         }
         getPaper() {
@@ -1205,26 +1237,36 @@
             return p;
         }
         show() {
-            if (!this.view) {
-                return;
+            try {
+                if (!this.view) {
+                    return;
+                }
+                this.visible = true;
+                this.view.style["visibility"] = "visible";
+                for (let submob of this.children) {
+                    submob.show();
+                } // we have to propagate visibility bc we have to for invisibility
+                this.redraw();
             }
-            this.visible = true;
-            this.view.style["visibility"] = "visible";
-            for (let submob of this.children) {
-                submob.show();
-            } // we have to propagate visibility bc we have to for invisibility
-            this.redraw();
+            catch (_a) {
+                console.warn(`Unsuccessfully tried to show ${this.constructor.name} (too soon?)`);
+            }
         }
         hide() {
-            if (!this.view) {
-                return;
+            try {
+                if (!this.view) {
+                    return;
+                }
+                this.visible = false;
+                this.view.style["visibility"] = "hidden";
+                for (let submob of this.children) {
+                    submob.hide();
+                } // we have to propagate invisibility
+                this.redraw();
             }
-            this.visible = false;
-            this.view.style["visibility"] = "hidden";
-            for (let submob of this.children) {
-                submob.hide();
-            } // we have to propagate invisibility
-            this.redraw();
+            catch (_a) {
+                console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (too soon?)`);
+            }
         }
         recursiveShow() {
             this.show();
@@ -1271,13 +1313,17 @@
         addDependent(target) {
             this.addDependency(null, target, null);
         }
-        update(argsDict = {}, redraw = true) {
-            // a new view should be set before anything else
-            if (argsDict['view']) {
-                this.setView(argsDict['view']);
-                delete argsDict['view'];
+        initialUpdate(argsDict = {}, superCall = false) {
+            if (superCall) {
+                this.setAttributes(argsDict);
             }
+            else {
+                this.update(argsDict);
+            }
+        }
+        updateModel(argsDict = {}) {
             this.setAttributes(argsDict);
+            //this.positionView()
             this.updateSubmobs();
             for (let dep of this.dependencies || []) {
                 let outputName = this[dep.outputName]; // may be undefined
@@ -1289,7 +1335,10 @@
                 }
                 dep.target.update();
             }
-            if (this.view && redraw) {
+        }
+        update(argsDict = {}, redraw = true) {
+            this.updateModel(argsDict);
+            if (redraw) {
                 this.redraw();
             }
         }
@@ -1324,7 +1373,9 @@
             this.selfHandlePointerUp = this.endSelfDragging;
         }
         disableDragging() {
-            this.passAlongEvents = this.previousPassAlongEvents;
+            if (this.previousPassAlongEvents != undefined) {
+                this.passAlongEvents = this.previousPassAlongEvents;
+            }
             this.selfHandlePointerDown = this.savedSelfHandlePointerDown;
             this.selfHandlePointerMove = this.savedSelfHandlePointerMove;
             this.selfHandlePointerUp = this.savedSelfHandlePointerUp;
@@ -1342,19 +1393,19 @@
                 t = t.parentElement;
                 targetViewChain.push(t);
             }
-            //console.log(targetViewChain)
+            console.log(targetViewChain);
             t = targetViewChain.pop();
             t = targetViewChain.pop();
             while (t != undefined) {
                 if (t['mobject'] != undefined) {
                     let r = t['mobject'];
-                    console.log('event target mob:', r);
+                    //console.log('event target mob:', r)
                     return r;
                 }
                 t = targetViewChain.pop();
             }
             // if all of this fails, you need to handle the event yourself
-            console.log('event target mob:', this);
+            //console.log('event target mob:', this)
             return this;
         }
         pointerDown(e) {
@@ -1366,28 +1417,28 @@
             removePointerDown(this.view, this.boundPointerDown);
             addPointerMove(this.view, this.boundPointerMove);
             addPointerUp(this.view, this.boundPointerUp);
-            //console.log('event target on ', this, 'is', this.eventTarget)
+            console.log('event target on ', this, 'is', this.eventTarget);
             if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-                //console.log('passing on')
+                console.log('passing on');
                 this.eventTarget.pointerDown(e);
             }
             else {
-                //console.log(`handling myself, and I am a ${this.constructor.name}`)
+                console.log(`handling myself, and I am a ${this.constructor.name}`);
                 this.selfHandlePointerDown(e);
             }
         }
         pointerMove(e) {
-            //console.log("event target:", this.eventTarget)
+            //console.log(this, "event target:", this.eventTarget)
             if (this.eventTarget.vetoOnStopPropagation) {
                 return;
             }
             e.stopPropagation();
             if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-                //console.log("here?")
+                //console.log("passing on")
                 this.eventTarget.pointerMove(e);
             }
             else {
-                //console.log("or here?")
+                //console.log(`handling myself, and I am a ${this.constructor.name}`)
                 this.selfHandlePointerMove(e);
             }
         }
@@ -1425,27 +1476,29 @@
         }
     }
     class VMobject extends Mobject {
-        constructor(argsDict = {}) {
-            super();
-            this.vertices = [];
-            this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-            this.svg['mobject'] = this;
-            this.path['mobject'] = this;
-            this.view.appendChild(this.svg); // why not just add?
-            this.svg.appendChild(this.path);
-            this.view.setAttribute('class', this.constructor.name + ' mobject-div');
-            this.svg.setAttribute('class', 'mobject-svg');
-            this.svg.style.overflow = 'visible';
-            this.setDefaults({
+        defaultArgs() {
+            return Object.assign(super.defaultArgs(), {
                 fillColor: Color.white(),
                 fillOpacity: 0,
                 strokeColor: Color.white(),
                 strokeWidth: 1,
             });
-            if (this.constructor.name == 'VMobject') {
-                this.update(argsDict);
-            }
+        }
+        statelessSetup() {
+            super.statelessSetup();
+            this.vertices = [];
+            this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            this.svg['mobject'] = this;
+            this.path['mobject'] = this;
+            this.svg.appendChild(this.path);
+            this.svg.setAttribute('class', 'mobject-svg');
+            this.svg.style.overflow = 'visible';
+        }
+        statefulSetup() {
+            super.statefulSetup();
+            this.view.appendChild(this.svg); // why not just add?
+            this.view.setAttribute('class', this.constructor.name + ' mobject-div');
         }
         redrawSelf() {
             let pathString = this.pathString();
@@ -1530,27 +1583,55 @@
             }
             return yMax;
         }
+        localULCorner() {
+            return new Vertex(this.localXMin(), this.localYMin());
+        }
+        getWidth() { return this.localXMax() - this.localXMin(); }
+        getHeight() { return this.localYMax() - this.localYMin(); }
+        adjustFrame() {
+            let shift = new Transform({ shift: this.localULCorner() });
+            let inverseShift = shift.inverse();
+            let updateDict = {};
+            for (let [key, value] of Object.entries(this)) {
+                var newValue;
+                if (value instanceof Vertex) {
+                    newValue = inverseShift.appliedTo(value);
+                }
+                else if (value instanceof Array && value.length > 0) {
+                    newValue = [];
+                    if (!(value[0] instanceof Vertex)) {
+                        continue;
+                    }
+                    for (let v of value) {
+                        newValue.push(inverseShift.appliedTo(v));
+                    }
+                }
+                else {
+                    continue;
+                }
+                updateDict[key] = newValue;
+            }
+            updateDict['anchor'] = shift.appliedTo(this.anchor);
+            updateDict['viewWidth'] = this.getWidth();
+            updateDict['viewHeight'] = this.getHeight();
+            console.log(updateDict);
+            this.update(updateDict);
+        }
     }
     class CurvedShape extends VMobject {
-        constructor(argsDict = {}) {
-            super();
-            if (this.constructor.name == 'CurvedShape') {
-                this.update(argsDict);
-            }
-        }
         updateBezierPoints() { }
         // implemented by subclasses
-        update(argsDict = {}, redraw = true) {
-            super.update(argsDict, redraw);
+        updateModel(argsDict = {}) {
+            super.updateModel(argsDict);
             this.updateBezierPoints();
         }
         // globalBezierPoints(): Array<Vertex> {
         // 	return this.globalTransform().appliedTo(this.bezierPoints)
         // }
-        redrawSelf() {
-            this.updateBezierPoints();
-            super.redrawSelf();
-        }
+        // redrawSelf() {
+        // 	this.updateBezierPoints()
+        // 	super.redrawSelf()
+        // }
         pathString() {
             //let points: Array<Vertex> = this.globalBezierPoints()
             let points = this.bezierPoints;
@@ -1639,17 +1720,13 @@
     // }
 
     class Circle extends CurvedShape {
-        constructor(argsDict = {}) {
-            super();
-            this.setDefaults({
+        defaultArgs() {
+            return Object.assign(super.defaultArgs(), {
                 midpoint: Vertex.origin(),
                 radius: 10
             });
-            if (this.constructor.name == 'Circle') {
-                this.update(argsDict);
-            }
         }
-        update(argsDict = {}, redraw = true) {
+        updateModel(argsDict = {}) {
             let r = argsDict['radius'] || this.radius;
             let a = argsDict['anchor'];
             if (a != undefined) {
@@ -1661,7 +1738,7 @@
             }
             argsDict['viewWidth'] = 2 * r;
             argsDict['viewHeight'] = 2 * r;
-            super.update(argsDict, redraw);
+            super.updateModel(argsDict);
         }
         updateBezierPoints() {
             let newBezierPoints = [];

@@ -75,9 +75,10 @@ export class Pendulum extends LinkableMobject {
 		})
 	}
 
-	angle() {
+	angle(): number {
 		let dt: number = (Date.now() - this.initialTime) % this.period
-		return this.initialAngle * Math.cos(2 * Math.PI * dt/this.period)
+		let value = this.initialAngle * Math.cos(2 * Math.PI * dt/this.period)
+		return value
 	}
 
 	updateModel(argsDict: object = {}) {
@@ -85,8 +86,9 @@ export class Pendulum extends LinkableMobject {
 		super.updateModel(argsDict)
 		//if (this.fixture == undefined) { return }
 
-		let angle: number = argsDict['initialAngle'] || this.angle()
+		let angle: number = argsDict['initialAngle'] ?? this.angle()
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.length)
+		
 		this.string.updateModel({
 			endPoint: newEndPoint
 		})
@@ -133,7 +135,8 @@ export class CreatedPendulum extends CreatedMobject {
 	dissolveInto(paper: Paper) {
 		super.dissolveInto(paper)
 		this.pendulum.update({
-			initialTime: Date.now()
+			initialTime: Date.now(),
+			period: 500 * this.pendulum.length ** 0.5 // ms
 		})
 		this.pendulum.run()
 	}
