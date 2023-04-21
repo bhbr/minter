@@ -42,7 +42,7 @@ export class Paper extends LinkableMobject {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			interactive: true,
-			draggable: false
+			draggable: true
 		})
 	}
 
@@ -50,10 +50,12 @@ export class Paper extends LinkableMobject {
 		super.statelessSetup()
 		this.currentColor = COLOR_PALETTE['white']
 		this.background = new Rectangle({
-			fillColor: Color.black(),
+			fillColor: Color.clear(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			passAlongEvents: true
+			passAlongEvents: false,
+			interactive: false,
+			draggable: false
 		})
 
 
@@ -128,23 +130,12 @@ export class Paper extends LinkableMobject {
 	startDragging(e: LocatedEvent) {
 		console.log('startDragging')
 		this.draggedMobject = this.eventTargetMobject(e)
-		if (this.draggedMobject == this) {
-			// check if we hit a CindyCanvas
-			for (let c of this.cindys) {
-				let p: Vertex = pointerEventVertex(e)
-				let p1: boolean = (p.x > c.anchor.x)
-				let p2: boolean = (p.y > c.anchor.y)
-				let p3: boolean = (p.x < c.anchor.x + c.viewWidth)
-				let p4: boolean = (p.y < c.anchor.y + c.viewHeight)
-				if (p1 && p2 && p3 && p4) {
-					this.draggedMobject = c
-					break
-				}
-			}
-		}
+		if (this.draggedMobject == this.background) { this.draggedMobject = this }
 		console.log('dragged:', this.draggedMobject)
-		if (this.draggedMobject == this || !this.draggedMobject.draggable) {
-			this.draggedMobject = undefined
+		if (!this.draggedMobject.draggable) { return }
+		if (this.draggedMobject == this) {
+			this.startSelfDragging(e)
+			//this.draggedMobject = undefined
 			return
 		}
 		this.dragPointStart = pointerEventVertex(e)
@@ -164,6 +155,12 @@ export class Paper extends LinkableMobject {
 
 	dragging(e: LocatedEvent) {
 		if (this.draggedMobject == undefined) { return }
+
+		if (this.draggedMobject == this) {
+			this.selfDragging(e)
+			return
+		}
+
 		let dragPoint = pointerEventVertex(e)
 		let dr = dragPoint.subtract(this.dragPointStart)
 		console.log(this.dragAnchorStart)
@@ -180,9 +177,24 @@ export class Paper extends LinkableMobject {
 	}
 
 	endDragging(e: LocatedEvent) {
-		this.dragPointStart = undefined
-		this.dragAnchorStart = undefined
+		if (this.draggedMobject = this) {
+			this.endSelfDragging(e)
+		}
 		this.draggedMobject = undefined
+	}
+
+	endSelfDragging(e: LocatedEvent) {
+		let dr = this.anchor.subtract(this.dragAnchorStart)
+		this.update({
+			anchor: this.dragAnchorStart
+		})
+		for (let submob of this.submobs) {
+			if (submob == this.background) { continue }
+			submob.update({
+				anchor: submob.anchor.add(dr)
+			})
+		}
+		super.endSelfDragging(e)
 	}
 
 	handleMessage(message: object) {

@@ -617,7 +617,7 @@ export class MGroup extends Mobject {
 
 	statefulSetup() {
 		super.statefulSetup()
-		// children may have been set as a constructor args
+		// children may have been set as constructor args
 		for (let submob of this.children) {
 			this.add(submob)
 		}

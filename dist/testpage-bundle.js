@@ -1,12 +1,24 @@
 (function () {
     'use strict';
 
+    // Problem: When updating a Mobject with setAttributes(argsDict),
+    // some atttributes should only be copied (passed by value), not linked (passed by reference).
+    // This mainly concerns Vertex. E. g. if one Mobject's anchor is set to another's
+    // by reference, these two attributes nwo point to the same object. Changing one Mobject's
+    // anchor now changes the other as well.
+    // The issue stems from the fact that a Vertex is an object even though it should
+    // just be a "dumb" list of numbers (a struct) without a persistent identity.
+    // Solution: An ExtendedObject has a flag passedByValue, which is taken into account
+    // when updating a Mobject's attribute with such an ExtendedObject as argument.
     class ExtendedObject {
         constructor(argsDict = {}, superCall = true) {
-            this.passedByValue = false;
+            // this signature needs to align with the constructor signature os Mobject,
+            // where the roll of superCall will become clear
+            this.passedByValue = false; // the default is pass-by-reference
             this.setAttributes(argsDict);
         }
         properties() {
+            // get a list of all of the objects property names, form most specific to most abstract
             let obj = this;
             let properties = [];
             // this loop walks up the superclass hierarchy and collects all inherited properties
@@ -17,7 +29,10 @@
             return properties;
         }
         setter(key) {
-            // a key can refer to a property or an accessor (getter/setter)
+            // when updating a Mobject with mob.setAttributes({prop: value}),
+            // the key "prop" can refer to either:
+            //  - a property (mob["prop"]) or
+            //  - an accessor (getter/setter mob.prop)
             // this picks the right one to call in setAttributes
             // so we don't create properties that shouldn't be objects in their own right
             let descriptor = undefined;
@@ -36,6 +51,10 @@
             }
         }
         setAttributes(argsDict = {}) {
+            // update the object with the given attribute names and values
+            // always change a nobject via this method,
+            // it will automatically check for mutability
+            // and pick the right setter method
             for (let [key, value] of Object.entries(argsDict)) {
                 let setter = this.setter(key);
                 if (setter != undefined) {
@@ -48,29 +67,35 @@
                 else {
                     // we have an as-of-yet unknown property
                     if (value != undefined && value.passedByValue) {
-                        // create and copy
+                        // create and copy (pass-by-value)
                         if (this[key] == undefined) {
                             this[key] = new value.constructor();
                         }
                         this[key].copyFrom(value);
                     }
                     else {
-                        // just link
+                        // just link (pass-by-reference)
                         this[key] = value;
                     }
                 }
             }
         }
         fixedArgs() { return {}; }
+        // filled upon subclassing
         assureProperty(key, cons) {
             if (this[key] == undefined) {
                 this[key] = new cons();
             }
         }
-        // we often cannot set default values for properties as declarations alone
-        // as these get set too late (at the end of the constructor)
-        // instead we call setDefaults at the appropriate time earlier in the constructor
         setDefaults(argsDict = {}) {
+            // we often cannot set default values for properties as declarations alone
+            // (before and outside the methods) as these get set too late
+            // (at the end of the constructor)
+            // instead we call setDefaults at the appropriate time earlier in the constructor
+            // the argsDict is considered as soft suggestions, only for properties
+            // that have not yet been set
+            // this is in opposition to setAttributes which has the mandate
+            // to overwrite existing properties
             let undefinedKVPairs = {};
             for (let [key, value] of Object.entries(argsDict)) {
                 if (this[key] == undefined) {
@@ -923,10 +948,12 @@
     const isTouchDevice = 'ontouchstart' in document.documentElement;
     const DRAW_BORDER = false;
     function stringFromPoint(point) {
+        // a string representation for CSS
         let x = point[0], y = point[1];
         return `${x} ${y}`;
     }
     function remove(arr, value, all = false) {
+        // remove an object from an Array
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] == value) {
                 arr.splice(i, 1);
@@ -936,8 +963,12 @@
             }
         }
     }
+    // any Event that has an associated location on the screen
+    // it can be triggered by a mouse, a finger or a stylus
     function pointerEventPageLocation(e) {
-        let t = null;
+        // subtract the sidebar's width if necessary
+        // i. e. if running in the browser (minter.html)
+        // instead of in the app (paper.html)
         let sidebarWidth = 0;
         try {
             let sidebar = document.querySelector('#sidebar');
@@ -945,6 +976,7 @@
         }
         catch (_a) {
         }
+        let t = null;
         if (e instanceof MouseEvent) {
             t = e;
         }

@@ -4,12 +4,14 @@ export const isTouchDevice: boolean = 'ontouchstart' in document.documentElement
 export const DRAW_BORDER: boolean = false
 
 export function stringFromPoint(point: Array<number>): string {
+	// a string representation for CSS
 	let x: number = point[0],
 		y: number = point[1]
 	return `${x} ${y}`
 }
 
 export function remove(arr: Array<any>, value: any, all: boolean = false) {
+	// remove an object from an Array
    for (let i = 0; i < arr.length; i++) {
 		if (arr[i] == value) {
 			arr.splice(i,1)
@@ -20,7 +22,6 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 
 
 // replicate RGB(A) notation from CSS
-//function rgb(r, g, b) { return `rgb(${255*r}, ${255*g}, ${255*b})` }
 export function rgba(r: number, g: number, b: number, a: number): string {
 	return `rgb(${255*r}, ${255*g}, ${255*b}, ${a})`
 }
@@ -78,15 +79,20 @@ export function removeLongPress(element: Element) {
 }
 
 export type LocatedEvent = PointerEvent | MouseEvent | TouchEvent
+// any Event that has an associated location on the screen
+// it can be triggered by a mouse, a finger or a stylus
 
 export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
-	let t: MouseEvent | Touch = null
+	// subtract the sidebar's width if necessary
+	// i. e. if running in the browser (minter.html)
+	// instead of in the app (paper.html)
 	let sidebarWidth: number = 0
 	try {
 		let sidebar: Element = document.querySelector('#sidebar')
 		sidebarWidth = sidebar.clientWidth
 	} catch {
 	}
+	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }
 	else { t = e.changedTouches[0] }
 	return [t.pageX - sidebarWidth, t.pageY]
@@ -130,6 +136,8 @@ export function removePointerUp(element: HTMLElement, method: (Event) => void) {
 	element.removeEventListener('pointerup', method, { capture: true })
 }
 
+// logging inside HTML instead of the console
+// for debugging the app
 export function logInto(obj: any, id: string) {
 	let msg = obj.toString()
 	let newLine: HTMLElement = document.createElement('p')
@@ -144,7 +152,7 @@ export function logInto(obj: any, id: string) {
 export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console') }
 
 
-
+// mixins allow to inherit from multiple classes (kinda)
 // https://www.typescriptlang.org/docs/handbook/mixins.html
 export function applyMixins(derivedCtor: any, constructors: any[]) {
   constructors.forEach((baseCtor) => {
