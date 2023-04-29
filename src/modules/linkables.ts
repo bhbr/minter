@@ -1,11 +1,9 @@
 import { Vertex } from './vertex-transform'
-import { Mobject, MGroup } from './mobject'
-import { VMobject } from './vmobject'
-import { TextLabel } from './textlabel'
+import { Mobject, VMobject, MGroup, TextLabel } from './mobject'
 import { Dependency } from './dependency'
 import { Color } from './color'
 import { Circle, RoundedRectangle } from './shapes'
-import { pointerEventVertex, LocatedEvent, paperLog, EventHandlingMode } from './helpers'
+import { pointerEventVertex, LocatedEvent, paperLog } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
@@ -19,44 +17,39 @@ export class LinkHook extends Circle {
 	inputName: string
 	outputName: string
 
-	readonly _radius = BULLET_SIZE
-	readonly fillOpacity = 0
-	readonly strokeColor = Color.white()
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {        
+			radius: BULLET_SIZE,
+			fillOpacity: 0,
+			strokeColor: Color.white()
+		})
 	}
-
 }
 
 
 export class InputList extends RoundedRectangle {
 
-	listInputNames: Array<string> = []
-	hookLocationDict = {}
-	readonly cornerRadius = 20
-	readonly fillColor = Color.white()
-	readonly fillOpacity = 0.2
-	readonly strokeWidth = 0
-	width = 150
+	listInputNames: Array<string>
+	hookLocationDict: object
 	mobject: Mobject
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			listInputNames: [],
+			hookLocationDict: {},
+			cornerRadius: 20,
+			fillColor: Color.white(),
+			fillOpacity: 0.2,
+			strokeWidth: 0,
+			width: 150
+		})
 	}
 
-	setup() {
-		super.setup()
+	statefulSetup() {
+		super.statefulSetup()
 		this.createHookList()
-		//this.update({ height: this.getHeight() }, false)
+		this.update({ height: this.getHeight() }, false)
 	}
 
 	createHookList() {
@@ -74,7 +67,7 @@ export class InputList extends RoundedRectangle {
 			this.add(t)
 			c.update({ anchor: new Vertex([15, -10 + 25 * (i + 1)]) })
 			t.update({ anchor: c.anchor.translatedBy(25, 0) })
-			this.hookLocationDict[name] = c.parent.localPointRelativeTo(c.midpoint, t.getPaper())
+			this.hookLocationDict[name] = c.parent.transformLocalPoint(c.midpoint, t.getPaper())
 		}
 	}
 
@@ -84,9 +77,9 @@ export class InputList extends RoundedRectangle {
 		else { return 40 + 25 * this.listInputNames.length }
 	}
 
-	updateSelf(args = {}, redraw = true) {
-		args['height'] = this.getHeight()
-		super.updateSelf(args, redraw)
+	updateModel(argsDict: object = {}) {
+		argsDict['height'] = this.getHeight()
+		super.updateModel(argsDict)
 	}
 }
 
@@ -94,27 +87,26 @@ export class InputList extends RoundedRectangle {
 
 export class OutputList extends RoundedRectangle {
 
-	listOutputNames: Array<string> = []
-	hookLocationDict = {}
-	readonly cornerRadius = 20
-	readonly fillColor = Color.white()
-	readonly fillOpacity = 0.3
-	readonly strokeWidth = 0
-	readonly width = 150
+	listOutputNames: Array<string>
+	hookLocationDict: object
 	mobject: Mobject
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			listOutputNames: [],
+			hookLocationDict: {},
+			cornerRadius: 20,
+			fillColor: Color.white(),
+			fillOpacity: 0.3,
+			strokeWidth: 0,
+			width: 150
+		})
 	}
 
-	setup() {
-		super.setup()
+	statefulSetup() {
+		super.statefulSetup()
 		this.createHookList()
-		//this.update({ height: this.getHeight() }, false)
+		this.update({ height: this.getHeight() }, false)
 	}
 
 	getHeight(): number {
@@ -141,85 +133,92 @@ export class OutputList extends RoundedRectangle {
 			this.add(t)
 			c.update({ anchor: new Vertex([15, -10 + 25 * (i + 1)]) })
 			t.update({ anchor: c.anchor.translatedBy(25, 0) })
-			this.hookLocationDict[name] = c.parent.localPointRelativeTo(c.midpoint, t.getPaper())
+			this.hookLocationDict[name] = c.parent.transformLocalPoint(c.midpoint, t.getPaper())
 		}
 	}
 
-	updateSelf(args = {}, redraw = true) {
-		args['height'] = this.getHeight()
-		super.updateSelf(args,redraw)
+	updateModel(argsDict: object = {}) {
+		argsDict['height'] = this.getHeight()
+		super.updateModel(argsDict)
 	}
 
 }
 
 export class IOList extends MGroup {
 
-	inputList = new InputList()
-	outputList = new OutputList()
-	listInputNames: Array<string> = []
-	listOutputNames: Array<string> = []
+	inputList: InputList
+	outputList: OutputList
+	listInputNames: Array<string>
+	listOutputNames: Array<string>
 	mobject: Mobject
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			listInputNames: [],
+			listOutputNames: []
+		})
 	}
 
-	setup() {
-		super.setup()
+	statelessSetup() {
+		this.inputList = new InputList()
+		this.outputList = new OutputList()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.inputList.listInputNames = this.listInputNames
 		this.outputList.listOutputNames = this.listOutputNames
 		this.inputList.mobject = this.mobject
 		this.outputList.mobject = this.mobject
-		this.inputList.setup()  // rework this
-		this.outputList.setup() // rework this
+		this.inputList.statefulSetup()  // rework this
+		this.outputList.statefulSetup() // rework this
 		this.add(this.inputList)
 		this.add(this.outputList)
 	}
 
-	updateSelf(args = {}, redraw) {
-		super.updateSelf(args, redraw)
-		this.inputList.update(args, false)  // will get redrawn when shown
-		this.outputList.update(args, false) // will get redrawn when shown
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+		this.inputList.updateModel(argsDict)
+		this.outputList.updateModel(argsDict)
 	}
 }
 
 export class DependencyMap extends MGroup {
 
-	linkLines: Array<LinkLine> = []
-	editedLinkLine?: LinkLine = null
-	pointerUpVertex?: Vertex = null
-	startMobject?: Mobject = null
+	linkLines: Array<LinkLine>
+	editedLinkLine: LinkLine
+	pointerUpVertex: Vertex
+	startMobject: Mobject
 	mobject: Mobject
-	readonly interactive = true
-	eventHandlingMode: EventHandlingMode = "self"
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			linkLines: []
+		})
+	}
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			interactive: true
+		})
 	}
 
 	selfHandlePointerDown(e: LocatedEvent) {
-		let t: Mobject = this.lowestTargetedMobject(e)
-		if (!(t instanceof LinkHook)) { return }
-
-		let tl = t as LinkHook
-		let llStart = tl.relativeCenter(this)
-		this.editedLinkLine = new LinkLine({
-			startPoint: llStart,
-			source: tl.mobject,
-			inputName: t.outputName,
-			startHook: tl,
-			superMobject: this.superMobject
-		})
-		this.add(this.editedLinkLine)
-		this.startMobject = tl.mobject
+		let t: Mobject = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
+		// find a better way to handle this!
+		if (t instanceof LinkHook) {
+			let tl = t as LinkHook
+			let llStart = tl.center(this)
+			this.editedLinkLine = new LinkLine({
+				startPoint: llStart,
+				source: tl.mobject,
+				inputName: t.outputName,
+				startHook: tl,
+				superMobject: this.superMobject
+			})
+			this.add(this.editedLinkLine)
+			this.startMobject = tl.mobject
+		}
 	}
 
 	selfHandlePointerMove(e: LocatedEvent) {
@@ -228,9 +227,10 @@ export class DependencyMap extends MGroup {
 		this.editedLinkLine.updateFromTip(this.snapInput(p))
 	}
 
+
 	selfHandlePointerUp(e: LocatedEvent) {
 		let line: LinkLine = this.editedLinkLine
-		let tcircle: any = this.lowestTargetedMobject(e)
+		let tcircle: any = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
 
 		let tl: LinkHook = null
 		if (tcircle.constructor.name == 'Circle') {
@@ -239,8 +239,8 @@ export class DependencyMap extends MGroup {
 				if (!(iol instanceof IOList)) { continue }
 				for (let b of iol.inputList.children) {
 					if (!(b instanceof LinkHook)) { continue }
-					let bc = b.relativeCenter(this.parent)
-					let tc = (tcircle as Circle).relativeCenter(this.parent)
+					let bc = b.center(this.parent)
+					let tc = (tcircle as Circle).center(this.parent)
 					if (bc.x == tc.x && bc.y == tc.y) {
 						tl = b
 						break
@@ -281,7 +281,7 @@ export class DependencyMap extends MGroup {
 			if (!(ioList instanceof IOList)) { continue }
 			let dict = ioList.inputList.hookLocationDict
 			for (let inputName of Object.keys(dict)) {
-				let loc = ioList.inputList.transformRelativeTo(this).appliedTo(dict[inputName])
+				let loc = ioList.inputList.relativeTransform(this).appliedTo(dict[inputName])
 				arr.push([loc, ioList.mobject, inputName])
 			}
 		}
@@ -294,7 +294,7 @@ export class DependencyMap extends MGroup {
 			if (!(ioList instanceof IOList)) { continue }
 			let dict = ioList.outputList.hookLocationDict
 			for (let outputName of Object.keys(dict)) {
-				let loc = ioList.outputList.transformRelativeTo(this).appliedTo(dict[outputName])
+				let loc = ioList.outputList.relativeTransform(this).appliedTo(dict[outputName])
 				arr.push([loc, ioList.mobject, outputName])
 			}
 		}
@@ -315,9 +315,9 @@ export class DependencyMap extends MGroup {
 		return [null, null]
 	}
 
-	fixLinkLine(args: object) {
-		let p: Vertex = args['fromPoint']
-		let q: Vertex = args['toPoint']
+	fixLinkLine(argsDict: object) {
+		let p: Vertex = argsDict['fromPoint']
+		let q: Vertex = argsDict['toPoint']
 		let [source, outputName] = this.getOutputFromVertex(p)
 		let [target, inputName] = this.getInputFromVertex(q)
 		if (source == null || target == null) {
@@ -329,16 +329,16 @@ export class DependencyMap extends MGroup {
 
 	}
 
-	updateSelf(args = {}, redraw = true) {
+	updateModel(argsDict: object = {}) {
 		for (let line of this.linkLines) {
-			line.startBullet.update({
-				midpoint: line.startHook.relativeCenter(this)
-			}, false) // will get redrawn when shown
-			line.endBullet.update({
-				midpoint: line.endHook.relativeCenter(this)
-			}, false) // will get redrawn when shown
+			line.startBullet.updateModel({
+				midpoint: line.startHook.center(this)
+			})
+			line.endBullet.updateModel({
+				midpoint: line.endHook.center(this)
+			})
 		}
-		super.updateSelf(args, redraw)
+		super.updateModel(argsDict)
 	}
 
 }
@@ -346,38 +346,35 @@ export class DependencyMap extends MGroup {
 
 export class LinkLine extends CreatedMobject {
 
-	startBullet = new Circle({
-		radius: BULLET_SIZE - 4,
-		fillOpacity: 1
-	})
-	endBullet = new Circle({
-		radius: BULLET_SIZE - 4,
-		fillOpacity: 1
-	})
+	startBullet: Circle
+	endBullet: Circle
 	startHook: LinkHook
 	endHook?: LinkHook
-	line = new Segment({
-		strokeWidth: 5
-	})
+	line: Segment
 	source: LinkableMobject
 	inputName: string
 	target: Mobject
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	statelessSetup() {
+		super.statelessSetup()
+		this.startBullet = new Circle({
+			radius: BULLET_SIZE - 4,
+			fillOpacity: 1
+		})
+		this.line = new Segment({
+			strokeWidth: 5
+		})
+		this.endBullet = new Circle({
+			radius: BULLET_SIZE - 4,
+			fillOpacity: 1
+		})
 	}
 
-	setup() {
-		super.setup()
+	statefulSetup() {
+		super.statefulSetup()
 		this.add(this.startBullet)
 		this.add(this.line)
 		this.add(this.endBullet)
-
-		// shouldn't the following be in updateSelf?
 		this.startBullet.update({
 			midpoint: this.startPoint
 		}, false)
@@ -409,38 +406,36 @@ export class LinkLine extends CreatedMobject {
 		this.update({endPoint: q})
 	}
 
-	updateSelf(args = {}, redraw) {
+	updateModel(argsDict: object = {}) {
 		if (this.startHook != undefined && this.startBullet != undefined) {
-			this.startBullet.centerAt(this.startHook.relativeCenter(this.superMobject), this.superMobject)
+			this.startBullet.centerAt(this.startHook.center(this.superMobject), this.superMobject)
 		}
 
 		if (this.endHook != undefined && this.endBullet != undefined) {
-			this.endBullet.centerAt(this.endHook.relativeCenter(this.superMobject), this.superMobject)
+			this.endBullet.centerAt(this.endHook.center(this.superMobject), this.superMobject)
 		}
 		if (this.line != undefined && this.startHook != undefined && this.endHook != undefined) {
-			this.line.updateSelf({
-				startPoint: this.startHook.relativeCenter(this.superMobject),
-				endPoint: this.endHook.relativeCenter(this.superMobject)
+			this.line.updateModel({
+				startPoint: this.startHook.center(this.superMobject),
+				endPoint: this.endHook.center(this.superMobject)
 			})
 		}
-		super.updateSelf(args, redraw)
+		super.updateModel(argsDict)
 	}
 }
 
-
 export class LinkableMobject extends Mobject {
 
-	inputNames: Array<string> = []
-	outputNames: Array<string> = []
+	inputNames: Array<string>
+	outputNames: Array<string>
 	dependencyMap: DependencyMap
 	cindys: Array<CindyCanvas>
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			inputNames: [],  // linkable parameters
+			outputNames: [], // linkable parameters
+		})
 	}
 
 	dependenciesBetweenChildren(): Array<Dependency> {
@@ -474,11 +469,11 @@ export class LinkableMobject extends Mobject {
 			listOutputNames: submob.outputNames,
 		})
 		this.dependencyMap.add(ioList)
-		let p1: Vertex = ioList.inputList.relativeBottomCenter(this)
-		let p2: Vertex = submob.relativeTopCenter(this)
+		let p1: Vertex = ioList.inputList.bottomCenter(this)
+		let p2: Vertex = submob.topCenter(this)
 		ioList.inputList.update({ anchor: ioList.inputList.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] - 10)})
-	 	let p3: Vertex = ioList.outputList.relativeTopCenter(this)
-		let p4: Vertex = submob.relativeBottomCenter(this)
+	 	let p3: Vertex = ioList.outputList.topCenter(this)
+		let p4: Vertex = submob.bottomCenter(this)
 		ioList.outputList.update({ anchor: ioList.outputList.anchor.translatedBy(p4[0] - p3[0], p4[1] - p3[1] + 10)})
 		ioList.update()
 	}
@@ -501,8 +496,8 @@ export class LinkableMobject extends Mobject {
 		}
 	}
 
-	updateSelf(args = {}, redraw = true) {
-		super.updateSelf(args ,redraw)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 		this.updateIOList()
 	}
 }

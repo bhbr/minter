@@ -1,60 +1,32 @@
-import { Vertex } from './vertex-transform'
-import { MGroup } from './mobject'
-import { Polygon } from './vmobject'
-import { ulCorner, getWidth, getHeight, EventHandlingMode } from './helpers'
-import { Color } from './color'
+import { Vertex, Transform } from './vertex-transform'
+import { MGroup, Polygon } from './mobject'
 
 export class Arrow extends Polygon {
+	startPoint: Vertex
+	endPoint: Vertex
 
-	startPoint = Vertex.origin()
-	endPoint = Vertex.origin()
-	eventHandlingMode: EventHandlingMode = "background"
-
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			startPoint: Vertex.origin(),
+			endPoint: Vertex.origin()
+		})
 	}
 
-	updateSelf(args = {}, redraw = true) {
-		super.updateSelf(args, false)
-		this.adjustFrame()
-		if (redraw) { this.redrawSelf() }
-	}
-
-	adjustFrame() {
-		let points = [this.startPoint, this.endPoint]
-		this.anchor = ulCorner(points)
-		this.viewWidth = getWidth(points)
-		this.viewHeight = getHeight(points)
-	}
 
 }
 
 export class Segment extends Arrow {
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
-	}
 
 	components(): Vertex {
 		return this.endPoint.subtract(this.startPoint)
 	}
 
-	updateSelf(args: object = {}, redraw = true) {
-		super.updateSelf(args, false)
-		let sp = this.drawingStartPoint()
-		let ep = this.drawingEndPoint()
-		let p = sp.subtract(this.anchor)
-		let q = ep.subtract(this.anchor)
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+		let p: Vertex = this.drawingStartPoint()
+		let q: Vertex = this.drawingEndPoint()
 		this.vertices = [p, q]
-		if (redraw) { this.redrawSelf() }
 
 	}
 
@@ -84,3 +56,67 @@ export class Line extends Ray {
 
 }
 
+
+// export class Arrow extends MGroup {
+
+//     constructor(start = Vertex.origin(), end = Vertex.origin()) {
+//         super()
+//         if (end == null) {
+//             this.components = new Vertex(start)
+//         } else {
+//             this.startPoint = new Vertex(start)
+//             this.components = new Vertex(end)
+//         }
+//         this.stem = new Segment(Vertex.origin(), this.components())
+//         this.add(this.stem)
+//         this.tip = new Polygon(this.tipPoints())
+//         this.add(this.tip)
+//     }
+
+//     get startPoint() { return this.anchor }
+//     set startPoint(newValue) { this.anchor = new Vertex(newValue) }
+
+//     tipPoints() {
+//         let w = new Scaling(-0.2).appliedTo(this.components)
+//         let w1 = new Rotation(Math.PI/8).appliedTo(w)
+//         let w2 = new Rotation(-Math.PI/8).appliedTo(w)
+//         return new Translation(this.components).appliedTo([Vertex.origin(), w1, w2])
+
+//     }
+
+//     get endPoint() {
+//         return this.startPoint.translatedBy(this.components)
+//     }
+
+//     set endPoint(newValue) {
+//         this.components = new Vertex(newValue).subtract(this.startPoint)
+//     }
+
+//     redraw() {
+
+//         if (this.view == undefined || this.components == undefined) { return }
+
+//         if (this.visible && this.components.isNaN()) {
+//             this.visible = false
+//         }
+//         if (!this.visible && !this.components.isNaN()) {
+//             this.visible = true
+//         }
+
+//         if (this.stem != undefined) {
+//             this.stem.anchor = Vertex.origin()
+//             this.stem.vertices = [Vertex.origin(), this.components]
+//         }
+//         if (this.tip != undefined) {
+//             this.tip.anchor = Vertex.origin()
+//             this.tip.vertices = this.tipPoints()
+//         }
+//         super.redraw()
+//     }
+
+//     norm2() { return this.components.norm2() }
+//     norm() { return Math.sqrt(this.norm2()) }
+
+// }
+
+// export class Vector extends Arrow {}

@@ -26,3 +26,8 @@ lib/sidebar.js
 lib/testpage.js
 src/.DS_Store
 *.js
+lib/modules/createdslider.js
+lib/.DS_Store
+lib/testpage.js
+node_modules/.DS_Store
+src-unmigrated/.DS_Store

@@ -1,67 +1,256 @@
 import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Dependency } from './dependency'
-import { Frame } from './frame'
-import { pointerEventVertex, LocatedEvent, EventHandlingMode } from './helpers'
-import { DRAW_BORDER, paperLog } from './helpers'
-import { addPointerDown, removePointerDown } from './helpers'
-import { addPointerMove, removePointerMove } from './helpers'
-import { addPointerUp, removePointerUp } from './helpers'
+import { ExtendedObject } from './extended-object'
+import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog, DRAW_BORDER } from './helpers'
 
-export class Mobject extends Frame {
 
-	_parent?: Mobject = null
-	children: Array<Mobject> = []
+export class Mobject extends ExtendedObject {
+
+	// position and hierarchy
+	transform: Transform
+	_parent?: Mobject
+	viewWidth: number
+	viewHeight: number
+	children: Array<Mobject>
 
 	// view and style
-	readonly view: HTMLDivElement = document.createElement('div')
-	visible = true
-	opacity = 1
-	backgroundColor = Color.clear()
-	drawBorder = DRAW_BORDER
+	view?: HTMLDivElement
+	visible: boolean
+	opacity: number
+	backgroundColor: Color
+	drawBorder: boolean
 
 	// dependency
-	dependencies: Array<Dependency> = []
+	dependencies: Array<Dependency>
 
 	// interactivity
-	eventTarget?: Mobject = null
-	eventHandlingMode: EventHandlingMode = "parent"
-	previousEventHandlingMode?: EventHandlingMode = null
-	draggable: boolean = false
-	dragPointStart?: Vertex = null
-	dragAnchorStart?: Vertex = null
+	eventTarget?: Mobject
+	vetoOnStopPropagation: boolean
+	interactive: boolean
+	passAlongEvents: boolean // to event target
+	previousPassAlongEvents?: boolean // stored copy while temporarily set to false when draggable
+	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
+	snappablePoints: Array<any> // workaround, don't ask
+	dragPointStart?: Vertex
+	dragAnchorStart?: Vertex
 
 
-	constructor(args = {}, superCall = false) {
+	constructor(argsDict: object = {}, superCall = false) {
 		super({}, true)
+
+		let initialArgs = this.defaultArgs()
+		Object.assign(initialArgs, argsDict)
+		Object.assign(initialArgs, this.fixedArgs())
+
+		this.statelessSetup()
+		//// updating
 		if (!superCall) {
-			if (args['view'] !== undefined) {
-				if (args['view'] instanceof HTMLDivElement) {
-					this.view = args['view']
-				} else {
-					console.error("Only HTMLDivElements can be a Mobject's view")
-				}
-			}
-			this.setup()
-			this.update(args)
+			this.setAttributes(initialArgs)
+			this.statefulSetup()
+			this.update()
 		}
 	}
 
+	defaultArgs(): object {
+		return {
+			transform: Transform.identity(),
+			viewWidth: 100,
+			viewHeight: 100,
+			children: [],
 
-	// hierarchy //
+			visible: true,
+			opacity: 1.0,
+			backgroundColor: Color.clear(),
+			drawBorder: DRAW_BORDER,
+
+			dependencies: [],
+
+			interactive: false,
+			vetoOnStopPropagation: false,
+			passAlongEvents: true,
+			draggable: false,
+			snappablePoints: [],
+
+			view: document.createElement('div')
+		}
+	}
+
+	fixedArgs(): object {
+		return {}
+	}
+
+
+	statelessSetup() {
+		//// state-independent setup
+
+		this.eventTarget = null
+		this.boundPointerDown = this.pointerDown.bind(this)
+		this.boundPointerMove = this.pointerMove.bind(this)
+		this.boundPointerUp = this.pointerUp.bind(this)
+		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
+		//this.boundUpdate = this.update.bind(this)
+		
+		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
+		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
+		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+
+		this.disableDragging()
+
+		// this.boundCreatePopover = this.createPopover.bind(this)
+		// this.boundDismissPopover = this.dismissPopover.bind(this)
+		// this.boundMouseUpAfterCreatingPopover = this.mouseUpAfterCreatingPopover.bind(this)
+
+
+	}
+
+	statefulSetup() {
+		this.setupView()
+		addPointerDown(this.view, this.boundPointerDown)
+	}
+
+	// position and hierarchy
+
+	get anchor(): Vertex {
+		return this.transform.anchor
+	}
+
+	set anchor(newValue: Vertex) {
+		if (!this.transform) {
+			this.transform = Transform.identity()
+		}
+		this.transform.anchor = newValue
+	}
+
+	centerAt(newCenter: Vertex, frame?: Mobject) {
+		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+		frame = frame || this.parent || this
+		let dr: Vertex = newCenter.subtract(this.center(frame))
+		let oldAnchor: Vertex = this.anchor.copy()
+		this.anchor = this.anchor.translatedBy(dr[0], dr[1])
+	}
+
+
+	relativeTransform(frame?: Mobject): Transform {
+		// If there is no frame, use the parent's coordinate frame. If there is no parent yet, use local coordinates
+		frame = frame || this.parent || this
+		let t = Transform.identity()
+		let mob: Mobject = this
+		while (mob && mob.transform instanceof Transform) {
+			if (mob == frame) { break }
+			t.leftComposeWith(new Transform({ shift: mob.anchor }))
+			t.leftComposeWith(mob.transform)
+			mob = mob.parent
+		}
+		return t
+	}
+
+	transformLocalPoint(point: Vertex, frame?: Mobject): Vertex {
+		let t = this.relativeTransform(frame)
+		return t.appliedTo(point)
+
+	}
+
+	// The following geometric properties are first computed from the view frame.
+	// The versions without "view" in the name can be overriden by subclasses,
+	// e. g. SVGMobjects.
+
+	viewULCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(Vertex.origin(), frame)
+	}
+
+	viewURCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth, 0), frame)
+	}
+
+	viewLLCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(0, this.viewHeight), frame)
+	}
+
+	viewLRCorner(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth, this.viewHeight), frame)
+	}
+
+	viewXMin(frame?: Mobject): number { return this.viewULCorner(frame).x }
+	viewXMax(frame?: Mobject): number { return this.viewLRCorner(frame).x }
+	viewYMin(frame?: Mobject): number { return this.viewULCorner(frame).y }
+	viewYMax(frame?: Mobject): number { return this.viewLRCorner(frame).y }
+
+	viewCenter(frame?: Mobject): Vertex {
+		return this.transformLocalPoint(new Vertex(this.viewWidth/2, this.viewHeight/2), frame)
+	}
+
+	viewMidX(frame?: Mobject): number { return this.viewCenter(frame).x }
+	viewMidY(frame?: Mobject): number { return this.viewCenter(frame).y }
+
+	viewLeftCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)) }
+	viewRightCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)) }
+	viewTopCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
+	viewBottomCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMax(frame)) }
+
+	// Equivalent (by default) versions without "view" in the name
+
+	ulCorner(frame?: Mobject): Vertex { return this.viewULCorner(frame) }
+	urCorner(frame?: Mobject): Vertex { return this.viewURCorner(frame) }
+	llCorner(frame?: Mobject): Vertex { return this.viewLLCorner(frame) }
+	lrCorner(frame?: Mobject): Vertex { return this.viewLRCorner(frame) }
+
+	xMin(frame?: Mobject): number { return this.viewXMin(frame) }
+	xMax(frame?: Mobject): number { return this.viewXMax(frame) }
+	yMin(frame?: Mobject): number { return this.viewYMin(frame) }
+	yMax(frame?: Mobject): number { return this.viewYMax(frame) }
+
+	center(frame?: Mobject): Vertex { return this.viewCenter(frame) }
+
+	midX(frame?: Mobject): number { return this.viewMidX(frame) }
+	midY(frame?: Mobject): number { return this.viewMidY(frame) }
+
+	leftCenter(frame?: Mobject): Vertex { return this.viewLeftCenter(frame) }
+	rightCenter(frame?: Mobject): Vertex { return this.viewRightCenter(frame) }
+	topCenter(frame?: Mobject): Vertex { return this.viewTopCenter(frame) }
+	bottomCenter(frame?: Mobject): Vertex { return this.viewBottomCenter(frame) }
+
+	// Local versions (relative to own coordinate system)
+
+	localULCorner(): Vertex { return this.ulCorner(this) }
+	localURCorner(): Vertex { return this.urCorner(this) }
+	localLLCorner(): Vertex { return this.llCorner(this) }
+	localLRCorner(): Vertex { return this.lrCorner(this) }
+
+	localXMin(): number { return this.xMin(this) }
+	localXMax(): number { return this.xMax(this) }
+	localYMin(): number { return this.yMin(this) }
+	localYMax(): number { return this.yMax(this) }
+
+	localCenter(): Vertex { return this.center(this) }
+
+	localMidX(): number { return this.midX(this) }
+	localMidY(): number { return this.midY(this) }
+
+	localLeftCenter(): Vertex { return this.leftCenter(this) }
+	localRightCenter(): Vertex { return this.rightCenter(this) }
+	localTopCenter(): Vertex { return this.topCenter(this) }
+	localBottomCenter(): Vertex { return this.bottomCenter(this) }
+
+
+
+
+
 
 	get superMobject(): Mobject { return this.parent }
 	set superMobject(newValue: Mobject) { this.parent = newValue }
 
+	// move to update?
 	get parent(): Mobject { return this._parent }
-	set parent(newParent: Mobject) {
+	set parent(newValue: Mobject) {
 		this.view?.remove()
-		this._parent = newParent
-		if (newParent == null) { return }
-		newParent.add(this)
+		this._parent = newValue
+		if (newValue == undefined) { return }
+		newValue.add(this)
 		if (this.parent.visible) { this.show() }
 		else { this.hide() }
 	}
+
 
 	get submobjects(): Array<Mobject> { return this.children }
 	set submobjects(newValue: Array<Mobject>) {
@@ -73,15 +262,75 @@ export class Mobject extends Frame {
 		this.submobs = newValue
 	}
 
-	add(child: Mobject) {
-		super.add(child)
-		this.view.appendChild(child.view)
-		child.update()
+
+
+	// view and style
+
+
+	setupView() {
+
+		this.view['mobject'] = this
+		if (this.superMobject) {
+			this.superMobject.view.appendChild(this.view)
+		}
+		addPointerDown(this.view, this.boundPointerDown) // TODO: move
+		//this.positionView()
+
+		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
+		this.view.style.transformOrigin = 'top left'
+		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
+		this.view.style.overflow = 'visible'
 	}
 
-	remove(child: Mobject) {
-		child.view.remove()
-		super.remove(child)
+	positionView() {
+		if (!this.view) { return }
+		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
+		this.view.style['transform'] = this.transform.asString()
+		this.view.style['width'] = this.viewWidth.toString() + 'px'
+		this.view.style['height'] = this.viewHeight.toString() + 'px'
+		if (this.anchor != undefined) {
+			this.view.style['left'] = this.anchor.x.toString() + 'px'
+			this.view.style['top'] = this.anchor.y.toString() + 'px'
+		}
+	}
+
+	add(submob: Mobject) {
+		if (submob.parent != this) { submob.parent = this }
+		if (this.children == undefined) {
+			console.error(`Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in statefulSetup()`)
+		}
+		if (!this.children.includes(submob)) {
+			this.children.push(submob)
+		}
+		this.view.append(submob.view)
+		submob.redraw()
+	}
+
+	remove(submob: Mobject) {
+		submob.view.remove()
+		remove(this.children, submob)
+		submob.parent = undefined
+	}
+
+	redrawSelf() { }
+
+	redrawSubmobs() {
+		for (let submob of this.children || []) {
+			submob.redraw()
+		}
+	}
+
+	redraw(recursive = true) {
+		try {
+			if (!this.view) { return }
+			this.positionView()
+			this.view.style['background-color'] = this.backgroundColor.toCSS()
+			//if (!this.visible || !this.parent) { return }
+			this.redrawSelf()
+			if (recursive) { this.redrawSubmobs() }
+		} catch {
+			console.warn(`Unsuccessfully tried to draw ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 
@@ -96,115 +345,28 @@ export class Mobject extends Frame {
 
 
 
-	// setup //
-
-	setup() {
-		this.setupView()
-		this.setupTouches()
-	}
-
-	setupView() {
-		this.view['mobject'] = this
-		if (this.superMobject) {
-			this.superMobject.view.appendChild(this.view)
-		}
-
-		this.view.setAttribute('class', 'mobject-div ' + this.constructor.name)
-		this.view.style.transformOrigin = `${this.transformOrigin[1]} ${this.transformOrigin[0]}` // 'top left' etc.
-		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
-		this.view.style.overflow = 'visible'
-		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
-	}
-
-	tearDownView() {
-		if (!this.view) { return }
-		if (this.superMobject) { this.superMobject.view.removeChild(this.view) }
-		removePointerDown(this.view, this.boundPointerDown)
-	}
-
-
-	setupTouches() {
-		this.eventTarget = null
-		this.boundPointerDown = this.pointerDown.bind(this)
-		this.boundPointerMove = this.pointerMove.bind(this)
-		this.boundPointerUp = this.pointerUp.bind(this)
-		this.boundLowestTargetedMobject = this.lowestTargetedMobject.bind(this)
-		
-		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-
-		this.view.style['pointer-events'] = (this.eventHandlingMode == "background") ? "none" : "auto"
-
-		addPointerDown(this.view, this.boundPointerDown)
-
-	}
-
-	// updating //
-
-	update(args = {}, redraw = true) {
-		this.updateSelf(args, redraw)
-		this.updateSubmobs(redraw)
-		this.updateDependents(redraw)
-	}
-
-	updateSelf(args = {}, redraw = true) {
-		if (args['view'] !== undefined) { this.tearDownView() }
-		this.setAttributes(args)
-		if (args['view'] !== undefined) {
-			this.setup()
-		}
-		if (redraw) { this.redrawSelf() }
-	}
-
-	updateSubmobs(redraw = true) {
-		for (let submob of this.submobs || []) {
-			if (!this.dependsOn(submob)) { // prevent dependency loops
-				submob.update({}, redraw)
-			}
-		}
-	}
-
-	updateDependents(redraw = true) {
-		for (let dep of this.dependencies || []) {
-			let outputValue: any = this[dep.outputName] // may be undefined
-			if (typeof outputValue === 'function') {
-				dep.target[dep.inputName] = outputValue.bind(this)()
-			} else if (outputValue !== undefined && outputValue !== null) {
-				dep.target[dep.inputName] = outputValue
-			}
-			dep.target.update({}, redraw)
-		}
-	}
-
-	redrawSelf() {
-		this.view.style['left'] = this.anchor.x.toString() + 'px'
-		this.view.style['top'] = this.anchor.y.toString() + 'px'
-
-		this.view.style['transform'] = this.transform.asString()
-		this.view.style['width'] = this.viewWidth.toString() + 'px'
-		this.view.style['height'] = this.viewHeight.toString() + 'px'
-
-		this.view.style['background-color'] = this.backgroundColor.toCSS()
-		this.view.style['visibility'] = this.visible ? 'visible' : 'hidden'
-	}
-
-
-	// view and style //
-
 	show() {
-		if (this.visible) { return }
-		this.redrawSelf()
-		this.visible = true
-		this.view.style['visibility'] = 'visible'
-		for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+		try {
+			if (!this.view) { return }
+			this.visible = true
+			this.view.style["visibility"] = "visible"
+			for (let submob of this.children) { submob.show() } // we have to propagate visibility bc we have to for invisibility
+			this.redraw()
+		} catch {
+			console.warn(`Unsuccessfully tried to show ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 	hide() {
-		if (!this.visible) { return }
-		this.visible = false
-		this.view.style['visibility'] = 'hidden'
-		for (let submob of this.children) { submob.hide() } // we have to propagate visibility bc we have to for invisibility
+		try {
+			if (!this.view) { return }
+			this.visible = false
+			this.view.style["visibility"] = "hidden"
+			for (let submob of this.children) { submob.hide() } // we have to propagate invisibility
+			this.redraw()
+		} catch {
+			console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (too soon?)`)
+		}
 	}
 
 	recursiveShow() {
@@ -222,56 +384,10 @@ export class Mobject extends Frame {
 	}
 
 
-	adjustFrame(recursive = true) {
-		if (recursive) {
-			for (let submob of this.submobjects) {
-				submob.adjustFrame(true)
-			}
-		}
-
-		let v = this.localExtentULCorner()
-		let shift = new Transform({ shift: v })
-		let inverseShift = shift.inverse()
-		let updateDict: object = {}
-		for (let [key, value] of Object.entries(this)) {
-			var newValue: any
-			if (value instanceof Vertex && key != 'anchor') {
-				newValue = inverseShift.appliedTo(value)
-			} else if (value instanceof Array && value.length > 0 && value[0] instanceof Vertex) {
-				newValue = inverseShift.appliedToVertices(value)
-			} else if (value instanceof Mobject && value != this.superMobject && !this.submobjects.includes(value)) {
-				// "unregistered" submobs, registered ones are handled below
-				value.update({
-					anchor: inverseShift.appliedTo(value.anchor)
-				})
-			} else {
-				continue
-			}
-			updateDict[key] = newValue
-		}
-
-		for (let submob of this.submobjects) {
-			let newAnchor = inverseShift.appliedTo(submob.anchor)
-			submob.update({
-				anchor: newAnchor
-			})
-		}
-
-		if (this.superMobject) {
-			updateDict['anchor'] = shift.appliedTo(this.anchor)
-		}
-		updateDict['viewWidth'] = this.getWidth()
-		updateDict['viewHeight'] = this.getHeight()
-		this.update(updateDict)
-
-	}
 
 
 
-
-
-
-	// dependencies //
+	// dependency
 
 	dependents(): Array<Mobject> {
 		let dep: Array<Mobject> = []
@@ -311,48 +427,54 @@ export class Mobject extends Frame {
 		this.addDependency(null, target, null)
 	}
 
+	initialUpdate(argsDict: object = {}, superCall = false) {
+		if (superCall) {
+			this.setAttributes(argsDict)
+		} else {
+			this.update(argsDict)
+		}
+	}
 
-	// event targets //
+	updateModel(argsDict: object = {}) {
 
-	targetViewChain(e: LocatedEvent): Array<Element> {
-		var t: Element = e.target as Element
-		console.log(t.tagName)
-		if (t.tagName == 'path') { t = t.parentElement.parentElement }
-		if (t.tagName == 'CANVAS') { t = t.parentElement }
-		if (t == this.view) { return [t] }
+		this.setAttributes(argsDict)
+		//this.positionView()
+		this.updateSubmobs()
 
-		let targetViewChain: Array<Element> = [t]
-		while (t != undefined && t != this.view) {
-			t = t.parentElement
-			targetViewChain.push(t)
+		for (let dep of this.dependencies || []) {
+			let outputName: any = this[dep.outputName] // may be undefined
+			if (typeof outputName === 'function') {
+				dep.target[dep.inputName] = outputName.bind(this)()
+			} else if (outputName != undefined && outputName != null) {
+				dep.target[dep.inputName] = outputName
+			}
+			dep.target.update()
 		}
 
-		return targetViewChain.reverse()
 	}
 
-	targetMobjectChain(e: LocatedEvent): Array<Mobject> {
-		let viewChain = this.targetViewChain(e)
-		let mobjectChain: Array<Mobject> = []
-		for (let view of viewChain) {
-			let mob = view['mobject']
-			if (mob != undefined) { mobjectChain.push(mob) }
+	update(argsDict: object = {}, redraw = true) {
+		this.updateModel(argsDict)
+
+		if (redraw) {
+			this.redraw()
 		}
-		return mobjectChain
+
 	}
 
-	targetedChild(e: LocatedEvent): Mobject | undefined {
-		let chain = this.targetMobjectChain(e)
-		return chain[1] ?? null
+	updateSubmobs() {
+		for (let submob of this.children || []) {
+			if (!this.dependsOn(submob)) { // prevent dependency loops
+				submob.update({}, false)
+			}
+		}
 	}
 
-	lowestTargetedMobject(e: LocatedEvent): Mobject | undefined {
-		let chain = this.targetMobjectChain(e)
-		return chain.pop() ?? null
-	}
 
 
 
-	// interactivity //
+
+	// interactivity
 
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
@@ -366,170 +488,126 @@ export class Mobject extends Frame {
 	boundPointerDown(e: LocatedEvent) { }
 	boundPointerMove(e: LocatedEvent) { }
 	boundPointerUp(e: LocatedEvent) { }
-	boundLowestTargetedMobject(e: LocatedEvent): Mobject { return this }
+	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
+
+
+	enableDragging() {
+		this.previousPassAlongEvents = this.passAlongEvents
+		this.passAlongEvents = false
+		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
+		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
+		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+		this.selfHandlePointerDown = this.startSelfDragging
+		this.selfHandlePointerMove = this.selfDragging
+		this.selfHandlePointerUp = this.endSelfDragging
+	}
+
+	disableDragging() {
+		if (this.previousPassAlongEvents != undefined) {
+			this.passAlongEvents = this.previousPassAlongEvents
+		}
+		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
+		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
+		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
+	}
+
+	eventTargetMobject(e: LocatedEvent): Mobject {
+		var t: Element = e.target as Element
+		if (t.tagName == 'path') { t = t.parentElement.parentElement }
+		if (t == this.view) {
+			return this
+		}
+		let targetViewChain: Array<Element> = [t]
+		while (t != undefined && t != this.view) {
+			t = t.parentElement
+			targetViewChain.push(t)
+		}
+		console.log(targetViewChain)
+		t = targetViewChain.pop()
+		t = targetViewChain.pop()
+		while (t != undefined) {
+			if (t['mobject'] != undefined) {
+				let r: Mobject = t['mobject']
+				//console.log('event target mob:', r)
+				return r
+			}
+			t = targetViewChain.pop()
+		}
+		// if all of this fails, you need to handle the event yourself
+		//console.log('event target mob:', this)
+		return this
+	}
 
 	pointerDown(e: LocatedEvent) {
+		this.eventTarget = this.boundEventTargetMobject(e)
+		if (this.eventTarget.vetoOnStopPropagation) { return }
 
-		if (this.draggable) {
-			e.stopPropagation()
-			this.startSelfDragging(e)
-			return
-		}
-
-		this.eventTarget = this.boundLowestTargetedMobject(e)
-		console.log('event target on ', this, 'is', this.eventTarget)
-		if (this.eventTarget.eventHandlingMode == "auto" && !this.eventTarget.draggable) { return }
 		e.stopPropagation()
-
 		removePointerDown(this.view, this.boundPointerDown)
 		addPointerMove(this.view, this.boundPointerMove)
 		addPointerUp(this.view, this.boundPointerUp)
 
-		if (this.eventHandlingMode == "self") {
-			console.log(`handling myself, and I am a ${this.constructor.name}`)
-			this.eventTarget = this
-			this.selfHandlePointerDown(e)
-		} else if (this.eventHandlingMode == "child") {
-			console.log(`trying to pass to a child`)
-			if (this.eventTarget == this) {
-				console.log(`no luck, I (a ${this.constructor.name}) have to handle this myself`)
-				this.selfHandlePointerDown(e)
-			} else {
-				console.log('found one')
-				this.eventTarget = this.targetedChild(e) ?? this
-				console.log(this.eventTarget)
-				if (this.eventTarget.draggable) {
-					this.eventTarget.startSelfDragging(e)
-					return
-				}
-				let th = this.eventTarget.eventHandlingMode
-				if (th == "self" || th == "child") {
-					console.log(`passing event down to a ${this.eventTarget.constructor.name}`)
-					this.eventTarget.pointerDown(e)
-				} else if (th == "parent") {
-					console.log(`no luck, the child (a ${this.eventTarget.constructor.name}) can't handle it`)
-					this.eventTarget = this
-					this.selfHandlePointerDown(e)
-				} else {
-					console.log(`${this.eventHandlingMode} `)
-					console.error(`eventHandlingMode badly set on my child, a ${this.eventTarget.constructor.name}`)
-				}
-			}
+		console.log('event target on ', this, 'is', this.eventTarget)
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+			console.log('passing on')
+			this.eventTarget.pointerDown(e)
 		} else {
-			console.log(`${this.eventHandlingMode} `)
-			console.error(`eventHandlingMode badly set on myself, a ${this.constructor.name}`)
+			console.log(`handling myself, and I am a ${this.constructor.name}`)
+			this.selfHandlePointerDown(e)
 		}
 	}
 
 	pointerMove(e: LocatedEvent) {
-		if (this.eventTarget.draggable) {
-			e.stopPropagation()
-			this.eventTarget.selfDragging(e)
-			return
-		}
-
-		console.log(this, "event target:", this.eventTarget)
-		if (this.eventHandlingMode == "auto") { return }
+		//console.log(this, "event target:", this.eventTarget)
+		if (this.eventTarget.vetoOnStopPropagation) { return }
 		e.stopPropagation()
 
-		if (this.eventTarget == this) { this.selfHandlePointerMove(e) }
-		else { this.eventTarget.pointerMove(e) }
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+			//console.log("passing on")
+			this.eventTarget.pointerMove(e)
+		} else {
+			//console.log(`handling myself, and I am a ${this.constructor.name}`)
+			this.selfHandlePointerMove(e)
+		}
 	}
 
 	pointerUp(e: LocatedEvent) {
-		if (this.eventTarget.draggable) {
-			e.stopPropagation()
-			this.eventTarget.endSelfDragging(e)
-			return
-		}
+		if (this.eventTarget.vetoOnStopPropagation) { return }
 
-		console.log(this, "event target:", this.eventTarget)
-		if (this.eventHandlingMode == "auto") { return }
 		e.stopPropagation()
-
 		removePointerMove(this.view, this.boundPointerMove)
 		removePointerUp(this.view, this.boundPointerUp)
 		addPointerDown(this.view, this.boundPointerDown)
 
-		if (this.eventTarget == this) { this.selfHandlePointerUp(e) }
-		else { this.eventTarget.pointerUp(e) }
-
+		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+			this.eventTarget.pointerUp(e)
+		} else {
+			this.selfHandlePointerUp(e)
+		}
 		this.eventTarget = null
 	}
 
 
 	startSelfDragging(e: LocatedEvent) {
 		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.anchor.copy()
+		this.dragAnchorStart = this.anchor
 	}
 
 	selfDragging(e: LocatedEvent) {
+		console.log('selfDragging')
 		let dragPoint: Vertex = pointerEventVertex(e)
 		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
+		
 		this.update({
 			anchor: this.dragAnchorStart.add(dr)
 		}, true)
 	}
 
 	endSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = null
-		this.dragAnchorStart = null
+		this.dragPointStart = undefined
+		this.dragAnchorStart = undefined
 	}
 
-	// aliases: children -> submobs
-	localSubmobXMin(): number { return this.localChildrenXMin() }
-	localSubmobMidX(): number { return this.localChildrenMidX() }
-	localSubmobXMax(): number { return this.localChildrenXMax() }
-	localSubmobYMin(): number { return this.localChildrenYMin() }
-	localSubmobMidY(): number { return this.localChildrenMidY() }
-	localSubmobYMax(): number { return this.localChildrenYMax() }
-	localSubmobULCorner(): Vertex { return this.localChildrenULCorner() }
-	localSubmobURCorner(): Vertex { return this.localChildrenURCorner() }
-	localSubmobLRCorner(): Vertex { return this.localChildrenLRCorner() }
-	localSubmobLLCorner(): Vertex { return this.localChildrenLLCorner() }
-	localSubmobCorners(): Array<Vertex> { return this.localChildrenCorners() }
-	localSubmobCenter(): Vertex { return this.localChildrenCenter() }
-	localSubmobTopCenter(): Vertex { return this.localChildrenTopCenter() }
-	localSubmobLeftCenter(): Vertex { return this.localChildrenLeftCenter() }
-	localSubmobBottomCenter(): Vertex { return this.localChildrenBottomCenter() }
-	localSubmobRightCenter(): Vertex { return this.localChildrenRightCenter() }
-	localSubmobOuterCenters(): Array<Vertex> { return this.localChildrenOuterCenters() }
-	// transformed versions
-	relativeSubmobXMin(frame?: Frame): number { return this.relativeChildrenXMin() }
-	relativeSubmobMidX(frame?: Frame): number { return this.relativeChildrenMidX() }
-	relativeSubmobXMax(frame?: Frame): number { return this.relativeChildrenXMax() }
-	relativeSubmobYMin(frame?: Frame): number { return this.relativeChildrenYMin() }
-	relativeSubmobMidY(frame?: Frame): number { return this.relativeChildrenMidY() }
-	relativeSubmobYMax(frame?: Frame): number { return this.relativeChildrenYMax() }
-	relativeSubmobULCorner(frame?: Frame): Vertex { return this.relativeChildrenULCorner(frame) }
-	relativeSubmobURCorner(frame?: Frame): Vertex { return this.relativeChildrenURCorner(frame) }
-	relativeSubmobLRCorner(frame?: Frame): Vertex { return this.relativeChildrenLRCorner(frame) }
-	relativeSubmobLLCorner(frame?: Frame): Vertex { return this.relativeChildrenLLCorner(frame) }
-	relativeSubmobCorners(frame?: Frame): Array<Vertex> { return this.relativeChildrenCorners(frame) }
-	relativeSubmobCenter(frame?: Frame): Vertex { return this.relativeChildrenCenter(frame) }
-	relativeSubmobTopCenter(frame?: Frame): Vertex { return this.relativeChildrenTopCenter(frame) }
-	relativeSubmobRightCenter(frame?: Frame): Vertex { return this.relativeChildrenRightCenter(frame) }
-	relativeSubmobBottomCenter(frame?: Frame): Vertex { return this.relativeChildrenBottomCenter(frame) }
-	relativeSubmobLeftCenter(frame?: Frame): Vertex { return this.relativeChildrenLeftCenter(frame) }
-	relativeSubmobOuterCenters(frame?: Frame): Array<Vertex> { return this.relativeChildrenOuterCenters(frame) }
-	// default frame
-	submobXMin(): number { return this.childrenXMin() }
-	submobMidX(): number { return this.childrenMidX() }
-	submobXMax(): number { return this.childrenXMax() }
-	submobYMin(): number { return this.childrenYMin() }
-	submobMidY(): number { return this.childrenMidY() }
-	submobYMax(): number { return this.childrenYMax() }
-	submobULCorner(): Vertex { return this.childrenULCorner() }
-	submobURCorner(): Vertex { return this.childrenURCorner() }
-	submobLRCorner(): Vertex { return this.childrenLRCorner() }
-	submobLLCorner(): Vertex { return this.childrenLLCorner() }
-	submobCorners(): Array<Vertex> { return this.childrenCorners() }
-	submobCenter(): Vertex { return this.childrenCenter() }
-	submobTopCenter(): Vertex { return this.childrenTopCenter() }
-	submobRightCenter(): Vertex { return this.childrenRightCenter() }
-	submobBottomCenter(): Vertex { return this.childrenBottomCenter() }
-	submobLeftCenter(): Vertex { return this.childrenLeftCenter() }
-	submobOuterCenters(): Array<Vertex> { return this.childrenOuterCenters() }
 
 }
 
@@ -537,9 +615,9 @@ export class Mobject extends Frame {
 
 export class MGroup extends Mobject {
 
-	setup() {
-		super.setup()
-		// children may have been set as a constructor args
+	statefulSetup() {
+		super.statefulSetup()
+		// children may have been set as constructor args
 		for (let submob of this.children) {
 			this.add(submob)
 		}
@@ -550,8 +628,336 @@ export class MGroup extends Mobject {
 
 
 
+export class VMobject extends Mobject {
+
+	svg: SVGSVGElement
+	path: SVGElement // child of view
+	vertices: Array<Vertex>
+
+	fillColor: Color
+	fillOpacity: number
+	strokeColor: Color
+	strokeWidth: number
 
 
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			fillColor: Color.white(),
+			fillOpacity: 0,
+			strokeColor: Color.white(),
+			strokeWidth: 1,
+		})
+	}
+
+	statelessSetup() {
+		super.statelessSetup()
+		this.vertices = []
+		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		this.svg['mobject'] = this
+		this.path['mobject'] = this
+		this.svg.appendChild(this.path)
+		this.svg.setAttribute('class', 'mobject-svg')
+		this.svg.style.overflow = 'visible'
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.view.appendChild(this.svg) // why not just add?
+		this.view.setAttribute('class', this.constructor.name + ' mobject-div')
+	}
+
+	redrawSelf() {
+		let pathString: string = this.pathString()
+		if (pathString.includes('NaN')) { return }
+
+		this.path.setAttribute('d', pathString)
+		this.path.style['fill'] = this.fillColor.toHex()
+		this.path.style['fill-opacity'] = this.fillOpacity.toString()
+		this.path.style['stroke'] = this.strokeColor.toHex()
+		this.path.style['stroke-width'] = this.strokeWidth.toString()
+	}
+
+	pathString(): string {
+		console.warn('please subclass pathString')
+		return ''
+	}
+
+	relativeVertices(frame?: Mobject): Array<Vertex> {
+		let returnValue: Array<Vertex> = this.relativeTransform(frame).appliedToVertices(this.vertices)
+		if (returnValue == undefined) { return [] }
+		else { return returnValue }
+	}
+
+	globalVertices(): Array<Vertex> {
+		return this.relativeVertices() // uses default frame = paper
+	}
+
+
+	localXMin(): number {
+		let xMin: number = Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { xMin = Math.min(xMin, p.x) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				xMin = Math.min(xMin, mob.localXMin() + mob.anchor.x)
+			}
+		}
+		return xMin
+	}
+
+	localXMax(): number {
+		let xMax: number = -Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { xMax = Math.max(xMax, p.x) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				xMax = Math.max(xMax, mob.localXMax() + mob.anchor.x)
+			}
+		}
+		return xMax
+	}
+
+	localYMin(): number {
+		let yMin: number = Infinity
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { yMin = Math.min(yMin, p.y) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				yMin = Math.min(yMin, mob.localYMin() + mob.anchor.y)
+			}
+		}
+		return yMin
+	}
+
+	localYMax(): number {
+		let yMax: number = -Infinity
+		if (this instanceof MGroup) {
+
+		}
+		if (this.vertices != undefined) {
+			for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
+		}
+		if (this.children != undefined) {
+			for (let mob of this.children) {
+				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
+			}
+		}
+		return yMax
+	}
+
+	localULCorner(): Vertex {
+		return new Vertex(this.localXMin(), this.localYMin())
+	}
+
+	getWidth(): number { return this.localXMax() - this.localXMin() }
+	getHeight(): number { return this.localYMax() - this.localYMin() }
+
+	adjustFrame() {
+		let shift = new Transform({ shift: this.localULCorner() })
+		let inverseShift = shift.inverse()
+		let updateDict: object = {}
+		for (let [key, value] of Object.entries(this)) {
+			var newValue: any
+			if (value instanceof Vertex) {
+				newValue = inverseShift.appliedTo(value)
+			} else if (value instanceof Array && value.length > 0) {
+				newValue = []
+				if (!(value[0] instanceof Vertex)) { continue }
+				for (let v of value) {
+					newValue.push(inverseShift.appliedTo(v))
+				}
+			} else {
+				continue
+			}
+			updateDict[key] = newValue
+		}
+
+		updateDict['anchor'] = shift.appliedTo(this.anchor)
+		updateDict['viewWidth'] = this.getWidth()
+		updateDict['viewHeight'] = this.getHeight()
+		console.log(updateDict)
+		this.update(updateDict)
+
+	}
+}
+
+
+
+
+
+
+
+
+export class Polygon extends VMobject {
+
+	closed: boolean
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			closed: true
+		})
+	}
+
+	pathString(): string {
+		let pathString: string = ''
+		//let v = this.globalVertices()
+		let v = this.vertices
+		if (v.length == 0) { return '' }
+		for (let point of v) {
+			if (point == undefined || point.isNaN()) {
+				pathString = ''
+				return pathString
+			}
+			let prefix: string = (pathString == '') ? 'M' : 'L'
+			pathString += prefix + stringFromPoint(point)
+		}
+		if (this.closed) {
+			pathString += 'Z'
+		}
+		return pathString
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class CurvedShape extends VMobject {
+
+	_bezierPoints: Array<Vertex>
+
+	updateBezierPoints() { }
+	// implemented by subclasses
+
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+		this.updateBezierPoints()
+	}
+
+	// globalBezierPoints(): Array<Vertex> {
+	// 	return this.globalTransform().appliedTo(this.bezierPoints)
+	// }
+
+	// redrawSelf() {
+	// 	this.updateBezierPoints()
+	// 	super.redrawSelf()
+	// }
+
+	pathString(): string {
+		//let points: Array<Vertex> = this.globalBezierPoints()
+		let points: Array<Vertex> = this.bezierPoints
+		if (points == undefined || points.length == 0) { return '' }
+
+		// there should be 3n+1 points
+		let nbCurves: number = (points.length - 1)/3
+		if (nbCurves % 1 != 0) { throw 'Incorrect number of Bézier points' }
+
+		let pathString: string = 'M' + stringFromPoint(points[0])
+		for (let i = 0; i < nbCurves; i++) {
+			let point1str: string = stringFromPoint(points[3*i + 1])
+			let point2str: string = stringFromPoint(points[3*i + 2])
+			let point3str: string = stringFromPoint(points[3*i + 3])
+			pathString += 'C' + point1str + ' ' + point2str + ' ' + point3str
+		}
+		pathString += 'Z'
+		return pathString
+	}
+
+	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
+	set bezierPoints(newValue: Array<Vertex>) {
+		this._bezierPoints = newValue
+		let v: Array<Vertex> = []
+		let i: number = 0
+		for (let p of this.bezierPoints) {
+			if (i % 3 == 1) { v.push(p) }
+			i += 1
+		}
+		this.vertices = v
+	}
+
+}
+
+
+
+
+
+export class TextLabel extends Mobject {
+
+	text: string
+	horizontalAlign: string // 'left' | 'center' | 'right'
+	verticalAlign: string // 'top' | 'center' | 'bottom'
+	color?: Color
+
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			text: 'text',
+			horizontalAlign: 'center',
+			verticalAlign: 'center',
+			color: Color.white()
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
+		this.view.style.display = 'flex'
+		this.view.style.fontFamily = 'Helvetica'
+		this.view.style.fontSize = '10px'
+	}
+
+	redrawSelf() {
+		if (this.anchor.isNaN()) { return }
+		if (this.color == undefined) { this.color = Color.white() }
+		super.redrawSelf()
+	}
+
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
+
+		//// internal dependencies
+		this.view.innerHTML = this.text
+		this.view.style.color = (this.color ?? Color.white()).toHex()
+		switch (this.verticalAlign) {
+		case 'top':
+			this.view.style.alignItems = 'flex-start'
+			break
+		case 'center':
+			this.view.style.alignItems = 'center'
+			break
+		case 'bottom':
+			this.view.style.alignItems = 'flex-end'
+			break
+		}
+		switch (this.horizontalAlign) {
+		case 'left':
+			this.view.style.justifyContent = 'flex-start'
+			break
+		case 'center':
+			this.view.style.justifyContent = 'center'
+			break
+		case 'right':
+			this.view.style.justifyContent = 'flex-end'
+			break
+		}
+
+	}
+
+}
 
 
 

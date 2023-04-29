@@ -1,5 +1,6 @@
+
 import { ExtendedObject } from '../modules/extended-object'
-import { Vertex, Transform } from '../modules/vertex-transform'
+import { Vertex, Transform } from '../modules/vertex-transform'
 
 // testing whether objects get created properly
 // esp. passing properties by value (Vertex, Transform) of by reference (anything else)

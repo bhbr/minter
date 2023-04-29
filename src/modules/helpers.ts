@@ -1,22 +1,17 @@
 import { Vertex } from './vertex-transform'
 
-export const isTouchDevice = 'ontouchstart' in document.documentElement
-export const DRAW_BORDER = true
-
-export type EventHandlingMode = "auto" | "drag" | "self" | "child" | "parent" | "background"
-// auto > do nothing, not even stop event bubbling/capturing (e. g. CindyCanvas)
-// drag > drag yourself inside your parent
-// self > selfHandle (e. g. BoxSlider, FreePoint)
-// child > submob handles it unless its handler is "parent" (e. g. Paper)
-// parent > parent handles it (e. g. Rectangle inside BoxSlider)
-// background > background mobject handles it (e. g. TwoPointCircle)
+export const isTouchDevice: boolean = 'ontouchstart' in document.documentElement
+export const DRAW_BORDER: boolean = false
 
 export function stringFromPoint(point: Array<number>): string {
-	let x = point[0], y = point[1]
+	// a string representation for CSS
+	let x: number = point[0],
+		y: number = point[1]
 	return `${x} ${y}`
 }
 
 export function remove(arr: Array<any>, value: any, all: boolean = false) {
+	// remove an object from an Array
    for (let i = 0; i < arr.length; i++) {
 		if (arr[i] == value) {
 			arr.splice(i,1)
@@ -26,9 +21,7 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 }
 
 
-
 // replicate RGB(A) notation from CSS
-//function rgb(r, g, b) { return `rgb(${255*r}, ${255*g}, ${255*b})` }
 export function rgba(r: number, g: number, b: number, a: number): string {
 	return `rgb(${255*r}, ${255*g}, ${255*b}, ${a})`
 }
@@ -86,15 +79,20 @@ export function removeLongPress(element: Element) {
 }
 
 export type LocatedEvent = PointerEvent | MouseEvent | TouchEvent
+// any Event that has an associated location on the screen
+// it can be triggered by a mouse, a finger or a stylus
 
 export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
-	let t: MouseEvent | Touch = null
+	// subtract the sidebar's width if necessary
+	// i. e. if running in the browser (minter.html)
+	// instead of in the app (paper.html)
 	let sidebarWidth: number = 0
 	try {
 		let sidebar: Element = document.querySelector('#sidebar')
 		sidebarWidth = sidebar.clientWidth
 	} catch {
 	}
+	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }
 	else { t = e.changedTouches[0] }
 	return [t.pageX - sidebarWidth, t.pageY]
@@ -138,6 +136,8 @@ export function removePointerUp(element: HTMLElement, method: (Event) => void) {
 	element.removeEventListener('pointerup', method, { capture: true })
 }
 
+// logging inside HTML instead of the console
+// for debugging the app
 export function logInto(obj: any, id: string) {
 	let msg = obj.toString()
 	let newLine: HTMLElement = document.createElement('p')
@@ -152,63 +152,7 @@ export function logInto(obj: any, id: string) {
 export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console') }
 
 
-export function extremeComponent(vertices: Array<Vertex>, index: number, direction: 1 | -1): number {
-	var extremum = -direction * Infinity
-	for (let v of vertices) {
-		extremum = (direction > 0) ? Math.max(extremum, v[index]) : Math.min(extremum, v[index])
-	}
-	return extremum
-}
-
-export function xMin(vertices: Array<Vertex>): number {
-	return extremeComponent(vertices, 0, -1)
-}
-
-export function xMax(vertices: Array<Vertex>): number {
-	return extremeComponent(vertices, 0, 1)
-}
-
-export function yMin(vertices: Array<Vertex>): number {
-	return extremeComponent(vertices, 1, -1)
-}
-
-export function yMax(vertices: Array<Vertex>): number {
-	return extremeComponent(vertices, 1, 1)
-}
-
-export function midX(vertices: Array<Vertex>): number {
-	return (xMin(vertices) + xMax(vertices))/2
-}
-
-export function midY(vertices: Array<Vertex>): number {
-	return (yMin(vertices) + yMax(vertices))/2
-}
-
-export function ulCorner(vertices: Array<Vertex>): Vertex {
-	return new Vertex(xMin(vertices), yMin(vertices))
-}
-
-export function urCorner(vertices: Array<Vertex>): Vertex {
-	return new Vertex(xMax(vertices), yMin(vertices))
-}
-
-export function llCorner(vertices: Array<Vertex>): Vertex {
-	return new Vertex(xMin(vertices), yMax(vertices))
-}
-
-export function lrCorner(vertices: Array<Vertex>): Vertex {
-	return new Vertex(xMax(vertices), yMax(vertices))
-}
-
-export function getWidth(vertices: Array<Vertex>): number {
-	return xMax(vertices) - xMin(vertices)
-}
-
-export function getHeight(vertices: Array<Vertex>): number {
-	return yMax(vertices) - yMin(vertices)
-}
-
-
+// mixins allow to inherit from multiple classes (kinda)
 // https://www.typescriptlang.org/docs/handbook/mixins.html
 export function applyMixins(derivedCtor: any, constructors: any[]) {
   constructors.forEach((baseCtor) => {

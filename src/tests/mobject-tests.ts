@@ -1,61 +1,23 @@
-import { Mobject } from '../modules/mobject'
-import { TextLabel } from '../modules/textlabel'
-import { Circle, TwoPointCircle, Rectangle, RoundedRectangle } from '../modules/shapes'
+import { Mobject, TextLabel } from '../modules/mobject'
+import { Circle, TwoPointCircle, Rectangle } from '../modules/shapes'
 import { Segment } from '../modules/arrows'
 import { paper } from '../paper'
-import { LocatedEvent, xMax } from '../modules/helpers'
 import { DEGREES } from '../modules/math'
 import { Vertex, Transform } from '../modules/vertex-transform'
 import { Color } from '../modules/color'
 import { WaveCindyCanvas } from '../modules/cindycanvas'
 import { Point, FreePoint } from '../modules/creating'
 import { BoxSlider } from '../modules/slider'
-import { Boolean, ToggleableBoolean, NotBoolean } from '../modules/boolean'
 
 export function TransformTest() {
-
-	let r = new Rectangle({
-		anchor: new Vertex(100, 50),
-		width: 150,
-		height: 100,
-		interactive: true
+	console.log("creating new circle")
+	let c = new Circle({
+		midpoint: new Vertex(300, 50)
 	})
-
-	let r2 = new Rectangle({
-		anchor: new Vertex(10, 10),
-		width: 30,
-		height: 20,
-		fillColor: Color.orange(),
-		transform: new Transform({
-			angle: 15 * DEGREES
-		})
+	paper.add(c)
+	c.update({
+		midpoint: new Vertex(100, 20)
 	})
-
-	r.add(r2)
-	paper.add(r)
-	let c = r.localTopCenter()
-
-	let t0 = r.transform
-	let t1 = new Transform({
-		angle: 10 * DEGREES,
-		anchor: c
-	})
-
-	r.selfHandlePointerDown = function(e: LocatedEvent) {
-		r.update({
-			transform: t1
-		})
-	}
-
-	r.selfHandlePointerUp = function(e: LocatedEvent) {
-		r.update({
-			transform: Transform.identity()
-		})
-	}
-
-	let vertices = [new Vertex(1, 2), new Vertex(3, 4)]
-	let m = xMax(vertices)
-	console.log(m)
 
 }
 
@@ -77,14 +39,16 @@ export function MobjectTest() {
 		anchor: new Vertex(200, 200)
 	})
 
-	let c = new Circle({
-		midpoint: new Vertex(50, 150),
-		radius: 50,
-		fillColor: Color.orange(),
-		opacity: 1.0,
-		interactive: true
-	})
-	f.add(c)
+	f.redraw()
+
+	// let c = new Circle({
+	// 	midpoint: new Vertex(50, 150),
+	// 	radius: 50,
+	// 	fillColor: Color.orange(),
+	// 	opacity: 1.0,
+	// 	interactive: true
+	// })
+	// f.add(c)
 
 	let l = new Segment({
 		startPoint: new Vertex(100, 0),
@@ -92,7 +56,7 @@ export function MobjectTest() {
 	})
 	f.add(l)
 	l.adjustFrame()
-	f.draggable = true
+	f.enableDragging()
 
 	console.log(f)
 
@@ -115,14 +79,15 @@ export function CircleTest() {
 	let r = 75
 	let c = new Circle({
 		midpoint: p,
-		radius: r
+		radius: r,
+		drawBorder: true
 	})
 	paper.add(c)
 	c.update({
 		radius: 25,
-		anchor: Vertex.origin()
+		midpoint: Vertex.origin()
 	})
-	// console.log(c)
+	console.log(c)
 }
 
 export function DrawCircleTest() {
@@ -169,7 +134,8 @@ export function CindyTest() {
 
 	paper.add(cv2)
 	cv2.startUp()
-	cv2.draggable = true
+	cv2.enableDragging()
+	cv2.disableDragging()
 	
 }
 
@@ -226,40 +192,6 @@ export function LinkTest() {
 	paper.showLinksOfSubmobs()
 
 
-}
-
-export function BooleanTest() {
-
-	let r = new RoundedRectangle({
-		width: 400,
-		height: 50,
-		cornerRadius: 50,
-		anchor: new Vertex(50, 50)
-	})
-	paper.add(r)
-	console.log(r.cornerRadius)
-
-	let b = new Boolean({
-		anchor: new Vertex(100, 100),
-		state: null
-	})
-	paper.add(b)
-	console.log(b.pill.cornerRadius)
-
-	let tb = new ToggleableBoolean({
-		anchor: new Vertex(300, 100),
-		state: false
-	})
-	paper.add(tb)
-
-	let nb = new NotBoolean({
-		argument: tb,
-		anchor: new Vertex(300, 150)
-	})
-
-	paper.add(nb)
-
-	tb.addDependency('state', nb, 'argument')
 }
 
 

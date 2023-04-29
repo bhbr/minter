@@ -9,98 +9,87 @@ import { Paper } from '../paper'
 
 export class CreationGroup extends CreatedMobject {
 
-	creations = {} // convert into string index signature 
-	visibleCreation = 'freehand'
-	drawFreehand = true
-	penColor = Color.white()
-	startPoint = Vertex.origin()
-	penTip?: Vertex = null
+	creations: object
+	visibleCreation: string = 'freehand'
+	drawFreehand: boolean = true
+	penColor: Color
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			penColor: Color.white(),
+			startPoint: Vertex.origin()
+		})
 	}
-	
-	setup() {
-		super.setup()
-		this.creations['freehand'] = new Freehand()
-		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint })
-		this.creations['ray'] = new DrawnRay({ startPoint: this.startPoint })
-		this.creations['line'] = new DrawnLine({ startPoint: this.startPoint })
-		this.creations['circle'] = new DrawnCircle({ startPoint: this.startPoint })
-		this.creations['cindy'] = new DrawnRectangle({ startPoint: this.startPoint })
-		this.creations['slider'] = new CreatedBoxSlider({ startPoint: this.startPoint })
-		// this.creations['pendulum'] = new CreatedPendulum({ startPoint: this.startPoint })
 
-		for (let creation of Object.values(this.creations) as Array<CreatedMobject>) {
-			this.add(creation)
-			this.addDependency('penColor', creation, 'penStrokeColor')
-			this.addDependency('penColor', creation, 'penFillColor')
-			creation.update()
+	statelessSetup() {
+		super.statelessSetup()
+		this.creations = { }
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		this.creations['freehand'] = new Freehand()
+		this.creations['segment'] = new DrawnSegment({ startPoint: this.startPoint})
+		this.creations['ray'] = new DrawnRay({startPoint: this.startPoint})
+		this.creations['line'] = new DrawnLine({startPoint: this.startPoint})
+		this.creations['circle'] = new DrawnCircle({startPoint: this.startPoint})
+		this.creations['cindy'] = new DrawnRectangle({startPoint: this.startPoint})
+		this.creations['slider'] = new CreatedBoxSlider({startPoint: this.startPoint})
+		this.creations['pendulum'] = new CreatedPendulum({startPoint: this.startPoint})
+
+		for (let mob of Object.values(this.creations)) {
+			this.addDependency('penColor', mob, 'penStrokeColor')
+			this.addDependency('penColor', mob, 'penFillColor')
+			mob.update()
 		}
 
 		this.setVisibleCreation(this.visibleCreation)
+		for (let creation of Object.values(this.creations)) {
+			this.add(creation)
+		}
 
 	}
 
 	updateFromTip(q: Vertex) {
-		this.creations['freehand'].updateFromTip(q)
-		if (this.visibleCreation != 'freehand') {
-			this.creations[this.visibleCreation].updateFromTip(q)
+		for (let creation of Object.values(this.creations)) {
+			creation.updateFromTip(q)
 		}
-		this.penTip = q
-
 	}
 
 	setVisibleCreation(visibleCreation: string) {
-		for (let mob of Object.values(this.creations) as Array<CreatedMobject>) {
+		for (let mob of Object.values(this.creations)) {
 			mob.hide()
 		}
 		this.visibleCreation = visibleCreation
-		if (this.penTip) {
-			this.creations[this.visibleCreation].updateFromTip(this.penTip)
-		}
 		if (!(visibleCreation == 'freehand' && !this.drawFreehand)) {
 			this.creations[visibleCreation].show()
 		}
 
 		if (visibleCreation == 'cindy') {
-			this.creations[visibleCreation].show()
 			this.creations[visibleCreation].strokeColor = Color.white()
 		}
 	}
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
-		let c = this.creations[this.visibleCreation]
-		c.update({ anchor: this.anchor })
-		c.dissolveInto(paper)
+		this.creations[this.visibleCreation].dissolveInto(paper)
 		paper.updateIOList()
-		this.penTip = null
 	}
 
-	updateSelf(args = {}, redraw = true) {
-
-		if (args['anchor'] === undefined && args['startPoint'] != undefined) {
-			args['anchor'] = args['startPoint']
-		}
-		// ^ unless the anchor is set explicitly, use the startPoint for it
-		super.updateSelf(args, redraw)
-
+	updateModel(argsDict: object = {}) {
+		super.updateModel(argsDict)
 		if (this.creations == undefined) { return }
-		let sc = args['strokeColor']
+		let sc = argsDict['strokeColor']
 		if (sc != undefined) {
-			for (let mob of Object.values(this.creations) as Array<CreatedMobject>) {
-				mob.update({ strokeColor: sc }, false) // most of them are hidden, the visible one will get redrawn soon enough
+			for (let mob of Object.values(this.creations)) {
+				mob.updateModel({ strokeColor: sc })
 			}
 		}
-		let fc = args['fillColor']
+		let fc = argsDict['fillColor']
 		if (fc != undefined) {
-			for (let mob of Object.values(this.creations) as Array<CreatedMobject>) {
-				mob.update({ fillColor: fc }, false)
+			for (let mob of Object.values(this.creations)) {
+				mob.updateModel({ fillColor: fc })
 			}
 		}
 	}
