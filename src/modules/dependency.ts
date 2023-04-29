@@ -7,10 +7,10 @@ export class Dependency {
 	target: Mobject
 	inputName: string
 
-	constructor(args: object = {}) {
-		this.source = args['source']
-		this.outputName = args['outputName'] // may be undefined
-		this.target = args['target']
-		this.inputName = args['inputName'] // may be undefined
+	constructor(argsDict: object = {}) {
+		this.source = argsDict['source']
+		this.outputName = argsDict['outputName'] // may be undefined
+		this.target = argsDict['target']
+		this.inputName = argsDict['inputName'] // may be undefined
 	}
 }

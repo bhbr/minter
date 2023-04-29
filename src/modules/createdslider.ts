@@ -1,31 +1,34 @@
+
 import { Vertex } from './vertex-transform'
 import { CreatedMobject } from './creating'
 import { BoxSlider } from './slider'
 import { WaveCindyCanvas } from './cindycanvas'
 import { Mobject } from './mobject'
 import { Color } from './color'
-import { EventHandlingMode } from './helpers'
 
 
 export class CreatedBoxSlider extends CreatedMobject {
 
-	protoSlider = new BoxSlider()
-	width = 50
-	height = 0
-	fillColor = Color.black()
-	startPoint = Vertex.origin()
-	eventHandlingMode: EventHandlingMode = "self"
+	protoSlider: BoxSlider
+	width: number
+	height: number
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			width: 50,
+			height: 0,
+			fillColor: Color.black(),
+			startPoint: Vertex.origin()
+		})
 	}
 
-	setup() {
-		super.setup()
+	statelessSetup() {
+		super.statelessSetup()
+		this.protoSlider = new BoxSlider()
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
 		this.add(this.protoSlider)
 		this.anchor = this.startPoint
 		this.protoSlider.update({

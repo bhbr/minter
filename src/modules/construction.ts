@@ -5,7 +5,7 @@ import { Circle, TwoPointCircle } from './shapes'
 import { CreatedMobject } from './creating'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
-import { LocatedEvent, pointerEventVertex, EventHandlingMode } from './helpers'
+import { LocatedEvent, pointerEventVertex } from './helpers'
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
@@ -18,32 +18,24 @@ export class IntersectionPoint extends Point {
 	fillOpacity: number = 0
 	lambda: number = NaN
 	mu: number = NaN
-	eventHandlingMode: EventHandlingMode = "background"
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			midpoint: new Vertex(NaN, NaN)
+		})
 	}
 
-	setup() {
-		super.setup()
-		this.midpoint = new Vertex(NaN, NaN)
-	}
-
-	updateSelf(args = {}, redraw = true) {
+	updateModel(argsDict: object = {}) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
 			if (!this.midpoint.equals(mp)) {
-				args['midpoint'] = mp
+				argsDict['midpoint'] = mp
 			}
 		}
-		super.updateSelf(args, redraw)
+		super.updateModel(argsDict)
 
 
 	}
@@ -139,22 +131,29 @@ export class IntersectionPoint extends Point {
 
 export class Construction extends LinkableMobject {
 	
-	points: Array<Point> = []
-	freePoints: Array<FreePoint> = []
-	constructedMobjects: Array<ConstructedMobject> = []
-	eventHandlingMode: EventHandlingMode = "child"
+	points: Array<Point>
+	freePoints: Array<FreePoint>
+	constructedMobjects: Array<ConstructedMobject>
 
-	constructor(args = {}, superCall = false) {
-		super({}, true)
-		if (!superCall) {
-			this.setup()
-			this.update(args)
-		}
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			points: [],
+			constructedMobjects: []
+		})
 	}
 
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			passAlongEvents: true,
+			interactive: true
+		})
+	}
+
+
 	integrate(mob: DrawnArrow | DrawnCircle) {
-		let p1: Point = this.pointForVertex(mob.startPoint.add(mob.anchor))
-		let p2: Point = this.pointForVertex(mob.endPoint.add(mob.anchor))
+		let p1: Point = this.pointForVertex(mob.startPoint)
+		let p2: Point = this.pointForVertex(mob.endPoint)
 
 		let cm: ConstructedMobject
 		if (mob instanceof DrawnSegment) {
@@ -174,9 +173,7 @@ export class Construction extends LinkableMobject {
 			p1.addDependency('midpoint', cm, 'midpoint')
 			p2.addDependency('midpoint', cm, 'outerPoint')
 		}
-		cm.anchor = mob.anchor
 		this.add(cm)
-		cm.adjustFrame()
 		this.intersectWithRest(cm)
 		this.constructedMobjects.push(cm)
 		p1.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})
@@ -192,6 +189,7 @@ export class Construction extends LinkableMobject {
 		return p
 	}
 
+
 	addPoint(p: Point): boolean {
 		for (let q of this.points) {
 			if (p.midpoint.equals(q.midpoint)) {
@@ -203,12 +201,14 @@ export class Construction extends LinkableMobject {
 		return true
 	}
 
+
+
 	intersectWithRest(geomob1: ConstructedMobject) {
 		for (let geomob2 of this.constructedMobjects) {
 			if (geomob1 == geomob2) { continue }
 			let nbPoints: number = (geomob1 instanceof Arrow && geomob2 instanceof Arrow) ? 1 : 2
 			for (let i = 0; i < nbPoints; i++) {
-				let p = new IntersectionPoint({
+				let p: IntersectionPoint = new IntersectionPoint({
 					geomob1: geomob1,
 					geomob2: geomob2,
 					index: i
