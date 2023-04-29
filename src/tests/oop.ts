@@ -1,42 +1,41 @@
-
-
 export class A {
 	value: number
+
 }
 
 export class B {
 	a1: A
 
-	constructor(argsDict = {}) {
+	constructor(args = {}) {
 		console.log('B.constructor')
 		this.a1 = new A()
 		if (this.constructor.name == 'B') {
-			this.update(argsDict)
+			this.update(args)
 		}
 	}
 
-	update(argsDict = {}) {
+	update(args = {}) {
 		console.log('B.update')
-		this.a1.value = argsDict['value1']
+		this.a1.value = args['value1']
 	}
 }
 
 export class C extends B {
 	a2: A
 
-	constructor(argsDict = {}) {
+	constructor(args = {}) {
 		console.log('C.constructor')
 		super()
 		this.a2 = new A()
 		if (this.constructor.name == 'C') {
-			this.update(argsDict)
+			this.update(args)
 		}
 	}
 
-	update(argsDict = {}) {
+	update(args = {}) {
 		console.log('C.update')
-		super.update(argsDict)
-		this.a2.value = argsDict['value2']
+		super.update(args)
+		this.a2.value = args['value2']
 	}
 }
 

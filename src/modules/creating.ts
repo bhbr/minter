@@ -1,29 +1,25 @@
 import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex } from './helpers'
 import { Vertex } from './vertex-transform'
-import { Mobject, MGroup, Polygon } from './mobject'
+import { Mobject, MGroup } from './mobject'
+import { Polygon } from './vmobject'
 import { Color } from './color'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
-import { LocatedEvent, paperLog } from './helpers'
+import { LocatedEvent, paperLog, EventHandlingMode } from './helpers'
 import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
 
-	startPoint: Vertex
-	endPoint: Vertex
-	visible: boolean = true
+	startPoint = Vertex.origin()
+	endPoint = Vertex.origin()
+	visible = true
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			startPoint: Vertex.origin(),
-			endPoint: Vertex.origin()
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			interactive: true
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
 	dissolveInto(paper: Paper) {
@@ -34,53 +30,54 @@ export class CreatedMobject extends MGroup {
 		for (let submob of this.children) {
 			console.log(submob)
 			paper.add(submob)
+			submob.adjustFrame()
 		}
 		console.log('dissolving CreatedMobject')
 	}
 
 	updateFromTip(q: Vertex) {
 		this.endPoint.copyFrom(q)
+		this.update()
 	}
 
 }
 
 class DrawnMobject extends CreatedMobject {
 
-	penStrokeColor: Color
-	penStrokeWidth: number
-	penFillColor: Color
-	penFillOpacity: number
+	penStrokeColor = Color.white()
+	penStrokeWidth = 1
+	penFillColor = Color.white()
+	penFillOpacity = 1
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			penStrokeColor: Color.white(),
-			penStrokeWidth: 1.0,
-			penFillColor: Color.white(),
-			penFillOpacity: 0.0
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
+
 }
 
 export class Freehand extends DrawnMobject {
 
-	line: Polygon
+	readonly fillOpacity = 0
+	line = new Polygon({
+		closed: false,
+		opacity: 1.0,
+		fillOpacity: this.fillOpacity
+	})
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			draggable: false
-		})
-	}
-	
-	statelessSetup() {
-		super.statelessSetup()
-		this.line = new Polygon({
-			closed: false,
-			opacity: 1.0
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
 		this.line.update({
 			strokeColor: this.penStrokeColor
@@ -117,26 +114,16 @@ export class Freehand extends DrawnMobject {
 	}
 	
 	updateFromTip(q: Vertex) {
+		super.updateFromTip(q)
 		this.updateWithLines(q)
-		this.redraw()
 	}
 
 	dissolveInto(superMobject: Mobject) {
-		this.line.adjustFrame()
-
-		let dr = this.line.anchor
-		this.line.update({
-			anchor: Vertex.origin()
-		})
-		this.update({
-			anchor: this.anchor.translatedBy(dr),
-			viewWidth: this.line.getWidth(),
-			viewHeight: this.line.getHeight()
-		})
 
 		superMobject.remove(this)
 		if (this.visible) {
 			superMobject.add(this)
+			this.adjustFrame()
 		}
 	}
 
@@ -146,21 +133,20 @@ export class Freehand extends DrawnMobject {
 
 export class Point extends Circle {
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			radius: 7.0
-		})
+	_radius = 7
+	fillColor = Color.white()
+	fillOpacity = 1
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			fillColor: Color.white(),
-			fillOpacity: 1.0
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		if (!this.midpoint || this.midpoint.isNaN()) {
 			this.update({ midpoint: Vertex.origin() }, false)
 		}
@@ -171,39 +157,33 @@ export class Point extends Circle {
 
 export class FreePoint extends Point {
 
-	fixedArgs() {
-		return Object.assign(super.fixedArgs(), {
-			draggable: true,
-			interactive: true
-		})
-	}
+	readonly draggable = true
+	eventHandlingMode: EventHandlingMode = "self"
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.enableDragging()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 }
 
 export class DrawnArrow extends DrawnMobject {
 
-	startFreePoint: FreePoint
-	endFreePoint: FreePoint
+	startFreePoint = new FreePoint()
+	endFreePoint = new FreePoint()
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			passAlongEvents: true
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-
-		this.startFreePoint = new FreePoint()
-		this.endFreePoint = new FreePoint()
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
 		this.endPoint = this.startPoint.copy()
@@ -233,15 +213,18 @@ export class DrawnArrow extends DrawnMobject {
 
 export class DrawnSegment extends DrawnArrow {
 
-	segment: Segment
+	segment = new Segment()
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.segment = new Segment()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.segment)
 		this.segment.update({
 			startPoint: this.startFreePoint.midpoint,
@@ -257,15 +240,18 @@ export class DrawnSegment extends DrawnArrow {
 
 export class DrawnRay extends DrawnArrow {
 
-	ray: Ray
+	ray = new Ray()
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.ray = new Ray()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.ray)
 		this.ray.update({
 			startPoint: this.startFreePoint.midpoint,
@@ -281,15 +267,18 @@ export class DrawnRay extends DrawnArrow {
 
 export class DrawnLine extends DrawnArrow {
 
-	line: Line
+	line = new Line()
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.line = new Line()
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.line)
 		this.line.update({
 			startPoint: this.startFreePoint.midpoint,
@@ -307,30 +296,22 @@ export class DrawnCircle extends DrawnMobject {
 
 	midpoint: Vertex
 	outerPoint: Vertex
-	freeMidpoint: FreePoint
-	freeOuterPoint: FreePoint
-	circle: TwoPointCircle
+	freeMidpoint = new FreePoint()
+	freeOuterPoint = new FreePoint()
+	circle = new TwoPointCircle()
+	readonly strokeWidth = 1
+	readonly fillOpacity = 0
 
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			strokeWidth: 1,
-			fillOpacity: 0,
-			passAlongEvents: true
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.freeMidpoint = new FreePoint()
-		this.freeOuterPoint = new FreePoint()
-		this.circle = new TwoPointCircle()
-
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 
 		this.midpoint = this.midpoint || this.startPoint.copy()
 		this.outerPoint = this.outerPoint || this.startPoint.copy()
@@ -369,18 +350,13 @@ export class DrawnCircle extends DrawnMobject {
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
 		this.outerPoint.copyFrom(q)
-		this.freeOuterPoint.midpoint.copyFrom(q)
+		this.freeOuterPoint.update({ midpoint: this.outerPoint })
 		this.update()
 	}
 
 	dissolveInto(paper: Paper) {
 		paper.construction.integrate(this)
 	}
-
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
-	}
-
 
 }
 

@@ -1,38 +1,49 @@
-import { Vertex } from './vertex-transform'
+import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
-import { Polygon, CurvedShape, MGroup } from './mobject'
-import { Segment } from './arrows'
-import { gray, pointerEventVertex } from './helpers'
+import { MGroup } from './mobject'
+import { Polygon, CurvedShape } from './vmobject'
+//import { Segment } from './arrows'
+import { gray, pointerEventVertex, EventHandlingMode } from './helpers'
+import { TAU } from './math'
 
 
 
 export class Circle extends CurvedShape {
 
-	midpoint: Vertex
-	radius: number
+	_radius = 50
+	anchor = new Vertex(-this.radius, -this.radius)
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			midpoint: Vertex.origin(),
-			radius: 10
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	updateModel(argsDict: object = {}) {
-
-		let r = argsDict['radius'] || this.radius
-		let a = argsDict['anchor']
-		if (a != undefined) {
-			argsDict['midpoint'] = a.translatedBy(r, r)
-		} else {
-			let m = argsDict['midpoint'] || this.midpoint
-			argsDict['anchor'] = m.translatedBy(-r, -r)
+	get midpoint(): Vertex { return this.anchor.translatedBy(this.radius, this.radius )}
+	set midpoint(newValue: Vertex) {
+		if (this.radius === undefined) {
+			this.radius = 0
 		}
+		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
+	}
 
-		argsDict['viewWidth'] = 2 * r
-		argsDict['viewHeight'] = 2 * r
+	get radius(): number { return this._radius }
+	set radius(newValue: number) {
+		if (this.anchor == undefined) {
+			this.midpoint = new Vertex(newValue, newValue)
+		}
+		let oldMidpoint = this.midpoint
+		this._radius = newValue
+		this.midpoint = oldMidpoint // this moves the anchor so that the midpoint stays the same
+	}
 
-		super.updateModel(argsDict)
+	updateSelf(args = {} ,redraw = true) {
+		let r = args['radius'] || this.radius
+		args['viewWidth'] = 2 * r
+		args['viewHeight'] = 2 * r
+		super.updateSelf(args, redraw)
 	}
 
 	updateBezierPoints() {
@@ -57,55 +68,41 @@ export class Circle extends CurvedShape {
 			translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius))
 		}
 		this.bezierPoints = translatedBezierPoints
-
-		// do NOT update the view, because redraw calls updateBezierPoints
 	}
 
 }
 
 export class TwoPointCircle extends Circle {
 
-	outerPoint: Vertex
+	outerPoint = Vertex.origin()
+	fillOpacity = 0
+	eventHandlingMode: EventHandlingMode = "background"
 
-	defaultArgs() {
-		return Object.assign(super.defaultArgs(), {
-			strokeColor: Color.white(),
-			fillColor: Color.white(),
-			fillOpacity: 0,
-			outerPoint: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-
-	statefulSetup() {
-		super.statefulSetup()
-		this.view.style['pointer-events'] = 'none'
-	}
-
-	updateModel(argsDict: object = {}) {
-
-		let p = argsDict['midpoint'] || this.midpoint
-		let q = argsDict['outerPoint'] || this.outerPoint
+	updateSelf(args = {}, redraw =true) {
+		let p = args['midpoint'] || this.midpoint
+		let q = args['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
-		argsDict['radius'] = r
-		super.updateModel(argsDict)
+		args['radius'] = r
+		super.updateSelf(args, redraw)
 	}
 
 }
 
 export class Ellipse extends CurvedShape {
 
-	majorAxis: number
-	minorAxis: number
-	tilt: number
+	majorAxis = 200
+	minorAxis = 100
+	tilt = 0
 
-	defaultArgs() {
-		return Object.assign(super.defaultArgs(), {
-			majorAxis: 200,
-			minorAxis: 100,
-			tilt: 0
-		})
-	}
+	constructor(args = {}) { super(args) }
 
 }
 
@@ -114,32 +111,24 @@ export class Ellipse extends CurvedShape {
 
 export class Rectangle extends Polygon {
 
-	width: number
-	height: number
-	p1: Vertex
-	p2: Vertex
-	p3: Vertex
-	p4: Vertex
-
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			width: 100,
-			height: 100,
-			p1: Vertex.origin(),
-			p2: Vertex.origin(),
-			p3: Vertex.origin(),
-			p4: Vertex.origin()
-		})
+	width = 200
+	height = 100
+	p1 = Vertex.origin()
+	p2 = new Vertex(this.width, 0)
+	p3 = new Vertex(this.width, this.height)
+	p4 = new Vertex(0, this.height)
+	vertices = [this.p1, this.p2, this.p3, this.p4]
+	
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.vertices = [this.p1, this.p2, this.p3, this.p4]
-	}
-
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -160,56 +149,84 @@ export class Rectangle extends Polygon {
 
 export class RoundedRectangle extends CurvedShape {
 
-	width: number
-	height: number
-	p1: Vertex
-	p2: Vertex
-	p3: Vertex
-	p4: Vertex
-	cornerRadius: number
+	width = 200
+	height = 100
+	cornerRadius = 10
+	p1 = Vertex.origin()
+	p2 = Vertex.origin()
+	p3 = Vertex.origin()
+	p4 = Vertex.origin()
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			cornerRadius: 10,
-			p1: Vertex.origin(),
-			p2: Vertex.origin(),
-			p3: Vertex.origin(),
-			p4: Vertex.origin()
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
+	}
+
+	quarterArc(): Array<Vertex> {
+
+		let arr: Array<Vertex> = []
+		let n: number = 4
+		for (let i = 0; i <= n; i++) {
+			let theta: number = i/n * TAU/4
+			let d: number = this.cornerRadius * 4/3 * Math.tan(TAU/(4*n)) * 0.25
+			let radialUnitVector = new Vertex(Math.cos(theta), Math.sin(theta))
+			let tangentUnitVector = new Vertex(-Math.sin(theta), Math.cos(theta))
+			let anchorPoint: Vertex = radialUnitVector.scaledBy(this.cornerRadius)
+
+			let leftControlPoint: Vertex = anchorPoint.translatedBy(tangentUnitVector.scaledBy(-d))
+			let rightControlPoint: Vertex = anchorPoint.translatedBy(tangentUnitVector.scaledBy(d))
+
+			if (i != 0) { arr.push(leftControlPoint) }
+			arr.push(anchorPoint)
+			if (i != n) { arr.push(rightControlPoint) }
+		}
+		return arr
 	}
 
 	updateBezierPoints() {
-		try {
-			let r = Math.min(this.cornerRadius, Math.min(this.width, this.height)/2)
-			this.p2.x = this.width
-			this.p3.x = this.width
-			this.p3.y = this.height
-			this.p4.y = this.height
-			let p11: Vertex = this.p1.translatedBy(0, r)
-			let p12: Vertex = this.p1.translatedBy(r, 0)
-			let p21: Vertex = this.p2.translatedBy(-r, 0)
-			let p22: Vertex = this.p2.translatedBy(0, r)
-			let p31: Vertex = this.p3.translatedBy(0, -r)
-			let p32: Vertex = this.p3.translatedBy(-r, 0)
-			let p41: Vertex = this.p4.translatedBy(r, 0)
-			let p42: Vertex = this.p4.translatedBy(0, -r)
-			this.bezierPoints = [
-				p12, p21,
-				p12, p21, this.p2,
-				this.p2, p22, p31,
-				p22, p31, this.p3,
-				this.p3, p32, p41,
-				p32, p41, this.p4,
-				this.p4, p42, p11,
-				p42, p11, this.p1,
-				this.p1, p12
-			]
-		} catch { }
+		let arc = this.quarterArc()
+		let w = this.width
+		let h = this.height
+		let r = this.cornerRadius
+		let t1 = new Transform({ angle: 0, shift: new Vertex(w - r, h - r)})
+		let arc1 = t1.appliedToVertices(arc)
+		let t2 = new Transform({ angle: TAU/4, shift: new Vertex(r, h - r)})
+		let arc2 = t2.appliedToVertices(arc)
+		let t3 = new Transform({ angle: TAU/2, shift: new Vertex(r, r)})
+		let arc3 = t3.appliedToVertices(arc)
+		let t4 = new Transform({ angle: 3/4*TAU, shift: new Vertex(w - r, r)})
+		let arc4 = t4.appliedToVertices(arc)
+		
+		var arr: Array<Vertex> = []
+		arr = arr.concat(arc1)
+		arr = arr.concat([new Vertex(r, h), new Vertex(w - r, h)])
+		arr = arr.concat(arc2)
+		arr = arr.concat([new Vertex(0, r), new Vertex(0, h - r)])
+		arr = arr.concat(arc3)
+		arr = arr.concat([new Vertex(w - r, 0), new Vertex(r, 0)])
+		arr = arr.concat(arc4)
+		arr = arr.concat([new Vertex(w, h - r), new Vertex(w, r)])
+		arr.push(arc1[0])
+		this.bezierPoints = arr
+
+
 	}
 
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args = {} ,redraw = true) {
+
+		// check if corner radius is not too large
+		let cr = args['cornerRadius'] || this.cornerRadius
+		let w = args['width'] || this.width
+		let h = args['height'] || this.height
+		let r = Math.min(cr, Math.min(w, h)/2)
+
+		args['cornerRadius'] = r
+
+		super.updateSelf(args, redraw)
 
 		//// internal dependencies
 		this.viewWidth = this.width

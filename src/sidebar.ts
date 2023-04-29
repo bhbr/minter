@@ -1,7 +1,8 @@
-import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
+import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent, EventHandlingMode } from './modules/helpers'
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
-import { Mobject, MGroup, TextLabel } from './modules/mobject'
+import { Mobject, MGroup } from './modules/mobject'
+import { TextLabel } from './modules/textlabel'
 import { Color, COLOR_PALETTE } from './modules/color'
 import { Circle, Rectangle } from './modules/shapes'
 import { Segment } from './modules/arrows'
@@ -34,110 +35,94 @@ const buttonScaleFactor: number = 1.3
 
 class Sidebar extends Mobject {
 
-	background: Rectangle
+	readonly viewWidth = 100
+	readonly viewHeight = 1024
+	readonly interactive = true
 	
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			viewWidth: 150,
-			viewHeight: 1024,
-			interactive: true
-		})
-	}
-
-	statelessSetup() {
-		this.background = new Rectangle({
+	background = new Rectangle({
+			width: this.viewWidth,
+			height: this.viewHeight,
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
 			passAlongEvents: true
 		})
-		super.statelessSetup()
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	statefulSetup() {
+	setup() {
+		super.setup()
 		this.add(this.background)
-		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight
-		})
-		super.statefulSetup()
-
 	}
 
 }
 
 class SidebarButton extends Circle {
 	
-	currentModeIndex: number
-	previousIndex: number
-	_baseColor: Color
-	_locationIndex: number
-	optionSpacing: number
-	touchStart: Vertex
-	active: boolean
-	showLabel: boolean
-	text: string
-	label: TextLabel
-	fontSize: number
-	messages: Array<object>
-	outgoingMessage: object
-	key: string
+	currentModeIndex = 0
+	previousIndex = 0
+	_baseColor = Color.white()
+	_locationIndex = 0
+	readonly optionSpacing: number = 25
+	readonly interactive = true
+	readonly strokeWidth = 0
+	touchStart?: Vertex = null
+	active = false
+	showLabel = true
+	text = 'label'
+	messages: Array<object> = []
+	outgoingMessage = {}
+	key?: string = null
+	_radius = buttonRadius
+	viewWidth = 2 * buttonRadius
+	viewHeight = 2 * buttonRadius
+	fillOpacity = 1
+	eventHandlingMode: EventHandlingMode = "self"
+
+	label = new TextLabel({
+		fontSize: 12,
+		color: Color.white(),
+		viewWidth: 2 * this.radius,
+		viewHeight: 2 * this.radius,
+		passAlongEvents: true
+	})
+
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
+	}
 
 	boundButtonUpByKey(e: KeyboardEvent) { }
 	boundButtonDownByKey(e: KeyboardEvent) { }
 
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			strokeWidth: 0,
-			optionSpacing: 25,
-			interactive: true
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			currentModeIndex: 0,
-			previousIndex: 0,
-			baseColor: Color.white(),
-			locationIndex: 0,
-			active: false,
-			showLabel: true,
-			text: 'text',
-			fontSize: 12,
-			messages: [],
-			radius: buttonRadius,
-			viewWidth: 2 * buttonRadius,
-			viewHeight: 2 * buttonRadius,
-			fillOpacity: 1
-		})
-	}
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.label = new TextLabel()
+	setup() {
+		super.setup()
 
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
 		addPointerDown(this.view, this.boundPointerDown) // this.boundButtonDownByPointer)
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
 		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius,
 			text: this.text
 		}, false)
-		let fontSize = this.fontSize ?? 12
-		this.label.view.style['font-size'] = `${fontSize}px`
-		this.label.view.style['color'] = Color.white().toHex()
+		// let fontSize = this.fontSize ?? 12
+		// this.label.view.style['font-size'] = `${fontSize}px`
+		// this.label.view.style['color'] = Color.white().toHex()
 
 	}
 
@@ -152,7 +137,7 @@ class SidebarButton extends Circle {
 	get locationIndex(): number { return this._locationIndex }
 	set locationIndex(newIndex: number) {
 		this._locationIndex = newIndex
-		this.anchor = buttonCenter(this._locationIndex)
+		this.midpoint = buttonCenter(this._locationIndex)
 	}
 
 	colorForIndex(i: number): Color {
@@ -173,19 +158,19 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
-		console.log("button down")
 		if (this.active) { return }
+		console.log('messaging paper with', this.messages[0])
 		this.messagePaper(this.messages[0])
 		this.active = true
-		let c = this.localCenter()
-		let t = new Transform({shift: c})
-		t.rightComposeWith(new Transform({scale: 1.2}))
-		t.rightComposeWith(new Transform({shift: c}).inverse())
-		// I know this is ugly, transform anchor doesn't work properly
+		let t = new Transform({
+			center: this.localCenter(),
+			scale: 1.2
+		})
 		this.update({
 			transform: t,
 			previousIndex: this.currentModeIndex
 		})
+
 	}
 	
 	selfHandlePointerDown(e: LocatedEvent) {
@@ -222,11 +207,10 @@ class SidebarButton extends Circle {
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update({
-			//radius: buttonRadius,
-			transform: new Transform({scale: 1.0, anchor: this.localCenter()}), // identity does not work, weirdly enough
+			radius: buttonRadius,
+			transform: Transform.identity(),
 			midpoint: newMidpoint
 		})
-		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)
 	}
 
@@ -239,17 +223,8 @@ class SidebarButton extends Circle {
 	}
 
 	updateLabel() {
-		if (this.label == undefined) { return }
-		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius
-		})
-
-		let f = this.active ? buttonScaleFactor : 1
-		let fs = f * (this.fontSize ?? 12)
-		this.label.view?.setAttribute('font-size', fs.toString())
 		if (this.showLabel) {
-			try {
+			try { // remove this
 				let msg = this.messages[this.currentModeIndex]
 				this.label.text = Object.values(msg)[0]
 			} catch { }
@@ -258,8 +233,8 @@ class SidebarButton extends Circle {
 		}
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	updateSelf(args = {} ,redraw = true) {
+		super.updateSelf(args, redraw)
 		this.updateLabel()
 	}
 	
@@ -317,32 +292,23 @@ class SidebarButton extends Circle {
 
 class ColorChangeButton extends SidebarButton {
 
-	colorNames: Array<string>
+	colorNames: Array<string> = Object.keys(COLOR_PALETTE)
+	readonly optionSpacing = 15
+	readonly showLabel = false
+	outgoingMessage = {}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			optionSpacing: 15,
-			showLabel: false
-		})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
+		}
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			showLabel: true
-		})
-	}
+	setup() {
+		super.setup()
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.outgoingMessage = {}
-
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-
-		this.colorNames = Object.keys(COLOR_PALETTE)
-		this.label.view.setAttribute('fill', 'black')
+		//this.label.view.setAttribute('fill', 'black')
 
 		for (let name of this.colorNames) {
 			this.messages.push({color: name})
@@ -367,7 +333,7 @@ class ColorChangeButton extends SidebarButton {
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
-		this.label.update({text: ''})
+		//this.label.update({text: ''})
 		this.messagePaper(this.outgoingMessage)
 		this.update()
 	}
@@ -382,25 +348,28 @@ class ColorChangeButton extends SidebarButton {
 
 class CreativeButton extends SidebarButton {
 
-	creations: Array<string>
+	creations: Array<string> = []
+	outgoingMessage = {creating: 'freehand'}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.messages = []
-		this.outgoingMessage = {creating: 'freehand'}
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-		for (let creation of this.creations) {
-			this.messages.push({creating: creation})
+	constructor(args = {}, superCall = false) {
+		super({}, true)
+		if (!superCall) {
+			this.setup()
+			this.update(args)
 		}
-
 	}
 
 	commonButtonUp() {
 		this.currentModeIndex = 0
 		super.commonButtonUp()
+	}
+
+	updateSelf(args = {}, redraw = true) {
+		super.updateSelf(args, redraw)
+		this.messages = []
+		for (let creation of this.creations) {
+			this.messages.push({creating: creation})
+		}
 	}
 
 	updateLabel() {
@@ -413,7 +382,6 @@ class CreativeButton extends SidebarButton {
 		} else {
 			this.label.update({text: ''})
 		}
-
 	}
 }
 
@@ -425,36 +393,49 @@ class ToggleButton extends SidebarButton {
 		super.commonButtonUp()
 	}
 
-	updateLabel() {
-		if (this.label == undefined) { return }
-		let f: number = this.active ? buttonScaleFactor : 1
-		this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
-	}
+	// updateLabel() {
+	// 	if (this.label == undefined) { return }
+	// 	let f: number = this.active ? buttonScaleFactor : 1
+	// 	this.label.view.setAttribute('font-size', (f * this.fontSize).toString())
+	// }
 
 }
 
 class DragButton extends ToggleButton {
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			fontSize: 25
+
+	setup() {
+		super.setup()
+		this.label.update({
+			fontSize: 25,
+			fontFamily: 'Times',
+			text: '↕︎'
 		})
+		// this.label.view.style['font-family'] = 'Times'
+		// this.label.view.style['font-size'] = `${this.fontSize}px`
+		// this.label.text = '↕︎'
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.label.view.style['font-family'] = 'Times'
-		this.label.view.style['font-size'] = `${this.fontSize}px`
-		this.label.text = '↕︎'
-	}
+	updateLabel() {}
 
 }
 
 class LinkButton extends ToggleButton {
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.label.text = 'link'
+	setup() {
+		super.setup()
+		this.label.update({
+			text: 'link'
+		})
+	}
+}
+
+class PanButton extends ToggleButton {
+	setup() {
+		super.setup()
+		this.label.update({
+			text: 'pan'
+		})
 	}
 }
 
@@ -463,10 +444,8 @@ let sidebar = new Sidebar({
 	view: document.querySelector('#sidebar')
 })
 
-console.log(sidebar)
-
-//paper.view.style.left = sidebar.viewWidth.toString() + "px"
-
+paper.view.style.left = sidebar.viewWidth.toString() + "px"
+let creating: boolean = false
 
 
 let lineButton = new CreativeButton({
@@ -513,16 +492,16 @@ cindyButton.update({
 	midpoint: buttonCenter(3)
 })
   
-let pendulumButton = new CreativeButton({
-	creations: ['pendulum'],
-	key: 't',
-	baseColor: Color.gray(0.4),
-	locationIndex: 4
-})
-sidebar.add(pendulumButton)
-pendulumButton.update({
-	midpoint: buttonCenter(4)
-})
+// let pendulumButton = new CreativeButton({
+// 	creations: ['pendulum'],
+// 	key: 't',
+// 	baseColor: Color.gray(0.4),
+// 	locationIndex: 4
+// })
+// sidebar.add(pendulumButton)
+// pendulumButton.update({
+// 	midpoint: buttonCenter(4)
+// })
   
 let dragButton = new DragButton({
 	messages: [{drag: true}],
@@ -549,18 +528,43 @@ linkButton.update({
 	midpoint: buttonCenter(6)
 })
 
-let colorButton = new ColorChangeButton({
-	key: 'd',
-	baseColor: Color.white(),
-	modeSpacing: 15,
-	locationIndex: 7,
-	fillOpacity: 1
-})
-sidebar.add(colorButton)
-colorButton.update({
-	midpoint: buttonCenter(7)
-})
+// let colorButton = new ColorChangeButton({
+// 	key: 'd',
+// 	baseColor: Color.white(),
+// 	modeSpacing: 15,
+// 	locationIndex: 7,
+// 	fillOpacity: 1
+// })
+// sidebar.add(colorButton)
+// colorButton.update({
+// 	midpoint: buttonCenter(7)
+// })
 
 
-let creating: boolean = false
+
+// let panButton = new PanButton({
+// 	messages: [{pan: true}],
+// 	outgoingMessage: {pan: false},
+// 	key: 'f',
+// 	baseColor: Color.gray(0.6),
+// 	modeSpacing: 15,
+// 	locationIndex: 8,
+// 	fillOpacity: 1
+// })
+// sidebar.add(panButton)
+// panButton.update({
+// 	midpoint: buttonCenter(8)
+// })
+
+
+
+
+
+
+
+
+
+
+
+
 
