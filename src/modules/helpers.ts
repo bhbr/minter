@@ -166,7 +166,14 @@ export function applyMixins(derivedCtor: any, constructors: any[]) {
   });
 }
 
-
+export enum PointerEventPolicy {
+	Transparent, // pass to Mobject underneath (done via a CSS property, e. g. for the interior of a TwoPointCircle)
+	Propagate, // don't interfere with event capturing (e.g. for CindyJS canvas)
+	PassUp, // to the parent, e. g. for the Rectangles of a BoxSlider
+	HandleYourself, // you are at the right address
+	PassDown, // to the lowest event target that is still a mobject and won't PassUp the event
+	Cancel // <=> HandleYourself with empty selfHandlers
+}
 
 
 

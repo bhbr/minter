@@ -1,20 +1,21 @@
-import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent } from './modules/helpers'
+import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/helpers'
 import { Vertex } from './modules/vertex-transform'
 import { Mobject, MGroup } from './modules/mobject'
+import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
+import { ExpandableMobject } from './modules/expandables'
 import { Color, COLOR_PALETTE } from './modules/color'
 import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
 import { Arrow, Segment, Ray, Line } from './modules/arrows'
 import { Point, FreePoint } from './modules/creating'
 import { CreationGroup } from './modules/creationgroup'
 import { BoxSlider } from './modules/slider'
-import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
 import { Construction } from './modules/construction'
 import { Pendulum } from './modules/pendulum'
 import { CindyCanvas } from './modules/cindycanvas'
 
 declare var CindyJS: any
 
-export class Paper extends LinkableMobject {
+export class Paper extends ExpandableMobject {
 
 	visibleCreation: string
 	cindyPorts: Array<object>
@@ -22,27 +23,24 @@ export class Paper extends LinkableMobject {
 	creationStartPoint: Vertex
 	currentColor: Color
 	creationGroup: CreationGroup
-	//dependencyMap: DependencyMap
-	draggedMobject: Mobject
-	//dragPointStart: Vertex
-	//dragAnchorStart: Vertex
-	draggedIOList: IOList
-	dragIOListAnchorStart: Vertex
 	construction: Construction
-	background: Rectangle
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			children: [],
 			visibleCreation: 'freehand',
 			snappablePoints: [],
+			interactive: true,
+			draggable: true,
+			draggedMobjects: []
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			interactive: true,
-			draggable: true
+			isExpanded: true
+			// interactive: true,
+			// draggable: true,
 		})
 	}
 
@@ -55,23 +53,27 @@ export class Paper extends LinkableMobject {
 			strokeWidth: 0,
 			passAlongEvents: false,
 			interactive: false,
-			draggable: false
+			draggable: false,
+			pointerEventPolicy: PointerEventPolicy.PassUp
 		})
 
 
 		this.construction = new Construction()
-		console.log(this.construction)
 	}
 
 	statefulSetup() {
+		console.log('starting stateful setup')
+		console.log(this.selfHandlePointerDown, this.savedSelfHandlePointerDown)
 		super.statefulSetup()
-		this.setDragging(false)
-		this.add(this.background)
+		console.log(this.selfHandlePointerDown, this.savedSelfHandlePointerDown)
+
 		this.add(this.construction)
 		this.construction.update({
 			viewWidth: 0, //this.viewWidth,
 			viewHeight: 0 //this.viewHeight
 		}, false)
+		console.log('setting dragging 2...')
+		this.setDragging(false)
 	}
 
 	updateModel(argsDict: object = {}) {
@@ -84,6 +86,10 @@ export class Paper extends LinkableMobject {
 			viewHeight: this.viewHeight
 		})
 	}
+
+	savedSelfHandlePointerDown(e: LocatedEvent) { this.startCreating(e) }
+	savedSelfHandlePointerMove(e: LocatedEvent) { this.creativeMove(e) }
+	savedSelfHandlePointerUp(e: LocatedEvent) { this.endCreating(e) }
 
 	changeColorByName(newColorName: string) {
 		let newColor: Color = COLOR_PALETTE[newColorName]
@@ -98,104 +104,6 @@ export class Paper extends LinkableMobject {
 		})
 	}
 
-	setDragging(flag: boolean) {
-		this.passAlongEvents = !flag
-		if (flag) {
-			this.selfHandlePointerDown = this.startDragging
-			this.selfHandlePointerMove = this.dragging
-			this.selfHandlePointerUp = this.endDragging
-			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = false
-			}
-		} else {
-			this.selfHandlePointerDown = this.startCreating
-			this.selfHandlePointerMove = this.creativeMove
-			this.selfHandlePointerUp = this.endCreating
-			for (let submob of this.getCindys()) {
-				submob.vetoOnStopPropagation = true
-			}
-		}
-	}
-
-	getCindys(): Array<CindyCanvas> {
-		let ret: Array<CindyCanvas> = []
-		for (let submob of this.submobs) {
-			if (submob instanceof CindyCanvas) {
-				ret.push(submob)
-			}
-		}
-		return ret
-	}
-
-	startDragging(e: LocatedEvent) {
-		console.log('startDragging')
-		this.draggedMobject = this.eventTargetMobject(e)
-		if (this.draggedMobject == this.background) { this.draggedMobject = this }
-		console.log('dragged:', this.draggedMobject)
-		if (!this.draggedMobject.draggable) { return }
-		if (this.draggedMobject == this) {
-			this.startSelfDragging(e)
-			//this.draggedMobject = undefined
-			return
-		}
-		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.draggedMobject.anchor.copy()
-
-		
-		this.draggedIOList = undefined
-		if (this.dependencyMap == undefined) { return }
-		for (let ioList of this.dependencyMap.children) {
-			if ((ioList as IOList).mobject == this.draggedMobject) {
-				this.draggedIOList = ioList as IOList
-				break
-			}
-		}
-		this.dragIOListAnchorStart = this.draggedIOList.anchor.copy()
-	}
-
-	dragging(e: LocatedEvent) {
-		if (this.draggedMobject == undefined) { return }
-
-		if (this.draggedMobject == this) {
-			this.selfDragging(e)
-			return
-		}
-
-		let dragPoint = pointerEventVertex(e)
-		let dr = dragPoint.subtract(this.dragPointStart)
-		console.log(this.dragAnchorStart)
-		let newAnchor: Vertex = this.dragAnchorStart.add(dr)
-		this.draggedMobject.update({ anchor: newAnchor })
-		this.draggedMobject.view.style.left = `${newAnchor.x}px`
-		this.draggedMobject.view.style.top = `${newAnchor.y}px`
-		console.log(this.draggedMobject)
-
-		if (this.dependencyMap == undefined) { return }
-		this.draggedIOList.anchor.copyFrom(this.dragIOListAnchorStart.add(dr))
-		this.draggedIOList.update()
-		this.dependencyMap.update()
-	}
-
-	endDragging(e: LocatedEvent) {
-		if (this.draggedMobject = this) {
-			this.endSelfDragging(e)
-		}
-		this.draggedMobject = undefined
-	}
-
-	endSelfDragging(e: LocatedEvent) {
-		let dr = this.anchor.subtract(this.dragAnchorStart)
-		this.update({
-			anchor: this.dragAnchorStart
-		})
-		for (let submob of this.submobs) {
-			if (submob == this.background) { continue }
-			submob.update({
-				anchor: submob.anchor.add(dr)
-			})
-		}
-		super.endSelfDragging(e)
-	}
 
 	handleMessage(message: object) {
 		if (message == undefined || message == {}) { return }
@@ -208,11 +116,13 @@ export class Paper extends LinkableMobject {
 		case 'creating':
 				this.changeVisibleCreation(value as string)
 			if (value == 'freehand') {
-				this.passAlongEvents = true
+				this.pointerEventPolicy = PointerEventPolicy.PassDown
+				//this.passAlongEvents = true
 				break
 			}
 			if (this.creationGroup == undefined) {
-				this.passAlongEvents = false
+				this.pointerEventPolicy = PointerEventPolicy.HandleYourself
+				//this.passAlongEvents = false
 			}
 			break
 		case 'color':
@@ -291,6 +201,15 @@ export class Paper extends LinkableMobject {
 		this.hideLinksOfSubmobs()
 	}
 
+	setDragging(flag: boolean) {
+		super.setDragging(flag)
+		if (!flag) {
+			this.selfHandlePointerDown = this.startCreating
+			this.selfHandlePointerMove = this.creativeMove
+			this.selfHandlePointerUp = this.endCreating
+		}
+	}
+
 }
 
 var paperAnchor = Vertex.origin()
@@ -301,7 +220,8 @@ if (isTouchDevice === false) {
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	anchor: paperAnchor,
-	passAlongEvents: true,
+	pointerEventPolicy: PointerEventPolicy.PassDown,
+	//passAlongEvents: true,
 	viewWidth: 1250,
 	viewHeight: 1200
 })

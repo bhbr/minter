@@ -5,7 +5,7 @@ import { CreatedMobject } from './creating'
 import { Mobject } from './mobject'
 import { Color } from './color'
 import { Paper } from '../paper'
-import { LocatedEvent } from './helpers'
+import { LocatedEvent, PointerEventPolicy } from './helpers'
 import { Rectangle } from './shapes'
 
 declare var CindyJS: any
@@ -20,6 +20,8 @@ export class CindyCanvas extends LinkableMobject {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			draggable: true,
+			pointerEventPolicy: PointerEventPolicy.Propagate,
+
 			interactive: true,
 			passAlongEvents: true,
 			vetoOnStopPropagation: true
@@ -107,15 +109,15 @@ export class CindyCanvas extends LinkableMobject {
 		}
 	}
 
-	enableDragging() {
-		super.enableDragging()
-		this.vetoOnStopPropagation = false
-	}
+	// enableDragging() {
+	// 	super.enableDragging()
+	// 	this.vetoOnStopPropagation = false
+	// }
 
-	disableDragging() {
-		super.disableDragging()
-		this.vetoOnStopPropagation = true
-	}
+	// disableDragging() {
+	// 	super.disableDragging()
+	// 	this.vetoOnStopPropagation = true
+	// }
 }
 
 

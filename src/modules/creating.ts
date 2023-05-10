@@ -4,14 +4,13 @@ import { Mobject, MGroup, Polygon } from './mobject'
 import { Color } from './color'
 import { Circle, TwoPointCircle } from './shapes'
 import { Arrow, Segment, Ray, Line } from './arrows'
-import { LocatedEvent, paperLog } from './helpers'
+import { LocatedEvent, PointerEventPolicy, paperLog } from './helpers'
 import { Paper } from '../paper'
 
 export class CreatedMobject extends MGroup {
 
 	startPoint: Vertex
 	endPoint: Vertex
-	visible: boolean = true
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -22,7 +21,10 @@ export class CreatedMobject extends MGroup {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			interactive: true
+			pointerEventPolicy: PointerEventPolicy.HandleYourself,
+			draggable: true,
+			visible: true
+			//interactive: true
 		})
 	}
 
@@ -65,12 +67,6 @@ export class Freehand extends DrawnMobject {
 
 	line: Polygon
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			draggable: false
-		})
-	}
-	
 	statelessSetup() {
 		super.statelessSetup()
 		this.line = new Polygon({
@@ -174,6 +170,7 @@ export class FreePoint extends Point {
 	fixedArgs() {
 		return Object.assign(super.fixedArgs(), {
 			draggable: true,
+			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			interactive: true
 		})
 	}
@@ -191,6 +188,7 @@ export class DrawnArrow extends DrawnMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
+			pointerEventPolicy: PointerEventPolicy.PassDown,
 			passAlongEvents: true
 		})
 	}
@@ -316,7 +314,8 @@ export class DrawnCircle extends DrawnMobject {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 1,
 			fillOpacity: 0,
-			passAlongEvents: true
+			pointerEventPolicy: PointerEventPolicy.PassDown,
+			//passAlongEvents: true
 		})
 	}
 
@@ -377,6 +376,7 @@ export class DrawnCircle extends DrawnMobject {
 		paper.construction.integrate(this)
 	}
 
+	// remove?
 	update(argsDict: object = {}, redraw: boolean = true) {
 		super.update(argsDict, redraw)
 	}

@@ -3,7 +3,7 @@ import { Mobject, VMobject, MGroup, TextLabel } from './mobject'
 import { Dependency } from './dependency'
 import { Color } from './color'
 import { Circle, RoundedRectangle } from './shapes'
-import { pointerEventVertex, LocatedEvent, paperLog } from './helpers'
+import { pointerEventVertex, LocatedEvent, PointerEventPolicy, paperLog } from './helpers'
 import { CreatedMobject } from './creating'
 import { Segment } from './arrows'
 import { CindyCanvas } from './cindycanvas'
@@ -16,7 +16,6 @@ export class LinkHook extends Circle {
 	mobject: Mobject
 	inputName: string
 	outputName: string
-
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {        
@@ -199,6 +198,7 @@ export class DependencyMap extends MGroup {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
+			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			interactive: true
 		})
 	}
@@ -429,7 +429,7 @@ export class LinkableMobject extends Mobject {
 	inputNames: Array<string>
 	outputNames: Array<string>
 	dependencyMap: DependencyMap
-	cindys: Array<CindyCanvas>
+	cindys: Array<CindyCanvas> // remove?
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {

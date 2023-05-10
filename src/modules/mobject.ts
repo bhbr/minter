@@ -2,7 +2,7 @@ import { Vertex, Transform } from './vertex-transform'
 import { Color } from './color'
 import { Dependency } from './dependency'
 import { ExtendedObject } from './extended-object'
-import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog, DRAW_BORDER } from './helpers'
+import { remove, stringFromPoint, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, paperLog, DRAW_BORDER, PointerEventPolicy } from './helpers'
 
 
 export class Mobject extends ExtendedObject {
@@ -26,17 +26,21 @@ export class Mobject extends ExtendedObject {
 
 	// interactivity
 	eventTarget?: Mobject
+	
 	vetoOnStopPropagation: boolean
 	interactive: boolean
 	passAlongEvents: boolean // to event target
 	previousPassAlongEvents?: boolean // stored copy while temporarily set to false when draggable
 	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
+	
+	_pointerEventPolicy: PointerEventPolicy
+	savedPointerEventPolicy: PointerEventPolicy
+
 	snappablePoints: Array<any> // workaround, don't ask
-	dragPointStart?: Vertex
 	dragAnchorStart?: Vertex
 
 
-	constructor(argsDict: object = {}, superCall = false) {
+	constructor(argsDict: object = {}, isSuperCall = false) {
 		super({}, true)
 
 		let initialArgs = this.defaultArgs()
@@ -44,8 +48,8 @@ export class Mobject extends ExtendedObject {
 		Object.assign(initialArgs, this.fixedArgs())
 
 		this.statelessSetup()
-		//// updating
-		if (!superCall) {
+
+		if (!isSuperCall) {
 			this.setAttributes(initialArgs)
 			this.statefulSetup()
 			this.update()
@@ -70,6 +74,9 @@ export class Mobject extends ExtendedObject {
 			vetoOnStopPropagation: false,
 			passAlongEvents: true,
 			draggable: false,
+
+			pointerEventPolicy: PointerEventPolicy.PassUp,
+
 			snappablePoints: [],
 
 			view: document.createElement('div')
@@ -455,11 +462,9 @@ export class Mobject extends ExtendedObject {
 
 	update(argsDict: object = {}, redraw = true) {
 		this.updateModel(argsDict)
-
 		if (redraw) {
 			this.redraw()
 		}
-
 	}
 
 	updateSubmobs() {
@@ -490,25 +495,31 @@ export class Mobject extends ExtendedObject {
 	boundPointerUp(e: LocatedEvent) { }
 	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
 
+	get pointerEventPolicy(): PointerEventPolicy {
+		return this._pointerEventPolicy
+	}
+
+	set pointerEventPolicy(newValue: PointerEventPolicy) {
+		this._pointerEventPolicy = newValue
+		if (this.view == undefined) { return }
+		if (this.pointerEventPolicy == PointerEventPolicy.Transparent) {
+			this.view.style['pointer-events'] = 'none'
+		} else {
+			this.view.style['pointer-events'] = 'auto'
+		}
+	}
 
 	enableDragging() {
-		this.previousPassAlongEvents = this.passAlongEvents
-		this.passAlongEvents = false
-		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-		this.selfHandlePointerDown = this.startSelfDragging
-		this.selfHandlePointerMove = this.selfDragging
-		this.selfHandlePointerUp = this.endSelfDragging
+		// this.previousPassAlongEvents = this.passAlongEvents
+		// this.passAlongEvents = false
+		this.savedPointerEventPolicy = this.pointerEventPolicy
+		this.pointerEventPolicy = PointerEventPolicy.PassUp
 	}
 
 	disableDragging() {
-		if (this.previousPassAlongEvents != undefined) {
-			this.passAlongEvents = this.previousPassAlongEvents
+		if (this.savedPointerEventPolicy != undefined) {
+			this.pointerEventPolicy = this.savedPointerEventPolicy
 		}
-		this.selfHandlePointerDown = this.savedSelfHandlePointerDown
-		this.selfHandlePointerMove = this.savedSelfHandlePointerMove
-		this.selfHandlePointerUp = this.savedSelfHandlePointerUp
 	}
 
 	eventTargetMobject(e: LocatedEvent): Mobject {
@@ -540,7 +551,7 @@ export class Mobject extends ExtendedObject {
 
 	pointerDown(e: LocatedEvent) {
 		this.eventTarget = this.boundEventTargetMobject(e)
-		if (this.eventTarget.vetoOnStopPropagation) { return }
+		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 
 		e.stopPropagation()
 		removePointerDown(this.view, this.boundPointerDown)
@@ -548,8 +559,10 @@ export class Mobject extends ExtendedObject {
 		addPointerUp(this.view, this.boundPointerUp)
 
 		console.log('event target on ', this, 'is', this.eventTarget)
-		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
-			console.log('passing on')
+		if (this.eventTarget != this
+			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
+			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
+			console.log('passing down')
 			this.eventTarget.pointerDown(e)
 		} else {
 			console.log(`handling myself, and I am a ${this.constructor.name}`)
@@ -559,10 +572,12 @@ export class Mobject extends ExtendedObject {
 
 	pointerMove(e: LocatedEvent) {
 		//console.log(this, "event target:", this.eventTarget)
-		if (this.eventTarget.vetoOnStopPropagation) { return }
+		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
 
-		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+		if (this.eventTarget != this
+			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
+			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
 			//console.log("passing on")
 			this.eventTarget.pointerMove(e)
 		} else {
@@ -572,14 +587,16 @@ export class Mobject extends ExtendedObject {
 	}
 
 	pointerUp(e: LocatedEvent) {
-		if (this.eventTarget.vetoOnStopPropagation) { return }
+		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 
 		e.stopPropagation()
 		removePointerMove(this.view, this.boundPointerMove)
 		removePointerUp(this.view, this.boundPointerUp)
 		addPointerDown(this.view, this.boundPointerDown)
 
-		if (this.eventTarget.interactive && this.eventTarget != this && this.passAlongEvents) {
+		if (this.eventTarget != this
+			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
+			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
 			this.eventTarget.pointerUp(e)
 		} else {
 			this.selfHandlePointerUp(e)
@@ -587,26 +604,6 @@ export class Mobject extends ExtendedObject {
 		this.eventTarget = null
 	}
 
-
-	startSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = pointerEventVertex(e)
-		this.dragAnchorStart = this.anchor
-	}
-
-	selfDragging(e: LocatedEvent) {
-		console.log('selfDragging')
-		let dragPoint: Vertex = pointerEventVertex(e)
-		let dr: Vertex = dragPoint.subtract(this.dragPointStart)
-		
-		this.update({
-			anchor: this.dragAnchorStart.add(dr)
-		}, true)
-	}
-
-	endSelfDragging(e: LocatedEvent) {
-		this.dragPointStart = undefined
-		this.dragAnchorStart = undefined
-	}
 
 
 }

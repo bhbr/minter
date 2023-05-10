@@ -5,7 +5,7 @@ import { Circle, TwoPointCircle } from './shapes'
 import { CreatedMobject } from './creating'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
-import { LocatedEvent, pointerEventVertex } from './helpers'
+import { LocatedEvent, PointerEventPolicy, pointerEventVertex } from './helpers'
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
@@ -139,14 +139,17 @@ export class Construction extends LinkableMobject {
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
-			constructedMobjects: []
+			constructedMobjects: [],
+			pointerEventPolicy: PointerEventPolicy.PassDown,
+			passAlongEvents: true,
+			interactive: true
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			passAlongEvents: true,
-			interactive: true
+			// passAlongEvents: true,
+			// interactive: true
 		})
 	}
 

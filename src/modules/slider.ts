@@ -1,4 +1,4 @@
-import { pointerEventVertex, LocatedEvent } from './helpers'
+import { pointerEventVertex, LocatedEvent, PointerEventPolicy } from './helpers'
 import { Vertex } from './vertex-transform'
 import { Color } from './color'
 import { Mobject, MGroup, TextLabel, Polygon } from './mobject'
@@ -35,6 +35,7 @@ export class BoxSlider extends LinkableMobject {
 			draggable: true,
 			interactive: true,
 			passAlongEvents: false,
+			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			outputNames: ['value'],
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5)

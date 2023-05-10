@@ -61,7 +61,7 @@ export class ExtendedObject {
 			
 			if (setter != undefined) {
 				
-				if (Object.keys(this.fixedArgs()).includes(key)) {
+				if (Object.keys(this.fixedArgs()).includes(key) && this[key] != undefined) {
 					console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
 					continue
 				}

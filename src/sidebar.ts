@@ -1,4 +1,4 @@
-import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent } from './modules/helpers'
+import { pointerEventVertex, isTouchDevice, rgb, gray, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, LocatedEvent, PointerEventPolicy } from './modules/helpers'
 import { TAU } from './modules/math'
 import { Vertex, Transform } from './modules/vertex-transform'
 import { Mobject, MGroup, TextLabel } from './modules/mobject'
@@ -40,7 +40,8 @@ class Sidebar extends Mobject {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
 			viewHeight: 1024,
-			interactive: true
+			pointerEventVertex: PointerEventPolicy.HandleYourself,
+			//interactive: true
 		})
 	}
 
@@ -49,7 +50,8 @@ class Sidebar extends Mobject {
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			passAlongEvents: true
+			pointerEventPolicy: PointerEventPolicy.PassDown,
+			//passAlongEvents: true
 		})
 		super.statelessSetup()
 	}
@@ -91,7 +93,8 @@ class SidebarButton extends Circle {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 0,
 			optionSpacing: 25,
-			interactive: true
+			pointerEventPolicy: PointerEventPolicy.HandleYourself,
+			//interactive: true
 		})
 	}
 
@@ -173,7 +176,6 @@ class SidebarButton extends Circle {
 	}
 
 	commonButtonDown() {
-		console.log("button down")
 		if (this.active) { return }
 		this.messagePaper(this.messages[0])
 		this.active = true
@@ -335,7 +337,6 @@ class ColorChangeButton extends SidebarButton {
 	statelessSetup() {
 		super.statelessSetup()
 		this.outgoingMessage = {}
-
 	}
 
 	statefulSetup() {
@@ -380,6 +381,7 @@ class ColorChangeButton extends SidebarButton {
 	}
 }
 
+
 class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
@@ -395,7 +397,6 @@ class CreativeButton extends SidebarButton {
 		for (let creation of this.creations) {
 			this.messages.push({creating: creation})
 		}
-
 	}
 
 	commonButtonUp() {
@@ -433,6 +434,7 @@ class ToggleButton extends SidebarButton {
 
 }
 
+
 class DragButton extends ToggleButton {
 
 	fixedArgs(): object {
@@ -456,14 +458,13 @@ class LinkButton extends ToggleButton {
 		super.statefulSetup()
 		this.label.text = 'link'
 	}
+
 }
 
 
 let sidebar = new Sidebar({
 	view: document.querySelector('#sidebar')
 })
-
-console.log(sidebar)
 
 //paper.view.style.left = sidebar.viewWidth.toString() + "px"
 
