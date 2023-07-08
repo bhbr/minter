@@ -31,7 +31,8 @@ export function MobjectTest() {
 		transform: new Transform({angle: 5 * DEGREES}),
 		anchor: new Vertex(100, 100),
 		drawBorder: true,
-		interactive: true
+		interactive: true,
+		draggable: true
 	})
 	paper.add(f)
 
@@ -56,7 +57,6 @@ export function MobjectTest() {
 	})
 	f.add(l)
 	l.adjustFrame()
-	f.enableDragging()
 
 	console.log(f)
 
@@ -134,8 +134,6 @@ export function CindyTest() {
 
 	paper.add(cv2)
 	cv2.startUp()
-	cv2.enableDragging()
-	cv2.disableDragging()
 	
 }
 

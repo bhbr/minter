@@ -42,8 +42,16 @@ export class ExpandableMobject extends LinkableMobject {
 
 	setDragging(flag: boolean) {
 		console.log('...setting dragging')
-		//this.passAlongEvents = !flag
 		this.pointerEventPolicy = (flag ? PointerEventPolicy.HandleYourself : PointerEventPolicy.PassDown)
+
+		this.update({
+			draggable: flag
+		})
+		for (let submob of this.submobs) {
+			submob.update({
+				draggable: flag
+			})
+		}
 
 		if (flag) {
 			this.savedSelfHandlePointerDown = this.selfHandlePointerDown
@@ -52,24 +60,21 @@ export class ExpandableMobject extends LinkableMobject {
 			this.selfHandlePointerDown = this.startDragging
 			this.selfHandlePointerMove = this.dragging
 			this.selfHandlePointerUp = this.endDragging
+
 			for (let submob of this.getCindys()) {
 				submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
-				//submob.vetoOnStopPropagation = false
 			}
 		} else {
-			console.log(this.selfHandlePointerDown)
+			//console.log(this.selfHandlePointerDown)
 			this.selfHandlePointerDown = this.savedSelfHandlePointerDown
-			console.log(this.selfHandlePointerDown)
+			//console.log(this.selfHandlePointerDown)
 			this.selfHandlePointerMove = this.savedSelfHandlePointerMove
 			this.selfHandlePointerUp = this.savedSelfHandlePointerUp
 			for (let submob of this.getCindys()) {
 				submob.pointerEventPolicy = PointerEventPolicy.Propagate
-				//submob.vetoOnStopPropagation = true
 			}
 		}
 	}
-
-
 
 	startDragging(e: LocatedEvent) {
 		console.log('startDragging')
@@ -122,4 +127,7 @@ export class ExpandableMobject extends LinkableMobject {
 	endDragging(e: LocatedEvent) {
 		this.draggedMobjects = []
 	}
+
+
+
 }

@@ -1,8 +1,8 @@
 // Problem: When updating a Mobject with setAttributes(argsDict),
 // some atttributes should only be copied (passed by value), not linked (passed by reference).
 // This mainly concerns Vertex. E. g. if one Mobject's anchor is set to another's
-// by reference, these two attributes nwo point to the same object. Changing one Mobject's
-// anchor now changes the other as well.
+// by reference, these two attributes now point to the same object. Changing one Mobject's
+// anchor now changes the other's as well.
 // The issue stems from the fact that a Vertex is an object even though it should
 // just be a "dumb" list of numbers (a struct) without a persistent identity.
 

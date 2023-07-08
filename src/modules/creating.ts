@@ -24,20 +24,15 @@ export class CreatedMobject extends MGroup {
 			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			draggable: true,
 			visible: true
-			//interactive: true
 		})
 	}
 
 	dissolveInto(paper: Paper) {
 		paper.remove(this)
-		console.log('a')
 		if (!this.visible) { return }
-		console.log('b')
 		for (let submob of this.children) {
-			console.log(submob)
 			paper.add(submob)
 		}
-		console.log('dissolving CreatedMobject')
 	}
 
 	updateFromTip(q: Vertex) {
@@ -170,15 +165,10 @@ export class FreePoint extends Point {
 	fixedArgs() {
 		return Object.assign(super.fixedArgs(), {
 			draggable: true,
-			pointerEventPolicy: PointerEventPolicy.HandleYourself,
-			interactive: true
+			pointerEventPolicy: PointerEventPolicy.HandleYourself
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.enableDragging()
-	}
 }
 
 export class DrawnArrow extends DrawnMobject {
@@ -188,8 +178,7 @@ export class DrawnArrow extends DrawnMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			pointerEventPolicy: PointerEventPolicy.PassDown,
-			passAlongEvents: true
+			pointerEventPolicy: PointerEventPolicy.PassDown
 		})
 	}
 
@@ -314,8 +303,7 @@ export class DrawnCircle extends DrawnMobject {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 1,
 			fillOpacity: 0,
-			pointerEventPolicy: PointerEventPolicy.PassDown,
-			//passAlongEvents: true
+			pointerEventPolicy: PointerEventPolicy.PassDown
 		})
 	}
 

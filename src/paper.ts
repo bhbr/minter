@@ -19,19 +19,16 @@ export class Paper extends ExpandableMobject {
 
 	visibleCreation: string
 	cindyPorts: Array<object>
-	//snappablePoints: Array<Point>
 	creationStartPoint: Vertex
 	currentColor: Color
-	creationGroup: CreationGroup
+	creationGroup?: CreationGroup
 	construction: Construction
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			children: [],
 			visibleCreation: 'freehand',
-			snappablePoints: [],
-			interactive: true,
-			draggable: true,
+			draggable: false,
 			draggedMobjects: []
 		})
 	}
@@ -39,8 +36,6 @@ export class Paper extends ExpandableMobject {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			isExpanded: true
-			// interactive: true,
-			// draggable: true,
 		})
 	}
 
@@ -51,8 +46,6 @@ export class Paper extends ExpandableMobject {
 			fillColor: Color.clear(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			passAlongEvents: false,
-			interactive: false,
 			draggable: false,
 			pointerEventPolicy: PointerEventPolicy.PassUp
 		})
@@ -62,15 +55,12 @@ export class Paper extends ExpandableMobject {
 	}
 
 	statefulSetup() {
-		console.log('starting stateful setup')
-		console.log(this.selfHandlePointerDown, this.savedSelfHandlePointerDown)
 		super.statefulSetup()
-		console.log(this.selfHandlePointerDown, this.savedSelfHandlePointerDown)
 
 		this.add(this.construction)
 		this.construction.update({
-			viewWidth: 0, //this.viewWidth,
-			viewHeight: 0 //this.viewHeight
+			viewWidth: 300, //this.viewWidth,
+			viewHeight: 200 //this.viewHeight
 		}, false)
 		console.log('setting dragging 2...')
 		this.setDragging(false)
@@ -117,12 +107,10 @@ export class Paper extends ExpandableMobject {
 				this.changeVisibleCreation(value as string)
 			if (value == 'freehand') {
 				this.pointerEventPolicy = PointerEventPolicy.PassDown
-				//this.passAlongEvents = true
 				break
 			}
 			if (this.creationGroup == undefined) {
 				this.pointerEventPolicy = PointerEventPolicy.HandleYourself
-				//this.passAlongEvents = false
 			}
 			break
 		case 'color':
@@ -173,6 +161,7 @@ export class Paper extends ExpandableMobject {
 	}
 
 	creativeMove(e: LocatedEvent) {
+		if (this.creationGroup == undefined) { return }
 		let p: Vertex = pointerEventVertex(e)
 		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 			// snap to existing points
@@ -188,6 +177,7 @@ export class Paper extends ExpandableMobject {
 	}
 
 	endCreating(e: LocatedEvent) {
+		if (this.creationGroup == undefined) { return }
 		this.creationGroup.dissolveInto(this)
 		this.creationGroup = undefined
 	}
@@ -210,6 +200,11 @@ export class Paper extends ExpandableMobject {
 		}
 	}
 
+	dragging(e: LocatedEvent) {
+		super.dragging(e)
+
+	}
+
 }
 
 var paperAnchor = Vertex.origin()
@@ -221,7 +216,6 @@ export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	anchor: paperAnchor,
 	pointerEventPolicy: PointerEventPolicy.PassDown,
-	//passAlongEvents: true,
 	viewWidth: 1250,
 	viewHeight: 1200
 })

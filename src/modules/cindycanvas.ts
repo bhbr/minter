@@ -21,10 +21,6 @@ export class CindyCanvas extends LinkableMobject {
 		return Object.assign(super.fixedArgs(), {
 			draggable: true,
 			pointerEventPolicy: PointerEventPolicy.Propagate,
-
-			interactive: true,
-			passAlongEvents: true,
-			vetoOnStopPropagation: true
 		})
 	}
 
@@ -109,15 +105,6 @@ export class CindyCanvas extends LinkableMobject {
 		}
 	}
 
-	// enableDragging() {
-	// 	super.enableDragging()
-	// 	this.vetoOnStopPropagation = false
-	// }
-
-	// disableDragging() {
-	// 	super.disableDragging()
-	// 	this.vetoOnStopPropagation = true
-	// }
 }
 
 

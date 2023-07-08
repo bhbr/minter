@@ -40,8 +40,7 @@ class Sidebar extends Mobject {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
 			viewHeight: 1024,
-			pointerEventVertex: PointerEventPolicy.HandleYourself,
-			//interactive: true
+			pointerEventVertex: PointerEventPolicy.HandleYourself
 		})
 	}
 
@@ -50,8 +49,7 @@ class Sidebar extends Mobject {
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			pointerEventPolicy: PointerEventPolicy.PassDown,
-			//passAlongEvents: true
+			pointerEventPolicy: PointerEventPolicy.PassDown
 		})
 		super.statelessSetup()
 	}
@@ -93,8 +91,7 @@ class SidebarButton extends Circle {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 0,
 			optionSpacing: 25,
-			pointerEventPolicy: PointerEventPolicy.HandleYourself,
-			//interactive: true
+			pointerEventPolicy: PointerEventPolicy.HandleYourself
 		})
 	}
 

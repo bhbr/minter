@@ -26,18 +26,17 @@ export class Mobject extends ExtendedObject {
 
 	// interactivity
 	eventTarget?: Mobject
-	
-	vetoOnStopPropagation: boolean
-	interactive: boolean
-	passAlongEvents: boolean // to event target
-	previousPassAlongEvents?: boolean // stored copy while temporarily set to false when draggable
-	draggable: boolean // by outside forces, that is (FreePoints drag themselves, as that is their method of interaction)
-	
+
+	draggable: boolean // by itself
+	dragAnchorStart?: Vertex
+
+
 	_pointerEventPolicy: PointerEventPolicy
 	savedPointerEventPolicy: PointerEventPolicy
 
 	snappablePoints: Array<any> // workaround, don't ask
-	dragAnchorStart?: Vertex
+	// remove?
+
 
 
 	constructor(argsDict: object = {}, isSuperCall = false) {
@@ -67,15 +66,10 @@ export class Mobject extends ExtendedObject {
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
 			drawBorder: DRAW_BORDER,
-
 			dependencies: [],
 
-			interactive: false,
-			vetoOnStopPropagation: false,
-			passAlongEvents: true,
-			draggable: false,
-
 			pointerEventPolicy: PointerEventPolicy.PassUp,
+			draggable: false,
 
 			snappablePoints: [],
 
@@ -101,8 +95,6 @@ export class Mobject extends ExtendedObject {
 		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
 		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
 		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-
-		this.disableDragging()
 
 		// this.boundCreatePopover = this.createPopover.bind(this)
 		// this.boundDismissPopover = this.dismissPopover.bind(this)
@@ -509,19 +501,6 @@ export class Mobject extends ExtendedObject {
 		}
 	}
 
-	enableDragging() {
-		// this.previousPassAlongEvents = this.passAlongEvents
-		// this.passAlongEvents = false
-		this.savedPointerEventPolicy = this.pointerEventPolicy
-		this.pointerEventPolicy = PointerEventPolicy.PassUp
-	}
-
-	disableDragging() {
-		if (this.savedPointerEventPolicy != undefined) {
-			this.pointerEventPolicy = this.savedPointerEventPolicy
-		}
-	}
-
 	eventTargetMobject(e: LocatedEvent): Mobject {
 		var t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement.parentElement }
@@ -545,7 +524,6 @@ export class Mobject extends ExtendedObject {
 			t = targetViewChain.pop()
 		}
 		// if all of this fails, you need to handle the event yourself
-		//console.log('event target mob:', this)
 		return this
 	}
 
@@ -559,30 +537,37 @@ export class Mobject extends ExtendedObject {
 		addPointerUp(this.view, this.boundPointerUp)
 
 		console.log('event target on ', this, 'is', this.eventTarget)
+		console.log(this.pointerEventPolicy, this.eventTarget.pointerEventPolicy)
 		if (this.eventTarget != this
 			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
-			console.log('passing down')
+			//console.log('passing down')
 			this.eventTarget.pointerDown(e)
 		} else {
-			console.log(`handling myself, and I am a ${this.constructor.name}`)
-			this.selfHandlePointerDown(e)
+			//console.log(`handling myself, and I am a ${this.constructor.name}`)
+			if (this.draggable) {
+				this.startDragging(e)
+			} else {
+				this.selfHandlePointerDown(e)
+			}
 		}
 	}
 
 	pointerMove(e: LocatedEvent) {
-		//console.log(this, "event target:", this.eventTarget)
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
 
 		if (this.eventTarget != this
 			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
-			//console.log("passing on")
 			this.eventTarget.pointerMove(e)
 		} else {
 			//console.log(`handling myself, and I am a ${this.constructor.name}`)
-			this.selfHandlePointerMove(e)
+			if (this.draggable) {
+				this.dragging(e)
+			} else {
+				this.selfHandlePointerMove(e)
+			}
 		}
 	}
 
@@ -599,9 +584,27 @@ export class Mobject extends ExtendedObject {
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
 			this.eventTarget.pointerUp(e)
 		} else {
-			this.selfHandlePointerUp(e)
+			if (this.draggable) {
+				this.endDragging(e)
+			} else {
+				this.selfHandlePointerUp(e)
+			}
 		}
 		this.eventTarget = null
+	}
+
+	startDragging(e: LocatedEvent) {
+		this.dragAnchorStart = this.anchor.subtract(pointerEventVertex(e))
+	}
+
+	dragging(e: LocatedEvent) {
+		this.update({
+			anchor: pointerEventVertex(e).add(this.dragAnchorStart)
+		})
+	}
+
+	endDragging(e: LocatedEvent) {
+		this.dragAnchorStart = null
 	}
 
 
@@ -845,15 +848,6 @@ export class CurvedShape extends VMobject {
 		this.updateBezierPoints()
 	}
 
-	// globalBezierPoints(): Array<Vertex> {
-	// 	return this.globalTransform().appliedTo(this.bezierPoints)
-	// }
-
-	// redrawSelf() {
-	// 	this.updateBezierPoints()
-	// 	super.redrawSelf()
-	// }
-
 	pathString(): string {
 		//let points: Array<Vertex> = this.globalBezierPoints()
 		let points: Array<Vertex> = this.bezierPoints
@@ -874,7 +868,7 @@ export class CurvedShape extends VMobject {
 		return pathString
 	}
 
-	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
+	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
 	set bezierPoints(newValue: Array<Vertex>) {
 		this._bezierPoints = newValue
 		let v: Array<Vertex> = []

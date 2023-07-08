@@ -36,8 +36,6 @@ export class IntersectionPoint extends Point {
 			}
 		}
 		super.updateModel(argsDict)
-
-
 	}
 
 	intersectionCoords(): Vertex {
@@ -140,19 +138,23 @@ export class Construction extends LinkableMobject {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
 			constructedMobjects: [],
-			pointerEventPolicy: PointerEventPolicy.PassDown,
-			passAlongEvents: true,
-			interactive: true
+			pointerEventPolicy: PointerEventPolicy.PassDown
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			// passAlongEvents: true,
-			// interactive: true
+			draggable: false,
+			backgroundColor: Color.gray(0.2)
 		})
 	}
 
+	statefulSetup() {
+		super.statefulSetup()
+		console.log(this.backgroundColor)
+		console.log(this.view.style['background-color'])
+		this.view.style.overflow = 'hidden'
+	}
 
 	integrate(mob: DrawnArrow | DrawnCircle) {
 		let p1: Point = this.pointForVertex(mob.startPoint)
