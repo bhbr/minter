@@ -16,7 +16,7 @@ The underlying API (written in TypeScript) is still in early development. It all
 - run build/build.sh
 - open minter/minter.html on a virtual server
 
-## Demo
+## Demo
 
 https://youtu.be/k4TVOGCF20s
 

@@ -7,7 +7,7 @@
     },
     "include": [
         "../src/*",
-        "../src/modules/*",
-        "../src/tests/*"
+        "../src/sidebar/*",
+        "../src/tests/*",
     ]
 }

@@ -1,0 +1,28 @@
+import { Circle } from '../shapes/Circle'
+import { Vertex } from '../helpers/Vertex_Transform'
+import { Color } from '../helpers/Color'
+
+export class Point extends Circle {
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			radius: 7.0
+		})
+	}
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			fillColor: Color.white(),
+			fillOpacity: 1.0
+		})
+	}
+
+	statefulSetup() {
+		super.statefulSetup()
+		if (!this.midpoint || this.midpoint.isNaN()) {
+			this.update({ midpoint: Vertex.origin() }, false)
+		}
+
+	}
+
+}

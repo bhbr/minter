@@ -8,11 +8,10 @@ def single_line_adder(line):
 	if (line.endswith("'\n") and not line.endswith(".js'\n")):
 		return line[:-2] + ".js'\n"
 
-
 def add_import_extensions(file):
 	with open(file, 'r') as fh:
-		new_code_lines = [single_line_adder(line) for line in fh.readlines()]
-	if (len(new_code_lines) == 0):
+		new_code_lines = [s for line in fh.readlines() if (s := single_line_adder(line)) is not None]
+	if len(new_code_lines) == 0:
 		return
 	with open(file, 'w') as fh:
 		fh.writelines(new_code_lines)

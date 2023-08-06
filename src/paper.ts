@@ -1,17 +1,27 @@
-import { addPointerDown, remove, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, logInto, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/helpers'
-import { Vertex } from './modules/vertex-transform'
-import { Mobject, MGroup } from './modules/mobject'
-import { LinkableMobject, IOList, DependencyMap } from './modules/linkables'
-import { ExpandableMobject } from './modules/expandables'
-import { Color, COLOR_PALETTE } from './modules/color'
-import { Circle, Rectangle, TwoPointCircle } from './modules/shapes'
-import { Arrow, Segment, Ray, Line } from './modules/arrows'
-import { Point, FreePoint } from './modules/creating'
-import { CreationGroup } from './modules/creationgroup'
-import { BoxSlider } from './modules/slider'
-import { Construction } from './modules/construction'
-import { Pendulum } from './modules/pendulum'
-import { CindyCanvas } from './modules/cindycanvas'
+import { remove, logInto, paperLog } from './modules/helpers/helpers'
+import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
+import { Vertex } from './modules/helpers/Vertex_Transform'
+import { Mobject } from './modules/mobject/Mobject'
+import { MGroup } from './modules/mobject/MGroup'
+import { LinkableMobject } from './modules/mobject/linkable/LinkableMobject'
+import { IOList } from './modules/mobject/linkable/IOList'
+import { DependencyMap } from './modules/mobject/linkable/DependencyMap'
+import { ExpandableMobject } from './modules/mobject/ExpandableMobject'
+import { Color, COLOR_PALETTE } from './modules/helpers/Color'
+import { Circle } from './modules/shapes/Circle'
+import { Rectangle } from './modules/shapes/Rectangle'
+import { TwoPointCircle } from './modules/shapes/TwoPointCircle'
+import { Arrow } from './modules/arrows/Arrow'
+import { Segment } from './modules/arrows/Segment'
+import { Ray } from './modules/arrows/Ray'
+import { Line } from './modules/arrows/Line'
+import { Point } from './modules/creations/Point'
+import { FreePoint } from './modules/creations/FreePoint'
+import { CreationGroup } from './modules/creations/CreationGroup'
+import { BoxSlider } from './modules/slider/BoxSlider'
+import { Construction } from './modules/construction/Construction'
+import { Pendulum } from './modules/pendulum/Pendulum'
+import { CindyCanvas } from './modules/cindy/CindyCanvas'
 
 declare var CindyJS: any
 
@@ -219,34 +229,6 @@ export const paper = new Paper({
 	viewWidth: 1250,
 	viewHeight: 1200
 })
-
-// let c = new Circle({
-// 	radius: 100,
-// 	anchor: new Vertex(200, 300)
-// })
-
-// let s = new BoxSlider({
-// 	anchor: new Vertex(200, 300),
-// 	height: 150
-// })
-
-// let r = new Rectangle({
-// 	anchor: new Vertex(150, 150),
-// 	fillColor: Color.red(),
-// 	fillOpacity: 1,
-// 	width: 220,
-// 	height: 150,
-// 	viewWidth: 220,
-// 	viewHeight: 150,
-// 	passAlongEvents: true
-// })
-
-// paper.add(c)
-// paper.add(s)
-// paper.add(r)
-
-
-
 
 
 
