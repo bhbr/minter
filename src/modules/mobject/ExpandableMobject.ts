@@ -9,7 +9,7 @@ import { CindyCanvas } from '../cindy/CindyCanvas'
 export class ExpandableMobject extends LinkableMobject {
 	
 	linkableChildren: Array<LinkableMobject>
-	isExpanded: boolean
+	expanded: boolean
 	background: Rectangle
 	draggedMobjects: Array<Mobject>
 	dragPointStart?: Vertex
@@ -18,7 +18,7 @@ export class ExpandableMobject extends LinkableMobject {
 		return Object.assign(super.defaultArgs(), {
 			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			linkableChildren: [],
-			isExpanded: false,
+			expanded: false,
 			draggedMobjects: []
 		})
 	}
@@ -38,7 +38,6 @@ export class ExpandableMobject extends LinkableMobject {
 		}
 		return ret
 	}
-
 
 	setDragging(flag: boolean) {
 		this.pointerEventPolicy = (flag ? PointerEventPolicy.HandleYourself : PointerEventPolicy.PassDown)
@@ -102,7 +101,6 @@ export class ExpandableMobject extends LinkableMobject {
 				break
 			}
 		}
-
 	}
 
 	dragging(e: LocatedEvent) {

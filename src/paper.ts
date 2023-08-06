@@ -59,20 +59,16 @@ export class Paper extends ExpandableMobject {
 			draggable: false,
 			pointerEventPolicy: PointerEventPolicy.PassUp
 		})
-
-
 		this.construction = new Construction()
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
-
 		this.add(this.construction)
 		this.construction.update({
-			viewWidth: 300, //this.viewWidth,
-			viewHeight: 200 //this.viewHeight
+			viewWidth: 300,
+			viewHeight: 200
 		}, false)
-		console.log('setting dragging 2...')
 		this.setDragging(false)
 	}
 
@@ -143,7 +139,6 @@ export class Paper extends ExpandableMobject {
 			this.creationGroup.setVisibleCreation(newVisibleCreation)
 		}
 	}
-
 
 	startCreating(e: LocatedEvent) {
 		console.log('startCreating')

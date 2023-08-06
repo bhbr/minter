@@ -83,7 +83,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 	statelessSetup() {
-		//// state-independent setup
+		// state-independent setup
 
 		this.eventTarget = null
 		this.boundPointerDown = this.pointerDown.bind(this)
@@ -502,12 +502,10 @@ export class Mobject extends ExtendedObject {
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
-			if (t['mobject'] != undefined) {
-				let r: any = t['mobject']
-				//console.log('event target mob:', r)
-				if (r.constructor.name == 'InteractiveMobject') {
-					return r
-				}
+			let m: any = t['mobject']
+			if (m != undefined) {
+				console.log('event target mobject:', m)
+				return m
 			}
 			t = targetViewChain.pop()
 		}

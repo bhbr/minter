@@ -33,10 +33,15 @@ export class BoxSlider extends LinkableMobject {
 			height: 200,
 			width: 50,
 			strokeColor: Color.white(),
-			pointerEventPolicy: PointerEventPolicy.HandleYourself,
-			outputNames: ['value'],
 			fillColor: Color.black(),
-			barFillColor: Color.gray(0.5)
+			barFillColor: Color.gray(0.5),
+			pointerEventPolicy: PointerEventPolicy.HandleYourself
+		})
+	}
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			outputNames: ['value']
 		})
 	}
 
