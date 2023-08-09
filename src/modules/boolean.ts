@@ -130,7 +130,7 @@
 // 		}, redraw)
 // 	}
 
-// 	selfHandlePointerUp(e: LocatedEvent) {
+// 	onPointerUp(e: LocatedEvent) {
 // 		if (this.smoothToggleParameter > 0 && this.smoothToggleParameter < 1) { return }
 // 		this.toggle()
 // 	}

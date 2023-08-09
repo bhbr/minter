@@ -61,9 +61,9 @@ export class ColorChangeButton extends SidebarButton {
 	}
 
 //	buttonDrag(e: LocatedEvent) {
-	selfHandlePointerMove(e: LocatedEvent) {
+	onPointerMove(e: LocatedEvent) {
 //		super.buttonDrag(e)
-		super.selfHandlePointerMove(e)
+		super.onPointerMove(e)
 		this.remove(this.label)
 	}
 }

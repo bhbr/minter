@@ -110,12 +110,12 @@ export class BoxSlider extends LinkableMobject {
 
 	}
 
-	selfHandlePointerDown(e: LocatedEvent) {
+	onPointerDown(e: LocatedEvent) {
 		this.scrubStartingPoint = pointerEventVertex(e)
 		this.valueBeforeScrubbing = this.value
 	}
 
-	selfHandlePointerMove(e: LocatedEvent) {
+	onPointerMove(e: LocatedEvent) {
 		let scrubVector: Vertex = pointerEventVertex(e).subtract(this.scrubStartingPoint)
 		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
 		this.value = Math.max(Math.min(this.value, this.max), this.min)

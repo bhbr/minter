@@ -1,5 +1,5 @@
 // long press gesture recognizer
-export function addLongPress(
+export function addLongPressListener(
 	element: Element,
 	triggeredFunction: (Event) => void,
 	time: number = 500
@@ -20,7 +20,7 @@ export function addLongPress(
 		window.clearTimeout(timeoutID)
 	}
 
-	function detectLongPress(e: Event) {
+	function detectLongPress(e: Event, triggeredFunction: any) {
 		element.removeEventListener('mouseup', cancelLongPress)
 		element.addEventListener('mouseup', endLongPress)
 		triggeredFunction(e)
@@ -36,7 +36,7 @@ export function addLongPress(
 
 }
 
-export function removeLongPress(element: Element) {
+export function removeLongPressListener(element: Element) {
 	element.removeEventListener('mousedown', element['startLongPress'])
 	element['startLongPress'] = undefined
 }

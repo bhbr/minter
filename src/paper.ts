@@ -73,9 +73,9 @@ export class Paper extends ExpandableMobject {
 		this.setDragging(false)
 	}
 
-	savedSelfHandlePointerDown(e: LocatedEvent) { this.startCreating(e) }
-	savedSelfHandlePointerMove(e: LocatedEvent) { this.creativeMove(e) }
-	savedSelfHandlePointerUp(e: LocatedEvent) { this.endCreating(e) }
+	savedOnPointerDown(e: LocatedEvent) { this.startCreating(e) }
+	savedOnPointerMove(e: LocatedEvent) { this.creativeMove(e) }
+	savedOnPointerUp(e: LocatedEvent) { this.endCreating(e) }
 
 	changeColorByName(newColorName: string) {
 		let newColor: Color = COLOR_PALETTE[newColorName]
@@ -131,7 +131,6 @@ export class Paper extends ExpandableMobject {
 	}
 
 	startCreating(e: LocatedEvent) {
-		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.construction.points) {
@@ -189,9 +188,9 @@ export class Paper extends ExpandableMobject {
 	setDragging(flag: boolean) {
 		super.setDragging(flag)
 		if (!flag) {
-			this.selfHandlePointerDown = this.startCreating
-			this.selfHandlePointerMove = this.creativeMove
-			this.selfHandlePointerUp = this.endCreating
+			this.onPointerDown = this.startCreating
+			this.onPointerMove = this.creativeMove
+			this.onPointerUp = this.endCreating
 		}
 	}
 
@@ -218,10 +217,46 @@ export const paper = new Paper({
 let obj1 = new ExpandableMobject({
 	viewWidth: 400,
 	viewHeight: 300,
-	anchor: new Vertex(500, 200)
+	anchor: new Vertex(500, 200),
+	pointerEventPolicy: PointerEventPolicy.PassUp
 })
 
+obj1.onPointerDown = (e: LocatedEvent) => { console.log('pointer down') }
+
 paper.add(obj1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

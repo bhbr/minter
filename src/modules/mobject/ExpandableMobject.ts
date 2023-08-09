@@ -1,11 +1,12 @@
 import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
-import { IOList } from './linkable/IOList'
+import { IOList } from 'linkable/IOList'
 import { RoundedRectangle } from '../shapes/RoundedRectangle'
 import { PointerEventPolicy, LocatedEvent, pointerEventVertex } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
+import { addLongPressListener, removeLongPressListener } from './long_press'
 
 export class ExpandableMobject extends LinkableMobject {
 	
@@ -14,6 +15,10 @@ export class ExpandableMobject extends LinkableMobject {
 	background: RoundedRectangle
 	draggedMobjects: Array<Mobject>
 	dragPointStart?: Vertex
+
+	boundLongPress(e: LocatedEvent) {
+		console.log('old boundLongPress')
+	}
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -26,6 +31,12 @@ export class ExpandableMobject extends LinkableMobject {
 		})
 	}
 
+	statelessSetup() {
+		super.statelessSetup()
+		console.log('binding longPress')
+		this.boundLongPress = this.longPress.bind(this)
+	}
+
 	statefulSetup() {
 		super.statefulSetup()
 		this.background = new RoundedRectangle({
@@ -35,10 +46,21 @@ export class ExpandableMobject extends LinkableMobject {
 			fillColor: Color.gray(0.5),
 			fillOpacity: 0.25,
 			strokeColor: Color.clear(),
-			anchor: Vertex.origin()
+			anchor: Vertex.origin(),
+			pointerEventPolicy: PointerEventPolicy.PassUp
 		})
 		this.add(this.background)
 		this.setDragging(false)
+		addLongPressListener(this.view, this.boundLongPress, 500)
+	}
+
+	longPress(e: LocatedEvent) {
+		console.log('new longPress')
+		this.expand()
+	}
+
+	expand() {
+		console.log('expanding')
 	}
 
 	getCindys(): Array<CindyCanvas> {
@@ -64,20 +86,20 @@ export class ExpandableMobject extends LinkableMobject {
 		}
 
 		if (flag) {
-			this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-			this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-			this.savedSelfHandlePointerUp = this.selfHandlePointerUp
-			this.selfHandlePointerDown = this.startDragging
-			this.selfHandlePointerMove = this.dragging
-			this.selfHandlePointerUp = this.endDragging
+			this.savedOnPointerDown = this.onPointerDown
+			this.savedOnPointerMove = this.onPointerMove
+			this.savedOnPointerUp = this.onPointerUp
+			this.onPointerDown = this.startDragging
+			this.onPointerMove = this.dragging
+			this.onPointerUp = this.endDragging
 
 			for (let submob of this.getCindys()) {
 				submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
 			}
 		} else {
-			this.selfHandlePointerDown = this.savedSelfHandlePointerDown
-			this.selfHandlePointerMove = this.savedSelfHandlePointerMove
-			this.selfHandlePointerUp = this.savedSelfHandlePointerUp
+			this.onPointerDown = this.savedOnPointerDown
+			this.onPointerMove = this.savedOnPointerMove
+			this.onPointerUp = this.savedOnPointerUp
 			for (let submob of this.getCindys()) {
 				submob.pointerEventPolicy = PointerEventPolicy.Propagate
 			}

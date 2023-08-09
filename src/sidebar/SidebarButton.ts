@@ -77,7 +77,7 @@ export class SidebarButton extends Circle {
 
 	statefulSetup() {
 		super.statefulSetup()
-		addPointerDown(this.view, this.boundPointerDown) // this.boundButtonDownByPointer)
+		addPointerDown(this.view, this.boundRawOnPointerDown) // this.boundButtonDownByPointer)
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
@@ -138,22 +138,22 @@ export class SidebarButton extends Circle {
 		})
 	}
 	
-	selfHandlePointerDown(e: LocatedEvent) {
+	onPointerDown(e: LocatedEvent) {
 		e.preventDefault()
 		e.stopPropagation()
 		this.commonButtonDown()
-		removePointerDown(this.view, this.boundPointerDown)
-		addPointerUp(this.view, this.boundPointerUp)
-		addPointerMove(this.view, this.boundPointerMove)
+		removePointerDown(this.view, this.boundRawOnPointerDown)
+		addPointerUp(this.view, this.boundRawOnPointerUp)
+		addPointerMove(this.view, this.boundRawOnPointerMove)
 		this.touchStart = pointerEventVertex(e)
 	}
 
-	selfHandlePointerUp(e: LocatedEvent) {
+	onPointerUp(e: LocatedEvent) {
 		e.preventDefault()
 		e.stopPropagation()
-		removePointerUp(this.view, this.boundPointerUp)
-		addPointerDown(this.view, this.boundPointerDown)
-		removePointerMove(this.view, this.boundPointerMove)
+		removePointerUp(this.view, this.boundRawOnPointerUp)
+		addPointerDown(this.view, this.boundRawOnPointerDown)
+		removePointerMove(this.view, this.boundRawOnPointerMove)
 		this.commonButtonUp()
 	}
 	
@@ -239,7 +239,7 @@ export class SidebarButton extends Circle {
 	}
 	
 	//buttonDrag(e: LocatedEvent) {
-	selfHandlePointerMove(e: LocatedEvent) {
+	onPointerMove(e: LocatedEvent) {
 		if (e != null) {
 			e.preventDefault()
 			e.stopPropagation()

@@ -9,36 +9,6 @@ export const DRAW_BORDER: boolean = false
 
 export class Mobject extends ExtendedObject {
 
-	// position
-	transform: Transform
-	viewWidth: number
-	viewHeight: number
-
-	// view and style
-	view?: HTMLDivElement
-	visible: boolean
-	opacity: number
-	backgroundColor: Color
-	drawBorder: boolean
-
-	// hierarchy
-	_parent?: Mobject
-	children: Array<Mobject>
-
-	// dependency
-	dependencies: Array<Dependency>
-
-	// interactivity
-	eventTarget?: Mobject
-	_pointerEventPolicy: PointerEventPolicy
-	savedPointerEventPolicy: PointerEventPolicy
-	draggable: boolean
-	dragAnchorStart?: Vertex
-
-	snappablePoints: Array<any> // workaround, don't ask
-	// remove?
-
-
 	////////////////////
 	// INITIALIZATION //
 	////////////////////
@@ -86,19 +56,21 @@ export class Mobject extends ExtendedObject {
 		// state-independent setup
 
 		this.eventTarget = null
-		this.boundPointerDown = this.pointerDown.bind(this)
-		this.boundPointerMove = this.pointerMove.bind(this)
-		this.boundPointerUp = this.pointerUp.bind(this)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
+		this.boundRawOnPointerDown = this.rawOnPointerDown.bind(this)
+		this.boundRawOnPointerMove = this.rawOnPointerMove.bind(this)
+		this.boundRawOnPointerUp = this.rawOnPointerUp.bind(this)
+		this.boundRawOnTap = this.rawOnTap.bind(this)
+		this.boundCancelTap = this.cancelTap.bind(this)
 		
-		this.savedSelfHandlePointerDown = this.selfHandlePointerDown
-		this.savedSelfHandlePointerMove = this.selfHandlePointerMove
-		this.savedSelfHandlePointerUp = this.selfHandlePointerUp
+		this.savedOnPointerDown = this.onPointerDown
+		this.savedOnPointerMove = this.onPointerMove
+		this.savedOnPointerUp = this.onPointerUp
 
 	}
 
 	statefulSetup() {
-		addPointerDown(this.view, this.boundPointerDown)
+		addPointerDown(this.view, this.boundRawOnPointerDown)
 		this.setupView()
 	}
 
@@ -106,6 +78,10 @@ export class Mobject extends ExtendedObject {
 	//////////////
 	// POSITION //
 	//////////////
+
+	transform: Transform
+	viewWidth: number
+	viewHeight: number
 
 	get anchor(): Vertex {
 		return this.transform.anchor
@@ -231,6 +207,12 @@ export class Mobject extends ExtendedObject {
 	// VIEW AND STYLE //
 	////////////////////
 
+	view?: HTMLDivElement
+	visible: boolean
+	opacity: number
+	backgroundColor: Color
+	drawBorder: boolean
+
 	setupView() {
 
 		this.view['mobject'] = this
@@ -243,7 +225,7 @@ export class Mobject extends ExtendedObject {
 		this.view.style.position = 'absolute' // 'absolute' positions it relative (sic) to its parent
 		this.view.style.overflow = 'visible'
 
-		addPointerDown(this.view, this.boundPointerDown)
+		addPointerDown(this.view, this.boundRawOnPointerDown)
 	}
 
 	positionView() {
@@ -322,6 +304,9 @@ export class Mobject extends ExtendedObject {
 	// HIERARCHY //
 	///////////////
 
+	_parent?: Mobject
+	children: Array<Mobject>
+
 	get parent(): Mobject { return this._parent }
 	set parent(newValue: Mobject) {
 		this.view?.remove()
@@ -375,6 +360,8 @@ export class Mobject extends ExtendedObject {
 	////////////////
 	// DEPENDENCY //
 	////////////////
+
+	dependencies: Array<Dependency>
 
 	dependents(): Array<Mobject> {
 		let dep: Array<Mobject> = []
@@ -459,20 +446,34 @@ export class Mobject extends ExtendedObject {
 	// INTERACTIVITY //
 	///////////////////
 
+	eventTarget?: Mobject
+	_pointerEventPolicy: PointerEventPolicy
+	savedPointerEventPolicy: PointerEventPolicy
+	draggable: boolean
+	dragAnchorStart?: Vertex
+
+	snappablePoints: Array<any> // workaround, don't ask
+	// remove?
+
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
-	selfHandlePointerDown(e: LocatedEvent) { }
-	selfHandlePointerMove(e: LocatedEvent) { }
-	selfHandlePointerUp(e: LocatedEvent) { }
-	savedSelfHandlePointerDown(e: LocatedEvent) { }
-	savedSelfHandlePointerMove(e: LocatedEvent) { }
-	savedSelfHandlePointerUp(e: LocatedEvent) { }
-	boundPointerDown(e: LocatedEvent) { }
-	boundPointerMove(e: LocatedEvent) { }
-	boundPointerUp(e: LocatedEvent) { }
 	boundEventTargetMobject(e: LocatedEvent): Mobject { return this }
-
+	onPointerDown(e: LocatedEvent) { }
+	onPointerMove(e: LocatedEvent) { }
+	onPointerUp(e: LocatedEvent) { }
+	onTap(e: LocatedEvent) {
+		console.log('tap on', this)
+	}
+	savedOnPointerDown(e: LocatedEvent) { }
+	savedOnPointerMove(e: LocatedEvent) { }
+	savedOnPointerUp(e: LocatedEvent) { }
+	boundRawOnPointerDown(e: LocatedEvent) { }
+	boundRawOnPointerMove(e: LocatedEvent) { }
+	boundRawOnPointerUp(e: LocatedEvent) { }
+	boundRawOnTap(e: LocatedEvent) { }
+	boundCancelTap(e: LocatedEvent) { }
+	
 	get pointerEventPolicy(): PointerEventPolicy {
 		return this._pointerEventPolicy
 	}
@@ -498,13 +499,13 @@ export class Mobject extends ExtendedObject {
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		console.log(targetViewChain)
+		//console.log(targetViewChain)
 		t = targetViewChain.pop()
 		t = targetViewChain.pop()
 		while (t != undefined) {
 			let m: any = t['mobject']
-			if (m != undefined) {
-				console.log('event target mobject:', m)
+			if (m != undefined && m.pointerEventPolicy != PointerEventPolicy.PassUp) {
+				//console.log('event target mobject:', m)
 				return m
 			}
 			t = targetViewChain.pop()
@@ -513,70 +514,106 @@ export class Mobject extends ExtendedObject {
 		return this
 	}
 
-	pointerDown(e: LocatedEvent) {
+	rawOnPointerDown(e: LocatedEvent) {
+		//console.log('rawOnPointerDown on', this)
 		this.eventTarget = this.boundEventTargetMobject(e)
+		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 
 		e.stopPropagation()
-		removePointerDown(this.view, this.boundPointerDown)
-		addPointerMove(this.view, this.boundPointerMove)
-		addPointerUp(this.view, this.boundPointerUp)
+		removePointerDown(this.view, this.boundRawOnPointerDown)
+		addPointerMove(this.view, this.boundRawOnPointerMove)
+		addPointerUp(this.view, this.boundRawOnTap)
+		addPointerUp(this.view, this.boundRawOnPointerUp)
+		let timeoutID = window.setTimeout(this.boundCancelTap, 500, e)
 
-		console.log('event target on ', this, 'is', this.eventTarget)
-		console.log(this.pointerEventPolicy, this.eventTarget.pointerEventPolicy)
+		//console.log('event target on ', this, 'is', this.eventTarget)
+		//console.log(this.pointerEventPolicy, this.eventTarget.pointerEventPolicy)
 		if (this.eventTarget != this
 			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
 			//console.log('passing down')
-			this.eventTarget.pointerDown(e)
+			this.eventTarget.rawOnPointerDown(e)
 		} else {
 			//console.log(`handling myself, and I am a ${this.constructor.name}`)
 			if (this.draggable) {
 				this.startDragging(e)
 			} else {
-				this.selfHandlePointerDown(e)
+				this.onPointerDown(e)
 			}
 		}
 	}
 
-	pointerMove(e: LocatedEvent) {
+	cancelTap(e: LocatedEvent) {
+		//console.log('cancelTap on', this)
+		removePointerUp(this.view, this.boundRawOnTap)
+	}
+
+	rawOnPointerMove(e: LocatedEvent) {
+		//console.log('rawOnPointerMove on', this)
+		//console.log('this:', this)
+		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
+		this.cancelTap(e)
 
 		if (this.eventTarget != this
 			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
-			this.eventTarget.pointerMove(e)
+			this.eventTarget.rawOnPointerMove(e)
 		} else {
 			//console.log(`handling myself, and I am a ${this.constructor.name}`)
 			if (this.draggable) {
 				this.dragging(e)
 			} else {
-				this.selfHandlePointerMove(e)
+				this.onPointerMove(e)
 			}
 		}
 	}
 
-	pointerUp(e: LocatedEvent) {
+	rawOnPointerUp(e: LocatedEvent) {
+		//console.log('rawOnPointerUp on', this)
+		//console.log('event target:', this.eventTarget)
+		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 
 		e.stopPropagation()
-		removePointerMove(this.view, this.boundPointerMove)
-		removePointerUp(this.view, this.boundPointerUp)
-		addPointerDown(this.view, this.boundPointerDown)
+		removePointerMove(this.view, this.boundRawOnPointerMove)
+		removePointerUp(this.view, this.boundRawOnPointerUp)
+		addPointerDown(this.view, this.boundRawOnPointerDown)
+		this.cancelTap(e)
 
 		if (this.eventTarget != this
 			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
 			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
-			this.eventTarget.pointerUp(e)
+			this.eventTarget.rawOnPointerUp(e)
 		} else {
 			if (this.draggable) {
 				this.endDragging(e)
 			} else {
-				this.selfHandlePointerUp(e)
+				this.onPointerUp(e)
 			}
 		}
 		this.eventTarget = null
+	}
+
+	rawOnTap(e: LocatedEvent) {
+		//console.log('rawOnTap on', this)
+		removePointerUp(this.view, this.boundRawOnPointerUp)
+		removePointerUp(this.view, this.boundRawOnTap)
+		removePointerMove(this.view, this.boundRawOnPointerMove)
+		addPointerDown(this.view, this.boundRawOnPointerDown)
+		this.cancelTap(e)
+
+		if (this.eventTarget != this
+			&& this.pointerEventPolicy == PointerEventPolicy.PassDown
+			&& this.eventTarget.pointerEventPolicy != PointerEventPolicy.PassUp) {
+			this.eventTarget.rawOnTap(e)
+		} else {
+			this.onTap(e)
+		}
+		this.eventTarget = null
+
 	}
 
 

@@ -28,7 +28,7 @@ export class DependencyMap extends MGroup {
 		})
 	}
 
-	selfHandlePointerDown(e: LocatedEvent) {
+	onPointerDown(e: LocatedEvent) {
 		let t: Mobject = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
 		// find a better way to handle this!
 		if (t instanceof LinkHook) {
@@ -46,14 +46,14 @@ export class DependencyMap extends MGroup {
 		}
 	}
 
-	selfHandlePointerMove(e: LocatedEvent) {
+	onPointerMove(e: LocatedEvent) {
 		if (this.editedLinkLine == undefined) { return }
 		let p = pointerEventVertex(e)
 		this.editedLinkLine.updateFromTip(this.snapInput(p))
 	}
 
 
-	selfHandlePointerUp(e: LocatedEvent) {
+	onPointerUp(e: LocatedEvent) {
 		let line: LinkLine = this.editedLinkLine
 		let tcircle: any = this.eventTargetMobject(e).eventTargetMobject(e).eventTargetMobject(e)
 
