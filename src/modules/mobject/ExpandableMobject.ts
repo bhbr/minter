@@ -22,19 +22,13 @@ export class ExpandableMobject extends LinkableMobject {
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			pointerEventPolicy: PointerEventPolicy.HandleYourself,
+			pointerEventPolicy: PointerEventPolicy.Handle,
 			linkableChildren: [],
 			expanded: false,
 			draggedMobjects: [],
 			viewWidth: 400,
 			viewHeight: 300
 		})
-	}
-
-	statelessSetup() {
-		super.statelessSetup()
-		console.log('binding longPress')
-		this.boundLongPress = this.longPress.bind(this)
 	}
 
 	statefulSetup() {
@@ -47,16 +41,10 @@ export class ExpandableMobject extends LinkableMobject {
 			fillOpacity: 0.25,
 			strokeColor: Color.clear(),
 			anchor: Vertex.origin(),
-			pointerEventPolicy: PointerEventPolicy.PassUp
+			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 		this.add(this.background)
 		this.setDragging(false)
-		addLongPressListener(this.view, this.boundLongPress, 500)
-	}
-
-	longPress(e: LocatedEvent) {
-		console.log('new longPress')
-		this.expand()
 	}
 
 	expand() {
@@ -74,36 +62,38 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	setDragging(flag: boolean) {
-		this.pointerEventPolicy = (flag ? PointerEventPolicy.HandleYourself : PointerEventPolicy.PassDown)
 
-		this.update({
-			draggable: flag
-		})
-		for (let submob of this.submobs) {
-			submob.update({
-				draggable: flag
-			})
-		}
+		// this.pointerEventPolicy = (flag ? PointerEventPolicy.Handle : PointerEventPolicy.Pass)
+		// console.log(this.pointerEventPolicy)
 
-		if (flag) {
-			this.savedOnPointerDown = this.onPointerDown
-			this.savedOnPointerMove = this.onPointerMove
-			this.savedOnPointerUp = this.onPointerUp
-			this.onPointerDown = this.startDragging
-			this.onPointerMove = this.dragging
-			this.onPointerUp = this.endDragging
+		// this.update({
+		// 	draggable: flag
+		// })
+		// for (let submob of this.submobs) {
+		// 	submob.update({
+		// 		draggable: flag
+		// 	})
+		// }
 
-			for (let submob of this.getCindys()) {
-				submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
-			}
-		} else {
-			this.onPointerDown = this.savedOnPointerDown
-			this.onPointerMove = this.savedOnPointerMove
-			this.onPointerUp = this.savedOnPointerUp
-			for (let submob of this.getCindys()) {
-				submob.pointerEventPolicy = PointerEventPolicy.Propagate
-			}
-		}
+		// if (flag) {
+		// 	this.savedOnPointerDown = this.onPointerDown
+		// 	this.savedOnPointerMove = this.onPointerMove
+		// 	this.savedOnPointerUp = this.onPointerUp
+		// 	this.onPointerDown = this.startDragging
+		// 	this.onPointerMove = this.dragging
+		// 	this.onPointerUp = this.endDragging
+
+		// 	// for (let submob of this.getCindys()) {
+		// 	// 	submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
+		// 	// }
+		// } else {
+		// 	this.onPointerDown = this.savedOnPointerDown
+		// 	this.onPointerMove = this.savedOnPointerMove
+		// 	this.onPointerUp = this.savedOnPointerUp
+		// 	for (let submob of this.getCindys()) {
+		// 		submob.pointerEventPolicy = PointerEventPolicy.Propagate
+		// 	}
+		// }
 	}
 
 	startDragging(e: LocatedEvent) {

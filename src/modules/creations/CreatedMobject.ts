@@ -17,7 +17,7 @@ export class CreatedMobject extends MGroup {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			pointerEventPolicy: PointerEventPolicy.HandleYourself,
+			pointerEventPolicy: PointerEventPolicy.Handle,
 			draggable: true,
 			visible: true
 		})

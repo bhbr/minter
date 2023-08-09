@@ -31,7 +31,7 @@ export class Construction extends LinkableMobject {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
 			constructedMobjects: [],
-			pointerEventPolicy: PointerEventPolicy.PassDown
+			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 	}
 
@@ -44,8 +44,6 @@ export class Construction extends LinkableMobject {
 
 	statefulSetup() {
 		super.statefulSetup()
-		console.log(this.backgroundColor)
-		console.log(this.view.style['background-color'])
 		this.view.style.overflow = 'hidden'
 	}
 

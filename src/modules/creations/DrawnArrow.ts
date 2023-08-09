@@ -11,7 +11,7 @@ export class DrawnArrow extends DrawnMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			pointerEventPolicy: PointerEventPolicy.PassDown
+			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 	}
 

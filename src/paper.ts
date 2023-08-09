@@ -58,7 +58,7 @@ export class Paper extends ExpandableMobject {
 			fillOpacity: 1,
 			strokeWidth: 0,
 			draggable: false,
-			pointerEventPolicy: PointerEventPolicy.PassUp
+			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 		this.construction = new Construction()
 	}
@@ -102,11 +102,11 @@ export class Paper extends ExpandableMobject {
 		case 'creating':
 				this.changeVisibleCreation(value as string)
 			if (value == 'freehand') {
-				this.pointerEventPolicy = PointerEventPolicy.PassDown
+				this.pointerEventPolicy = PointerEventPolicy.Pass
 				break
 			}
 			if (this.creationGroup == undefined) {
-				this.pointerEventPolicy = PointerEventPolicy.HandleYourself
+				this.pointerEventPolicy = PointerEventPolicy.Handle
 			}
 			break
 		case 'color':
@@ -188,9 +188,9 @@ export class Paper extends ExpandableMobject {
 	setDragging(flag: boolean) {
 		super.setDragging(flag)
 		if (!flag) {
-			this.onPointerDown = this.startCreating
-			this.onPointerMove = this.creativeMove
-			this.onPointerUp = this.endCreating
+			//this.onPointerDown = this.startCreating
+			//this.onPointerMove = this.creativeMove
+			//this.onPointerUp = this.endCreating
 		}
 	}
 
@@ -209,7 +209,7 @@ if (isTouchDevice === false) {
 export const paper = new Paper({
 	view: document.querySelector('#paper'),
 	anchor: paperAnchor,
-	pointerEventPolicy: PointerEventPolicy.PassDown,
+	pointerEventPolicy: PointerEventPolicy.Handle,
 	viewWidth: 1250,
 	viewHeight: 1200
 })
@@ -218,10 +218,8 @@ let obj1 = new ExpandableMobject({
 	viewWidth: 400,
 	viewHeight: 300,
 	anchor: new Vertex(500, 200),
-	pointerEventPolicy: PointerEventPolicy.PassUp
+	pointerEventPolicy: PointerEventPolicy.Handle
 })
-
-obj1.onPointerDown = (e: LocatedEvent) => { console.log('pointer down') }
 
 paper.add(obj1)
 

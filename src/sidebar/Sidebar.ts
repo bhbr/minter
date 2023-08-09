@@ -28,7 +28,7 @@ export class Sidebar extends Mobject {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
 			viewHeight: 1024,
-			pointerEventVertex: PointerEventPolicy.HandleYourself
+			pointerEventVertex: PointerEventPolicy.Handle
 		})
 	}
 
@@ -37,7 +37,7 @@ export class Sidebar extends Mobject {
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			pointerEventPolicy: PointerEventPolicy.PassDown
+			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 		super.statelessSetup()
 	}

@@ -6,7 +6,7 @@ export class FreePoint extends Point {
 	fixedArgs() {
 		return Object.assign(super.fixedArgs(), {
 			draggable: true,
-			pointerEventPolicy: PointerEventPolicy.HandleYourself
+			pointerEventPolicy: PointerEventPolicy.Handle
 		})
 	}
 

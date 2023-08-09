@@ -35,7 +35,7 @@ export class BoxSlider extends LinkableMobject {
 			strokeColor: Color.white(),
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5),
-			pointerEventPolicy: PointerEventPolicy.HandleYourself
+			pointerEventPolicy: PointerEventPolicy.Handle
 		})
 	}
 

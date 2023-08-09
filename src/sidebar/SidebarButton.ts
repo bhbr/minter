@@ -42,7 +42,7 @@ export class SidebarButton extends Circle {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 0,
 			optionSpacing: 25,
-			pointerEventPolicy: PointerEventPolicy.HandleYourself
+			pointerEventPolicy: PointerEventPolicy.Handle
 		})
 	}
 
@@ -77,7 +77,7 @@ export class SidebarButton extends Circle {
 
 	statefulSetup() {
 		super.statefulSetup()
-		addPointerDown(this.view, this.boundRawOnPointerDown) // this.boundButtonDownByPointer)
+		//addPointerDown(this.view, this.boundRawOnPointerDown) // this.boundButtonDownByPointer)
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
@@ -142,18 +142,18 @@ export class SidebarButton extends Circle {
 		e.preventDefault()
 		e.stopPropagation()
 		this.commonButtonDown()
-		removePointerDown(this.view, this.boundRawOnPointerDown)
-		addPointerUp(this.view, this.boundRawOnPointerUp)
-		addPointerMove(this.view, this.boundRawOnPointerMove)
+		//removePointerDown(this.view, this.boundRawOnPointerDown)
+		//addPointerUp(this.view, this.boundRawOnPointerUp)
+		//addPointerMove(this.view, this.boundRawOnPointerMove)
 		this.touchStart = pointerEventVertex(e)
 	}
 
 	onPointerUp(e: LocatedEvent) {
 		e.preventDefault()
 		e.stopPropagation()
-		removePointerUp(this.view, this.boundRawOnPointerUp)
-		addPointerDown(this.view, this.boundRawOnPointerDown)
-		removePointerMove(this.view, this.boundRawOnPointerMove)
+		//removePointerUp(this.view, this.boundRawOnPointerUp)
+		//addPointerDown(this.view, this.boundRawOnPointerDown)
+		//removePointerMove(this.view, this.boundRawOnPointerMove)
 		this.commonButtonUp()
 	}
 	

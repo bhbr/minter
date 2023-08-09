@@ -24,7 +24,7 @@ export class DependencyMap extends MGroup {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			pointerEventPolicy: PointerEventPolicy.HandleYourself
+			pointerEventPolicy: PointerEventPolicy.Handle
 		})
 	}
 

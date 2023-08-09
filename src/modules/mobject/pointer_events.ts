@@ -11,13 +11,8 @@ export enum PointerEventPolicy {
 	// e. g. for the interior of a TwoPointCircle
 	Propagate, // don't interfere with event capturing
 	// e.g. for CindyJS canvas
-	PassUp, // to the parent
-	// e. g. for the Rectangles of a BoxSlider
-	HandleYourself, // you are at the right address
-	PassDown, // to the lowest event target that is still a mobject and won't PassUp the event
-	// e. g. Paper
-	Cancel // <=> HandleYourself with empty selfHandlers
-	// e. g. an IntersectionPoint
+	Handle, // you are at the right address
+	Pass // up or down
 }
 
 export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
