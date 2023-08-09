@@ -154,7 +154,6 @@ export class VMobject extends Mobject {
 		updateDict['anchor'] = shift.appliedTo(this.anchor)
 		updateDict['viewWidth'] = this.getWidth()
 		updateDict['viewHeight'] = this.getHeight()
-		console.log(updateDict)
 		this.update(updateDict)
 
 	}

@@ -1,16 +1,17 @@
 import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
 import { IOList } from './linkable/IOList'
-import { Rectangle } from '../shapes/Rectangle'
+import { RoundedRectangle } from '../shapes/RoundedRectangle'
 import { PointerEventPolicy, LocatedEvent, pointerEventVertex } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
+import { Color } from '../helpers/Color'
 
 export class ExpandableMobject extends LinkableMobject {
 	
 	linkableChildren: Array<LinkableMobject>
 	expanded: boolean
-	background: Rectangle
+	background: RoundedRectangle
 	draggedMobjects: Array<Mobject>
 	dragPointStart?: Vertex
 
@@ -19,12 +20,23 @@ export class ExpandableMobject extends LinkableMobject {
 			pointerEventPolicy: PointerEventPolicy.HandleYourself,
 			linkableChildren: [],
 			expanded: false,
-			draggedMobjects: []
+			draggedMobjects: [],
+			viewWidth: 400,
+			viewHeight: 300
 		})
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
+		this.background = new RoundedRectangle({
+			width: this.viewWidth,
+			height: this.viewHeight,
+			cornerRadius: 50,
+			fillColor: Color.gray(0.5),
+			fillOpacity: 0.25,
+			strokeColor: Color.clear(),
+			anchor: Vertex.origin()
+		})
 		this.add(this.background)
 		this.setDragging(false)
 	}
@@ -122,6 +134,16 @@ export class ExpandableMobject extends LinkableMobject {
 		this.draggedMobjects = []
 	}
 
-
+	updateModel(argsDict: object = {}) {
+		argsDict['viewWidth'] = this.viewWidth
+		argsDict['viewHeight'] = this.viewHeight
+		super.updateModel(argsDict)
+		this.background.updateModel({
+			width: this.viewWidth,
+			height: this.viewHeight,
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight
+		})
+	}
 
 }

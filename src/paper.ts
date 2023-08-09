@@ -9,7 +9,7 @@ import { DependencyMap } from './modules/mobject/linkable/DependencyMap'
 import { ExpandableMobject } from './modules/mobject/ExpandableMobject'
 import { Color, COLOR_PALETTE } from './modules/helpers/Color'
 import { Circle } from './modules/shapes/Circle'
-import { Rectangle } from './modules/shapes/Rectangle'
+import { RoundedRectangle } from './modules/shapes/RoundedRectangle'
 import { TwoPointCircle } from './modules/shapes/TwoPointCircle'
 import { Arrow } from './modules/arrows/Arrow'
 import { Segment } from './modules/arrows/Segment'
@@ -52,7 +52,8 @@ export class Paper extends ExpandableMobject {
 	statelessSetup() {
 		super.statelessSetup()
 		this.currentColor = COLOR_PALETTE['white']
-		this.background = new Rectangle({
+		this.background = new RoundedRectangle({
+			cornerRadius: 0,
 			fillColor: Color.clear(),
 			fillOpacity: 1,
 			strokeWidth: 0,
@@ -64,23 +65,12 @@ export class Paper extends ExpandableMobject {
 
 	statefulSetup() {
 		super.statefulSetup()
-		this.add(this.construction)
-		this.construction.update({
-			viewWidth: 300,
-			viewHeight: 200
-		}, false)
+		// this.add(this.construction)
+		// this.construction.update({
+		// 	viewWidth: 300,
+		// 	viewHeight: 200
+		// }, false)
 		this.setDragging(false)
-	}
-
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
-
-		this.background.updateModel({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
-		})
 	}
 
 	savedSelfHandlePointerDown(e: LocatedEvent) { this.startCreating(e) }
@@ -225,6 +215,13 @@ export const paper = new Paper({
 	viewHeight: 1200
 })
 
+let obj1 = new ExpandableMobject({
+	viewWidth: 400,
+	viewHeight: 300,
+	anchor: new Vertex(500, 200)
+})
+
+paper.add(obj1)
 
 
 
