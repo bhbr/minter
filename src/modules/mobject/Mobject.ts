@@ -485,6 +485,9 @@ export class Mobject extends ExtendedObject {
 	onTap(e: LocatedEvent) {
 		console.log('tap on', this)
 	}
+	onDoubleTap(e: LocatedEvent) {
+		console.log('double tap on', this)
+	}
 	onLongPress(e: LocatedEvent) {
 		console.log('long press on', this)
 	}
@@ -609,22 +612,33 @@ export class Mobject extends ExtendedObject {
 		this.saveToEventHistory(e)
 		this.resetTimeout()
 		this.onPointerUp(e)
-		if (this.isTap(e)) {
+		if (this.tapDetected()) {
 			this.onTap(e)
 		}
-		
+		if (this.doubleTapDetected()) {
+			this.onDoubleTap(e)
+		}
 	}
 
-	isTap(e: LocatedEvent): boolean {
-		var e1 = this.locatedEventHistory[this.locatedEventHistory.length - 1]
-		if (e1 == e) {
-			e1 = this.locatedEventHistory[this.locatedEventHistory.length - 2]
-		}
-		let e2 = e
-		let t1 = e1.timeStamp
-		let t2 = e2.timeStamp
-		let dt = t2 - t1
-		return dt < 500
+	isTap(e1: LocatedEvent, e2: LocatedEvent, dt: number = 500): boolean {
+		return Math.abs(e2.timeStamp - e1.timeStamp) < 500
+	}
+
+	tapDetected(): boolean {
+		if (this.locatedEventHistory.length < 2) { return false }
+		let e1 = this.locatedEventHistory[this.locatedEventHistory.length - 2]
+		let e2 = this.locatedEventHistory[this.locatedEventHistory.length - 1]
+		return this.isTap(e1, e2)
+	}
+
+	doubleTapDetected(): boolean {
+		if (this.locatedEventHistory.length < 4) { return false }
+		let e1 = this.locatedEventHistory[this.locatedEventHistory.length - 4]
+		let e2 = this.locatedEventHistory[this.locatedEventHistory.length - 3]
+		let e3 = this.locatedEventHistory[this.locatedEventHistory.length - 2]
+		let e4 = this.locatedEventHistory[this.locatedEventHistory.length - 1]
+		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, 1000)
+		
 	}
 
 	rawOnLongPress(e: LocatedEvent) {
