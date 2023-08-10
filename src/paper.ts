@@ -218,7 +218,7 @@ let obj1 = new ExpandableMobject({
 	viewWidth: 400,
 	viewHeight: 300,
 	anchor: new Vertex(500, 200),
-	pointerEventPolicy: PointerEventPolicy.Handle
+	pointerEventPolicy: PointerEventPolicy.Pass
 })
 
 paper.add(obj1)

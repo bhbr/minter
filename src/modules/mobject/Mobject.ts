@@ -70,8 +70,7 @@ export class Mobject extends ExtendedObject {
 		this.boundOnPointerMove = this.onPointerMove.bind(this)
 		this.boundOnPointerUp = this.onPointerUp.bind(this)
 		this.boundOnTap = this.onTap.bind(this)
-		this.boundOnLongPress = this.onLongPress.bind(this)
-
+		this.boundRawOnLongPress = this.rawOnLongPress.bind(this)
 
 		this.savedOnPointerDown = this.onPointerDown
 		this.savedOnPointerMove = this.onPointerMove
@@ -488,7 +487,6 @@ export class Mobject extends ExtendedObject {
 	}
 	onLongPress(e: LocatedEvent) {
 		console.log('long press on', this)
-		this.resetTimeout()
 	}
 	savedOnPointerDown(e: LocatedEvent) { }
 	savedOnPointerMove(e: LocatedEvent) { }
@@ -503,12 +501,19 @@ export class Mobject extends ExtendedObject {
 	boundRawOnPointerDown(e: LocatedEvent) { }
 	boundRawOnPointerMove(e: LocatedEvent) { }
 	boundRawOnPointerUp(e: LocatedEvent) { }
+	boundRawOnLongPress(e: LocatedEvent) { }
 	boundOnPointerDown(e: LocatedEvent) { }
 	boundOnPointerMove(e: LocatedEvent) { }
 	boundOnPointerUp(e: LocatedEvent) { }
 	boundOnTap(e: LocatedEvent) { }
-	boundOnLongPress(e: LocatedEvent) { }
 
+	get locatedEventHistory(): Array<LocatedEvent> {
+		if (this.pointerEventHistory.length > 0) {
+			return this.pointerEventHistory
+		} else { //if (this.touchEventHistory.length > 0) {
+			return this.touchEventHistory
+		}
+	}
 
 	get pointerEventPolicy(): PointerEventPolicy {
 		return this._pointerEventPolicy
@@ -588,32 +593,43 @@ export class Mobject extends ExtendedObject {
 	rawOnPointerDown(e: LocatedEvent) {
 		//console.log('rawOnPointerDown on', this)
 		this.saveToEventHistory(e)
-		if (true) { this.onPointerDown(e) }
-		this.timeoutID = window.setTimeout(this.boundOnLongPress, 1000, e)
+		this.onPointerDown(e)
+		this.timeoutID = window.setTimeout(this.boundRawOnLongPress, 1000, e)
 	}
 
 	rawOnPointerMove(e: LocatedEvent) {
 		//console.log('rawOnPointerMove on', this)
 		this.saveToEventHistory(e)
 		this.resetTimeout()
-		if (true) { this.onPointerMove(e) }
+		this.onPointerMove(e)
 	}
 
 	rawOnPointerUp(e: LocatedEvent) {
 		//console.log('rawOnPointerUp on', this)
 		this.saveToEventHistory(e)
 		this.resetTimeout()
-		if (true) { this.onPointerUp(e) }
-		if (e.constructor.name == 'PointerEvent' || e.constructor.name == 'MouseEvent') {
-			let e1 = this.pointerEventHistory[this.pointerEventHistory.length - 2]
-			let e2 = e
-			let t1 = e1.timeStamp
-			let t2 = e2.timeStamp
-			let dt = t2 - t1
-			if (dt < 500) {
-				this.onTap(e)
-			}
+		this.onPointerUp(e)
+		if (this.isTap(e)) {
+			this.onTap(e)
 		}
+		
+	}
+
+	isTap(e: LocatedEvent): boolean {
+		var e1 = this.locatedEventHistory[this.locatedEventHistory.length - 1]
+		if (e1 == e) {
+			e1 = this.locatedEventHistory[this.locatedEventHistory.length - 2]
+		}
+		let e2 = e
+		let t1 = e1.timeStamp
+		let t2 = e2.timeStamp
+		let dt = t2 - t1
+		return dt < 500
+	}
+
+	rawOnLongPress(e: LocatedEvent) {
+		this.onLongPress(e)
+		this.resetTimeout()
 	}
 
 	resetTimeout() {
