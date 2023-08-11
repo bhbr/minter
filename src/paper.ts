@@ -241,7 +241,8 @@ obj2.update({
 obj1.animate({
 	fillColor: Color.blue(),
 	cornerRadius: 20,
-	width: 100
+	//width: 100,
+	anchor: new Vertex(300, 100)
 }, 2)
 
 // console.log(obj1.path)

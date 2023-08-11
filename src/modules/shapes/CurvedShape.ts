@@ -49,18 +49,27 @@ export class CurvedShape extends VMobject {
 		this.vertices = v
 	}
 
+
+	///////////////
+	// ANIMATION //
+	///////////////
+
+	animatableProperties(): Array<string> {
+		return super.animatableProperties().concat([
+			'bezierPoints'
+		])
+	}
+		
+	animate(argsDict: object = {}, seconds: number) {
+		super.animate(argsDict, seconds)
+	}
+
 	morphTo(newShape: CurvedShape, seconds: number) {
 		if (newShape.constructor.name != this.constructor.name
 			|| newShape.bezierPoints.length != this.bezierPoints.length) {
 			console.error('Morphing not possible')
 			return
 		}
-
-
-	}
-		
-	animate(argsDict: object = {}, seconds: number) {
-		super.animate(argsDict, seconds)
 	}
 	
 

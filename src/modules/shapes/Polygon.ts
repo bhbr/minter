@@ -12,6 +12,12 @@ export class Polygon extends VMobject {
 		})
 	}
 
+	animatableProperties(): Array<string> {
+		return super.animatableProperties().concat([
+			'vertices'
+		])
+	}
+
 	static makePathString(vertices: Array<Vertex>, closed: boolean): string {
 		let pathString: string = ''
 		let v = vertices

@@ -312,46 +312,6 @@ export class Mobject extends ExtendedObject {
 	}
 
 
-	///////////////
-	// ANIMATION //
-	///////////////
-
-	animation(key: string, value: any, seconds: number): SVGAnimateElement {
-		// subclass versions are called first
-		return Mobject.emptyAnimation(seconds)
-	}
-
-	static emptyAnimation(seconds: number) {
-		let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
-		anim.setAttribute('fill', 'freeze')
-		return anim
-	}
-
-	animations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
-		let anims: Array<SVGAnimateElement> = []
-		for (let [key, value] of Object.entries(argsDict)) {
-			let anim: SVGAnimateElement = this.animation(key, value, seconds)
-			anims.push(anim)
-		}
-		return anims
-	}
-
-	play(anims: Array<SVGAnimateElement>, seconds, argsDict: object = {}) {
-		for (let anim of anims) {
-			anim.setAttribute('begin', '0s')
-		}
-		let ts = window.setTimeout(() => {
-			this.update(argsDict)
-			for (let anim of anims) {
-				anim.remove()
-			}
-		}, seconds * 1000)
-	}
-
-	animate(argsDict: object = {}, seconds: number) {
-		let anims: Array<SVGAnimateElement> = this.animations(argsDict, seconds)
-		this.play(anims, seconds, argsDict)
-	}
 
 
 
