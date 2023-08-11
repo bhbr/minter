@@ -343,7 +343,7 @@ export class Mobject extends ExtendedObject {
 		let ts = window.setTimeout(() => {
 			this.update(argsDict)
 			for (let anim of anims) {
-				//anim.remove()
+				anim.remove()
 			}
 		}, seconds * 1000)
 	}

@@ -161,15 +161,17 @@ export class VMobject extends Mobject {
 
 	animation(key: string, value: any, seconds: number): SVGAnimateElement {
 		let anim = Mobject.emptyAnimation(seconds)
-		console.log(key, this.properties())
+
 		if (key == 'fillColor') {
+
 			anim.setAttribute('attributeName', 'fill')
 			anim.setAttribute('attributeType', 'CSS')
 			anim.setAttribute('from', this.fillColor.toHex())
 			anim.setAttribute('to', value.toHex())
 			this.path.appendChild(anim)
+
 		} else if (this.properties().includes(key)) {
-			console.log('in properties')
+
 			let newObj = deepCopy(this)
 			let argsDict: object = {}
 			argsDict[key] = value
@@ -177,10 +179,11 @@ export class VMobject extends Mobject {
 			anim.setAttribute('attributeName', 'd')
 			anim.setAttribute('values', this.pathString() + ';' + newObj.pathString() + ';')
 			this.path.appendChild(anim)
-			console.log(this.path)
+
 		} else {
 			anim = super.animation(key, value, seconds)
 		}
+		
 		anim.setAttribute('begin', 'indefinite')
 		anim.setAttribute('dur', seconds.toString() + 's')
 		return anim

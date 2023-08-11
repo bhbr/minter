@@ -240,7 +240,7 @@ obj2.update({
 
 obj1.animate({
 	fillColor: Color.blue(),
-	//cornerRadius: 20,
+	cornerRadius: 20,
 	width: 100
 }, 2)
 
