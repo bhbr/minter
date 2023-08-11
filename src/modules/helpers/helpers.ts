@@ -52,7 +52,7 @@ export function copy(obj: any): any {
 
 	console.log('copying', obj)
 
-	if (typeof obj != 'object' || obj == null) {
+	if (typeof obj != 'object' || obj === null) {
 		return obj
 	}
 
@@ -72,7 +72,7 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 	//console.log('deep-copying', obj)
 	//console.log('memo:', memo)
 
-	if (typeof obj != 'object' || obj == null) {
+	if (typeof obj != 'object' || obj === null) {
 		return obj
 	}
 
@@ -104,7 +104,15 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 			return newObj
 		}
 
-	let newObj: object = {}
+	var newObj = Object.create(obj.constructor.prototype)
+	if (obj.constructor.name == 'HTMLDivElement') {
+		newObj = document.createElement('div')
+	} else if (obj.constructor.name == 'HTMLSVGElement') {
+		newObj = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+	} else if (obj.constructor.name == 'HTMLPathElement') {
+		newObj = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+	}
+
 	memo.push([obj, newObj])
 	for (let [key, value] of Object.entries(obj)) {
 
@@ -126,6 +134,12 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 				//console.log('OBJECT registered new value:', value, y)
 				//console.log('OBJECT new memo:', memo)
 			}
+	}
+	if (obj.svg != undefined) {
+		newObj.svg = obj.svg.cloneNode()
+		newObj.path = obj.path.cloneNode()
+		newObj.view.appendChild(newObj.svg)
+		newObj.svg.appendChild(newObj.path)
 	}
 	return newObj
 

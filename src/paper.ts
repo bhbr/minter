@@ -215,55 +215,43 @@ export const paper = new Paper({
 	viewHeight: 1200
 })
 
-let obj = new ExpandableMobject({
-	viewWidth: 400,
-	viewHeight: 300,
+let obj1 = new RoundedRectangle({
+	width: 400,
+	height: 300,
+	cornerRadius: 100,
+	fillColor: Color.red(),
+	fillOpacity: 1.0,
 	anchor: new Vertex(500, 200),
 	pointerEventPolicy: PointerEventPolicy.Handle
 })
-obj.background.view.setAttribute('id', 'background')
+paper.add(obj1)
 
-paper.add(obj)
-
-
-let obj1 = new RoundedRectangle({
-	width: 200,
-	height: 100,
-	cornerRadius: 50,
-	fillColor: Color.red(),
-	fillOpacity: 1.0,
-	anchor: new Vertex(50, 50)
-})
-
-let submob = new Circle({
-	anchor: new Vertex(100, 50),
-	radius: 25
-})
-
-obj1.add(submob)
 
 let obj2 = deepCopy(obj1)
+obj2.update({
+	viewWidth: 300,
+	viewHeight: 500,
+	cornerRadius: 20,
+	fillColor: Color.green(),
+	fillOpacity: 0.3,
+	anchor: new Vertex(300, 100)
+})
+//paper.add(obj2)
 
-console.log(obj1, obj2)//, obj3)
+obj1.animate({
+	fillColor: Color.blue(),
+	//cornerRadius: 20,
+	width: 100
+}, 2)
 
-console.log(obj1.children === obj2.children)
-console.log(obj1.children[0] === obj2.children[0])
-console.log(obj1 === obj2)
-
-//console.log(obj1['0'] === obj3['0'])
-
-//paper.add(obj1)
+// console.log(obj1.path)
+// console.log(obj2.path)
 
 // obj1.path.setAttribute('id', 'path1')
-// obj2.path.setAttribute('id', 'path2')
+// //obj2.path.setAttribute('id', 'path2')
 
 // let d1: string = obj1.pathString()
 // let d2: string = obj2.pathString()
-
-// obj2.path.animate({
-// 	strokeWidth: [1.0, 5.0],
-// 	d: [d1, d2]
-// }, 1000)
 
 // let anim1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate')
 // anim1.setAttribute('attributeName', 'd')

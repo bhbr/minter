@@ -18,7 +18,9 @@ export class RoundedRectangle extends CurvedShape {
 			p1: Vertex.origin(),
 			p2: Vertex.origin(),
 			p3: Vertex.origin(),
-			p4: Vertex.origin()
+			p4: Vertex.origin(),
+			width: 200,
+			height: 100
 		})
 	}
 

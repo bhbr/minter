@@ -1,4 +1,4 @@
-import { remove, stringFromPoint, paperLog } from '../helpers/helpers'
+import { remove, stringFromPoint, paperLog, deepCopy } from '../helpers/helpers'
 import { PointerEventPolicy, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './pointer_events'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { ExtendedObject } from '../helpers/ExtendedObject'
@@ -316,46 +316,43 @@ export class Mobject extends ExtendedObject {
 	// ANIMATION //
 	///////////////
 
-	animate(argsDict: object = {}, seconds: number) {
+	animation(key: string, value: any, seconds: number): SVGAnimateElement {
+		// subclass versions are called first
+		return Mobject.emptyAnimation(seconds)
+	}
 
-		let cssNames = {
-			'transform': 'transform',
-			'viewWidth': 'width',
-			'viewHeight': 'height',
-			'opacity': 'opacity',
-			'backgroundColor': 'background-color'
-		}
+	static emptyAnimation(seconds: number) {
+		let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+		anim.setAttribute('fill', 'freeze')
+		return anim
+	}
 
+	animations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
 		let anims: Array<SVGAnimateElement> = []
 		for (let [key, value] of Object.entries(argsDict)) {
-			if (!Object.keys(cssNames).includes(key)) { return }
-			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
-			anim.setAttribute('attributeName', cssNames[key])
-			anim.setAttribute('attributeType', 'CSS')
-			anim.setAttribute('from', this[key].toString())
-			anim.setAttribute('to', value.toString())
-			anim.setAttribute('dur', seconds.toString () + 's')
-			anim.setAttribute('fill', 'freeze')
+			let anim: SVGAnimateElement = this.animation(key, value, seconds)
 			anims.push(anim)
 		}
-		var maxDuration = 0
+		return anims
+	}
+
+	play(anims: Array<SVGAnimateElement>, seconds, argsDict: object = {}) {
 		for (let anim of anims) {
-			this.view.appendChild(anim)
-			maxDuration = Math.max(maxDuration, anim.getSimpleDuration())
+			anim.setAttribute('begin', '0s')
 		}
-		//let finalMob = 
 		let ts = window.setTimeout(() => {
-			//this.updateFrom(obj2, )
+			this.update(argsDict)
 			for (let anim of anims) {
-				anim.remove()
+				//anim.remove()
 			}
-		}, maxDuration)
-
+		}, seconds * 1000)
 	}
 
-	play(anims: Array<SVGAnimateElement>) {
-
+	animate(argsDict: object = {}, seconds: number) {
+		let anims: Array<SVGAnimateElement> = this.animations(argsDict, seconds)
+		this.play(anims, seconds, argsDict)
 	}
+
 
 
 
@@ -368,7 +365,11 @@ export class Mobject extends ExtendedObject {
 
 	get parent(): Mobject { return this._parent }
 	set parent(newValue: Mobject) {
-		this.view?.remove()
+		try {
+			this.view?.remove()
+		} catch {
+			console.warn('View is not part of body')
+		}
 		this._parent = newValue
 		if (newValue == undefined) { return }
 		newValue.add(this)
