@@ -1,4 +1,4 @@
-import { remove, logInto, paperLog } from './modules/helpers/helpers'
+import { remove, logInto, paperLog, copy, deepCopy } from './modules/helpers/helpers'
 import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
 import { Vertex } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
@@ -9,6 +9,7 @@ import { DependencyMap } from './modules/mobject/linkable/DependencyMap'
 import { ExpandableMobject } from './modules/mobject/ExpandableMobject'
 import { Color, COLOR_PALETTE } from './modules/helpers/Color'
 import { Circle } from './modules/shapes/Circle'
+import { Rectangle } from './modules/shapes/Rectangle'
 import { RoundedRectangle } from './modules/shapes/RoundedRectangle'
 import { TwoPointCircle } from './modules/shapes/TwoPointCircle'
 import { Arrow } from './modules/arrows/Arrow'
@@ -214,36 +215,81 @@ export const paper = new Paper({
 	viewHeight: 1200
 })
 
-let obj1 = new ExpandableMobject({
+let obj = new ExpandableMobject({
 	viewWidth: 400,
 	viewHeight: 300,
 	anchor: new Vertex(500, 200),
-	pointerEventPolicy: PointerEventPolicy.Pass
+	pointerEventPolicy: PointerEventPolicy.Handle
+})
+obj.background.view.setAttribute('id', 'background')
+
+paper.add(obj)
+
+
+let obj1 = new RoundedRectangle({
+	width: 200,
+	height: 100,
+	cornerRadius: 50,
+	fillColor: Color.red(),
+	fillOpacity: 1.0,
+	anchor: new Vertex(50, 50)
 })
 
-paper.add(obj1)
+let submob = new Circle({
+	anchor: new Vertex(100, 50),
+	radius: 25
+})
 
+obj1.add(submob)
 
+let obj2 = deepCopy(obj1)
 
+console.log(obj1, obj2)//, obj3)
 
+console.log(obj1.children === obj2.children)
+console.log(obj1.children[0] === obj2.children[0])
+console.log(obj1 === obj2)
 
+//console.log(obj1['0'] === obj3['0'])
 
+//paper.add(obj1)
 
+// obj1.path.setAttribute('id', 'path1')
+// obj2.path.setAttribute('id', 'path2')
 
+// let d1: string = obj1.pathString()
+// let d2: string = obj2.pathString()
 
+// obj2.path.animate({
+// 	strokeWidth: [1.0, 5.0],
+// 	d: [d1, d2]
+// }, 1000)
 
+// let anim1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate')
+// anim1.setAttribute('attributeName', 'd')
+// anim1.setAttribute('values', d1 + ';' + d2 + ';')
+// anim1.setAttribute('dur', '1s')
+// anim1.setAttribute('fill', 'freeze')
 
+// let anim2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate')
+// anim2.setAttribute('attributeName', 'fill-opacity')
+// anim2.setAttribute('attributeType', 'CSS')
+// anim2.setAttribute('from', '1.0')
+// anim2.setAttribute('to', '0.1')
+// anim2.setAttribute('dur', '1s')
+// anim2.setAttribute('fill', 'freeze')
 
+// obj1.path.appendChild(anim1)
+// obj1.path.appendChild(anim2)
 
-
-
-
-
-
-
-
-
-
+// let timeoutID1 = window.setTimeout(() => {
+// 	console.log(obj1.vertices)
+// 	console.log(obj1.pathString())
+// 	console.log(obj1.path.getAttribute('d'))
+// 	obj1.updateFrom(obj2, ['width', 'height', 'cornerRadius', 'fillOpacity'])
+// 	anim1.remove()
+// 	anim2.remove()
+// }, 1000)
 
 
 

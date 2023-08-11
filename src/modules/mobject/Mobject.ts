@@ -264,6 +264,7 @@ export class Mobject extends ExtendedObject {
 			if (!this.view) { return }
 			this.positionView()
 			this.view.style['background-color'] = this.backgroundColor.toCSS()
+			this.view.style['opacity'] = this.opacity.toString()
 			//if (!this.visible || !this.parent) { return }
 			this.redrawSelf()
 			if (recursive) { this.redrawSubmobs() }
@@ -309,6 +310,53 @@ export class Mobject extends ExtendedObject {
 			depmob.hide()
 		}
 	}
+
+
+	///////////////
+	// ANIMATION //
+	///////////////
+
+	animate(argsDict: object = {}, seconds: number) {
+
+		let cssNames = {
+			'transform': 'transform',
+			'viewWidth': 'width',
+			'viewHeight': 'height',
+			'opacity': 'opacity',
+			'backgroundColor': 'background-color'
+		}
+
+		let anims: Array<SVGAnimateElement> = []
+		for (let [key, value] of Object.entries(argsDict)) {
+			if (!Object.keys(cssNames).includes(key)) { return }
+			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+			anim.setAttribute('attributeName', cssNames[key])
+			anim.setAttribute('attributeType', 'CSS')
+			anim.setAttribute('from', this[key].toString())
+			anim.setAttribute('to', value.toString())
+			anim.setAttribute('dur', seconds.toString () + 's')
+			anim.setAttribute('fill', 'freeze')
+			anims.push(anim)
+		}
+		var maxDuration = 0
+		for (let anim of anims) {
+			this.view.appendChild(anim)
+			maxDuration = Math.max(maxDuration, anim.getSimpleDuration())
+		}
+		//let finalMob = 
+		let ts = window.setTimeout(() => {
+			//this.updateFrom(obj2, )
+			for (let anim of anims) {
+				anim.remove()
+			}
+		}, maxDuration)
+
+	}
+
+	play(anims: Array<SVGAnimateElement>) {
+
+	}
+
 
 
 	///////////////
@@ -434,7 +482,6 @@ export class Mobject extends ExtendedObject {
 			}
 			dep.target.update()
 		}
-
 	}
 
 	update(argsDict: object = {}, redraw = true) {
@@ -442,6 +489,14 @@ export class Mobject extends ExtendedObject {
 		if (redraw) {
 			this.redraw()
 		}
+	}
+
+	updateFrom(mob: Mobject, attrs: Array<string>, redraw = true) {
+		let updateDict: object = {}
+		for (let attr of attrs) {
+			updateDict[attr] = mob[attr]
+		}
+		this.update(updateDict, redraw)
 	}
 
 	updateSubmobs() {
@@ -474,22 +529,22 @@ export class Mobject extends ExtendedObject {
 	removeFreePoint(fp: any) { }
 
 	onPointerDown(e: LocatedEvent) {
-		console.log('pointer down on', this)
+	//	console.log('pointer down on', this)
 	}
 	onPointerMove(e: LocatedEvent) {
-		console.log('pointer move on', this)
+	//	console.log('pointer move on', this)
 	}
 	onPointerUp(e: LocatedEvent) {
-		console.log('pointer up on', this)
+	//	console.log('pointer up on', this)
 	}
 	onTap(e: LocatedEvent) {
-		console.log('tap on', this)
+	//	console.log('tap on', this)
 	}
 	onDoubleTap(e: LocatedEvent) {
-		console.log('double tap on', this)
+	//	console.log('double tap on', this)
 	}
 	onLongPress(e: LocatedEvent) {
-		console.log('long press on', this)
+	//	console.log('long press on', this)
 	}
 	savedOnPointerDown(e: LocatedEvent) { }
 	savedOnPointerMove(e: LocatedEvent) { }

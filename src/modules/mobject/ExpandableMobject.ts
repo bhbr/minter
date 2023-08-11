@@ -15,10 +15,8 @@ export class ExpandableMobject extends LinkableMobject {
 	background: RoundedRectangle
 	draggedMobjects: Array<Mobject>
 	dragPointStart?: Vertex
-
-	boundLongPress(e: LocatedEvent) {
-		console.log('old boundLongPress')
-	}
+	contractedWidth: number
+	contractedHeight: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -27,7 +25,9 @@ export class ExpandableMobject extends LinkableMobject {
 			expanded: false,
 			draggedMobjects: [],
 			viewWidth: 400,
-			viewHeight: 300
+			viewHeight: 300,
+			contractedWidth: 400,
+			contractedHeight: 300
 		})
 	}
 
@@ -44,11 +44,73 @@ export class ExpandableMobject extends LinkableMobject {
 			pointerEventPolicy: PointerEventPolicy.Pass
 		})
 		this.add(this.background)
+
 		this.setDragging(false)
+	}
+
+	getExpandedBackground(): RoundedRectangle {
+		let ew = this.getPaper().viewWidth
+		let eh = this.getPaper().viewHeight
+		return new RoundedRectangle({
+			width: 0.9 * ew,
+			height: 0.9 * eh,
+			cornerRadius: 50,
+			anchor: new Vertex(0.05 * ew, 0.05 * eh)
+		})
+	}
+
+	getExpandedPath(): Array<Vertex> {
+		return this.getExpandedBackground().bezierPoints
+	}
+
+	getExpandedPathString(): string {
+		return this.getExpandedBackground().pathString()
+	}
+
+	getContractedBackground(): RoundedRectangle {
+		let ew = this.contractedWidth
+		let eh = this.contractedHeight
+		return new RoundedRectangle({
+			width: ew,
+			height: eh,
+			cornerRadius: 50,
+			anchor: this.anchor
+		})
+	}
+
+	getContractedPath(): Array<Vertex> {
+		return this.getContractedBackground().bezierPoints
+	}
+
+	getContractedPathString(): string {
+		return this.getContractedBackground().pathString()
 	}
 
 	expand() {
 		console.log('expanding')
+		this.expanded = true
+		console.log(this.background.path)
+		console.log(this.getExpandedPath())
+		let animation = this.background.path.animate(
+			{
+				d: [this.getContractedPathString(), this.getExpandedPathString()]
+			},
+		1000)
+		console.log(animation)
+		animation.play()
+	}
+
+	contract() {
+		console.log('contract')
+		this.expanded = false
+	}
+
+	onDoubleTap(e: LocatedEvent) {
+		if (this.expanded) {
+			this.contract()
+		} else {
+			this.expand()
+		}		
 	}
 
 	getCindys(): Array<CindyCanvas> {

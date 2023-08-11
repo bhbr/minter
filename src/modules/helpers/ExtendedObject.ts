@@ -53,7 +53,7 @@ export class ExtendedObject {
 
 	setAttributes(argsDict: object = {}) {
 		// update the object with the given attribute names and values
-		// always change a nobject via this method,
+		// always change an object via this method,
 		// it will automatically check for mutability
 		// and pick the right setter method
 		for (let [key, value] of Object.entries(argsDict)) {
@@ -83,11 +83,17 @@ export class ExtendedObject {
 		}
 	}
 
+	copyAttributesFrom(obj: ExtendedObject, attrs: Array<string>) {
+		let updateDict: object = {}
+		for (let attr of attrs) {
+			updateDict[attr] = obj[attr]
+		}
+		this.setAttributes(updateDict)
+	}
+
 
 	fixedArgs(): object { return {} }
 	// filled upon subclassing
-
-
 
 	assureProperty(key: string, cons: any) {
 		if (this[key] == undefined) { this[key] = new cons() }
@@ -108,6 +114,12 @@ export class ExtendedObject {
 			if (this[key] == undefined) { undefinedKVPairs[key] = value }
 		}
 		this.setAttributes(undefinedKVPairs)
+	}
+
+	copy(): ExtendedObject {
+		let obj = new ExtendedObject()
+		obj.copyAttributesFrom(this, Object.keys(this))
+		return obj
 	}
 
 

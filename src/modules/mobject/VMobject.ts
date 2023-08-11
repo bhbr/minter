@@ -14,7 +14,6 @@ export class VMobject extends Mobject {
 	strokeColor: Color
 	strokeWidth: number
 
-
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			fillColor: Color.white(),

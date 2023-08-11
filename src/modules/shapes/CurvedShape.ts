@@ -14,9 +14,8 @@ export class CurvedShape extends VMobject {
 		this.updateBezierPoints()
 	}
 
-	pathString(): string {
-		//let points: Array<Vertex> = this.globalBezierPoints()
-		let points: Array<Vertex> = this.bezierPoints
+	static makePathString(bezierPoints: Array<Vertex>): string {
+		let points: Array<Vertex> = bezierPoints
 		if (points == undefined || points.length == 0) { return '' }
 
 		// there should be 3n+1 points
@@ -34,6 +33,10 @@ export class CurvedShape extends VMobject {
 		return pathString
 	}
 
+	pathString(): string {
+		return CurvedShape.makePathString(this.bezierPoints)
+	}
+
 	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
 	set bezierPoints(newValue: Array<Vertex>) {
 		this._bezierPoints = newValue
@@ -45,5 +48,24 @@ export class CurvedShape extends VMobject {
 		}
 		this.vertices = v
 	}
+
+	morphTo(newShape: CurvedShape, seconds: number) {
+		if (newShape.constructor.name != this.constructor.name
+			|| newShape.bezierPoints.length != this.bezierPoints.length) {
+			console.error('Morphing not possible')
+			return
+		}
+
+
+	}
+		
+	animate(argsDict: object = {}, seconds: number) {
+		super.animate(argsDict, seconds)
+	}
+	
+
+
+
+
 
 }
