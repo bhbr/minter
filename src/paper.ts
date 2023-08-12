@@ -240,6 +240,9 @@ obj2.update({
 
 obj1.animate({
 	fillColor: Color.blue(),
+	fillOpacity: 0.1,
+	strokeColor: Color.red(),
+	strokeWidth: 20,
 	cornerRadius: 20,
 	//width: 100,
 	anchor: new Vertex(300, 100)

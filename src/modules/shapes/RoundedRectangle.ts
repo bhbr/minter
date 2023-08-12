@@ -1,5 +1,6 @@
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CurvedShape } from './CurvedShape'
+import { remove } from '../helpers/helpers'
 
 
 export class RoundedRectangle extends CurvedShape {
@@ -74,6 +75,14 @@ export class RoundedRectangle extends CurvedShape {
 		this.p3.y = this.height
 		this.p4.y = this.height
 
+	}
+
+	geometricProperties(): Array<string> {
+		return super.geometricProperties().concat([
+			'width',
+			'height',
+			'cornerRadius'
+		])
 	}
 
 }

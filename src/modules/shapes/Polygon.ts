@@ -12,7 +12,7 @@ export class Polygon extends VMobject {
 		})
 	}
 
-	animatableProperties(): Array<string> {
+	geeomtricProperties(): Array<string> {
 		return super.animatableProperties().concat([
 			'vertices'
 		])

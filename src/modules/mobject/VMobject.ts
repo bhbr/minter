@@ -178,6 +178,10 @@ export class VMobject extends Mobject {
 		]
 	}
 
+	geometricProperties(): Array<string> {
+		return []
+	}
+
 	static emptyAnimation(seconds: number) {
 		let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
 		anim.setAttribute('fill', 'freeze')
@@ -200,6 +204,42 @@ export class VMobject extends Mobject {
 			this.path.appendChild(anim)
 			return anim
 
+		} else if (key == 'fillOpacity') {
+
+			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+			anim.setAttribute('attributeName', 'fill-opacity')
+			anim.setAttribute('attributeType', 'CSS')
+			anim.setAttribute('from', this.fillOpacity.toString())
+			anim.setAttribute('to', value.toString())
+			anim.setAttribute('begin', 'indefinite')
+			anim.setAttribute('dur', seconds.toString() + 's')
+			this.path.appendChild(anim)
+			return anim
+
+		} else if (key == 'strokeColor') {
+
+			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+			anim.setAttribute('attributeName', 'stroke')
+			anim.setAttribute('attributeType', 'CSS')
+			anim.setAttribute('from', this.fillColor.toHex())
+			anim.setAttribute('to', value.toHex())
+			anim.setAttribute('begin', 'indefinite')
+			anim.setAttribute('dur', seconds.toString() + 's')
+			this.path.appendChild(anim)
+			return anim
+
+		} else if (key == 'strokeWidth') {
+
+			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+			anim.setAttribute('attributeName', 'stroke-width')
+			anim.setAttribute('attributeType', 'CSS')
+			anim.setAttribute('from', this.strokeWidth.toString())
+			anim.setAttribute('to', value.toString())
+			anim.setAttribute('begin', 'indefinite')
+			anim.setAttribute('dur', seconds.toString() + 's')
+			this.path.appendChild(anim)
+			return anim
+
 		} else if (key == 'anchor') {
 
 			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion') as SVGAnimateMotionElement
@@ -211,7 +251,12 @@ export class VMobject extends Mobject {
 			this.path.appendChild(anim)
 			return anim
 
-		} else {
+		} else if ((key == 'bezierPoints' && this.constructor.name != 'CurvedShape')
+					|| (key == 'vertices' && this.constructor.name != 'Polygon')) {
+
+			console.error('unanimatable property', key, 'on', this)
+
+		} else if (this.geometricProperties().includes(key)) {
 
 			let newObj = deepCopy(this)
 			let argsDict: object = {}
@@ -253,6 +298,7 @@ export class VMobject extends Mobject {
 
 	animate(argsDict: object = {}, seconds: number) {
 		let anims: Array<SVGAnimateElement> = this.animations(argsDict, seconds)
+		console.log(anims)
 		this.play(anims, seconds, argsDict)
 	}
 

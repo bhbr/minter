@@ -54,8 +54,8 @@ export class CurvedShape extends VMobject {
 	// ANIMATION //
 	///////////////
 
-	animatableProperties(): Array<string> {
-		return super.animatableProperties().concat([
+	geometricProperties(): Array<string> {
+		return super.geometricProperties().concat([
 			'bezierPoints'
 		])
 	}
