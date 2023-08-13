@@ -1,6 +1,6 @@
 import { remove, logInto, paperLog, copy, deepCopy } from './modules/helpers/helpers'
 import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
-import { Vertex } from './modules/helpers/Vertex_Transform'
+import { Vertex, Transform } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
 import { LinkableMobject } from './modules/mobject/linkable/LinkableMobject'
@@ -23,6 +23,7 @@ import { BoxSlider } from './modules/slider/BoxSlider'
 import { Construction } from './modules/construction/Construction'
 import { Pendulum } from './modules/pendulum/Pendulum'
 import { CindyCanvas } from './modules/cindy/CindyCanvas'
+import { DEGREES } from './modules/helpers/math'
 
 declare var CindyJS: any
 
@@ -215,38 +216,29 @@ export const paper = new Paper({
 	viewHeight: 1200
 })
 
-let obj1 = new RoundedRectangle({
+let obj1 = new ExpandableMobject({
 	width: 400,
 	height: 300,
 	cornerRadius: 100,
 	fillColor: Color.red(),
 	fillOpacity: 1.0,
-	anchor: new Vertex(500, 200),
-	pointerEventPolicy: PointerEventPolicy.Handle
+	anchor: new Vertex(500, 200)
 })
 paper.add(obj1)
 
-
-let obj2 = deepCopy(obj1)
-obj2.update({
-	viewWidth: 300,
-	viewHeight: 500,
-	cornerRadius: 20,
-	fillColor: Color.green(),
-	fillOpacity: 0.3,
-	anchor: new Vertex(300, 100)
-})
-//paper.add(obj2)
-
 obj1.animate({
-	fillColor: Color.blue(),
-	fillOpacity: 0.1,
-	strokeColor: Color.red(),
-	strokeWidth: 20,
-	cornerRadius: 20,
-	//width: 100,
-	anchor: new Vertex(300, 100)
-}, 2)
+	viewWidth: 200,
+	viewHeight: 400,
+	transform: new Transform({angle: 20 * DEGREES}),//, anchor: new Vertex(100, 100)}),
+	anchor: new Vertex(200, 100),
+	opacity: 0.3,
+	backgroundColor: Color.green()
+}, 1)
+
+// obj1.update({
+// 	anchor: new Vertex(50, 50)
+// })
+
 
 // console.log(obj1.path)
 // console.log(obj2.path)

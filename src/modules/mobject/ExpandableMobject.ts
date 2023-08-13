@@ -43,7 +43,7 @@ export class ExpandableMobject extends LinkableMobject {
 			anchor: Vertex.origin(),
 			pointerEventPolicy: PointerEventPolicy.Pass
 		})
-		this.add(this.background)
+		//this.add(this.background)
 
 		this.setDragging(false)
 	}
@@ -89,15 +89,19 @@ export class ExpandableMobject extends LinkableMobject {
 	expand() {
 		console.log('expanding')
 		this.expanded = true
-		console.log(this.background.path)
-		console.log(this.getExpandedPath())
-		let animation = this.background.path.animate(
-			{
-				d: [this.getContractedPathString(), this.getExpandedPathString()]
-			},
-		1000)
-		console.log(animation)
-		animation.play()
+		this.background.animate({
+			width: 100,
+			height: 200,
+			anchor: new Vertex(300, 100)
+		}, 2)
+		this.update({
+			width: 100,
+			height: 200,
+			anchor: new Vertex(300, 100)	
+		})
+		this.background.update({
+			anchor: Vertex.origin()
+		})
 	}
 
 	contract() {
@@ -209,8 +213,8 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	updateModel(argsDict: object = {}) {
-		argsDict['viewWidth'] = this.viewWidth
-		argsDict['viewHeight'] = this.viewHeight
+		//argsDict['viewWidth'] = this.viewWidth
+		//argsDict['viewHeight'] = this.viewHeight
 		super.updateModel(argsDict)
 		this.background.updateModel({
 			width: this.viewWidth,

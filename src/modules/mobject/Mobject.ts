@@ -5,7 +5,7 @@ import { ExtendedObject } from '../helpers/ExtendedObject'
 import { Color } from '../helpers/Color'
 import { Dependency } from './Dependency'
 
-export const DRAW_BORDER: boolean = false
+export const DRAW_BORDER: boolean = true
 
 export class Mobject extends ExtendedObject {
 
@@ -243,12 +243,10 @@ export class Mobject extends ExtendedObject {
 		if (!this.view) { return }
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		this.view.style['transform'] = this.transform.asString()
+		this.view.style['left'] = this.anchor.x.toString() + 'px'
+		this.view.style['top'] = this.anchor.y.toString() + 'px'
 		this.view.style['width'] = this.viewWidth.toString() + 'px'
 		this.view.style['height'] = this.viewHeight.toString() + 'px'
-		if (this.anchor != undefined) {
-			this.view.style['left'] = this.anchor.x.toString() + 'px'
-			this.view.style['top'] = this.anchor.y.toString() + 'px'
-		}
 	}
 
 	redrawSelf() { }
@@ -312,6 +310,86 @@ export class Mobject extends ExtendedObject {
 	}
 
 
+	///////////////
+	// ANIMATION //
+	///////////////
+
+	animatableProperties(): Array<string> {
+		return [
+			'transform',
+			'viewWidth',
+			'viewHeight',
+			'anchor',
+			'opacity',
+			'backgroundColor'
+		]
+	}
+
+	animate(argsDict: object = {}, seconds: number = 1) {
+
+		argsDict = this.consolidateTransformAndAnchor(argsDict)
+		this.view.style['animation-name'] = 'anim'
+		this.view.style['animation-duration'] = `${seconds}s`
+		this.view.style['animation-timing-function'] = 'linear'
+
+		let styleTag = document.createElement('style')
+		styleTag.innerHTML = this.animationStyleTagHTML(argsDict)
+		this.view.appendChild(styleTag)
+
+		let timeoutID = window.setTimeout(() => {
+			this.view.style.removeProperty('animation-name')
+			this.view.style.removeProperty('animation-duration')
+			this.view.style.removeProperty('animation-timing-function')
+			this.view.childNodes[this.view.childNodes.length - 1].remove()
+			this.update(argsDict)
+			console.log(this)
+		}, 1000 * seconds)
+
+	}
+
+	animationStyleTagHTML(argsDict: object = {}): string {
+		var headCode = "@keyframes anim { \nfrom { \n"
+		var fromCode = ""
+		var midCode = "}\nto {\n"
+		var toCode = ""
+		var endCode = "}\n}"
+
+		let newTransform: any = argsDict['transform']
+		if (newTransform) {
+			let nt = newTransform as Transform
+			fromCode = fromCode + `transform: ${this.transform};\n`
+			toCode = toCode + `transform: ${nt.asString()};`
+			fromCode = fromCode + `left: ${this.anchor.x}px;\ntop: ${this.anchor.y}px;\n`
+			toCode = toCode + `left: ${nt.anchor.x}px;\ntop: ${nt.anchor.y}px;\n`
+		}
+
+		let newViewWidth: any = argsDict['viewWidth']
+		if (newViewWidth != undefined) {
+			fromCode = fromCode + `width: ${this.viewWidth}px;\n`
+			toCode = toCode + `width: ${newViewWidth}px;\n`
+		}
+
+		let newViewHeight: any = argsDict['viewHeight']
+		if (newViewHeight != undefined) {
+			fromCode = fromCode + `height: ${this.viewHeight}px;\n`
+			toCode = toCode + `height: ${newViewHeight}px;\n`
+		}
+
+
+		let newOpacity: any = argsDict['opacity']
+		if (newOpacity != undefined) {
+			fromCode = fromCode + `opacity: ${this.opacity};\n`
+			toCode = toCode + `opacity: ${newOpacity};\n`
+		}
+
+		let newBackgroundColor: any = argsDict['backgroundColor']
+		if (newBackgroundColor != undefined) {
+			fromCode = fromCode + `background-color: ${this.backgroundColor.toCSS()};\n`
+			toCode = toCode + `background-color: ${newBackgroundColor.toCSS()};\n`
+		}
+
+		return headCode + fromCode + midCode + toCode + endCode
+	}
 
 
 
@@ -428,10 +506,27 @@ export class Mobject extends ExtendedObject {
 		}
 	}
 
+	consolidateTransformAndAnchor(argsDict: object = {}): object {
+		let newAnchor: any = argsDict['anchor']
+		var newTransform: any = argsDict['transform'] ?? Transform.identity()
+		if (newTransform) {
+			let nt: Transform = newTransform as Transform
+			if (nt.anchor.isZero()) {
+				nt.anchor = newAnchor ?? this.anchor
+			}
+			argsDict['transform'] = newTransform
+		} else {
+			newTransform = this.transform
+			newTransform.anchor = argsDict['anchor'] ?? this.anchor
+		}
+		delete argsDict['anchor']
+		return argsDict
+	}
+
 	updateModel(argsDict: object = {}) {
 
+		argsDict = this.consolidateTransformAndAnchor(argsDict)
 		this.setAttributes(argsDict)
-		//this.positionView()
 		this.updateSubmobs()
 
 		for (let dep of this.dependencies || []) {

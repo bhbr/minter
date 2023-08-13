@@ -297,8 +297,8 @@ export class VMobject extends Mobject {
 	}
 
 	animate(argsDict: object = {}, seconds: number) {
+		super.animate(argsDict)
 		let anims: Array<SVGAnimateElement> = this.animations(argsDict, seconds)
-		console.log(anims)
 		this.play(anims, seconds, argsDict)
 	}
 
