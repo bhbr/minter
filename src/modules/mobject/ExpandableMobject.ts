@@ -43,7 +43,7 @@ export class ExpandableMobject extends LinkableMobject {
 			anchor: Vertex.origin(),
 			pointerEventPolicy: PointerEventPolicy.Pass
 		})
-		//this.add(this.background)
+		this.add(this.background)
 
 		this.setDragging(false)
 	}
@@ -87,21 +87,22 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	expand() {
-		console.log('expanding')
+		console.log("expand")
 		this.expanded = true
-		this.background.animate({
-			width: 100,
-			height: 200,
+		this.background.startSelfAnimation({
+			width: 150,
+			height: 100,
+			cornerRadius: 10,
+			fillColor: Color.blue(),
+			fillOpacity: 0.2,
+			strokeWidth: 20,
+			strokeColor: Color.yellow()
+		}, 5)
+		this.startSelfAnimation({
+			viewWidth: 150,
+			viewHeight: 100,
 			anchor: new Vertex(300, 100)
-		}, 2)
-		this.update({
-			width: 100,
-			height: 200,
-			anchor: new Vertex(300, 100)	
-		})
-		this.background.update({
-			anchor: Vertex.origin()
-		})
+		}, 5)
 	}
 
 	contract() {
@@ -110,6 +111,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	onDoubleTap(e: LocatedEvent) {
+		console.log("onDoubleTap enter:", Date.now())
 		if (this.expanded) {
 			this.contract()
 		} else {
@@ -215,6 +217,7 @@ export class ExpandableMobject extends LinkableMobject {
 	updateModel(argsDict: object = {}) {
 		//argsDict['viewWidth'] = this.viewWidth
 		//argsDict['viewHeight'] = this.viewHeight
+		//console.log('updating ExpandableMobject')
 		super.updateModel(argsDict)
 		this.background.updateModel({
 			width: this.viewWidth,

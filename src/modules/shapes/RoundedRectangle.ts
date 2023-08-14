@@ -1,4 +1,5 @@
 import { Vertex } from '../helpers/Vertex_Transform'
+import { VertexArray } from '../helpers/VertexArray'
 import { CurvedShape } from './CurvedShape'
 import { remove } from '../helpers/helpers'
 
@@ -44,7 +45,7 @@ export class RoundedRectangle extends CurvedShape {
 			let p41: Vertex = this.p4.translatedBy(r, 0)
 			let p42: Vertex = this.p4.translatedBy(0, -r)
 			let m41: Vertex = this.p4.add(this.p1).divide(2)
-			this.bezierPoints = [
+			this.bezierPoints = new VertexArray([
 				p12, p21,
 				this.p1, m12, this.p2,
 				p12, p21, this.p2,
@@ -58,12 +59,12 @@ export class RoundedRectangle extends CurvedShape {
 				this.p4, m41, this.p1,
 				p42, p11, this.p1,
 				this.p1, p12
-			]
+			])
 		} catch { }
 	}
 
-
 	updateModel(argsDict: object = {}) {
+		//console.log('updating RoundedRectangle')
 		super.updateModel(argsDict)
 
 		//// internal dependencies
@@ -77,8 +78,8 @@ export class RoundedRectangle extends CurvedShape {
 
 	}
 
-	geometricProperties(): Array<string> {
-		return super.geometricProperties().concat([
+	animatableSVGPathProperties(): Array<string> {
+		return super.animatableSVGPathProperties().concat([
 			'width',
 			'height',
 			'cornerRadius'

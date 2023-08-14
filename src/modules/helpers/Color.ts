@@ -47,6 +47,15 @@ export class Color {
 		return new Color(r, g, b, a)
 	}
 
+	interpolate(newColor: Color, weight: number) {
+		return new Color(
+			(1 - weight) * this.red + weight * newColor.red,
+			(1 - weight) * this.green + weight * newColor.green,
+			(1 - weight) * this.blue + weight * newColor.blue,
+			(1 - weight) * this.alpha + weight * newColor.alpha
+		)
+	}
+
 	static clear(): Color { return new Color(0, 0, 0, 0) }
 
 	static gray(x): Color { return new Color(x, x, x) }

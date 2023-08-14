@@ -2,13 +2,14 @@ import { Mobject } from './Mobject'
 import { MGroup } from './MGroup'
 import { Color } from '../helpers/Color'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
-import { deepCopy, stringFromPoint } from '../helpers/helpers'
+import { VertexArray } from '../helpers/VertexArray'
+import { deepCopy, stringFromPoint, remove, restrictedDict } from '../helpers/helpers'
 
 export class VMobject extends Mobject {
 
 	svg: SVGSVGElement
 	path: SVGElement // child of view
-	vertices: Array<Vertex>
+	vertices: VertexArray
 
 	fillColor: Color
 	fillOpacity: number
@@ -26,7 +27,7 @@ export class VMobject extends Mobject {
 
 	statelessSetup() {
 		super.statelessSetup()
-		this.vertices = []
+		this.vertices = new VertexArray()
 		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.svg['mobject'] = this
@@ -164,13 +165,17 @@ export class VMobject extends Mobject {
 	///////////////
 
 	animatableProperties(): Array<string> {
+		return this.animatableCSSProperties()
+			.concat(this.animatableSVGProperties())
+	}
+
+	animatableSVGProperties(): Array<string> {
+		return this.animatableSVGStyleProperties()
+			.concat(this.animatableSVGPathProperties())
+	}
+
+	animatableSVGStyleProperties(): Array<string> {
 		return [
-			'transform',
-			'viewWidth',
-			'viewHeight',
-			'anchor',
-			'opacity',
-			'backgroundColor',
 			'fillColor',
 			'fillOpacity',
 			'strokeColor',
@@ -178,7 +183,7 @@ export class VMobject extends Mobject {
 		]
 	}
 
-	geometricProperties(): Array<string> {
+	animatableSVGPathProperties(): Array<string> {
 		return []
 	}
 
@@ -188,9 +193,8 @@ export class VMobject extends Mobject {
 		return anim
 	}
 
-
-
-	animation(key: string, value: any, seconds: number): SVGAnimateElement {
+	nonPathSVGAnimation(key: string, value: any, seconds: number): SVGAnimateElement {
+		//console.log("nonPathSVGAnimation (VMobject) enter:", Date.now())
 
 		if (key == 'fillColor') {
 
@@ -202,6 +206,7 @@ export class VMobject extends Mobject {
 			anim.setAttribute('begin', 'indefinite')
 			anim.setAttribute('dur', seconds.toString() + 's')
 			this.path.appendChild(anim)
+			//console.log("nonPathSVGAnimation (VMobject) exit:", Date.now())
 			return anim
 
 		} else if (key == 'fillOpacity') {
@@ -214,6 +219,7 @@ export class VMobject extends Mobject {
 			anim.setAttribute('begin', 'indefinite')
 			anim.setAttribute('dur', seconds.toString() + 's')
 			this.path.appendChild(anim)
+			//console.log("nonPathSVGAnimation (VMobject) exit:", Date.now())
 			return anim
 
 		} else if (key == 'strokeColor') {
@@ -226,6 +232,7 @@ export class VMobject extends Mobject {
 			anim.setAttribute('begin', 'indefinite')
 			anim.setAttribute('dur', seconds.toString() + 's')
 			this.path.appendChild(anim)
+			//console.log("nonPathSVGAnimation (VMobject) exit:", Date.now())
 			return anim
 
 		} else if (key == 'strokeWidth') {
@@ -238,17 +245,7 @@ export class VMobject extends Mobject {
 			anim.setAttribute('begin', 'indefinite')
 			anim.setAttribute('dur', seconds.toString() + 's')
 			this.path.appendChild(anim)
-			return anim
-
-		} else if (key == 'anchor') {
-
-			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion') as SVGAnimateMotionElement
-			let dr = (value as Vertex).subtract(this.anchor)
-			let pathString = 'M' + stringFromPoint(Vertex.origin()) + 'L' + stringFromPoint(dr)
-			anim.setAttribute('path', pathString)
-			anim.setAttribute('begin', 'indefinite')
-			anim.setAttribute('dur', seconds.toString() + 's')
-			this.path.appendChild(anim)
+			//console.log("nonPathSVGAnimation (VMobject) exit:", Date.now())
 			return anim
 
 		} else if ((key == 'bezierPoints' && this.constructor.name != 'CurvedShape')
@@ -256,75 +253,102 @@ export class VMobject extends Mobject {
 
 			console.error('unanimatable property', key, 'on', this)
 
-		} else if (this.geometricProperties().includes(key)) {
-
-			let newObj = deepCopy(this)
-			let argsDict: object = {}
-			argsDict[key] = value
-			newObj.update(argsDict)
-
-			let anim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
-			anim.setAttribute('attributeName', 'd')
-			anim.setAttribute('values', this.pathString() + ';' + newObj.pathString() + ';')
-			anim.setAttribute('begin', 'indefinite')
-			anim.setAttribute('dur', seconds.toString() + 's')
-			this.path.appendChild(anim)
-			return anim
-
+		} else {
+			console.error("???")
 		}
 
 	}
 
-	animations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
-		let anims: Array<SVGAnimateElement> = []
-		for (let [key, value] of Object.entries(argsDict)) {
-			let anim: SVGAnimateElement = this.animation(key, value, seconds)
+	svgAnimations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
+		//console.log("svgAnimation (VMobject) enter:", Date.now())
+
+		let pathArgsDict = restrictedDict(argsDict, this.animatableSVGPathProperties())
+		let styleArgsDict = restrictedDict(argsDict, this.animatableSVGStyleProperties())
+
+		let anims = super.svgAnimations(argsDict, seconds)
+		let newObj = deepCopy(this)
+		newObj.update(pathArgsDict)
+
+		let pathAnim = document.createElementNS('http://www.w3.org/2000/svg', 'animate') as SVGAnimateElement
+		pathAnim.setAttribute('attributeName', 'd')
+		pathAnim.setAttribute('values', this.pathString() + ';' + newObj.pathString() + ';')
+		pathAnim.setAttribute('begin', 'indefinite')
+		pathAnim.setAttribute('dur', seconds.toString() + 's')
+		this.path.appendChild(pathAnim)
+		anims.push(pathAnim)
+
+		for (let [key, value] of Object.entries(styleArgsDict)) {
+			let anim: SVGAnimateElement = this.nonPathSVGAnimation(key, value, seconds)
 			anims.push(anim)
 		}
+		console.log("svgAnimation (VMobject) exit:", Date.now())
 		return anims
 	}
 
-	play(anims: Array<SVGAnimateElement>, seconds, argsDict: object = {}) {
-		for (let anim of anims) {
-			anim.setAttribute('begin', '0s')
-		}
-		let ts = window.setTimeout(() => {
-			this.update(argsDict)
-			for (let anim of anims) {
-				anim.remove()
-			}
-		}, seconds * 1000)
-	}
-
 	animate(argsDict: object = {}, seconds: number) {
-		super.animate(argsDict)
-		let anims: Array<SVGAnimateElement> = this.animations(argsDict, seconds)
-		this.play(anims, seconds, argsDict)
+		//console.log("animate (VMobject) enter:", Date.now())
+
+		let cssArgsDict = restrictedDict(argsDict, this.animatableCSSProperties())
+		let svgArgsDict = restrictedDict(argsDict, this.animatableSVGProperties())
+
+		let anims: Array<SVGAnimateElement> = this.svgAnimations(svgArgsDict, seconds)
+		this.playSVG(anims, seconds, argsDict)
+		super.animate(argsDict, seconds)
+		//console.log("animate (VMobject) exit:", Date.now())
 	}
 
+	playSVG(anims: Array<SVGAnimateElement>, seconds: number, argsDict: object = {}) {
+		//console.log("playSVG (VMobject) enter:", Date.now())
+		for (let anim of anims) {
+			//console.log(anim as SVGAnimateElement)
+			anim.setAttribute('begin', '0s')
+			console.log("adding SVG anim:", this.runningAnimations, "to", this)
+			console.log("before:", this.runningAnimations)
+			this.runningAnimations.push(anim)
+			console.log("after:", this.runningAnimations)
+			anim.addEventListener('endEvent', (event) => {
+				console.log(event)
+				if (!this.runningAnimations.includes(anim)) {
+					return
+				}
+				console.log("removing SVG anim:", anim, "from", this)
+				console.log("before:", this.runningAnimations)
+				remove(this.runningAnimations, anim)
+				console.log("after:", this.runningAnimations)
+				if (this.runningAnimations.length == 0 && this.superMobject.runningAnimations.length == 0) {
+					console.log("no more animations (SVG) on", this)
+					var update = true
+					for (let depmob of this.allDependents()) {
+						if (depmob.runningAnimations.length > 0) {
+							update = false
+						}
+					}
+					for (let submob of this.submobs) {
+						if (submob.runningAnimations.length > 0) {
+							update = false
+						}
+					}
+					if (update) {
+						console.log('and we are free to update')
+						console.log(this, argsDict)
+						this.update(argsDict)
+					}
+				}
+			})
+//			anim.beginElement()
+		}
+		//console.log("playSVG (VMobject) exit:", Date.now())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	}
 
 }
+
+
+
+
+
+
+
+
+
+

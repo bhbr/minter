@@ -1,4 +1,5 @@
 import { Vertex } from '../helpers/Vertex_Transform'
+import { VertexArray } from './../helpers/VertexArray'
 import { Polygon } from './Polygon'
 
 export class Rectangle extends Polygon {
@@ -24,7 +25,7 @@ export class Rectangle extends Polygon {
 
 	statefulSetup() {
 		super.statefulSetup()
-		this.vertices = [this.p1, this.p2, this.p3, this.p4]
+		this.vertices = new VertexArray([this.p1, this.p2, this.p3, this.p4])
 	}
 
 	updateModel(argsDict: object = {}) {

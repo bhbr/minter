@@ -1,10 +1,11 @@
 import { VMobject } from '../mobject/VMobject'
 import { Vertex } from '../helpers/Vertex_Transform'
+import { VertexArray } from '../helpers/VertexArray'
 import { stringFromPoint } from '../helpers/helpers'
 
 export class CurvedShape extends VMobject {
 
-	_bezierPoints: Array<Vertex>
+	_bezierPoints: VertexArray
 
 	updateBezierPoints() { }
 	// implemented by subclasses
@@ -14,8 +15,8 @@ export class CurvedShape extends VMobject {
 		this.updateBezierPoints()
 	}
 
-	static makePathString(bezierPoints: Array<Vertex>): string {
-		let points: Array<Vertex> = bezierPoints
+	static makePathString(bezierPoints: VertexArray): string {
+		let points: VertexArray = bezierPoints
 		if (points == undefined || points.length == 0) { return '' }
 
 		// there should be 3n+1 points
@@ -37,10 +38,10 @@ export class CurvedShape extends VMobject {
 		return CurvedShape.makePathString(this.bezierPoints)
 	}
 
-	get bezierPoints(): Array<Vertex> { return this._bezierPoints }
-	set bezierPoints(newValue: Array<Vertex>) {
+	get bezierPoints(): VertexArray { return this._bezierPoints }
+	set bezierPoints(newValue: VertexArray) {
 		this._bezierPoints = newValue
-		let v: Array<Vertex> = []
+		let v = new VertexArray()
 		let i: number = 0
 		for (let p of this.bezierPoints) {
 			if (i % 3 == 1) { v.push(p) }
@@ -54,14 +55,10 @@ export class CurvedShape extends VMobject {
 	// ANIMATION //
 	///////////////
 
-	geometricProperties(): Array<string> {
-		return super.geometricProperties().concat([
+	animatableSVGPathProperties(): Array<string> {
+		return super.animatableSVGPathProperties().concat([
 			'bezierPoints'
 		])
-	}
-		
-	animate(argsDict: object = {}, seconds: number) {
-		super.animate(argsDict, seconds)
 	}
 
 	morphTo(newShape: CurvedShape, seconds: number) {

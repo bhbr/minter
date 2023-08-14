@@ -47,6 +47,16 @@ export function applyMixins(derivedCtor: any, constructors: any[]) {
   });
 }
 
+export function restrictedDict(dict: object, keys: Array<string>): object {
+	let ret: object = {}
+	for (let key of keys) {
+		let value: any = dict[key]
+		if (value !== undefined) {
+			ret[key] = dict[key]
+		}
+	}
+	return ret
+}
 
 export function copy(obj: any): any {
 

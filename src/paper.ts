@@ -24,6 +24,7 @@ import { Construction } from './modules/construction/Construction'
 import { Pendulum } from './modules/pendulum/Pendulum'
 import { CindyCanvas } from './modules/cindy/CindyCanvas'
 import { DEGREES } from './modules/helpers/math'
+import { WaveCindyCanvas } from './modules/cindy/WaveCindyCanvas'
 
 declare var CindyJS: any
 
@@ -219,67 +220,31 @@ export const paper = new Paper({
 let obj1 = new ExpandableMobject({
 	width: 400,
 	height: 300,
+	anchor: new Vertex(500, 200)
+})
+obj1.background.update({
 	cornerRadius: 100,
 	fillColor: Color.red(),
-	fillOpacity: 1.0,
-	anchor: new Vertex(500, 200)
+	fillOpacity: 0.5,
 })
 paper.add(obj1)
 
-obj1.animate({
-	viewWidth: 200,
-	viewHeight: 400,
-	transform: new Transform({angle: 20 * DEGREES}),//, anchor: new Vertex(100, 100)}),
-	anchor: new Vertex(200, 100),
-	opacity: 0.3,
-	backgroundColor: Color.green()
-}, 1)
+let obj2 = new WaveCindyCanvas({
+			anchor: new Vertex(100, 100),
+			viewWidth: 150,
+			viewHeight: 150,
+			points: [[0.4, 0.4], [0.3, 0.8]],
+			id: `wavey`
+		})
 
-// obj1.update({
-// 	anchor: new Vertex(50, 50)
-// })
+paper.add(obj2)
+obj2.startUp()
 
-
-// console.log(obj1.path)
-// console.log(obj2.path)
-
-// obj1.path.setAttribute('id', 'path1')
-// //obj2.path.setAttribute('id', 'path2')
-
-// let d1: string = obj1.pathString()
-// let d2: string = obj2.pathString()
-
-// let anim1 = document.createElementNS('http://www.w3.org/2000/svg', 'animate')
-// anim1.setAttribute('attributeName', 'd')
-// anim1.setAttribute('values', d1 + ';' + d2 + ';')
-// anim1.setAttribute('dur', '1s')
-// anim1.setAttribute('fill', 'freeze')
-
-// let anim2 = document.createElementNS('http://www.w3.org/2000/svg', 'animate')
-// anim2.setAttribute('attributeName', 'fill-opacity')
-// anim2.setAttribute('attributeType', 'CSS')
-// anim2.setAttribute('from', '1.0')
-// anim2.setAttribute('to', '0.1')
-// anim2.setAttribute('dur', '1s')
-// anim2.setAttribute('fill', 'freeze')
-
-// obj1.path.appendChild(anim1)
-// obj1.path.appendChild(anim2)
-
-// let timeoutID1 = window.setTimeout(() => {
-// 	console.log(obj1.vertices)
-// 	console.log(obj1.pathString())
-// 	console.log(obj1.path.getAttribute('d'))
-// 	obj1.updateFrom(obj2, ['width', 'height', 'cornerRadius', 'fillOpacity'])
-// 	anim1.remove()
-// 	anim2.remove()
-// }, 1000)
-
-
-
-
-
-
+obj2.startSelfAnimation({
+	anchor: new Vertex(200, 200),
+	viewWidth: 250,
+	viewHeight: 350
+}, 3)
 
 
 

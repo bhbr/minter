@@ -1,6 +1,7 @@
 import { VMobject } from '../mobject/VMobject'
 import { stringFromPoint } from '../helpers/helpers'
 import { Vertex } from '../helpers/Vertex_Transform'
+import { VertexArray } from '../helpers/VertexArray'
 
 export class Polygon extends VMobject {
 
@@ -12,13 +13,13 @@ export class Polygon extends VMobject {
 		})
 	}
 
-	geeomtricProperties(): Array<string> {
-		return super.animatableProperties().concat([
+	animatableSVGPathProperties(): Array<string> {
+		return super.animatableSVGPathProperties().concat([
 			'vertices'
 		])
 	}
 
-	static makePathString(vertices: Array<Vertex>, closed: boolean): string {
+	static makePathString(vertices: VertexArray, closed: boolean): string {
 		let pathString: string = ''
 		let v = vertices
 		if (v.length == 0) { return '' }

@@ -119,6 +119,10 @@ export class Vertex extends Array {
 		return listOfVertices
 	}
 
+	interpolate(newVertex: Vertex, weight: number) {
+		return this.scaledBy(1 - weight).add(newVertex.scaledBy(weight))
+	}
+
 }
 
 export class Transform extends ExtendedObject {
@@ -150,7 +154,7 @@ export class Transform extends ExtendedObject {
 		let str2: string = this.scale == 1 ? `` : `scale(${this.scale})`
 		let str3: string = this.angle == 0 ? `` : `rotate(${this.angle/DEGREES}deg)`
 		let str4: string = `` // this.anchor.isZero() ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px)`
-		let str5: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px)`
+		let str5: string = `translate(${this.shift.x}px,${this.shift.y}px)`
 		
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `)
 	}
@@ -213,6 +217,15 @@ export class Transform extends ExtendedObject {
 
 	leftComposedWith(t: Transform): Transform {
 		return t.rightComposedWith(this)
+	}
+
+	interpolate(newTransform: Transform, weight: number) {
+		return new Transform({
+			anchor: this.anchor.interpolate(newTransform.anchor, weight),
+			angle: (1 - weight) * this.angle + weight * newTransform.angle,
+			scale: (1 - weight) * this.scale + weight * newTransform.scale,
+			shift: this.shift.interpolate(newTransform.shift, weight)
+		})
 	}
 
 }

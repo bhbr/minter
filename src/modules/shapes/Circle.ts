@@ -1,5 +1,6 @@
 import { CurvedShape } from './CurvedShape'
 import { Vertex } from '../helpers/Vertex_Transform'
+import { VertexArray } from '../helpers/VertexArray'
 
 export class Circle extends CurvedShape {
 
@@ -31,7 +32,7 @@ export class Circle extends CurvedShape {
 	}
 
 	updateBezierPoints() {
-		let newBezierPoints: Array<Vertex> = []
+		let newBezierPoints = new VertexArray()
 		let n: number = 8
 		for (let i = 0; i <= n; i++) {
 			let theta: number = i/n * 2 * Math.PI
@@ -47,7 +48,7 @@ export class Circle extends CurvedShape {
 			newBezierPoints.push(anchorPoint)
 			if (i != n) { newBezierPoints.push(rightControlPoint) }
 		}
-		let translatedBezierPoints = []
+		let translatedBezierPoints = new VertexArray()
 		for (let i = 0; i < newBezierPoints.length; i++) {
 			translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius))
 		}

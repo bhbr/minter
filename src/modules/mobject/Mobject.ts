@@ -1,9 +1,10 @@
-import { remove, stringFromPoint, paperLog, deepCopy } from '../helpers/helpers'
+import { remove, stringFromPoint, paperLog, deepCopy, restrictedDict } from '../helpers/helpers'
 import { PointerEventPolicy, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './pointer_events'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { ExtendedObject } from '../helpers/ExtendedObject'
 import { Color } from '../helpers/Color'
 import { Dependency } from './Dependency'
+import { VertexArray } from '../helpers/VertexArray'
 
 export const DRAW_BORDER: boolean = true
 
@@ -44,7 +45,7 @@ export class Mobject extends ExtendedObject {
 			dependencies: [],
 
 			pointerEventPolicy: PointerEventPolicy.Pass,
-			snappablePoints: [],
+			snappablePoints: []
 		}
 	}
 
@@ -76,6 +77,7 @@ export class Mobject extends ExtendedObject {
 		this.savedOnPointerMove = this.onPointerMove
 		this.savedOnPointerUp = this.onPointerUp
 
+		this.runningAnimations = []
 	}
 
 	statefulSetup() {
@@ -314,41 +316,51 @@ export class Mobject extends ExtendedObject {
 	// ANIMATION //
 	///////////////
 
-	animatableProperties(): Array<string> {
+	runningAnimations: Array<HTMLStyleElement | SVGAnimateElement>
+	interpolationStartCopy: this
+	interpolationStopCopy: this
+	animationTimeStart: number
+	animationDuration: number
+
+	animatableCSSProperties(): Array<string> {
 		return [
 			'transform',
+			'anchor',
 			'viewWidth',
 			'viewHeight',
-			'anchor',
 			'opacity',
 			'backgroundColor'
 		]
 	}
 
-	animate(argsDict: object = {}, seconds: number = 1) {
-
-		argsDict = this.consolidateTransformAndAnchor(argsDict)
-		this.view.style['animation-name'] = 'anim'
-		this.view.style['animation-duration'] = `${seconds}s`
-		this.view.style['animation-timing-function'] = 'linear'
-
-		let styleTag = document.createElement('style')
-		styleTag.innerHTML = this.animationStyleTagHTML(argsDict)
-		this.view.appendChild(styleTag)
-
-		let timeoutID = window.setTimeout(() => {
-			this.view.style.removeProperty('animation-name')
-			this.view.style.removeProperty('animation-duration')
-			this.view.style.removeProperty('animation-timing-function')
-			this.view.childNodes[this.view.childNodes.length - 1].remove()
-			this.update(argsDict)
-			console.log(this)
-		}, 1000 * seconds)
-
+	animatableProperties(): Array<string> {
+		return this.animatableCSSProperties()
 	}
 
-	animationStyleTagHTML(argsDict: object = {}): string {
-		var headCode = "@keyframes anim { \nfrom { \n"
+	cssAnimation(argsDict: object = {}, seconds: number): HTMLStyleElement | null {
+		//console.log("cssAnimation enter:", Date.now())
+
+		let animatableCSSArgsDict: object = restrictedDict(argsDict, this.animatableCSSProperties())
+		if (Object.keys(animatableCSSArgsDict).length == 0) {
+			return null
+		}
+
+		animatableCSSArgsDict = this.consolidateTransformAndAnchor(animatableCSSArgsDict)
+		let animationName = `anim-${Date.now()}`
+		this.view.style['animation-name'] = animationName
+		this.view.style['animation-duration'] = `${seconds}s`
+		this.view.style['animation-timing-function'] = 'linear'
+		this.view.style['animation-play-state'] = 'paused'
+
+		let styleTag = document.createElement('style')
+		styleTag.innerHTML = this.animationStyleTagHTML(animatableCSSArgsDict, animationName)
+		//console.log("cssAnimation exit:", Date.now())
+		this.view.appendChild(styleTag)
+		return styleTag
+	}
+
+	animationStyleTagHTML(argsDict: object = {}, name: string): string {
+		var headCode = `@keyframes ${name} { \nfrom { \n`
 		var fromCode = ""
 		var midCode = "}\nto {\n"
 		var toCode = ""
@@ -357,8 +369,8 @@ export class Mobject extends ExtendedObject {
 		let newTransform: any = argsDict['transform']
 		if (newTransform) {
 			let nt = newTransform as Transform
-			fromCode = fromCode + `transform: ${this.transform};\n`
-			toCode = toCode + `transform: ${nt.asString()};`
+			fromCode = fromCode + `transform: ${this.transform.asString()};\n`
+			toCode = toCode + `transform: ${nt.asString()};\n`
 			fromCode = fromCode + `left: ${this.anchor.x}px;\ntop: ${this.anchor.y}px;\n`
 			toCode = toCode + `left: ${nt.anchor.x}px;\ntop: ${nt.anchor.y}px;\n`
 		}
@@ -391,8 +403,103 @@ export class Mobject extends ExtendedObject {
 		return headCode + fromCode + midCode + toCode + endCode
 	}
 
+	playCSS(cssAnimation: HTMLStyleElement, seconds, argsDict: object = {}) {
+		///console.log("playCSS enter:", Date.now(), "on:", this)
+		this.view.style['animation-play-state'] = 'running'
+		console.log("adding CSS anim:", cssAnimation, "to", this)
+		console.log("before:", this.runningAnimations)
+		this.runningAnimations.push(cssAnimation)
+		console.log("after:", this.runningAnimations)
 
+		//console.log("playCSS exit:", Date.now(), "on:", this)
+		//return
+		this.view.addEventListener('animationend', (event) => {
+			console.log(event)
+			if (!this.runningAnimations.includes(cssAnimation)) {
+				return
+			}
+			console.log("removing CSS anim:", cssAnimation, "from", this)
+			console.log("before:", this.runningAnimations)
+			remove(this.runningAnimations, cssAnimation)
+			console.log("after:", this.runningAnimations)
 
+			this.view.style.removeProperty('animation-name')
+			this.view.style.removeProperty('animation-duration')
+			this.view.style.removeProperty('animation-timing-function')
+			cssAnimation.remove()
+			if (this.runningAnimations.length == 0 && this.superMobject.runningAnimations.length == 0) {
+				var update = true
+				for (let depmob of this.allDependents()) {
+					if (depmob.runningAnimations.length > 0) {
+						update = false
+					}
+				}
+				for (let submob of this.submobs) {
+					if (submob.runningAnimations.length > 0) {
+						update = false
+					}
+				}
+				console.log("no more animations (CSS) on", this)
+				if (update) {
+					console.log("and we are free to update")
+					console.log(this, argsDict)
+					this.update(argsDict)
+				}
+			}
+		})
+	}
+
+	svgAnimations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
+		return []
+	}
+
+	animate(argsDict: object = {}, seconds: number) {
+		//console.log("animate (Mobject) enter:", Date.now())
+		let anim = this.cssAnimation(argsDict, seconds)
+		if (anim) {
+			this.playCSS(anim, seconds, argsDict)
+		}
+		//console.log("animate (Mobject) exit:", Date.now())
+
+	}
+
+	startSelfAnimation(argsDict: object = {}, seconds: number) {
+		this.interpolationStartCopy = deepCopy(this)
+		this.interpolationStopCopy = deepCopy(this)
+		this.interpolationStopCopy.update(argsDict, false)
+		let dt = 10
+		this.animationTimeStart = Date.now()
+		this.animationDuration = seconds
+		let animationInterval = window.setInterval(function(){this.selfAnimate(Object.keys(argsDict))}.bind(this), dt)
+		window.setTimeout(()=>{window.clearInterval(animationInterval)}, seconds * 1000)
+	}
+
+	selfAnimate(keys: Array<string>) {
+		console.log('animating')
+		let weight = (Date.now() - this.animationTimeStart)/(this.animationDuration * 1000)
+		let newArgsDict = this.interpolatedAnimationArgs(keys, weight)
+		this.update(newArgsDict)
+	}
+
+	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {
+		let ret: object = {}
+		for (let key of keys) {
+			let startValue: any = this.interpolationStartCopy[key]
+			let stopValue: any = this.interpolationStopCopy[key]
+			if (typeof startValue ==  'number') {
+				ret[key] = (1 - weight) * startValue + weight * stopValue
+			} else if (startValue instanceof Vertex) {
+				ret[key] = startValue.interpolate(stopValue as Vertex, weight)
+			} else if (startValue instanceof Transform) {
+				ret[key] = startValue.interpolate(stopValue as Transform, weight)
+			} else if (startValue instanceof Color) {
+				ret[key] = startValue.interpolate(stopValue as Color, weight)
+			} else if (startValue instanceof VertexArray) {
+				ret[key] = startValue.interpolate(stopValue as VertexArray, weight)
+			}
+		}
+		return ret
+	}
 
 	///////////////
 	// HIERARCHY //
@@ -720,6 +827,7 @@ export class Mobject extends ExtendedObject {
 
 	rawOnPointerUp(e: LocatedEvent) {
 		//console.log('rawOnPointerUp on', this)
+		console.log("rawPointerUp enter:", Date.now())
 		this.saveToEventHistory(e)
 		this.resetTimeout()
 		this.onPointerUp(e)

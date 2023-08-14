@@ -1,4 +1,5 @@
 import { Vertex } from './../helpers/Vertex_Transform'
+import { VertexArray } from './../helpers/VertexArray'
 import { Arrow } from './Arrow'
 
 export class Segment extends Arrow {
@@ -11,7 +12,7 @@ export class Segment extends Arrow {
 		super.updateModel(argsDict)
 		let p: Vertex = this.drawingStartPoint()
 		let q: Vertex = this.drawingEndPoint()
-		this.vertices = [p, q]
+		this.vertices = new VertexArray([p, q])
 
 	}
 
