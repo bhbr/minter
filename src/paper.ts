@@ -240,7 +240,7 @@ let obj2 = new WaveCindyCanvas({
 paper.add(obj2)
 obj2.startUp()
 
-obj2.startSelfAnimation({
+obj2.animate({
 	anchor: new Vertex(200, 200),
 	viewWidth: 250,
 	viewHeight: 350

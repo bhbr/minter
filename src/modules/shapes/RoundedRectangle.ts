@@ -78,14 +78,6 @@ export class RoundedRectangle extends CurvedShape {
 
 	}
 
-	animatableSVGPathProperties(): Array<string> {
-		return super.animatableSVGPathProperties().concat([
-			'width',
-			'height',
-			'cornerRadius'
-		])
-	}
-
 }
 
 

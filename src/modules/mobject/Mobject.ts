@@ -76,8 +76,6 @@ export class Mobject extends ExtendedObject {
 		this.savedOnPointerDown = this.onPointerDown
 		this.savedOnPointerMove = this.onPointerMove
 		this.savedOnPointerUp = this.onPointerUp
-
-		this.runningAnimations = []
 	}
 
 	statefulSetup() {
@@ -316,166 +314,24 @@ export class Mobject extends ExtendedObject {
 	// ANIMATION //
 	///////////////
 
-	runningAnimations: Array<HTMLStyleElement | SVGAnimateElement>
 	interpolationStartCopy: this
 	interpolationStopCopy: this
 	animationTimeStart: number
 	animationDuration: number
 
-	animatableCSSProperties(): Array<string> {
-		return [
-			'transform',
-			'anchor',
-			'viewWidth',
-			'viewHeight',
-			'opacity',
-			'backgroundColor'
-		]
-	}
-
-	animatableProperties(): Array<string> {
-		return this.animatableCSSProperties()
-	}
-
-	cssAnimation(argsDict: object = {}, seconds: number): HTMLStyleElement | null {
-		//console.log("cssAnimation enter:", Date.now())
-
-		let animatableCSSArgsDict: object = restrictedDict(argsDict, this.animatableCSSProperties())
-		if (Object.keys(animatableCSSArgsDict).length == 0) {
-			return null
-		}
-
-		animatableCSSArgsDict = this.consolidateTransformAndAnchor(animatableCSSArgsDict)
-		let animationName = `anim-${Date.now()}`
-		this.view.style['animation-name'] = animationName
-		this.view.style['animation-duration'] = `${seconds}s`
-		this.view.style['animation-timing-function'] = 'linear'
-		this.view.style['animation-play-state'] = 'paused'
-
-		let styleTag = document.createElement('style')
-		styleTag.innerHTML = this.animationStyleTagHTML(animatableCSSArgsDict, animationName)
-		//console.log("cssAnimation exit:", Date.now())
-		this.view.appendChild(styleTag)
-		return styleTag
-	}
-
-	animationStyleTagHTML(argsDict: object = {}, name: string): string {
-		var headCode = `@keyframes ${name} { \nfrom { \n`
-		var fromCode = ""
-		var midCode = "}\nto {\n"
-		var toCode = ""
-		var endCode = "}\n}"
-
-		let newTransform: any = argsDict['transform']
-		if (newTransform) {
-			let nt = newTransform as Transform
-			fromCode = fromCode + `transform: ${this.transform.asString()};\n`
-			toCode = toCode + `transform: ${nt.asString()};\n`
-			fromCode = fromCode + `left: ${this.anchor.x}px;\ntop: ${this.anchor.y}px;\n`
-			toCode = toCode + `left: ${nt.anchor.x}px;\ntop: ${nt.anchor.y}px;\n`
-		}
-
-		let newViewWidth: any = argsDict['viewWidth']
-		if (newViewWidth != undefined) {
-			fromCode = fromCode + `width: ${this.viewWidth}px;\n`
-			toCode = toCode + `width: ${newViewWidth}px;\n`
-		}
-
-		let newViewHeight: any = argsDict['viewHeight']
-		if (newViewHeight != undefined) {
-			fromCode = fromCode + `height: ${this.viewHeight}px;\n`
-			toCode = toCode + `height: ${newViewHeight}px;\n`
-		}
-
-
-		let newOpacity: any = argsDict['opacity']
-		if (newOpacity != undefined) {
-			fromCode = fromCode + `opacity: ${this.opacity};\n`
-			toCode = toCode + `opacity: ${newOpacity};\n`
-		}
-
-		let newBackgroundColor: any = argsDict['backgroundColor']
-		if (newBackgroundColor != undefined) {
-			fromCode = fromCode + `background-color: ${this.backgroundColor.toCSS()};\n`
-			toCode = toCode + `background-color: ${newBackgroundColor.toCSS()};\n`
-		}
-
-		return headCode + fromCode + midCode + toCode + endCode
-	}
-
-	playCSS(cssAnimation: HTMLStyleElement, seconds, argsDict: object = {}) {
-		///console.log("playCSS enter:", Date.now(), "on:", this)
-		this.view.style['animation-play-state'] = 'running'
-		console.log("adding CSS anim:", cssAnimation, "to", this)
-		console.log("before:", this.runningAnimations)
-		this.runningAnimations.push(cssAnimation)
-		console.log("after:", this.runningAnimations)
-
-		//console.log("playCSS exit:", Date.now(), "on:", this)
-		//return
-		this.view.addEventListener('animationend', (event) => {
-			console.log(event)
-			if (!this.runningAnimations.includes(cssAnimation)) {
-				return
-			}
-			console.log("removing CSS anim:", cssAnimation, "from", this)
-			console.log("before:", this.runningAnimations)
-			remove(this.runningAnimations, cssAnimation)
-			console.log("after:", this.runningAnimations)
-
-			this.view.style.removeProperty('animation-name')
-			this.view.style.removeProperty('animation-duration')
-			this.view.style.removeProperty('animation-timing-function')
-			cssAnimation.remove()
-			if (this.runningAnimations.length == 0 && this.superMobject.runningAnimations.length == 0) {
-				var update = true
-				for (let depmob of this.allDependents()) {
-					if (depmob.runningAnimations.length > 0) {
-						update = false
-					}
-				}
-				for (let submob of this.submobs) {
-					if (submob.runningAnimations.length > 0) {
-						update = false
-					}
-				}
-				console.log("no more animations (CSS) on", this)
-				if (update) {
-					console.log("and we are free to update")
-					console.log(this, argsDict)
-					this.update(argsDict)
-				}
-			}
-		})
-	}
-
-	svgAnimations(argsDict: object = {}, seconds: number): Array<SVGAnimateElement> {
-		return []
-	}
 
 	animate(argsDict: object = {}, seconds: number) {
-		//console.log("animate (Mobject) enter:", Date.now())
-		let anim = this.cssAnimation(argsDict, seconds)
-		if (anim) {
-			this.playCSS(anim, seconds, argsDict)
-		}
-		//console.log("animate (Mobject) exit:", Date.now())
-
-	}
-
-	startSelfAnimation(argsDict: object = {}, seconds: number) {
 		this.interpolationStartCopy = deepCopy(this)
 		this.interpolationStopCopy = deepCopy(this)
 		this.interpolationStopCopy.update(argsDict, false)
 		let dt = 10
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds
-		let animationInterval = window.setInterval(function(){this.selfAnimate(Object.keys(argsDict))}.bind(this), dt)
+		let animationInterval = window.setInterval(function(){this.updateAnimation(Object.keys(argsDict))}.bind(this), dt)
 		window.setTimeout(()=>{window.clearInterval(animationInterval)}, seconds * 1000)
 	}
 
-	selfAnimate(keys: Array<string>) {
-		console.log('animating')
+	updateAnimation(keys: Array<string>) {
 		let weight = (Date.now() - this.animationTimeStart)/(this.animationDuration * 1000)
 		let newArgsDict = this.interpolatedAnimationArgs(keys, weight)
 		this.update(newArgsDict)

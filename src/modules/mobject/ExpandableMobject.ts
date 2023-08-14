@@ -87,9 +87,8 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	expand() {
-		console.log("expand")
 		this.expanded = true
-		this.background.startSelfAnimation({
+		this.background.animate({
 			width: 150,
 			height: 100,
 			cornerRadius: 10,
@@ -98,7 +97,7 @@ export class ExpandableMobject extends LinkableMobject {
 			strokeWidth: 20,
 			strokeColor: Color.yellow()
 		}, 5)
-		this.startSelfAnimation({
+		this.animate({
 			viewWidth: 150,
 			viewHeight: 100,
 			anchor: new Vertex(300, 100)

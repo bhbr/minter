@@ -51,26 +51,6 @@ export class CurvedShape extends VMobject {
 	}
 
 
-	///////////////
-	// ANIMATION //
-	///////////////
-
-	animatableSVGPathProperties(): Array<string> {
-		return super.animatableSVGPathProperties().concat([
-			'bezierPoints'
-		])
-	}
-
-	morphTo(newShape: CurvedShape, seconds: number) {
-		if (newShape.constructor.name != this.constructor.name
-			|| newShape.bezierPoints.length != this.bezierPoints.length) {
-			console.error('Morphing not possible')
-			return
-		}
-	}
-	
-
-
 
 
 
