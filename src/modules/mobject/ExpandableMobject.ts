@@ -15,8 +15,9 @@ export class ExpandableMobject extends LinkableMobject {
 	background: RoundedRectangle
 	draggedMobjects: Array<Mobject>
 	dragPointStart?: Vertex
-	contractedWidth: number
-	contractedHeight: number
+	compactWidth: number
+	compactHeight: number
+	compactAnchor: Vertex
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -26,8 +27,9 @@ export class ExpandableMobject extends LinkableMobject {
 			draggedMobjects: [],
 			viewWidth: 400,
 			viewHeight: 300,
-			contractedWidth: 400,
-			contractedHeight: 300
+			compactWidth: 400,
+			compactHeight: 300,
+			compactAnchor: Vertex.origin()
 		})
 	}
 
@@ -48,60 +50,13 @@ export class ExpandableMobject extends LinkableMobject {
 		this.setDragging(false)
 	}
 
-	getExpandedBackground(): RoundedRectangle {
-		let ew = this.getPaper().viewWidth
-		let eh = this.getPaper().viewHeight
-		return new RoundedRectangle({
-			width: 0.9 * ew,
-			height: 0.9 * eh,
-			cornerRadius: 50,
-			anchor: new Vertex(0.05 * ew, 0.05 * eh)
-		})
-	}
-
-	getExpandedPath(): Array<Vertex> {
-		return this.getExpandedBackground().bezierPoints
-	}
-
-	getExpandedPathString(): string {
-		return this.getExpandedBackground().pathString()
-	}
-
-	getContractedBackground(): RoundedRectangle {
-		let ew = this.contractedWidth
-		let eh = this.contractedHeight
-		return new RoundedRectangle({
-			width: ew,
-			height: eh,
-			cornerRadius: 50,
-			anchor: this.anchor
-		})
-	}
-
-	getContractedPath(): Array<Vertex> {
-		return this.getContractedBackground().bezierPoints
-	}
-
-	getContractedPathString(): string {
-		return this.getContractedBackground().pathString()
-	}
-
 	expand() {
 		this.expanded = true
-		this.background.animate({
-			width: 150,
-			height: 100,
-			cornerRadius: 10,
-			fillColor: Color.blue(),
-			fillOpacity: 0.2,
-			strokeWidth: 20,
-			strokeColor: Color.yellow()
-		}, 5)
 		this.animate({
-			viewWidth: 150,
-			viewHeight: 100,
-			anchor: new Vertex(300, 100)
-		}, 5)
+			viewWidth: this.getPaper().viewWidth - 100,
+			viewHeight: this.getPaper().viewHeight - 100,
+			anchor: new Vertex(50, 50)
+		}, 0.5)
 	}
 
 	contract() {

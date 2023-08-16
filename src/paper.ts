@@ -23,8 +23,9 @@ import { BoxSlider } from './modules/slider/BoxSlider'
 import { Construction } from './modules/construction/Construction'
 import { Pendulum } from './modules/pendulum/Pendulum'
 import { CindyCanvas } from './modules/cindy/CindyCanvas'
-import { DEGREES } from './modules/helpers/math'
+import { DEGREES, TAU } from './modules/helpers/math'
 import { WaveCindyCanvas } from './modules/cindy/WaveCindyCanvas'
+import { CircularArc } from './modules/shapes/CircularArc'
 
 declare var CindyJS: any
 
@@ -229,27 +230,31 @@ obj1.background.update({
 })
 paper.add(obj1)
 
-let obj2 = new WaveCindyCanvas({
-			anchor: new Vertex(100, 100),
-			viewWidth: 150,
-			viewHeight: 150,
-			points: [[0.4, 0.4], [0.3, 0.8]],
-			id: `wavey`
-		})
-
-paper.add(obj2)
-obj2.startUp()
-
-obj2.animate({
-	anchor: new Vertex(200, 200),
-	viewWidth: 250,
-	viewHeight: 350
-}, 3)
 
 
+let arc = new CircularArc({
+	radius: 200,
+	angle: 0.75 * TAU,
+	midpoint: new Vertex(300, 300),
+	strokeColor: Color.red(),
+	strokeWidth: 3,
+	fillColor: Color.green(),
+	fillOpacity: 0.5
+})
 
+paper.add(arc)
 
+let circle = new Circle({
+	radius: 200,
+	midpoint: new Vertex(400, 400),
+	strokeColor: Color.red(),
+	strokeWidth: 3,
+	fillColor: Color.green(),
+	fillOpacity: 0.5
+})
 
+paper.add(circle)
+console.log(circle)
 
 
 
