@@ -47,6 +47,8 @@ export class BoxSlider extends LinkableMobject {
 
 	statelessSetup() {
 		//// state-independent setup
+		super.statelessSetup()
+
 		this.outerBar = new Rectangle({
 			fillColor: Color.black(),
 			fillOpacity: 1,

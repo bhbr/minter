@@ -43,13 +43,15 @@ export class Paper extends ExpandableMobject {
 			children: [],
 			visibleCreation: 'freehand',
 			draggable: false,
-			draggedMobjects: []
+			draggedMobjects: [],
+			pointerEventPolicy: PointerEventPolicy.Handle
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			isExpanded: true
+			expanded: true,
+			expandedPadding: 0,
 		})
 	}
 
@@ -77,9 +79,9 @@ export class Paper extends ExpandableMobject {
 		this.setDragging(false)
 	}
 
-	savedOnPointerDown(e: LocatedEvent) { this.startCreating(e) }
-	savedOnPointerMove(e: LocatedEvent) { this.creativeMove(e) }
-	savedOnPointerUp(e: LocatedEvent) { this.endCreating(e) }
+	// onPointerDown(e: LocatedEvent) { this.startCreating(e) }
+	// onPointerMove(e: LocatedEvent) { this.creativeMove(e) }
+	// onPointerUp(e: LocatedEvent) { this.endCreating(e) }
 
 	changeColorByName(newColorName: string) {
 		let newColor: Color = COLOR_PALETTE[newColorName]
@@ -135,6 +137,7 @@ export class Paper extends ExpandableMobject {
 	}
 
 	startCreating(e: LocatedEvent) {
+		console.log('startCreating')
 		this.creationStartPoint = pointerEventVertex(e)
 		let drawFreehand = true
 		for (let fp of this.construction.points) {
@@ -189,72 +192,51 @@ export class Paper extends ExpandableMobject {
 		this.hideLinksOfSubmobs()
 	}
 
-	setDragging(flag: boolean) {
-		super.setDragging(flag)
-		if (!flag) {
-			//this.onPointerDown = this.startCreating
-			//this.onPointerMove = this.creativeMove
-			//this.onPointerUp = this.endCreating
-		}
-	}
+	// setDragging(flag: boolean) {
+	// 	super.setDragging(flag)
+	// 	if (!flag) {
+	// 		//this.onPointerDown = this.startCreating
+	// 		//this.onPointerMove = this.creativeMove
+	// 		//this.onPointerUp = this.endCreating
+	// 	}
+	// }
 
-	dragging(e: LocatedEvent) {
-		super.dragging(e)
+	// dragging(e: LocatedEvent) {
+	// 	super.dragging(e)
+	// }
 
+	get expandedAnchor(): Vertex {
+		return isTouchDevice ? Vertex.origin() : new Vertex(150, 0)
 	}
 
 }
 
-var paperAnchor = Vertex.origin()
-if (isTouchDevice === false) {
-	paperAnchor = new Vertex(150, 0)
-}
-
+let paperDiv = document.querySelector('#paper') as HTMLElement
 export const paper = new Paper({
-	view: document.querySelector('#paper'),
-	anchor: paperAnchor,
-	pointerEventPolicy: PointerEventPolicy.Handle,
+	view: paperDiv,
 	viewWidth: 1250,
-	viewHeight: 1200
+	viewHeight: 1024,
 })
 
-let obj1 = new ExpandableMobject({
-	width: 400,
-	height: 300,
-	anchor: new Vertex(500, 200)
-})
-obj1.background.update({
-	cornerRadius: 100,
-	fillColor: Color.red(),
-	fillOpacity: 0.5,
-})
-paper.add(obj1)
-
-
-
-let arc = new CircularArc({
-	radius: 200,
-	angle: 0.75 * TAU,
-	midpoint: new Vertex(300, 300),
-	strokeColor: Color.red(),
-	strokeWidth: 3,
-	fillColor: Color.green(),
-	fillOpacity: 0.5
+let slider1 = new BoxSlider({
+	anchor: new Vertex(100, 100)
 })
 
-paper.add(arc)
+paper.add(slider1)
 
-let circle = new Circle({
-	radius: 200,
-	midpoint: new Vertex(400, 400),
-	strokeColor: Color.red(),
-	strokeWidth: 3,
-	fillColor: Color.green(),
-	fillOpacity: 0.5
+let slider2 = new BoxSlider({
+	anchor: new Vertex(300, 100)
 })
 
-paper.add(circle)
-console.log(circle)
+paper.add(slider2)
+
+paper.setDragging(true)
+slider1.setDragging(true)
+slider2.setDragging(true)
+
+
+
+
 
 
 

@@ -68,7 +68,7 @@ export class Color {
 	static green(): Color { return new Color(0, 1, 0) }
 	static blue(): Color { return new Color(0, 0, 1) }
 	static indigo(): Color { return new Color(0.5, 0, 1) }
-	static violet(): Color { return new Color(1, 0, 1) }
+	static purple(): Color { return new Color(1, 0, 1) }
 
 }
 
@@ -81,5 +81,5 @@ export const COLOR_PALETTE: object = {
 	'green': Color.green(),
 	'blue': Color.blue(),
 	'indigo': Color.indigo(),
-	'violet': Color.violet()
+	'purple': Color.purple()
 }

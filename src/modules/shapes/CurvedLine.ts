@@ -26,16 +26,16 @@ export class CurvedLine extends VMobject {
 		let points: VertexArray = bezierPoints
 		if (points == undefined || points.length == 0) { return '' }
 
-		// there should be 3n+1 points
+		// there should be 3n + 1 points
 		let nbCurves: number = (points.length - 1)/3
 		if (nbCurves % 1 != 0) { throw 'Incorrect number of Bézier points' }
 
 		let pathString: string = 'M' + stringFromPoint(points[0])
 		for (let i = 0; i < nbCurves; i++) {
-			let point1str: string = stringFromPoint(points[3*i + 1])
-			let point2str: string = stringFromPoint(points[3*i + 2])
-			let point3str: string = stringFromPoint(points[3*i + 3])
-			pathString += 'C' + point1str + ' ' + point2str + ' ' + point3str
+			let point1str: string = stringFromPoint(points[3 * i + 1])
+			let point2str: string = stringFromPoint(points[3 * i + 2])
+			let point3str: string = stringFromPoint(points[3 * i + 3])
+			pathString += `C${point1str} ${point2str} ${point3str}`
 		}
 		if (closed) {
 			pathString += 'Z'

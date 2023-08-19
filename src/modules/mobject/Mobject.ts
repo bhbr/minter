@@ -548,7 +548,7 @@ export class Mobject extends ExtendedObject {
 	removeFreePoint(fp: any) { }
 
 	onPointerDown(e: LocatedEvent) {
-	//	console.log('pointer down on', this)
+		console.log('pointer down on', this)
 	}
 	onPointerMove(e: LocatedEvent) {
 	//	console.log('pointer move on', this)
@@ -622,7 +622,7 @@ export class Mobject extends ExtendedObject {
 		while (t != undefined) {
 			t = targetViewChain.pop()
 			let m: any = t['mobject']
-			//console.log(m)
+			//console.log(m, m.pointerEventPolicy, PointerEventPolicy.Handle)
 			if (m != undefined && m.pointerEventPolicy == PointerEventPolicy.Handle) {
 				//console.log('event target mobject:', m)
 				return m
@@ -683,7 +683,6 @@ export class Mobject extends ExtendedObject {
 
 	rawOnPointerUp(e: LocatedEvent) {
 		//console.log('rawOnPointerUp on', this)
-		console.log("rawPointerUp enter:", Date.now())
 		this.saveToEventHistory(e)
 		this.resetTimeout()
 		this.onPointerUp(e)
@@ -696,7 +695,9 @@ export class Mobject extends ExtendedObject {
 	}
 
 	isTap(e1: LocatedEvent, e2: LocatedEvent, dt: number = 500): boolean {
-		return Math.abs(e2.timeStamp - e1.timeStamp) < 500
+		return ((e1.type == "pointerdown" || e1.type == "mousedown")
+			&& (e2.type == "pointerup" || e2.type == "mousedown")
+			&& Math.abs(e2.timeStamp - e1.timeStamp) < 500)
 	}
 
 	tapDetected(): boolean {
@@ -742,5 +743,50 @@ export class Mobject extends ExtendedObject {
 	endDragging(e: LocatedEvent) {
 		this.dragAnchorStart = null
 	}
+
+	setDragging(draggable: boolean) {
+		if (draggable) {
+			this.savedOnPointerDown = this.onPointerDown
+			this.savedOnPointerMove = this.onPointerMove
+			this.savedOnPointerUp = this.onPointerUp
+			this.onPointerDown = this.startDragging
+			this.onPointerMove = this.dragging
+			this.onPointerUp = this.endDragging
+		} else {
+			this.onPointerDown = this.savedOnPointerDown
+			this.onPointerMove = this.savedOnPointerMove
+			this.onPointerUp = this.savedOnPointerUp
+			this.savedOnPointerDown = (e: LocatedEvent) => { }
+			this.savedOnPointerMove = (e: LocatedEvent) => { }
+			this.savedOnPointerUp = (e: LocatedEvent) => { }
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

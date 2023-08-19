@@ -18,6 +18,7 @@ export class ExpandableMobject extends LinkableMobject {
 	compactWidth: number
 	compactHeight: number
 	compactAnchor: Vertex
+	expandedPadding: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -25,16 +26,20 @@ export class ExpandableMobject extends LinkableMobject {
 			linkableChildren: [],
 			expanded: false,
 			draggedMobjects: [],
-			viewWidth: 400,
-			viewHeight: 300,
 			compactWidth: 400,
 			compactHeight: 300,
-			compactAnchor: Vertex.origin()
+			compactAnchor: Vertex.origin(),
+			expandedPadding: 50
 		})
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
+		
+		this.viewWidth = this.expanded ? this.expandedWidth : this.compactWidth
+		this.viewHeight = this.expanded ? this.expandedHeight : this.compactHeight
+		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor
+
 		this.background = new RoundedRectangle({
 			width: this.viewWidth,
 			height: this.viewHeight,
@@ -45,32 +50,55 @@ export class ExpandableMobject extends LinkableMobject {
 			anchor: Vertex.origin(),
 			pointerEventPolicy: PointerEventPolicy.Pass
 		})
+		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+		// TODO: clip at rounded corners as well
 		this.add(this.background)
 
-		this.setDragging(false)
+		//this.setDragging(false)
+	}
+
+	get expandedAnchor(): Vertex {
+		return new Vertex(this.expandedPadding, this.expandedPadding)
+	}
+
+	get expandedWidth(): number {
+		return this.getPaper().viewWidth - 2 * this.expandedPadding
+	}
+
+	get expandedHeight(): number {
+		return this.getPaper().viewHeight - 2 * this.expandedPadding
 	}
 
 	expand() {
 		this.expanded = true
 		this.animate({
-			viewWidth: this.getPaper().viewWidth - 100,
-			viewHeight: this.getPaper().viewHeight - 100,
-			anchor: new Vertex(50, 50)
+			viewWidth: this.expandedWidth,
+			viewHeight: this.expandedHeight,
+			anchor: this.expandedAnchor
 		}, 0.5)
 	}
 
 	contract() {
 		console.log('contract')
 		this.expanded = false
+		this.animate({
+			viewWidth: this.compactWidth,
+			viewHeight: this.compactHeight,
+			anchor: this.compactAnchor
+		}, 0.5)
 	}
 
-	onDoubleTap(e: LocatedEvent) {
-		console.log("onDoubleTap enter:", Date.now())
+	toggleViewState() {
 		if (this.expanded) {
 			this.contract()
 		} else {
 			this.expand()
-		}		
+		}	
+	}
+
+	onDoubleTap(e: LocatedEvent) {
+		console.log('double tap')
+		this.toggleViewState()
 	}
 
 	getCindys(): Array<CindyCanvas> {
@@ -83,57 +111,62 @@ export class ExpandableMobject extends LinkableMobject {
 		return ret
 	}
 
-	setDragging(flag: boolean) {
+	// setDragging(flag: boolean) {
 
-		// this.pointerEventPolicy = (flag ? PointerEventPolicy.Handle : PointerEventPolicy.Pass)
-		// console.log(this.pointerEventPolicy)
+	// 	this.pointerEventPolicy = (flag ? PointerEventPolicy.Handle : PointerEventPolicy.Pass)
+	// 	console.log(this.pointerEventPolicy)
 
-		// this.update({
-		// 	draggable: flag
-		// })
-		// for (let submob of this.submobs) {
-		// 	submob.update({
-		// 		draggable: flag
-		// 	})
-		// }
+	// 	this.update({
+	// 		draggable: flag
+	// 	})
+	// 	for (let submob of this.submobs) {
+	// 		submob.update({
+	// 			draggable: flag
+	// 		})
+	// 	}
 
-		// if (flag) {
-		// 	this.savedOnPointerDown = this.onPointerDown
-		// 	this.savedOnPointerMove = this.onPointerMove
-		// 	this.savedOnPointerUp = this.onPointerUp
-		// 	this.onPointerDown = this.startDragging
-		// 	this.onPointerMove = this.dragging
-		// 	this.onPointerUp = this.endDragging
+	// 	if (flag) {
+	// 		this.savedOnPointerDown = this.onPointerDown
+	// 		this.savedOnPointerMove = this.onPointerMove
+	// 		this.savedOnPointerUp = this.onPointerUp
+	// 		this.onPointerDown = this.startDragging
+	// 		this.onPointerMove = this.dragging
+	// 		this.onPointerUp = this.endDragging
 
-		// 	// for (let submob of this.getCindys()) {
-		// 	// 	submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
-		// 	// }
-		// } else {
-		// 	this.onPointerDown = this.savedOnPointerDown
-		// 	this.onPointerMove = this.savedOnPointerMove
-		// 	this.onPointerUp = this.savedOnPointerUp
-		// 	for (let submob of this.getCindys()) {
-		// 		submob.pointerEventPolicy = PointerEventPolicy.Propagate
-		// 	}
-		// }
-	}
+	// 		// for (let submob of this.getCindys()) {
+	// 		// 	submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
+	// 		// }
+	// 	} else {
+	// 		this.onPointerDown = this.savedOnPointerDown
+	// 		this.onPointerMove = this.savedOnPointerMove
+	// 		this.onPointerUp = this.savedOnPointerUp
+	// 		for (let submob of this.getCindys()) {
+	// 			submob.pointerEventPolicy = PointerEventPolicy.Propagate
+	// 		}
+	// 	}
+	// }
 
 	startDragging(e: LocatedEvent) {
+		if (!this.expanded) {
+			console.log("is expanded")
+			super.startDragging(e)
+			return
+		}
 		console.log('startDragging')
 		let target = this.eventTargetMobject(e)
-		if (target == this.background) {
+		if (target == this) {
 			this.draggedMobjects = []
 			for (let child of this.children) {
-				if (child.draggable){
+				if (child instanceof LinkableMobject) {
 					this.draggedMobjects.push(child)
 				}
 			}
-		} else if (target.draggable) {
+		} else if (target instanceof LinkableMobject) {
 			this.draggedMobjects = [target]
 		} else {
 			this.draggedMobjects = []
 		}
-
+		console.log(this.draggedMobjects)
 		this.dragPointStart = pointerEventVertex(e)
 
 		for (let mob of this.draggedMobjects) {
@@ -150,6 +183,10 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	dragging(e: LocatedEvent) {
+		if (!this.expanded) {
+			super.dragging(e)
+			return
+		}
 		let dragPoint = pointerEventVertex(e)
 		let dr = dragPoint.subtract(this.dragPointStart)
 
@@ -165,6 +202,10 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	endDragging(e: LocatedEvent) {
+		if (!this.expanded) {
+			super.endDragging(e)
+			return
+		}
 		this.draggedMobjects = []
 	}
 
