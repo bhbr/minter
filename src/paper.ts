@@ -224,14 +224,22 @@ let slider1 = new BoxSlider({
 
 paper.add(slider1)
 
-let slider2 = new BoxSlider({
-	anchor: new Vertex(300, 100)
+let exp = new ExpandableMobject({
+	compactAnchor: new Vertex(200, 100),
+	compactWidth: 300,
+	compactHeight: 200
 })
 
-paper.add(slider2)
+let slider2 = new BoxSlider({
+	anchor: new Vertex(50, 50)
+})
+
+exp.add(slider2)
+paper.add(exp)
 
 paper.setDragging(true)
 slider1.setDragging(true)
+exp.setDragging(true)
 slider2.setDragging(true)
 
 

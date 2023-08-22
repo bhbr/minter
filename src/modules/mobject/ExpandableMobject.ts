@@ -38,14 +38,14 @@ export class ExpandableMobject extends LinkableMobject {
 		
 		this.viewWidth = this.expanded ? this.expandedWidth : this.compactWidth
 		this.viewHeight = this.expanded ? this.expandedHeight : this.compactHeight
-		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor
+		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor.copy()
 
 		this.background = new RoundedRectangle({
 			width: this.viewWidth,
 			height: this.viewHeight,
 			cornerRadius: 50,
-			fillColor: Color.gray(0.5),
-			fillOpacity: 0.25,
+			fillColor: Color.gray(0.1),
+			fillOpacity: 0.8,
 			strokeColor: Color.clear(),
 			anchor: Vertex.origin(),
 			pointerEventPolicy: PointerEventPolicy.Pass
@@ -76,16 +76,18 @@ export class ExpandableMobject extends LinkableMobject {
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
+		window.setTimeout(() => { console.log(this.compactAnchor) }, 1000)
 	}
 
 	contract() {
-		console.log('contract')
 		this.expanded = false
+		//this.compactAnchor = new Vertex(200, 100)
 		this.animate({
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
+		window.setTimeout(() => { console.log(this.compactAnchor) }, 1000)
 	}
 
 	toggleViewState() {
