@@ -18,8 +18,6 @@ import { ColorChangeButton } from './ColorChangeButton'
 
 let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
 
-
-
 export class Sidebar extends Mobject {
 
 	background: Rectangle

@@ -6,7 +6,7 @@ import { Color } from '../helpers/Color'
 import { Dependency } from './Dependency'
 import { VertexArray } from '../helpers/VertexArray'
 
-export const DRAW_BORDER: boolean = true
+export const DRAW_BORDER: boolean = false
 
 export class Mobject extends ExtendedObject {
 

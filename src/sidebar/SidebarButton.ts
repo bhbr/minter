@@ -129,8 +129,8 @@ export class SidebarButton extends Circle {
 		this.active = true
 		let c = this.localCenter()
 		let t = new Transform({shift: c})
-		t.rightComposeWith(new Transform({scale: 1.2}))
-		t.rightComposeWith(new Transform({shift: c}).inverse())
+		t.rightComposeWith(new Transform({ scale: 1.2 }))
+		t.rightComposeWith(new Transform({ shift: c }).inverse())
 		// I know this is ugly, transform anchor doesn't work properly
 		this.update({
 			transform: t,
@@ -184,7 +184,7 @@ export class SidebarButton extends Circle {
 		try {
 			(window as Window).webkit.messageHandlers.handleMessage.postMessage(message)
 		} catch {
-			paper.handleMessage(message)
+			paper.getMessage(message)
 		}
 	}
 

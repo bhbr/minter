@@ -8,6 +8,8 @@ import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
 import { addLongPressListener, removeLongPressListener } from './long_press'
 
+declare var paper: any
+
 export class ExpandableMobject extends LinkableMobject {
 	
 	linkableChildren: Array<LinkableMobject>
@@ -54,7 +56,7 @@ export class ExpandableMobject extends LinkableMobject {
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 
-		//this.setDragging(false)
+		this.setDragging(false)
 	}
 
 	get expandedAnchor(): Vertex {
@@ -71,23 +73,22 @@ export class ExpandableMobject extends LinkableMobject {
 
 	expand() {
 		this.expanded = true
+		paper.mobject.expandedMobject = this
 		this.animate({
 			viewWidth: this.expandedWidth,
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
-		window.setTimeout(() => { console.log(this.compactAnchor) }, 1000)
 	}
 
 	contract() {
 		this.expanded = false
-		//this.compactAnchor = new Vertex(200, 100)
+		paper.mobject.expandedMobject = this.parent
 		this.animate({
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
-		window.setTimeout(() => { console.log(this.compactAnchor) }, 1000)
 	}
 
 	toggleViewState() {
@@ -111,6 +112,10 @@ export class ExpandableMobject extends LinkableMobject {
 			}
 		}
 		return ret
+	}
+
+	handleMessage(key: string, value: any) {
+		console.log(key, value)
 	}
 
 	// setDragging(flag: boolean) {

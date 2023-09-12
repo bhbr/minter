@@ -31,20 +31,22 @@ declare var CindyJS: any
 
 export class Paper extends ExpandableMobject {
 
-	visibleCreation: string
+	//visibleCreation: string
 	cindyPorts: Array<object>
-	creationStartPoint: Vertex
+	//creationStartPoint: Vertex
 	currentColor: Color
-	creationGroup?: CreationGroup
+	//creationGroup?: CreationGroup
 	construction: Construction
+	expandedMobject: ExpandableMobject
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			children: [],
-			visibleCreation: 'freehand',
+			//visibleCreation: 'freehand',
 			draggable: false,
 			draggedMobjects: [],
-			pointerEventPolicy: PointerEventPolicy.Handle
+			pointerEventPolicy: PointerEventPolicy.Handle,
+			expandedMobject: this
 		})
 	}
 
@@ -89,99 +91,102 @@ export class Paper extends ExpandableMobject {
 	}
 
 	changeColor(newColor: Color) {
-		this.currentColor = newColor
-		if (this.creationGroup == undefined) { return }
-		this.creationGroup.update({
-			penColor: this.currentColor
-		})
+		// this.currentColor = newColor
+		// if (this.creationGroup == undefined) { return }
+		// this.creationGroup.update({
+		// 	penColor: this.currentColor
+		// })
 	}
 
 
-	handleMessage(message: object) {
+	getMessage(message: object) {
 		if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
 		let value: string | boolean | number = Object.values(message)[0]
 		if (value == "true") { value = true }
 		if (value == "false") { value = false }
+		this.expandedMobject.handleMessage(key, value)
+	}
 
+	handleMessage(key: string, value: any) {
 		switch (key) {
-		case 'creating':
-				this.changeVisibleCreation(value as string)
-			if (value == 'freehand') {
-				this.pointerEventPolicy = PointerEventPolicy.Pass
-				break
-			}
-			if (this.creationGroup == undefined) {
-				this.pointerEventPolicy = PointerEventPolicy.Handle
-			}
-			break
-		case 'color':
-			this.changeColor(COLOR_PALETTE[value as string] as Color)
-			break
+		// case 'creating':
+			// 	this.changeVisibleCreation(value as string)
+			// if (value == 'freehand') {
+			// 	this.pointerEventPolicy = PointerEventPolicy.Pass
+			// 	break
+			// }
+			// if (this.creationGroup == undefined) {
+			// 	this.pointerEventPolicy = PointerEventPolicy.Handle
+			// }
+		// 	break
+		// case 'color':
+		// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
+		// 	break
 		case 'drag':
 			this.setDragging(value as boolean)
 			break
-		case 'toggleLinks':
-			if (value == 1 || value == '1') { this.showAllLinks() }
-			else { this.hideAllLinks() }
-			break
+		// case 'toggleLinks':
+		// 	if (value == 1 || value == '1') { this.showAllLinks() }
+		// 	else { this.hideAllLinks() }
+		// 	break
 		}
 
 	}
 
-	changeVisibleCreation(newVisibleCreation: string) {
-		this.visibleCreation = newVisibleCreation
-		if (this.creationGroup != undefined) {
-			this.creationGroup.setVisibleCreation(newVisibleCreation)
-		}
-	}
+	// changeVisibleCreation(newVisibleCreation: string) {
+	// 	this.visibleCreation = newVisibleCreation
+	// 	if (this.creationGroup != undefined) {
+	// 		this.creationGroup.setVisibleCreation(newVisibleCreation)
+	// 	}
+	// }
 
-	startCreating(e: LocatedEvent) {
-		console.log('startCreating')
-		this.creationStartPoint = pointerEventVertex(e)
-		let drawFreehand = true
-		for (let fp of this.construction.points) {
-			if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
-				this.creationStartPoint = fp.midpoint
-				drawFreehand = false
-			}
-		}
+	// startCreating(e: LocatedEvent) {
+	// 	console.log('startCreating')
+	// 	this.creationStartPoint = pointerEventVertex(e)
+	// 	let drawFreehand = true
+	// 	for (let fp of this.construction.points) {
+	// 		if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
+	// 			this.creationStartPoint = fp.midpoint
+	// 			drawFreehand = false
+	// 		}
+	// 	}
 
-		this.creationGroup = new CreationGroup({
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
-			startPoint: this.creationStartPoint,
-			visibleCreation: this.visibleCreation,
-			drawFreehand: drawFreehand,
-			penColor: this.currentColor
-		})
+	// 	this.creationGroup = new CreationGroup({
+	// 		viewWidth: this.viewWidth,
+	// 		viewHeight: this.viewHeight,
+	// 		startPoint: this.creationStartPoint,
+	// 		visibleCreation: this.visibleCreation,
+	// 		drawFreehand: drawFreehand,
+	// 		penColor: this.currentColor
+	// 	})
 		
-		this.addDependency('currentColor', this.creationGroup, 'strokeColor')
-		this.add(this.creationGroup)
-		this.changeVisibleCreation(this.visibleCreation)
-	}
+	// 	this.addDependency('currentColor', this.creationGroup, 'strokeColor')
+	// 	this.add(this.creationGroup)
+	// 	this.changeVisibleCreation(this.visibleCreation)
+	// }
 
-	creativeMove(e: LocatedEvent) {
-		if (this.creationGroup == undefined) { return }
-		let p: Vertex = pointerEventVertex(e)
-		if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
-			// snap to existing points
-			for (let fq of this.construction.points) {
-				let q: Vertex = fq.midpoint
-				if (p.subtract(q).norm() < 10) {
-					p = q
-					break
-				}
-			}
-		}
-		this.creationGroup.updateFromTip(p)
-	}
+	// creativeMove(e: LocatedEvent) {
+	// 	if (this.creationGroup == undefined) { return }
+	// 	let p: Vertex = pointerEventVertex(e)
+	// 	if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
+	// 		// snap to existing points
+	// 		for (let fq of this.construction.points) {
+	// 			let q: Vertex = fq.midpoint
+	// 			if (p.subtract(q).norm() < 10) {
+	// 				p = q
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// 	this.creationGroup.updateFromTip(p)
+	// }
 
-	endCreating(e: LocatedEvent) {
-		if (this.creationGroup == undefined) { return }
-		this.creationGroup.dissolveInto(this)
-		this.creationGroup = undefined
-	}
+	// endCreating(e: LocatedEvent) {
+	// 	if (this.creationGroup == undefined) { return }
+	// 	this.creationGroup.dissolveInto(this)
+	// 	this.creationGroup = undefined
+	// }
 
 
 	showAllLinks() {
@@ -219,28 +224,28 @@ export const paper = new Paper({
 })
 
 let slider1 = new BoxSlider({
-	anchor: new Vertex(100, 100)
+	anchor: new Vertex(200, 500),
 })
 
 paper.add(slider1)
 
 let exp = new ExpandableMobject({
 	compactAnchor: new Vertex(200, 100),
-	compactWidth: 300,
+	compactWidth: 500,
 	compactHeight: 200
 })
 
 let slider2 = new BoxSlider({
-	anchor: new Vertex(50, 50)
+	anchor: new Vertex(100, 50)
 })
 
 exp.add(slider2)
 paper.add(exp)
 
-paper.setDragging(true)
-slider1.setDragging(true)
-exp.setDragging(true)
-slider2.setDragging(true)
+// paper.setDragging(true)
+// slider1.setDragging(true)
+// exp.setDragging(true)
+// slider2.setDragging(true)
 
 
 
