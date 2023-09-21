@@ -19,19 +19,23 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 
 // logging inside HTML instead of the console
 // for debugging the app
-export function logInto(obj: any, id: string) {
+function logInto(obj: any, id: string) {
 	let msg = obj.toString()
 	let newLine: HTMLElement = document.createElement('p')
 	newLine.innerText = msg
 	let myConsole: HTMLElement = document.querySelector('#' + id)
+  myConsole.appendChild(newLine)
 	
 	// Neither of these lines does what it is claimed to. I give up
-	//myConsole.scrollTop = console.scrollHeight
-	//newLine.scrollIntoView()
+	myConsole.scrollTop = myConsole.scrollHeight
+	newLine.scrollIntoView()
 }
 
-export function paperLog(msg: any) { } // logInto(msg.toString(), 'paper-console') }
-
+function paperLog(msg: any) { logInto(msg.toString(), 'paper-console') }
+function sidebarLog(msg: any) { logInto(msg.toString(), 'sidebar-console') }
+function consoleLog(msg: any) { console.log(msg.toString()) }
+// change the next line to suit your debugging needs
+export function log(msg: any) { paperLog(msg) }
 
 // mixins allow to inherit from multiple classes (kinda)
 // https://www.typescriptlang.org/docs/handbook/mixins.html

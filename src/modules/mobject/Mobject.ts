@@ -1,5 +1,5 @@
-import { remove, stringFromPoint, paperLog, deepCopy, restrictedDict } from '../helpers/helpers'
-import { PointerEventPolicy, pointerEventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent } from './pointer_events'
+import { remove, stringFromPoint, log, deepCopy, restrictedDict } from '../helpers/helpers'
+import { PointerEventPolicy, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, eventPageLocation, locatedEventType, LocatedEventType } from './pointer_events'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { ExtendedObject } from '../helpers/ExtendedObject'
 import { Color } from '../helpers/Color'
@@ -57,8 +57,7 @@ export class Mobject extends ExtendedObject {
 		// state-independent setup
 
 		this.eventTarget = null
-		this.pointerEventHistory = []
-		this.touchEventHistory = []
+		this.locatedEventHistory = []
 
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
 		this.boundCapturedOnPointerDown = this.capturedOnPointerDown.bind(this)
@@ -540,8 +539,7 @@ export class Mobject extends ExtendedObject {
 	snappablePoints: Array<any> // workaround, don't ask
 	// remove?
 
-	pointerEventHistory: Array<PointerEvent>
-	touchEventHistory: Array<TouchEvent>
+	locatedEventHistory: Array<LocatedEvent>
 	timeoutID?: number
 
 	// empty method as workaround (don't ask)
@@ -584,14 +582,6 @@ export class Mobject extends ExtendedObject {
 	boundOnPointerUp(e: LocatedEvent) { }
 	boundOnTap(e: LocatedEvent) { }
 
-	get locatedEventHistory(): Array<LocatedEvent> {
-		if (this.pointerEventHistory.length > 0) {
-			return this.pointerEventHistory
-		} else { //if (this.touchEventHistory.length > 0) {
-			return this.touchEventHistory
-		}
-	}
-
 	get pointerEventPolicy(): PointerEventPolicy {
 		return this._pointerEventPolicy
 	}
@@ -632,21 +622,11 @@ export class Mobject extends ExtendedObject {
 		return this
 	}
 
-	saveToEventHistory(e: LocatedEvent) {
-		if (e.constructor.name == 'TouchEvent') {
-			this.touchEventHistory.push(e as TouchEvent)
-		} else if (e.constructor.name == 'PointerEvent' || e.constructor.name == 'MouseEvent') {
-			this.pointerEventHistory.push(e as PointerEvent)
-		}
-	}
-
 	capturedOnPointerDown(e: LocatedEvent) {
 		this.eventTarget = this.boundEventTargetMobject(e)
-
 		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
-
 		this.eventTarget.rawOnPointerDown(e)
 	}
 
@@ -654,7 +634,6 @@ export class Mobject extends ExtendedObject {
 		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
-
 		this.eventTarget.rawOnPointerMove(e)
 	}
 
@@ -662,28 +641,45 @@ export class Mobject extends ExtendedObject {
 		if (this.eventTarget == null) { return }
 		if (this.eventTarget.pointerEventPolicy == PointerEventPolicy.Propagate) { return }
 		e.stopPropagation()
-
 		this.eventTarget.rawOnPointerUp(e)
 		this.eventTarget = null
 	}
 
+	registerLocatedEvent(e: LocatedEvent): boolean {
+		//log(`registering, ${e.type}, ${e.timeStamp}, ${eventPageLocation(e)}`)
+		let minIndex = Math.max(0, this.locatedEventHistory.length - 5)
+		for (var i = minIndex; i < this.locatedEventHistory.length; i++) {
+			let e2 = this.locatedEventHistory[i]
+			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
+				//log(`same location, ${e.type}, ${e2.type}`)
+				if (locatedEventType(e) == locatedEventType(e2)) {
+					//log('found a duplicate')
+					return false
+				}	
+			}
+		}
+		//log('no duplicate')
+		this.locatedEventHistory.push(e)
+		return true
+	}
+
 	rawOnPointerDown(e: LocatedEvent) {
-		//console.log('rawOnPointerDown on', this)
-		this.saveToEventHistory(e)
+		if (!this.registerLocatedEvent(e)) { return }
+		log('rawOnPointerDown down')
 		this.onPointerDown(e)
 		this.timeoutID = window.setTimeout(this.boundRawOnLongPress, 1000, e)
 	}
 
 	rawOnPointerMove(e: LocatedEvent) {
-		//console.log('rawOnPointerMove on', this)
-		this.saveToEventHistory(e)
+		if (!this.registerLocatedEvent(e)) { return }
+		log('rawOnPointerMove move')
 		this.resetTimeout()
 		this.onPointerMove(e)
 	}
 
 	rawOnPointerUp(e: LocatedEvent) {
-		//console.log('rawOnPointerUp on', this)
-		this.saveToEventHistory(e)
+		if (!this.registerLocatedEvent(e)) { return }
+		log('rawOnPointerUp up')
 		this.resetTimeout()
 		this.onPointerUp(e)
 		if (this.tapDetected()) {
@@ -695,8 +691,8 @@ export class Mobject extends ExtendedObject {
 	}
 
 	isTap(e1: LocatedEvent, e2: LocatedEvent, dt: number = 500): boolean {
-		return ((e1.type == "pointerdown" || e1.type == "mousedown")
-			&& (e2.type == "pointerup" || e2.type == "mousedown")
+		return (locatedEventType(e1) == LocatedEventType.Down
+			&& locatedEventType(e2) == LocatedEventType.Up
 			&& Math.abs(e2.timeStamp - e1.timeStamp) < 500)
 	}
 
@@ -731,12 +727,12 @@ export class Mobject extends ExtendedObject {
 	}
 
 	startDragging(e: LocatedEvent) {
-		this.dragAnchorStart = this.anchor.subtract(pointerEventVertex(e))
+		this.dragAnchorStart = this.anchor.subtract(eventVertex(e))
 	}
 
 	dragging(e: LocatedEvent) {
 		this.update({
-			anchor: pointerEventVertex(e).add(this.dragAnchorStart)
+			anchor: eventVertex(e).add(this.dragAnchorStart)
 		})
 	}
 

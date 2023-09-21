@@ -6,7 +6,7 @@ import { Segment } from '../../arrows/Segment'
 import { LinkableMobject } from './LinkableMobject'
 import { Mobject } from '../Mobject'
 import { DependencyMap } from './DependencyMap'
-import { paperLog } from '../../helpers/helpers'
+import { log } from '../../helpers/helpers'
 import { BULLET_SIZE } from './constants'
 
 export class LinkLine extends CreatedMobject {
@@ -57,7 +57,7 @@ export class LinkLine extends CreatedMobject {
 			fromPoint: this.startPoint,
 			toPoint: this.endPoint
 		})
-		paperLog('dissolving LinkLine')
+		log('dissolving LinkLine')
 
 		//super.dissolveInto(superMobject)
 	}

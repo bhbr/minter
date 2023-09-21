@@ -1,5 +1,5 @@
-import { LocatedEvent, PointerEventPolicy, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, pointerEventVertex } from '../mobject/pointer_events'
-import { logInto, paperLog } from '../helpers/helpers'
+import { LocatedEvent, PointerEventPolicy, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex } from '../mobject/pointer_events'
+import { log } from '../helpers/helpers'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { Mobject } from '../mobject/Mobject'
 import { MGroup } from '../mobject/MGroup'

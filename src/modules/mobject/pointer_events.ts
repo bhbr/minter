@@ -6,6 +6,14 @@ export type LocatedEvent = PointerEvent | MouseEvent | TouchEvent
 // any Event that has an associated location on the screen
 // it can be triggered by a mouse, a finger or a stylus
 
+export enum LocatedEventType {
+	Down,
+	Move,
+	Up,
+	Cancel,
+	Unknown
+}
+
 export enum PointerEventPolicy {
 	Transparent, // pass to Mobject underneath (done via a CSS property)
 	// e. g. for the interior of a TwoPointCircle
@@ -15,7 +23,7 @@ export enum PointerEventPolicy {
 	Pass // up or down
 }
 
-export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
+export function eventPageLocation(e: LocatedEvent): Array<number> {
 	// subtract the sidebar's width if necessary
 	// i. e. if running in the browser (minter.html)
 	// instead of in the app (paper.html)
@@ -31,8 +39,16 @@ export function pointerEventPageLocation(e: LocatedEvent): Array<number> {
 	return [t.pageX - sidebarWidth, t.pageY]
 }
 
-export function pointerEventVertex(e: LocatedEvent): Vertex {
-	return new Vertex(pointerEventPageLocation(e))
+export function eventVertex(e: LocatedEvent): Vertex {
+	return new Vertex(eventPageLocation(e))
+}
+
+export function locatedEventType(e: LocatedEvent): LocatedEventType {
+	if (e.type == 'pointerdown' || e.type == 'mousedown' || e.type == 'touchstart') { return LocatedEventType.Down }
+	if (e.type == 'pointermove' || e.type == 'mousemove' || e.type == 'touchmove') { return LocatedEventType.Move }
+	if (e.type == 'pointerup' || e.type == 'mouseup' || e.type == 'touchend') { return LocatedEventType.Up }
+	if (e.type == 'pointercancel' || e.type == 'touchcancel') { return LocatedEventType.Cancel }
+	return LocatedEventType.Unknown
 }
 
 

@@ -5,7 +5,7 @@ import { PointerEventPolicy } from '../modules/mobject/pointer_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from './button_geometry'
 import { TextLabel } from '../modules/TextLabel'
 import { Paper } from '../Paper'
-import { pointerEventVertex, LocatedEvent, isTouchDevice, addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from '../modules/mobject/pointer_events'
+import { eventVertex, LocatedEvent, isTouchDevice, addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from '../modules/mobject/pointer_events'
 
 var paper: Paper = null
 
@@ -145,7 +145,7 @@ export class SidebarButton extends Circle {
 		//removePointerDown(this.view, this.boundRawOnPointerDown)
 		//addPointerUp(this.view, this.boundRawOnPointerUp)
 		//addPointerMove(this.view, this.boundRawOnPointerMove)
-		this.touchStart = pointerEventVertex(e)
+		this.touchStart = eventVertex(e)
 	}
 
 	onPointerUp(e: LocatedEvent) {
@@ -182,7 +182,7 @@ export class SidebarButton extends Circle {
 
 	messagePaper(message: object) {
 		try {
-			(window as Window).webkit.messageHandlers.handleMessage.postMessage(message)
+			(window as Window).webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
 			paper.getMessage(message)
 		}
@@ -249,7 +249,7 @@ export class SidebarButton extends Circle {
 		if (e instanceof MouseEvent) { t = e }
 		else { t = e.changedTouches[0] }
 	
-		let p: Vertex = pointerEventVertex(e)
+		let p: Vertex = eventVertex(e)
 		var dx: number = p.x - this.touchStart.x
 
 		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)

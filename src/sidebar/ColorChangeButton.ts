@@ -33,7 +33,7 @@ export class ColorChangeButton extends SidebarButton {
 		this.label.view.setAttribute('fill', 'black')
 
 		for (let name of this.colorNames) {
-			this.messages.push({color: name})
+			this.messages.push({color: name, target: 'paper'})
 		}
 	}
 

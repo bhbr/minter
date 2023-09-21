@@ -2,13 +2,17 @@ import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
 import { IOList } from 'linkable/IOList'
 import { RoundedRectangle } from '../shapes/RoundedRectangle'
-import { PointerEventPolicy, LocatedEvent, pointerEventVertex } from './pointer_events'
+import { PointerEventPolicy, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
 import { addLongPressListener, removeLongPressListener } from './long_press'
+import { log } from '../helpers/helpers'
 
 declare var paper: any
+declare var sidebar: any
+
+interface Window { webkit?: any }
 
 export class ExpandableMobject extends LinkableMobject {
 	
@@ -46,7 +50,7 @@ export class ExpandableMobject extends LinkableMobject {
 			width: this.viewWidth,
 			height: this.viewHeight,
 			cornerRadius: 50,
-			fillColor: Color.gray(0.1),
+			fillColor: Color.gray(0.2),
 			fillOpacity: 0.8,
 			strokeColor: Color.clear(),
 			anchor: Vertex.origin(),
@@ -73,22 +77,35 @@ export class ExpandableMobject extends LinkableMobject {
 
 	expand() {
 		this.expanded = true
-		paper.mobject.expandedMobject = this
+		//paper.mobject.expandedMobject = this
 		this.animate({
 			viewWidth: this.expandedWidth,
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
+		let message = {}
+		this.messageSidebar({'color': 'red'})
+
 	}
 
 	contract() {
 		this.expanded = false
-		paper.mobject.expandedMobject = this.parent
+		//paper.mobject.expandedMobject = this.parent
 		this.animate({
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
+	}
+
+	messageSidebar(message: object) {
+		if (isTouchDevice) {
+			log('touch');
+			(window as Window).webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
+		} else {
+			log('no touch')
+			sidebar.mobject.getMessage(message)
+		}
 	}
 
 	toggleViewState() {
@@ -100,7 +117,6 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	onDoubleTap(e: LocatedEvent) {
-		console.log('double tap')
 		this.toggleViewState()
 	}
 
@@ -115,7 +131,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	handleMessage(key: string, value: any) {
-		console.log(key, value)
+		log(`${key}, ${value}`)
 	}
 
 	// setDragging(flag: boolean) {
@@ -155,11 +171,9 @@ export class ExpandableMobject extends LinkableMobject {
 
 	startDragging(e: LocatedEvent) {
 		if (!this.expanded) {
-			console.log("is expanded")
 			super.startDragging(e)
 			return
 		}
-		console.log('startDragging')
 		let target = this.eventTargetMobject(e)
 		if (target == this) {
 			this.draggedMobjects = []
@@ -174,7 +188,7 @@ export class ExpandableMobject extends LinkableMobject {
 			this.draggedMobjects = []
 		}
 		console.log(this.draggedMobjects)
-		this.dragPointStart = pointerEventVertex(e)
+		this.dragPointStart = eventVertex(e)
 
 		for (let mob of this.draggedMobjects) {
 			mob.dragAnchorStart = mob.anchor.copy()
@@ -194,7 +208,7 @@ export class ExpandableMobject extends LinkableMobject {
 			super.dragging(e)
 			return
 		}
-		let dragPoint = pointerEventVertex(e)
+		let dragPoint = eventVertex(e)
 		let dr = dragPoint.subtract(this.dragPointStart)
 
 		for (let mob of this.draggedMobjects) {

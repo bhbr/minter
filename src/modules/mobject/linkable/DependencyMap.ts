@@ -1,5 +1,5 @@
 import { Vertex } from '../../helpers/Vertex_Transform'
-import { PointerEventPolicy, LocatedEvent, pointerEventVertex } from '../pointer_events'
+import { PointerEventPolicy, LocatedEvent, eventVertex } from '../pointer_events'
 import { Mobject } from '../Mobject'
 import { MGroup } from '../MGroup'
 import { LinkHook } from './LinkHook'
@@ -48,7 +48,7 @@ export class DependencyMap extends MGroup {
 
 	onPointerMove(e: LocatedEvent) {
 		if (this.editedLinkLine == undefined) { return }
-		let p = pointerEventVertex(e)
+		let p = eventVertex(e)
 		this.editedLinkLine.updateFromTip(this.snapInput(p))
 	}
 
@@ -82,7 +82,7 @@ export class DependencyMap extends MGroup {
 		this.linkLines.push(line)
 
 		this.editedLinkLine = undefined
-		this.pointerUpVertex = pointerEventVertex(e)
+		this.pointerUpVertex = eventVertex(e)
 	}
 
 	snapInput(p: Vertex): Vertex {

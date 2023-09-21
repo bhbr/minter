@@ -1,5 +1,5 @@
-import { remove, logInto, paperLog, copy, deepCopy } from './modules/helpers/helpers'
-import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, pointerEventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
+import { remove, log, copy, deepCopy } from './modules/helpers/helpers'
+import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
 import { Vertex, Transform } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
@@ -143,7 +143,7 @@ export class Paper extends ExpandableMobject {
 
 	// startCreating(e: LocatedEvent) {
 	// 	console.log('startCreating')
-	// 	this.creationStartPoint = pointerEventVertex(e)
+	// 	this.creationStartPoint = eventVertex(e)
 	// 	let drawFreehand = true
 	// 	for (let fp of this.construction.points) {
 	// 		if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
@@ -168,7 +168,7 @@ export class Paper extends ExpandableMobject {
 
 	// creativeMove(e: LocatedEvent) {
 	// 	if (this.creationGroup == undefined) { return }
-	// 	let p: Vertex = pointerEventVertex(e)
+	// 	let p: Vertex = eventVertex(e)
 	// 	if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
 	// 		// snap to existing points
 	// 		for (let fq of this.construction.points) {
@@ -230,7 +230,7 @@ let slider1 = new BoxSlider({
 paper.add(slider1)
 
 let exp = new ExpandableMobject({
-	compactAnchor: new Vertex(200, 100),
+	compactAnchor: new Vertex(400, 100),
 	compactWidth: 500,
 	compactHeight: 200
 })
@@ -242,11 +242,12 @@ let slider2 = new BoxSlider({
 exp.add(slider2)
 paper.add(exp)
 
-// paper.setDragging(true)
-// slider1.setDragging(true)
-// exp.setDragging(true)
+paper.setDragging(true)
+slider1.setDragging(true)
+exp.setDragging(true)
 // slider2.setDragging(true)
 
+log('done')
 
 
 

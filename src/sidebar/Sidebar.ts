@@ -1,8 +1,8 @@
-import { pointerEventVertex, isTouchDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, PointerEventPolicy } from '../modules/mobject/pointer_events'
+import { eventVertex, isTouchDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, PointerEventPolicy } from '../modules/mobject/pointer_events'
 import { rgb, gray } from '../modules/helpers/rgb'
 import { TAU } from '../modules/helpers/math'
 import { Vertex, Transform } from '../modules/helpers/Vertex_Transform'
-import { logInto } from '../modules/helpers/helpers'
+import { log } from '../modules/helpers/helpers'
 import { Mobject } from '../modules/mobject/Mobject'
 import { MGroup } from '../modules/mobject/MGroup'
 import { TextLabel } from '../modules/TextLabel'
@@ -16,8 +16,6 @@ import { DragButton } from './DragButton'
 import { LinkButton } from './LinkButton'
 import { ColorChangeButton } from './ColorChangeButton'
 
-let log: (string) => void = function(msg: string) { logInto(msg, 'sidebar-console') }
-
 export class Sidebar extends Mobject {
 
 	background: Rectangle
@@ -26,7 +24,7 @@ export class Sidebar extends Mobject {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
 			viewHeight: 1024,
-			pointerEventVertex: PointerEventPolicy.Handle
+			eventVertex: PointerEventPolicy.Handle
 		})
 	}
 
@@ -47,6 +45,44 @@ export class Sidebar extends Mobject {
 			height: this.viewHeight
 		})
 		super.statefulSetup()
+
+	}
+
+	getMessage(message: object) {
+		//log('got the message')
+		if (message == undefined || message == {}) { return }
+		let key: string = Object.keys(message)[0]
+		let value: string | boolean | number = Object.values(message)[0]
+		if (value == "true") { value = true }
+		if (value == "false") { value = false }
+		this.handleMessage(key, value)
+	}
+
+	handleMessage(key: string, value: any) {
+		switch (key) {
+		// case 'creating':
+			// 	this.changeVisibleCreation(value as string)
+			// if (value == 'freehand') {
+			// 	this.pointerEventPolicy = PointerEventPolicy.Pass
+			// 	break
+			// }
+			// if (this.creationGroup == undefined) {
+			// 	this.pointerEventPolicy = PointerEventPolicy.Handle
+			// }
+		// 	break
+		// case 'color':
+		// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
+		// 	break
+		case 'color':
+			this.background.update({
+				'fillColor': COLOR_PALETTE[value]
+			})
+			break
+		// case 'toggleLinks':
+		// 	if (value == 1 || value == '1') { this.showAllLinks() }
+		// 	else { this.hideAllLinks() }
+		// 	break
+		}
 
 	}
 

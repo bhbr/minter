@@ -14,13 +14,13 @@ import { TwoPointCircle } from '../shapes/TwoPointCircle'
 import { CreatedMobject } from '../creations/CreatedMobject'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { Color } from '../helpers/Color'
-import { LocatedEvent, PointerEventPolicy, pointerEventVertex } from '../mobject/pointer_events'
-import { LinkableMobject } from '../mobject/linkable/LinkableMobject'
+import { LocatedEvent, PointerEventPolicy, eventVertex } from '../mobject/pointer_events'
+import { ExpandableMobject } from '../mobject/ExpandableMobject'
 import { IntersectionPoint } from './IntersectionPoint'
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
-export class Construction extends LinkableMobject {
+export class Construction extends ExpandableMobject {
 	
 	points: Array<Point>
 	freePoints: Array<FreePoint>

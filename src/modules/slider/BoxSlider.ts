@@ -5,7 +5,7 @@ import { Mobject } from '../mobject/Mobject'
 import { MGroup } from '../mobject/MGroup'
 import { TextLabel } from '../TextLabel'
 import { Polygon } from '../shapes/Polygon'
-import { pointerEventVertex, LocatedEvent, PointerEventPolicy } from '../mobject/pointer_events'
+import { eventVertex, LocatedEvent, PointerEventPolicy } from '../mobject/pointer_events'
 import { Line } from '../arrows/Line'
 import { Circle } from '../shapes/Circle'
 import { Rectangle } from '../shapes/Rectangle'
@@ -113,12 +113,12 @@ export class BoxSlider extends LinkableMobject {
 	}
 
 	onPointerDown(e: LocatedEvent) {
-		this.scrubStartingPoint = pointerEventVertex(e)
+		this.scrubStartingPoint = eventVertex(e)
 		this.valueBeforeScrubbing = this.value
 	}
 
 	onPointerMove(e: LocatedEvent) {
-		let scrubVector: Vertex = pointerEventVertex(e).subtract(this.scrubStartingPoint)
+		let scrubVector: Vertex = eventVertex(e).subtract(this.scrubStartingPoint)
 		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
 		this.value = Math.max(Math.min(this.value, this.max), this.min)
 		this.update()
