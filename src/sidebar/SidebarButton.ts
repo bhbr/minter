@@ -6,6 +6,7 @@ import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from './button_geome
 import { TextLabel } from '../modules/TextLabel'
 import { Paper } from '../Paper'
 import { eventVertex, LocatedEvent, isTouchDevice, addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from '../modules/mobject/pointer_events'
+import { log } from '../modules/helpers/helpers'
 
 var paper: Paper = null
 
@@ -13,7 +14,6 @@ if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper')
 	paper = paperView['mobject'] as Paper
 }
-
 
 interface Window { webkit?: any }
 
@@ -89,7 +89,6 @@ export class SidebarButton extends Circle {
 		let fontSize = this.fontSize ?? 12
 		this.label.view.style['font-size'] = `${fontSize}px`
 		this.label.view.style['color'] = Color.white().toHex()
-
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -167,14 +166,14 @@ export class SidebarButton extends Circle {
 
 	commonButtonUp() {
 		let dx: number = this.currentModeIndex * this.optionSpacing
-		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		let newAnchor = new Vertex(buttonCenter(this.locationIndex).x + dx - BUTTON_RADIUS, buttonCenter(this.locationIndex).y - BUTTON_RADIUS)
 
 		this.active = false
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update({
 			//radius: buttonRadius,
-			transform: new Transform({scale: 1.0, anchor: this.localCenter()}), // identity does not work, weirdly enough
-			midpoint: newMidpoint
+			transform: new Transform({scale: 1.0, anchor: newAnchor}), // identity does not work, weirdly enough
+			//midpoint: newMidpoint
 		})
 		this.label.view.setAttribute('font-size', this.fontSize.toString())
 		this.messagePaper(this.outgoingMessage)

@@ -27,8 +27,7 @@ export class DrawnCircle extends DrawnMobject {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 1,
-			fillOpacity: 0,
-			pointerEventPolicy: PointerEventPolicy.Pass
+			fillOpacity: 0
 		})
 	}
 

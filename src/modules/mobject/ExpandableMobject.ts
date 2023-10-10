@@ -2,36 +2,45 @@ import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
 import { IOList } from 'linkable/IOList'
 import { RoundedRectangle } from '../shapes/RoundedRectangle'
-import { PointerEventPolicy, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
+import { PointerEventPolicy, PointerEventAction, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
 import { addLongPressListener, removeLongPressListener } from './long_press'
-import { log } from '../helpers/helpers'
+import { log, remove } from '../helpers/helpers'
+import { CreatedMobject } from '../creations/CreatedMobject'
+import { Freehand } from '../creations/Freehand'
+//import { Sidebar } from '../../sidebar/Sidebar'
 
 declare var paper: any
 declare var sidebar: any
 
 interface Window { webkit?: any }
 
+
 export class ExpandableMobject extends LinkableMobject {
 	
 	linkableChildren: Array<LinkableMobject>
 	expanded: boolean
 	background: RoundedRectangle
-	draggedMobjects: Array<Mobject>
-	dragPointStart?: Vertex
+	pannedMobjects: Array<Mobject>
+	panPointStart?: Vertex
 	compactWidth: number
 	compactHeight: number
 	compactAnchor: Vertex
 	expandedPadding: number
+	sidebar: any
+	createdMobject?: CreatedMobject
+	pointerEventAction: PointerEventAction
+	savedPointerEventAction?: PointerEventAction
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			pointerEventPolicy: PointerEventPolicy.Handle,
+			pointerEventAction: PointerEventAction.Drag,
+			savedPointerEventAction: null,
 			linkableChildren: [],
 			expanded: false,
-			draggedMobjects: [],
 			compactWidth: 400,
 			compactHeight: 300,
 			compactAnchor: Vertex.origin(),
@@ -53,14 +62,20 @@ export class ExpandableMobject extends LinkableMobject {
 			fillColor: Color.gray(0.2),
 			fillOpacity: 0.8,
 			strokeColor: Color.clear(),
-			anchor: Vertex.origin(),
-			pointerEventPolicy: PointerEventPolicy.Pass
+			anchor: Vertex.origin()
 		})
+
+		this.createdMobject = null
 		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 
-		this.setDragging(false)
+		if (this.expanded) {
+			this.pointerEventAction = PointerEventAction.Pan
+		} else {
+			this.pointerEventAction = this.pointerEventAction | PointerEventAction.Drag
+			this.disableLinkables()
+		}
 	}
 
 	get expandedAnchor(): Vertex {
@@ -75,22 +90,45 @@ export class ExpandableMobject extends LinkableMobject {
 		return this.getPaper().viewHeight - 2 * this.expandedPadding
 	}
 
+	get contracted(): boolean {
+		return !this.expanded
+	}
+
+	set contracted(newValue: boolean) {
+		this.expanded = !newValue
+	}
+
 	expand() {
 		this.expanded = true
-		//paper.mobject.expandedMobject = this
+		paper.mobject.expandedMobject = this
+		this.enableLinkables()
+		this.savedPointerEventAction = this.pointerEventAction
+		this.pointerEventAction = PointerEventAction.Pan
 		this.animate({
 			viewWidth: this.expandedWidth,
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
-		let message = {}
-		this.messageSidebar({'color': 'red'})
+		// let message = {}
+
+		// clear sidebar => should be done in Sidebar.ts
+		// this.sidebar.view = document.querySelector('#sidebar')
+		// var first = this.sidebar.view.firstElementChild
+        // while (first) {
+        //     first.remove()
+        //     first = this.sidebar.view.firstElementChild
+        // }
+		// this.messageSidebar({'color': 'red'})
 
 	}
 
 	contract() {
 		this.expanded = false
-		//paper.mobject.expandedMobject = this.parent
+		this.pointerEventPolicy = PointerEventPolicy.Handle
+		this.pointerEventAction = this.savedPointerEventAction | PointerEventAction.Drag
+
+		this.disableLinkables()
+		paper.mobject.expandedMobject = this.parent
 		this.animate({
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
@@ -98,12 +136,39 @@ export class ExpandableMobject extends LinkableMobject {
 		}, 0.5)
 	}
 
+	addLinkable(mob: LinkableMobject) {
+		this.add(mob)
+		this.linkableChildren.push(mob)
+		if (this.contracted) {
+			this.disableLinkable(mob)
+		}
+	}
+
+	disableLinkable(mob: LinkableMobject) {
+		mob.savedPointerEventPolicy = mob.pointerEventPolicy
+		mob.pointerEventPolicy = PointerEventPolicy.PassUp
+	}
+
+	disableLinkables() {
+		for (let mob of this.linkableChildren) {
+			this.disableLinkable(mob)
+		}
+	}
+
+	enableLinkable(mob: LinkableMobject) {
+		mob.pointerEventPolicy = mob.savedPointerEventPolicy
+	}
+
+	enableLinkables() {
+		for (let mob of this.linkableChildren) {
+			this.enableLinkable(mob)
+		}
+	}
+
 	messageSidebar(message: object) {
 		if (isTouchDevice) {
-			log('touch');
 			(window as Window).webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
 		} else {
-			log('no touch')
 			sidebar.mobject.getMessage(message)
 		}
 	}
@@ -120,6 +185,12 @@ export class ExpandableMobject extends LinkableMobject {
 		this.toggleViewState()
 	}
 
+
+	removeLinkable(mob: LinkableMobject) {
+		remove(this.linkableChildren, mob)
+		this.remove(mob)
+	}
+
 	getCindys(): Array<CindyCanvas> {
 		let ret: Array<CindyCanvas> = []
 		for (let submob of this.submobs) {
@@ -131,103 +202,135 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	handleMessage(key: string, value: any) {
-		log(`${key}, ${value}`)
+		switch (key) {
+			case 'drag':
+				log(this.linkableChildren)
+				for (let mob of this.linkableChildren) {
+					log(mob)
+					log(value)
+					mob.setDragging(value as boolean)
+				}
+				break
+		}
 	}
 
-	// setDragging(flag: boolean) {
-
-	// 	this.pointerEventPolicy = (flag ? PointerEventPolicy.Handle : PointerEventPolicy.Pass)
-	// 	console.log(this.pointerEventPolicy)
-
-	// 	this.update({
-	// 		draggable: flag
-	// 	})
-	// 	for (let submob of this.submobs) {
-	// 		submob.update({
-	// 			draggable: flag
-	// 		})
-	// 	}
-
-	// 	if (flag) {
-	// 		this.savedOnPointerDown = this.onPointerDown
-	// 		this.savedOnPointerMove = this.onPointerMove
-	// 		this.savedOnPointerUp = this.onPointerUp
-	// 		this.onPointerDown = this.startDragging
-	// 		this.onPointerMove = this.dragging
-	// 		this.onPointerUp = this.endDragging
-
-	// 		// for (let submob of this.getCindys()) {
-	// 		// 	submob.pointerEventPolicy = PointerEventPolicy.Cancel //?
-	// 		// }
-	// 	} else {
-	// 		this.onPointerDown = this.savedOnPointerDown
-	// 		this.onPointerMove = this.savedOnPointerMove
-	// 		this.onPointerUp = this.savedOnPointerUp
-	// 		for (let submob of this.getCindys()) {
-	// 			submob.pointerEventPolicy = PointerEventPolicy.Propagate
-	// 		}
-	// 	}
-	// }
-
-	startDragging(e: LocatedEvent) {
-		if (!this.expanded) {
-			super.startDragging(e)
-			return
+	onPointerDown(e: LocatedEvent) {
+		switch (this.pointerEventAction) {
+		case PointerEventAction.Drag:
+			this.startDragging(e)
+			break
+		case PointerEventAction.Pan:
+			this.startPanning(e)
+			break
+		case PointerEventAction.Create:
+			this.startCreating(e)
+			break
+		case PointerEventAction.Custom:
+			this.customOnPointerDown(e)
+			break
 		}
-		let target = this.eventTargetMobject(e)
-		if (target == this) {
-			this.draggedMobjects = []
-			for (let child of this.children) {
-				if (child instanceof LinkableMobject) {
-					this.draggedMobjects.push(child)
-				}
-			}
-		} else if (target instanceof LinkableMobject) {
-			this.draggedMobjects = [target]
-		} else {
-			this.draggedMobjects = []
-		}
-		console.log(this.draggedMobjects)
-		this.dragPointStart = eventVertex(e)
+	}
 
-		for (let mob of this.draggedMobjects) {
+	startCreating(e: LocatedEvent) {
+		//log('start creating')
+	}
+
+	customOnPointerDown(e: LocatedEvent) {
+		//log('customOnPointerDown')
+	}
+
+	onPointerMove(e: LocatedEvent) {
+		switch (this.pointerEventAction) {
+		case PointerEventAction.Drag:
+			this.dragging(e)
+			break
+		case PointerEventAction.Pan:
+			this.panning(e)
+			break
+		case PointerEventAction.Create:
+			this.creating(e)
+			break
+		case PointerEventAction.Custom:
+			this.customOnPointerMove(e)
+			break
+		}
+	}
+
+	creating(e: LocatedEvent) {
+		//log('creating')
+	}
+
+	customOnPointerMove(e: LocatedEvent) {
+		//log('customOnPointerMove')
+	}
+
+	onPointerUp(e: LocatedEvent) {
+		switch (this.pointerEventAction) {
+		case PointerEventAction.Drag:
+			this.endDragging(e)
+			break
+		case PointerEventAction.Pan:
+			this.endPanning(e)
+			break
+		case PointerEventAction.Create:
+			this.endCreating(e)
+			break
+		case PointerEventAction.Custom:
+			this.customOnPointerUp(e)
+			break
+		}
+	}
+
+	endCreating(e: LocatedEvent) {
+		//log('end creating')
+	}
+
+	customOnPointerUp(e: LocatedEvent) {
+		//log('customOnPointerUp')
+	}
+
+	startPanning(e: LocatedEvent) {
+		this.panPointStart = eventVertex(e)
+
+		this.pannedMobjects = []
+		for (let mob of this.linkableChildren) {
+			this.pannedMobjects.push(mob)
+			// add later: IOList, DependencyMap
+			// so we can pan while showing links
+		}
+
+		for (let mob of this.pannedMobjects) {
 			mob.dragAnchorStart = mob.anchor.copy()
 		}
-
-		if (this.dependencyMap == undefined) { return }
-		for (let ioList of this.dependencyMap.children) {
-			if (this.draggedMobjects.includes((ioList as IOList).mobject)) {
-				this.draggedMobjects.push(ioList as IOList)
-				break
-			}
-		}
 	}
 
-	dragging(e: LocatedEvent) {
-		if (!this.expanded) {
-			super.dragging(e)
-			return
-		}
-		let dragPoint = eventVertex(e)
-		let dr = dragPoint.subtract(this.dragPointStart)
+	panning(e: LocatedEvent) {
+		let panPoint = eventVertex(e)
+		let dr = panPoint.subtract(this.panPointStart)
 
-		for (let mob of this.draggedMobjects) {
+		for (let mob of this.pannedMobjects) {
 			let newAnchor: Vertex = mob.dragAnchorStart.add(dr)
 			mob.update({ anchor: newAnchor })
 			mob.view.style.left = `${newAnchor.x}px`
 			mob.view.style.top = `${newAnchor.y}px`
 		}
-
-		if (this.dependencyMap == undefined) { return }
-		this.dependencyMap.update()
 	}
 
-	endDragging(e: LocatedEvent) {
-		if (!this.expanded) {
-			super.endDragging(e)
-			return
+	endPanning(e: LocatedEvent) {
+		this.pannedMobjects = []
+	}
+
+	setDragging(draggable: boolean) {
+		super.setDragging(draggable)
+		if (draggable) {
+			this.savedPointerEventAction = this.pointerEventAction
+			this.pointerEventAction = PointerEventAction.Drag
+		} else {
+			if (this.savedPointerEventAction !== null) {
+				this.pointerEventAction = this.savedPointerEventAction
+			}
+			this.savedPointerEventAction = null
 		}
-		this.draggedMobjects = []
 	}
 
 	updateModel(argsDict: object = {}) {
@@ -242,5 +345,50 @@ export class ExpandableMobject extends LinkableMobject {
 			viewHeight: this.viewHeight
 		})
 	}
+
+
+
+	// onPointerMove(e: LocatedEvent) {
+	// 	log('moving')
+	// 	if (this.createdMobject == null) {
+	// 		log('start moving')
+	// 		this.createdMobject = new Freehand()
+	// 		this.add(this.createdMobject)
+	// 		this.creating = true
+	// 	}
+	// 	this.createdMobject.updateFromTip(eventVertex(e))
+	// }
+
+	// onPointerUp(e: LocatedEvent) {
+	// 	log('pointer up')
+	// 	this.createdMobject.dissolveInto(this)
+	// 	this.createdMobject = null
+	// 	this.creating = false
+	// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

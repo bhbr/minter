@@ -30,8 +30,7 @@ export class Construction extends ExpandableMobject {
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
-			constructedMobjects: [],
-			pointerEventPolicy: PointerEventPolicy.Pass
+			constructedMobjects: []
 		})
 	}
 

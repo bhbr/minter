@@ -20,7 +20,18 @@ export enum PointerEventPolicy {
 	Propagate, // don't interfere with event capturing
 	// e.g. for CindyJS canvas
 	Handle, // you are at the right address
-	Pass // up or down
+	PassUp // let the parent handle it, even if the target (this mob or a submob) could handle it
+
+	// General rule: the event is handled by the lowest submob that can handle it
+	// and that is not underneath a PassUp
+	// If the event policies end in a loop, no one handles it
+}
+
+export enum PointerEventAction { // what do to on pointer down
+	Drag, // the whole object within its supermob
+	Pan, // the linkables within
+	Create, // a new linkable mob
+	Custom // only if contracted
 }
 
 export function eventPageLocation(e: LocatedEvent): Array<number> {

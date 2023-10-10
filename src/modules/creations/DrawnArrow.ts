@@ -9,12 +9,6 @@ export class DrawnArrow extends DrawnMobject {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			pointerEventPolicy: PointerEventPolicy.Pass
-		})
-	}
-
 	statelessSetup() {
 		super.statelessSetup()
 

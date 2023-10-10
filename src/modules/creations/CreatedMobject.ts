@@ -1,7 +1,7 @@
 import { MGroup } from '../mobject/MGroup'
 import { PointerEventPolicy } from '../mobject/pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
-import { Paper } from '../../Paper'
+import { ExpandableMobject } from '../mobject/ExpandableMobject'
 
 export class CreatedMobject extends MGroup {
 
@@ -23,11 +23,11 @@ export class CreatedMobject extends MGroup {
 		})
 	}
 
-	dissolveInto(paper: Paper) {
-		paper.remove(this)
+	dissolveInto(mob: ExpandableMobject) {
+		mob.remove(this)
 		if (!this.visible) { return }
 		for (let submob of this.children) {
-			paper.add(submob)
+			mob.add(submob)
 		}
 	}
 

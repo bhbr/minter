@@ -33,7 +33,7 @@ export class Sidebar extends Mobject {
 			fillColor: Color.black(),
 			fillOpacity: 1,
 			strokeWidth: 0,
-			pointerEventPolicy: PointerEventPolicy.Pass
+			pointerEventPolicy: PointerEventPolicy.PassUp //?
 		})
 		super.statelessSetup()
 	}
@@ -44,6 +44,7 @@ export class Sidebar extends Mobject {
 			width: this.viewWidth,
 			height: this.viewHeight
 		})
+		this.view['mobject'] = this
 		super.statefulSetup()
 
 	}
@@ -59,6 +60,7 @@ export class Sidebar extends Mobject {
 	}
 
 	handleMessage(key: string, value: any) {
+		log(`Sidebar got message ${key} ${value}`)
 		switch (key) {
 		// case 'creating':
 			// 	this.changeVisibleCreation(value as string)
@@ -82,6 +84,9 @@ export class Sidebar extends Mobject {
 		// 	if (value == 1 || value == '1') { this.showAllLinks() }
 		// 	else { this.hideAllLinks() }
 		// 	break
+		case 'init':
+			log('initializing for')
+			log(value)
 		}
 
 	}

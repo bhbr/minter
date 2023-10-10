@@ -1,5 +1,5 @@
 import { remove, stringFromPoint, log, deepCopy, restrictedDict } from '../helpers/helpers'
-import { PointerEventPolicy, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, eventPageLocation, locatedEventType, LocatedEventType } from './pointer_events'
+import { PointerEventPolicy, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, eventPageLocation, locatedEventType, LocatedEventType, isTouchDevice } from './pointer_events'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { ExtendedObject } from '../helpers/ExtendedObject'
 import { Color } from '../helpers/Color'
@@ -44,7 +44,7 @@ export class Mobject extends ExtendedObject {
 			drawBorder: DRAW_BORDER,
 			dependencies: [],
 
-			pointerEventPolicy: PointerEventPolicy.Pass,
+			pointerEventPolicy: PointerEventPolicy.PassUp,
 			snappablePoints: []
 		}
 	}
@@ -533,7 +533,6 @@ export class Mobject extends ExtendedObject {
 	eventTarget?: Mobject
 	_pointerEventPolicy: PointerEventPolicy
 	savedPointerEventPolicy: PointerEventPolicy
-	draggable: boolean
 	dragAnchorStart?: Vertex
 
 	snappablePoints: Array<any> // workaround, don't ask
@@ -546,22 +545,28 @@ export class Mobject extends ExtendedObject {
 	removeFreePoint(fp: any) { }
 
 	onPointerDown(e: LocatedEvent) {
-		console.log('pointer down on', this)
+		log('pointer down on')
+		log(this)
 	}
 	onPointerMove(e: LocatedEvent) {
-	//	console.log('pointer move on', this)
+		//log('pointer move on')
+		//log(this)
 	}
 	onPointerUp(e: LocatedEvent) {
-	//	console.log('pointer up on', this)
+		log('pointer up on')
+		log(this)
 	}
 	onTap(e: LocatedEvent) {
-	//	console.log('tap on', this)
+		log('tap on')
+		log(this)
 	}
 	onDoubleTap(e: LocatedEvent) {
-	//	console.log('double tap on', this)
+		log('double tap on')
+		log(this)
 	}
 	onLongPress(e: LocatedEvent) {
-	//	console.log('long press on', this)
+		log('long press on')
+		log(this)
 	}
 	savedOnPointerDown(e: LocatedEvent) { }
 	savedOnPointerMove(e: LocatedEvent) { }
@@ -596,7 +601,10 @@ export class Mobject extends ExtendedObject {
 		}
 	}
 
-	eventTargetMobject(e: LocatedEvent): Mobject {
+	eventTargetMobject(e: LocatedEvent): Mobject | null {
+		// find the lowest Mobject willing and allowed to handle the event
+
+		// collect the chain of target views (highest to lowest)
 		var t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement.parentElement }
 		if (t == this.view) {
@@ -608,18 +616,36 @@ export class Mobject extends ExtendedObject {
 			targetViewChain.push(t)
 		}
 		targetViewChain.reverse()
-		//console.log(targetViewChain)
-		while (t != undefined) {
-			t = targetViewChain.pop()
-			let m: any = t['mobject']
-			//console.log(m, m.pointerEventPolicy, PointerEventPolicy.Handle)
+		//log("view chain:")
+		//log(targetViewChain)
+
+		let targetMobChain: Array<Mobject> = []
+		for (var view of targetViewChain.values()) {
+			//log(view)
+			let m: any = view['mobject']
+			if (m == undefined) { continue }
+			let mob: Mobject = m as Mobject
+			if (mob.pointerEventPolicy == PointerEventPolicy.PassUp) { break }
+			// only consider targets above the first PassUp
+			targetMobChain.push(mob)
+		}
+		//log("target mob chain:")
+		//log(targetMobChain)
+
+		var m: any
+		while (targetMobChain.length > 0) {
+			//log('pop')
+			m = targetMobChain.pop()
+			//log(m)
+			//log(m.pointerEventPolicy)
+			//log(PointerEventPolicy.Handle)
 			if (m != undefined && m.pointerEventPolicy == PointerEventPolicy.Handle) {
-				//console.log('event target mobject:', m)
+				//log(`event target mobject: ${m.constructor.name}`)
 				return m
 			}
 		}
-		// if all of this fails, paper handles the event itself
-		return this
+		// if all of this fails, this mob must handle the event itself
+		return null
 	}
 
 	capturedOnPointerDown(e: LocatedEvent) {
@@ -647,39 +673,45 @@ export class Mobject extends ExtendedObject {
 
 	registerLocatedEvent(e: LocatedEvent): boolean {
 		//log(`registering, ${e.type}, ${e.timeStamp}, ${eventPageLocation(e)}`)
-		let minIndex = Math.max(0, this.locatedEventHistory.length - 5)
-		for (var i = minIndex; i < this.locatedEventHistory.length; i++) {
-			let e2 = this.locatedEventHistory[i]
-			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
-				//log(`same location, ${e.type}, ${e2.type}`)
-				if (locatedEventType(e) == locatedEventType(e2)) {
-					//log('found a duplicate')
-					return false
-				}	
+		if (isTouchDevice) {
+
+			let minIndex = Math.max(0, this.locatedEventHistory.length - 5)
+			for (var i = minIndex; i < this.locatedEventHistory.length; i++) {
+				let e2 = this.locatedEventHistory[i]
+				if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
+					//log(`same location, ${e.type}, ${e2.type}`)
+					if (locatedEventType(e) == locatedEventType(e2)) {
+						//log('found a duplicate')
+						return false
+					}	
+				}
 			}
+			//log('no duplicate')
+			this.locatedEventHistory.push(e)
+			return true
+		} else {
+			this.locatedEventHistory.push(e)
+			return true
 		}
-		//log('no duplicate')
-		this.locatedEventHistory.push(e)
-		return true
 	}
 
 	rawOnPointerDown(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		log('rawOnPointerDown down')
+		//log('rawOnPointerDown down')
 		this.onPointerDown(e)
 		this.timeoutID = window.setTimeout(this.boundRawOnLongPress, 1000, e)
 	}
 
 	rawOnPointerMove(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		log('rawOnPointerMove move')
+		//log('rawOnPointerMove move')
 		this.resetTimeout()
 		this.onPointerMove(e)
 	}
 
 	rawOnPointerUp(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		log('rawOnPointerUp up')
+		//log('rawOnPointerUp up')
 		this.resetTimeout()
 		this.onPointerUp(e)
 		if (this.tapDetected()) {

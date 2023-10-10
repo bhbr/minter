@@ -35,7 +35,7 @@ function paperLog(msg: any) { logInto(msg.toString(), 'paper-console') }
 function sidebarLog(msg: any) { logInto(msg.toString(), 'sidebar-console') }
 function consoleLog(msg: any) { console.log(msg.toString()) }
 // change the next line to suit your debugging needs
-export function log(msg: any) { paperLog(msg) }
+export function log(msg: any) { console.log(msg) }
 
 // mixins allow to inherit from multiple classes (kinda)
 // https://www.typescriptlang.org/docs/handbook/mixins.html
@@ -63,8 +63,6 @@ export function restrictedDict(dict: object, keys: Array<string>): object {
 }
 
 export function copy(obj: any): any {
-
-	console.log('copying', obj)
 
 	if (typeof obj != 'object' || obj === null) {
 		return obj

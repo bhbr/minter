@@ -1,5 +1,5 @@
 import { remove, log, copy, deepCopy } from './modules/helpers/helpers'
-import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
+import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy, PointerEventAction } from './modules/mobject/pointer_events'
 import { Vertex, Transform } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
@@ -66,24 +66,20 @@ export class Paper extends ExpandableMobject {
 			fillOpacity: 1,
 			strokeWidth: 0,
 			draggable: false,
-			pointerEventPolicy: PointerEventPolicy.Pass
+			pointerEventPolicy: PointerEventPolicy.PassUp //?
 		})
 		this.construction = new Construction()
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
+		this.setDragging(false)
 		// this.add(this.construction)
 		// this.construction.update({
 		// 	viewWidth: 300,
 		// 	viewHeight: 200
 		// }, false)
-		this.setDragging(false)
 	}
-
-	// onPointerDown(e: LocatedEvent) { this.startCreating(e) }
-	// onPointerMove(e: LocatedEvent) { this.creativeMove(e) }
-	// onPointerUp(e: LocatedEvent) { this.endCreating(e) }
 
 	changeColorByName(newColorName: string) {
 		let newColor: Color = COLOR_PALETTE[newColorName]
@@ -108,31 +104,33 @@ export class Paper extends ExpandableMobject {
 		this.expandedMobject.handleMessage(key, value)
 	}
 
-	handleMessage(key: string, value: any) {
-		switch (key) {
-		// case 'creating':
-			// 	this.changeVisibleCreation(value as string)
-			// if (value == 'freehand') {
-			// 	this.pointerEventPolicy = PointerEventPolicy.Pass
-			// 	break
-			// }
-			// if (this.creationGroup == undefined) {
-			// 	this.pointerEventPolicy = PointerEventPolicy.Handle
-			// }
-		// 	break
-		// case 'color':
-		// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
-		// 	break
-		case 'drag':
-			this.setDragging(value as boolean)
-			break
-		// case 'toggleLinks':
-		// 	if (value == 1 || value == '1') { this.showAllLinks() }
-		// 	else { this.hideAllLinks() }
-		// 	break
-		}
+	// handleMessage(key: string, value: any) {
+	// 	log(`Paper got message ${key} ${value}`)
+	// 	switch (key) {
+	// 	// case 'creating':
+	// 	// 		this.changeVisibleCreation(value as string)
+	// 	// 	if (value == 'freehand') {
+	// 	// 		this.pointerEventPolicy = PointerEventPolicy.Pass
+	// 	// 		break
+	// 	// 	}
+	// 	// 	if (this.creationGroup == undefined) {
+	// 	// 		this.pointerEventPolicy = PointerEventPolicy.Handle
+	// 	// 	}
+	// 	// 	break
+	// 	// case 'color':
+	// 	// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
+	// 	// 	break
+	// 	case 'drag':
+	// 		log('drag')
+	// 		this.setDragging(value as boolean)
+	// 		break
+	// 	// case 'toggleLinks':
+	// 	// 	if (value == 1 || value == '1') { this.showAllLinks() }
+	// 	// 	else { this.hideAllLinks() }
+	// 	// 	break
+	// 	}
 
-	}
+	// }
 
 	// changeVisibleCreation(newVisibleCreation: string) {
 	// 	this.visibleCreation = newVisibleCreation
@@ -227,28 +225,24 @@ let slider1 = new BoxSlider({
 	anchor: new Vertex(200, 500),
 })
 
-paper.add(slider1)
+paper.addLinkable(slider1)
 
 let exp = new ExpandableMobject({
 	compactAnchor: new Vertex(400, 100),
 	compactWidth: 500,
-	compactHeight: 200
+	compactHeight: 200,
+	contracted: true,
+	pointerEventAction: PointerEventAction.Custom
 })
 
 let slider2 = new BoxSlider({
 	anchor: new Vertex(100, 50)
 })
 
-exp.add(slider2)
-paper.add(exp)
+exp.addLinkable(slider2)
+paper.addLinkable(exp)
 
-paper.setDragging(true)
-slider1.setDragging(true)
-exp.setDragging(true)
-// slider2.setDragging(true)
-
-log('done')
-
+log(exp.pointerEventAction)
 
 
 
