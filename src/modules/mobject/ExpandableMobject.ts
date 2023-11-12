@@ -2,7 +2,7 @@ import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
 import { IOList } from 'linkable/IOList'
 import { RoundedRectangle } from '../shapes/RoundedRectangle'
-import { LocatedEventDevice, PointerEventPolicy, PointerEventAction, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
+import { LocatedEventDevice, PointerEventPolicy, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
@@ -29,15 +29,11 @@ export class ExpandableMobject extends LinkableMobject {
 	expandedPadding: number
 	sidebar: any
 	createdMobject?: CreatedMobject
-	//pointerEventAction: PointerEventAction
-	//savedPointerEventAction?: PointerEventAction
 	dragEnabled: boolean
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			pointerEventPolicy: PointerEventPolicy.Handle,
-			//pointerEventAction: PointerEventAction.Drag,
-			//savedPointerEventAction: null,
 			dragEnabled: false,
 			linkableChildren: [],
 			expanded: false,
@@ -70,10 +66,7 @@ export class ExpandableMobject extends LinkableMobject {
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 
-		if (this.expanded) {
-			//this.pointerEventAction = PointerEventAction.Pan
-		} else {
-			//this.pointerEventAction = this.pointerEventAction | PointerEventAction.Drag
+		if (this.contracted) {
 			this.disableLinkables()
 		}
 
@@ -103,8 +96,6 @@ export class ExpandableMobject extends LinkableMobject {
 		this.expanded = true
 		paper.mobject.expandedMobject = this
 		this.enableLinkables()
-		//this.savedPointerEventAction = this.pointerEventAction
-		//this.pointerEventAction = PointerEventAction.Pan
 		this.animate({
 			viewWidth: this.expandedWidth,
 			viewHeight: this.expandedHeight,
@@ -116,7 +107,6 @@ export class ExpandableMobject extends LinkableMobject {
 	contract() {
 		this.expanded = false
 		this.pointerEventPolicy = PointerEventPolicy.Handle
-		//this.pointerEventAction = this.savedPointerEventAction | PointerEventAction.Drag
 
 		this.disableLinkables()
 		paper.mobject.expandedMobject = this.parent
@@ -207,9 +197,6 @@ export class ExpandableMobject extends LinkableMobject {
 
 	onPointerDown(e: LocatedEvent) {
 		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
-		// log(`expanded: ${this.expanded}`)
-		// log(`isPen: ${isPen}`)
-		// log(`dragEnabled: ${this.dragEnabled}`)
 		if (this.expanded && (this.dragEnabled || !isPen)) {
 		//	log('pan')
 			this.startPanning(e)
@@ -224,20 +211,6 @@ export class ExpandableMobject extends LinkableMobject {
 			this.customOnPointerDown(e)
 		}
 
-		// switch (this.pointerEventAction) {
-		// case PointerEventAction.Drag:
-		// 	this.startDragging(e)
-		// 	break
-		// case PointerEventAction.Pan:
-		// 	this.startPanning(e)
-		// 	break
-		// case PointerEventAction.Create:
-		// 	this.startCreating(e)
-		// 	break
-		// case PointerEventAction.Custom:
-		// 	this.customOnPointerDown(e)
-		// 	break
-		// }
 	}
 
 
@@ -260,20 +233,6 @@ export class ExpandableMobject extends LinkableMobject {
 		} else if (this.contracted && !this.dragEnabled) {
 			this.customOnPointerMove(e)
 		}
-		// switch (this.pointerEventAction) {
-		// case PointerEventAction.Drag:
-		// 	this.dragging(e)
-		// 	break
-		// case PointerEventAction.Pan:
-		// 	this.panning(e)
-		// 	break
-		// case PointerEventAction.Create:
-		// 	this.creating(e)
-		// 	break
-		// case PointerEventAction.Custom:
-		// 	this.customOnPointerMove(e)
-		// 	break
-		// }
 	}
 
 	creating(e: LocatedEvent) {
@@ -295,20 +254,6 @@ export class ExpandableMobject extends LinkableMobject {
 		} else if (this.contracted && !this.dragEnabled) {
 			this.customOnPointerUp(e)
 		}
-		// switch (this.pointerEventAction) {
-		// case PointerEventAction.Drag:
-		// 	this.endDragging(e)
-		// 	break
-		// case PointerEventAction.Pan:
-		// 	this.endPanning(e)
-		// 	break
-		// case PointerEventAction.Create:
-		// 	this.endCreating(e)
-		// 	break
-		// case PointerEventAction.Custom:
-		// 	this.customOnPointerUp(e)
-		// 	break
-		// }
 	}
 
 	endCreating(e: LocatedEvent) {

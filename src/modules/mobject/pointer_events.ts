@@ -22,13 +22,6 @@ export enum PointerEventPolicy {
 	// If the event policies end in a loop, no one handles it
 }
 
-export enum PointerEventAction { // what do to on pointer down
-	Drag, // the whole object within its supermob
-	Pan, // the linkables within
-	Create, // a new linkable mob
-	Custom // only if contracted
-}
-
 export function eventPageLocation(e: LocatedEvent): Array<number> {
 	// subtract the sidebar's width if necessary
 	// i. e. if running in the browser (minter.html)

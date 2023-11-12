@@ -1,5 +1,5 @@
 import { remove, log, copy, deepCopy } from './modules/helpers/helpers'
-import { locatedEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy, PointerEventAction } from './modules/mobject/pointer_events'
+import { locatedEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy } from './modules/mobject/pointer_events'
 import { Vertex, Transform } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
@@ -117,10 +117,6 @@ export class Paper extends ExpandableMobject {
 		if (value == "false") { value = false }
 		this.expandedMobject.handleMessage(key, value)
 	}
-
-	// onPointerDown(e: LocatedEvent) {
-	// 	log(locatedEventDevice(e))
-	// }
 
 	boundButtonDownByKey(e: KeyboardEvent) { }
 	boundButtonUpByKey(e: KeyboardEvent) { }
@@ -269,8 +265,7 @@ let exp = new ExpandableMobject({
 	compactAnchor: new Vertex(400, 100),
 	compactWidth: 500,
 	compactHeight: 200,
-	contracted: true,
-	pointerEventAction: PointerEventAction.Custom
+	contracted: true
 })
 
 let slider2 = new BoxSlider({
