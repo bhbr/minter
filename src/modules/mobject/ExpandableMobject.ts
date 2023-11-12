@@ -2,7 +2,7 @@ import { Mobject } from './Mobject'
 import { LinkableMobject } from './linkable/LinkableMobject'
 import { IOList } from 'linkable/IOList'
 import { RoundedRectangle } from '../shapes/RoundedRectangle'
-import { PointerEventPolicy, PointerEventAction, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
+import { LocatedEventDevice, PointerEventPolicy, PointerEventAction, LocatedEvent, eventVertex, isTouchDevice } from './pointer_events'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { CindyCanvas } from '../cindy/CindyCanvas'
 import { Color } from '../helpers/Color'
@@ -10,13 +10,11 @@ import { addLongPressListener, removeLongPressListener } from './long_press'
 import { log, remove } from '../helpers/helpers'
 import { CreatedMobject } from '../creations/CreatedMobject'
 import { Freehand } from '../creations/Freehand'
-//import { Sidebar } from '../../sidebar/Sidebar'
 
 declare var paper: any
 declare var sidebar: any
 
 interface Window { webkit?: any }
-
 
 export class ExpandableMobject extends LinkableMobject {
 	
@@ -31,14 +29,16 @@ export class ExpandableMobject extends LinkableMobject {
 	expandedPadding: number
 	sidebar: any
 	createdMobject?: CreatedMobject
-	pointerEventAction: PointerEventAction
-	savedPointerEventAction?: PointerEventAction
+	//pointerEventAction: PointerEventAction
+	//savedPointerEventAction?: PointerEventAction
+	dragEnabled: boolean
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			pointerEventPolicy: PointerEventPolicy.Handle,
-			pointerEventAction: PointerEventAction.Drag,
-			savedPointerEventAction: null,
+			//pointerEventAction: PointerEventAction.Drag,
+			//savedPointerEventAction: null,
+			dragEnabled: false,
 			linkableChildren: [],
 			expanded: false,
 			compactWidth: 400,
@@ -71,11 +71,12 @@ export class ExpandableMobject extends LinkableMobject {
 		this.add(this.background)
 
 		if (this.expanded) {
-			this.pointerEventAction = PointerEventAction.Pan
+			//this.pointerEventAction = PointerEventAction.Pan
 		} else {
-			this.pointerEventAction = this.pointerEventAction | PointerEventAction.Drag
+			//this.pointerEventAction = this.pointerEventAction | PointerEventAction.Drag
 			this.disableLinkables()
 		}
+
 	}
 
 	get expandedAnchor(): Vertex {
@@ -102,30 +103,20 @@ export class ExpandableMobject extends LinkableMobject {
 		this.expanded = true
 		paper.mobject.expandedMobject = this
 		this.enableLinkables()
-		this.savedPointerEventAction = this.pointerEventAction
-		this.pointerEventAction = PointerEventAction.Pan
+		//this.savedPointerEventAction = this.pointerEventAction
+		//this.pointerEventAction = PointerEventAction.Pan
 		this.animate({
 			viewWidth: this.expandedWidth,
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
-		// let message = {}
-
-		// clear sidebar => should be done in Sidebar.ts
-		// this.sidebar.view = document.querySelector('#sidebar')
-		// var first = this.sidebar.view.firstElementChild
-        // while (first) {
-        //     first.remove()
-        //     first = this.sidebar.view.firstElementChild
-        // }
-		// this.messageSidebar({'color': 'red'})
-
+		this.messageSidebar({'init': ['ArrowButton']})
 	}
 
 	contract() {
 		this.expanded = false
 		this.pointerEventPolicy = PointerEventPolicy.Handle
-		this.pointerEventAction = this.savedPointerEventAction | PointerEventAction.Drag
+		//this.pointerEventAction = this.savedPointerEventAction | PointerEventAction.Drag
 
 		this.disableLinkables()
 		paper.mobject.expandedMobject = this.parent
@@ -204,7 +195,7 @@ export class ExpandableMobject extends LinkableMobject {
 	handleMessage(key: string, value: any) {
 		switch (key) {
 			case 'drag':
-				log(this.linkableChildren)
+				this.dragEnabled = true
 				for (let mob of this.linkableChildren) {
 					log(mob)
 					log(value)
@@ -215,45 +206,74 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	onPointerDown(e: LocatedEvent) {
-		switch (this.pointerEventAction) {
-		case PointerEventAction.Drag:
-			this.startDragging(e)
-			break
-		case PointerEventAction.Pan:
+		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
+		// log(`expanded: ${this.expanded}`)
+		// log(`isPen: ${isPen}`)
+		// log(`dragEnabled: ${this.dragEnabled}`)
+		if (this.expanded && (this.dragEnabled || !isPen)) {
+		//	log('pan')
 			this.startPanning(e)
-			break
-		case PointerEventAction.Create:
+		} else if (this.contracted && this.dragEnabled) {
+		//	log('drag')
+			this.startDragging(e)
+		} else if (this.expanded && isPen && !this.dragEnabled) {
+		//	log('create')
 			this.startCreating(e)
-			break
-		case PointerEventAction.Custom:
+		} else if (this.contracted && !this.dragEnabled) {
+		//	log('custom')
 			this.customOnPointerDown(e)
-			break
 		}
+
+		// switch (this.pointerEventAction) {
+		// case PointerEventAction.Drag:
+		// 	this.startDragging(e)
+		// 	break
+		// case PointerEventAction.Pan:
+		// 	this.startPanning(e)
+		// 	break
+		// case PointerEventAction.Create:
+		// 	this.startCreating(e)
+		// 	break
+		// case PointerEventAction.Custom:
+		// 	this.customOnPointerDown(e)
+		// 	break
+		// }
 	}
 
+
 	startCreating(e: LocatedEvent) {
-		//log('start creating')
+		log('start creating')
 	}
 
 	customOnPointerDown(e: LocatedEvent) {
-		//log('customOnPointerDown')
+		log('customOnPointerDown')
 	}
 
 	onPointerMove(e: LocatedEvent) {
-		switch (this.pointerEventAction) {
-		case PointerEventAction.Drag:
-			this.dragging(e)
-			break
-		case PointerEventAction.Pan:
+		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
+		if (this.expanded && (this.dragEnabled || !isPen)) {
 			this.panning(e)
-			break
-		case PointerEventAction.Create:
+		} else if (this.contracted && this.dragEnabled) {
+			this.dragging(e)
+		} else if (this.expanded && isPen && !this.dragEnabled) {
 			this.creating(e)
-			break
-		case PointerEventAction.Custom:
+		} else if (this.contracted && !this.dragEnabled) {
 			this.customOnPointerMove(e)
-			break
 		}
+		// switch (this.pointerEventAction) {
+		// case PointerEventAction.Drag:
+		// 	this.dragging(e)
+		// 	break
+		// case PointerEventAction.Pan:
+		// 	this.panning(e)
+		// 	break
+		// case PointerEventAction.Create:
+		// 	this.creating(e)
+		// 	break
+		// case PointerEventAction.Custom:
+		// 	this.customOnPointerMove(e)
+		// 	break
+		// }
 	}
 
 	creating(e: LocatedEvent) {
@@ -265,28 +285,38 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	onPointerUp(e: LocatedEvent) {
-		switch (this.pointerEventAction) {
-		case PointerEventAction.Drag:
-			this.endDragging(e)
-			break
-		case PointerEventAction.Pan:
+		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
+		if (this.expanded && (this.dragEnabled || !isPen)) {
 			this.endPanning(e)
-			break
-		case PointerEventAction.Create:
+		} else if (this.contracted && this.dragEnabled) {
+			this.endDragging(e)
+		} else if (this.expanded && isPen && !this.dragEnabled) {
 			this.endCreating(e)
-			break
-		case PointerEventAction.Custom:
+		} else if (this.contracted && !this.dragEnabled) {
 			this.customOnPointerUp(e)
-			break
 		}
+		// switch (this.pointerEventAction) {
+		// case PointerEventAction.Drag:
+		// 	this.endDragging(e)
+		// 	break
+		// case PointerEventAction.Pan:
+		// 	this.endPanning(e)
+		// 	break
+		// case PointerEventAction.Create:
+		// 	this.endCreating(e)
+		// 	break
+		// case PointerEventAction.Custom:
+		// 	this.customOnPointerUp(e)
+		// 	break
+		// }
 	}
 
 	endCreating(e: LocatedEvent) {
-		//log('end creating')
+		log('end creating')
 	}
 
 	customOnPointerUp(e: LocatedEvent) {
-		//log('customOnPointerUp')
+		log('customOnPointerUp')
 	}
 
 	startPanning(e: LocatedEvent) {
@@ -322,15 +352,16 @@ export class ExpandableMobject extends LinkableMobject {
 
 	setDragging(draggable: boolean) {
 		super.setDragging(draggable)
-		if (draggable) {
-			this.savedPointerEventAction = this.pointerEventAction
-			this.pointerEventAction = PointerEventAction.Drag
-		} else {
-			if (this.savedPointerEventAction !== null) {
-				this.pointerEventAction = this.savedPointerEventAction
-			}
-			this.savedPointerEventAction = null
-		}
+		this.dragEnabled = draggable
+		// if (draggable) {
+		// 	this.savedPointerEventAction = this.pointerEventAction
+		// 	this.pointerEventAction = PointerEventAction.Drag
+		// } else {
+		// 	if (this.savedPointerEventAction !== null) {
+		// 		this.pointerEventAction = this.savedPointerEventAction
+		// 	}
+		// 	this.savedPointerEventAction = null
+		// }
 	}
 
 	updateModel(argsDict: object = {}) {
@@ -345,7 +376,6 @@ export class ExpandableMobject extends LinkableMobject {
 			viewHeight: this.viewHeight
 		})
 	}
-
 
 
 	// onPointerMove(e: LocatedEvent) {

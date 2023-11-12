@@ -2,17 +2,12 @@ import { Vertex } from '../helpers/Vertex_Transform'
 
 export const isTouchDevice: boolean = 'ontouchstart' in document.documentElement
 
-export type LocatedEvent = PointerEvent | MouseEvent | TouchEvent
+export type LocatedEvent = MouseEvent | TouchEvent
 // any Event that has an associated location on the screen
 // it can be triggered by a mouse, a finger or a stylus
 
-export enum LocatedEventType {
-	Down,
-	Move,
-	Up,
-	Cancel,
-	Unknown
-}
+export enum LocatedEventType { Down, Move, Up, Cancel, Unknown }
+export enum LocatedEventDevice { Mouse, Finger, Pen, Unknown }
 
 export enum PointerEventPolicy {
 	Transparent, // pass to Mobject underneath (done via a CSS property)
@@ -62,6 +57,31 @@ export function locatedEventType(e: LocatedEvent): LocatedEventType {
 	return LocatedEventType.Unknown
 }
 
+export function locatedEventDevice(e: LocatedEvent): LocatedEventDevice {
+	if (e instanceof PointerEvent) {
+		switch (e.pointerType) {
+		case "pen":
+			return LocatedEventDevice.Pen
+		case "touch":
+			return LocatedEventDevice.Finger
+		case "mouse":
+			return LocatedEventDevice.Mouse
+		default:
+			return LocatedEventDevice.Unknown
+		}
+	}
+	if (e instanceof MouseEvent) {
+		return LocatedEventDevice.Mouse
+	}
+	if (e instanceof TouchEvent) {
+		if ((e as TouchEvent).touches[0].force == 0) {
+			return LocatedEventDevice.Pen
+		} else {
+			return LocatedEventDevice.Finger
+		}
+	}
+	return LocatedEventDevice.Unknown
+}
 
 export function addPointerDown(element: HTMLElement, method: (Event) => void) {
 	element.addEventListener('touchstart', method, { capture: true })

@@ -1,5 +1,5 @@
 import { remove, log, copy, deepCopy } from './modules/helpers/helpers'
-import { addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy, PointerEventAction } from './modules/mobject/pointer_events'
+import { locatedEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, eventVertex, LocatedEvent, PointerEventPolicy, PointerEventAction } from './modules/mobject/pointer_events'
 import { Vertex, Transform } from './modules/helpers/Vertex_Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
@@ -38,6 +38,7 @@ export class Paper extends ExpandableMobject {
 	//creationGroup?: CreationGroup
 	construction: Construction
 	expandedMobject: ExpandableMobject
+	emulatePen: boolean
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -46,7 +47,8 @@ export class Paper extends ExpandableMobject {
 			draggable: false,
 			draggedMobjects: [],
 			pointerEventPolicy: PointerEventPolicy.Handle,
-			expandedMobject: this
+			expandedMobject: this,
+			emulatePen: false
 		})
 	}
 
@@ -74,6 +76,18 @@ export class Paper extends ExpandableMobject {
 	statefulSetup() {
 		super.statefulSetup()
 		this.setDragging(false)
+
+		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
+		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
+
+		document.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key == "Shift") { this.emulatePen = true }
+		})
+
+		document.addEventListener('keyup', (e: KeyboardEvent) => {
+			if (e.key == "Shift") { this.emulatePen = false }
+		})
+
 		// this.add(this.construction)
 		// this.construction.update({
 		// 	viewWidth: 300,
@@ -102,6 +116,30 @@ export class Paper extends ExpandableMobject {
 		if (value == "true") { value = true }
 		if (value == "false") { value = false }
 		this.expandedMobject.handleMessage(key, value)
+	}
+
+	// onPointerDown(e: LocatedEvent) {
+	// 	log(locatedEventDevice(e))
+	// }
+
+	boundButtonDownByKey(e: KeyboardEvent) { }
+	boundButtonUpByKey(e: KeyboardEvent) { }
+
+	buttonDownByKey(e: KeyboardEvent) {
+		e.preventDefault()
+		e.stopPropagation()
+		document.addEventListener('keyup', this.boundButtonUpByKey)
+		if (e.key == 'shift') {
+			this.emulatePen = true
+		}
+	}
+
+	buttonUpByKey(e: KeyboardEvent) {
+		if (e.key == 'shift') {
+			document.removeEventListener('keyup', this.boundButtonUpByKey)
+			document.addEventListener('keydown', this.boundButtonDownByKey)
+			this.emulatePen = false
+		}
 	}
 
 	// handleMessage(key: string, value: any) {
@@ -241,10 +279,6 @@ let slider2 = new BoxSlider({
 
 exp.addLinkable(slider2)
 paper.addLinkable(exp)
-
-log(exp.pointerEventAction)
-
-
 
 
 

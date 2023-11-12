@@ -102,7 +102,7 @@ export class SidebarButton extends Circle {
 	get locationIndex(): number { return this._locationIndex }
 	set locationIndex(newIndex: number) {
 		this._locationIndex = newIndex
-		this.anchor = buttonCenter(this._locationIndex)
+		this.update({ midpoint: buttonCenter(this._locationIndex) })
 	}
 
 	colorForIndex(i: number): Color {

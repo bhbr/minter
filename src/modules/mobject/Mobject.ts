@@ -1,10 +1,11 @@
-import { remove, stringFromPoint, log, deepCopy, restrictedDict } from '../helpers/helpers'
-import { PointerEventPolicy, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, eventPageLocation, locatedEventType, LocatedEventType, isTouchDevice } from './pointer_events'
+import { remove, stringFromPoint, log, deepCopy } from '../helpers/helpers'
+import { LocatedEventDevice, locatedEventDevice, PointerEventPolicy, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, LocatedEvent, eventPageLocation, locatedEventType, LocatedEventType, isTouchDevice } from './pointer_events'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { ExtendedObject } from '../helpers/ExtendedObject'
 import { Color } from '../helpers/Color'
 import { Dependency } from './Dependency'
 import { VertexArray } from '../helpers/VertexArray'
+import { Paper } from '../../Paper'
 
 export const DRAW_BORDER: boolean = false
 
@@ -408,12 +409,12 @@ export class Mobject extends ExtendedObject {
 		submob.view.remove()
 	}
 
-	getPaper(): Mobject {
+	getPaper(): Paper {
 		let p: Mobject = this
 		while (p != undefined && p.constructor.name != 'Paper') {
 			p = p.parent
 		}
-		return p
+		return (p as Paper)
 	}
 
 
@@ -544,30 +545,13 @@ export class Mobject extends ExtendedObject {
 	// empty method as workaround (don't ask)
 	removeFreePoint(fp: any) { }
 
-	onPointerDown(e: LocatedEvent) {
-		log('pointer down on')
-		log(this)
-	}
-	onPointerMove(e: LocatedEvent) {
-		//log('pointer move on')
-		//log(this)
-	}
-	onPointerUp(e: LocatedEvent) {
-		log('pointer up on')
-		log(this)
-	}
-	onTap(e: LocatedEvent) {
-		log('tap on')
-		log(this)
-	}
-	onDoubleTap(e: LocatedEvent) {
-		log('double tap on')
-		log(this)
-	}
-	onLongPress(e: LocatedEvent) {
-		log('long press on')
-		log(this)
-	}
+	onPointerDown(e: LocatedEvent) { }
+	onPointerMove(e: LocatedEvent) { }
+	onPointerUp(e: LocatedEvent) { }
+	onTap(e: LocatedEvent) { }
+	onDoubleTap(e: LocatedEvent) { }
+	onLongPress(e: LocatedEvent) { }
+
 	savedOnPointerDown(e: LocatedEvent) { }
 	savedOnPointerMove(e: LocatedEvent) { }
 	savedOnPointerUp(e: LocatedEvent) { }
@@ -756,6 +740,29 @@ export class Mobject extends ExtendedObject {
 			this.timeoutID = null
 		}
 
+	}
+
+	locatedEventDevice(e: LocatedEvent): LocatedEventDevice {
+		if (isTouchDevice) {
+			if (e instanceof TouchEvent) {
+				if (e.touches[0].force == 0) {
+					return LocatedEventDevice.Finger
+				} else {
+					return LocatedEventDevice.Pen
+				}
+			} else if (e instanceof MouseEvent) {
+				return LocatedEventDevice.Mouse
+			}
+			 else {
+				return LocatedEventDevice.Unknown
+			}
+		} else {
+			if (this.getPaper().emulatePen) {
+				return LocatedEventDevice.Pen
+			} else {
+				return LocatedEventDevice.Finger
+			}
+		}
 	}
 
 	startDragging(e: LocatedEvent) {

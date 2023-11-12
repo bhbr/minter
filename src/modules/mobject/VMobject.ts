@@ -3,7 +3,7 @@ import { MGroup } from './MGroup'
 import { Color } from '../helpers/Color'
 import { Vertex, Transform } from '../helpers/Vertex_Transform'
 import { VertexArray } from '../helpers/VertexArray'
-import { deepCopy, stringFromPoint, remove, restrictedDict } from '../helpers/helpers'
+import { deepCopy, stringFromPoint, remove } from '../helpers/helpers'
 
 export class VMobject extends Mobject {
 

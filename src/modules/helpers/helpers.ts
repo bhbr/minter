@@ -1,4 +1,4 @@
-
+import { isTouchDevice } from '../mobject/pointer_events'
 
 export function stringFromPoint(point: Array<number>): string {
 	// a string representation for CSS
@@ -31,35 +31,10 @@ function logInto(obj: any, id: string) {
 	newLine.scrollIntoView()
 }
 
-function paperLog(msg: any) { logInto(msg.toString(), 'paper-console') }
-function sidebarLog(msg: any) { logInto(msg.toString(), 'sidebar-console') }
-function consoleLog(msg: any) { console.log(msg.toString()) }
-// change the next line to suit your debugging needs
-export function log(msg: any) { console.log(msg) }
-
-// mixins allow to inherit from multiple classes (kinda)
-// https://www.typescriptlang.org/docs/handbook/mixins.html
-export function applyMixins(derivedCtor: any, constructors: any[]) {
-  constructors.forEach((baseCtor) => {
-    Object.getOwnPropertyNames(baseCtor.prototype).forEach((name) => {
-      Object.defineProperty(
-        derivedCtor.prototype,
-        name,
-        Object.getOwnPropertyDescriptor(baseCtor.prototype, name)
-      );
-    });
-  });
-}
-
-export function restrictedDict(dict: object, keys: Array<string>): object {
-	let ret: object = {}
-	for (let key of keys) {
-		let value: any = dict[key]
-		if (value !== undefined) {
-			ret[key] = dict[key]
-		}
-	}
-	return ret
+function htmlLog(msg: any) { logInto(msg.toString(), 'console') }
+function jsLog(msg: any) { console.log(msg.toString()) }
+export function log(msg: any) {
+	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
 }
 
 export function copy(obj: any): any {
