@@ -318,17 +318,18 @@ export class Mobject extends ExtendedObject {
 	interpolationStopCopy: this
 	animationTimeStart: number
 	animationDuration: number
-
+	animationInterval: number
 
 	animate(argsDict: object = {}, seconds: number) {
 		this.interpolationStartCopy = deepCopy(this)
-		this.interpolationStopCopy = deepCopy(this)
+		this.interpolationStartCopy.clearLocatedEventHistory()
+		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
 		this.interpolationStopCopy.update(argsDict, false)
 		let dt = 10
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds
-		let animationInterval = window.setInterval(function(){this.updateAnimation(Object.keys(argsDict))}.bind(this), dt)
-		window.setTimeout(()=>{window.clearInterval(animationInterval)}, seconds * 1000)
+		this.animationInterval = window.setInterval(function(){this.updateAnimation(Object.keys(argsDict))}.bind(this), dt)
+		window.setTimeout(this.cleanupAfterAnimation.bind(this), seconds * 1000)
 	}
 
 	updateAnimation(keys: Array<string>) {
@@ -355,6 +356,13 @@ export class Mobject extends ExtendedObject {
 			}
 		}
 		return ret
+	}
+
+	cleanupAfterAnimation() {
+		window.clearInterval(this.animationInterval)
+		this.animationInterval = null
+		this.interpolationStartCopy = null
+		this.interpolationStopCopy = null
 	}
 
 	///////////////
@@ -704,6 +712,14 @@ export class Mobject extends ExtendedObject {
 		if (this.doubleTapDetected()) {
 			this.onDoubleTap(e)
 		}
+		//window.setTimeout(this.clearLocatedEventHistory, 2000)
+	}
+
+	clearLocatedEventHistory() {
+		if (this.locatedEventHistory == undefined) { return }
+		for (var i = 0; i < this.locatedEventHistory.length; i++) {
+			this.locatedEventHistory.pop()
+		}
 	}
 
 	isTap(e1: LocatedEvent, e2: LocatedEvent, dt: number = 500): boolean {
@@ -739,7 +755,6 @@ export class Mobject extends ExtendedObject {
 			clearTimeout(this.timeoutID)
 			this.timeoutID = null
 		}
-
 	}
 
 	locatedEventDevice(e: LocatedEvent): LocatedEventDevice {

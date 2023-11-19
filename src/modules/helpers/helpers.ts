@@ -31,8 +31,24 @@ function logInto(obj: any, id: string) {
 	newLine.scrollIntoView()
 }
 
-function htmlLog(msg: any) { logInto(msg.toString(), 'console') }
-function jsLog(msg: any) { console.log(msg.toString()) }
+function htmlLog(msg: any) {
+	if (msg === undefined) {
+		logInto('undefined', 'console')
+	} else if (msg === null) {
+		logInto('null', 'console')
+	} else {
+		logInto(msg.toString(), 'console')
+	}
+}
+function jsLog(msg: any) {
+	if (msg === undefined) {
+		console.log('undefined')
+	} else if (msg === null) {
+		console.log('null', 'console')
+	} else {
+		console.log(msg.toString())
+	}
+}
 export function log(msg: any) {
 	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
 }
@@ -56,11 +72,21 @@ export function copy(obj: any): any {
 
 export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 
-	//console.log('deep-copying', obj)
-	//console.log('memo:', memo)
+	// log('deep-copying')
+	// if (obj === null) {
+	// 	log('NULL')
+	// }
+	//log(obj)
+	// log('memo:')
+	// log(memo.length)
 
 	if (typeof obj != 'object' || obj === null) {
 		return obj
+	}
+	//log(obj.constructor.name)
+
+	if (obj.constructor.name.endsWith('Event')) {
+		return null
 	}
 
 	if (obj.constructor.name == 'Array') {

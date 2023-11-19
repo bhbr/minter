@@ -166,59 +166,7 @@ export class Paper extends ExpandableMobject {
 
 	// }
 
-	// changeVisibleCreation(newVisibleCreation: string) {
-	// 	this.visibleCreation = newVisibleCreation
-	// 	if (this.creationGroup != undefined) {
-	// 		this.creationGroup.setVisibleCreation(newVisibleCreation)
-	// 	}
-	// }
 
-	// startCreating(e: LocatedEvent) {
-	// 	console.log('startCreating')
-	// 	this.creationStartPoint = eventVertex(e)
-	// 	let drawFreehand = true
-	// 	for (let fp of this.construction.points) {
-	// 		if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
-	// 			this.creationStartPoint = fp.midpoint
-	// 			drawFreehand = false
-	// 		}
-	// 	}
-
-	// 	this.creationGroup = new CreationGroup({
-	// 		viewWidth: this.viewWidth,
-	// 		viewHeight: this.viewHeight,
-	// 		startPoint: this.creationStartPoint,
-	// 		visibleCreation: this.visibleCreation,
-	// 		drawFreehand: drawFreehand,
-	// 		penColor: this.currentColor
-	// 	})
-		
-	// 	this.addDependency('currentColor', this.creationGroup, 'strokeColor')
-	// 	this.add(this.creationGroup)
-	// 	this.changeVisibleCreation(this.visibleCreation)
-	// }
-
-	// creativeMove(e: LocatedEvent) {
-	// 	if (this.creationGroup == undefined) { return }
-	// 	let p: Vertex = eventVertex(e)
-	// 	if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
-	// 		// snap to existing points
-	// 		for (let fq of this.construction.points) {
-	// 			let q: Vertex = fq.midpoint
-	// 			if (p.subtract(q).norm() < 10) {
-	// 				p = q
-	// 				break
-	// 			}
-	// 		}
-	// 	}
-	// 	this.creationGroup.updateFromTip(p)
-	// }
-
-	// endCreating(e: LocatedEvent) {
-	// 	if (this.creationGroup == undefined) { return }
-	// 	this.creationGroup.dissolveInto(this)
-	// 	this.creationGroup = undefined
-	// }
 
 
 	showAllLinks() {
@@ -255,25 +203,15 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
-let slider1 = new BoxSlider({
-	anchor: new Vertex(200, 500),
-})
 
-paper.addLinkable(slider1)
-
-let exp = new ExpandableMobject({
+let con = new Construction({
 	compactAnchor: new Vertex(400, 100),
 	compactWidth: 500,
 	compactHeight: 200,
 	contracted: true
 })
 
-let slider2 = new BoxSlider({
-	anchor: new Vertex(100, 50)
-})
-
-exp.addLinkable(slider2)
-paper.addLinkable(exp)
+paper.addLinkable(con)
 
 
 

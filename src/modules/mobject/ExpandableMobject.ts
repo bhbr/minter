@@ -30,6 +30,9 @@ export class ExpandableMobject extends LinkableMobject {
 	sidebar: any
 	createdMobject?: CreatedMobject
 	dragEnabled: boolean
+	buttons: Array<string>
+	creationStroke: Array<Vertex>
+	creationMode: string
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -40,7 +43,10 @@ export class ExpandableMobject extends LinkableMobject {
 			compactWidth: 400,
 			compactHeight: 300,
 			compactAnchor: Vertex.origin(),
-			expandedPadding: 50
+			expandedPadding: 50,
+			buttons: [],
+			creationStroke: [],
+			creationMode: 'draw'
 		})
 	}
 
@@ -101,7 +107,7 @@ export class ExpandableMobject extends LinkableMobject {
 			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
-		this.messageSidebar({'init': ['ArrowButton']})
+		this.messageSidebar({'init': this.buttons})
 	}
 
 	contract() {
@@ -166,7 +172,6 @@ export class ExpandableMobject extends LinkableMobject {
 		this.toggleViewState()
 	}
 
-
 	removeLinkable(mob: LinkableMobject) {
 		remove(this.linkableChildren, mob)
 		this.remove(mob)
@@ -192,8 +197,24 @@ export class ExpandableMobject extends LinkableMobject {
 					mob.setDragging(value as boolean)
 				}
 				break
+			case 'create':
+				this.remove(this.createdMobject)
+				this.createdMobject = this.createCreatedMobject(value)
+				this.add(this.createdMobject)
 		}
 	}
+
+	createCreatedMobject(type: string) {
+		if (type == 'draw') {
+			let fh = new Freehand()
+			fh.line.update({
+				vertices: this.creationStroke
+			})
+			return fh
+		}
+	}
+
+
 
 	onPointerDown(e: LocatedEvent) {
 		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
@@ -213,13 +234,14 @@ export class ExpandableMobject extends LinkableMobject {
 
 	}
 
-
-	startCreating(e: LocatedEvent) {
-		log('start creating')
-	}
-
 	customOnPointerDown(e: LocatedEvent) {
 		log('customOnPointerDown')
+	}
+
+	startCreating(e: LocatedEvent) {
+		this.creationStroke.push(eventVertex(e))
+		this.createdMobject = this.createCreatedMobject(this.creationMode)
+		this.add(this.createdMobject)
 	}
 
 	onPointerMove(e: LocatedEvent) {
@@ -236,7 +258,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	creating(e: LocatedEvent) {
-		//log('creating')
+		this.createdMobject.updateFromTip(eventVertex(e))
 	}
 
 	customOnPointerMove(e: LocatedEvent) {
@@ -257,7 +279,8 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	endCreating(e: LocatedEvent) {
-		log('end creating')
+		this.createdMobject.dissolveInto(this)
+		this.createdMobject = null
 	}
 
 	customOnPointerUp(e: LocatedEvent) {
@@ -298,21 +321,9 @@ export class ExpandableMobject extends LinkableMobject {
 	setDragging(draggable: boolean) {
 		super.setDragging(draggable)
 		this.dragEnabled = draggable
-		// if (draggable) {
-		// 	this.savedPointerEventAction = this.pointerEventAction
-		// 	this.pointerEventAction = PointerEventAction.Drag
-		// } else {
-		// 	if (this.savedPointerEventAction !== null) {
-		// 		this.pointerEventAction = this.savedPointerEventAction
-		// 	}
-		// 	this.savedPointerEventAction = null
-		// }
 	}
 
 	updateModel(argsDict: object = {}) {
-		//argsDict['viewWidth'] = this.viewWidth
-		//argsDict['viewHeight'] = this.viewHeight
-		//console.log('updating ExpandableMobject')
 		super.updateModel(argsDict)
 		this.background.updateModel({
 			width: this.viewWidth,
@@ -343,7 +354,50 @@ export class ExpandableMobject extends LinkableMobject {
 
 
 
+	// changeVisibleCreation(newVisibleCreation: string) {
+	// 	this.visibleCreation = newVisibleCreation
+	// 	if (this.creationGroup != undefined) {
+	// 		this.creationGroup.setVisibleCreation(newVisibleCreation)
+	// 	}
+	// }
 
+
+		// let drawFreehand = true
+		// for (let fp of this.construction.points) {
+		// 	if (this.creationStartPoint.subtract(fp.midpoint).norm() < 20) {
+		// 		this.creationStartPoint = fp.midpoint
+		// 		drawFreehand = false
+		// 	}
+		// }
+
+		
+		
+	// 	this.addDependency('currentColor', this.creationGroup, 'strokeColor')
+	// 	this.add(this.creationGroup)
+	// 	this.changeVisibleCreation(this.visibleCreation)
+	// }
+
+	// creativeMove(e: LocatedEvent) {
+	// 	if (this.creationGroup == undefined) { return }
+	// 	let p: Vertex = eventVertex(e)
+	// 	if (['segment', 'ray', 'line', 'circle'].includes(this.creationGroup.visibleCreation)) {
+	// 		// snap to existing points
+	// 		for (let fq of this.construction.points) {
+	// 			let q: Vertex = fq.midpoint
+	// 			if (p.subtract(q).norm() < 10) {
+	// 				p = q
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+	// 	this.creationGroup.updateFromTip(p)
+	// }
+
+	// endCreating(e: LocatedEvent) {
+	// 	if (this.creationGroup == undefined) { return }
+	// 	this.creationGroup.dissolveInto(this)
+	// 	this.creationGroup = undefined
+	// }
 
 
 

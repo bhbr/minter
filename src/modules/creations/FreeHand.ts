@@ -3,6 +3,7 @@ import { DrawnMobject } from './DrawnMobject'
 import { Polygon } from '../shapes/Polygon'
 import { Circle } from '../shapes/Circle'
 import { Vertex } from '../helpers/Vertex_Transform'
+import { log } from '../helpers/helpers'
 
 export class Freehand extends DrawnMobject {
 
@@ -25,7 +26,7 @@ export class Freehand extends DrawnMobject {
 		this.add(this.line)
 	}
 
-	updateWithPoints(q) {
+	updateWithPoints(q: Vertex) {
 		let nbDrawnPoints: number = this.children.length
 		let p = null
 		if (nbDrawnPoints > 0) {
@@ -61,7 +62,7 @@ export class Freehand extends DrawnMobject {
 	dissolveInto(superMobject: Mobject) {
 		this.line.adjustFrame()
 
-		let dr = this.line.anchor
+		let dr = this.line.anchor.copy()
 		this.line.update({
 			anchor: Vertex.origin()
 		})

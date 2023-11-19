@@ -36,8 +36,7 @@ export class Construction extends ExpandableMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			draggable: false,
-			backgroundColor: Color.gray(0.1)
+			buttons: ['ArrowButton']
 		})
 	}
 
