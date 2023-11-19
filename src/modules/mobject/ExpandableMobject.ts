@@ -239,7 +239,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	startCreating(e: LocatedEvent) {
-		this.creationStroke.push(eventVertex(e))
+		this.creationStroke.push(eventVertex(e).subtract(this.anchor))
 		this.createdMobject = this.createCreatedMobject(this.creationMode)
 		this.add(this.createdMobject)
 	}
@@ -258,7 +258,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	creating(e: LocatedEvent) {
-		this.createdMobject.updateFromTip(eventVertex(e))
+		this.createdMobject.updateFromTip(eventVertex(e).subtract(this.anchor))
 	}
 
 	customOnPointerMove(e: LocatedEvent) {
@@ -281,6 +281,7 @@ export class ExpandableMobject extends LinkableMobject {
 	endCreating(e: LocatedEvent) {
 		this.createdMobject.dissolveInto(this)
 		this.createdMobject = null
+		this.creationStroke = []
 	}
 
 	customOnPointerUp(e: LocatedEvent) {

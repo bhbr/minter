@@ -60,6 +60,7 @@ export class Freehand extends DrawnMobject {
 	}
 
 	dissolveInto(superMobject: Mobject) {
+
 		this.line.adjustFrame()
 
 		let dr = this.line.anchor.copy()
