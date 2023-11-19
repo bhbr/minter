@@ -7,13 +7,13 @@ export class CreativeButton extends SidebarButton {
 	statelessSetup() {
 		super.statelessSetup()
 		this.messages = []
-		this.outgoingMessage = {creating: 'freehand'}
+		this.outgoingMessage = {create: 'freehand'}
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
 		for (let creation of this.creations) {
-			this.messages.push({creating: creation})
+			this.messages.push({create: creation})
 		}
 	}
 

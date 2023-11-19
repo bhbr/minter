@@ -76,23 +76,10 @@ export class Paper extends ExpandableMobject {
 	statefulSetup() {
 		super.statefulSetup()
 		this.setDragging(false)
-
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
-
-		document.addEventListener('keydown', (e: KeyboardEvent) => {
-			if (e.key == "Shift") { this.emulatePen = true }
-		})
-
-		document.addEventListener('keyup', (e: KeyboardEvent) => {
-			if (e.key == "Shift") { this.emulatePen = false }
-		})
-
-		// this.add(this.construction)
-		// this.construction.update({
-		// 	viewWidth: 300,
-		// 	viewHeight: 200
-		// }, false)
+		document.addEventListener('keydown', this.boundButtonDownByKey)
+		document.addEventListener('keyup', this.boundButtonUpByKey)
 	}
 
 	changeColorByName(newColorName: string) {
@@ -122,50 +109,39 @@ export class Paper extends ExpandableMobject {
 	boundButtonUpByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
+		log('button down')
 		e.preventDefault()
 		e.stopPropagation()
+		document.removeEventListener('keydown', this.boundButtonDownByKey)
 		document.addEventListener('keyup', this.boundButtonUpByKey)
-		if (e.key == 'shift') {
-			this.emulatePen = true
+		if (e.key == 'Shift') {
+			log('Shift')
+			this.emulatePen = !this.emulatePen
+			log(this.emulatePen)
 		}
 	}
 
 	buttonUpByKey(e: KeyboardEvent) {
-		if (e.key == 'shift') {
+		log('button up')
+		if (e.key == 'Shift') {
+			log('Shift')
 			document.removeEventListener('keyup', this.boundButtonUpByKey)
 			document.addEventListener('keydown', this.boundButtonDownByKey)
-			this.emulatePen = false
+			//this.emulatePen = false
 		}
 	}
 
 	// handleMessage(key: string, value: any) {
 	// 	log(`Paper got message ${key} ${value}`)
 	// 	switch (key) {
-	// 	// case 'creating':
-	// 	// 		this.changeVisibleCreation(value as string)
-	// 	// 	if (value == 'freehand') {
-	// 	// 		this.pointerEventPolicy = PointerEventPolicy.Pass
-	// 	// 		break
-	// 	// 	}
-	// 	// 	if (this.creationGroup == undefined) {
-	// 	// 		this.pointerEventPolicy = PointerEventPolicy.Handle
-	// 	// 	}
-	// 	// 	break
 	// 	// case 'color':
 	// 	// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
 	// 	// 	break
-	// 	case 'drag':
-	// 		log('drag')
-	// 		this.setDragging(value as boolean)
-	// 		break
 	// 	// case 'toggleLinks':
 	// 	// 	if (value == 1 || value == '1') { this.showAllLinks() }
 	// 	// 	else { this.hideAllLinks() }
 	// 	// 	break
 	// 	}
-
-	// }
-
 
 
 
@@ -176,19 +152,6 @@ export class Paper extends ExpandableMobject {
 	hideAllLinks() {
 		this.hideLinksOfSubmobs()
 	}
-
-	// setDragging(flag: boolean) {
-	// 	super.setDragging(flag)
-	// 	if (!flag) {
-	// 		//this.onPointerDown = this.startCreating
-	// 		//this.onPointerMove = this.creativeMove
-	// 		//this.onPointerUp = this.endCreating
-	// 	}
-	// }
-
-	// dragging(e: LocatedEvent) {
-	// 	super.dragging(e)
-	// }
 
 	get expandedAnchor(): Vertex {
 		return isTouchDevice ? Vertex.origin() : new Vertex(150, 0)
@@ -211,7 +174,7 @@ let con = new Construction({
 	contracted: true
 })
 
-paper.addLinkable(con)
+paper.add(con)
 
 
 

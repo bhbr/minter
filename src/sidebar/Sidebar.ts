@@ -91,30 +91,7 @@ export class Sidebar extends Mobject {
 	}
 
 	handleMessage(key: string, value: any) {
-		log(`Sidebar got message ${key} ${value}`)
 		switch (key) {
-		// case 'creating':
-			// 	this.changeVisibleCreation(value as string)
-			// if (value == 'freehand') {
-			// 	this.pointerEventPolicy = PointerEventPolicy.Pass
-			// 	break
-			// }
-			// if (this.creationGroup == undefined) {
-			// 	this.pointerEventPolicy = PointerEventPolicy.Handle
-			// }
-		// 	break
-		// case 'color':
-		// 	this.changeColor(COLOR_PALETTE[value as string] as Color)
-		// 	break
-		case 'color':
-			this.background.update({
-				'fillColor': COLOR_PALETTE[value]
-			})
-			break
-		// case 'toggleLinks':
-		// 	if (value == 1 || value == '1') { this.showAllLinks() }
-		// 	else { this.hideAllLinks() }
-		// 	break
 		case 'init':
 			this.initialize(value)
 		}
@@ -122,7 +99,6 @@ export class Sidebar extends Mobject {
 	}
 
 }
-
 
 let sidebar = new Sidebar({
 	view: document.querySelector('#sidebar')

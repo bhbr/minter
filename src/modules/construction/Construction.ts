@@ -17,6 +17,7 @@ import { Color } from '../helpers/Color'
 import { LocatedEvent, PointerEventPolicy, eventVertex } from '../mobject/pointer_events'
 import { ExpandableMobject } from '../mobject/ExpandableMobject'
 import { IntersectionPoint } from './IntersectionPoint'
+import { log } from '../helpers/helpers'
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
@@ -113,4 +114,39 @@ export class Construction extends ExpandableMobject {
 		}
 	}
 
+	createCreatedMobject(type: string): CreatedMobject {
+		log('creating CreatedMobject')
+		switch (type) {
+		case 'segment':
+			log('creating segment')
+			let sg = new DrawnSegment({
+				startPoint: this.creationStroke[0]
+			})
+			return sg
+		}
+		console.log('super call')
+		return super.createCreatedMobject(type)
+	}
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

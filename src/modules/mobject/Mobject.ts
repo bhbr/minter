@@ -130,8 +130,8 @@ export class Mobject extends ExtendedObject {
 	transformLocalPoint(point: Vertex, frame?: Mobject): Vertex {
 		let t = this.relativeTransform(frame)
 		return t.appliedTo(point)
-
 	}
+
 	// The following geometric properties are first computed from the view frame.
 	// The versions without "view" in the name can be overriden by subclasses,
 	// e. g. VMobjects.
@@ -661,6 +661,12 @@ export class Mobject extends ExtendedObject {
 		e.stopPropagation()
 		this.eventTarget.rawOnPointerUp(e)
 		this.eventTarget = null
+	}
+
+	localEventVertex(e: LocatedEvent): Vertex {
+		let p: Vertex = eventVertex(e)
+		if (isTouchDevice) { p.translateBy(-150, 0) }
+		return this.relativeTransform(this.getPaper()).inverse().appliedTo(p)
 	}
 
 	registerLocatedEvent(e: LocatedEvent): boolean {

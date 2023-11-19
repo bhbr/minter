@@ -19,9 +19,9 @@ interface Window { webkit?: any }
 export class ExpandableMobject extends LinkableMobject {
 	
 	linkableChildren: Array<LinkableMobject>
+	pannableChildren: Array<Mobject>
 	expanded: boolean
 	background: RoundedRectangle
-	pannedMobjects: Array<Mobject>
 	panPointStart?: Vertex
 	compactWidth: number
 	compactHeight: number
@@ -39,6 +39,7 @@ export class ExpandableMobject extends LinkableMobject {
 			pointerEventPolicy: PointerEventPolicy.Handle,
 			dragEnabled: false,
 			linkableChildren: [],
+			pannableChildren: [],
 			expanded: false,
 			compactWidth: 400,
 			compactHeight: 300,
@@ -124,12 +125,26 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	addLinkable(mob: LinkableMobject) {
-		this.add(mob)
 		this.linkableChildren.push(mob)
+		this.addPannable(mob)
 		if (this.contracted) {
 			this.disableLinkable(mob)
 		}
 	}
+
+	addPannable(mob: Mobject) {
+		this.pannableChildren.push(mob)
+	}
+
+	add(mob: Mobject) {
+		super.add(mob)
+		if (mob instanceof LinkableMobject) {
+			this.addLinkable(mob)
+		}
+		if (mob instanceof Freehand) {
+			this.addPannable(mob)
+		}
+  	}
 
 	disableLinkable(mob: LinkableMobject) {
 		mob.savedPointerEventPolicy = mob.pointerEventPolicy
@@ -198,40 +213,48 @@ export class ExpandableMobject extends LinkableMobject {
 				}
 				break
 			case 'create':
+				log('handling create message')
+				this.creationMode = value
+				if (this.createdMobject == null) {
+					return
+				}
 				this.remove(this.createdMobject)
 				this.createdMobject = this.createCreatedMobject(value)
 				this.add(this.createdMobject)
 		}
 	}
 
-	createCreatedMobject(type: string) {
-		if (type == 'draw') {
+	createCreatedMobject(type: string): CreatedMobject {
+		log('creating createdMobject')
+		switch (type) {
+		case 'draw':
+			log('it is a Freehand')
 			let fh = new Freehand()
 			fh.line.update({
 				vertices: this.creationStroke
 			})
 			return fh
 		}
+		log('it is not a FreeHand')
+		return null
 	}
 
-
-
 	onPointerDown(e: LocatedEvent) {
+		log('on pointer down')
 		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
 		if (this.expanded && (this.dragEnabled || !isPen)) {
-		//	log('pan')
+			log('start panning')
 			this.startPanning(e)
 		} else if (this.contracted && this.dragEnabled) {
-		//	log('drag')
+			log('start dragging')
 			this.startDragging(e)
 		} else if (this.expanded && isPen && !this.dragEnabled) {
-		//	log('create')
+			log('start creating')
 			this.startCreating(e)
 		} else if (this.contracted && !this.dragEnabled) {
-		//	log('custom')
+			log('custom on pointer down')
 			this.customOnPointerDown(e)
 		}
-
 	}
 
 	customOnPointerDown(e: LocatedEvent) {
@@ -239,7 +262,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	startCreating(e: LocatedEvent) {
-		this.creationStroke.push(eventVertex(e).subtract(this.anchor))
+		this.creationStroke.push(this.localEventVertex(e))
 		this.createdMobject = this.createCreatedMobject(this.creationMode)
 		this.add(this.createdMobject)
 	}
@@ -258,7 +281,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	creating(e: LocatedEvent) {
-		this.createdMobject.updateFromTip(eventVertex(e).subtract(this.anchor))
+		this.createdMobject.updateFromTip(this.localEventVertex(e))
 	}
 
 	customOnPointerMove(e: LocatedEvent) {
@@ -291,14 +314,8 @@ export class ExpandableMobject extends LinkableMobject {
 	startPanning(e: LocatedEvent) {
 		this.panPointStart = eventVertex(e)
 
-		this.pannedMobjects = []
-		for (let mob of this.linkableChildren) {
-			this.pannedMobjects.push(mob)
-			// add later: IOList, DependencyMap
-			// so we can pan while showing links
-		}
 
-		for (let mob of this.pannedMobjects) {
+		for (let mob of this.pannableChildren) {
 			mob.dragAnchorStart = mob.anchor.copy()
 		}
 	}
@@ -307,7 +324,7 @@ export class ExpandableMobject extends LinkableMobject {
 		let panPoint = eventVertex(e)
 		let dr = panPoint.subtract(this.panPointStart)
 
-		for (let mob of this.pannedMobjects) {
+		for (let mob of this.pannableChildren) {
 			let newAnchor: Vertex = mob.dragAnchorStart.add(dr)
 			mob.update({ anchor: newAnchor })
 			mob.view.style.left = `${newAnchor.x}px`
@@ -316,7 +333,6 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	endPanning(e: LocatedEvent) {
-		this.pannedMobjects = []
 	}
 
 	setDragging(draggable: boolean) {

@@ -26,7 +26,7 @@ export function eventPageLocation(e: LocatedEvent): Array<number> {
 	// subtract the sidebar's width if necessary
 	// i. e. if running in the browser (minter.html)
 	// instead of in the app (paper.html)
-	let sidebarWidth: number = 0
+	var sidebarWidth: number = 0
 	try {
 		let sidebar: Element = document.querySelector('#sidebar')
 		sidebarWidth = sidebar.clientWidth
