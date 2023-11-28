@@ -1,5 +1,5 @@
 import { Point } from './Point'
-import { PointerEventPolicy } from '../mobject/pointer_events'
+import { PointerEventPolicy, LocatedEvent } from '../mobject/pointer_events'
 
 export class FreePoint extends Point {
 
@@ -8,6 +8,18 @@ export class FreePoint extends Point {
 			draggable: true,
 			pointerEventPolicy: PointerEventPolicy.Handle
 		})
+	}
+
+	onPointerDown(e: LocatedEvent) {
+		this.startDragging(e)
+	}
+
+	onPointerMove(e: LocatedEvent) {
+		this.dragging(e)
+	}
+
+	onPointerUp(e: LocatedEvent) {
+		this.endDragging(e)
 	}
 
 }

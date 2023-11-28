@@ -97,7 +97,7 @@ export class Paper extends ExpandableMobject {
 
 
 	getMessage(message: object) {
-		if (message == undefined || message == {}) { return }
+		//if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
 		let value: string | boolean | number = Object.values(message)[0]
 		if (value == "true") { value = true }
@@ -109,22 +109,17 @@ export class Paper extends ExpandableMobject {
 	boundButtonUpByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
-		log('button down')
 		e.preventDefault()
 		e.stopPropagation()
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
 		document.addEventListener('keyup', this.boundButtonUpByKey)
 		if (e.key == 'Shift') {
-			log('Shift')
 			this.emulatePen = !this.emulatePen
-			log(this.emulatePen)
 		}
 	}
 
 	buttonUpByKey(e: KeyboardEvent) {
-		log('button up')
 		if (e.key == 'Shift') {
-			log('Shift')
 			document.removeEventListener('keyup', this.boundButtonUpByKey)
 			document.addEventListener('keydown', this.boundButtonDownByKey)
 			//this.emulatePen = false
@@ -174,7 +169,7 @@ let con = new Construction({
 	contracted: true
 })
 
-paper.add(con)
+paper.addPannable(con)
 
 
 

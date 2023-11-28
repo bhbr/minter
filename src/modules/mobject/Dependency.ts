@@ -1,4 +1,4 @@
-import { Mobject } from './mobject'
+import { Mobject } from './Mobject'
 
 export class Dependency {
 

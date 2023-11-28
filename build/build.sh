@@ -1,4 +1,5 @@
 #!/bin/bash
+rm -r ../lib/* ../dist/*
 tsc --build tsconfig.json
 python3 add-import-extension.py
 rollup ../lib/testpage.js --format iife --name "Testpage" --file ../dist/testpage-bundle.js

@@ -1,5 +1,7 @@
 import { isTouchDevice } from '../mobject/pointer_events'
 
+export const LOG_STACK_RESOLUTION = 7
+
 export function stringFromPoint(point: Array<number>): string {
 	// a string representation for CSS
 	let x: number = point[0],
@@ -44,12 +46,20 @@ function jsLog(msg: any) {
 	if (msg === undefined) {
 		console.log('undefined')
 	} else if (msg === null) {
-		console.log('null', 'console')
+		console.log('null')
 	} else {
-		console.log(msg.toString())
+		console.log(msg)
 	}
 }
+
+export function stackSize(): number {
+	let s = (new Error()).stack
+	let a = s.split('\n')
+	return a.length
+}
+
 export function log(msg: any) {
+	if (stackSize() > LOG_STACK_RESOLUTION) { return }
 	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
 }
 

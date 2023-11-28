@@ -10,6 +10,7 @@ import { addLongPressListener, removeLongPressListener } from './long_press'
 import { log, remove } from '../helpers/helpers'
 import { CreatedMobject } from '../creations/CreatedMobject'
 import { Freehand } from '../creations/Freehand'
+import { DrawnArrow } from '../creations/DrawnArrow'
 
 declare var paper: any
 declare var sidebar: any
@@ -47,7 +48,7 @@ export class ExpandableMobject extends LinkableMobject {
 			expandedPadding: 50,
 			buttons: [],
 			creationStroke: [],
-			creationMode: 'draw'
+			creationMode: 'freehand'
 		})
 	}
 
@@ -125,26 +126,17 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	addLinkable(mob: LinkableMobject) {
-		this.linkableChildren.push(mob)
 		this.addPannable(mob)
+		this.linkableChildren.push(mob)
 		if (this.contracted) {
 			this.disableLinkable(mob)
 		}
 	}
 
 	addPannable(mob: Mobject) {
+		this.add(mob)
 		this.pannableChildren.push(mob)
 	}
-
-	add(mob: Mobject) {
-		super.add(mob)
-		if (mob instanceof LinkableMobject) {
-			this.addLinkable(mob)
-		}
-		if (mob instanceof Freehand) {
-			this.addPannable(mob)
-		}
-  	}
 
 	disableLinkable(mob: LinkableMobject) {
 		mob.savedPointerEventPolicy = mob.pointerEventPolicy
@@ -207,13 +199,10 @@ export class ExpandableMobject extends LinkableMobject {
 			case 'drag':
 				this.dragEnabled = true
 				for (let mob of this.linkableChildren) {
-					log(mob)
-					log(value)
 					mob.setDragging(value as boolean)
 				}
 				break
 			case 'create':
-				log('handling create message')
 				this.creationMode = value
 				if (this.createdMobject == null) {
 					return
@@ -225,34 +214,26 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	createCreatedMobject(type: string): CreatedMobject {
-		log('creating createdMobject')
 		switch (type) {
-		case 'draw':
-			log('it is a Freehand')
-			let fh = new Freehand()
-			fh.line.update({
-				vertices: this.creationStroke
-			})
-			return fh
+			case 'freehand':
+				let fh = new Freehand()
+				fh.line.update({
+					vertices: this.creationStroke
+				})
+				return fh
 		}
-		log('it is not a FreeHand')
 		return null
 	}
 
 	onPointerDown(e: LocatedEvent) {
-		log('on pointer down')
 		let isPen: boolean = (this.locatedEventDevice(e) == LocatedEventDevice.Pen)
 		if (this.expanded && (this.dragEnabled || !isPen)) {
-			log('start panning')
 			this.startPanning(e)
 		} else if (this.contracted && this.dragEnabled) {
-			log('start dragging')
 			this.startDragging(e)
 		} else if (this.expanded && isPen && !this.dragEnabled) {
-			log('start creating')
 			this.startCreating(e)
 		} else if (this.contracted && !this.dragEnabled) {
-			log('custom on pointer down')
 			this.customOnPointerDown(e)
 		}
 	}
@@ -281,7 +262,9 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	creating(e: LocatedEvent) {
-		this.createdMobject.updateFromTip(this.localEventVertex(e))
+		let v: Vertex = this.localEventVertex(e)
+		this.creationStroke.push(v)
+		this.createdMobject.updateFromTip(v)
 	}
 
 	customOnPointerMove(e: LocatedEvent) {
@@ -313,7 +296,6 @@ export class ExpandableMobject extends LinkableMobject {
 
 	startPanning(e: LocatedEvent) {
 		this.panPointStart = eventVertex(e)
-
 
 		for (let mob of this.pannableChildren) {
 			mob.dragAnchorStart = mob.anchor.copy()

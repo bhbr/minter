@@ -6,6 +6,7 @@ import { Color } from '../helpers/Color'
 import { Dependency } from './Dependency'
 import { VertexArray } from '../helpers/VertexArray'
 import { Paper } from '../../Paper'
+import { stackSize } from '../helpers/helpers'
 
 export const DRAW_BORDER: boolean = false
 
@@ -637,7 +638,7 @@ export class Mobject extends ExtendedObject {
 			}
 		}
 		// if all of this fails, this mob must handle the event itself
-		return null
+		return this
 	}
 
 	capturedOnPointerDown(e: LocatedEvent) {
@@ -695,21 +696,18 @@ export class Mobject extends ExtendedObject {
 
 	rawOnPointerDown(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		//log('rawOnPointerDown down')
 		this.onPointerDown(e)
 		this.timeoutID = window.setTimeout(this.boundRawOnLongPress, 1000, e)
 	}
 
 	rawOnPointerMove(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		//log('rawOnPointerMove move')
 		this.resetTimeout()
 		this.onPointerMove(e)
 	}
 
 	rawOnPointerUp(e: LocatedEvent) {
 		if (!this.registerLocatedEvent(e)) { return }
-		//log('rawOnPointerUp up')
 		this.resetTimeout()
 		this.onPointerUp(e)
 		if (this.tapDetected()) {
@@ -722,10 +720,7 @@ export class Mobject extends ExtendedObject {
 	}
 
 	clearLocatedEventHistory() {
-		if (this.locatedEventHistory == undefined) { return }
-		for (var i = 0; i < this.locatedEventHistory.length; i++) {
-			this.locatedEventHistory.pop()
-		}
+		this.locatedEventHistory = []
 	}
 
 	isTap(e1: LocatedEvent, e2: LocatedEvent, dt: number = 500): boolean {

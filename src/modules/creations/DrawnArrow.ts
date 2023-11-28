@@ -3,6 +3,8 @@ import { DrawnMobject } from './DrawnMobject'
 import { PointerEventPolicy } from '../mobject/pointer_events'
 import { FreePoint } from './FreePoint'
 import { Paper } from '../../Paper'
+import { Mobject } from '../mobject/Mobject'
+import { Construction } from '../construction/Construction'
 
 export class DrawnArrow extends DrawnMobject {
 
@@ -20,7 +22,7 @@ export class DrawnArrow extends DrawnMobject {
 		super.statefulSetup()
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
-		this.endPoint = this.startPoint.copy()
+		this.endPoint = this.endPoint ?? this.startPoint.copy()
 		this.addDependency('penStrokeColor', this.startFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.startFreePoint, 'fillColor')
 		this.addDependency('penStrokeColor', this.endFreePoint, 'strokeColor')
@@ -29,8 +31,6 @@ export class DrawnArrow extends DrawnMobject {
 		this.addDependency('endPoint', this.endFreePoint, 'midpoint')
 		this.startFreePoint.update({ midpoint: this.startPoint })
 		this.endFreePoint.update({ midpoint: this.endPoint })
-		
-
 	}
 
 	updateFromTip(q: Vertex) {
@@ -38,8 +38,8 @@ export class DrawnArrow extends DrawnMobject {
 		this.update()
 	}
 
-	dissolveInto(paper: Paper) {
-		paper.construction.integrate(this)
+	dissolveInto(superMobject: Mobject) {
+		(superMobject as Construction).integrate(this)
 	}
 
 }

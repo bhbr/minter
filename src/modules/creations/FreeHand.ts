@@ -4,6 +4,7 @@ import { Polygon } from '../shapes/Polygon'
 import { Circle } from '../shapes/Circle'
 import { Vertex } from '../helpers/Vertex_Transform'
 import { log } from '../helpers/helpers'
+import { ExpandableMobject } from '../mobject/ExpandableMobject'
 
 export class Freehand extends DrawnMobject {
 
@@ -59,7 +60,7 @@ export class Freehand extends DrawnMobject {
 		this.redraw()
 	}
 
-	dissolveInto(superMobject: Mobject) {
+	dissolveInto(superMobject: ExpandableMobject) {
 
 		this.line.adjustFrame()
 
@@ -75,7 +76,7 @@ export class Freehand extends DrawnMobject {
 
 		superMobject.remove(this)
 		if (this.visible) {
-			superMobject.add(this)
+			superMobject.addPannable(this)
 		}
 	}
 

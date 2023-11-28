@@ -82,7 +82,7 @@ export class Sidebar extends Mobject {
 	}
 
 	getMessage(message: object) {
-		if (message == undefined || message == {}) { return }
+		//if (message == undefined || message == {}) { return }
 		let key: string = Object.keys(message)[0]
 		let value: string | boolean | number = Object.values(message)[0]
 		if (value == "true") { value = true }

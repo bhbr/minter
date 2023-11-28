@@ -11,7 +11,7 @@ import { Arrow } from '../arrows/Arrow'
 import { Segment } from '../arrows/Segment'
 import { Ray } from '../arrows/Ray'
 import { Line } from '../arrows/Line'
-import { Paper } from '../../paper'
+import { Paper } from '../../Paper'
 import { DrawnMobject } from './DrawnMobject'
 import { FreePoint } from './FreePoint'
 

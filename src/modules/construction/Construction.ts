@@ -5,6 +5,7 @@ import { DrawnRay } from '../creations/DrawnRay'
 import { DrawnLine } from '../creations/DrawnLine'
 import { DrawnArrow } from '../creations/DrawnArrow'
 import { DrawnCircle } from '../creations/DrawnCircle'
+import { Freehand } from '../creations/Freehand'
 import { Arrow } from '../arrows/Arrow'
 import { Segment } from '../arrows/Segment'
 import { Ray } from '../arrows/Ray'
@@ -27,7 +28,6 @@ export class Construction extends ExpandableMobject {
 	freePoints: Array<FreePoint>
 	constructedMobjects: Array<ConstructedMobject>
 
-
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
@@ -47,8 +47,11 @@ export class Construction extends ExpandableMobject {
 	}
 
 	integrate(mob: DrawnArrow | DrawnCircle) {
+		this.remove(mob)
 		let p1: Point = this.pointForVertex(mob.startPoint)
 		let p2: Point = this.pointForVertex(mob.endPoint)
+		this.addPannable(p1)
+		this.addPannable(p2)
 
 		let cm: ConstructedMobject
 		if (mob instanceof DrawnSegment) {
@@ -71,8 +74,8 @@ export class Construction extends ExpandableMobject {
 		this.add(cm)
 		this.intersectWithRest(cm)
 		this.constructedMobjects.push(cm)
-		p1.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})
-		p2.update({strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor})
+		p1.update({ strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor })
+		p2.update({ strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor })
 	}
 
 	pointForVertex(v: Vertex): Point {
@@ -115,18 +118,21 @@ export class Construction extends ExpandableMobject {
 	}
 
 	createCreatedMobject(type: string): CreatedMobject {
-		log('creating CreatedMobject')
 		switch (type) {
-		case 'segment':
-			log('creating segment')
-			let sg = new DrawnSegment({
-				startPoint: this.creationStroke[0]
-			})
-			return sg
+			case 'segment':
+				let sg = new DrawnSegment({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				return sg
 		}
-		console.log('super call')
+
 		return super.createCreatedMobject(type)
 	}
+
+	onPointerDown(e: LocatedEvent) { }
+	onPointerMove(e: LocatedEvent) { }
+	onPointerUp(e: LocatedEvent) { }
 
 }
 

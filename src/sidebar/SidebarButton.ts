@@ -110,7 +110,6 @@ export class SidebarButton extends Circle {
 	}
 	
 	buttonDownByKey(e: KeyboardEvent) {
-		log('Sidebar button down')
 		e.preventDefault()
 		e.stopPropagation()
 		document.addEventListener('keyup', this.boundButtonUpByKey)
