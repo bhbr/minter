@@ -1,0 +1,1 @@
+{"version":3,"file":"CindyButton.js","sourceRoot":"","sources":["../../src/sidebar/CindyButton.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,MAAM,kBAAkB,CAAA;AAGjD,MAAM,OAAO,WAAY,SAAQ,cAAc;IAE9C,SAAS;QACR,OAAO,MAAM,CAAC,MAAM,CAAC,KAAK,CAAC,SAAS,EAAE,EAAE;YACvC,SAAS,EAAE,CAAC,OAAO,CAAC;YACpB,GAAG,EAAE,GAAG;SACR,CAAC,CAAA;IACH,CAAC;CAED"}

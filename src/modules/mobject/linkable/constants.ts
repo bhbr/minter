@@ -1,0 +1,10 @@
+export const IO_LIST_WIDTH: number = 150
+export const IO_LIST_OFFSET: number = 10
+export const HOOK_RADIUS: number = 9
+export const BULLET_RADIUS: number = 7
+export const SNAPPING_DISTANCE: number = 12.5
+export const HOOK_INSET_X: number = 15
+export const HOOK_INSET_Y: number = 15
+export const HOOK_VERTICAL_SPACING: number = 25
+export const HOOK_LABEL_INSET: number = 30
+export const LINK_LINE_WIDTH: number = 5

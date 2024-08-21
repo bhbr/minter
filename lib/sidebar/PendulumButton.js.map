@@ -1,0 +1,1 @@
+{"version":3,"file":"PendulumButton.js","sourceRoot":"","sources":["../../src/sidebar/PendulumButton.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,MAAM,kBAAkB,CAAA;AAEjD,MAAM,OAAO,cAAe,SAAQ,cAAc;IAEjD,SAAS;QACR,OAAO,MAAM,CAAC,MAAM,CAAC,KAAK,CAAC,SAAS,EAAE,EAAE;YACvC,SAAS,EAAE,CAAC,UAAU,CAAC;YACvB,GAAG,EAAE,GAAG;SACR,CAAC,CAAA;IACH,CAAC;CAED"}

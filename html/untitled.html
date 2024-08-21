@@ -1,0 +1,28 @@
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=10,user-scalable=yes">
+
+    <title></title>
+
+    <link rel="stylesheet" href="./minter.css">
+    
+    <script type="text/javascript" src="../../../CindyJS/build/js/Cindy.js"></script>
+    <script type="text/javascript" src="../../../CindyJS/build/js/CindyGL.js"></script>
+    
+  </head>
+
+  <body style="background: black;">
+
+        <div id="paper" style="float: left; display: inline; pointer-events: auto; transform-origin: left top; position: absolute; overflow: visible; border: 1px dashed green; transform: translate(0px, 0px); left: 150px; top: 0px; width: 1250px; height: 1200px; background-color: rgba(0, 0, 0, 0); opacity: 1;" class="mobject-div Paper"><div class="VMobject mobject-div" id="box" style="pointer-events: auto; transform-origin: left top; position: absolute; overflow: visible; border: 1px dashed green; transform: translate(0px, 0px); left: 0px; top: 0px; width: 1250px; height: 1200px; background-color: rgba(0, 0, 0, 0); opacity: 1; visibility: visible;"><svg class="mobject-svg" style="overflow: visible;"><path id="boxpath" d="M200 0L400 200L200 400L0 200Z" style="fill: rgb(128, 128, 128); fill-opacity: 0.5; stroke: rgba(255, 0, 0, 1); stroke-width: 2;"></path></svg></div></div>
+        <!--<p id='sidebar-console' width='200px' height='200px' style='background-color: red; color: white; white-space: pre;'>sidebar console</p>-->
+    
+    <!--<script type="module" src="../lib/Paper.js"></script>
+    <script type="module" src="../lib/sidebar/Sidebar.js"></script>-->
+    <script>
+        let box = document.getElementById('box');
+        let boxpath = document.getElementById('boxpath');
+        boxpath.addEventListener('mousedown', function() { alert() });
+    </script>
+  
+
+</body></html>
