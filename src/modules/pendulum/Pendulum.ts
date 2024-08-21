@@ -45,9 +45,11 @@ export class Pendulum extends LinkableMobject {
 		this.fixture.update({
 			width: this.fixtureWidth,
 			height: this.fixtureHeight,
-			anchor: new Vertex(-this.fixtureWidth/2, -this.fixtureHeight)
+			anchor: new Vertex((this.viewWidth - this.fixtureWidth)/2, 0)
 		}, false)
-
+		this.string.update({
+			startPoint: new Vertex(this.viewWidth/2, this.fixtureHeight)
+		})
 		this.weight.update({
 			radius: this.weightRadius
 		})
@@ -57,10 +59,11 @@ export class Pendulum extends LinkableMobject {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			fixtureWidth: 50,
-			fixtureHeight: 10,
+			fixtureHeight: 20,
 			initialSpeed: 0,
 			inputNames: ['length', 'mass'],
-			outputNames: ['angle', 'period']
+			outputNames: ['angle', 'period'],
+			drawBorder: true
 		})
 	}
 
@@ -94,10 +97,12 @@ export class Pendulum extends LinkableMobject {
 
 	updateModel(argsDict: object = {}) {
 
+		argsDict['viewHeight'] = this.fixtureHeight + this.pixelLength + this.weightRadius
+
 		super.updateModel(argsDict)
 
 		let angle: number = argsDict['initialAngle'] ?? this.angle
-		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.pixelLength)
+		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.pixelLength).add(this.string.startPoint)
 		
 		this.string.updateModel({
 			endPoint: newEndPoint

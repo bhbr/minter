@@ -3065,8 +3065,11 @@ var Paper = (function (exports) {
             this.fixture.update({
                 width: this.fixtureWidth,
                 height: this.fixtureHeight,
-                anchor: new Vertex(-this.fixtureWidth / 2, -this.fixtureHeight)
+                anchor: new Vertex((this.viewWidth - this.fixtureWidth) / 2, 0)
             }, false);
+            this.string.update({
+                startPoint: new Vertex(this.viewWidth / 2, this.fixtureHeight)
+            });
             this.weight.update({
                 radius: this.weightRadius
             });
@@ -3074,10 +3077,11 @@ var Paper = (function (exports) {
         fixedArgs() {
             return Object.assign(super.fixedArgs(), {
                 fixtureWidth: 50,
-                fixtureHeight: 10,
+                fixtureHeight: 20,
                 initialSpeed: 0,
                 inputNames: ['length', 'mass'],
-                outputNames: ['angle', 'period']
+                outputNames: ['angle', 'period'],
+                drawBorder: true
             });
         }
         defaultArgs() {
@@ -3104,9 +3108,10 @@ var Paper = (function (exports) {
             return 50 * this.mass ** 0.5;
         }
         updateModel(argsDict = {}) {
+            argsDict['viewHeight'] = this.fixtureHeight + this.pixelLength + this.weightRadius;
             super.updateModel(argsDict);
             let angle = argsDict['initialAngle'] ?? this.angle;
-            let newEndPoint = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.pixelLength);
+            let newEndPoint = (new Vertex(0, 1)).rotatedBy(-angle).scaledBy(this.pixelLength).add(this.string.startPoint);
             this.string.updateModel({
                 endPoint: newEndPoint
             });
@@ -3138,7 +3143,8 @@ var Paper = (function (exports) {
         }
         updateFromTip(q) {
             super.updateFromTip(q);
-            let dr = q.subtract(this.startPoint);
+            var dr = q.subtract(this.startPoint);
+            dr = dr.subtract(new Vertex(this.viewWidth / 2, this.pendulum.fixtureHeight));
             let length = dr.norm();
             let angle = Math.atan2(dr.x, dr.y);
             this.pendulum.update({

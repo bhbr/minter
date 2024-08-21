@@ -27,7 +27,8 @@ export class CreatingPendulum extends CreatingMobject {
 
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
-		let dr: Vertex = q.subtract(this.startPoint)
+		var dr: Vertex = q.subtract(this.startPoint)
+		dr = dr.subtract(new Vertex(this.viewWidth/2, this.pendulum.fixtureHeight))
 		let length: number = dr.norm()
 		let angle: number = Math.atan2(dr.x, dr.y)
 		this.pendulum.update({
