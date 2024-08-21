@@ -1,0 +1,7 @@
+
+.DS_Store
+lib/.DS_Store
+src/.DS_Store
+src/modules/.DS_Store
+lib/*
+dist/*
