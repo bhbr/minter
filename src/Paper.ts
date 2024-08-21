@@ -24,7 +24,8 @@ import { CircularArc } from './modules/shapes/CircularArc'
 import { WaveCindyCanvas } from './modules/cindy/WaveCindyCanvas'
 import { LinkHook } from './modules/mobject/linkable/LinkHook'
 import { LinkBullet } from './modules/mobject/linkable/LinkBullet'
-
+import { ValueBox } from './modules/arithmetic/ValueBox'
+import { MultiplyBox } from './modules/arithmetic/BinaryOperatorBox'
 
 export class Paper extends ExpandableMobject {
 
@@ -140,6 +141,11 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
+let m = new MultiplyBox({
+	anchor: new Vertex(500, 300)
+})
+
+paper.addToContent(m)
 
 
 
