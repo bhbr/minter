@@ -11,7 +11,7 @@ import { RoundedRectangle } from '../../shapes/RoundedRectangle'
 import { ScreenEvent, ScreenEventHandler } from '../screen_events'
 import { log } from '../../helpers/helpers'
 import { CreatingMobject } from '../../creations/CreatingMobject'
-import { Segment } from '../..//arrows/Segment'
+import { Segment } from '../../arrows/Segment'
 import { CindyCanvas } from '../../cindy/CindyCanvas'
 import { InputList } from './InputList'
 import { OutputList } from './OutputList'
@@ -28,6 +28,7 @@ export class LinkableMobject extends Mobject {
 		return Object.assign(super.defaultArgs(), {
 			inputNames: [],  // linkable parameters
 			outputNames: [], // linkable parameters
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 
