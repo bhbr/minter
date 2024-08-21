@@ -3,6 +3,5 @@
 lib/.DS_Store
 src/.DS_Store
 src/modules/.DS_Store
-lib/*.js
-lib/*.js.map
-dist/*.js
+*.js
+*.js.map

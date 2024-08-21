@@ -143,8 +143,3 @@ export const paper = new Paper({
 
 
 
-
-
-
-
-
