@@ -209,7 +209,6 @@ export class LinkMap extends Mobject {
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
 		startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
-		startHook.mobject.update()
 	}
 
 	updateModel(argsDict: object = {}) {
