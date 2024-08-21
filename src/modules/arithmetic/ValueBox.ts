@@ -49,10 +49,16 @@ export class ValueBox extends LinkableMobject {
 			width: this.viewWidth,
 			height: this.viewHeight
 		})
+
+		var labelText = `${this.value.toPrecision(3)}`
+		if (isNaN(this.value) || !isFinite(this.value)) {
+			labelText = ''
+		}
+
 		this.valueLabel.update({
 			width: this.viewWidth,
 			height: this.viewHeight,
-			text: `${this.value.toPrecision(3)}`
+			text: labelText
 		})
 	}
 

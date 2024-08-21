@@ -1,5 +1,4 @@
 import { ToggleButton } from './ToggleButton'
-import { Color } from '../modules/helpers/Color'
 
 export class DragButton extends ToggleButton {
 

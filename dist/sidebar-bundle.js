@@ -2028,7 +2028,7 @@ var Sidebar = (function (exports) {
     class SliderButton extends CreativeButton {
         fixedArgs() {
             return Object.assign(super.fixedArgs(), {
-                creations: ['slider'],
+                creations: ['slider', 'value', '+', '–', '*', '/'],
                 key: 'r'
             });
         }

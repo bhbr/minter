@@ -12,6 +12,9 @@ import { CreatingExpandableMobject } from './CreatingExpandableMobject'
 import { CreatingConstruction } from '../../construction/CreatingConstruction'
 import { CreatingWaveCindyCanvas } from '../../cindy/CreatingWaveCindyCanvas'
 import { CreatingBoxSlider } from '../../slider/CreatingBoxSlider'
+import { CreatingFixedMobject } from '../../creations/CreatingFixedMobject'
+import { CreatingValueBox } from '../../creations/CreatingValueBox'
+import { CreatingAddBox, CreatingSubtractBox, CreatingMultiplyBox, CreatingDivideBox } from '../../creations/CreatingBinaryOperatorBox'
 import { WaveCindyCanvas } from '../../cindy/WaveCindyCanvas'
 import { BoxSlider } from '../../slider/BoxSlider'
 import { Freehand } from '../../creations/Freehand'
@@ -309,6 +312,41 @@ export class ExpandableMobject extends LinkableMobject {
 				})
 				s.protoSlider.hideLinks()
 				return s
+			case 'value':
+				let v = new CreatingValueBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v.creation.hideLinks()
+				return v
+			case '+':
+				let v1 = new CreatingAddBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v1.creation.hideLinks()
+				return v1
+			case '–':
+				let v2 = new CreatingSubtractBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v2.creation.hideLinks()
+				return v2
+			case '*':
+				let v3 = new CreatingMultiplyBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v3.creation.hideLinks()
+				return v3
+			case '/':
+				let v4 = new CreatingDivideBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v4.creation.hideLinks()
+				return v4
 			case 'exp':
 				let e = new CreatingExpandableMobject({
 					startPoint: this.creationStroke[0],

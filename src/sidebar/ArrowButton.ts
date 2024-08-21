@@ -1,5 +1,4 @@
 import { CreativeButton } from './CreativeButton'
-import { Color } from '../modules/helpers/Color'
 
 export class ArrowButton extends CreativeButton {
 

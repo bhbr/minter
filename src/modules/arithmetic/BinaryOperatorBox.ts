@@ -11,6 +11,7 @@ export class BinaryOperatorBox extends ValueBox {
 	operand2: number
 	operator: string
 	operatorSign: Circle
+	operatorLabel: TextLabel
 	operatorDict: object
 
 	defaultsArgs(): object {
@@ -25,7 +26,7 @@ export class BinaryOperatorBox extends ValueBox {
 		return Object.assign(super.fixedArgs(), {
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result'],
-			operatorDict: {"+": "+", "-": "–", "*": "&times;", "/": "&divide;"}
+			operatorDict: {"+": "+", "-": "–", "*": "&times;", ":": "&divide;"}
 		})
 	}
 
@@ -37,13 +38,13 @@ export class BinaryOperatorBox extends ValueBox {
 			fillColor: Color.black(),
 			fillOpacity: 1.0
 		})
-		let label = new TextLabel({
+		this.operatorLabel = new TextLabel({
 			text: this.operatorDict[this.operator],
 			viewWidth: 2 * this.operatorSign.radius,
 			viewHeight: 2 * this.operatorSign.radius
 		})
-		label.view.style.fontSize = '14px'
-		this.operatorSign.add(label)
+		this.operatorLabel.view.style.fontSize = '14px'
+		this.operatorSign.add(this.operatorLabel)
 		this.add(this.operatorSign)
 	}
 
@@ -57,7 +58,7 @@ export class BinaryOperatorBox extends ValueBox {
 			return a - b
 		case "*":
 			return a * b
-		case "/":
+		case ":":
 			return a / b
 		}
 		return 0
@@ -97,7 +98,7 @@ export class MultiplyBox extends BinaryOperatorBox {
 export class DivideBox extends BinaryOperatorBox {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			operator: "/"
+			operator: ":"
 		})
 	}
 }
