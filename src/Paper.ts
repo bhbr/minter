@@ -18,7 +18,7 @@ import { Line } from './modules/arrows/Line'
 import { Point } from './modules/creations/Point'
 import { FreePoint } from './modules/creations/FreePoint'
 import { BoxSlider } from './modules/slider/BoxSlider'
-import { Pendulum } from './modules/pendulum/Pendulum'
+import { Swing } from './modules/swing/Swing'
 import { DEGREES, TAU } from './modules/helpers/math'
 import { CircularArc } from './modules/shapes/CircularArc'
 import { WaveCindyCanvas } from './modules/cindy/WaveCindyCanvas'
@@ -48,7 +48,7 @@ export class Paper extends ExpandableMobject {
 		return Object.assign(super.fixedArgs(), {
 			expanded: true,
 			expandedPadding: 0,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'PendulumButton']
+			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton']
 		})
 	}
 
@@ -136,14 +136,12 @@ export class Paper extends ExpandableMobject {
 
 }
 
-let paperDiv = document.querySelector('#paper_id') as HTMLElement
+let paperDiv = document.querySelector('#paper_id') as HTMLDivElement
 export const paper = new Paper({
 	view: paperDiv,
 	viewWidth: 1250,
 	viewHeight: 1024,
 })
-
-
 
 
 

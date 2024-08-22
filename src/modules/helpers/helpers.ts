@@ -281,8 +281,3 @@ export function getPaper(): Paper {
 
 
 
-
-
-
-
-

@@ -21,7 +21,7 @@ import { LinkButton } from './LinkButton'
 import { ColorChangeButton } from './ColorChangeButton'
 import { Paper } from '../Paper'
 
-let paperButtons: Array<string> = ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'PendulumButton']
+let paperButtons: Array<string> = ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton']
 
 export class Sidebar extends Mobject {
 
@@ -195,14 +195,14 @@ export const sidebar = new Sidebar({
 // 	midpoint: buttonCenter(3)
 // })
   
-// let pendulumButton = new CreativeButton({
-// 	creations: ['pendulum'],
+// let swingButton = new CreativeButton({
+// 	creations: ['swing'],
 // 	key: 't',
 // 	baseColor: Color.gray(0.4),
 // 	locationIndex: 4
 // })
-// sidebar.addButton(pendulumButton)
-// pendulumButton.update({
+// sidebar.addButton(swingButton)
+// swingButton.update({
 // 	midpoint: buttonCenter(4)
 // })
 

@@ -22,7 +22,7 @@ import { ExpandButton } from './ExpandButton'
 import { Sidebar } from '../../../sidebar/Sidebar'
 import { convertArrayToString, getPaper } from '../../helpers/helpers'
 import { LinkHook } from '../linkable/LinkHook'
-import { CreatingPendulum } from '../../pendulum/CreatingPendulum'
+import { CreatingSwing } from '../../swing/CreatingSwing'
 
 // imports for Construction
 import { Point } from '../../creations/Point'
@@ -156,7 +156,7 @@ export class ExpandableMobject extends LinkableMobject {
 
 	expandStateChange() {
 		this.expanded = true
-		this.getPaper().expandedMobject = this
+		getPaper().expandedMobject = this
 		this.enableContent()
 		if (this.parent !== undefined) {
 			this.parent.moveToTop(this)
@@ -165,12 +165,12 @@ export class ExpandableMobject extends LinkableMobject {
 			text: '–'
 		})
 		this.moveToTop(this.linkMap)
-		this.sidebar = this.getPaper().sidebar
+		this.sidebar = getPaper().sidebar
 		if (this.sidebar === null || this.sidebar === undefined) {
 			let sidebarView = document.querySelector('#sidebar_id')
 			if (sidebarView !== null) {
 				this.sidebar = (sidebarView as any)['mobject']
-				this.getPaper().sidebar = this.sidebar
+				getPaper().sidebar = this.sidebar
 			}
 		}
 	}
@@ -189,7 +189,7 @@ export class ExpandableMobject extends LinkableMobject {
 		this.expanded = false
 		this.disableContent()
 		if (this.parent) {
-			this.getPaper().expandedMobject = this.parent as ExpandableMobject
+			getPaper().expandedMobject = this.parent as ExpandableMobject
 		}
 		this.expandButton.update({
 			text: '+'
@@ -359,8 +359,8 @@ export class ExpandableMobject extends LinkableMobject {
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
 				return e2
-			case 'pendulum':
-				let p = new CreatingPendulum({
+			case 'swing':
+				let p = new CreatingSwing({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})

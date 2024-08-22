@@ -39,7 +39,7 @@ export function eventVertex(e: ScreenEvent): Vertex {
 	// i. e. if running in the browser (minter.html)
 	// instead of in the app (paper.html)
 	var sidebarWidth: number = 0
-	let sidebarView: Element = document.querySelector('#sidebar_id')
+	let sidebarView = document.querySelector('#sidebar_id') as HTMLDivElement
 	if (sidebarView !== null) {
 		// we are in the browser
 		sidebarWidth = sidebarView.clientWidth

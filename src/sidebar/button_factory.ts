@@ -6,7 +6,7 @@ import { LinkButton } from './LinkButton'
 import { CindyButton } from './CindyButton'
 import { ArithmeticButton } from './ArithmeticButton'
 import { ExpandableButton } from './ExpandableButton'
-import { PendulumButton } from './PendulumButton'
+import { SwingButton } from './SwingButton'
 
 export function buttonFactory(name: string, locationIndex: number): SidebarButton {
 	switch (name) {
@@ -24,7 +24,7 @@ export function buttonFactory(name: string, locationIndex: number): SidebarButto
 		return new ArithmeticButton({locationIndex: locationIndex})
 	case 'ExpandableButton':
 		return new ExpandableButton({locationIndex: locationIndex})
-	case 'PendulumButton':
-		return new PendulumButton({locationIndex: locationIndex})
+	case 'SwingButton':
+		return new SwingButton({locationIndex: locationIndex})
 	}
 }

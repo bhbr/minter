@@ -1,50 +1,50 @@
 import { CreatingMobject } from '../creations/CreatingMobject'
-import { Pendulum } from './Pendulum'
+import { Swing } from './Swing'
 import { Vertex } from '../helpers/Vertex'
 import { Paper } from '../../Paper'
 
-export class CreatingPendulum extends CreatingMobject {
+export class CreatingSwing extends CreatingMobject {
 
-	pendulum: Pendulum
+	swing: Swing
 
 	statelessSetup() {
 		super.statelessSetup()
-		this.pendulum = new Pendulum()
+		this.swing = new Swing()
 	}
 
 	statefulSetup() {
 		super.statefulSetup()
-		this.add(this.pendulum)
-		this.pendulum.update({
+		this.add(this.swing)
+		this.swing.update({
 			anchor: this.startPoint
 		}, false)
-		this.pendulum.hideLinks()
+		this.swing.hideLinks()
 	}
 
-	createdMobject(): Pendulum {
-		return this.pendulum
+	createdMobject(): Swing {
+		return this.swing
 	}
 
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
 		var dr: Vertex = q.subtract(this.startPoint)
-		dr = dr.subtract(new Vertex(this.viewWidth/2, this.pendulum.fixtureHeight))
+		dr = dr.subtract(new Vertex(this.viewWidth/2, this.swing.fixtureHeight))
 		let length: number = dr.norm()
 		let angle: number = Math.atan2(dr.x, dr.y)
-		this.pendulum.update({
+		this.swing.update({
 			maxLength: length,
 			length: 1,
 			initialAngle: angle
 		})
-		this.pendulum.hideLinks()
+		this.swing.hideLinks()
 	}
 
 	dissolve() {
 		super.dissolve()
-		this.pendulum.update({
+		this.swing.update({
 			initialTime: Date.now()
 		})
-		this.pendulum.run()
+		this.swing.run()
 	}
 
 }
