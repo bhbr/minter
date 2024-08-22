@@ -1,10 +1,10 @@
 import { CreativeButton } from './CreativeButton'
 
-export class SliderButton extends CreativeButton {
+export class ArithmeticButton extends CreativeButton {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			creations: ['slider', 'value', '+', '–', '*', '/'],
+			creations: ['var', 'const', '+', '–', '&times;', '/'],
 			key: 'r'
 		})
 	}

@@ -2025,10 +2025,10 @@ var Sidebar = (function (exports) {
         }
     }
 
-    class SliderButton extends CreativeButton {
+    class ArithmeticButton extends CreativeButton {
         fixedArgs() {
             return Object.assign(super.fixedArgs(), {
-                creations: ['slider', 'value', '+', '–', '*', '/'],
+                creations: ['var', 'const', '+', '–', '&times;', '/'],
                 key: 'r'
             });
         }
@@ -2064,8 +2064,8 @@ var Sidebar = (function (exports) {
                 return new LinkButton({ locationIndex: locationIndex });
             case 'CindyButton':
                 return new CindyButton({ locationIndex: locationIndex });
-            case 'SliderButton':
-                return new SliderButton({ locationIndex: locationIndex });
+            case 'ArithmeticButton':
+                return new ArithmeticButton({ locationIndex: locationIndex });
             case 'ExpandableButton':
                 return new ExpandableButton({ locationIndex: locationIndex });
             case 'PendulumButton':
@@ -2073,7 +2073,7 @@ var Sidebar = (function (exports) {
         }
     }
 
-    let paperButtons = ['DragButton', 'LinkButton', 'ExpandableButton', 'SliderButton', 'CindyButton', 'PendulumButton'];
+    let paperButtons = ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'PendulumButton'];
     class Sidebar extends Mobject {
         fixedArgs() {
             return Object.assign(super.fixedArgs(), {

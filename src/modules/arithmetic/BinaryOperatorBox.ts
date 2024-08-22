@@ -26,7 +26,7 @@ export class BinaryOperatorBox extends ValueBox {
 		return Object.assign(super.fixedArgs(), {
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result'],
-			operatorDict: {"+": "+", "-": "–", "*": "&times;", ":": "&divide;"}
+			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"}
 		})
 	}
 
@@ -56,9 +56,9 @@ export class BinaryOperatorBox extends ValueBox {
 			return a + b
 		case "–":
 			return a - b
-		case "*":
+		case "&times;":
 			return a * b
-		case ":":
+		case "/":
 			return a / b
 		}
 		return 0
@@ -82,7 +82,7 @@ export class AddBox extends BinaryOperatorBox {
 export class SubtractBox extends BinaryOperatorBox {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			operator: "-"
+			operator: "–"
 		})
 	}
 }
@@ -90,7 +90,7 @@ export class SubtractBox extends BinaryOperatorBox {
 export class MultiplyBox extends BinaryOperatorBox {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			operator: "*"
+			operator: "&times;"
 		})
 	}
 }
@@ -98,7 +98,7 @@ export class MultiplyBox extends BinaryOperatorBox {
 export class DivideBox extends BinaryOperatorBox {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			operator: ":"
+			operator: "/"
 		})
 	}
 }

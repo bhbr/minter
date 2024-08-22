@@ -305,14 +305,14 @@ export class ExpandableMobject extends LinkableMobject {
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
 				return c
-			case 'slider':
+			case 'var':
 				let s = new CreatingBoxSlider({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
 				s.protoSlider.hideLinks()
 				return s
-			case 'value':
+			case 'const':
 				let v = new CreatingValueBox({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
@@ -333,7 +333,7 @@ export class ExpandableMobject extends LinkableMobject {
 				})
 				v2.creation.hideLinks()
 				return v2
-			case '*':
+			case '&times;':
 				let v3 = new CreatingMultiplyBox({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]

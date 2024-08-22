@@ -4,7 +4,7 @@ import { CircleButton } from './CircleButton'
 import { DragButton } from './DragButton'
 import { LinkButton } from './LinkButton'
 import { CindyButton } from './CindyButton'
-import { SliderButton } from './SliderButton'
+import { ArithmeticButton } from './ArithmeticButton'
 import { ExpandableButton } from './ExpandableButton'
 import { PendulumButton } from './PendulumButton'
 
@@ -20,8 +20,8 @@ export function buttonFactory(name: string, locationIndex: number): SidebarButto
 		return new LinkButton({locationIndex: locationIndex})
 	case 'CindyButton':
 		return new CindyButton({locationIndex: locationIndex})
-	case 'SliderButton':
-		return new SliderButton({locationIndex: locationIndex})
+	case 'ArithmeticButton':
+		return new ArithmeticButton({locationIndex: locationIndex})
 	case 'ExpandableButton':
 		return new ExpandableButton({locationIndex: locationIndex})
 	case 'PendulumButton':
