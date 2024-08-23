@@ -171,17 +171,12 @@ and logic for drawing and user interaction.
 		// These methods for event handling need to be "bound"
 		// to the mobject (whatever that means)
 		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
-		this.boundCapturedOnPointerDown = this.capturedOnPointerDown.bind(this)
-		this.boundCapturedOnPointerMove = this.capturedOnPointerMove.bind(this)
-		this.boundCapturedOnPointerUp = this.capturedOnPointerUp.bind(this)
-		this.boundRawOnPointerDown = this.rawOnPointerDown.bind(this)
-		this.boundRawOnPointerMove = this.rawOnPointerMove.bind(this)
-		this.boundRawOnPointerUp = this.rawOnPointerUp.bind(this)
 		this.boundOnPointerDown = this.onPointerDown.bind(this)
 		this.boundOnPointerMove = this.onPointerMove.bind(this)
 		this.boundOnPointerUp = this.onPointerUp.bind(this)
 		this.boundOnTap = this.onTap.bind(this)
-		this.boundRawOnLongPress = this.rawOnLongPress.bind(this)
+		this.boundOnDoubleTap = this.onDoubleTap.bind(this)
+		this.boundOnLongPress = this.onLongPress.bind(this)
 
 		/*
 		When holding down the drag button,
@@ -200,9 +195,9 @@ and logic for drawing and user interaction.
 	statefulSetup() {
 	// state-dependent setup (step 3)
 		this.setupView()
-		addPointerDown(this.view, this.boundCapturedOnPointerDown)
-		addPointerMove(this.view, this.boundCapturedOnPointerMove)
-		addPointerUp(this.view, this.boundCapturedOnPointerUp)
+		addPointerDown(this.view, this.capturedOnPointerDown.bind(this))
+		addPointerMove(this.view, this.capturedOnPointerMove.bind(this))
+		addPointerUp(this.view, this.capturedOnPointerUp.bind(this))
 	}
 
 
@@ -827,7 +822,6 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-
 	eventTarget?: Mobject
 	_screenEventHandler: ScreenEventHandler
 	savedScreenEventHandler?: ScreenEventHandler
@@ -835,35 +829,6 @@ and logic for drawing and user interaction.
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
-
-	// empty method as workaround (don't ask)
-	removeFreePoint(fp: any) { }
-
-	onPointerDown(e: ScreenEvent) { }
-	onPointerMove(e: ScreenEvent) { }
-	onPointerUp(e: ScreenEvent) { }
-	onTap(e: ScreenEvent) { }
-	onDoubleTap(e: ScreenEvent) { }
-	onLongPress(e: ScreenEvent) { }
-
-	savedOnPointerDown(e: ScreenEvent) { }
-	savedOnPointerMove(e: ScreenEvent) { }
-	savedOnPointerUp(e: ScreenEvent) { }
-	savedOnTap(e: ScreenEvent) { }
-	savedOnLongPress(e: ScreenEvent) { }
-
-	boundEventTargetMobject(e: ScreenEvent): Mobject { return this }
-	boundCapturedOnPointerDown(e: ScreenEvent) { }
-	boundCapturedOnPointerMove(e: ScreenEvent) { }
-	boundCapturedOnPointerUp(e: ScreenEvent) { }
-	boundRawOnPointerDown(e: ScreenEvent) { }
-	boundRawOnPointerMove(e: ScreenEvent) { }
-	boundRawOnPointerUp(e: ScreenEvent) { }
-	boundRawOnLongPress(e: ScreenEvent) { }
-	boundOnPointerDown(e: ScreenEvent) { }
-	boundOnPointerMove(e: ScreenEvent) { }
-	boundOnPointerUp(e: ScreenEvent) { }
-	boundOnTap(e: ScreenEvent) { }
 
 	get screenEventHandler(): ScreenEventHandler {
 		return this._screenEventHandler
@@ -879,6 +844,43 @@ and logic for drawing and user interaction.
 		}
 	}
 
+
+	/*
+	The following empty methods need to be declared here
+	so we can manipulate and override them later.
+	*/
+
+
+	onPointerDown(e: ScreenEvent) { }
+	boundOnPointerDown(e: ScreenEvent) { }
+	savedOnPointerDown(e: ScreenEvent) { }
+
+	onPointerMove(e: ScreenEvent) { }
+	boundOnPointerMove(e: ScreenEvent) { }
+	savedOnPointerMove(e: ScreenEvent) { }
+
+	onPointerUp(e: ScreenEvent) { }
+	boundOnPointerUp(e: ScreenEvent) { }
+	savedOnPointerUp(e: ScreenEvent) { }
+
+	onTap(e: ScreenEvent) { }
+	boundOnTap(e: ScreenEvent) { }
+	savedOnTap(e: ScreenEvent) { }
+
+	onDoubleTap(e: ScreenEvent) { }
+	boundOnDoubleTap(e: ScreenEvent) { }
+	savedOnDoubleTap(e: ScreenEvent) { }
+
+	onLongPress(e: ScreenEvent) { }
+	boundOnLongPress(e: ScreenEvent) { }
+	savedOnLongPress(e: ScreenEvent) { }
+
+	boundEventTargetMobject(e: ScreenEvent): Mobject { return this }
+
+
+	// Methods for temporarily disabling interactivity on a mobject
+	// (e. g. when dragging a CindyCanvas)
+
 	disable() {
 		this.savedScreenEventHandler = this.screenEventHandler
 		this.screenEventHandler = ScreenEventHandler.Parent // .Below?
@@ -890,10 +892,71 @@ and logic for drawing and user interaction.
 		this.savedScreenEventHandler = null
 	}
 
-	eventTargetMobjectChain(e: ScreenEvent): Array<Mobject> {
-		// find the lowest Mobject willing and allowed to handle the event
 
-		// collect the chain of target views (highest to lowest)
+	/*
+	Finding the event target
+
+	Depending on the screenEventHandler:
+
+	- .Below: mobject is transparent (via CSS), the sibling mobject
+	          underneath or the parent should handle the event
+	          Example: TwoPointCircle in a Construction
+	- .Auto:  don't interfere with event propagation at all
+	          Example: CindyCanvas
+
+	Otherwise the event is captured by the topmost view (paper or sidebar),
+	the automatic propagation is stopped and the event is passed onto the
+	eventTarget as determined by the declared screenEventHandlers in the
+	chain of possible event targets.
+	The event target is the lowest mobject willing to handle it and that
+	is not underneath a mobject that wants its parent to handle it.
+
+	- .Parent: the parent should handle it
+	- .Self:   handle it if no child wants to handle it and if no parent wants
+	           its parent to handle it
+	*/
+
+	eventTargetMobject(e: ScreenEvent): Mobject | null {
+	/*
+	Find the lowest Mobject willing and allowed to handle the event
+	General rule: the event is handled by the lowest submob that can handle it
+	and that is not underneath a mobject that wants its parent to handle it.
+	If the event policies end in a loop, no one handles it.
+	*/
+		var t: Element = e.target as Element
+		if (t == this.view) {
+			return this
+		}
+		let targetMobChain = this.eventTargetMobjectChain(e) // defined below
+		var m: any
+		while (targetMobChain.length > 0) {
+			m = targetMobChain.pop()
+			if (m != undefined && (m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
+				return m
+			}
+		}
+		// if all of this fails, this mob must handle the event itself
+		return this
+	}
+
+	eventTargetMobjectChain(e: ScreenEvent): Array<Mobject> {
+	// Collect the chain of corresponding target mobjects (lowest to highest)
+		let targetViewChain = this.eventTargetViewChain(e) // defined below
+		let targetMobChain: Array<Mobject> = []
+		for (var view of targetViewChain.values()) {
+			let m: any = view['mobject']
+			if (m == undefined) { continue }
+			let mob: Mobject = m as Mobject
+			if (mob.screenEventHandler == ScreenEventHandler.Parent) { break }
+			// only consider targets above the first mobject
+			// with ScreenEventHandler.Parent
+			targetMobChain.push(mob)
+		}
+		return targetMobChain
+	}
+
+	eventTargetViewChain(e: ScreenEvent): Array<Element> {
+	// Collect the chain of target views (highest to lowest)
 		var t: Element = e.target as Element
 		if (t.tagName == 'path') { t = t.parentElement.parentElement }
 		// the mob whose view contains the svg element containing the path
@@ -907,151 +970,188 @@ and logic for drawing and user interaction.
 			targetViewChain.push(t)
 		}
 		targetViewChain.reverse()
-		//log(targetViewChain)
-
-		// collect the chain of corresponding target mobjects (lowest to highest)
-		let targetMobChain: Array<Mobject> = []
-		for (var view of targetViewChain.values()) {
-			let m: any = view['mobject']
-			if (m == undefined) { continue }
-			let mob: Mobject = m as Mobject
-			if (mob.screenEventHandler == ScreenEventHandler.Parent) { break }
-			// only consider targets above the first .Parent
-			targetMobChain.push(mob)
-		}
-		//log(targetMobChain)
-		return targetMobChain
+		return targetViewChain
 	}
 
-	eventTargetMobject(e: ScreenEvent): Mobject | null {
-		var t: Element = e.target as Element
-		if (t == this.view) {
-			return this
-		}
-		let targetMobChain = this.eventTargetMobjectChain(e)
-		//log(targetMobChain)
-		var m: any
-		while (targetMobChain.length > 0) {
-			//log('pop')
-			m = targetMobChain.pop()
-			//log(m)
-			//log(m.screenEventHandler)
-			if (m != undefined && (m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
-				//log(`event target mobject: ${m.constructor.name}`)
-				//log(m.screenEventHandler)
-				return m
-			}
-		}
-		// if all of this fails, this mob must handle the event itself
-		return this
-	}
+
+	/*
+	Captured event methods
+
+	Instead of calling the event methods exposed in the API (onPointerDown etc.),
+	the event listeners call these methods that do some housekeeping
+	before and after:
+
+	Step 1: determine the event target (only in capturedOnPointerDown)
+	Step 2: stop the propagation ( or not if ScreenEventHandler.Auto)
+	Step 3: check if the event is just a duplicate of the last event
+	Step 4: call the API event method
+	Step 5: set/unset timers to listen for e. g. taps, double taps, long presses etc.
+	*/
 
 	capturedOnPointerDown(e: ScreenEvent) {
-		this.eventTarget = this.boundEventTargetMobject(e)
-		if (this.eventTarget == null) { return }
-		if (this.eventTarget.screenEventHandler == ScreenEventHandler.Auto) { return }
+
+		// step 1
+		this.eventTarget = this.eventTargetMobject.bind(this)(e) // this.boundEventTargetMobject(e)
+		let target = this.eventTarget
+		if (target == null) { return }
+
+		// step 2
+		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-		this.eventTarget.rawOnPointerDown(e)
+
+		// step 3
+		target.registerScreenEvent(e)
+		if (this.isDuplicate(e)) { return }
+
+		// step 4
+		target.onPointerDown(e)
+
+		// step 5
+		target.timeoutID = window.setTimeout(
+			function() {
+				target.onLongPress(e)
+				this.resetTimeout()
+			}.bind(this), 1000, e)
 	}
 
 	capturedOnPointerMove(e: ScreenEvent) {
-		if (this.eventTarget == null) { return }
-		if (this.eventTarget.screenEventHandler == ScreenEventHandler.Auto) { return }
+
+		// step 1
+		let target = this.eventTarget
+		if (target == null) { return }
+
+		// step 2
+		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-		this.eventTarget.rawOnPointerMove(e)
+
+		// step 3
+		target.registerScreenEvent(e)
+		if (this.isDuplicate(e)) { return }
+
+		// step 4
+		target.onPointerMove(e)
+
+		// step 5
+		target.resetTimeout()
 	}
 
 	capturedOnPointerUp(e: ScreenEvent) {
-		if (this.eventTarget == null) { return }
-		if (this.eventTarget.screenEventHandler == ScreenEventHandler.Auto) { return }
+
+		// step 1
+		let target = this.eventTarget
+		if (target == null) { return }
+
+		// step 2
+		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-		this.eventTarget.rawOnPointerUp(e)
+
+		// step 3
+		target.registerScreenEvent(e)
+		if (this.isDuplicate(e)) { return }
+
+		// step 4
+		target.onPointerUp(e)
+
+		if (target.tapDetected()) {
+			target.onTap(e)
+		}
+
+		if (target.doubleTapDetected()) {
+			target.onDoubleTap(e)
+		}
+
+		// step 5
+		target.resetTimeout()
+		window.setTimeout(this.clearScreenEventHistory, 2000)
 		this.eventTarget = null
 	}
 
+
+	// Local coordinates for use in custom event methods
+
 	localEventVertex(e: ScreenEvent): Vertex {
+	/*
+	eventVertex(e) gives the coordinates in the topmost
+	mobject's frame (paper or sidebar). This method here
+	finds them in the mobject's local frame.
+	*/
 		let p: Vertex = eventVertex(e)
-		let pp = getPaper()
-		let rt = this.relativeTransform(pp)
-		let inv = rt.inverse()
-		let q = inv.appliedTo(p)
+		let rt = this.relativeTransform(getPaper())
+		let q = rt.inverse().appliedTo(p)
 		return q
 	}
 
-	registerScreenEvent(e: ScreenEvent): boolean {
-		// return value is a success flag
-		// (false if e is just a duplicate of the latest registered event)
-		if (isTouchDevice) {
 
-			let minIndex = Math.max(0, this.screenEventHistory.length - 5)
-			for (var i = minIndex; i < this.screenEventHistory.length; i++) {
-				let e2 = this.screenEventHistory[i]
-				if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
-					if (screenEventType(e) == screenEventType(e2)) {
-						return false
-					}	
-				}
+	// Looking for duplicates
+
+	registerScreenEvent(e: ScreenEvent) {
+		if (this.isDuplicate(e)) { return }
+		this.screenEventHistory.push(e)
+	}
+
+	isDuplicate(e: ScreenEvent): boolean {
+	/*
+	Duplicates can occur on an iPad, where the same action
+	triggers a TouchEvent and a MouseEvent. Here we are just looking at
+	the screenEvent's type (down, move, up or cancel) and ignore
+	the device to determine duplicates.
+	*/
+		if (!isTouchDevice) { return false } // no iPad = no problem
+		let minIndex = Math.max(0, this.screenEventHistory.length - 5)
+		for (var i = minIndex; i < this.screenEventHistory.length; i++) {
+			let e2 = this.screenEventHistory[i]
+			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
+				if (screenEventType(e) == screenEventType(e2)) {
+					return true
+				}	
 			}
 		}
-		this.screenEventHistory.push(e)
-		return true
+		return false
+
 	}
 
-	rawOnPointerDown(e: ScreenEvent) {
-		if (!this.registerScreenEvent(e)) { return }
-		this.onPointerDown(e)
-		this.timeoutID = window.setTimeout(this.boundRawOnLongPress, 1000, e)
-	}
 
-	rawOnPointerMove(e: ScreenEvent) {
-		if (!this.registerScreenEvent(e)) { return }
-		this.resetTimeout()
-		this.onPointerMove(e)
-	}
-
-	rawOnPointerUp(e: ScreenEvent) {
-		if (!this.registerScreenEvent(e)) { return }
-		this.resetTimeout()
-		this.onPointerUp(e)
-		if (this.tapDetected()) {
-			this.onTap(e)
-		}
-		if (this.doubleTapDetected()) {
-			this.onDoubleTap(e)
-		}
-		//window.setTimeout(this.clearScreenEventHistory, 2000)
-	}
-
-	clearScreenEventHistory() {
-		this.screenEventHistory = []
-	}
+	// Gesture recognizers
 
 	isTap(e1: ScreenEvent, e2: ScreenEvent, dt: number = 500): boolean {
+	// Do these two events together form a tap gesture?
 		return (screenEventType(e1) == ScreenEventType.Down
 			&& screenEventType(e2) == ScreenEventType.Up
 			&& Math.abs(e2.timeStamp - e1.timeStamp) < 500)
 	}
 
 	tapDetected(): boolean {
+	// Have we just witnessed a tap?
 		if (this.screenEventHistory.length < 2) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		return this.isTap(e1, e2)
 	}
 
+	isDoubleTap(e1: ScreenEvent, e2: ScreenEvent, e3: ScreenEvent, e4: ScreenEvent, dt: number = 1000): boolean {
+	// Do these fours events together form a double tap gesture?
+		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, dt)
+	}
+
 	doubleTapDetected(): boolean {
+	// Have we just witnessed a double tap?
 		if (this.screenEventHistory.length < 4) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 4]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 3]
 		let e3 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e4 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, 1000)
-		
+		return this.isDoubleTap(e1, e2, e3, e4)
 	}
 
-	rawOnLongPress(e: ScreenEvent) {
-		this.onLongPress(e)
-		this.resetTimeout()
+	mereTapDetected(): boolean {
+		return this.tapDetected() && !this.doubleTapDetected()
+	}
+
+
+	// Cleanup methods
+
+	clearScreenEventHistory() {
+		this.screenEventHistory = []
 	}
 
 	resetTimeout() {
@@ -1061,23 +1161,15 @@ and logic for drawing and user interaction.
 		}
 	}
 
-	startDragging(e: ScreenEvent) {
-		this.dragAnchorStart = this.anchor.subtract(eventVertex(e))
-	}
 
-	dragging(e: ScreenEvent) {
-		this.update({
-			anchor: eventVertex(e).add(this.dragAnchorStart)
-		})
-	}
+	// Dragging methods
 
-	endDragging(e: ScreenEvent) {
-		this.dragAnchorStart = null
-	}
-
-	draggingEnabled(): boolean {
-		return (this.onPointerDown == this.startDragging)
-	}
+	/*
+	Mobjects drag themselves, not via their parent.
+	This is possible since the event target is fixed by hand
+	as long as the gesture occurs, even if individual events
+	(pointer moves) may trigger outside it because of lag.
+	*/
 
 	setDragging(flag: boolean) {
 		if (flag) {
@@ -1098,6 +1190,25 @@ and logic for drawing and user interaction.
 			this.savedOnPointerUp = (e: ScreenEvent) => { }
 		}
 	}
+
+	draggingEnabled(): boolean {
+		return (this.onPointerDown == this.startDragging)
+	}
+
+	startDragging(e: ScreenEvent) {
+		this.dragAnchorStart = this.anchor.subtract(eventVertex(e))
+	}
+
+	dragging(e: ScreenEvent) {
+		this.update({
+			anchor: eventVertex(e).add(this.dragAnchorStart)
+		})
+	}
+
+	endDragging(e: ScreenEvent) {
+		this.dragAnchorStart = null
+	}
+
 
 
 

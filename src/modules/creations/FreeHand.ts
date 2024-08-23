@@ -97,7 +97,6 @@ export class Freehand extends CreatingMobject {
 		})
 
 		let par = this.parent
-		log(par)
 		this.parent.remove(this)
 		if (this.visible) {
 			par.addToContent(this)

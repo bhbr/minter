@@ -136,6 +136,33 @@ export class Paper extends ExpandableMobject {
 
 }
 
+class Tapper extends Rectangle {
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+
+	onPointerDown(e: ScreenEvent) {
+		log('pointer down')
+	}
+
+	onTap(e: ScreenEvent) {
+		log('tap')
+	}
+
+	onDoubleTap(e: ScreenEvent) {
+		log('double tap')
+	}
+
+	onLongPress(e: ScreenEvent) {
+		log('long press')
+	}
+
+}
+
 let paperDiv = document.querySelector('#paper_id') as HTMLDivElement
 export const paper = new Paper({
 	view: paperDiv,
@@ -143,6 +170,11 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
+let tapper = new Tapper({
+	anchor: new Vertex(100, 100)
+})
+
+paper.add(tapper)
 
 
 
