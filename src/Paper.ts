@@ -28,6 +28,7 @@ import { ValueBox } from './modules/arithmetic/ValueBox'
 import { MultiplyBox } from './modules/arithmetic/BinaryOperatorBox'
 import { CreatingFixedMobject } from './modules/creations/CreatingFixedMobject'
 import { DivideBox } from './modules/arithmetic/BinaryOperatorBox'
+import { ColorSample } from './modules/ColorSample'
 
 export class Paper extends ExpandableMobject {
 
@@ -170,11 +171,9 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
-let tapper = new Tapper({
+let c = new ColorSample({
 	anchor: new Vertex(100, 100)
 })
 
-paper.add(tapper)
-
-
+paper.addToContent(c)
 
