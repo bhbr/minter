@@ -28,7 +28,7 @@ export function logString(msg: any) {
 	} else if (msg === null) {
 		return 'null'
 	} else if (typeof msg === 'string') {
-		return '"' + msg + '"'
+		return msg
 	} else if (typeof msg === 'boolean') {
 		return (msg as boolean) ? 'true' : 'false'
 	} else if (typeof msg === 'number') {

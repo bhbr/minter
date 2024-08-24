@@ -132,6 +132,32 @@ var Sidebar = (function (exports) {
     const TAU = 2 * Math.PI;
     const DEGREES = TAU / 360;
 
+    class VertexArray extends Array {
+        constructor(array) {
+            super();
+            if (!array) {
+                return;
+            }
+            for (let vertex of array) {
+                this.push(vertex);
+            }
+        }
+        interpolate(newVertexArray, weight) {
+            let interpolatedVertexArray = new VertexArray();
+            for (let i = 0; i < this.length; i++) {
+                interpolatedVertexArray.push(this[i].interpolate(newVertexArray[i], weight));
+            }
+            return interpolatedVertexArray;
+        }
+        imageUnder(transform) {
+            let image = new VertexArray();
+            for (let i = 0; i < this.length; i++) {
+                image.push(this[i].imageUnder(transform));
+            }
+            return image;
+        }
+    }
+
     class Transform extends ExtendedObject {
         constructor(argsDict = {}) {
             super(argsDict);
@@ -174,7 +200,8 @@ var Sidebar = (function (exports) {
             return new Vertex(this.a() * p.x + this.b() * p.y + this.e(), this.c() * p.x + this.d() * p.y + this.f());
         }
         appliedToVertices(vertices) {
-            let ret = [];
+            // This method accepts also an undertyped argument
+            let ret = new VertexArray();
             for (let v of vertices) {
                 ret.push(this.appliedTo(v));
             }
@@ -319,7 +346,7 @@ var Sidebar = (function (exports) {
             return (isNaN(this.x) || isNaN(this.y));
         }
         static vertices(listOfComponents) {
-            let listOfVertices = [];
+            let listOfVertices = new VertexArray();
             for (let components of listOfComponents) {
                 let v = new Vertex(components);
                 listOfVertices.push(v);
@@ -361,14 +388,18 @@ var Sidebar = (function (exports) {
         ScreenEventHandler[ScreenEventHandler["Self"] = 2] = "Self";
         ScreenEventHandler[ScreenEventHandler["Parent"] = 3] = "Parent"; // let the parent handle it, even if the target (this mob or a submob) could handle it
         // i. e. this disables the interactivity of the mobjects and of all its submobs
-        // General rule: the event is handled by the lowest submob that can handle it
-        // and that is not underneath a PassUp
-        // If the event policies end in a loop, no one handles it
+        /*
+        General rule: the event is handled by the lowest submob that can handle it
+        and that is not underneath a mobject that wants its parent to handle it.
+        If the event policies end in a loop, no one handles it
+        */
     })(ScreenEventHandler || (ScreenEventHandler = {}));
     function eventVertex(e) {
-        // subtract the sidebar's width if necessary
-        // i. e. if running in the browser (minter.html)
-        // instead of in the app (paper.html)
+        /*
+        subtract the sidebar's width if necessary
+        i. e. if running in the browser (minter.html)
+        instead of in the app (paper.html)
+        */
         var sidebarWidth = 0;
         let sidebarView = document.querySelector('#sidebar_id');
         if (sidebarView !== null) {
@@ -400,6 +431,10 @@ var Sidebar = (function (exports) {
         }
         return ScreenEventType.Unknown;
     }
+    /*
+    The following functions handle adding and removing event listeners,
+    including the confusion between touch, mouse and pointer events.
+    */
     function addPointerDown(element, method) {
         element.addEventListener('touchstart', method, { capture: true });
         element.addEventListener('mousedown', method, { capture: true });
@@ -599,32 +634,6 @@ var Sidebar = (function (exports) {
         }
     }
 
-    class VertexArray extends Array {
-        constructor(array) {
-            super();
-            if (!array) {
-                return;
-            }
-            for (let vertex of array) {
-                this.push(vertex);
-            }
-        }
-        interpolate(newVertexArray, weight) {
-            let interpolatedVertexArray = new VertexArray();
-            for (let i = 0; i < this.length; i++) {
-                interpolatedVertexArray.push(this[i].interpolate(newVertexArray[i], weight));
-            }
-            return interpolatedVertexArray;
-        }
-        imageUnder(transform) {
-            let image = new VertexArray();
-            for (let i = 0; i < this.length; i++) {
-                image.push(this[i].imageUnder(transform));
-            }
-            return image;
-        }
-    }
-
     /*
     For debugging; draw the border of the mobject's view
     (a HTMLDivelement) via a CSS property
@@ -699,7 +708,7 @@ var Sidebar = (function (exports) {
             // STEP 3
             this.statefulSetup();
             // STEP 4
-            this.update();
+            this.update(argsDict);
         }
         initialArgs(argsDict = {}) {
             /*
@@ -762,6 +771,18 @@ var Sidebar = (function (exports) {
             // subclass, override this method as described
             // further up in defaultArgs().
             return {};
+        }
+        removeFixedArgs(argsDict = {}) {
+            let newArgsDict = {};
+            let fixedKeys = Object.keys(this.fixedArgs());
+            for (let key of Object.keys(argsDict)) {
+                if (fixedKeys.includes(key)) {
+                    console.warn(`Cannot change property ${key} of ${this.constructor.name}`);
+                    continue;
+                }
+                newArgsDict[key] = argsDict[key];
+            }
+            return newArgsDict;
         }
         statelessSetup() {
             // state-independent setup (step 1)
@@ -1193,6 +1214,7 @@ var Sidebar = (function (exports) {
         updateModel(argsDict = {}) {
             // Update just the properties and what depends on them, without redrawing
             argsDict = this.consolidateTransformAndAnchor(argsDict); // see below
+            argsDict = this.removeFixedArgs(argsDict);
             this.setAttributes(argsDict);
             this.updateSubmobModels();
             for (let dep of this.dependencies || []) {
@@ -1627,18 +1649,22 @@ var Sidebar = (function (exports) {
         statelessSetup() {
             super.statelessSetup();
             this.vertices = new VertexArray();
+            // setup the svg
             this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
             this.svg['mobject'] = this;
-            this.path['mobject'] = this;
-            this.svg.appendChild(this.path);
             this.svg.setAttribute('class', 'mobject-svg');
             this.svg.style.overflow = 'visible';
+            // and its path
+            this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            this.path['mobject'] = this;
+            this.svg.appendChild(this.path);
         }
         statefulSetup() {
             this.setupView();
             this.view.appendChild(this.svg);
             this.view.setAttribute('class', this.constructor.name + ' mobject-div');
+            // screen events are detected on the path
+            // so the active area is clipped to its shape
             addPointerDown(this.path, this.capturedOnPointerDown.bind(this));
             addPointerMove(this.path, this.capturedOnPointerMove.bind(this));
             addPointerUp(this.path, this.capturedOnPointerUp.bind(this));
@@ -1655,21 +1681,35 @@ var Sidebar = (function (exports) {
             this.path.style['stroke-width'] = this.strokeWidth.toString();
         }
         pathString() {
+            // This method turns this.vertices into a CSS path
             console.warn('please subclass pathString');
             return '';
         }
         relativeVertices(frame) {
+            // the vertices are in local coordinates, convert them to the given frame of an ancestor mobject
             let returnValue = this.relativeTransform(frame).appliedToVertices(this.vertices);
             if (returnValue == undefined) {
-                return [];
+                return new VertexArray();
             }
             else {
                 return returnValue;
             }
         }
         globalVertices() {
-            return this.relativeVertices(); // uses default frame = paper
+            // uses default frame = paper
+            return this.relativeVertices();
         }
+        //////////////////////////////////////////////////////////
+        //                                                      //
+        //                     FRAME METHODS                    //
+        //                                                      //
+        //////////////////////////////////////////////////////////
+        /*
+        The coordinate extrema (x_min, x_max, y_min, y_max) are computed from the vertices
+        instead of the view frame as for a general Mobject.
+        Other coordinate quantities (x_mid, y_mid, ulCorner etc.) are computes from these
+        four values.
+        */
         localXMin() {
             let xMin = Infinity;
             if (this.vertices != undefined) {
@@ -1726,12 +1766,36 @@ var Sidebar = (function (exports) {
             }
             return yMax;
         }
-        localULCorner() {
-            return new Vertex(this.localXMin(), this.localYMin());
-        }
+        localMidX() { return (this.localXMin() + this.localXMax()) / 2; }
+        localMidY() { return (this.localYMin() + this.localYMax()) / 2; }
+        localULCorner() { return new Vertex(this.localXMin(), this.localYMin()); }
+        localURCorner() { return new Vertex(this.localXMax(), this.localYMin()); }
+        localLLCorner() { return new Vertex(this.localXMin(), this.localYMax()); }
+        localLRCorner() { return new Vertex(this.localXMax(), this.localYMax()); }
+        localCenter() { return new Vertex(this.localMidX(), this.localMidY()); }
+        localLeftCenter() { return new Vertex(this.localXMin(), this.localMidY()); }
+        localRightCenter() { return new Vertex(this.localXMax(), this.localMidY()); }
+        localTopCenter() { return new Vertex(this.localMidX(), this.localYMin()); }
+        localBottomCenter() { return new Vertex(this.localMidX(), this.localYMax()); }
+        ulCorner(frame) { return this.transformLocalPoint(this.localULCorner(), frame); }
+        urCorner(frame) { return this.transformLocalPoint(this.localURCorner(), frame); }
+        llCorner(frame) { return this.transformLocalPoint(this.localLLCorner(), frame); }
+        lrCorner(frame) { return this.transformLocalPoint(this.localLRCorner(), frame); }
+        center(frame) { return this.transformLocalPoint(this.localCenter(), frame); }
+        xMin(frame) { return this.ulCorner(frame).x; }
+        xMax(frame) { return this.lrCorner(frame).x; }
+        yMin(frame) { return this.ulCorner(frame).y; }
+        yMax(frame) { return this.lrCorner(frame).y; }
+        midX(frame) { return this.center(frame).x; }
+        midY(frame) { return this.center(frame).y; }
+        leftCenter(frame) { return this.transformLocalPoint(this.localLeftCenter(), frame); }
+        rightCenter(frame) { return this.transformLocalPoint(this.localRightCenter(), frame); }
+        topCenter(frame) { return this.transformLocalPoint(this.localTopCenter(), frame); }
+        bottomCenter(frame) { return this.transformLocalPoint(this.localRightCenter(), frame); }
         getWidth() { return this.localXMax() - this.localXMin(); }
         getHeight() { return this.localYMax() - this.localYMin(); }
         adjustFrame() {
+            // Set the view anchor and size to fit the frame as computed from the vertices
             let shift = new Transform({ shift: this.localULCorner() });
             let inverseShift = shift.inverse();
             let updateDict = {};
@@ -1880,6 +1944,12 @@ var Sidebar = (function (exports) {
     }
 
     class CircularArc extends CurvedLine {
+        get midpoint() {
+            return this.anchor.translatedBy(this.radius, this.radius);
+        }
+        set midpoint(newValue) {
+            this.anchor = newValue.translatedBy(-this.radius, -this.radius);
+        }
         defaultArgs() {
             return Object.assign(super.defaultArgs(), {
                 midpoint: Vertex.origin(),
@@ -1893,17 +1963,38 @@ var Sidebar = (function (exports) {
             });
         }
         updateModel(argsDict = {}) {
-            let r = argsDict['radius'] || this.radius;
+            /*
+            Since midpoint is just an alias for a shifted anchor, there is possible
+            confusion when updating a Circle/CircularArc with a new midpoint, anchor
+            and/or radius.
+            This is resolved here:
+                - updating the midpoint changes the anchor with the given new or existing radius
+                - updating just the radius keeps the midpoint where it is (anchor changes)
+            */
+            // read all possible new values
+            let r = argsDict['radius'];
+            let m = argsDict['midpoint'];
             let a = argsDict['anchor'];
-            if (a != undefined) {
-                argsDict['midpoint'] = a.translatedBy(r, r);
+            if (m && a) {
+                throw `Inconsistent data: cannot set midpoint and anchor of a ${this.constructor.name} simultaneously`;
             }
-            else {
-                let m = argsDict['midpoint'] || this.midpoint;
+            // adjust the anchor according to the given parameters
+            if (r !== undefined && !m && !a) { // only r given
+                argsDict['anchor'] = this.midpoint.translatedBy(-r, -r);
+            }
+            else if (r === undefined && m && !a) { // only m given
+                argsDict['anchor'] = m.translatedBy(-this.radius, -this.radius);
+            }
+            else if (r === undefined && !m && a) ;
+            else if (r !== undefined && m) { // r and m given, but no a
                 argsDict['anchor'] = m.translatedBy(-r, -r);
             }
-            argsDict['viewWidth'] = 2 * r;
-            argsDict['viewHeight'] = 2 * r;
+            else ;
+            // remove the new midpoint (taken care of by updating the anchor)
+            delete argsDict['midpoint'];
+            let updatedRadius = (r !== undefined) ? r : this.radius;
+            argsDict['viewWidth'] = 2 * updatedRadius;
+            argsDict['viewHeight'] = 2 * updatedRadius;
             super.updateModel(argsDict);
         }
         updateBezierPoints() {

@@ -4,16 +4,18 @@ import { log } from '../helpers/helpers'
 (window as any).emulatePen = false
 export const isTouchDevice: boolean = (document.body.className == 'ipad')
 
-// Screen input can come from a mouse, finger(s) or a pen/stylus.
-// There exist classes MouseEvent and TouchEvent, as well as
-// PointerEvent as a hardware-agnostic representation of all three.
-// Pen input has no separate class, but PointerEvent has properties
-// specific to that.
-// For backwards compatibility (?), PointerEvent is actually
-// a subclass of MouseEvent. In addition, depending on device,
-// OS and browser, pen input may appear as a TouchEvent or even a MouseEvent.
-// So it is all quite unreliable and we need to build our own
-// clean API that can distinguish between all these kinds of input.
+/*
+Screen input can come from a mouse, finger(s) or a pen/stylus.
+There exist classes MouseEvent and TouchEvent, as well as
+PointerEvent as a hardware-agnostic representation of all three.
+Pen input has no separate class, but PointerEvent has properties
+specific to that.
+For backwards compatibility (?), PointerEvent is actually
+a subclass of MouseEvent. In addition, depending on device,
+OS and browser, pen input may appear as a TouchEvent or even a MouseEvent.
+So it is all quite unreliable and we need to build our own
+clean API that can distinguish between all these kinds of input.
+*/
 
 export type ScreenEvent = MouseEvent | TouchEvent
 // this includes PointerEvent (subclass of MouseEvent)
@@ -29,15 +31,19 @@ export enum ScreenEventHandler {
 	Parent // let the parent handle it, even if the target (this mob or a submob) could handle it
 	// i. e. this disables the interactivity of the mobjects and of all its submobs
 
-	// General rule: the event is handled by the lowest submob that can handle it
-	// and that is not underneath a PassUp
-	// If the event policies end in a loop, no one handles it
+	/*
+	General rule: the event is handled by the lowest submob that can handle it
+	and that is not underneath a mobject that wants its parent to handle it.
+	If the event policies end in a loop, no one handles it
+	*/
 }
 
 export function eventVertex(e: ScreenEvent): Vertex {
-	// subtract the sidebar's width if necessary
-	// i. e. if running in the browser (minter.html)
-	// instead of in the app (paper.html)
+/*
+subtract the sidebar's width if necessary
+i. e. if running in the browser (minter.html)
+instead of in the app (paper.html)
+*/
 	var sidebarWidth: number = 0
 	let sidebarView = document.querySelector('#sidebar_id') as HTMLDivElement
 	if (sidebarView !== null) {
@@ -82,6 +88,10 @@ export function screenEventDevice(e: ScreenEvent): ScreenEventDevice {
 	}
 }
 
+/*
+The following functions handle adding and removing event listeners,
+including the confusion between touch, mouse and pointer events.
+*/
 
 export function addPointerDown(element: HTMLElement | SVGElement, method: (Event) => void) {
 	element.addEventListener('touchstart', method, { capture: true })

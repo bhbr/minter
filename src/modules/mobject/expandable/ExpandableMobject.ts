@@ -4,6 +4,7 @@ import { LinkMap } from '../linkable/LinkMap'
 import { RoundedRectangle } from '../../shapes/RoundedRectangle'
 import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from '../screen_events'
 import { Vertex } from '../../helpers/Vertex'
+import { VertexArray } from '../../helpers/VertexArray'
 import { Color } from '../../helpers/Color'
 import { addLongPressListener, removeLongPressListener } from '../long_press'
 import { log, remove } from '../../helpers/helpers'
@@ -64,7 +65,7 @@ export class ExpandableMobject extends LinkableMobject {
 	sidebar?: any
 	creatingMobject?: CreatingMobject
 	buttons: Array<string>
-	creationStroke: Array<Vertex>
+	creationStroke: VertexArray
 	creationMode: string
 	expandButton: ExpandButton
 	contentInset: number
@@ -408,7 +409,7 @@ export class ExpandableMobject extends LinkableMobject {
 	endCreating(e: ScreenEvent) {
 		this.creatingMobject.dissolve()
 		this.creatingMobject = null
-		this.creationStroke = []
+		this.creationStroke = new VertexArray()
 	}
 
 

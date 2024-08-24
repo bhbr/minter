@@ -1,9 +1,9 @@
-import { Color } from './helpers/Color'
-import { Circle } from './shapes/Circle'
-import { LinkableMobject } from './mobject/linkable/LinkableMobject'
-import { Vertex } from './helpers/Vertex'
-import { log } from './helpers/helpers'
-import { ScreenEventHandler } from './mobject/screen_events'
+import { Color } from '../helpers/Color'
+import { Circle } from '../shapes/Circle'
+import { LinkableMobject } from '../mobject/linkable/LinkableMobject'
+import { Vertex } from '../helpers/Vertex'
+import { log } from '../helpers/helpers'
+import { ScreenEventHandler } from '../mobject/screen_events'
 
 let RADIUS = 30
 

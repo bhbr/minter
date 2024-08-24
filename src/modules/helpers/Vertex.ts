@@ -1,4 +1,5 @@
 import { Transform } from './Transform'
+import { VertexArray } from './VertexArray'
 
 export class Vertex extends Array {
 
@@ -109,8 +110,8 @@ export class Vertex extends Array {
 		return (isNaN(this.x) || isNaN(this.y)) 
 	}
 
-	static vertices(listOfComponents: Array<Array<number>>): Array<Vertex> {
-		let listOfVertices: Array<Vertex> = []
+	static vertices(listOfComponents: Array<Array<number>>): VertexArray {
+		let listOfVertices = new VertexArray()
 		for (let components of listOfComponents) {
 			let v = new Vertex(components)
 			listOfVertices.push(v)

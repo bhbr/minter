@@ -1,6 +1,7 @@
 import { ExtendedObject } from './ExtendedObject'
 import { TAU, PI, DEGREES } from './math'
 import { Vertex } from './Vertex'
+import { VertexArray } from './VertexArray'
 
 export class Transform extends ExtendedObject {
 
@@ -60,8 +61,9 @@ export class Transform extends ExtendedObject {
 		)
 	}
 
-	appliedToVertices(vertices: Array<Vertex>): Array<Vertex> {
-		let ret: Array<Vertex> = []
+	appliedToVertices(vertices: Array<Vertex>): VertexArray {
+	// This method accepts also an undertyped argument
+		let ret = new VertexArray()
 		for (let v of vertices) {
 			ret.push(this.appliedTo(v))
 		}

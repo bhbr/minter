@@ -89,7 +89,7 @@ and logic for drawing and user interaction.
 		// STEP 3
 		this.statefulSetup()
 		// STEP 4
-		this.update()
+		this.update(argsDict)
 		
 	}
 
@@ -163,6 +163,19 @@ and logic for drawing and user interaction.
 	// subclass, override this method as described
 	// further up in defaultArgs().
 		return {}
+	}
+
+	removeFixedArgs(argsDict: object = {}) {
+		let newArgsDict = {}
+		let fixedKeys = Object.keys(this.fixedArgs())
+		for (let key of Object.keys(argsDict)) {
+			if (fixedKeys.includes(key)) {
+				console.warn(`Cannot change property ${key} of ${this.constructor.name}`)
+				continue
+			}
+			newArgsDict[key] = argsDict[key]
+		}
+		return newArgsDict
 	}
 
 	statelessSetup() {
@@ -493,7 +506,6 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-
 	/*
 	Animation is 'home-grown' (not via CSS).
 	Any numerical property (number, Color, Vertex,
@@ -738,6 +750,7 @@ and logic for drawing and user interaction.
 	updateModel(argsDict: object = {}) {
 	// Update just the properties and what depends on them, without redrawing
 		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
+		argsDict = this.removeFixedArgs(argsDict)
 		this.setAttributes(argsDict)
 		this.updateSubmobModels()
 

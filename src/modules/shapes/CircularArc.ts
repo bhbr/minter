@@ -2,19 +2,26 @@ import { CurvedLine } from './CurvedLine'
 import { Vertex } from '../helpers/Vertex'
 import { VertexArray } from '../helpers/VertexArray'
 import { DEGREES, TAU } from '../helpers/math'
+import { log } from '../helpers/helpers'
 
 export class CircularArc extends CurvedLine {
 
-	midpoint: Vertex
 	radius: number
 	angle: number
 	nbPoints: number
+
+	get midpoint(): Vertex {
+		return this.anchor.translatedBy(this.radius, this.radius)
+	}
+	set midpoint(newValue: Vertex) {
+		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
+	}
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			midpoint: Vertex.origin(),
 			radius: 10,
-			angle: TAU/4,
+			angle: TAU / 4,
 		})
 	}
 
@@ -25,18 +32,43 @@ export class CircularArc extends CurvedLine {
 	}
 
 	updateModel(argsDict: object = {}) {
+	/*
+	Since midpoint is just an alias for a shifted anchor, there is possible
+	confusion when updating a Circle/CircularArc with a new midpoint, anchor
+	and/or radius.
+	This is resolved here:
+		- updating the midpoint changes the anchor with the given new or existing radius
+		- updating just the radius keeps the midpoint where it is (anchor changes)
+	*/
 
-		let r = argsDict['radius'] || this.radius
+		// read all possible new values
+		let r = argsDict['radius']
+		let m = argsDict['midpoint']
 		let a = argsDict['anchor']
-		if (a != undefined) {
-			argsDict['midpoint'] = a.translatedBy(r, r)
-		} else {
-			let m = argsDict['midpoint'] || this.midpoint
-			argsDict['anchor'] = m.translatedBy(-r, -r)
+
+		if (m && a) {
+			throw `Inconsistent data: cannot set midpoint and anchor of a ${this.constructor.name} simultaneously`
 		}
 
-		argsDict['viewWidth'] = 2 * r
-		argsDict['viewHeight'] = 2 * r
+		// adjust the anchor according to the given parameters
+		if (r !== undefined && !m && !a) { // only r given
+			argsDict['anchor'] = this.midpoint.translatedBy(-r, -r)
+		} else if (r === undefined && m && !a) { // only m given
+			argsDict['anchor'] = m.translatedBy(-this.radius, -this.radius)
+		} else if (r === undefined && !m && a) { // only a given
+			// nothing to adjust
+		} else if (r !== undefined && m) { // r and m given, but no a
+			argsDict['anchor'] = m.translatedBy(-r, -r)
+		} else if (r !== undefined && !m && a) { // r and a given
+			// nothing to adjust
+		} 
+
+		// remove the new midpoint (taken care of by updating the anchor)
+		delete argsDict['midpoint']
+
+		let updatedRadius = (r !== undefined) ? r : this.radius
+		argsDict['viewWidth'] = 2 * updatedRadius
+		argsDict['viewHeight'] = 2 * updatedRadius
 
 		super.updateModel(argsDict)
 	}

@@ -28,7 +28,8 @@ import { ValueBox } from './modules/arithmetic/ValueBox'
 import { MultiplyBox } from './modules/arithmetic/BinaryOperatorBox'
 import { CreatingFixedMobject } from './modules/creations/CreatingFixedMobject'
 import { DivideBox } from './modules/arithmetic/BinaryOperatorBox'
-import { ColorSample } from './modules/ColorSample'
+//import { ColorSample } from './modules/color/ColorSample'
+//import { TextLabel } from './modules/TextLabel'
 
 export class Paper extends ExpandableMobject {
 
@@ -171,9 +172,14 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
-let c = new ColorSample({
-	anchor: new Vertex(100, 100)
-})
+// try {
+// 	let c2 = new ColorSample({
+// 		anchor: new Vertex(300, 300),
+// 		color: Color.red()
+// 	})
+// 	paper.addToContent(c2)
+// } catch {
+// 	log('sth went wrong')
+// }
 
-paper.addToContent(c)
 
