@@ -700,7 +700,7 @@ and logic for drawing and user interaction.
 		return otherMobject.allDependents().includes(this)
 	}
 
-	addDependency(outputName: string, target: Mobject, inputName: string) {
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null) {
 		if (this.dependsOn(target)) {
 			throw 'Circular dependency!'
 		}
