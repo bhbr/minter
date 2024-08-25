@@ -6,7 +6,6 @@ import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, 
 import { Vertex } from '../../helpers/Vertex'
 import { VertexArray } from '../../helpers/VertexArray'
 import { Color } from '../../helpers/Color'
-import { addLongPressListener, removeLongPressListener } from '../long_press'
 import { log, remove } from '../../helpers/helpers'
 import { CreatingMobject } from '../../creations/CreatingMobject'
 import { CreatingExpandableMobject } from './CreatingExpandableMobject'
