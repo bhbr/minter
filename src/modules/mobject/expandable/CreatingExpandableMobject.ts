@@ -1,5 +1,5 @@
 import { CreatingBox } from '../../creations/CreatingBox'
-import { ExpandableMobject } from './ExpandableMobject'
+import { ExpandableMobject } from './ExpandableMobject_Construction'
 import { Vertex } from '../../helpers/Vertex'
 
 

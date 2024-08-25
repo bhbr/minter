@@ -1,5 +1,5 @@
 import { Mobject } from '../mobject/Mobject'
-import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject'
+import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject_Construction'
 import { WaveCindyCanvas } from './WaveCindyCanvas'
 import { CreatingBox } from '../creations/CreatingBox'
 import { log } from '../helpers/helpers'

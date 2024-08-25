@@ -3,7 +3,7 @@ import { Vertex } from '../helpers/Vertex'
 import { Color } from '../helpers/Color'
 import { log } from '../helpers/helpers'
 
-export class Point extends Circle {
+export class ConstructionPoint extends Circle {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {

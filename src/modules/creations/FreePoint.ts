@@ -1,12 +1,12 @@
-import { Point } from './Point'
+import { ConstructionPoint } from './ConstructionPoint'
 import { ScreenEventHandler, ScreenEvent } from '../mobject/screen_events'
 import { log } from '../helpers/helpers'
 
-export class FreePoint extends Point {
+export class FreePoint extends ConstructionPoint {
 
 	fixedArgs() {
 		return Object.assign(super.fixedArgs(), {
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Parent
 		})
 	}
 

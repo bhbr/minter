@@ -1,10 +1,10 @@
-import { Point } from './../creations/Point'
-import { ConstructedMobject } from '../mobject/expandable/ExpandableMobject'
+import { ConstructionPoint } from './../creations/ConstructionPoint'
+import { ConstructedMobject } from '../mobject/expandable/ExpandableMobject_Construction'
 import { Vertex } from '../helpers/Vertex'
 import { Arrow } from '../arrows/Arrow'
 import { Circle } from '../shapes/Circle'
 
-export class IntersectionPoint extends Point {
+export class IntersectionPoint extends ConstructionPoint {
 
 	geomob1: ConstructedMobject
 	geomob2: ConstructedMobject

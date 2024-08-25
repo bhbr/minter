@@ -1,5 +1,5 @@
 import { Mobject } from '../Mobject'
-import { ExpandableMobject } from '../expandable/ExpandableMobject'
+import { ExpandableMobject } from '../expandable/ExpandableMobject_Construction'
 import { LinkableMobject } from '../linkable/LinkableMobject'
 import { DependencyLink } from './DependencyLink'
 import { LinkBullet } from './LinkBullet'

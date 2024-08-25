@@ -1,6 +1,6 @@
 import { CreatingBox } from '../creations/CreatingBox'
 import { Vertex } from '../helpers/Vertex'
-import { ExpandableMobject, Construction } from '../mobject/expandable/ExpandableMobject'
+import { ExpandableMobject, Construction } from '../mobject/expandable/ExpandableMobject_Construction'
 
 export class CreatingConstruction extends CreatingBox {
 

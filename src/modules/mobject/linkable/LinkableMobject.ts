@@ -1,5 +1,5 @@
 import { Vertex } from '../../helpers/Vertex'
-import { ExpandableMobject } from '../expandable/ExpandableMobject'
+import { ExpandableMobject } from '../expandable/ExpandableMobject_Construction'
 import { Mobject } from '../Mobject'
 import { VMobject } from '../VMobject'
 import { MGroup } from '../MGroup'

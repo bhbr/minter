@@ -828,6 +828,7 @@ and logic for drawing and user interaction.
 	}
 
 	set screenEventHandler(newValue: ScreenEventHandler) {
+		this.view.setAttribute('screen-event-handler', newValue.toString())
 		this._screenEventHandler = newValue
 		if (this.view == undefined) { return }
 		if (this.screenEventHandler == ScreenEventHandler.Below) {
@@ -916,7 +917,11 @@ and logic for drawing and user interaction.
 		var m: any
 		while (targetMobChain.length > 0) {
 			m = targetMobChain.pop()
-			if (m != undefined && (m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
+			if (m === undefined) { return this }
+			if (m.screenEventHandler == ScreenEventHandler.Parent) {
+				return m.parent
+			}
+			if ((m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
 				return m
 			}
 		}
@@ -925,18 +930,19 @@ and logic for drawing and user interaction.
 	}
 
 	eventTargetMobjectChain(e: ScreenEvent): Array<Mobject> {
-	// Collect the chain of corresponding target mobjects (lowest to highest)
+	// Collect the chain of corresponding target mobjects (highest to lowest)
 		let targetViewChain = this.eventTargetViewChain(e) // defined below
 		let targetMobChain: Array<Mobject> = []
 		for (var view of targetViewChain.values()) {
 			let m: any = view['mobject']
 			if (m == undefined) { continue }
 			let mob: Mobject = m as Mobject
-			if (mob.screenEventHandler == ScreenEventHandler.Parent) { break }
+			//if (mob.screenEventHandler == ScreenEventHandler.Parent) { break }
 			// only consider targets above the first mobject
 			// with ScreenEventHandler.Parent
 			targetMobChain.push(mob)
 		}
+		//log(targetMobChain)
 		return targetMobChain
 	}
 
@@ -954,8 +960,8 @@ and logic for drawing and user interaction.
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		targetViewChain.reverse()
-		return targetViewChain
+		//log(targetViewChain)
+		return targetViewChain.reverse()
 	}
 
 
@@ -977,6 +983,7 @@ and logic for drawing and user interaction.
 
 		// step 1
 		let target = this.eventTargetMobject(e)
+		log(`target is ${target}`)
 		this.eventTarget = target
 		if (target == null) { return }
 		

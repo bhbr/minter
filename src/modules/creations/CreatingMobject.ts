@@ -2,7 +2,7 @@ import { Mobject } from '../mobject/Mobject'
 import { MGroup } from '../mobject/MGroup'
 import { ScreenEventHandler } from '../mobject/screen_events'
 import { Vertex } from '../helpers/Vertex'
-import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject'
+import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject_Construction'
 import { log } from '../helpers/helpers'
 
 export class CreatingMobject extends Mobject {

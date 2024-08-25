@@ -14,16 +14,13 @@ import { Line } from '../arrows/Line'
 import { Paper } from '../../Paper'
 import { ConstructingMobject } from './ConstructingMobject'
 import { FreePoint } from './FreePoint'
-import { Construction } from '../mobject/expandable/ExpandableMobject'
+import { Construction } from '../mobject/expandable/ExpandableMobject_Construction'
 
 export class ConstructingCircle extends ConstructingMobject {
 
-	midpoint: Vertex
-	outerPoint: Vertex
 	freeMidpoint: FreePoint
 	freeOuterPoint: FreePoint
 	circle: TwoPointCircle
-
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
@@ -44,8 +41,8 @@ export class ConstructingCircle extends ConstructingMobject {
 	statefulSetup() {
 		super.statefulSetup()
 
-		this.midpoint = this.midpoint || this.startPoint.copy()
-		this.outerPoint = this.outerPoint || this.startPoint.copy()
+		let sp = this.construction.snappedPointForVertex(this.startPoint)
+		let sp1 = (sp === null) ? this.startPoint : sp.midpoint
 
 		this.add(this.freeMidpoint)
 		this.add(this.freeOuterPoint)
@@ -62,12 +59,12 @@ export class ConstructingCircle extends ConstructingMobject {
 
 
 		this.freeMidpoint.update({
-			midpoint: this.midpoint,
+			midpoint: sp1,
 			strokeColor: this.penStrokeColor,
 			fillColor: this.penFillColor
 		}, false)
 		this.freeOuterPoint.update({
-			midpoint: this.outerPoint,
+			midpoint: this.endPoint,
 			strokeColor: this.penStrokeColor,
 			fillColor: this.penFillColor
 		}, false)
@@ -80,13 +77,13 @@ export class ConstructingCircle extends ConstructingMobject {
 
 	updateFromTip(q: Vertex) {
 		super.updateFromTip(q)
-		this.outerPoint.copyFrom(q)
-		this.freeOuterPoint.midpoint.copyFrom(q)
+		// this.outerPoint.copyFrom(q)
+		this.freeOuterPoint.update({ midpoint: q })
 		this.update()
 	}
 
 	dissolve() {
-		this.parent.integrate(this)
+		this.construction.integrate(this)
 	}
 
 	// remove?

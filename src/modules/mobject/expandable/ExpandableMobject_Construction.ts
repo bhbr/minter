@@ -25,8 +25,9 @@ import { LinkHook } from '../linkable/LinkHook'
 import { CreatingSwing } from '../../swing/CreatingSwing'
 
 // imports for Construction
-import { Point } from '../../creations/Point'
+import { ConstructionPoint } from '../../creations/ConstructionPoint'
 import { FreePoint } from '../../creations/FreePoint'
+import { ConstructingMobject } from '../../creations/ConstructingMobject'
 import { ConstructingSegment } from '../../creations/ConstructingSegment'
 import { ConstructingRay } from '../../creations/ConstructingRay'
 import { ConstructingLine } from '../../creations/ConstructingLine'
@@ -40,34 +41,49 @@ import { Circle } from '../../shapes/Circle'
 import { TwoPointCircle } from '../../shapes/TwoPointCircle'
 import { IntersectionPoint } from './../../construction/IntersectionPoint'
 
+/*
+The classes ExpandableMobject and Construction need to be defined
+in the same file, to resolve a circularity issue.
+*/
 
-
-
-
-///////////////////////
-// EXPANDABLEMOBJECT //
-///////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////// EXPANDABLE MOBJECT //////////////////////
+///////////////////////////////////////////////////////////////
 
 declare var paper: any
 declare interface Window { webkit?: any }
 
 export class ExpandableMobject extends LinkableMobject {
-	
-	contentChildren: Array<Mobject>
-	expanded: boolean
-	background: RoundedRectangle
-	panPointStart?: Vertex
-	compactWidth: number
-	compactHeight: number
-	compactAnchor: Vertex
-	expandedPadding: number
+/*
+An expandable mobject can be expanded into a full screen view,
+in which submobjects ("contentChildren") can be created with
+a pen and custom sidebar buttons.
+
+In addition, the content children can be linked (those that
+are linkable) together.
+
+The content children can also be dragged and panned.
+*/
+
+
 	sidebar?: any
-	creatingMobject?: CreatingMobject
 	buttons: Array<string>
+
+	creatingMobject?: CreatingMobject
 	creationStroke: VertexArray
 	creationMode: string
+
+	panPointStart?: Vertex
+
+	//////////////////////////////////////////////////////////
+	//                                                      //
+	//                    INITIALIZATION                    //
+	//                                                      //
+	//////////////////////////////////////////////////////////
+
+	background: RoundedRectangle
 	expandButton: ExpandButton
-	contentInset: number
+	contentChildren: Array<Mobject>
 	linkMap: LinkMap
 
 	defaultArgs(): object {
@@ -133,6 +149,21 @@ export class ExpandableMobject extends LinkableMobject {
 		}
 		this.hideLinksOfContent()
 	}
+
+
+	//////////////////////////////////////////////////////////
+	//                                                      //
+	//                  EXPAND AND CONTRACT                 //
+	//                                                      //
+	//////////////////////////////////////////////////////////
+
+	compactWidth: number
+	compactHeight: number
+	compactAnchor: Vertex
+	expandedPadding: number
+	contentInset: number
+
+	expanded: boolean
 
 	get expandedAnchor(): Vertex {
 		return new Vertex(this.expandedPadding, this.expandedPadding)
@@ -231,7 +262,9 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	disableContent() {
+		//log(`disabling content of ${this}`)
 		for (let mob of this.contentChildren) {
+		//	log(`disabling ${mob}`)
 			mob.disable()
 		}
 	}
@@ -266,6 +299,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 
 	handleMessage(key: string, value: any) {
+		this.enableContent()
 		switch (key) {
 			case 'drag':
 				this.setPanning(value as boolean)
@@ -493,7 +527,7 @@ export class ExpandableMobject extends LinkableMobject {
 		}
 	}
 
-	inerInputHookLocation(submob: LinkableMobject, name: string): Vertex {
+	innerInputHookLocation(submob: LinkableMobject, name: string): Vertex {
 		let hookLocation = submob.inputList.hookNamed(name).positionInLinkMap()
 		return hookLocation
 	}
@@ -546,15 +580,13 @@ export type ConstructedMobject = Arrow | TwoPointCircle
 
 export class Construction extends ExpandableMobject {
 	
-	points: Array<Point>
-	freePoints: Array<FreePoint>
+	points: Array<ConstructionPoint>
 	constructedMobjects: Array<ConstructedMobject>
 	declare creatingMobject: ConstructingArrow | ConstructingCircle
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			points: [],
-			freePoints: [],
 			constructedMobjects: []
 		})
 	}
@@ -573,10 +605,124 @@ export class Construction extends ExpandableMobject {
 		})
 	}
 
+	snapped(v1: Vertex, v2: Vertex): boolean {
+		return v1.closeTo(v2, 10)
+	}
+
+	snappedPointForVertex(v: Vertex): ConstructionPoint | null {
+		for (let p of this.points) {
+			if (this.snapped(v, p.midpoint)) { return p }
+		}
+		return null
+	}
+
+	addPoint(p: ConstructionPoint): boolean {
+		for (let q of this.points) {
+			if (this.snapped(p.midpoint, q.midpoint)) {
+				return false
+			}
+		}
+		this.add(p)
+		this.points.push(p)
+		return true
+	}
+
+	freePoints(): Array<FreePoint> {
+		let ret: Array<FreePoint> = []
+		for (let p of this.points) {
+			if (p instanceof FreePoint) {
+				ret.push(p)
+			}
+		}
+		return ret
+	}
+
+	createCreatingMobject(type: string): CreatingMobject {
+		switch (type) {
+			case 'segment':
+				let sg = new ConstructingSegment({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					construction: this
+				})
+				return sg
+			case 'ray':
+				let ray = new ConstructingRay({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					construction: this
+				})
+				return ray
+			case 'line':
+				let line = new ConstructingLine({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					construction: this
+				})
+				return line
+			case 'circle':
+				let c = new ConstructingCircle({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					construction: this
+				})
+				return c
+		}
+		return super.createCreatingMobject(type)
+	}
+
+	startCreating(e: ScreenEvent) {
+		let v = this.localEventVertex(e)
+		let p: ConstructionPoint | null = this.snappedPointForVertex(v)
+		log(`found point: ${p}`)
+		if (this.creationMode == 'freehand') {
+			if (p === null) { // starting a freehand drawing
+				super.startCreating(e)
+			} else if (p instanceof FreePoint) { // dragging a free point
+				this.eventTarget = p
+				p.startDragging(e)
+			} // hitting any other point does nothing if in freehand mode
+			return
+		}
+		this.creationStroke.push(v)
+		this.creatingMobject = this.createCreatingMobject(this.creationMode) as ConstructingArrow | ConstructingCircle
+		this.add(this.creatingMobject)
+
+	}
+
+	creating(e: ScreenEvent) {
+		if (this.creationMode == 'freehand') {
+			super.creating(e)
+			return
+		}
+		let p: Vertex = this.localEventVertex(e)
+		for (let fq of this.points) {
+			let q: Vertex = fq.midpoint
+			if (this.snapped(p, q)) {
+				p = q
+				break
+			}
+		}
+		this.creatingMobject.updateFromTip(p)
+	}
+
+	addToContent(mob: Mobject) {
+		super.addToContent(mob)
+		if (mob instanceof ConstructionPoint) {
+			this.points.push(mob)
+			if (mob instanceof FreePoint && !this.points.includes(mob)) {
+				this.points.push(mob)
+			}
+		}
+	}
+
+
+
+
 	integrate(mob: ConstructingArrow | ConstructingCircle) {
 		this.remove(mob)
-		let p1: Point = this.pointForVertex(mob.startPoint)
-		let p2: Point = this.pointForVertex(mob.endPoint)
+		let p1: ConstructionPoint = this.snappedPointForVertex(mob.startPoint) ?? new FreePoint({ midpoint: mob.startPoint })
+		let p2: ConstructionPoint = this.snappedPointForVertex(mob.endPoint) ?? new FreePoint({ midpoint: mob.endPoint })
 		this.addToContent(p1)
 		this.addToContent(p2)
 
@@ -605,26 +751,6 @@ export class Construction extends ExpandableMobject {
 		p2.update({ strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor })
 	}
 
-	pointForVertex(v: Vertex): Point {
-		for (let p of this.points) {
-			if (p.midpoint.equals(v)) { return p }
-		}
-		let p: FreePoint = new FreePoint({midpoint: v})
-		this.addPoint(p)
-		return p
-	}
-
-	addPoint(p: Point): boolean {
-		for (let q of this.points) {
-			if (p.midpoint.equals(q.midpoint)) {
-				return false
-			}
-		}
-		this.add(p)
-		this.points.push(p)
-		return true
-	}
-
 	intersectWithRest(geomob1: ConstructedMobject) {
 		for (let geomob2 of this.constructedMobjects) {
 			if (geomob1 == geomob2) { continue }
@@ -644,68 +770,26 @@ export class Construction extends ExpandableMobject {
 		}
 	}
 
-	createCreatingMobject(type: string): CreatingMobject {
-		switch (type) {
-			case 'segment':
-				let sg = new ConstructingSegment({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return sg
-			case 'ray':
-				let ray = new ConstructingRay({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return ray
-			case 'line':
-				let line = new ConstructingLine({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return line
-			case 'circle':
-				let c = new ConstructingCircle({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return c
-		}
-		return super.createCreatingMobject(type)
-	}
-
-
-	creating(e: ScreenEvent) {
-		if (this.creationMode == 'freehand') {
-			super.creating(e)
+	onPointerDown(e: ScreenEvent) {
+		if (this.creationMode != 'freehand') {
+			super.onPointerDown(e)
 			return
 		}
-		let p: Vertex = this.localEventVertex(e)
-		for (let fq of this.points) {
-			let q: Vertex = fq.midpoint
-			if (p.subtract(q).norm() < 10) {
-				p = q
-				break
-			}
+		if (this.contracted) { return }
+		let v = this.localEventVertex(e)
+		let p = this.snappedPointForVertex(v)
+		if (p !== null) {
+			getPaper().eventTarget = p
+			p.startDragging(e)
+		} else {
+			this.startCreating(e)
 		}
-		this.creatingMobject.updateFromTip(p)
+
 	}
 
-	addToContent(mob: Mobject) {
-		super.addToContent(mob)
-		if (mob instanceof Point) {
-			this.points.push(mob)
-			if (mob instanceof FreePoint) {
-				this.freePoints.push(mob)
-			}
-		}
-	}
+
+
 }
-
-
-
-
-
 
 
 

@@ -4,7 +4,7 @@ import { Polygon } from '../shapes/Polygon'
 import { Circle } from '../shapes/Circle'
 import { Vertex } from '../helpers/Vertex'
 import { log } from '../helpers/helpers'
-import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject'
+import { ExpandableMobject } from '../mobject/expandable/ExpandableMobject_Construction'
 import { Color } from '../helpers/Color'
 import { ScreenEventHandler } from '../mobject/screen_events'
 

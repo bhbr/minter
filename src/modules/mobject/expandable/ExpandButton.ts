@@ -1,4 +1,4 @@
-import { ExpandableMobject } from './ExpandableMobject'
+import { ExpandableMobject } from './ExpandableMobject_Construction'
 import { TextLabel } from '../../TextLabel'
 import { ScreenEvent, ScreenEventHandler } from '../screen_events'
 import { Vertex } from '../../helpers/Vertex'

@@ -5,7 +5,7 @@ import { Transform } from './modules/helpers/Transform'
 import { Mobject } from './modules/mobject/Mobject'
 import { MGroup } from './modules/mobject/MGroup'
 import { LinkableMobject } from './modules/mobject/linkable/LinkableMobject'
-import { ExpandableMobject, Construction } from './modules/mobject/expandable/ExpandableMobject'
+import { ExpandableMobject, Construction } from './modules/mobject/expandable/ExpandableMobject_Construction'
 import { Color, COLOR_PALETTE } from './modules/helpers/Color'
 import { Circle } from './modules/shapes/Circle'
 import { Rectangle } from './modules/shapes/Rectangle'
@@ -15,8 +15,6 @@ import { Arrow } from './modules/arrows/Arrow'
 import { Segment } from './modules/arrows/Segment'
 import { Ray } from './modules/arrows/Ray'
 import { Line } from './modules/arrows/Line'
-import { Point } from './modules/creations/Point'
-import { FreePoint } from './modules/creations/FreePoint'
 import { BoxSlider } from './modules/slider/BoxSlider'
 import { Swing } from './modules/swing/Swing'
 import { DEGREES, TAU } from './modules/helpers/math'
@@ -161,21 +159,6 @@ export const paper = new Paper({
 	viewWidth: 1250,
 	viewHeight: 1024,
 })
-
-let c = new ColorSample({
-	anchor: new Vertex(400, 200)
-})
-
-paper.addToContent(c)
-
-// let s = new BoxSlider({
-// 	anchor: new Vertex(200, 200)
-// })
-
-// paper.addToContent(s)
-// paper.showLinksOfContent()
-//paper.linkMap.createNewLinkBetween(s.outputHooks[0], c.inputHooks[0])
-
 
 
 

@@ -1,6 +1,6 @@
 import { CreatingMobject } from '../creations/CreatingMobject'
 import { Color } from '../helpers/Color'
-import { Construction } from '../mobject/expandable/ExpandableMobject'
+import { Construction } from '../mobject/expandable/ExpandableMobject_Construction'
 
 export class ConstructingMobject extends CreatingMobject {
 
@@ -8,6 +8,7 @@ export class ConstructingMobject extends CreatingMobject {
 	penStrokeWidth: number
 	penFillColor: Color
 	penFillOpacity: number
+	construction: Construction
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -18,10 +19,4 @@ export class ConstructingMobject extends CreatingMobject {
 		})
 	}
 
-	get parent(): Construction {
-		return super.parent as Construction
-	}
-	set parent(newValue: Construction) {
-		super.parent = newValue
-	}
 }
