@@ -210,7 +210,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 	leftCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLeftCenter(), frame) }
 	rightCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
 	topCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localTopCenter(), frame) }
-	bottomCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
+	bottomCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localBottomCenter(), frame) }
 
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }

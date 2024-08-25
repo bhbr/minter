@@ -28,8 +28,7 @@ import { ValueBox } from './modules/arithmetic/ValueBox'
 import { MultiplyBox } from './modules/arithmetic/BinaryOperatorBox'
 import { CreatingFixedMobject } from './modules/creations/CreatingFixedMobject'
 import { DivideBox } from './modules/arithmetic/BinaryOperatorBox'
-//import { ColorSample } from './modules/color/ColorSample'
-//import { TextLabel } from './modules/TextLabel'
+import { ColorSample } from './modules/ColorSample'
 
 export class Paper extends ExpandableMobject {
 
@@ -136,23 +135,12 @@ export class Paper extends ExpandableMobject {
 	expand() { }
 	contract() { }
 
-}
-
-class Tapper extends Rectangle {
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			screenEventHandler: ScreenEventHandler.Self
-		})
-	}
-
-
-	onPointerDown(e: ScreenEvent) {
-		log('pointer down')
-	}
-
 	onTap(e: ScreenEvent) {
 		log('tap')
+	}
+
+	onMereTap(e: ScreenEvent) {
+		log('mere tap')
 	}
 
 	onDoubleTap(e: ScreenEvent) {
@@ -163,6 +151,7 @@ class Tapper extends Rectangle {
 		log('long press')
 	}
 
+
 }
 
 let paperDiv = document.querySelector('#paper_id') as HTMLDivElement
@@ -172,14 +161,23 @@ export const paper = new Paper({
 	viewHeight: 1024,
 })
 
-// try {
-// 	let c2 = new ColorSample({
-// 		anchor: new Vertex(300, 300),
-// 		color: Color.red()
-// 	})
-// 	paper.addToContent(c2)
-// } catch {
-// 	log('sth went wrong')
-// }
+let c = new ColorSample({
+	anchor: new Vertex(400, 200)
+})
+
+paper.addToContent(c)
+
+let s = new BoxSlider({
+	anchor: new Vertex(200, 200)
+})
+
+paper.addToContent(s)
+
+paper.linkMap.createNewLinkBetween(s.outputHooks[0], c.inputHooks[0])
+
+
+
+
+
 
 

@@ -89,7 +89,7 @@ and logic for drawing and user interaction.
 		// STEP 3
 		this.statefulSetup()
 		// STEP 4
-		this.update(argsDict)
+		this.update()
 		
 	}
 
@@ -165,31 +165,10 @@ and logic for drawing and user interaction.
 		return {}
 	}
 
-	removeFixedArgs(argsDict: object = {}) {
-		let newArgsDict = {}
-		let fixedKeys = Object.keys(this.fixedArgs())
-		for (let key of Object.keys(argsDict)) {
-			if (fixedKeys.includes(key)) {
-				console.warn(`Cannot change property ${key} of ${this.constructor.name}`)
-				continue
-			}
-			newArgsDict[key] = argsDict[key]
-		}
-		return newArgsDict
-	}
-
 	statelessSetup() {
-	// state-independent setup (step 1)
+	// state-independent setup (step 1 in constructor)
 
-		// These methods for event handling need to be "bound"
-		// to the mobject (whatever that means)
-		this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
-		this.boundOnPointerDown = this.onPointerDown.bind(this)
-		this.boundOnPointerMove = this.onPointerMove.bind(this)
-		this.boundOnPointerUp = this.onPointerUp.bind(this)
-		this.boundOnTap = this.onTap.bind(this)
-		this.boundOnDoubleTap = this.onDoubleTap.bind(this)
-		this.boundOnLongPress = this.onLongPress.bind(this)
+		//this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
 
 		/*
 		When holding down the drag button,
@@ -206,7 +185,7 @@ and logic for drawing and user interaction.
 	}
 
 	statefulSetup() {
-	// state-dependent setup (step 3)
+	// state-dependent setup (step 3 in constructor)
 		this.setupView()
 		addPointerDown(this.view, this.capturedOnPointerDown.bind(this))
 		addPointerMove(this.view, this.capturedOnPointerMove.bind(this))
@@ -506,6 +485,7 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+
 	/*
 	Animation is 'home-grown' (not via CSS).
 	Any numerical property (number, Color, Vertex,
@@ -750,7 +730,6 @@ and logic for drawing and user interaction.
 	updateModel(argsDict: object = {}) {
 	// Update just the properties and what depends on them, without redrawing
 		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
-		argsDict = this.removeFixedArgs(argsDict)
 		this.setAttributes(argsDict)
 		this.updateSubmobModels()
 
@@ -835,6 +814,7 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+
 	eventTarget?: Mobject
 	_screenEventHandler: ScreenEventHandler
 	savedScreenEventHandler?: ScreenEventHandler
@@ -857,43 +837,35 @@ and logic for drawing and user interaction.
 		}
 	}
 
-
 	/*
 	The following empty methods need to be declared here
 	so we can manipulate and override them later.
 	*/
 
-
 	onPointerDown(e: ScreenEvent) { }
-	boundOnPointerDown(e: ScreenEvent) { }
-	savedOnPointerDown(e: ScreenEvent) { }
-
 	onPointerMove(e: ScreenEvent) { }
-	boundOnPointerMove(e: ScreenEvent) { }
-	savedOnPointerMove(e: ScreenEvent) { }
-
 	onPointerUp(e: ScreenEvent) { }
-	boundOnPointerUp(e: ScreenEvent) { }
-	savedOnPointerUp(e: ScreenEvent) { }
-
 	onTap(e: ScreenEvent) { }
-	boundOnTap(e: ScreenEvent) { }
-	savedOnTap(e: ScreenEvent) { }
-
+	onMereTap(e: ScreenEvent) { }
 	onDoubleTap(e: ScreenEvent) { }
-	boundOnDoubleTap(e: ScreenEvent) { }
-	savedOnDoubleTap(e: ScreenEvent) { }
-
 	onLongPress(e: ScreenEvent) { }
-	boundOnLongPress(e: ScreenEvent) { }
+
+	/*
+	Backup versions for temporarily disabling
+	interactivity on a mobject (e. g. while dragging)
+	*/
+	savedOnPointerDown(e: ScreenEvent) { }
+	savedOnPointerMove(e: ScreenEvent) { }
+	savedOnPointerUp(e: ScreenEvent) { }
+	savedOnTap(e: ScreenEvent) { }
+	savedOnMereTap(e: ScreenEvent) { }
 	savedOnLongPress(e: ScreenEvent) { }
 
-	boundEventTargetMobject(e: ScreenEvent): Mobject { return this }
 
-
-	// Methods for temporarily disabling interactivity on a mobject
-	// (e. g. when dragging a CindyCanvas)
-
+	/*
+	Methods for temporarily disabling interactivity on a mobject
+	(e. g. when dragging a CindyCanvas)
+	*/
 	disable() {
 		this.savedScreenEventHandler = this.screenEventHandler
 		this.screenEventHandler = ScreenEventHandler.Parent // .Below?
@@ -1004,21 +976,21 @@ and logic for drawing and user interaction.
 	capturedOnPointerDown(e: ScreenEvent) {
 
 		// step 1
-		this.eventTarget = this.eventTargetMobject.bind(this)(e) // this.boundEventTargetMobject(e)
-		let target = this.eventTarget
+		let target = this.eventTargetMobject(e)
+		this.eventTarget = target
 		if (target == null) { return }
-
+		
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-
+		
 		// step 3
-		target.registerScreenEvent(e)
-		if (this.isDuplicate(e)) { return }
-
+		if (target.isDuplicate(e)) { return }
+		this.registerScreenEvent(e)
+		
 		// step 4
 		target.onPointerDown(e)
-
+		
 		// step 5
 		target.timeoutID = window.setTimeout(
 			function() {
@@ -1032,18 +1004,18 @@ and logic for drawing and user interaction.
 		// step 1
 		let target = this.eventTarget
 		if (target == null) { return }
-
+		
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-
+		
 		// step 3
-		target.registerScreenEvent(e)
-		if (this.isDuplicate(e)) { return }
-
+		if (target.isDuplicate(e)) { return }
+		this.registerScreenEvent(e)
+		
 		// step 4
 		target.onPointerMove(e)
-
+	
 		// step 5
 		target.resetTimeout()
 	}
@@ -1053,29 +1025,24 @@ and logic for drawing and user interaction.
 		// step 1
 		let target = this.eventTarget
 		if (target == null) { return }
-
+		
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-
+		
 		// step 3
-		target.registerScreenEvent(e)
-		if (this.isDuplicate(e)) { return }
-
+		if (target.isDuplicate(e)) { return }
+		this.registerScreenEvent(e)
+		
 		// step 4
 		target.onPointerUp(e)
-
-		if (target.tapDetected()) {
-			target.onTap(e)
-		}
-
-		if (target.doubleTapDetected()) {
-			target.onDoubleTap(e)
-		}
+		if (target.tapDetected()) { target.onTap(e) }
+		if (target.mereTapDetected()) { target.onMereTap(e) }
+		if (target.doubleTapDetected()) { target.onDoubleTap(e) }
 
 		// step 5
 		target.resetTimeout()
-		window.setTimeout(this.clearScreenEventHistory, 2000)
+		window.setTimeout(target.clearScreenEventHistory, 2000)
 		this.eventTarget = null
 	}
 
@@ -1095,7 +1062,7 @@ and logic for drawing and user interaction.
 	}
 
 
-	// Looking for duplicates
+	// Looking for duplicate events
 
 	registerScreenEvent(e: ScreenEvent) {
 		if (this.isDuplicate(e)) { return }
@@ -1116,11 +1083,10 @@ and logic for drawing and user interaction.
 			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
 				if (screenEventType(e) == screenEventType(e2)) {
 					return true
-				}	
+				}
 			}
 		}
 		return false
-
 	}
 
 
@@ -1141,19 +1107,15 @@ and logic for drawing and user interaction.
 		return this.isTap(e1, e2)
 	}
 
-	isDoubleTap(e1: ScreenEvent, e2: ScreenEvent, e3: ScreenEvent, e4: ScreenEvent, dt: number = 1000): boolean {
-	// Do these fours events together form a double tap gesture?
-		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, dt)
-	}
-
 	doubleTapDetected(): boolean {
-	// Have we just witnessed a double tap?
+	// Do these fours events together form a double tap gesture?
 		if (this.screenEventHistory.length < 4) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 4]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 3]
 		let e3 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e4 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		return this.isDoubleTap(e1, e2, e3, e4)
+		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, 1000)
+		
 	}
 
 	mereTapDetected(): boolean {
@@ -1221,6 +1183,8 @@ and logic for drawing and user interaction.
 	endDragging(e: ScreenEvent) {
 		this.dragAnchorStart = null
 	}
+
+
 
 
 

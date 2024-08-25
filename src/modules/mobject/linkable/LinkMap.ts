@@ -89,7 +89,7 @@ export class LinkMap extends Mobject {
 		}
 	}
 
-	createNewLinkBetween(startHook: LinkHook, endHook) {
+	createNewLinkBetween(startHook: LinkHook, endHook: LinkHook) {
 		this.openLink = new DependencyLink()
 		this.add(this.openLink)
 		this.openLink.startBullet.update({
