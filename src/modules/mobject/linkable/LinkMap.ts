@@ -106,7 +106,7 @@ export class LinkMap extends Mobject {
 
 	onPointerMove(e: ScreenEvent) {
 		var p = this.localEventVertex(e)
-		//log(p)
+		
 		let hooks = this.compatibleHooks()
 		for (let h of hooks) {
 			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
@@ -181,10 +181,17 @@ export class LinkMap extends Mobject {
 	onPointerUp(e: ScreenEvent) {
 		let h = this.hookAtLocation(this.localEventVertex(e))
 		if (h === null) {
-			this.remove(this.openLink)
+			this.abortLinkCreation()
 		} else {
 			this.createNewDependency()
+			this.openLink = null
+			this.openBullet = null
 		}
+	}
+
+	abortLinkCreation() {
+		if (this.openLink === null) { return }
+		this.remove(this.openLink)
 		this.openLink = null
 		this.openBullet = null
 	}

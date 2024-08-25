@@ -53,7 +53,6 @@ instead of in the app (paper.html)
 	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }
 	else { t = e.changedTouches[0] }
-	//log(`pageXY: ${t.pageX}, ${t.pageY}`)
 	return new Vertex(t.pageX - sidebarWidth, t.pageY)
 }
 

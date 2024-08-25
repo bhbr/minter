@@ -487,6 +487,7 @@ export class ExpandableMobject extends LinkableMobject {
 	}
 	
 	hideLinksOfContent() {
+		this.linkMap.abortLinkCreation()
 		this.remove(this.linkMap)
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()

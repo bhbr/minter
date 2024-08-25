@@ -1,3 +1,5 @@
+import { copy } from './helpers'
+
 // Problem: When updating a Mobject with setAttributes(argsDict),
 // some attributes should only be copied (passed by value),
 // not linked (passed by reference). This mainly concerns Vertex.
@@ -24,7 +26,7 @@ export class ExtendedObject {
 	}
 
 	properties(): Array<string> {
-		// get a list of all of the objects property names, form most specific to most abstract
+		// get a list of all of the objects property names, from most specific to most abstract
 		let obj: object = this
 		let properties: Array<string> = []
 		// this loop walks up the superclass hierarchy and collects all inherited properties
@@ -36,10 +38,10 @@ export class ExtendedObject {
 	}
 
 	setter(key: string): any {
-		// when updating a Mobject with mob.setAttributes({prop: value}),
-		// the key "prop" can refer to either:
-		//  - a property (mob["prop"]) or
-		//  - an accessor (getter/setter mob.prop)
+		// when updating a Mobject with mob.setAttributes({key: value}),
+		// "key can refer to either:
+		//  - a property (mob["key"]) or
+		//  - an accessor (getter/setter mob.key)
 		// this picks the right one to call in setAttributes
 		// so we don't create properties that shouldn't be objects in their own right
 		let descriptor: any = undefined
@@ -59,29 +61,47 @@ export class ExtendedObject {
 		// always change an object via this method,
 		// it will automatically check for mutability
 		// and pick the right setter method
+
+		let propertyArgsDict: object = {}
+		let accessorArgsDict: object = {}
 		for (let [key, value] of Object.entries(argsDict)) {
-			let setter: any = this.setter(key)
-			
-			if (setter != undefined) {
-				
-				if (Object.keys(this.fixedArgs()).includes(key) && this[key] != undefined) {
-					console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
-					continue
-				}
-				setter.call(this, value)
-				
+			if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
+				propertyArgsDict[key] = value
 			} else {
-				// we have an as-of-yet unknown property
-				if (value != undefined && value.passedByValue) {
-					// create and copy (pass-by-value)
-					if (this[key] == undefined) {
-						this[key] = new value.constructor()
-					}
-					this[key].copyFrom(value) 
-				} else {
-					// just link (pass-by-reference)
-					this[key] = value
+				accessorArgsDict[key] = value
+			}
+		}
+
+		for (let [key, value] of Object.entries(propertyArgsDict)) {
+			this.setValue(key, value)
+		}
+		for (let [key, value] of Object.entries(accessorArgsDict)) {
+			this.setValue(key, value)
+		}
+	}
+
+	setValue(key: string, value: any) {
+		let setter: any = this.setter(key)
+			
+		if (setter != undefined) {
+			
+			if (Object.keys(this.fixedArgs()).includes(key) && this[key] != undefined) {
+				console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
+				return
+			}
+			setter.call(this, value)
+			
+		} else {
+			// we have an as-of-yet unknown property
+			if (value != undefined && value.passedByValue) {
+				// create and copy (pass-by-value)
+				if (this[key] == undefined) {
+					this[key] = new value.constructor()
 				}
+				this[key].copyFrom(value) 
+			} else {
+				// just link (pass-by-reference)
+				this[key] = value
 			}
 		}
 	}

@@ -986,7 +986,7 @@ and logic for drawing and user interaction.
 		
 		// step 3
 		if (target.isDuplicate(e)) { return }
-		this.registerScreenEvent(e)
+		target.registerScreenEvent(e)
 		
 		// step 4
 		target.onPointerDown(e)
@@ -1011,7 +1011,7 @@ and logic for drawing and user interaction.
 		
 		// step 3
 		if (target.isDuplicate(e)) { return }
-		this.registerScreenEvent(e)
+		target.registerScreenEvent(e)
 		
 		// step 4
 		target.onPointerMove(e)
@@ -1032,7 +1032,7 @@ and logic for drawing and user interaction.
 		
 		// step 3
 		if (target.isDuplicate(e)) { return }
-		this.registerScreenEvent(e)
+		target.registerScreenEvent(e)
 		
 		// step 4
 		target.onPointerUp(e)

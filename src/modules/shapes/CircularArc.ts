@@ -4,6 +4,8 @@ import { VertexArray } from '../helpers/VertexArray'
 import { DEGREES, TAU } from '../helpers/math'
 import { log } from '../helpers/helpers'
 
+const DEFAULT_RADIUS = 10
+
 export class CircularArc extends CurvedLine {
 
 	radius: number
@@ -11,16 +13,22 @@ export class CircularArc extends CurvedLine {
 	nbPoints: number
 
 	get midpoint(): Vertex {
+		if (this.radius === undefined) {
+			throw 'No radius yet!'
+		}
 		return this.anchor.translatedBy(this.radius, this.radius)
 	}
 	set midpoint(newValue: Vertex) {
+		if (this.radius === undefined) {
+			throw 'No radius yet!'
+		}
 		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
 	}
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			midpoint: Vertex.origin(),
-			radius: 10,
+			radius: DEFAULT_RADIUS,
 			angle: TAU / 4,
 		})
 	}

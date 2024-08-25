@@ -29,6 +29,7 @@ import { MultiplyBox } from './modules/arithmetic/BinaryOperatorBox'
 import { CreatingFixedMobject } from './modules/creations/CreatingFixedMobject'
 import { DivideBox } from './modules/arithmetic/BinaryOperatorBox'
 import { ColorSample } from './modules/ColorSample'
+import { ExtendedObject } from './modules/helpers/ExtendedObject'
 
 export class Paper extends ExpandableMobject {
 
@@ -167,13 +168,21 @@ let c = new ColorSample({
 
 paper.addToContent(c)
 
-let s = new BoxSlider({
-	anchor: new Vertex(200, 200)
-})
+// let s = new BoxSlider({
+// 	anchor: new Vertex(200, 200)
+// })
 
-paper.addToContent(s)
+// paper.addToContent(s)
+// paper.showLinksOfContent()
+//paper.linkMap.createNewLinkBetween(s.outputHooks[0], c.inputHooks[0])
 
-paper.linkMap.createNewLinkBetween(s.outputHooks[0], c.inputHooks[0])
+
+
+
+
+
+
+
 
 
 

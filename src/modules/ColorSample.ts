@@ -12,14 +12,19 @@ export class ColorSample extends LinkableMobject {
 	color: Color
 	circle: Circle
 
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			color: Color.white()
+		})
+	}
+
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 2 * RADIUS,
 			viewHeight: 2 * RADIUS,
 			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
-			screenEventHandler: ScreenEventHandler.Self,
-			drawBorder: true
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 

@@ -35,7 +35,6 @@ export class ColorSample extends LinkableMobject {
 	statefulSetup() {
 		super.statefulSetup()
 		let c = this.circle.fillColor
-		log(c)
 		this.add(this.circle)
 	}
 
