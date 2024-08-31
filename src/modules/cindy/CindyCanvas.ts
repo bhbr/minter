@@ -8,6 +8,7 @@ import { Color } from '../helpers/Color'
 import { Paper } from '../../Paper'
 import { Rectangle } from '../shapes/Rectangle'
 import { log } from '../helpers/helpers'
+import { PlayButton }  from './PlayButton'
 
 declare var CindyJS: any
 
@@ -16,8 +17,8 @@ export class CindyCanvas extends LinkableMobject {
 	port: object
 	id: string
 	core: any
-	//points: Array<Array<number>>
 	innerCanvas: Mobject
+	playButton: PlayButton
 	
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
@@ -25,11 +26,12 @@ export class CindyCanvas extends LinkableMobject {
 		})
 	}
 
-	// defaultArgs(): object {
-	// 	return Object.assign(super.defaultArgs(), {
-	// 		points: []
-	// 	})
-	// }
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			playedOnce: false
+		})
+	}
+
 
 	statefulSetup() {
 		super.statefulSetup()
@@ -51,6 +53,13 @@ export class CindyCanvas extends LinkableMobject {
 				visibleRect: [0, 1, 1, 0]
 			}]
 		}
+
+		this.playButton = new PlayButton({
+			anchor: new Vertex(5, 5),
+			cindy: this
+		})
+
+		this.add(this.playButton)
 	}
 
 	initCode() {
@@ -59,6 +68,11 @@ export class CindyCanvas extends LinkableMobject {
 
 	drawCode() {
 		return `drawcmd();`
+	}
+
+	mousemoveCode(): string {
+		// do not redraw until I say so
+		return ''
 	}
 
 	cindySetup() {
@@ -74,7 +88,11 @@ export class CindyCanvas extends LinkableMobject {
 		drawScript.textContent = this.drawCode()
 		document.body.appendChild(drawScript)
 
-		//this.port['element'] = this.view
+		let mousemoveScript = document.createElement('script')
+		mousemoveScript.setAttribute('type', 'text/x-cindyscript')
+		mousemoveScript.setAttribute('id', `${this.id}mousemove`)
+		mousemoveScript.textContent = this.mousemoveCode()
+		document.body.appendChild(mousemoveScript)
 
 		let argsDict: object = {
 			scripts: `${this.id}*`,
@@ -87,17 +105,29 @@ export class CindyCanvas extends LinkableMobject {
 
 	startUp() {
 		if (document.readyState === 'complete') {
-			this.startNow()
+			this.play()
 		} else {
-			document.addEventListener('DOMContentLoaded', function(e: Event) { this.startNow(); }.bind(this))
+			document.addEventListener('DOMContentLoaded', function(e: Event) { this.play(); }.bind(this))
 		}
 	}
 
-	startNow() {
-		this.core.startup()
-		this.core.started = true
+	play() {
+		log('play')
+		if (!this.core.started) {
+			this.core.startup()
+			this.core.started = true
+		}
 		this.core.play()
-		console.log(this.initCode())
+	}
+
+	pause() {
+		log('pause')
+		this.core.pause()
+	}
+
+	stop() {
+		log('stop')
+		this.core.stop()
 	}
 
 	geometry(): Array<any> { return [] }
@@ -117,9 +147,11 @@ export class CindyCanvas extends LinkableMobject {
 		initScript.textContent = this.initCode()
 		let drawScript = document.querySelector(`#${this.id}draw`)
 		drawScript.textContent = this.drawCode()
+		let mousemoveScript = document.querySelector(`#${this.id}mousemove`)
+		mousemoveScript.textContent = this.mousemoveCode()
 		let args: object = {
 			scripts: `${this.id}*`,
-			animation: { autoplay: true },
+			animation: { autoplay: false },
 			ports: [this.port],
 			geometry: this.geometry()
 		}

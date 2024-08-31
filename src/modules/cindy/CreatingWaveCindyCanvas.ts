@@ -28,7 +28,8 @@ export class CreatingWaveCindyCanvas extends CreatingBox {
 		let cm = this.createdMobject()
 		this.parent.addToContent(cm)
 		this.parent.remove(this)
-		cm.startUp()
+		cm.play()
+		cm.stop()
 		console.log(cm.sourcePositions())
 	}
 

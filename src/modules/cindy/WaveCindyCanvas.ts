@@ -1,5 +1,6 @@
 import { CindyCanvas } from './CindyCanvas'
 import { log } from '../helpers/helpers'
+import { Color } from '../helpers/Color'
 
 export class WaveCindyCanvas extends CindyCanvas {
 
@@ -7,19 +8,21 @@ export class WaveCindyCanvas extends CindyCanvas {
 	frequency: number
 	nbSources: number
 	sourceYPosition: number
+	color: Color
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			wavelength: 1,
+			wavelength: 0.25,
 			frequency: 0,
 			nbSources: 1,
-			sourceYPosition: 0.2
+			sourceYPosition: 0.2,
+			color: Color.green()
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			inputNames: ['wavelength', 'frequency', 'nbSources'],
+			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],
 			outputNames: []
 		})
 	}
@@ -30,24 +33,39 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	initCode(): string {
-		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds() * f)); drawcmd() := ( colorplot((0, ${this.WfunctionCode()}, 0)););` + super.initCode()
+		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds() * f)); drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););` + super.initCode()
 	}
 
 	WfunctionCode(): string {
 		let l = 0.1 * (this.wavelength || 1)
 		let f = 10 * (this.frequency || 1)
-		let code: string = ''
+		let code: string = '('
 		for (let i = 0; i < this.nbSources; i++) {
 			if (i > 0) {
 				code += ' + '
 			}
-			code += `W(#, A${i}, ${l}, ${f})/${this.nbSources}`
+			code += `W(#, A${i}, ${l}, ${f})`
 		}
+		code += `)/${this.nbSources}`
 		return code
 	}
 
-	drawCode(): string {
-		return `drawcmd();`
+	codeRed(): string {
+		var w: string = this.WfunctionCode()
+		w += ` * ${this.color.red}`
+		return w
+	}
+
+	codeGreen(): string {
+		var w: string = this.WfunctionCode()
+		w += ` * ${this.color.green}`
+		return w
+	}
+
+	codeBlue(): string {
+		var w: string = this.WfunctionCode()
+		w += ` * ${this.color.blue}`
+		return w
 	}
 
 	sourcePositions(): Array<Array<number>> {
@@ -77,8 +95,9 @@ export class WaveCindyCanvas extends CindyCanvas {
 		if (argsDict['nbSources'] != undefined) {
 			this.reload(argsDict)
 		}
-		let code = `drawcmd() := ( colorplot((0, ${this.WfunctionCode()}, 0)););`
+		let code = `drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););`
 		this.core.evokeCS(code)
 	}
+
 
 }

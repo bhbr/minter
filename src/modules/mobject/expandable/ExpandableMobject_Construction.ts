@@ -338,7 +338,7 @@ The content children can also be dragged and panned.
 				let c = new CreatingWaveCindyCanvas({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1],
-					nbSources: 2
+					nbSources: 1
 				})
 				return c
 			case 'var1':

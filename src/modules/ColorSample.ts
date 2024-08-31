@@ -59,7 +59,7 @@ export class ColorSample extends LinkableMobject {
 		let c = this.color.alpha = newValue
 	}
 
-	updateModel(argsDict) {
+	updateModel(argsDict: object = {}) {
 		super.updateModel(argsDict)
 		this.circle.updateModel({
 			fillColor: this.color
