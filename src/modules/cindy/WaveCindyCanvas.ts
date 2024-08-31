@@ -41,7 +41,7 @@ export class WaveCindyCanvas extends CindyCanvas {
 			if (i > 0) {
 				code += ' + '
 			}
-			code += `W(#, A${i}, ${l}, ${f})`
+			code += `W(#, A${i}, ${l}, ${f})/${this.nbSources}`
 		}
 		return code
 	}
