@@ -16,7 +16,7 @@ export class CindyCanvas extends LinkableMobject {
 	port: object
 	id: string
 	core: any
-	points: Array<Array<number>>
+	//points: Array<Array<number>>
 	innerCanvas: Mobject
 	
 	fixedArgs(): object {
@@ -25,11 +25,11 @@ export class CindyCanvas extends LinkableMobject {
 		})
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			points: []
-		})
-	}
+	// defaultArgs(): object {
+	// 	return Object.assign(super.defaultArgs(), {
+	// 		points: []
+	// 	})
+	// }
 
 	statefulSetup() {
 		super.statefulSetup()
@@ -97,7 +97,7 @@ export class CindyCanvas extends LinkableMobject {
 		this.core.startup()
 		this.core.started = true
 		this.core.play()
-		setTimeout(function() { console.log('core:', this.core) }.bind(this), 1000)
+		console.log(this.initCode())
 	}
 
 	geometry(): Array<any> { return [] }
@@ -111,7 +111,21 @@ export class CindyCanvas extends LinkableMobject {
 		}
 	}
 
-
+	reload(argsDict: object = {}) {
+		log('reloading')
+		let initScript = document.querySelector(`#${this.id}init`)
+		initScript.textContent = this.initCode()
+		let drawScript = document.querySelector(`#${this.id}draw`)
+		drawScript.textContent = this.drawCode()
+		let args: object = {
+			scripts: `${this.id}*`,
+			animation: { autoplay: true },
+			ports: [this.port],
+			geometry: this.geometry()
+		}
+		this.core = CindyJS.newInstance(args)
+		this.startUp()
+	}
 
 
 

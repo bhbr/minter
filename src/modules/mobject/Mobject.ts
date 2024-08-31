@@ -735,13 +735,16 @@ and logic for drawing and user interaction.
 
 		for (let dep of this.dependencies || []) {
 
-			let outputName: any = this[dep.outputName] // may be undefined
-			if (typeof outputName === 'function') {
-				dep.target[dep.inputName] = outputName.bind(this)()
-			} else if (outputName !== undefined && outputName !== null) {
-				dep.target[dep.inputName] = outputName
+			let output: any = this[dep.outputName] // value or function, may be undefined
+			var outputValue: any
+			if (typeof output === 'function') {
+				outputValue = output.bind(this)()
+			} else if (output !== undefined && output !== null) {
+				outputValue = output
 			}
-			dep.target.updateModel()
+			let obj: object = {}
+			obj[dep.inputName] = outputValue
+			dep.target.updateModel(obj)
 
 		}
 	}

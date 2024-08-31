@@ -12,13 +12,17 @@ export class CreatingBoxSlider extends CreatingMobject {
 	protoSlider: BoxSlider
 	width: number
 	height: number
+	min: number
+	max: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			width: 50,
 			height: 0,
 			fillColor: Color.black(),
-			startPoint: Vertex.origin()
+			startPoint: Vertex.origin(),
+			min: 0,
+			max: 1
 		})
 	}
 
@@ -32,7 +36,9 @@ export class CreatingBoxSlider extends CreatingMobject {
 		this.add(this.protoSlider)
 		this.anchor = this.startPoint
 		this.protoSlider.update({
-			value: 0.5,
+			min: this.min,
+			max: this.max,
+			value: 0.6 * (this.min + this.max),
 			width: this.width,
 			height: 1,
 			fillColor: Color.black(),

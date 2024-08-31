@@ -337,16 +337,28 @@ The content children can also be dragged and panned.
 			case 'cindy':
 				let c = new CreatingWaveCindyCanvas({
 					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					nbSources: 2
 				})
 				return c
-			case 'var':
+			case 'var1':
 				let s = new CreatingBoxSlider({
 					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					min: 0,
+					max: 1
 				})
 				s.protoSlider.hideLinks()
 				return s
+			case 'var10':
+				let s2 = new CreatingBoxSlider({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1],
+					min: 0,
+					max: 10
+				})
+				s2.protoSlider.hideLinks()
+				return s2
 			case 'const':
 				let v = new CreatingValueBox({
 					startPoint: this.creationStroke[0],

@@ -6,12 +6,20 @@ import { log } from '../helpers/helpers'
 
 export class CreatingWaveCindyCanvas extends CreatingBox {
 
+	nbSources: number
+
+	defaultArgs(): object {
+		return Object.assign(super.defaultArgs(), {
+			nbSources: 1
+		})
+	}
+
 	createdMobject(): WaveCindyCanvas {
 		return new WaveCindyCanvas({
 			anchor: this.startPoint,
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
-			points: [[0.4, 0.4], [0.3, 0.8]],
+			nbSources: this.nbSources,
 			id: `wave-${this.viewWidth}x${this.viewHeight}`
 		})
 	}
@@ -21,6 +29,7 @@ export class CreatingWaveCindyCanvas extends CreatingBox {
 		this.parent.addToContent(cm)
 		this.parent.remove(this)
 		cm.startUp()
+		console.log(cm.sourcePositions())
 	}
 
 }

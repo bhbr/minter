@@ -4,7 +4,7 @@ export class ArithmeticButton extends CreativeButton {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			creations: ['var', 'const', '+', '–', '&times;', '/'],
+			creations: ['var1', 'var10', 'const', '+', '–', '&times;', '/'],
 			key: 'r'
 		})
 	}
