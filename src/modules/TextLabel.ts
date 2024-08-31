@@ -7,14 +7,17 @@ export class TextLabel extends Mobject {
 	horizontalAlign: string // 'left' | 'center' | 'right'
 	verticalAlign: string // 'top' | 'center' | 'bottom'
 	color?: Color
-
+	borderColor: Color
+	borderWidth: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
-			color: Color.white()
+			color: Color.white(),
+			borderColor: Color.white(),
+			borderWidth: 1
 		})
 	}
 
@@ -38,6 +41,8 @@ export class TextLabel extends Mobject {
 		//// internal dependencies
 		this.view.innerHTML = this.text
 		this.view.style.color = (this.color ?? Color.white()).toHex()
+		this.view.style.borderColor = (this.borderColor ?? Color.white()).toHex()
+		this.view.style.borderWidth = `${this.borderWidth}px`
 		switch (this.verticalAlign) {
 		case 'top':
 			this.view.style.alignItems = 'flex-start'

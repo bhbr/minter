@@ -36,6 +36,7 @@ export class SidebarButton extends Circle {
 	messages: Array<object>
 	outgoingMessage: object
 	key: string
+	activeKeyboard: boolean
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
@@ -59,7 +60,8 @@ export class SidebarButton extends Circle {
 			radius: BUTTON_RADIUS,
 			viewWidth: 2 * BUTTON_RADIUS,
 			viewHeight: 2 * BUTTON_RADIUS,
-			fillOpacity: 1
+			fillOpacity: 1,
+			activeKeyboard: true
 		})
 	}
 
@@ -102,6 +104,7 @@ export class SidebarButton extends Circle {
 	}
 	
 	buttonDownByKey(key: string) {
+		if (!this.activeKeyboard) { return }
 		if (key == this.key) {
 			this.commonButtonDown()
 		} else if (key == 'ArrowRight' && this.active) {
@@ -140,6 +143,7 @@ export class SidebarButton extends Circle {
 	}
 	
 	buttonUpByKey(key) {
+		if (!this.activeKeyboard) { return }
 		if (key == this.key) {
 			this.commonButtonUp()
 		}

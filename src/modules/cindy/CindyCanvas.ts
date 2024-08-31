@@ -96,7 +96,7 @@ export class CindyCanvas extends LinkableMobject {
 
 		let argsDict: object = {
 			scripts: `${this.id}*`,
-			animation: { autoplay: true },
+			animation: { autoplay: false },
 			ports: [this.port],
 			geometry: this.geometry()
 		}
@@ -142,7 +142,6 @@ export class CindyCanvas extends LinkableMobject {
 	}
 
 	reload(argsDict: object = {}) {
-		log('reloading')
 		let initScript = document.querySelector(`#${this.id}init`)
 		initScript.textContent = this.initCode()
 		let drawScript = document.querySelector(`#${this.id}draw`)

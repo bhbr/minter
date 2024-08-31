@@ -28,19 +28,22 @@ import { CreatingFixedMobject } from './modules/creations/CreatingFixedMobject'
 import { DivideBox } from './modules/arithmetic/BinaryOperatorBox'
 import { ColorSample } from './modules/ColorSample'
 import { ExtendedObject } from './modules/helpers/ExtendedObject'
+import { InputValueBox } from './modules/arithmetic/InputValueBox'
 
 export class Paper extends ExpandableMobject {
 
 	currentColor: Color
 	expandedMobject: ExpandableMobject
 	pressedKeys: Array<string>
+	activeKeyboard: boolean
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			children: [],
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,
-			pressedKeys: []
+			pressedKeys: [],
+			activeKeyboard: true
 		})
 	}
 
@@ -101,6 +104,7 @@ export class Paper extends ExpandableMobject {
 	boundButtonUpByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
+		if (!this.activeKeyboard) { return }
 		e.preventDefault()
 		e.stopPropagation()
 		if (this.pressedKeys.includes(e.key)) { return }
@@ -117,6 +121,7 @@ export class Paper extends ExpandableMobject {
 	}
 
 	buttonUpByKey(e: KeyboardEvent) {
+		if (!this.activeKeyboard) { return }
 		e.preventDefault()
 		e.stopPropagation()
 		remove(this.pressedKeys, e.key)
@@ -159,9 +164,6 @@ export const paper = new Paper({
 	viewWidth: 1250,
 	viewHeight: 1024,
 })
-
-
-
 
 
 

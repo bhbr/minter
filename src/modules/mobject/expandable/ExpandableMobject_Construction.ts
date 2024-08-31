@@ -14,6 +14,7 @@ import { CreatingWaveCindyCanvas } from '../../cindy/CreatingWaveCindyCanvas'
 import { CreatingBoxSlider } from '../../slider/CreatingBoxSlider'
 import { CreatingFixedMobject } from '../../creations/CreatingFixedMobject'
 import { CreatingValueBox } from '../../creations/CreatingValueBox'
+import { CreatingInputValueBox } from '../../creations/CreatingInputValueBox'
 import { CreatingAddBox, CreatingSubtractBox, CreatingMultiplyBox, CreatingDivideBox } from '../../creations/CreatingBinaryOperatorBox'
 import { WaveCindyCanvas } from '../../cindy/WaveCindyCanvas'
 import { BoxSlider } from '../../slider/BoxSlider'
@@ -68,7 +69,7 @@ The content children can also be dragged and panned.
 
 
 	sidebar?: any
-	buttons: Array<string>
+	buttonNames: Array<string>
 
 	creatingMobject?: CreatingMobject
 	creationStroke: VertexArray
@@ -214,7 +215,7 @@ The content children can also be dragged and panned.
 			viewHeight: this.expandedHeight - 2 * this.contentInset,
 			anchor: this.expandedAnchor
 		}, 0.5)
-		this.messageSidebar({ 'init': convertArrayToString(this.buttons) })
+		this.messageSidebar({ 'init': convertArrayToString(this.buttonNames) })
 	}
 
 	contractStateChange() {
@@ -236,7 +237,7 @@ The content children can also be dragged and panned.
 			anchor: this.compactAnchor
 		}, 0.5)
 		if (this.parent instanceof ExpandableMobject) {
-			this.messageSidebar({ 'init': convertArrayToString(this.parent.buttons) })
+			this.messageSidebar({ 'init': convertArrayToString(this.parent.buttonNames) })
 		}
 		this.sidebar = null
 	}
@@ -359,13 +360,20 @@ The content children can also be dragged and panned.
 				})
 				s2.protoSlider.hideLinks()
 				return s2
-			case 'const':
+			case 'value':
 				let v = new CreatingValueBox({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
 				v.creation.hideLinks()
 				return v
+			case 'input':
+				let v5 = new CreatingInputValueBox({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				v5.creation.hideLinks()
+				return v5
 			case '+':
 				let v1 = new CreatingAddBox({
 					startPoint: this.creationStroke[0],

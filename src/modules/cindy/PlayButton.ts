@@ -21,6 +21,8 @@ export class PlayButton extends TextLabel {
 			viewHeight: 20,
 			backgroundColor: Color.black(),
 			color: Color.white(),
+			borderColor: Color.white(),
+			borderWidth: 1,
 			screenEventHandler: ScreenEventHandler.Self
 		})
 	}

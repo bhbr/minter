@@ -30,7 +30,6 @@ export class CreatingWaveCindyCanvas extends CreatingBox {
 		this.parent.remove(this)
 		cm.play()
 		cm.stop()
-		console.log(cm.sourcePositions())
 	}
 
 }

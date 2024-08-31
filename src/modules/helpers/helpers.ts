@@ -1,5 +1,6 @@
 import { isTouchDevice } from '../mobject/screen_events'
 import { Paper } from '../../Paper'
+import { Sidebar } from '../../sidebar/Sidebar'
 
 /////////////
 // LOGGING //
@@ -272,6 +273,9 @@ export function getPaper(): Paper {
 	return document.querySelector('#paper_id')['mobject']
 }
 
+export function getSidebar(): Sidebar {
+	return document.querySelector('#sidebar_id')['mobject']
+}
 
 
 

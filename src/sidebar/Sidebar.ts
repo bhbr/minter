@@ -77,7 +77,9 @@ export class Sidebar extends Mobject {
 		let i = this.buttons.length
 		this.add(button)
 		this.buttons.push(button)
-		button.update({ midpoint: buttonCenter(i) })
+		button.update({
+			midpoint: buttonCenter(i)
+		})
 	}
 
 	clear() {
