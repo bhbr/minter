@@ -39,7 +39,8 @@ import { Ray } from '../../arrows/Ray'
 import { Line } from '../../arrows/Line'
 import { Circle } from '../../shapes/Circle'
 import { TwoPointCircle } from '../../shapes/TwoPointCircle'
-import { IntersectionPoint } from './../../construction/IntersectionPoint'
+import { IntersectionPoint } from '../../construction/IntersectionPoint'
+import { CreatingColorSample } from '../../creations/CreatingColorSample'
 
 /*
 The classes ExpandableMobject and Construction need to be defined
@@ -95,7 +96,7 @@ The content children can also be dragged and panned.
 			compactHeight: 300,
 			compactAnchor: Vertex.origin(),
 			expandedPadding: 10,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'SliderButton'],
+			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'SliderButton', 'ColorSampleButton'],
 			creationStroke: [],
 			creationMode: 'freehand',
 			contentInset: 0,
@@ -399,6 +400,12 @@ The content children can also be dragged and panned.
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
 				return p
+			case 'color':
+				let c2 = new CreatingColorSample({
+					startPoint: this.creationStroke[0],
+					endPoint: this.creationStroke[this.creationStroke.length - 1]
+				})
+				return c2
 		}
 	}
 

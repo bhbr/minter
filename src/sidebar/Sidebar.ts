@@ -19,9 +19,10 @@ import { CreativeButton } from './CreativeButton'
 import { DragButton } from './DragButton'
 import { LinkButton } from './LinkButton'
 import { ColorChangeButton } from './ColorChangeButton'
+import { ColorSampleButton } from './ColorSampleButton'
 import { Paper } from '../Paper'
 
-let paperButtons: Array<string> = ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton']
+let paperButtons: Array<string> = ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton', 'ColorSampleButton']
 
 export class Sidebar extends Mobject {
 

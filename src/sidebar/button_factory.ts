@@ -7,6 +7,7 @@ import { CindyButton } from './CindyButton'
 import { ArithmeticButton } from './ArithmeticButton'
 import { ExpandableButton } from './ExpandableButton'
 import { SwingButton } from './SwingButton'
+import { ColorSampleButton } from './ColorSampleButton'
 
 export function buttonFactory(name: string, locationIndex: number): SidebarButton {
 	switch (name) {
@@ -26,5 +27,7 @@ export function buttonFactory(name: string, locationIndex: number): SidebarButto
 		return new ExpandableButton({locationIndex: locationIndex})
 	case 'SwingButton':
 		return new SwingButton({locationIndex: locationIndex})
+	case 'ColorSampleButton':
+		return new ColorSampleButton({locationIndex: locationIndex})
 	}
 }

@@ -26,8 +26,8 @@ export class WaveCindyCanvas extends CindyCanvas {
 	}
 
 	initCode(): string {
-		let l = 0.1*(this.wavelength || 1)
-		let f = 10*(this.frequency || 1)
+		let l = 0.1 * (this.wavelength || 1)
+		let f = 10 * (this.frequency || 1)
 		return `W(x, p, l, f) := 0.5 * (1 + sin(|x - p| / l - seconds()*f)); drawcmd() := ( colorplot((0,W(#, A0, ${l}, ${f}) + W(#, A1, ${l}, ${f}),0)););` + super.initCode()
 	}
 

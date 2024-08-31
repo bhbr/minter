@@ -48,7 +48,7 @@ export class Paper extends ExpandableMobject {
 		return Object.assign(super.fixedArgs(), {
 			expanded: true,
 			expandedPadding: 0,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton']
+			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton', 'ColorSampleButton']
 		})
 	}
 
