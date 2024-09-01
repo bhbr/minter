@@ -1,13 +1,12 @@
 import { CreativeButton } from './CreativeButton'
 
-export class CindyButton extends CreativeButton {
+export class NumberButton extends CreativeButton {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			creations: ['cindy'],
-			key: 'z'
+			creations: ['var1', 'var10', 'value', 'input'],
+			key: 'r'
 		})
 	}
 
 }
-

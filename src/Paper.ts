@@ -51,7 +51,7 @@ export class Paper extends ExpandableMobject {
 		return Object.assign(super.fixedArgs(), {
 			expanded: true,
 			expandedPadding: 0,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'ArithmeticButton', 'CindyButton', 'SwingButton', 'ColorSampleButton']
+			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'CindyButton', 'SwingButton', 'ColorSampleButton']
 		})
 	}
 
@@ -138,23 +138,6 @@ export class Paper extends ExpandableMobject {
 
 	expand() { }
 	contract() { }
-
-	onTap(e: ScreenEvent) {
-		log('tap')
-	}
-
-	onMereTap(e: ScreenEvent) {
-		log('mere tap')
-	}
-
-	onDoubleTap(e: ScreenEvent) {
-		log('double tap')
-	}
-
-	onLongPress(e: ScreenEvent) {
-		log('long press')
-	}
-
 
 }
 

@@ -5,7 +5,7 @@ export class SwingButton extends CreativeButton {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			creations: ['swing'],
-			key: 'z'
+			key: 'u'
 		})
 	}
 	

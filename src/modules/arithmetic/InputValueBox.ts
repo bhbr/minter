@@ -3,7 +3,7 @@ import { TextLabel } from '../TextLabel'
 import { Color } from '../helpers/Color'
 import { LinkableMobject } from '../mobject/linkable/LinkableMobject'
 import { log, getPaper, getSidebar } from '../helpers/helpers'
-import { ScreenEvent, ScreenEventHandler } from '../mobject/screen_events'
+import { ScreenEvent, ScreenEventHandler, isTouchDevice } from '../mobject/screen_events'
 import { SidebarButton } from '../../sidebar/SidebarButton'
 
 export class InputValueBox extends LinkableMobject {
@@ -25,7 +25,7 @@ export class InputValueBox extends LinkableMobject {
 
 	onPointerUp(e: ScreenEvent) {
 		this.inputBox.focus()
-		document.addEventListener('keydown', this.boundEnterPressed)
+		document.addEventListener('keydown', this.boundKeyPressed)
 		getPaper().activeKeyboard = false
 		for (let button of getSidebar().buttons) {
 			button.activeKeyboard = false
@@ -42,11 +42,9 @@ export class InputValueBox extends LinkableMobject {
 		this.inputBox = document.createElement('input')
 		this.inputBox.setAttribute('type', 'text')
 		this.inputBox.size = 10
-		this.inputBox.setAttribute('onsubmit', 'alert()')
-		this.inputBox.setAttribute('id', Date.now().toString())
 		this.add(this.background)
 		this.view.appendChild(this.inputBox)
-		this.boundEnterPressed = this.enterPressed.bind(this)
+		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
 	updateModel(argsDict: object = {}) {
@@ -58,20 +56,26 @@ export class InputValueBox extends LinkableMobject {
 
 	}
 
-	enterPressed(e: KeyboardEvent) {
-		if (e.keyCode != 13) { return }
+	keyPressed(e: KeyboardEvent) {
+		log('Z')
+		if (e.which != 13) { return }
+		log('A')
 		this.inputBox.blur()
 		getPaper().activeKeyboard = true
-		for (let button of getSidebar().buttons) {
-			button.activeKeyboard = true
+		log('B')
+		if (!isTouchDevice) {
+			for (let button of getSidebar().buttons) {
+				button.activeKeyboard = true
+			}
 		}
+		log('C')
 		this.updateModel({
 			value: Number(this.inputBox.value)
 		})
 		log(this.value)
 	}
 
-	boundEnterPressed(e: ScreenEvent) { }
+	boundKeyPressed(e: ScreenEvent) { }
 
 
 

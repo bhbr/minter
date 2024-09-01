@@ -97,7 +97,7 @@ The content children can also be dragged and panned.
 			compactHeight: 300,
 			compactAnchor: Vertex.origin(),
 			expandedPadding: 10,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'SliderButton', 'ColorSampleButton'],
+			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
 			creationStroke: [],
 			creationMode: 'freehand',
 			contentInset: 0,
