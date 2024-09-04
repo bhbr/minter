@@ -1,6 +1,6 @@
 import { Vertex } from '../../helpers/Vertex'
 import { Color } from '../../helpers/Color'
-import { Mobject } from './../Mobject'
+import { LinkableMobject } from './LinkableMobject'
 import { RoundedRectangle } from '../../shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
 import { TextLabel } from '../../TextLabel'
@@ -8,10 +8,13 @@ import { log } from '../../helpers/helpers'
 import { IO_LIST_WIDTH, IO_LIST_OFFSET, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 
 export class InputList extends RoundedRectangle {
+/*
+A visual list of available input variables of a linkable mobject
+*/
 
 	inputNames: Array<string>
 	linkHooks: Array<LinkHook>
-	mobject: Mobject
+	mobject: LinkableMobject // the mobject whose input this list represents
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {

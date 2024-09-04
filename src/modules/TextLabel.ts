@@ -9,6 +9,7 @@ export class TextLabel extends Mobject {
 	color?: Color
 	borderColor: Color
 	borderWidth: number
+	fontSize: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -26,7 +27,7 @@ export class TextLabel extends Mobject {
 		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
 		this.view.style.display = 'flex'
 		this.view.style.fontFamily = 'Helvetica'
-		this.view.style.fontSize = '10px'
+		this.view.style.fontSize = `${this.fontSize}px`
 	}
 
 	redrawSelf() {

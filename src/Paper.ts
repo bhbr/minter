@@ -144,7 +144,7 @@ export class Paper extends ExpandableMobject {
 let paperDiv = document.querySelector('#paper_id') as HTMLDivElement
 export const paper = new Paper({
 	view: paperDiv,
-	viewWidth: 1250,
+	viewWidth: 1216,
 	viewHeight: 1024,
 })
 

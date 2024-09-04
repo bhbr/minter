@@ -17,7 +17,7 @@ export class CreatingBoxSlider extends CreatingMobject {
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			width: 50,
+			width: 70,
 			height: 0,
 			fillColor: Color.black(),
 			startPoint: Vertex.origin(),

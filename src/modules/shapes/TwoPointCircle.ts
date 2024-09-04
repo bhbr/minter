@@ -3,6 +3,10 @@ import { Vertex } from '../helpers/Vertex'
 import { Color } from '../helpers/Color'
 
 export class TwoPointCircle extends Circle {
+/*
+For constructions. A circle defined by its midpoint and a point
+on its circumference. The radius (and anchor) is updated automatically.
+*/
 
 	outerPoint: Vertex
 

@@ -25,6 +25,7 @@ export class BoxSlider extends LinkableMobject {
 	fillColor: Color
 	barFillColor: Color
 	label: TextLabel
+	precision: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -32,11 +33,12 @@ export class BoxSlider extends LinkableMobject {
 			max: 1,
 			value: 0.6,
 			height: 200,
-			width: 50,
+			width: 70,
 			strokeColor: Color.white(),
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5),
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			precision: 3
 		})
 	}
 
@@ -64,7 +66,8 @@ export class BoxSlider extends LinkableMobject {
 		this.label = new TextLabel({
 			viewHeight: 25,
 			horizontalAlign: 'center',
-			verticalAlign: 'center'
+			verticalAlign: 'center',
+			fontSize: 20
 		})
 	}
 
@@ -106,12 +109,16 @@ export class BoxSlider extends LinkableMobject {
 			fillColor: this.barFillColor
 		}, false)
 
+		this.updateLabel()
+
+	}
+
+	updateLabel() {
 		this.label.update({
-			text: this.value.toPrecision(3).toString(),
+			text: this.value.toPrecision(this.precision).toString(),
 			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
 			viewWidth: this.width
 		}, false)
-
 	}
 
 	onPointerDown(e: ScreenEvent) {

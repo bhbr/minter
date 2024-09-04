@@ -64,7 +64,7 @@ export class BinaryOperatorBox extends ValueBox {
 		return 0
 	}
 
-	updateModel(argsDict) {
+	updateModel(argsDict: object = {}) {
 		argsDict['value'] = this.result()
 		super.updateModel(argsDict)
 	}

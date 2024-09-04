@@ -14,4 +14,7 @@ export class Ellipse extends CurvedShape {
 		})
 	}
 
+	updateBezierPoints() { }
+	// needs implementation
+
 }

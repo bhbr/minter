@@ -11,6 +11,11 @@ import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
 
 export class DependencyLink extends Mobject {
+/*
+The drawn link between an output hook and an input hook,
+the visual representation of a dependency between two
+linkable mobjects
+*/
 
 	dependency: Dependency
 	startBullet: LinkBullet

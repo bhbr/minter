@@ -16,13 +16,13 @@ export class RoundedRectangle extends CurvedShape {
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
+			width: 200,
+			height: 100,
 			cornerRadius: 10,
 			p1: Vertex.origin(),
-			p2: Vertex.origin(),
-			p3: Vertex.origin(),
-			p4: Vertex.origin(),
-			width: 200,
-			height: 100
+			p2: new Vertex(200, 0),
+			p3: new Vertex(200, 100),
+			p4: new Vertex(0, 100),
 		})
 	}
 
@@ -64,7 +64,6 @@ export class RoundedRectangle extends CurvedShape {
 	}
 
 	updateModel(argsDict: object = {}) {
-		//console.log('updating RoundedRectangle')
 		super.updateModel(argsDict)
 
 		//// internal dependencies

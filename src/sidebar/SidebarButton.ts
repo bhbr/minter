@@ -120,13 +120,15 @@ export class SidebarButton extends Circle {
 		this.active = true
 		this.update({
 			radius: 1.2 * this.radius,
-			previousIndex: this.currentModeIndex
+			previousIndex: this.currentModeIndex,
+			fontSize: this.fontSize * 1.2
 		})
 		this.label.view.style.setProperty('font-size', `${1.2*this.fontSize}px`)
 		this.label.update({
 			viewWidth: 2 * this.radius,
 			viewHeight: 2 * this.radius			
 		})
+		this.updateLabel()
 	}
 	
 	onPointerDown(e: ScreenEvent) {
@@ -158,13 +160,15 @@ export class SidebarButton extends Circle {
 		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update({
 			radius: this.radius/1.2,
-			midpoint: newMidpoint
+			midpoint: newMidpoint,
+			fontSize: this.fontSize / 1.2
 		})
 		this.label.view.style.setProperty('font-size', `${this.fontSize}px`)
 		this.label.update({
 			viewWidth: 2 * this.radius,
 			viewHeight: 2 * this.radius			
 		})
+		this.updateLabel()
 		this.messagePaper(this.outgoingMessage)
 	}
 	
@@ -217,10 +221,10 @@ export class SidebarButton extends Circle {
 		if (this.currentModeIndex == this.messages.length - 1) { return }
 		let dx: number = this.optionSpacing * (this.currentModeIndex + 1)
 
-		let c = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		//let c = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.update({
-			transform: new Transform({ scale: 1.2 }),
-			midpoint: c
+			radius: this.radius * 1.2,
+			midpoint: this.midpoint.translatedBy(this.optionSpacing, 0)
 		})
 		this.updateModeIndex(this.currentModeIndex + 1, true)
 	}
@@ -229,7 +233,11 @@ export class SidebarButton extends Circle {
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
 		let dx: number = this.optionSpacing * (this.currentModeIndex - 1)
-		this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		//this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		this.update({
+			radius: this.radius / 1.2,
+			midpoint: this.midpoint.translatedBy(-this.optionSpacing, 0)
+		})
 		this.updateModeIndex(this.currentModeIndex - 1, true)
 	}
 	

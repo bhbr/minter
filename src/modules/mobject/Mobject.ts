@@ -1052,7 +1052,7 @@ and logic for drawing and user interaction.
 
 		// step 5
 		target.resetTimeout()
-		window.setTimeout(target.clearScreenEventHistory, 2000)
+		window.setTimeout(target.clearScreenEventHistory.bind(target), 500)
 		this.eventTarget = null
 	}
 
@@ -1091,9 +1091,13 @@ and logic for drawing and user interaction.
 		for (var i = minIndex; i < this.screenEventHistory.length; i++) {
 			let e2 = this.screenEventHistory[i]
 			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
-				if (screenEventType(e) == screenEventType(e2)) {
+				// too close
+				if (screenEventType(e) == screenEventType(e2) && screenEventType(e) != ScreenEventType.Move) {
 					return true
 				}
+			} else if (!eventVertex(e).closeTo(eventVertex(e2), 200)) {
+				// too far
+				return true
 			}
 		}
 		return false

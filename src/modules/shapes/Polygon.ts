@@ -4,6 +4,9 @@ import { Vertex } from '../helpers/Vertex'
 import { VertexArray } from '../helpers/VertexArray'
 
 export class Polygon extends VMobject {
+	/*
+	In a polygon, the array this.points describes the vertices connected by straight lines.
+	*/
 
 	closed: boolean
 
@@ -22,6 +25,7 @@ export class Polygon extends VMobject {
 				pathString = ''
 				return pathString
 			}
+			// move (M) to the first point, then connect the points with lines (L)
 			let prefix: string = (pathString == '') ? 'M' : 'L'
 			pathString += prefix + stringFromPoint(point)
 		}

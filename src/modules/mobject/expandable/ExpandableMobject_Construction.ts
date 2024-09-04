@@ -12,6 +12,7 @@ import { CreatingExpandableMobject } from './CreatingExpandableMobject'
 import { CreatingConstruction } from '../../construction/CreatingConstruction'
 import { CreatingWaveCindyCanvas } from '../../cindy/CreatingWaveCindyCanvas'
 import { CreatingBoxSlider } from '../../slider/CreatingBoxSlider'
+import { CreatingBoxStepper } from '../../slider/CreatingBoxStepper'
 import { CreatingFixedMobject } from '../../creations/CreatingFixedMobject'
 import { CreatingValueBox } from '../../creations/CreatingValueBox'
 import { CreatingInputValueBox } from '../../creations/CreatingInputValueBox'
@@ -96,8 +97,8 @@ The content children can also be dragged and panned.
 			compactWidth: 400,
 			compactHeight: 300,
 			compactAnchor: Vertex.origin(),
-			expandedPadding: 10,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
+			expandedPadding: 20,
+			buttonNames: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
 			creationStroke: [],
 			creationMode: 'freehand',
 			contentInset: 0,
@@ -112,7 +113,7 @@ The content children can also be dragged and panned.
 			fillColor: Color.gray(0.1),
 			fillOpacity: 1.0,
 			strokeColor: Color.white(),
-			strokeWidth: 1.0,
+			strokeWidth: 2.0,
 			screenEventHandler: ScreenEventHandler.Parent
 		})
 
@@ -342,7 +343,7 @@ The content children can also be dragged and panned.
 					nbSources: 1
 				})
 				return c
-			case 'var1':
+			case 'slider':
 				let s = new CreatingBoxSlider({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1],
@@ -351,8 +352,8 @@ The content children can also be dragged and panned.
 				})
 				s.protoSlider.hideLinks()
 				return s
-			case 'var10':
-				let s2 = new CreatingBoxSlider({
+			case 'stepper':
+				let s2 = new CreatingBoxStepper({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1],
 					min: 0,
@@ -620,7 +621,7 @@ export class Construction extends ExpandableMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			buttons: ['DragButton', 'ArrowButton', 'CircleButton']
+			buttonNames: ['DragButton', 'ArrowButton', 'CircleButton']
 		})
 	}
 

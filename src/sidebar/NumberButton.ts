@@ -4,7 +4,7 @@ export class NumberButton extends CreativeButton {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			creations: ['var1', 'var10', 'value', 'input'],
+			creations: ['input', 'slider', 'stepper'],
 			key: 'r'
 		})
 	}

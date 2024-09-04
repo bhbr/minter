@@ -41,7 +41,13 @@ export class InputValueBox extends LinkableMobject {
 		})
 		this.inputBox = document.createElement('input')
 		this.inputBox.setAttribute('type', 'text')
-		this.inputBox.size = 10
+		this.inputBox.style.width = '90%'
+		this.inputBox.style.padding = '3px 3px'
+		this.inputBox.style.color = 'white'
+		this.inputBox.style.backgroundColor = 'black'
+		this.inputBox.style.textAlign = 'center'
+		this.inputBox.style.verticalAlign = 'center'
+		this.inputBox.style.fontSize = '20px'
 		this.add(this.background)
 		this.view.appendChild(this.inputBox)
 		this.boundKeyPressed = this.keyPressed.bind(this)

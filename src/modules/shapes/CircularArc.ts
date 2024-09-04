@@ -10,8 +10,10 @@ export class CircularArc extends CurvedLine {
 
 	radius: number
 	angle: number
-	nbPoints: number
+	nbPoints: number // vertex resolution along the arc
 
+	// A circle's midpoint is not implemented as its own property,
+	// that needs to be kept in sync with its anchor
 	get midpoint(): Vertex {
 		if (this.radius === undefined) {
 			throw 'No radius yet!'

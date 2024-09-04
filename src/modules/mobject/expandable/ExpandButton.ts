@@ -13,8 +13,8 @@ export class ExpandButton extends TextLabel {
 			viewHeight: 30,
 			anchor: Vertex.origin(),
 			screenEventHandler: ScreenEventHandler.Self,
-			backgroundColor: Color.green().brighten(0.5),
-			color: Color.black()
+			backgroundColor: Color.gray(0.25),
+			color: Color.white()
 		})
 	}
 
