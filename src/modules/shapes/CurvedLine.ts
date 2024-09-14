@@ -5,17 +5,12 @@ import { stringFromPoint } from '../helpers/helpers'
 
 export class CurvedLine extends VMobject {
 	/*
-	Curved lines described as cubic Bézier curves, see
-	https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths#bézier_curves
-
-	In a curved line, the array this.points represents the vertices and control points:
-	- this.points[0, 3, 6, 9, ...] : vertices (synced with this.vertices)
-	- this.points[1, 4, 7, 10, ...] : forward ('left') control points
-	- this.points[2, 5, 8, 11, ...] : backward ('right') control points
-	
+	In a curved line, the array this.bezierPoints represents the vertices and control points:
+	- this.bezierPoints[0, 3, 6, 9, ...] : vertices (synced with this.vertices)
+	- this.bezierPoints[1, 4, 7, 10, ...] : forward ('left') control points
+	- this.bezierPoints[2, 5, 8, 11, ...] : backward ('right') control points
+	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
-
-
 	_bezierPoints: VertexArray
 	get bezierPoints(): VertexArray { return this._bezierPoints }
 	set bezierPoints(newValue: VertexArray) {
