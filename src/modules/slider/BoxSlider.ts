@@ -12,20 +12,33 @@ import { Rectangle } from '../shapes/Rectangle'
 import { log } from '../helpers/helpers'
 
 export class BoxSlider extends LinkableMobject {
+/*
+A BoxSlider represents a continuous variable. Its value varies
+between a min (0 for now) and max (1 for now) value via scrubbing.
+*/
 
+	// geometry
+	height: number
+	width: number
+
+	// components
+	outerBar: Rectangle
+	filledBar: Rectangle
+	label: TextLabel
+
+	// style
+	fillColor: Color
+	barFillColor: Color
+
+	// variable
 	min: number
 	max: number
 	value: number
+	precision: number
+
+	// scrubbing
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
-	height: number
-	width: number
-	outerBar: Rectangle
-	filledBar: Rectangle
-	fillColor: Color
-	barFillColor: Color
-	label: TextLabel
-	precision: number
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -50,7 +63,6 @@ export class BoxSlider extends LinkableMobject {
 	}
 
 	statelessSetup() {
-		//// state-independent setup
 		super.statelessSetup()
 
 		this.outerBar = new Rectangle({
@@ -80,6 +92,7 @@ export class BoxSlider extends LinkableMobject {
 	}
 
 	normalizedValue(): number {
+	// is always between 0 and 1
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
@@ -90,7 +103,6 @@ export class BoxSlider extends LinkableMobject {
 		this.viewWidth = this.width
 		this.viewHeight = this.height
 		this.positionView()
-
 
 		//// updating submobs
 		let a: number = this.normalizedValue()
