@@ -9,7 +9,8 @@ import { IO_LIST_WIDTH, IO_LIST_OFFSET, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_I
 
 export class InputList extends RoundedRectangle {
 /*
-A visual list of available input variables of a linkable mobject
+A visual list of available input variables of a linkable mobject.
+It is displayed on top of the mobject when the 'link' toggle button is held down.
 */
 
 	inputNames: Array<string>
@@ -36,6 +37,7 @@ A visual list of available input variables of a linkable mobject
 	}
 
 	getHeight(): number {
+	// calculate the height from the number of inputs
 		if (this.inputNames == undefined) { return 0 }
 		if (this.inputNames.length == 0) { return 0 }
 		else {
@@ -45,32 +47,33 @@ A visual list of available input variables of a linkable mobject
 	}
 
 	createHookList() {
+	// create the hooks (empty circles) and their labels
 		this.linkHooks = []
 		for (let i = 0; i < this.inputNames.length; i++) {
 			let name = this.inputNames[i]
-			let h = new LinkHook({
+			let hook = new LinkHook({
 				mobject: this.mobject,
 				name: name,
 				type: 'input'
 			})
-			let t = new TextLabel({
+			let label = new TextLabel({
 				text: name,
 				horizontalAlign: 'left',
 				verticalAlign: 'center',
 				viewHeight: HOOK_VERTICAL_SPACING,
 				viewWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
 			})
-			this.add(h)
-			this.add(t)
+			this.add(hook)
+			this.add(label)
 			let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i])
-			h.update({ midpoint: m })
-			let a = h.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING/2)
-			t.update({ anchor: a })
-			this.linkHooks.push(h)
+			hook.update({ midpoint: m })
+			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING/2)
+			label.update({ anchor: a })
+			this.linkHooks.push(hook)
 		}
 	}
 
-	hookNamed(name): LinkHook | null {
+	hookNamed(name: string): LinkHook | null {
 		for (let h of this.linkHooks) {
 			if (h.name == name) {
 				return h
@@ -84,7 +87,7 @@ A visual list of available input variables of a linkable mobject
 			this.createHookList()
 		}
 		let p1: Vertex = this.bottomCenter()
-			let p2: Vertex = this.mobject.localTopCenter()
+		let p2: Vertex = this.mobject.localTopCenter()
 		let v = new Vertex(p2[0] - p1[0], p2[1] - p1[1] - IO_LIST_OFFSET)
 		argsDict['anchor'] = this.anchor.translatedBy(v)
 		argsDict['height'] = this.getHeight()
