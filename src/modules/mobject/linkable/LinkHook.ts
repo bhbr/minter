@@ -8,10 +8,6 @@ import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_RADIUS, BULLET_RADIUS } from './consta
 import { isTouchDevice } from '../screen_events'
 
 export class LinkHook extends Circle {
-/*
-A link bullet gets dragged onto a link hook to create
-a dependency between two linkable mobjects.
-*/
 
 	mobject: LinkableMobject
 	name: string
