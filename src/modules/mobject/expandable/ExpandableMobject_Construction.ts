@@ -138,9 +138,9 @@ The content children can also be dragged and panned.
 	statefulSetup() {
 		super.statefulSetup()
 		
-		this.viewWidth = this.expanded ? this.expandedWidth : this.compactWidth
-		this.viewHeight = this.expanded ? this.expandedHeight : this.compactHeight
-		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor.copy()
+		this.viewWidth = this.expanded ? this.expandedWidth() : this.compactWidth
+		this.viewHeight = this.expanded ? this.expandedHeight() : this.compactHeight
+		this.anchor = this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
 
 		this.background.update({
 			width: this.viewWidth,
@@ -154,8 +154,8 @@ The content children can also be dragged and panned.
 		this.add(this.expandButton)
 
 		this.linkMap.update({
-			viewWidth: this.expandedWidth,
-			viewHeight: this.expandedHeight
+			viewWidth: this.expandedWidth(),
+			viewHeight: this.expandedHeight()
 		})
 		
 		if (this.contracted) {
@@ -180,15 +180,15 @@ The content children can also be dragged and panned.
 
 	expanded: boolean
 
-	get expandedAnchor(): Vertex {
+	expandedAnchor(): Vertex {
 		return new Vertex(this.expandedPadding, this.expandedPadding)
 	}
 
-	get expandedWidth(): number {
+	expandedWidth(): number {
 		return getPaper().viewWidth - 2 * this.expandedPadding
 	}
 
-	get expandedHeight(): number {
+	expandedHeight(): number {
 		return getPaper().viewHeight - 2 * this.expandedPadding
 	}
 
@@ -224,9 +224,9 @@ The content children can also be dragged and panned.
 	expand() {
 		this.expandStateChange()
 		this.animate({
-			viewWidth: this.expandedWidth,
-			viewHeight: this.expandedHeight,
-			anchor: this.expandedAnchor
+			viewWidth: this.expandedWidth(),
+			viewHeight: this.expandedHeight(),
+			anchor: this.expandedAnchor()
 		}, 0.5)
 		this.messageSidebar({ 'init': convertArrayToString(this.buttonNames) })
 	}
