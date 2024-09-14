@@ -59,7 +59,7 @@ declare interface Window { webkit?: any }
 export class ExpandableMobject extends LinkableMobject {
 /*
 An expandable mobject can be expanded into a full screen view,
-in which submobjects ("contentChildren") can be created with
+in which submobjects ('contentChildren') can be created with
 a pen and custom sidebar buttons.
 
 In addition, the content children can be linked (those that
@@ -68,10 +68,17 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-
+	// a reference to the sidebar so we can change it
 	sidebar?: any
+	// by creating buttons named this:
 	buttonNames: Array<string>
 
+	/*
+	When starting to draw, a CreatingMobject is
+	initialized, changing as the pen moves.
+	When the creation mode changes via the buttons,
+	it is replaced by a new creating mobject.
+	*/
 	creatingMobject?: CreatingMobject
 	creationStroke: VertexArray
 	creationMode: string
@@ -84,9 +91,16 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+	// the submobs that will pan along (not e. g. the window chrome)
+	contentChildren: Array<Mobject>
+
+	/*
+	Window chrome
+	*/
 	background: RoundedRectangle
 	expandButton: ExpandButton
-	contentChildren: Array<Mobject>
+
+	// the map of dependencies between the linkable content children
 	linkMap: LinkMap
 
 	defaultArgs(): object {
@@ -94,8 +108,8 @@ The content children can also be dragged and panned.
 			screenEventHandler: ScreenEventHandler.Self,
 			contentChildren: [],
 			expanded: false,
-			compactWidth: 400,
-			compactHeight: 300,
+			compactWidth: 400, // defined below in the section 'expand and contract'
+			compactHeight: 300, // idem
 			compactAnchor: Vertex.origin(),
 			expandedPadding: 20,
 			buttonNames: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
@@ -531,6 +545,8 @@ The content children can also be dragged and panned.
 	}
 
 	linkableChildren(): Array<LinkableMobject> {
+	// the content children that are linkable
+	// counter-example: points etc. in a construction (for now)
 		let arr: Array<LinkableMobject> = []
 		for (let submob of this.contentChildren) {
 			if (submob instanceof LinkableMobject) {
@@ -541,6 +557,7 @@ The content children can also be dragged and panned.
 	}
 
 	showLinksOfContent() {
+	// toggled by 'link' button in sidebar
 		this.add(this.linkMap)
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
@@ -548,6 +565,7 @@ The content children can also be dragged and panned.
 	}
 	
 	hideLinksOfContent() {
+	// toggled by 'link' button in sidebar
 		this.linkMap.abortLinkCreation()
 		this.remove(this.linkMap)
 		for (let submob of this.linkableChildren()) {
@@ -596,13 +614,9 @@ The content children can also be dragged and panned.
 
 
 
-//////////////////
-// CONSTRUCTION //
-//////////////////
-
-
-
-
+///////////////////////////////////////////////////////////////
+//////////////////////// CONSTRUCTION /////////////////////////
+///////////////////////////////////////////////////////////////
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
