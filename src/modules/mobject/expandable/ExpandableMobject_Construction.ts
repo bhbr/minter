@@ -115,7 +115,6 @@ The content children can also be dragged and panned.
 			buttonNames: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
 			creationStroke: [],
 			creationMode: 'freehand',
-			contentInset: 0,
 			sidebar: null
 		})
 	}
@@ -144,9 +143,9 @@ The content children can also be dragged and panned.
 		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor.copy()
 
 		this.background.update({
-			width: this.viewWidth - 2 * this.contentInset,
-			height: this.viewHeight - 2 * this.contentInset,
-			anchor: new Vertex(this.contentInset, this.contentInset)
+			width: this.viewWidth,
+			height: this.viewHeight,
+			anchor: Vertex.origin()
 		})
 
 		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
@@ -178,7 +177,6 @@ The content children can also be dragged and panned.
 	compactHeight: number
 	compactAnchor: Vertex
 	expandedPadding: number
-	contentInset: number
 
 	expanded: boolean
 
@@ -226,8 +224,8 @@ The content children can also be dragged and panned.
 	expand() {
 		this.expandStateChange()
 		this.animate({
-			viewWidth: this.expandedWidth - 2 * this.contentInset,
-			viewHeight: this.expandedHeight - 2 * this.contentInset,
+			viewWidth: this.expandedWidth,
+			viewHeight: this.expandedHeight,
 			anchor: this.expandedAnchor
 		}, 0.5)
 		this.messageSidebar({ 'init': convertArrayToString(this.buttonNames) })
@@ -247,8 +245,8 @@ The content children can also be dragged and panned.
 	contract() {
 		this.contractStateChange()
 		this.animate({
-			viewWidth: this.compactWidth - 2 * this.contentInset,
-			viewHeight: this.compactHeight - 2 * this.contentInset,
+			viewWidth: this.compactWidth,
+			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
 		if (this.parent instanceof ExpandableMobject) {
