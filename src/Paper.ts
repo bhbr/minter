@@ -132,7 +132,7 @@ export class Paper extends ExpandableMobject {
 		}
 	}
 
-	expandedAnchor(): Vertex {
+	get expandedAnchor(): Vertex {
 		return isTouchDevice ? Vertex.origin() : new Vertex(150, 0)
 	}
 

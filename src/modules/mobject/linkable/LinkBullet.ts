@@ -7,10 +7,6 @@ import { isTouchDevice } from '../screen_events'
 import { log } from '../../helpers/helpers'
 
 export class LinkBullet extends Circle {
-/*
-A link bullet gets dragged onto a link hook to create
-a dependency between two linkable mobjects.
-*/
 	
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {        
@@ -28,7 +24,6 @@ a dependency between two linkable mobjects.
 	}
 
 	positionInLinkMap(): Vertex {
-		// used e. g. for snapping
 		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent.parent)
 	}
 
