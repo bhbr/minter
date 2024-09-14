@@ -447,11 +447,11 @@ The content children can also be dragged and panned.
 		this.startCreating(e)
 	}
 
-	onTap(e: ScreenEvent) { }
+	//onTap(e: ScreenEvent) { }
 
-	customOnPointerDown(e: ScreenEvent) {
-		log('customOnPointerDown')
-	}
+	// customOnPointerDown(e: ScreenEvent) {
+	// 	log('customOnPointerDown')
+	// }
 
 	startCreating(e: ScreenEvent) {
 		this.creationStroke.push(this.localEventVertex(e))
@@ -471,8 +471,8 @@ The content children can also be dragged and panned.
 		this.creatingMobject.updateFromTip(v)
 	}
 
-	customOnPointerMove(e: ScreenEvent) {
-	}
+	// customOnPointerMove(e: ScreenEvent) {
+	// }
 
 	onPointerUp(e: ScreenEvent) {
 		if (this.contracted) { return }
@@ -486,9 +486,9 @@ The content children can also be dragged and panned.
 	}
 
 
-	customOnPointerUp(e: ScreenEvent) {
-		log('customOnPointerUp')
-	}
+	// customOnPointerUp(e: ScreenEvent) {
+	// 	log('customOnPointerUp')
+	// }
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = eventVertex(e)
