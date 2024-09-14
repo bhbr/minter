@@ -59,7 +59,7 @@ declare interface Window { webkit?: any }
 export class ExpandableMobject extends LinkableMobject {
 /*
 An expandable mobject can be expanded into a full screen view,
-in which submobjects ("contentChildren") can be created with
+in which submobjects ('contentChildren') can be created with
 a pen and custom sidebar buttons.
 
 In addition, the content children can be linked (those that
@@ -68,10 +68,17 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-
+	// a reference to the sidebar so we can change it
 	sidebar?: any
+	// by creating buttons named this:
 	buttonNames: Array<string>
 
+	/*
+	When starting to draw, a CreatingMobject is
+	initialized, changing as the pen moves.
+	When the creation mode changes via the buttons,
+	it is replaced by a new creating mobject.
+	*/
 	creatingMobject?: CreatingMobject
 	creationStroke: VertexArray
 	creationMode: string
@@ -84,9 +91,16 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+	// the submobs that will pan along (not e. g. the window chrome)
+	contentChildren: Array<Mobject>
+
+	/*
+	Window chrome
+	*/
 	background: RoundedRectangle
 	expandButton: ExpandButton
-	contentChildren: Array<Mobject>
+
+	// the map of dependencies between the linkable content children
 	linkMap: LinkMap
 
 	defaultArgs(): object {
@@ -94,14 +108,13 @@ The content children can also be dragged and panned.
 			screenEventHandler: ScreenEventHandler.Self,
 			contentChildren: [],
 			expanded: false,
-			compactWidth: 400,
-			compactHeight: 300,
+			compactWidth: 400, // defined below in the section 'expand and contract'
+			compactHeight: 300, // idem
 			compactAnchor: Vertex.origin(),
 			expandedPadding: 20,
 			buttonNames: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'ColorSampleButton'],
 			creationStroke: [],
 			creationMode: 'freehand',
-			contentInset: 0,
 			sidebar: null
 		})
 	}
@@ -125,14 +138,14 @@ The content children can also be dragged and panned.
 	statefulSetup() {
 		super.statefulSetup()
 		
-		this.viewWidth = this.expanded ? this.expandedWidth : this.compactWidth
-		this.viewHeight = this.expanded ? this.expandedHeight : this.compactHeight
-		this.anchor = this.expanded ? this.expandedAnchor : this.compactAnchor.copy()
+		this.viewWidth = this.expanded ? this.expandedWidth() : this.compactWidth
+		this.viewHeight = this.expanded ? this.expandedHeight() : this.compactHeight
+		this.anchor = this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
 
 		this.background.update({
-			width: this.viewWidth - 2 * this.contentInset,
-			height: this.viewHeight - 2 * this.contentInset,
-			anchor: new Vertex(this.contentInset, this.contentInset)
+			width: this.viewWidth,
+			height: this.viewHeight,
+			anchor: Vertex.origin()
 		})
 
 		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
@@ -141,8 +154,8 @@ The content children can also be dragged and panned.
 		this.add(this.expandButton)
 
 		this.linkMap.update({
-			viewWidth: this.expandedWidth,
-			viewHeight: this.expandedHeight
+			viewWidth: this.expandedWidth(),
+			viewHeight: this.expandedHeight()
 		})
 		
 		if (this.contracted) {
@@ -164,19 +177,18 @@ The content children can also be dragged and panned.
 	compactHeight: number
 	compactAnchor: Vertex
 	expandedPadding: number
-	contentInset: number
 
 	expanded: boolean
 
-	get expandedAnchor(): Vertex {
+	expandedAnchor(): Vertex {
 		return new Vertex(this.expandedPadding, this.expandedPadding)
 	}
 
-	get expandedWidth(): number {
+	expandedWidth(): number {
 		return getPaper().viewWidth - 2 * this.expandedPadding
 	}
 
-	get expandedHeight(): number {
+	expandedHeight(): number {
 		return getPaper().viewHeight - 2 * this.expandedPadding
 	}
 
@@ -212,9 +224,9 @@ The content children can also be dragged and panned.
 	expand() {
 		this.expandStateChange()
 		this.animate({
-			viewWidth: this.expandedWidth - 2 * this.contentInset,
-			viewHeight: this.expandedHeight - 2 * this.contentInset,
-			anchor: this.expandedAnchor
+			viewWidth: this.expandedWidth(),
+			viewHeight: this.expandedHeight(),
+			anchor: this.expandedAnchor()
 		}, 0.5)
 		this.messageSidebar({ 'init': convertArrayToString(this.buttonNames) })
 	}
@@ -233,8 +245,8 @@ The content children can also be dragged and panned.
 	contract() {
 		this.contractStateChange()
 		this.animate({
-			viewWidth: this.compactWidth - 2 * this.contentInset,
-			viewHeight: this.compactHeight - 2 * this.contentInset,
+			viewWidth: this.compactWidth,
+			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
 		if (this.parent instanceof ExpandableMobject) {
@@ -435,11 +447,11 @@ The content children can also be dragged and panned.
 		this.startCreating(e)
 	}
 
-	onTap(e: ScreenEvent) { }
+	//onTap(e: ScreenEvent) { }
 
-	customOnPointerDown(e: ScreenEvent) {
-		log('customOnPointerDown')
-	}
+	// customOnPointerDown(e: ScreenEvent) {
+	// 	log('customOnPointerDown')
+	// }
 
 	startCreating(e: ScreenEvent) {
 		this.creationStroke.push(this.localEventVertex(e))
@@ -459,8 +471,8 @@ The content children can also be dragged and panned.
 		this.creatingMobject.updateFromTip(v)
 	}
 
-	customOnPointerMove(e: ScreenEvent) {
-	}
+	// customOnPointerMove(e: ScreenEvent) {
+	// }
 
 	onPointerUp(e: ScreenEvent) {
 		if (this.contracted) { return }
@@ -474,9 +486,9 @@ The content children can also be dragged and panned.
 	}
 
 
-	customOnPointerUp(e: ScreenEvent) {
-		log('customOnPointerUp')
-	}
+	// customOnPointerUp(e: ScreenEvent) {
+	// 	log('customOnPointerUp')
+	// }
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = eventVertex(e)
@@ -531,6 +543,8 @@ The content children can also be dragged and panned.
 	}
 
 	linkableChildren(): Array<LinkableMobject> {
+	// the content children that are linkable
+	// counter-example: points etc. in a construction (for now)
 		let arr: Array<LinkableMobject> = []
 		for (let submob of this.contentChildren) {
 			if (submob instanceof LinkableMobject) {
@@ -541,6 +555,7 @@ The content children can also be dragged and panned.
 	}
 
 	showLinksOfContent() {
+	// toggled by 'link' button in sidebar
 		this.add(this.linkMap)
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
@@ -548,6 +563,7 @@ The content children can also be dragged and panned.
 	}
 	
 	hideLinksOfContent() {
+	// toggled by 'link' button in sidebar
 		this.linkMap.abortLinkCreation()
 		this.remove(this.linkMap)
 		for (let submob of this.linkableChildren()) {
@@ -596,13 +612,9 @@ The content children can also be dragged and panned.
 
 
 
-//////////////////
-// CONSTRUCTION //
-//////////////////
-
-
-
-
+///////////////////////////////////////////////////////////////
+//////////////////////// CONSTRUCTION /////////////////////////
+///////////////////////////////////////////////////////////////
 
 export type ConstructedMobject = Arrow | TwoPointCircle
 
