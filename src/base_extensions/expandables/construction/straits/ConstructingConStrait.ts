@@ -4,7 +4,7 @@ import { Construction } from 'core/mobject/expandable/ExpandableMobject_Construc
 import { ConstructingMobject } from '../ConstructingMobject'
 import { ConPoint } from '../ConPoint'
 
-export class ConstructingConArrow extends ConstructingMobject {
+export class ConstructingConStrait extends ConstructingMobject {
 
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint

@@ -30,15 +30,15 @@ import { CreatingSwing } from 'extensions/created_mobjects/Swing/CreatingSwing'
 import { ConPoint } from 'base_extensions/expandables/construction/ConPoint'
 import { FreePoint } from 'base_extensions/expandables/construction/FreePoint'
 import { ConstructingMobject } from 'base_extensions/expandables/construction/ConstructingMobject'
-import { ConstructingConSegment } from 'base_extensions/expandables/construction/arrows/ConSegment/ConstructingConSegment'
-import { ConstructingConRay } from 'base_extensions/expandables/construction/arrows/ConRay/ConstructingConRay'
-import { ConstructingConLine } from 'base_extensions/expandables/construction/arrows/ConLine/ConstructingConLine'
-import { ConstructingConArrow } from 'base_extensions/expandables/construction/arrows/ConstructingConArrow'
+import { ConstructingConLine } from 'base_extensions/expandables/construction/straits/ConLine/ConstructingConLine'
+import { ConstructingConRay } from 'base_extensions/expandables/construction/straits/ConRay/ConstructingConRay'
+import { ConstructingConSegment } from 'base_extensions/expandables/construction/straits/ConSegment/ConstructingConSegment'
+import { ConstructingConStrait } from 'base_extensions/expandables/construction/straits/ConstructingConStrait'
 import { ConstructingConCircle } from 'base_extensions/expandables/construction/ConCircle/ConstructingConCircle'
-import { ConArrow } from 'base_extensions/expandables/construction/arrows/ConArrow'
-import { ConSegment } from 'base_extensions/expandables/construction/arrows/ConSegment/ConSegment'
-import { ConRay } from 'base_extensions/expandables/construction/arrows/ConRay/ConRay'
-import { ConLine } from 'base_extensions/expandables/construction/arrows/ConLine/ConLine'
+import { ConStrait } from 'base_extensions/expandables/construction/straits/ConStrait'
+import { ConLine } from 'base_extensions/expandables/construction/straits/ConLine/ConLine'
+import { ConRay } from 'base_extensions/expandables/construction/straits/ConRay/ConRay'
+import { ConSegment } from 'base_extensions/expandables/construction/straits/ConSegment/ConSegment'
 import { ConCircle } from 'base_extensions/expandables/construction/ConCircle/ConCircle'
 import { Circle } from 'base_extensions/mobjects/shapes/Circle'
 import { IntersectionPoint } from 'base_extensions/expandables/construction/IntersectionPoint'
@@ -616,14 +616,14 @@ The content children can also be dragged and panned.
 //////////////////////// CONSTRUCTION /////////////////////////
 ///////////////////////////////////////////////////////////////
 
-export type ConMobject = ConArrow | ConCircle
-export type ConstructingConMobject = ConstructingConArrow | ConstructingConCircle
+export type ConMobject = ConStrait | ConCircle
+export type ConstructingConMobject = ConstructingConStrait | ConstructingConCircle
 
 export class Construction extends ExpandableMobject {
 	
 	points: Array<ConPoint>
 	constructedMobjects: Array<ConMobject>
-	declare creatingMobject: ConstructingConArrow | ConstructingConCircle
+	declare creatingMobject: ConstructingConMobject
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -634,7 +634,7 @@ export class Construction extends ExpandableMobject {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			buttonNames: ['DragButton', 'ArrowButton', 'CircleButton']
+			buttonNames: ['DragButton', 'StraitButton', 'CircleButton']
 		})
 	}
 
@@ -760,7 +760,7 @@ export class Construction extends ExpandableMobject {
 
 
 
-	integrate(mob: ConstructingConArrow | ConstructingConCircle) {
+	integrate(mob: ConstructingConMobject) {
 		this.remove(mob)
 		let p1: ConPoint = this.snappedPointForVertex(mob.startPoint) ?? new FreePoint({ midpoint: mob.startPoint })
 		let p2: ConPoint = this.snappedPointForVertex(mob.endPoint) ?? new FreePoint({ midpoint: mob.endPoint })
@@ -795,7 +795,7 @@ export class Construction extends ExpandableMobject {
 	intersectWithRest(geomob1: ConMobject) {
 		for (let geomob2 of this.constructedMobjects) {
 			if (geomob1 == geomob2) { continue }
-			let nbPoints: number = (geomob1 instanceof ConArrow && geomob2 instanceof ConArrow) ? 1 : 2
+			let nbPoints: number = (geomob1 instanceof ConStrait && geomob2 instanceof ConStrait) ? 1 : 2
 			for (let i = 0; i < nbPoints; i++) {
 				let p: IntersectionPoint = new IntersectionPoint({
 					geomob1: geomob1,

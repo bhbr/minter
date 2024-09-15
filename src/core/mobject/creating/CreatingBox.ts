@@ -1,6 +1,6 @@
 import { CreatingMobject } from './CreatingMobject'
 import { Color } from 'core/helpers/Color'
-import { Segment } from 'base_extensions/mobjects/shapes/Segment'
+import { Line } from 'base_extensions/mobjects/shapes/Line'
 import { Vertex } from 'core/helpers/Vertex'
 import { Mobject } from '../Mobject'
 
@@ -10,17 +10,17 @@ export class CreatingBox extends CreatingMobject {
 	p2: Vertex
 	p3: Vertex
 	p4: Vertex
-	top: Segment
-	bottom: Segment
-	left: Segment
-	right: Segment
+	top: Line
+	bottom: Line
+	left: Line
+	right: Line
 
 	statelessSetup() {
 		super.statelessSetup()
-		this.top = new Segment({ strokeColor: Color.white() })
-		this.bottom = new Segment({ strokeColor: Color.white() })
-		this.left = new Segment({ strokeColor: Color.white() })
-		this.right = new Segment({ strokeColor: Color.white() })
+		this.top = new Line({ strokeColor: Color.white() })
+		this.bottom = new Line({ strokeColor: Color.white() })
+		this.left = new Line({ strokeColor: Color.white() })
+		this.right = new Line({ strokeColor: Color.white() })
 	}
 
 	statefulSetup() {

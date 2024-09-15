@@ -1,7 +1,7 @@
 import { Vertex } from 'core/helpers/Vertex'
 import { Color } from 'core/helpers/Color'
 import { LinkableMobject } from 'core/mobject/linkable/LinkableMobject'
-import { Segment } from 'base_extensions/mobjects/shapes/Segment'
+import { Line } from 'base_extensions/mobjects/shapes/Line'
 import { Rectangle } from 'base_extensions/mobjects/shapes/Rectangle'
 import { Circle } from 'base_extensions/mobjects/shapes/Circle'
 
@@ -18,7 +18,7 @@ export class Swing extends LinkableMobject {
 	fixtureHeight: number
 
 	fixture: Rectangle
-	string: Segment
+	string: Line
 	weight: Circle
 
 	fixedArgs(): object {
@@ -47,7 +47,7 @@ export class Swing extends LinkableMobject {
 			fillColor: Color.white(),
 			fillOpacity: 1
 		})
-		this.string = new Segment()
+		this.string = new Line()
 		this.weight = new Circle({
 			fillColor: Color.white(),
 			fillOpacity: 1

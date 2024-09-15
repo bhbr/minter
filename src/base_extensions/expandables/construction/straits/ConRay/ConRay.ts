@@ -1,7 +1,7 @@
 import { Vertex } from 'core/helpers/Vertex'
-import { ConSegment } from '../ConSegment/ConSegment'
+import { ConStrait } from '../ConStrait'
 
-export class ConRay extends ConSegment {
+export class ConRay extends ConStrait {
 
 	drawingEndPoint(): Vertex {
 		if (this.startPoint == this.endPoint) { return this.endPoint }

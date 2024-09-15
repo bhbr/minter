@@ -1,7 +1,7 @@
 import { ConPoint } from './ConPoint'
 import { ConMobject } from 'core/mobject/expandable/ExpandableMobject_Construction'
 import { Vertex } from 'core/helpers/Vertex'
-import { ConArrow } from './arrows/ConArrow'
+import { ConStrait } from './straits/ConStrait'
 import { ConCircle } from './ConCircle/ConCircle'
 
 export class IntersectionPoint extends ConPoint {
@@ -33,11 +33,11 @@ export class IntersectionPoint extends ConPoint {
 	}
 
 	intersectionCoords(): Vertex {
-		if (this.geomob1 instanceof ConArrow && this.geomob2 instanceof ConCircle) {
+		if (this.geomob1 instanceof ConStrait && this.geomob2 instanceof ConCircle) {
 			return this.arrowCircleIntersection(this.geomob1, this.geomob2, this.index)
-		} else if (this.geomob1 instanceof ConCircle && this.geomob2 instanceof ConArrow) {
+		} else if (this.geomob1 instanceof ConCircle && this.geomob2 instanceof ConStrait) {
 			return this.arrowCircleIntersection(this.geomob2, this.geomob1, this.index)
-		} else if (this.geomob1 instanceof ConArrow && this.geomob2 instanceof ConArrow) {
+		} else if (this.geomob1 instanceof ConStrait && this.geomob2 instanceof ConStrait) {
 			return this.arrowArrowIntersection(this.geomob1, this.geomob2)
 		} else if (this.geomob1 instanceof ConCircle && this.geomob2 instanceof ConCircle) {
 			return this.circleCircleIntersection(this.geomob1, this.geomob2, this.index)
@@ -46,9 +46,9 @@ export class IntersectionPoint extends ConPoint {
 		}
 	}
 
-	arrowCircleIntersection(arrow: ConArrow, circle: ConCircle, index: number): Vertex {
-		let A: Vertex = arrow.startPoint
-		let B: Vertex = arrow.endPoint
+	arrowCircleIntersection(strait: ConStrait, circle: ConCircle, index: number): Vertex {
+		let A: Vertex = strait.startPoint
+		let B: Vertex = strait.endPoint
 		let C: Vertex = circle.midpoint
 		let r: number = circle.radius
 
@@ -59,20 +59,20 @@ export class IntersectionPoint extends ConPoint {
 
 		this.lambda = (-b + (index == 0 ? -1 : 1) * d**0.5)/(2*a)
 		let P: Vertex = A.add(B.subtract(A).multiply(this.lambda))
-		if (arrow.constructor.name == 'Segment') {
+		if (strait.constructor.name == 'ConLine') {
 			if (this.lambda < 0 || this.lambda > 1) { P = new Vertex(NaN, NaN) }
-		} else if (arrow.constructor.name == 'Ray') {
+		} else if (strait.constructor.name == 'ConRay') {
 			if (this.lambda < 0) { P = new Vertex(NaN, NaN) }
 		}
 		return P
 	}
 
-	arrowArrowIntersection(arrow1: ConArrow, arrow2: ConArrow) {
+	arrowArrowIntersection(strait1: ConStrait, strait2: ConStrait) {
 
-		let A: Vertex = arrow1.startPoint
-		let B: Vertex = arrow1.endPoint
-		let C: Vertex = arrow2.startPoint
-		let D: Vertex = arrow2.endPoint
+		let A: Vertex = strait1.startPoint
+		let B: Vertex = strait1.endPoint
+		let C: Vertex = strait2.startPoint
+		let D: Vertex = strait2.endPoint
 
 		let AB = B.subtract(A)
 		let CD = D.subtract(C)
@@ -84,8 +84,8 @@ export class IntersectionPoint extends ConPoint {
 		this.mu = (AB.y*AC.x - AB.x*AC.y)/det
 		let Q: Vertex = A.add(AB.multiply(this.lambda))
 
-		let intersectionFlag1: boolean = (arrow1.constructor.name == 'Segment' && this.lambda >= 0 && this.lambda <= 1) || (arrow1.constructor.name == 'Ray' && this.lambda >= 0) || (arrow1.constructor.name == 'Line')
-		let intersectionFlag2: boolean = (arrow2.constructor.name == 'Segment' && this.mu >= 0 && this.mu <= 1) || (arrow2.constructor.name == 'Ray' && this.mu >= 0) || (arrow2.constructor.name == 'Line')
+		let intersectionFlag1: boolean = (strait1.constructor.name == 'ConLine' && this.lambda >= 0 && this.lambda <= 1) || (strait1.constructor.name == 'ConRay' && this.lambda >= 0) || (strait1.constructor.name == 'ConLine')
+		let intersectionFlag2: boolean = (strait2.constructor.name == 'ConLine' && this.mu >= 0 && this.mu <= 1) || (strait2.constructor.name == 'ConRay' && this.mu >= 0) || (strait2.constructor.name == 'ConLine')
 
 		return (intersectionFlag1 && intersectionFlag2) ? Q : new Vertex(NaN, NaN)
 

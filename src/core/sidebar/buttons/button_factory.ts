@@ -1,5 +1,5 @@
 import { SidebarButton } from './SidebarButton'
-import { ArrowButton } from 'base_extensions/expandables/construction/arrows/ArrowButton'
+import { StraitButton } from 'base_extensions/expandables/construction/straits/StraitButton'
 import { ConCircleButton } from 'base_extensions/expandables/construction/ConCircle/ConCircleButton'
 import { DragButton } from './DragButton'
 import { LinkButton } from './LinkButton'
@@ -12,8 +12,8 @@ import { ColorSampleButton } from 'base_extensions/created_mobjects/ColorSample/
 
 export function buttonFactory(name: string, locationIndex: number): SidebarButton {
 	switch (name) {
-	case 'ArrowButton':
-		return new ArrowButton({locationIndex: locationIndex})
+	case 'StraitButton':
+		return new StraitButton({locationIndex: locationIndex})
 	case 'CircleButton':
 		return new ConCircleButton({locationIndex: locationIndex})
 	case 'DragButton':

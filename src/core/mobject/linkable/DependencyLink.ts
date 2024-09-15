@@ -1,6 +1,6 @@
 import { Vertex } from 'core/helpers/Vertex'
 import { Dependency } from '../Dependency'
-import { Segment } from 'base_extensions/mobjects/shapes/Segment'
+import { Line } from 'base_extensions/mobjects/shapes/Line'
 import { Mobject } from '../Mobject'
 import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
@@ -15,14 +15,14 @@ linkable mobjects
 	dependency: Dependency
 	startBullet: LinkBullet
 	endBullet: LinkBullet
-	linkLine: Segment
+	linkLine: Line
 
 	statelessSetup() {
 		super.statelessSetup()
 		this.dependency = new Dependency()
 		this.startBullet = new LinkBullet()
 		this.endBullet = new LinkBullet()
-		this.linkLine = new Segment({
+		this.linkLine = new Line({
 			strokeWidth: LINK_LINE_WIDTH
 		})
 	}

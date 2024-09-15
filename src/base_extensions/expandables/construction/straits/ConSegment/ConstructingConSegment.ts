@@ -1,7 +1,7 @@
-import { ConstructingConArrow } from '../ConstructingConArrow'
+import { ConstructingConStrait } from '../ConstructingConStrait'
 import { ConSegment } from './ConSegment'
 
-export class ConstructingConSegment extends ConstructingConArrow {
+export class ConstructingConSegment extends ConstructingConStrait {
 
 	segment: ConSegment
 
