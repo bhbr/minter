@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
         "outDir": "../lib",
+        "baseUrl": "../src",
         "allowJs": true,
         "target": "es2021",
         "sourceMap": true,
@@ -8,11 +9,16 @@
             "dom",
             "dom.iterable",
             "es2021",
-        ]
+        ],
+        "paths": {
+            "core/*": ["../src/core/*"],
+            "base_extensions/*": ["../src/base_extensions/*"],
+            "extensions/*": ["../src/extensions/*"]
+        }
     },
     "include": [
-        "../src/*",
-        "../src/sidebar/*",
-        "../src/tests/*",
+        "../src/core/*",
+        "../src/base_extensions/*",
+        "../src/extensions/*"
     ]
 }
