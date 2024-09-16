@@ -63,22 +63,17 @@ export class InputValueBox extends LinkableMobject {
 	}
 
 	keyPressed(e: KeyboardEvent) {
-		log('Z')
 		if (e.which != 13) { return }
-		log('A')
 		this.inputBox.blur()
 		getPaper().activeKeyboard = true
-		log('B')
 		if (!isTouchDevice) {
 			for (let button of getSidebar().buttons) {
 				button.activeKeyboard = true
 			}
 		}
-		log('C')
 		this.updateModel({
 			value: Number(this.inputBox.value)
 		})
-		log(this.value)
 	}
 
 	boundKeyPressed(e: ScreenEvent) { }

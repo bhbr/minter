@@ -7,7 +7,7 @@ import { Color } from 'core/helpers/Color'
 
 export class CreatingBoxSlider extends CreatingMobject {
 
-	protoSlider: BoxSlider
+	declare creation?: BoxSlider
 	width: number
 	height: number
 	min: number
@@ -24,53 +24,57 @@ export class CreatingBoxSlider extends CreatingMobject {
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.protoSlider = new BoxSlider()
-	}
+	// statelessSetup() {
+	// 	super.statelessSetup()
+	// 	this.creation = new BoxSlider()
+	// }
 
 	statefulSetup() {
 		super.statefulSetup()
-		this.add(this.protoSlider)
+		this.creation = this.createMobject()
+		this.add(this.creation)
 		this.anchor = this.startPoint
-		this.protoSlider.update({
+		if (this.creation == null) { return }
+		this.creation.update({
 			min: this.min,
 			max: this.max,
-			value: 0.6 * (this.min + this.max),
+			value: 0.4 * this.min + 0.6 * this.max,
 			width: this.width,
 			height: 1,
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5)
 		})
-		this.protoSlider.hideLinks()
+		this.creation.hideLinks()
 	}
 
-	createdMobject(): LinkableMobject {
-		return this.protoSlider
+	createMobject(): BoxSlider {
+		return this.creation || new BoxSlider()
 	}
 
 	updateFromTip(q: Vertex) {
 		this.update({ // This shouldn't be necessary, fix
 			fillColor: Color.black()
 		})
-		this.protoSlider.update({
+		if (this.creation === null) { return }
+		this.creation.update({
 			height: q.y - this.startPoint.y,
 			//fillColor: gray(0.5) // This shouldn't be necessary, fix
 		})
-		this.protoSlider.filledBar.update({
+		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)
 		})
-		this.protoSlider.hideLinks()
+		this.creation.hideLinks()
 	}
 
 	dissolve() {
 		super.dissolve()
-		this.protoSlider.update({
+		if (this.creation === null) { return }
+		this.creation.update({
 			anchor: this.anchor
 		})
-		this.protoSlider.outerBar.update({ anchor: new Vertex(0, 0) }) // necessary?
-		this.protoSlider.label.update({
-			anchor: new Vertex(this.protoSlider.width/2 - this.protoSlider.label.viewWidth/2, this.protoSlider.height/2 - this.protoSlider.label.viewHeight/2)
+		this.creation.outerBar.update({ anchor: new Vertex(0, 0) }) // necessary?
+		this.creation.label.update({
+			anchor: new Vertex(this.creation.width/2 - this.creation.label.viewWidth/2, this.creation.height/2 - this.creation.label.viewHeight/2)
 		})
 
 	}

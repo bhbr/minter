@@ -3,9 +3,11 @@ import { BoxStepper } from './BoxStepper'
 
 export class CreatingBoxStepper extends CreatingBoxSlider {
 
+	declare creation: BoxStepper
+
 	statelessSetup() {
 		super.statelessSetup()
-		this.protoSlider = new BoxStepper()
+		this.creation = new BoxStepper()
 	}
 
 }

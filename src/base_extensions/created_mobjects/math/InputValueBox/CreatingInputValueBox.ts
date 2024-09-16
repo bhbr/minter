@@ -6,7 +6,7 @@ export class CreatingInputValueBox extends CreatingFixedMobject {
 	
 	declare creation: InputValueBox
 
-	createdMobject() {
+	createMobject() {
 		return new InputValueBox({
 			anchor: this.startPoint
 		})

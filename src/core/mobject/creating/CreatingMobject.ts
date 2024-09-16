@@ -7,11 +7,13 @@ export class CreatingMobject extends Mobject {
 
 	startPoint: Vertex
 	endPoint: Vertex
+	creation?: Mobject
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			startPoint: Vertex.origin(),
-			endPoint: Vertex.origin()
+			endPoint: Vertex.origin(),
+			creation: null
 		})
 	}
 
@@ -29,16 +31,16 @@ export class CreatingMobject extends Mobject {
 	}
 
 	dissolve() {
-		let cm = this.createdMobject()
-		cm.update({
+		this.creation = this.createMobject()
+		this.creation.update({
 			anchor: this.startPoint
 		})
-		this.parent.addToContent(cm)
+		this.parent.addToContent(this.creation)
 		this.parent.remove(this)
 	}
 
-	createdMobject(): Mobject {
-		return this
+	createMobject(): Mobject {
+		return new Mobject()
 	}
 
 	updateFromTip(q: Vertex) {

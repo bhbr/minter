@@ -6,7 +6,7 @@ export class CreatingColorSample extends CreatingFixedMobject {
 	
 	declare creation: ColorSample
 
-	createdMobject() {
+	createMobject() {
 		return new ColorSample({
 			midpoint: this.startPoint
 		})

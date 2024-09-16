@@ -64,21 +64,15 @@ export class CreatingBox extends CreatingMobject {
 		})
 	}
 
-	createdMobject(): Mobject {
-		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
-		let bottomRight = new Vertex(Math.max(this.p1.x, this.p3.x), Math.max(this.p1.y, this.p3.y))
-		let w = bottomRight.x - topLeft.x
-		let h = bottomRight.y - topLeft.y
-
-		let cm = new Mobject({
-			anchor: topLeft,
-			viewWidth: w,
-			viewHeight: h
-		})
-		return cm
+	getWidth(): number {
+		return this.lrCorner().x - this.ulCorner().x
 	}
 
-	
+	getHeight(): number {
+		return this.lrCorner().y - this.ulCorner().y
+	}
+
+
 }
 
 

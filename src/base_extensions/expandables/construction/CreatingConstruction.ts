@@ -4,12 +4,14 @@ import { ExpandableMobject, Construction } from 'core/mobject/expandable/Expanda
 
 export class CreatingConstruction extends CreatingBox {
 
-	createdMobject(): ExpandableMobject {
+	declare creation?: Construction
+
+	createMobject(): Construction {
 		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
 		let c = new Construction({
 			compactAnchor: topLeft,
-			compactWidth: this.viewWidth,
-			compactHeight: this.viewHeight
+			compactWidth: this.getWidth(),
+			compactHeight: this.getHeight()
 		})
 		c.contractStateChange()
 		return c

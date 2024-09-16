@@ -45,16 +45,16 @@ and logic for drawing and user interaction.
 
 	A mobject is created in four steps:
 
-	STEP 1: [in this.statelessSetup()] //
+	STEP 1: [in this.statelessSetup()]
 	
 	   Create all objects that any properties (state-defining variables)
 	   may rely on (e. g. the view = HTMLDivElement).
 	
-	STEP 2: [in this.setAttributes(...)] //
+	STEP 2: [in this.setAttributes(...)]
 	
 	   Set all state variables.
 	
-	STEP 3: [in this.statefulSetup()] //
+	STEP 3: [in this.statefulSetup()]
 	
 	   Complete the setup applying the properties
 	   onto the objects created in step 1
@@ -63,7 +63,7 @@ and logic for drawing and user interaction.
 	   need to be run only once at the mobject's
 	   creation.
 	
-	STEP 4: [in this.update(...)] //
+	STEP 4: [in this.update(...)]
 	
 	   All the ways the properties influence
 	   the mobject whenever they change.
@@ -627,6 +627,9 @@ and logic for drawing and user interaction.
 	add(submob: Mobject) {
 		// Set this as the submob's parent
 		if (submob.parent != this) {
+			if (submob.parent !== null && submob.parent !== undefined) {
+				submob.parent.remove(submob)
+			}
 			submob.parent = this
 		}
 		// Add submob to the children
@@ -940,12 +943,10 @@ and logic for drawing and user interaction.
 			let m: any = view['mobject']
 			if (m == undefined) { continue }
 			let mob: Mobject = m as Mobject
-			//if (mob.screenEventHandler == ScreenEventHandler.Parent) { break }
 			// only consider targets above the first mobject
 			// with ScreenEventHandler.Parent
 			targetMobChain.push(mob)
 		}
-		//log(targetMobChain)
 		return targetMobChain
 	}
 
@@ -963,7 +964,6 @@ and logic for drawing and user interaction.
 			t = t.parentElement
 			targetViewChain.push(t)
 		}
-		//log(targetViewChain)
 		return targetViewChain.reverse()
 	}
 
@@ -986,7 +986,6 @@ and logic for drawing and user interaction.
 
 		// step 1
 		let target = this.eventTargetMobject(e)
-		log(`target is ${target}`)
 		this.eventTarget = target
 		if (target == null) { return }
 		

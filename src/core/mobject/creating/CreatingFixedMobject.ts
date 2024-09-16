@@ -7,15 +7,13 @@ import { LinkableMobject } from '../linkable/LinkableMobject'
 
 export class CreatingFixedMobject extends CreatingMobject {
 
-	creation: Mobject
-
 	statefulSetup() {
 		super.statefulSetup()
-		this.creation = this.createdMobject()
+		this.creation = this.createMobject()
 		this.add(this.creation)
 	}
 	
-	createdMobject(): Mobject {
+	createMobject(): Mobject {
 		return new Rectangle({
 			width: 50,
 			height: 50,
@@ -36,13 +34,11 @@ export class CreatingFixedMobject extends CreatingMobject {
 	}
 
 	dissolve() {
-		let cm = this.creation
-		cm.update({
+		if (this.creation === null) { return }
+		this.creation.update({
 			anchor: this.endPoint
 		})
-		this.remove(cm)
-		this.parent.addToContent(cm)
-		this.parent.remove(this)
+		this.parent.addToContent(this.creation)
 	}
 
 }

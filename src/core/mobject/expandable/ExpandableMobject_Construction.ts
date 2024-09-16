@@ -133,6 +133,22 @@ The content children can also be dragged and panned.
 		this.expandButton = new ExpandButton()
 		this.creatingMobject = null
 		this.linkMap = new LinkMap()
+
+		this.constructors = {
+			'wavy': CreatingWavy,
+			'slider': CreatingBoxSlider,
+			'stepper': CreatingBoxStepper,
+			'value': CreatingValueBox,
+			'input': CreatingInputValueBox,
+			'+': CreatingAddBox,
+			'–': CreatingSubtractBox,
+			'&times;': CreatingMultiplyBox,
+			'/': CreatingDivideBox,
+			'exp': CreatingExpandableMobject,
+			'cons': CreatingConstruction,
+			'swing': CreatingSwing,
+			'color': CreatingColorSample
+		}
 	}
 
 	statefulSetup() {
@@ -164,6 +180,7 @@ The content children can also be dragged and panned.
 			this.expandStateChange()
 		}
 		this.hideLinksOfContent()
+
 	}
 
 
@@ -277,9 +294,7 @@ The content children can also be dragged and panned.
 	}
 
 	disableContent() {
-		//log(`disabling content of ${this}`)
 		for (let mob of this.contentChildren) {
-		//	log(`disabling ${mob}`)
 			mob.disable()
 		}
 	}
@@ -313,6 +328,9 @@ The content children can also be dragged and panned.
 		this.remove(mob)
 	}
 
+
+	constructors: object
+
 	handleMessage(key: string, value: any) {
 		this.enableContent()
 		switch (key) {
@@ -341,6 +359,7 @@ The content children can also be dragged and panned.
 	}
 
 	createCreatingMobject(type: string): CreatingMobject {
+
 		switch (type) {
 			case 'freehand':
 				let fh = new Freehand()
@@ -348,97 +367,16 @@ The content children can also be dragged and panned.
 					vertices: this.creationStroke
 				})
 				return fh
-			case 'wavy':
-				let c = new CreatingWavy({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1],
-					nbSources: 1
-				})
-				return c
-			case 'slider':
-				let s = new CreatingBoxSlider({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1],
-					min: 0,
-					max: 1
-				})
-				s.protoSlider.hideLinks()
-				return s
-			case 'stepper':
-				let s2 = new CreatingBoxStepper({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1],
-					min: 0,
-					max: 10
-				})
-				s2.protoSlider.hideLinks()
-				return s2
-			case 'value':
-				let v = new CreatingValueBox({
+			default:
+				let cons = this.constructors[type]
+				let cm = new cons({
 					startPoint: this.creationStroke[0],
 					endPoint: this.creationStroke[this.creationStroke.length - 1]
 				})
-				v.creation.hideLinks()
-				return v
-			case 'input':
-				let v5 = new CreatingInputValueBox({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				v5.creation.hideLinks()
-				return v5
-			case '+':
-				let v1 = new CreatingAddBox({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				v1.creation.hideLinks()
-				return v1
-			case '–':
-				let v2 = new CreatingSubtractBox({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				v2.creation.hideLinks()
-				return v2
-			case '&times;':
-				let v3 = new CreatingMultiplyBox({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				v3.creation.hideLinks()
-				return v3
-			case '/':
-				let v4 = new CreatingDivideBox({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				v4.creation.hideLinks()
-				return v4
-			case 'exp':
-				let e = new CreatingExpandableMobject({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return e
-			case 'cons':
-				let e2 = new CreatingConstruction({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return e2
-			case 'swing':
-				let p = new CreatingSwing({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return p
-			case 'color':
-				let c2 = new CreatingColorSample({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
-				})
-				return c2
+				if (cm.creation instanceof LinkableMobject) {
+					cm.creation.hideLinks()
+				}
+				return cm
 		}
 	}
 
@@ -446,12 +384,6 @@ The content children can also be dragged and panned.
 		if (this.contracted) { return }
 		this.startCreating(e)
 	}
-
-	//onTap(e: ScreenEvent) { }
-
-	// customOnPointerDown(e: ScreenEvent) {
-	// 	log('customOnPointerDown')
-	// }
 
 	startCreating(e: ScreenEvent) {
 		this.creationStroke.push(this.localEventVertex(e))
@@ -471,9 +403,6 @@ The content children can also be dragged and panned.
 		this.creatingMobject.updateFromTip(v)
 	}
 
-	// customOnPointerMove(e: ScreenEvent) {
-	// }
-
 	onPointerUp(e: ScreenEvent) {
 		if (this.contracted) { return }
 		this.endCreating(e)
@@ -484,11 +413,6 @@ The content children can also be dragged and panned.
 		this.creatingMobject = null
 		this.creationStroke = new VertexArray()
 	}
-
-
-	// customOnPointerUp(e: ScreenEvent) {
-	// 	log('customOnPointerUp')
-	// }
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = eventVertex(e)
@@ -511,8 +435,7 @@ The content children can also be dragged and panned.
 		this.linkMap.update()
 	}
 
-	endPanning(e: ScreenEvent) {
-	}
+	endPanning(e: ScreenEvent) { }
 
 	setPanning(flag: boolean) {
 		if (flag) {
@@ -715,7 +638,6 @@ export class Construction extends ExpandableMobject {
 	startCreating(e: ScreenEvent) {
 		let v = this.localEventVertex(e)
 		let p: ConPoint | null = this.snappedPointForVertex(v)
-		log(`found point: ${p}`)
 		if (this.creationMode == 'freehand') {
 			if (p === null) { // starting a freehand drawing
 				super.startCreating(e)
