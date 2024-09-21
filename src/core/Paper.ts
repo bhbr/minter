@@ -1,13 +1,19 @@
-import { remove, log, convertStringToArray } from 'core/helpers/helpers'
-import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, ScreenEvent, ScreenEventHandler } from 'core/mobject/screen_events'
-import { Vertex } from 'core/helpers/Vertex'
-import { ExpandableMobject } from 'core/mobject/expandable/ExpandableMobject_Construction'
-import { Color, COLOR_PALETTE } from 'core/helpers/Color'
 
-export class Paper extends ExpandableMobject {
+import { log } from 'core/functions/logging'
+import { remove, convertStringToArray } from 'core/functions/arrays'
+import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Vertex } from 'core/classes/vertex/Vertex'
+import { Board } from 'core/boards/Board'
+import { Color } from 'core/classes/Color'
+import { COLOR_PALETTE } from 'core/constants'
+
+import { DemoPaper } from 'extensions/boards/demo/DemoPaper'
+import { DemoSidebar } from 'extensions/boards/demo/DemoSidebar'
+
+export class Paper extends Board {
 
 	currentColor: Color
-	expandedMobject: ExpandableMobject
+	expandedMobject: Board
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
@@ -17,15 +23,17 @@ export class Paper extends ExpandableMobject {
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,
 			pressedKeys: [],
-			activeKeyboard: true
+			activeKeyboard: true,
+			view: document.querySelector('#paper_id') as HTMLDivElement,
+			viewWidth: 1216,
+			viewHeight: 1024
 		})
 	}
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			expanded: true,
-			expandedPadding: 0,
-			buttons: ['DragButton', 'LinkButton', 'ExpandableButton', 'NumberButton', 'ArithmeticButton', 'WavyButton', 'SwingButton', 'ColorSampleButton']
+			expandedPadding: 0
 		})
 	}
 
@@ -40,7 +48,6 @@ export class Paper extends ExpandableMobject {
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 		document.addEventListener('keyup', this.boundButtonUpByKey)
-		this.expandButton.hide()
 		this.background.update({
 			cornerRadius: 0,
 			strokeColor: Color.clear(),
@@ -57,7 +64,6 @@ export class Paper extends ExpandableMobject {
 		this.currentColor = newColor
 	}
 
-
 	getMessage(message: object) {
 		let key: string = Object.keys(message)[0]
 		let value: string | boolean | number | Array<string> = Object.values(message)[0]
@@ -70,6 +76,9 @@ export class Paper extends ExpandableMobject {
 		}
 		if ((key == "link" || key == "drag") && typeof value === "string") {
 			value = (value as string === "1")
+		}
+		if (key == "init" && value == "sidebar") {
+			this.initSidebar()
 		}
 		this.expandedMobject.handleMessage(key, value)
 	}
@@ -115,12 +124,20 @@ export class Paper extends ExpandableMobject {
 
 }
 
-let paperDiv = document.querySelector('#paper_id') as HTMLDivElement
-export const paper = new Paper({
-	view: paperDiv,
-	viewWidth: 1216,
-	viewHeight: 1024,
-})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
