@@ -225,34 +225,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 	getHeight(): number { return this.localYMax() - this.localYMin() }
 
 
-	adjustFrame() {
-	// Set the view anchor and size to fit the frame as computed from the vertices
-		let shift = new Transform({ shift: this.localULCorner() })
-		let inverseShift = shift.inverse()
-		let updateDict: object = {}
 
-		for (let [key, value] of Object.entries(this)) {
-			var newValue: any
-			if (value instanceof Vertex) {
-				newValue = inverseShift.appliedTo(value)
-			} else if (value instanceof Array && value.length > 0) {
-				newValue = []
-				if (!(value[0] instanceof Vertex)) { continue }
-				for (let v of value) {
-					newValue.push(inverseShift.appliedTo(v))
-				}
-			} else {
-				continue
-			}
-			updateDict[key] = newValue
-		}
-
-		updateDict['anchor'] = shift.appliedTo(this.anchor)
-		updateDict['viewWidth'] = this.getWidth()
-		updateDict['viewHeight'] = this.getHeight()
-		this.update(updateDict)
-
-	}
 
 }
 

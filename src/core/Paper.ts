@@ -7,8 +7,8 @@ import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
 import { COLOR_PALETTE } from 'core/constants'
 
-import { DemoPaper } from 'extensions/boards/demo/DemoPaper'
-import { DemoSidebar } from 'extensions/boards/demo/DemoSidebar'
+// StartPaper needs to be imported *somewhere* for TS to compile it
+import { StartPaper } from 'startPaper'
 
 export class Paper extends Board {
 

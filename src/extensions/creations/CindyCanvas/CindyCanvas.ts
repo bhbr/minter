@@ -17,7 +17,7 @@ export class CindyCanvas extends Linkable {
 	
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			screenEventHandler: ScreenEventHandler.Self,
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 

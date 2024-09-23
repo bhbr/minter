@@ -30,9 +30,9 @@ declare interface Window { webkit?: any }
 
 export class Board extends Linkable {
 /*
-An expandable mobject can be expanded into a full screen view,
-in which submobjects ('contentChildren') can be created with
-a pen and custom sidebar buttons.
+A board can be expanded into a full screen view, in which 
+submobjects ('contentChildren') can be created with a pen
+and custom sidebar buttons.
 
 In addition, the content children can be linked (those that
 are linkable) together.
@@ -44,18 +44,6 @@ The content children can also be dragged and panned.
 	sidebar?: any
 	// by creating buttons named this:
 	buttonNames: Array<string>
-
-	/*
-	When starting to draw, a Creator is
-	initialized, changing as the pen moves.
-	When the creation mode changes via the buttons,
-	it is replaced by a new creating mobject.
-	*/
-	Creator?: Creator
-	creationStroke: VertexArray
-	creationMode: string
-
-	panPointStart?: Vertex
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -107,7 +95,7 @@ The content children can also be dragged and panned.
 		})
 
 		this.expandButton = new ExpandButton()
-		this.Creator = null
+		this.creator = null
 		this.linkMap = new LinkMap()
 
 		this.creationConstructors = {
@@ -279,6 +267,16 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+	/*
+	When starting to draw, a Creator is
+	initialized, changing as the pen moves.
+	When the creation mode changes via the buttons,
+	it is replaced by a new creating mobject.
+	*/
+	creator?: Creator
+	creationStroke: VertexArray
+	creationMode: string
+
 	// a dictionary of constructors to use
 	// for creating new mobjects
 	creationConstructors: object
@@ -322,12 +320,12 @@ The content children can also be dragged and panned.
 				break
 			case 'create':
 				this.creationMode = value
-				if (this.Creator == null) {
+				if (this.creator == null) {
 					return
 				}
-				this.remove(this.Creator)
-				this.Creator = this.createCreator(this.creationMode)
-				this.add(this.Creator)
+				this.remove(this.creator)
+				this.creator = this.createCreator(this.creationMode)
+				this.add(this.creator)
 				break
 			case 'link':
 				if (value) {
@@ -350,8 +348,7 @@ The content children can also be dragged and panned.
 			default:
 				let cons = this.creationConstructors[type]
 				let cm = new cons({
-					startPoint: this.creationStroke[0],
-					endPoint: this.creationStroke[this.creationStroke.length - 1]
+					creationStroke: this.creationStroke
 				})
 				if (cm.creation instanceof Linkable) {
 					cm.creation.hideLinks()
@@ -367,8 +364,8 @@ The content children can also be dragged and panned.
 
 	startCreating(e: ScreenEvent) {
 		this.creationStroke.push(this.localEventVertex(e))
-		this.Creator = this.createCreator(this.creationMode)
-		this.add(this.Creator)
+		this.creator = this.createCreator(this.creationMode)
+		this.add(this.creator)
 	}
 
 	onPointerMove(e: ScreenEvent) {
@@ -380,7 +377,7 @@ The content children can also be dragged and panned.
 	creating(e: ScreenEvent) {
 		let v: Vertex = this.localEventVertex(e)
 		this.creationStroke.push(v)
-		this.Creator.updateFromTip(v)
+		this.creator.updateFromTip(v)
 	}
 
 	onPointerUp(e: ScreenEvent) {
@@ -389,8 +386,8 @@ The content children can also be dragged and panned.
 	}
 
 	endCreating(e: ScreenEvent) {
-		this.Creator.dissolve()
-		this.Creator = null
+		this.creator.dissolve()
+		this.creator = null
 		this.creationStroke = new VertexArray()
 	}
 
@@ -400,6 +397,8 @@ The content children can also be dragged and panned.
 	//                        PANNING                       //
 	//                                                      //
 	//////////////////////////////////////////////////////////
+
+	panPointStart?: Vertex
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = eventVertex(e)

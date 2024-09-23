@@ -352,6 +352,37 @@ and logic for drawing and user interaction.
 	localTopCenter(): Vertex { return this.topCenter(this) }
 	localBottomCenter(): Vertex { return this.bottomCenter(this) }
 
+	getWidth(): number { return this.localXMax() - this.localXMin() }
+	getHeight(): number { return this.localYMax() - this.localYMin() }
+
+	adjustFrame() {
+	// Set the view anchor and size to fit the frame as computed from the vertices
+		let shift = new Transform({ shift: this.localULCorner() })
+		let inverseShift = shift.inverse()
+		let updateDict: object = {}
+
+		for (let [key, value] of Object.entries(this)) {
+			var newValue: any
+			if (value instanceof Vertex) {
+				newValue = inverseShift.appliedTo(value)
+			} else if (value instanceof Array && value.length > 0) {
+				newValue = []
+				if (!(value[0] instanceof Vertex)) { continue }
+				for (let v of value) {
+					newValue.push(inverseShift.appliedTo(v))
+				}
+			} else {
+				continue
+			}
+			updateDict[key] = newValue
+		}
+
+		updateDict['anchor'] = shift.appliedTo(this.anchor)
+		updateDict['viewWidth'] = this.getWidth()
+		updateDict['viewHeight'] = this.getHeight()
+		this.update(updateDict)
+
+	}
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -373,7 +404,6 @@ and logic for drawing and user interaction.
 	set visible(newValue: boolean) {
 		this.view.style['visibility'] = newValue ? 'visible' : 'hidden'
 	}
-
 
 	setupView() {
 		this.view['mobject'] = this
@@ -734,6 +764,8 @@ and logic for drawing and user interaction.
 		this.setAttributes(argsDict)
 		this.updateSubmobModels()
 
+		let targetsAndUpdateDicts: Array<[Mobject, object]> = []
+
 		for (let dep of this.dependencies || []) {
 
 			let output: any = this[dep.outputName] // value or function, may be undefined
@@ -743,10 +775,28 @@ and logic for drawing and user interaction.
 			} else if (output !== undefined && output !== null) {
 				outputValue = output
 			}
-			let obj: object = {}
-			obj[dep.inputName] = outputValue
-			dep.target.updateModel(obj)
+			
+			var repeatMobject = false
+			for (let pair of targetsAndUpdateDicts) {
+				let target = pair[0]
+				if (target == dep.target) {
+					let updateDict = pair[1]
+					updateDict[dep.inputName] = outputValue
+					repeatMobject = true
+					break
+				}
+			}
+			if (!repeatMobject) {
+				let newUpdateDict = {}
+				newUpdateDict[dep.inputName] = outputValue
+				targetsAndUpdateDicts.push([dep.target, newUpdateDict])
+			}
+		}
 
+		for (let pair of targetsAndUpdateDicts) {
+			let target = pair[0]
+			let updateDict = pair[1]
+			target.updateModel(updateDict)
 		}
 	}
 

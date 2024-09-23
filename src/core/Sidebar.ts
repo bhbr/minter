@@ -16,7 +16,9 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 
-//var paper: Paper = null
+// StartSidebar needs to be imported *somewhere* for TS to compile it
+import { StartSidebar } from 'startSidebar'
+
 interface Window { webkit?: any }
 
 
@@ -120,7 +122,7 @@ export class Sidebar extends Mobject {
 	}
 
 	requestInit() {
-		let message = {'init': 'sidebar'}
+		let message = { init: 'sidebar' }
 		try {
 			(window as Window).webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {

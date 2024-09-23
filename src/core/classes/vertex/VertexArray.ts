@@ -4,13 +4,17 @@ import { Transform } from './Transform'
 
 export class VertexArray extends Array<Vertex> {
 
-	constructor(array?: Array<Vertex>) {
+	constructor(array?: Array<Vertex> | Array<Array<number>>) {
 		super()
 		if (!array) {
 			return
 		}
 		for (let vertex of array) {
-			this.push(vertex)
+			if (vertex instanceof Vertex) {
+				this.push(vertex)
+			} else {
+				this.push(new Vertex(vertex))
+			}
 		}
 	}
 	

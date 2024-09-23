@@ -25,7 +25,7 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 	}
 
-	// this declares that the parent mobject will always be an expandable mobject
+	// this declares that the parent mobject will always be a board
 	get parent(): Board {
 		return super.parent as Board
 	}

@@ -101,6 +101,14 @@ export class Vertex extends Array {
 		this.copyFrom(this.scaledBy(scale, center))
 	}
 
+	normalized(): Vertex {
+		return this.scaledBy(1 / this.norm())
+	}
+
+	normalize(){
+		this.scaleBy(1 / this.norm())
+	}
+
 	add(otherVertex: Vertex): Vertex { return this.translatedBy(otherVertex) }
 	multiply(factor: number): Vertex { return this.scaledBy(factor) }
 	divide(factor: number): Vertex { return this.multiply(1/factor) }

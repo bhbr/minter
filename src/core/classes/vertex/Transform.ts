@@ -15,6 +15,7 @@ export class Transform extends ExtendedObject {
 		this.passedByValue = true
 		this.assureProperty('anchor', Vertex)
 		this.assureProperty('shift', Vertex)
+
 		this.setDefaults({
 			anchor: Vertex.origin(),
 			angle: 0,
@@ -31,15 +32,15 @@ export class Transform extends ExtendedObject {
 		let str1: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px) `
 		let str2: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px) `
 		let str3: string = this.scale == 1 ? `` : `scale(${this.scale}) `
-		let str4: string = this.angle == 0 ? `` : `rotate(${this.angle/DEGREES}deg) `
+		let str4: string = this.angle == 0 ? `` : `rotate(${-this.angle / DEGREES}deg) `
 		let str5: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px) `
 
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
 	}
 
 	a(): number { return this.scale * Math.cos(this.angle) }
-	b(): number { return -this.scale * Math.sin(this.angle) }
-	c(): number { return this.scale * Math.sin(this.angle) }
+	b(): number { return this.scale * Math.sin(this.angle) }
+	c(): number { return -this.scale * Math.sin(this.angle) }
 	d(): number { return this.scale * Math.cos(this.angle) }
 	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
 	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
