@@ -33,7 +33,15 @@ export class Sidebar extends Mobject {
 		return Object.assign(super.fixedArgs(), {
 			viewWidth: 150,
 			viewHeight: 1024,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			background: new Rectangle({
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeWidth: 0,
+				screenEventHandler: ScreenEventHandler.Parent,
+				width: this.viewWidth,
+				height: this.viewHeight
+			})
 		})
 	}
 
@@ -51,22 +59,8 @@ export class Sidebar extends Mobject {
 		})
 	}
 
-	statelessSetup() {
-		this.background = new Rectangle({
-			fillColor: Color.gray(0.1),
-			fillOpacity: 1.0,
-			strokeWidth: 0,
-			screenEventHandler: ScreenEventHandler.Parent // ?
-		})
-		super.statelessSetup()
-	}
-
-	statefulSetup() {
+	setup() {
 		this.add(this.background)
-		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight
-		})
 		this.view['mobject'] = this
 		let paper = getPaper()
 		if (paper !== null) {
@@ -79,7 +73,7 @@ export class Sidebar extends Mobject {
 		// (updated later to accomodate sidebar wishes of
 		// expandable submobs)
 		this.initialize(this.buttonNames())
-		super.statefulSetup()
+		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
 	}
 

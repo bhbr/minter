@@ -22,5 +22,3 @@ export class ConSidebar extends Sidebar {
 		})
 	}
 }
-
-export const sidebar = new ConSidebar()

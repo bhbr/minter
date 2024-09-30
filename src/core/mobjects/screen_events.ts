@@ -65,6 +65,10 @@ export function screenEventType(e: ScreenEvent): ScreenEventType {
 	return ScreenEventType.Unknown
 }
 
+export function screenEventTypeAsString(e: ScreenEvent): string {
+	return ScreenEventType[screenEventType(e)]
+}
+
 export function screenEventDevice(e: ScreenEvent): ScreenEventDevice {
 	if (isTouchDevice) {
 		if (e instanceof TouchEvent) {
@@ -86,6 +90,10 @@ export function screenEventDevice(e: ScreenEvent): ScreenEventDevice {
 			return ScreenEventDevice.Finger
 		}
 	}
+}
+
+export function screenEventDeviceAsString(e: ScreenEvent): string {
+	return ScreenEventDevice[screenEventDevice(e)]
 }
 
 /*

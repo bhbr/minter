@@ -22,16 +22,6 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
-			fixtureWidth: 50,
-			fixtureHeight: 20,
-			initialSpeed: 0,
-			inputNames: ['length', 'mass'],
-			outputNames: ['angle', 'period']
-		})
-	}
-
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			maxLength: 300,
@@ -42,22 +32,28 @@ export class Swing extends Linkable {
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.fixture = new Rectangle({
-			fillColor: Color.white(),
-			fillOpacity: 1
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			fixtureWidth: 50,
+			fixtureHeight: 20,
+			initialSpeed: 0,
+			inputNames: ['length', 'mass'],
+			outputNames: ['angle', 'period'],
+			fixture: new Rectangle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			string: new Line(),
+			weight: new Circle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			initialTime: Date.now()
 		})
-		this.string = new Line()
-		this.weight = new Circle({
-			fillColor: Color.white(),
-			fillOpacity: 1
-		})
-		this.initialTime = Date.now()
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.fixture)
 		this.add(this.string)
 		this.add(this.weight)

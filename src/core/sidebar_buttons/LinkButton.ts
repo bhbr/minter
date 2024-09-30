@@ -6,14 +6,14 @@ export class LinkButton extends ToggleButton {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			messages: [{ link: true }],
-			outgoingMessage: { link: false }
+			outgoingMessage: { link: false },
+			text: 'link'
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.label.view['fill'] = 'black'
-		this.label.text = 'link'
 	}
 
 }

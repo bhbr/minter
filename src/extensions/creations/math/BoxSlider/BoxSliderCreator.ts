@@ -24,8 +24,8 @@ export class BoxSliderCreator extends Creator {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.creation = this.createMobject()
 		this.add(this.creation)
 		this.anchor = this.getStartPoint()

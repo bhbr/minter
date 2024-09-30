@@ -8,9 +8,8 @@ export class ConstructionCreator extends SpanningCreator {
 	declare creation?: Construction
 
 	createMobject(): Construction {
-		let topLeft = new Vertex(Math.min(this.p1.x, this.p3.x), Math.min(this.p1.y, this.p3.y))
 		let c = new Construction({
-			compactAnchor: topLeft,
+			compactAnchor: this.topLeftVertex(),
 			compactWidth: this.getWidth(),
 			compactHeight: this.getHeight()
 		})

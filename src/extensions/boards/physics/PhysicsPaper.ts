@@ -19,6 +19,9 @@ export class PhysicsPaper extends Paper {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
+			scene: new InclinedScene({
+			anchor: new Vertex(100, 100)
+		}),
 			creationConstructors: {
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
@@ -33,15 +36,8 @@ export class PhysicsPaper extends Paper {
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.scene = new InclinedScene({
-			anchor: new Vertex(100, 100)
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.addToContent(this.scene)
 	}
 

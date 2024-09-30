@@ -1,17 +1,16 @@
 
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
+import { Playable } from './Playable'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { CindyCanvas } from './CindyCanvas'
+import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
 
-export class PlayButton extends TextLabel {
+export class PlayButton extends SimpleButton {
 
-	playState: boolean
-	cindy: CindyCanvas
+	mobject: Playable
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			playState: false,
 			text: 'play'
 		})
 	}
@@ -28,20 +27,16 @@ export class PlayButton extends TextLabel {
 		})
 	}
 
-	onPointerUp(e: ScreenEvent) {
-		this.playState = !this.playState
-		if (this.playState) {
-			this.cindy.play()
-			this.updateModel({
-				text: 'pause'
-			})
-		} else {
-			this.cindy.pause()
-			this.updateModel({
-				text: 'play'
-			})
+	action() {
+		this.mobject.togglePlayState()
+		this.toggleLabel()
+	}
 
-		}
+	toggleLabel() {
+		this.updateModel({
+			text: (this.text == 'play') ? 'pause' : 'play'
+		})
+		
 	}
 
 }

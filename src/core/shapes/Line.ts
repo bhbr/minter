@@ -4,6 +4,7 @@ import { VertexArray } from 'core/classes/vertex/VertexArray'
 import { Polygon } from 'core/vmobjects/Polygon'
 
 export class Line extends Polygon {
+
 	startPoint: Vertex
 	endPoint: Vertex
 
@@ -14,6 +15,11 @@ export class Line extends Polygon {
 		})
 	}
 
+	/*
+	Subclasses might want to draw not right from start to end,
+	but e. g. extend to the edge of the screen or leave
+	space for an arrow
+	*/
 	drawingStartPoint() {
 		return this.startPoint
 	}

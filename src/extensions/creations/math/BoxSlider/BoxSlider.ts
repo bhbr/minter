@@ -53,33 +53,26 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			inputNames: [],
-			outputNames: ['value']
+			outputNames: ['value'],
+			outerBar: new Rectangle({
+				fillColor: Color.black(),
+				fillOpacity: 1,
+				strokeColor: Color.white()
+			}),
+			filledBar: new Rectangle({
+				fillOpacity: 0.5
+			}),
+			label: new TextLabel({
+				viewHeight: 25,
+				horizontalAlign: 'center',
+				verticalAlign: 'center',
+				fontSize: 20
+			})
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-
-		this.outerBar = new Rectangle({
-			fillColor: Color.black(),
-			fillOpacity: 1,
-			strokeColor: Color.white()
-		})
-
-		this.filledBar = new Rectangle({
-			fillOpacity: 0.5
-		})
-
-		this.label = new TextLabel({
-			viewHeight: 25,
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
-			fontSize: 20
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.outerBar)
 		this.add(this.filledBar)
 		this.add(this.label)
@@ -97,7 +90,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		//// internal dependencies
 		this.viewWidth = this.width
 		this.viewHeight = this.height
-		this.positionView()
+		this.redrawView()
 
 		//// updating submobs
 		let a: number = this.normalizedValue()

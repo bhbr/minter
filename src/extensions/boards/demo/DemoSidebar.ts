@@ -2,7 +2,7 @@
 import { Sidebar } from 'core/Sidebar'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
-import { ConButton } from 'extensions/boards/construction/ConButton'
+import { ExtendedBoardButton } from 'extensions/sidebar_buttons/ExtendedBoardButton'
 import { StraitButton } from 'extensions/boards/construction/straits/StraitButton'
 import { ConCircleButton } from 'extensions/boards/construction/ConCircle/ConCircleButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
@@ -18,7 +18,7 @@ export class DemoSidebar extends Sidebar {
 			availableButtonClasses: [
 				DragButton,
 				LinkButton,
-				ConButton,
+				ExtendedBoardButton,
 				StraitButton,
 				ConCircleButton,
 				NumberButton,
@@ -30,5 +30,3 @@ export class DemoSidebar extends Sidebar {
 		})
 	}
 }
-
-export const sidebar = new DemoSidebar()

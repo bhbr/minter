@@ -18,19 +18,14 @@ export class ColorChangeButton extends SidebarButton {
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			showLabel: true
+			showLabel: true,
+			outgoingMessage: {},
+			colorNames: Object.keys(COLOR_PALETTE)
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.outgoingMessage = {}
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-
-		this.colorNames = Object.keys(COLOR_PALETTE)
+	setup() {
+		super.setup()
 		this.label.view.setAttribute('fill', 'black')
 
 		for (let name of this.colorNames) {

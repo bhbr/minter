@@ -61,24 +61,24 @@ TODO: support mutiple paths e. g. for shapes with holes
 		})
 	}
 
-	statelessSetup() {
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			vertices: new VertexArray(),
+			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+			path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		})
+	}
 
-		super.statelessSetup()
-		this.vertices = new VertexArray()
+	setup() {
 
 		// setup the svg
-		this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
 		this.svg['mobject'] = this
 		this.svg.setAttribute('class', 'mobject-svg')
 		this.svg.style.overflow = 'visible'
 		// and its path
-		this.path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		this.path['mobject'] = this
 		this.svg.appendChild(this.path)
 
-	}
-
-	statefulSetup() {
 		this.setupView()
 		this.view.appendChild(this.svg)
 		this.view.setAttribute('class', this.constructor.name + ' mobject-div')

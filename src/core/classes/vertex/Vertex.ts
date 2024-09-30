@@ -136,6 +136,14 @@ export class Vertex extends Array {
 		return `[${this.x}, ${this.y}]`
 	}
 
+	static innerProduct(v: Vertex, w: Vertex): number {
+		return v[0] * w[0] + v[1] * w[1]
+	}
+
+	static outerProduct(v: Vertex, w: Vertex): number {
+		return v[0] * w[1] - v[1] * w[0]
+	}
+
 }
 
 

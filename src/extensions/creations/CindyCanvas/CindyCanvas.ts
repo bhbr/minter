@@ -3,33 +3,49 @@ import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Mobject } from 'core/mobjects/Mobject'
 import { Linkable } from 'core/linkables/Linkable'
-import { PlayButton }  from './PlayButton'
+import { Playable } from 'extensions/mobjects/PlayButton/Playable'
+import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
+import { Rectangle } from 'core/shapes/Rectangle'
 
 declare var CindyJS: any
 
-export class CindyCanvas extends Linkable {
+export class CindyCanvas extends Linkable implements Playable {
 
 	port: object
 	id: string
 	core: any
+	outerFrame: Rectangle
 	innerCanvas: Mobject
 	playButton: PlayButton
+	playState: 'play' | 'pause' | 'stop'
 	
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			outerFrame: new Rectangle(),
+			playButton: new PlayButton({
+				anchor: new Vertex(5, 5)
+			})
 		})
 	}
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			playedOnce: false
+			playedOnce: false,
+			playState: 'stop',
+			drawBorder: true
 		})
 	}
 
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
+
+		this.outerFrame.update({
+			width: this.viewWidth,
+			height: this.viewHeight
+		})
+		this.add(this.outerFrame)
 
 		this.innerCanvas = new Mobject({
 			viewWidth: this.viewWidth,
@@ -38,6 +54,8 @@ export class CindyCanvas extends Linkable {
 		})
 		this.add(this.innerCanvas)
 		this.innerCanvas.view.style['pointer-events'] = 'auto'
+
+		this.id = `${this.constructor.name}-${Math.floor(1000 * Math.random())}`
 		this.innerCanvas.view.id = this.id
 
 		this.port = {
@@ -49,11 +67,9 @@ export class CindyCanvas extends Linkable {
 			}]
 		}
 
-		this.playButton = new PlayButton({
-			anchor: new Vertex(5, 5),
-			cindy: this
+		this.playButton.update({
+			mobject: this
 		})
-
 		this.add(this.playButton)
 	}
 
@@ -112,14 +128,25 @@ export class CindyCanvas extends Linkable {
 			this.core.started = true
 		}
 		this.core.play()
+		this.playState = 'play'
 	}
 
 	pause() {
 		this.core.pause()
+		this.playState = 'pause'
+	}
+
+	togglePlayState() {
+		if (this.playState == 'play') {
+			this.pause()
+		} else {
+			this.play()
+		}
 	}
 
 	stop() {
 		this.core.stop()
+		this.playState = 'stop'
 	}
 
 	geometry(): Array<any> { return [] }

@@ -32,8 +32,8 @@
 // 		})
 // 	}
 
-// 	statefulSetup() {
-// 		super.statefulSetup()
+// 	setup() {
+// 		super.setup()
 // 		let c = this.circle.fillColor
 // 		this.add(this.circle)
 // 	}

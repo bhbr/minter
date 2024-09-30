@@ -8,8 +8,8 @@ import { Linkable } from 'core/linkables/Linkable'
 
 export class DraggingCreator extends Creator {
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.creation = this.createMobject()
 		this.add(this.creation)
 	}
@@ -28,10 +28,6 @@ export class DraggingCreator extends Creator {
 		this.creation.update({
 			anchor: q
 		})
-		// the following is a temporary bug fix
-		if (this.creation instanceof Linkable) {
-			this.creation.hideLinks()
-		}
 	}
 
 	dissolve() {

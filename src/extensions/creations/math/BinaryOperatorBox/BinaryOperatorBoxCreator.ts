@@ -5,8 +5,8 @@ import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox } from '
 export class BinaryOperatorBoxCreator extends DraggingCreator {
 	declare creation: BinaryOperatorBox
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.creation.operatorLabel.update({
 			text: this.creation.operatorDict[this.creation.operator]
 		})

@@ -27,4 +27,3 @@ export class PhysicsSidebar extends Sidebar {
 	}
 }
 
-export const sidebar = new PhysicsSidebar()

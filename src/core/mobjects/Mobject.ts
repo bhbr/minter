@@ -46,31 +46,12 @@ and logic for drawing and user interaction.
 	It also allows to control the setting of fixed and default
 	state variables.
 
-	A mobject is created in four steps:
+	A mobject is created in two steps:
 
-	STEP 1: [in this.statelessSetup()]
-	
-	   Create all objects that any properties (state-defining variables)
-	   may rely on (e. g. the view = HTMLDivElement).
-	
-	STEP 2: [in this.setAttributes(...)]
-	
-	   Set all state variables.
-	
-	STEP 3: [in this.statefulSetup()]
-	
-	   Complete the setup applying the properties
-	   onto the objects created in step 1
-	   (e. g. setting the view's width and height).
-	   This step should only contain commands that
-	   need to be run only once at the mobject's
-	   creation.
-	
-	STEP 4: [in this.update(...)]
-	
-	   All the ways the properties influence
-	   the mobject whenever they change.
+
 	*/
+
+	readonlyProperties: Array<string>
 
 	constructor(argsDict: object = {}, isSuperCall = false) {
 	/*
@@ -84,14 +65,11 @@ and logic for drawing and user interaction.
 
 		// Now we are back in the lowest-class constructor
 
-		// STEP 1
-		this.statelessSetup()
-		// STEP 2
 		let initialArgs = this.initialArgs(argsDict)
 		this.setAttributes(initialArgs)
-		// STEP 3
-		this.statefulSetup()
-		// STEP 4
+
+		this.setup()
+		
 		this.update()
 		
 	}
@@ -105,8 +83,6 @@ and logic for drawing and user interaction.
 		// Given values supercede default values
 		let initialArgs = this.defaultArgs()
 		Object.assign(initialArgs, argsDict)
-
-		// Fixed values supercede given values
 		Object.assign(initialArgs, this.fixedArgs())
 		return initialArgs
 	}
@@ -127,6 +103,7 @@ and logic for drawing and user interaction.
 		return {
 			// The meaning of these properties is explained in the sections further below.
 
+			readonlyProperties: [],
 			// position
 			transform: Transform.identity(),
 			viewWidth: 100,
@@ -145,6 +122,7 @@ and logic for drawing and user interaction.
 			drawBorder: DRAW_BORDER,
 
 			// hierarchy
+			_parent: null,
 			children: [], // i. e. submobjects
 
 			// dependencies
@@ -168,10 +146,9 @@ and logic for drawing and user interaction.
 		return {}
 	}
 
-	statelessSetup() {
-	// state-independent setup (step 1 in constructor)
-
-		//this.boundEventTargetMobject = this.eventTargetMobject.bind(this)
+	setup() {
+	// state-dependent setup (step 3 in constructor)
+		this.setupView()
 
 		/*
 		When holding down the drag button,
@@ -185,11 +162,6 @@ and logic for drawing and user interaction.
 		this.savedOnPointerDown = this.onPointerDown
 		this.savedOnPointerMove = this.onPointerMove
 		this.savedOnPointerUp = this.onPointerUp
-	}
-
-	statefulSetup() {
-	// state-dependent setup (step 3 in constructor)
-		this.setupView()
 		addPointerDown(this.view, this.capturedOnPointerDown.bind(this))
 		addPointerMove(this.view, this.capturedOnPointerMove.bind(this))
 		addPointerUp(this.view, this.capturedOnPointerUp.bind(this))
@@ -394,16 +366,9 @@ and logic for drawing and user interaction.
 	view?: HTMLDivElement
 	// the following properties encode CSS properties
 	opacity: number
+	visible: boolean
 	backgroundColor: Color
 	drawBorder: boolean
-
-	get visible(): boolean {
-		return this.view.style['visibility'] == 'visible'
-	}
-
-	set visible(newValue: boolean) {
-		this.view.style['visibility'] = newValue ? 'visible' : 'hidden'
-	}
 
 	setupView() {
 		this.view['mobject'] = this
@@ -418,22 +383,26 @@ and logic for drawing and user interaction.
 		// by default, the mobject can draw outside its view's borders
 	}
 
-	positionView() {
+	redrawView() {
 		if (!this.view) { return }
-		this.view.style['transform'] = this.transform.withoutAnchor().toCSSString()
-		this.view.style['left'] = `${this.anchor.x.toString()}px`
-		this.view.style['top'] = `${this.anchor.y.toString()}px`
-		this.view.style['width'] = `${this.viewWidth.toString()}px`
-		this.view.style['height'] = `${this.viewHeight.toString()}px`
-	}
-
-	styleView() { // CSS properties
-		if (!this.view) { return }
+		this.view.style.transform = this.transform.withoutAnchor().toCSSString()
+		this.view.style.left = `${this.anchor.x.toString()}px`
+		this.view.style.top = `${this.anchor.y.toString()}px`
+		this.view.style.width = `${this.viewWidth.toString()}px`
+		this.view.style.height = `${this.viewHeight.toString()}px`
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
-		this.view.style['background-color'] = this.backgroundColor.toCSS()
-		this.view.style['opacity'] = this.opacity.toString()
+		this.view.style.backgroundColor = this.backgroundColor.toCSS()
+		this.view.style.opacity = this.opacity.toString()
+		this.view.style.visibility = this.shouldBeDrawn() ? 'visible' : 'hidden'
 	}
 
+	shouldBeDrawn(): boolean {
+		if (!this.visible) { return false }
+		for (let a of this.ancestors()) {
+			if (!a.visible) { return false}
+		}
+		return true
+	}
 
 	// Drawing methods //
 
@@ -443,21 +412,15 @@ and logic for drawing and user interaction.
 	overridden in subclasses
 	*/
 
-	redrawSubmobs() {
-		for (let submob of this.children || []) {
-			submob.redraw()
-		}
-	}
-
 	redraw(recursive = true) {
 		// redraw yourself and your children
 		try {
 			if (!this.view) { return }
-			this.positionView()
-			this.styleView()
+			this.redrawView()
 			this.redrawSelf()
-			if (recursive) {
-				this.redrawSubmobs()
+			if (!recursive) { return }
+			for (let submob of this.children || []) {
+				submob.redraw()
 			}
 		} catch { }
 	}
@@ -481,8 +444,11 @@ and logic for drawing and user interaction.
 
 	hide() {
 	// Hide this mobject and all of its descendents
+		if (!this.view) {
+			console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (no view yet)`)
+			return
+		}
 		try {
-			if (!this.view) { return }
 			this.visible = false
 			for (let submob of this.children) {
 				submob.hide()
@@ -634,11 +600,19 @@ and logic for drawing and user interaction.
 			return
 		}
 		newValue.add(this)
-		if (newValue.visible) {
-			this.show()
-		} else {
-			this.hide()
+	}
+
+	ancestors(): Array<Mobject> {
+		let ret: Array<Mobject> = []
+		let p = this.parent
+		if (p === undefined || p === null) {
+			return ret
 		}
+		while (p != null) {
+			ret.push(p)
+			p = p.parent
+		}
+		return ret
 	}
 
 	// Alias for parent
@@ -665,7 +639,7 @@ and logic for drawing and user interaction.
 		}
 		// Add submob to the children
 		if (this.children === undefined || this.children === null) {
-			throw `Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in statefulSetup()`
+			throw `Please add submob ${submob.constructor.name} to ${this.constructor.name} later, in setup()`
 		} else if (!this.children.includes(submob)) {
 			this.children.push(submob)
 		}
@@ -1024,7 +998,7 @@ and logic for drawing and user interaction.
 	before and after:
 
 	Step 1: determine the event target (only in capturedOnPointerDown)
-	Step 2: stop the propagation ( or not if ScreenEventHandler.Auto)
+	Step 2: stop the propagation (or not if screenEventHandler is .Auto)
 	Step 3: check if the event is just a duplicate of the last event
 	Step 4: call the API event method
 	Step 5: set/unset timers to listen for e. g. taps, double taps, long presses etc.
@@ -1128,12 +1102,11 @@ and logic for drawing and user interaction.
 
 	isDuplicate(e: ScreenEvent): boolean {
 	/*
-	Duplicates can occur on an iPad, where the same action
+	Duplicates can occur e. g. on an iPad where the same action
 	triggers a TouchEvent and a MouseEvent. Here we are just looking at
 	the screenEvent's type (down, move, up or cancel) and ignore
 	the device to determine duplicates.
 	*/
-		if (!isTouchDevice) { return false } // no iPad = no problem
 		let minIndex = Math.max(0, this.screenEventHistory.length - 5)
 		for (var i = minIndex; i < this.screenEventHistory.length; i++) {
 			let e2 = this.screenEventHistory[i]
@@ -1143,7 +1116,8 @@ and logic for drawing and user interaction.
 					return true
 				}
 			} else if (!eventVertex(e).closeTo(eventVertex(e2), 200)) {
-				// too far
+				// too far, this can't be either
+				// (TODO: multiple touches)
 				return true
 			}
 		}

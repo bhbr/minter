@@ -12,8 +12,8 @@ export class CreativeButton extends SidebarButton {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		for (let c of this.creations) {
 			this.messages.push({create: c})
 		}

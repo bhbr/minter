@@ -11,8 +11,6 @@ export class Creator extends Mobject {
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
-			//startPoint: Vertex.origin(),
-			//endPoint: Vertex.origin(),
 			creationStroke: [],
 			creation: null
 		})
@@ -46,6 +44,7 @@ export class Creator extends Mobject {
 		})
 		this.parent.addToContent(this.creation)
 		this.parent.remove(this)
+		this.parent.creator = null
 	}
 
 	createMobject(): Mobject {

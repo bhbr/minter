@@ -23,8 +23,8 @@ export class Rectangle extends Polygon {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.vertices = new VertexArray([this.p1, this.p2, this.p3, this.p4])
 	}
 

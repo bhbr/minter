@@ -30,8 +30,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.createHookList()
 		this.update({ height: this.getHeight() }, false)
 	}
@@ -82,7 +82,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			this.createHookList()
 		}
 		let p1: Vertex = this.topCenter()
-		let p2: Vertex = this.mobject.localBottomCenter()
+		let p2: Vertex = (this.mobject != null) ? this.mobject.localBottomCenter() : Vertex.origin()
 		argsDict['anchor'] = this.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] + IO_LIST_OFFSET)
 		argsDict['height'] = this.getHeight()
 		super.updateModel(argsDict)

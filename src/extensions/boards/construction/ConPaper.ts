@@ -14,5 +14,3 @@ export class ConPaper extends Construction {
 	}
 
 }
-
-export const paper = new ConPaper()

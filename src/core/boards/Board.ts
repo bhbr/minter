@@ -77,44 +77,41 @@ The content children can also be dragged and panned.
 				'LinkButton',
 				'BoardButton'
 			],
+			creationConstructors: {
+				'board': BoardCreator
+			},
 			creationStroke: [],
 			creationMode: 'freehand',
 			sidebar: null
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.background = new RoundedRectangle({
-			cornerRadius: 50,
-			fillColor: Color.gray(0.1),
-			fillOpacity: 1.0,
-			strokeColor: Color.white(),
-			strokeWidth: 2.0,
-			screenEventHandler: ScreenEventHandler.Parent
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			expandButton: new ExpandButton(),
+			linkMap: new LinkMap(),
+			creator: null,
+			background: new RoundedRectangle({
+				anchor: Vertex.origin(),
+				cornerRadius: 50,
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeColor: Color.white(),
+				strokeWidth: 2.0,
+				screenEventHandler: ScreenEventHandler.Parent
+			})
 		})
-
-		this.expandButton = new ExpandButton()
-		this.creator = null
-		this.linkMap = new LinkMap()
-
-		this.creationConstructors = {
-			'board': BoardCreator
-		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		
 		this.viewWidth = this.expanded ? this.expandedWidth() : this.compactWidth
 		this.viewHeight = this.expanded ? this.expandedHeight() : this.compactHeight
 		this.anchor = this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
 
-		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			anchor: Vertex.origin()
-		})
+		this.addDependency('viewWidth', this.background, 'width')
+		this.addDependency('viewHeight', this.background, 'height')
 
 		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
@@ -122,10 +119,8 @@ The content children can also be dragged and panned.
 		this.add(this.expandButton)
 		this.expandButton.hide()
 
-		this.linkMap.update({
-			viewWidth: this.expandedWidth(),
-			viewHeight: this.expandedHeight()
-		})
+		this.addDependency('expandedWidth', this.linkMap, 'viewWidth')
+		this.addDependency('expandedHeight', this.linkMap, 'viewHeight')
 		
 		if (this.contracted) {
 			this.contractStateChange()
@@ -184,7 +179,7 @@ The content children can also be dragged and panned.
 		this.expanded = true
 		getPaper().expandedMobject = this
 		this.enableContent()
-		if (this.parent !== undefined) {
+		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
 		}
 		this.expandButton.update({
@@ -387,7 +382,6 @@ The content children can also be dragged and panned.
 
 	endCreating(e: ScreenEvent) {
 		this.creator.dissolve()
-		this.creator = null
 		this.creationStroke = new VertexArray()
 	}
 

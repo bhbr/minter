@@ -14,20 +14,16 @@ export class ConCircleConstructor extends Constructor {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 1,
-			fillOpacity: 0
+			fillOpacity: 0,
+			freeMidpoint : new FreePoint(),
+			freeOuterPoint: new FreePoint(),
+			circle: new ConCircle()
+
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.freeMidpoint = new FreePoint()
-		this.freeOuterPoint = new FreePoint()
-		this.circle = new ConCircle()
-
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 
 		let sp = this.construction.snappedPointForVertex(this.startPoint)
 		let sp1 = (sp === null) ? this.startPoint : sp.midpoint

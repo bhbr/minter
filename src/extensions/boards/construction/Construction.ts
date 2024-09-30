@@ -51,8 +51,8 @@ export class Construction extends Board {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.view.style.overflow = 'hidden'
 		this.background.update({
 			fillColor: Color.black()

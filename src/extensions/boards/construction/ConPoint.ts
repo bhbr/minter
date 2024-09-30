@@ -18,8 +18,8 @@ export class ConPoint extends Circle {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		if (!this.midpoint || this.midpoint.isNaN()) {
 			this.update({ midpoint: Vertex.origin() }, false)
 		}

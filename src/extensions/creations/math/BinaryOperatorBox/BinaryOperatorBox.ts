@@ -26,19 +26,22 @@ export class BinaryOperatorBox extends ValueBox {
 		return Object.assign(super.fixedArgs(), {
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result'],
-			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"}
+			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
+			operatorSign: new Circle({
+				radius: 10,
+				fillColor: Color.black(),
+				fillOpacity: 1.0
+			}),
+			operatorLabel: new TextLabel()
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.operatorSign = new Circle({
-			midpoint: new Vertex(this.viewWidth / 2, 0),
-			radius: 10,
-			fillColor: Color.black(),
-			fillOpacity: 1.0
+	setup() {
+		super.setup()
+		this.operatorSign.update({
+			midpoint: new Vertex(this.viewWidth / 2, 0)
 		})
-		this.operatorLabel = new TextLabel({
+		this.operatorLabel.update({
 			text: this.operatorDict[this.operator],
 			viewWidth: 2 * this.operatorSign.radius,
 			viewHeight: 2 * this.operatorSign.radius
@@ -72,6 +75,9 @@ export class BinaryOperatorBox extends ValueBox {
 }
 
 export class AddBox extends BinaryOperatorBox {
+
+	declare operator: '+'
+
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			operator: "+"

@@ -15,7 +15,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	inputNames: Array<string>
 	linkHooks: Array<LinkHook>
-	mobject: Linkable // the mobject whose input this list represents
+	mobject?: Linkable // the mobject whose input this list represents
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -30,8 +30,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.createHookList()
 		this.update({ height: this.getHeight() }, false)
 	}
@@ -87,7 +87,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			this.createHookList()
 		}
 		let p1: Vertex = this.bottomCenter()
-		let p2: Vertex = this.mobject.localTopCenter()
+		let p2: Vertex = (this.mobject != null) ? this.mobject.localTopCenter() : Vertex.origin()
 		let v = new Vertex(p2[0] - p1[0], p2[1] - p1[1] - IO_LIST_OFFSET)
 		argsDict['anchor'] = this.anchor.translatedBy(v)
 		argsDict['height'] = this.getHeight()

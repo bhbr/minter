@@ -7,13 +7,17 @@ import { Vertex } from 'core/classes/vertex/Vertex'
 import { Transform } from 'core/classes/vertex/Transform'
 import { log } from 'core/functions/logging'
 import { ForceVector } from './ForceVector'
+import { Torque } from './Torque'
 import { Color } from 'core/classes/Color'
-import { PlayButton } from './PlayButton'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
+import { Playable } from 'extensions/mobjects/PlayButton/Playable'
+import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
+import { Toggle } from 'extensions/mobjects/Toggle'
+import { MGroup } from 'core/mobjects/MGroup'
 
 const FORCE_SCALE: number = 50
 
-export class InclinedScene extends Linkable {
+export class InclinedScene extends Linkable implements Playable {
 
 	inclination: number
 	plane: InclinedPlane
@@ -22,6 +26,12 @@ export class InclinedScene extends Linkable {
 	gravityForce: ForceVector
 	normalForce: ForceVector
 	staticFrictionForce: ForceVector
+	forces: MGroup
+	gravityTorque: Torque
+	normalTorque: Torque
+	staticFrictionTorque: Torque
+	torques: MGroup
+	torqueOrigin: Vertex
 	forceScale: number
 	staticFrictionNumber: number
 	running: boolean
@@ -29,7 +39,10 @@ export class InclinedScene extends Linkable {
 	simulationInterval?: number
 	boxStartCOM: Vertex
 	playButton: PlayButton
+	playState: 'play' | 'pause' | 'stop'
 	glidingStarted?: boolean
+	_showTorques: boolean
+	showTorquesToggle: Toggle
 
 	defaultArgs(): object {
 		return Object.assign(super.defaultArgs(), {
@@ -41,7 +54,9 @@ export class InclinedScene extends Linkable {
 			running: false,
 			simulationStartTime: null,
 			simulationInterval: null,
-			glidingStarted: null
+			glidingStarted: null,
+			showTorques: false,
+			torqueOrigin: Vertex.origin()
 		})
 	}
 
@@ -51,48 +66,50 @@ export class InclinedScene extends Linkable {
 				'inclination'
 			],
 			forceScale: ForceVector,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			playButton: new PlayButton(),
+			box: new InclinedBox({
+				width: 100,
+				height: 75
+			}),
+			plane: new InclinedPlane({
+				length: 500
+			}),
+			gravityForce: new ForceVector({
+				direction: 3/4 * TAU,
+				scale: FORCE_SCALE,
+				size: 2,
+				color: Color.red()
+			}),
+			normalForce: new ForceVector({
+				scale: FORCE_SCALE,
+				color: Color.blue()
+			}),
+			staticFrictionForce: new ForceVector({
+				scale: FORCE_SCALE,
+				color: Color.green()
+			}),
+			showTorquesToggle: new Toggle({
+				propertyName: 'showTorques',
+				labelText: 'show torques',
+				anchor: new Vertex(10, 50)
+			}),
+			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
+			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.playButton = new PlayButton({
-			scene: this
-		})
-		this.box = new InclinedBox({
-			width: 100,
-			height: 75
-		})
-		this.plane = new InclinedPlane({
-			length: 500
-		})
-		this.gravityForce = new ForceVector({
-			direction: 3/4 * TAU,
-			scale: FORCE_SCALE,
-			size: 2,
-			color: Color.red()
-		})
+	setup() {
+		super.setup()
+		this.playButton.update({ mobject: this })
+		this.showTorquesToggle.update({ mobject: this })
 
-		this.normalForce = new ForceVector({
-			scale: FORCE_SCALE,
-			color: Color.blue()
-		})
-
-		this.staticFrictionForce = new ForceVector({
-			scale: FORCE_SCALE,
-			color: Color.green()
-		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
 		this.add(this.plane)
 		this.add(this.box)
-		this.add(this.gravityForce)
-		this.add(this.normalForce)
-		this.add(this.staticFrictionForce)
+		this.add(this.forces)
+		this.add(this.torques)
 		this.add(this.playButton)
+		this.add(this.showTorquesToggle)
 
 		this.plane.update({
 			midpoint: this.localCenter(),
@@ -117,6 +134,46 @@ export class InclinedScene extends Linkable {
 			inclination: this.inclination
 		})
 
+		this.forces.add(this.gravityForce)
+		this.forces.add(this.normalForce)
+		this.forces.add(this.staticFrictionForce)
+
+		this.showTorques = false
+		this.torqueOrigin = this.box.llCorner()
+
+		this.gravityTorque = new Torque({
+			anchor: this.torqueOrigin,
+			force: this.gravityForce
+		})
+		this.torques.add(this.gravityTorque)
+
+		this.normalTorque = new Torque({
+			anchor: this.torqueOrigin,
+			force: this.normalForce
+		})
+		this.torques.add(this.normalTorque)
+
+		this.staticFrictionTorque = new Torque({
+			anchor: this.torqueOrigin,
+			force: this.staticFrictionForce
+		})
+		this.torques.add(this.staticFrictionTorque)
+
+		this.add(this.torques)
+		this.showTorques = false
+	}
+
+	get showTorques(): boolean {
+		return this._showTorques
+	}
+
+	set showTorques(newValue: boolean) {
+		this._showTorques = newValue
+		if (newValue) {
+			this.torques.show()
+		} else {
+			this.torques.hide()
+		}
 	}
 
 	gravityForceNormalComponent(): number {
@@ -142,6 +199,7 @@ export class InclinedScene extends Linkable {
 	}
 
 	updateModel(argsDict: object = {}) {
+		argsDict['torqueOrigin'] = this.box.llCorner()
 		super.updateModel(argsDict)
 		let v = new Vertex(0, -this.box.height / 2).rotatedBy(this.inclination)
 		let newCOM = this.vertexAlongPlane(this.initialBoxPositionAlongPlane).translatedBy(v)
@@ -168,7 +226,6 @@ export class InclinedScene extends Linkable {
 		}
 		this.glidingStarted = true
 		let FtotSize = this.gravityForceParallelComponent() / 10
-		console.log(FtotSize)
 		let t = (Date.now() - this.simulationStartTime) / 1000
 		let boxPositionAlongPlane = this.initialBoxPositionAlongPlane - FtotSize * 0.5 * t ** 2
 		let newBoxBottomCenter = this.vertexAlongPlane(boxPositionAlongPlane)
@@ -184,7 +241,18 @@ export class InclinedScene extends Linkable {
 		this.simulationInterval = null
 	}
 
+	togglePlayState() {
+		if (this.playState == 'play') {
+			this.pause()
+		} else {
+			this.play()
+		}
+	}
 
+	onPointerDown(e: ScreenEvent) {
+		console.log('Scene')
+		console.log(this.eventTargetMobjectChain(e))
+	}
 
 
 

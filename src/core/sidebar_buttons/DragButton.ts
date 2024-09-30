@@ -6,13 +6,9 @@ export class DragButton extends ToggleButton {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			messages: [{ drag: true }],
-			outgoingMessage: { drag: false }
+			outgoingMessage: { drag: false },
+			text: 'drag'
 		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
-		this.label.text = 'drag'
 	}
 
 }

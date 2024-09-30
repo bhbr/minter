@@ -1,6 +1,6 @@
 
-import { PhysicsPaper } from './extensions/boards/physics/PhysicsPaper'
+import { DemoPaper } from './extensions/boards/demo/DemoPaper'
 
-export class StartPaper extends PhysicsPaper { }
+export class StartPaper extends DemoPaper { }
 
 export const paper = new StartPaper()

@@ -17,7 +17,11 @@ export class ValueBox extends Linkable {
 			viewHeight: 40,
 			inputNames: ['value'],
 			outputNames: ['value'],
-			strokeWidth: 0.0
+			strokeWidth: 0.0,
+			background: new Rectangle({
+				fillColor: Color.black()
+			}),
+			valueLabel: new TextLabel()
 		})
 	}
 
@@ -27,14 +31,13 @@ export class ValueBox extends Linkable {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.background = new Rectangle({
+	setup() {
+		super.setup()
+		this.background.update({
 			width: this.viewWidth,
-			height: this.viewHeight,
-			fillColor: Color.black()
+			height: this.viewHeight
 		})
-		this.valueLabel = new TextLabel({
+		this.valueLabel.update({
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
 			text: `${this.value}`

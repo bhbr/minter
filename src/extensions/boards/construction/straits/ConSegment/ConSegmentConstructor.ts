@@ -6,13 +6,15 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	segment: ConSegment
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.segment = new ConSegment()
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			segment: new ConSegment()
+		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.segment)
 		this.segment.update({
 			startPoint: this.startFreePoint.midpoint,

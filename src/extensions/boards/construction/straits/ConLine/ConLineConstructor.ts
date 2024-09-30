@@ -6,13 +6,14 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.line = new ConLine()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			line: new ConLine()
+		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.line)
 		this.line.update({
 			startPoint: this.startFreePoint.midpoint,

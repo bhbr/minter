@@ -21,7 +21,11 @@ export class InputValueBox extends Linkable {
 			inputNames: [],
 			outputNames: ['value'],
 			strokeWidth: 0.0,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			background: new Rectangle({
+				fillColor: Color.black()
+			}),
+			inputBox: document.createElement('input')
 		})
 	}
 
@@ -34,14 +38,12 @@ export class InputValueBox extends Linkable {
 		}
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.background = new Rectangle({
 			width: this.viewWidth,
-			height: this.viewHeight,
-			fillColor: Color.black()
+			height: this.viewHeight
 		})
-		this.inputBox = document.createElement('input')
 		this.inputBox.setAttribute('type', 'text')
 		this.inputBox.style.width = '90%'
 		this.inputBox.style.padding = '3px 3px'

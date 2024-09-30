@@ -5,8 +5,8 @@ import { Color } from 'core/classes/Color'
 export class TextLabel extends Mobject {
 
 	text: string
-	horizontalAlign: string // 'left' | 'center' | 'right'
-	verticalAlign: string // 'top' | 'center' | 'bottom'
+	horizontalAlign: 'left' | 'center' | 'right'
+	verticalAlign: 'top' | 'center' | 'bottom'
 	color?: Color
 	borderColor: Color
 	borderWidth: number
@@ -23,18 +23,12 @@ export class TextLabel extends Mobject {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.view.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
 		this.view.style.display = 'flex'
 		this.view.style.fontFamily = 'Helvetica'
 		this.view.style.fontSize = `${this.fontSize}px`
-	}
-
-	redrawSelf() {
-		if (this.anchor.isNaN()) { return }
-		if (this.color == undefined) { this.color = Color.white() }
-		super.redrawSelf()
 	}
 
 	updateModel(argsDict: object = {}) {

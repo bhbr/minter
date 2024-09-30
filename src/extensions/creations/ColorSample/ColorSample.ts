@@ -24,22 +24,18 @@ export class ColorSample extends Linkable {
 			viewHeight: 2 * RADIUS,
 			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			circle : new Circle({
+				radius: RADIUS,
+				midpoint: new Vertex(RADIUS, RADIUS),
+				fillOpacity: 1
+			})
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.circle = new Circle({
-			radius: RADIUS,
-			midpoint: new Vertex(RADIUS, RADIUS),
-			fillOpacity: 1
-		})
-	}
-
-	statefulSetup() {
+	setup() {
+		super.setup()
 		this.add(this.circle)
-		super.statefulSetup()
 	}
 
 	get red(): number { return this.color.red }

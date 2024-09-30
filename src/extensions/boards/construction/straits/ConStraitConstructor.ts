@@ -10,14 +10,16 @@ export class ConStraitConstructor extends Constructor {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.startFreePoint = new FreePoint()
-		this.endFreePoint = new FreePoint()
+
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			startFreePoint: new FreePoint(),
+			endFreePoint: new FreePoint()
+		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		let sp = this.construction.snappedPointForVertex(this.startPoint)
 		let sp1 = (sp === null) ? this.startPoint : sp.midpoint
 		

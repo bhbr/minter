@@ -7,13 +7,14 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.swing = new Swing()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			swing: new Swing()
+		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.swing)
 		this.swing.update({
 			anchor: this.getStartPoint()

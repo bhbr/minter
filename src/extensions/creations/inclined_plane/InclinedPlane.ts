@@ -20,17 +20,13 @@ export class InclinedPlane extends Polygon {
 	fixedArgs(): object {
 		return Object.assign(super.defaultArgs(), {
 			fillColor: Color.white(),
-			fillOpacity: 0.5
+			fillOpacity: 0.5,
+			vertices: new VertexArray([
+				Vertex.origin(),
+				Vertex.origin(),
+				Vertex.origin()
+			])
 		})
-	}
-
-	statelessSetup() {
-		super.statelessSetup()
-		this.vertices = new VertexArray([
-			Vertex.origin(),
-			Vertex.origin(),
-			Vertex.origin()
-		])
 	}
 
 	getWidth(): number {

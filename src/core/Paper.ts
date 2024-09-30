@@ -33,17 +33,13 @@ export class Paper extends Board {
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
 			expanded: true,
-			expandedPadding: 0
+			expandedPadding: 0,
+			currentColor: Color.white()
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.currentColor = COLOR_PALETTE['white']
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		document.addEventListener('keydown', this.boundButtonDownByKey)

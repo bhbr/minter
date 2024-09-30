@@ -48,7 +48,8 @@ export class SidebarButton extends Circle {
 		return Object.assign(super.fixedArgs(), {
 			strokeWidth: 0,
 			optionSpacing: 25,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			label: new TextLabel()
 		})
 	}
 
@@ -71,13 +72,8 @@ export class SidebarButton extends Circle {
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.label = new TextLabel()
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)

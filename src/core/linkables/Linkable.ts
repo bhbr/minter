@@ -25,6 +25,13 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 	}
 
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			inputList: new InputList(),
+			outputList: new OutputList()
+		})
+	}
+
 	// this declares that the parent mobject will always be a board
 	get parent(): Board {
 		return super.parent as Board
@@ -33,15 +40,15 @@ which can be linked to such-exposed variables of other mobjects.
 		super.parent = newValue
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
-		this.inputList = new InputList({
+	setup() {
+		super.setup()
+		this.inputList.update({
 			mobject: this,
 			inputNames: this.inputNames
 		})
 		this.add(this.inputList)
 		this.inputList.hide()
-		this.outputList = new OutputList({
+		this.outputList.update({
 			mobject: this,
 			outputNames: this.outputNames
 		})

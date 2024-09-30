@@ -18,18 +18,17 @@ linkable mobjects
 	endBullet: LinkBullet
 	linkLine: Line
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.dependency = new Dependency()
-		this.startBullet = new LinkBullet()
-		this.endBullet = new LinkBullet()
-		this.linkLine = new Line({
-			strokeWidth: LINK_LINE_WIDTH
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			dependency: new Dependency(),
+			startBullet: new LinkBullet(),
+			endBullet: new LinkBullet(),
+			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.startBullet)
 		this.add(this.linkLine)
 		this.add(this.endBullet)

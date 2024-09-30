@@ -10,8 +10,11 @@ export class CurvedLine extends VMobject {
 	- this.bezierPoints[2, 5, 8, 11, ...] : backward ('right') control points
 	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
+
 	_bezierPoints: VertexArray
+
 	get bezierPoints(): VertexArray { return this._bezierPoints }
+	
 	set bezierPoints(newValue: VertexArray) {
 		this._bezierPoints = newValue
 		let v = new VertexArray()

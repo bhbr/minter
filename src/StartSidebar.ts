@@ -1,6 +1,6 @@
 
-import { PhysicsSidebar } from './extensions/boards/physics/PhysicsSidebar'
+import { DemoSidebar } from './extensions/boards/demo/DemoSidebar'
 
-export class StartSidebar extends PhysicsSidebar { }
+export class StartSidebar extends DemoSidebar { }
 
 export const sidebar = new StartSidebar()

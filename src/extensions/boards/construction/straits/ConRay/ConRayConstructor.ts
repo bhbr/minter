@@ -6,13 +6,14 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.ray = new ConRay()
+	fixedArgs(): object {
+		return Object.assign(super.fixedArgs(), {
+			ray: new ConRay()
+		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.add(this.ray)
 		this.ray.update({
 			startPoint: this.startFreePoint.midpoint,

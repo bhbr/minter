@@ -21,38 +21,30 @@ export class Freehand extends Creator {
 
 	fixedArgs(): object {
 		return Object.assign(super.fixedArgs(), {
+			line: new Polygon({
+				closed: false,
+				opacity: 1.0
+			}),
 			screenEventHandler: ScreenEventHandler.Below
 		})
 	}
 
-	statelessSetup() {
-		super.statelessSetup()
-		this.line = new Polygon({
-			closed: false,
-			opacity: 1.0,
+	setup() {
+		super.setup()
+		this.line.update({
 			vertices: this.creationStroke
 		})
-	}
-
-	statefulSetup() {
-		super.statefulSetup()
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
-		this.line.update({
-			strokeColor: this.penStrokeColor
-		})
 		this.add(this.line)
 	}
 
 	
 	updateFromTip(q: Vertex) {
-		//this.line.vertices.push(q)
-		//this.endPoint.copyFrom(q)
 		super.updateFromTip(q)
-		this.redraw() // necessary?
+		this.redraw()
 	}
 
 	dissolve() {
-
 		this.line.adjustFrame()
 
 		let dr = this.line.anchor.copy()

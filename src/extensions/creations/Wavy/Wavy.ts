@@ -27,8 +27,8 @@ export class Wavy extends CindyCanvas {
 		})
 	}
 
-	statefulSetup() {
-		super.statefulSetup()
+	setup() {
+		super.setup()
 		this.cindySetup()
 	}
 

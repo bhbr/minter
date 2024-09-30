@@ -19,8 +19,7 @@ export class WavyCreator extends SpanningCreator {
 			anchor: this.getStartPoint(),
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
-			nbSources: this.nbSources,
-			id: `wave-${this.viewWidth}x${this.viewHeight}`
+			nbSources: this.nbSources
 		})
 	}
 
