@@ -5,7 +5,7 @@ import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, r
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { COLOR_PALETTE } from 'core/constants'
+import { PAPER_WIDTH, PAGE_HEIGHT, COLOR_PALETTE } from 'core/constants'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
 import { StartPaper } from 'startPaper'
@@ -17,20 +17,25 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+		])
+	}
+
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			children: [],
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,
 			pressedKeys: [],
 			activeKeyboard: true,
 			view: document.querySelector('#paper_id') as HTMLDivElement,
-			viewWidth: 1216,
-			viewHeight: 1024,
+			viewWidth: PAPER_WIDTH,
+			viewHeight: PAGE_HEIGHT,
 			expanded: true,
 			expandedPadding: 0,
 			currentColor: Color.white()
-		}
+		})
 	}
 
 	setup() {

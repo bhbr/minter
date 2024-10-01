@@ -5,9 +5,9 @@ import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
 export class FreePoint extends ConPoint {
 
 	defaults() {
-		return {
+		return Object.assign(super.defaults(), {
 			screenEventHandler: ScreenEventHandler.Parent
-		}
+		})
 	}
 
 	onPointerDown(e: ScreenEvent) {

@@ -6,11 +6,11 @@ import { Color } from 'core/classes/Color'
 export class ConPoint extends Circle {
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			radius: 7.0,
 			fillColor: Color.white(),
 			fillOpacity: 1.0
-		}
+		})
 	}
 
 	setup() {

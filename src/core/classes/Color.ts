@@ -32,6 +32,10 @@ export class Color {
 		return `rgb(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`
 	}
 
+	toString(): string {
+		return this.toCSS()
+	}
+
 	withAlpha(a: number, premultiplied: boolean = false): Color {
 		return new Color(this.red, this.green, this.blue, premultiplied ? a * this.alpha : a)
 	}

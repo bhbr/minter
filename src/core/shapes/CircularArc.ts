@@ -12,6 +12,12 @@ export class CircularArc extends CurvedLine {
 	angle: number
 	nbPoints: number // vertex resolution along the arc
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'nbPoints'
+		])
+	}
+
 	// A circle's midpoint is not implemented as its own property,
 	// that needs to be kept in sync with its anchor
 	get midpoint(): Vertex {
@@ -28,12 +34,12 @@ export class CircularArc extends CurvedLine {
 	}
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			midpoint: Vertex.origin(),
 			radius: DEFAULT_RADIUS,
 			angle: TAU / 4,
 			nbPoints: 32
-		}
+		})
 	}
 
 	updateModel(argsDict: object = {}) {

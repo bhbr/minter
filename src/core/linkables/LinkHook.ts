@@ -13,14 +13,14 @@ export class LinkHook extends Circle {
 	type: "input" | "output"
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			mobject: new Mobject(),
 			name: "default",
 			type: "input",
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white()
-		}
+		})
 	}
 
 	positionInLinkMap(): Vertex {

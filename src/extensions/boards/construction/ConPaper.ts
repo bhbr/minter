@@ -4,13 +4,13 @@ import { Construction } from './Construction'
 export class ConPaper extends Construction {
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			buttonNames: [
 				'DragButton',
 				'StraitButton',
 				'ConCircleButton'
 			]
-		}
+		})
 	}
 
 }

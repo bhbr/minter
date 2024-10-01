@@ -18,7 +18,7 @@ export class PhysicsPaper extends Paper {
 	scene: InclinedScene
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			scene: new InclinedScene({
 			anchor: new Vertex(100, 100)
 		}),
@@ -33,7 +33,7 @@ export class PhysicsPaper extends Paper {
 				'LinkButton',
 				'NumberButton'
 			]
-		}
+		})
 	}
 
 	setup() {

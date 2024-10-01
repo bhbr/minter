@@ -45,7 +45,7 @@ export class InclinedScene extends Linkable implements Playable {
 	showTorquesToggle: Toggle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			viewWidth: 500,
 			viewHeight: 300,
 			inclination: 20 * DEGREES,
@@ -91,7 +91,7 @@ export class InclinedScene extends Linkable implements Playable {
 			}),
 			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
 			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
-		}
+		})
 	}
 
 	setup() {

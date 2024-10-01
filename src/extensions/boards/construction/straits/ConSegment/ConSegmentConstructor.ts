@@ -7,9 +7,9 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 	segment: ConSegment
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			segment: new ConSegment()
-		}
+		})
 	}
 
 	setup() {

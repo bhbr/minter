@@ -12,11 +12,11 @@ a dependency between two linkable mobjects.
 */
 	
 	defaults(): object {
-		return {        
+		return Object.assign(super.defaults(), {        
 			radius: BULLET_RADIUS,
 			fillOpacity: 1,
 			strokeColor: Color.white()
-		}
+		})
 	}
 
 	get parent(): DependencyLink {

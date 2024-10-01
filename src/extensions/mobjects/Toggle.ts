@@ -21,7 +21,7 @@ export class Toggle extends Mobject {
 	}
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			state: false,
 			mobject: null,
 			propertyName: '',
@@ -39,7 +39,7 @@ export class Toggle extends Mobject {
 				viewHeight: 20
 			}),
 			screenEventHandler: ScreenEventHandler.Self
-		}
+		})
 	}
 
 	setup() {

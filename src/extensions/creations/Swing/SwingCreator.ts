@@ -8,9 +8,9 @@ export class SwingCreator extends Creator {
 	swing: Swing
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			swing: new Swing()
-		}
+		})
 	}
 
 	setup() {

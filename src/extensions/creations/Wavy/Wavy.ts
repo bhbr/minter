@@ -11,7 +11,7 @@ export class Wavy extends CindyCanvas {
 	color: Color
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],
 			outputNames: [],
 			wavelength: 0.25,
@@ -19,7 +19,7 @@ export class Wavy extends CindyCanvas {
 			nbSources: 1,
 			sourceYPosition: 0.2,
 			color: Color.green()
-		}
+		})
 	}
 
 	initCode(): string {

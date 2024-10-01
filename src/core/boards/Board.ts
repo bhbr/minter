@@ -64,7 +64,7 @@ The content children can also be dragged and panned.
 	linkMap: LinkMap
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			screenEventHandler: ScreenEventHandler.Self,
 			contentChildren: [],
 			expanded: false,
@@ -95,7 +95,7 @@ The content children can also be dragged and panned.
 				strokeWidth: 2.0,
 				screenEventHandler: ScreenEventHandler.Parent
 			})
-		}
+		})
 	}
 
 	setup() {

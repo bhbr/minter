@@ -7,9 +7,9 @@ export class ConRayConstructor extends ConStraitConstructor {
 	ray: ConRay
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			ray: new ConRay()
-		}
+		})
 	}
 
 	setup() {

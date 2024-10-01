@@ -20,7 +20,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	playState: 'play' | 'pause' | 'stop'
 	
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			screenEventHandler: ScreenEventHandler.Self,
 			outerFrame: new Rectangle(),
 			playButton: new PlayButton({
@@ -29,7 +29,7 @@ export class CindyCanvas extends Linkable implements Playable {
 			playedOnce: false,
 			playState: 'stop',
 			drawBorder: true
-		}
+		})
 	}
 
 	setup() {

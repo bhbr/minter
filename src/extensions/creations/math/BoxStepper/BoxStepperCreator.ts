@@ -7,9 +7,9 @@ export class BoxStepperCreator extends BoxSliderCreator {
 	declare creation: BoxStepper
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			creation: new BoxStepper()
-		}
+		})
 	}
 
 }

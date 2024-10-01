@@ -6,11 +6,11 @@ import { Vertex } from 'core/classes/vertex/Vertex'
 export class BoxStepper extends BoxSlider {
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			min: 0,
 			max: 10,
 			precision: 0
-		}
+		})
 	}
 
 	onPointerMove(e: ScreenEvent) {

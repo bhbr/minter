@@ -7,9 +7,9 @@ export class CurvedShape extends CurvedLine {
 	*/
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			closed: true
-		}
+		})
 	}
 
 }

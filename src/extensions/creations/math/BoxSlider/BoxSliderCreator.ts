@@ -15,13 +15,13 @@ export class BoxSliderCreator extends Creator {
 	max: number
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			width: 70,
 			height: 0,
 			fillColor: Color.black(),
 			min: 0,
 			max: 1
-		}
+		})
 	}
 
 	setup() {

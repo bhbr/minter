@@ -26,7 +26,7 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 export class DemoPaper extends Paper {
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'slider': BoxSliderCreator,
@@ -52,13 +52,13 @@ export class DemoPaper extends Paper {
 				'SwingButton',
 				'ColorSampleButton'
 			]
-		}
+		})
 	}
 
 	setup() {
 		super.setup()
 		let rect = new Rectangle({
-			anchor: new Vertex(50, 50),
+			anchor: new Vertex(100, 100),
 			width: 100,
 			height: 100,
 			fillColor: Color.red(),
@@ -76,6 +76,11 @@ export class DemoPaper extends Paper {
 
 		rect.add(circ)
 		this.addToContent(rect)
+		console.log(ScreenEventHandler[rect.screenEventHandler])
+
+		circ.update({
+			strokeWidth: 10
+		})
 
 		rect.onPointerDown = (e: ScreenEvent) => {
 			console.log(rect.localEventVertex(e))

@@ -7,10 +7,10 @@ export class Ellipse extends CurvedShape {
 	minorAxis: number
 
 	defaults() {
-		return {
+		return Object.assign(super.defaults(), {
 			majorAxis: 200,
 			minorAxis: 100
-		}
+		})
 	}
 
 	updateBezierPoints() { }

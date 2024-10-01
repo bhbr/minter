@@ -12,13 +12,13 @@ export class ConCircleConstructor extends Constructor {
 	circle: ConCircle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			strokeWidth: 1,
 			fillOpacity: 0,
 			freeMidpoint : new FreePoint(),
 			freeOuterPoint: new FreePoint(),
 			circle: new ConCircle()
-		}
+		})
 	}
 
 	setup() {

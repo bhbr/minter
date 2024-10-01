@@ -48,28 +48,23 @@ and logic for drawing and user interaction.
 
 	*/
 
-	constructor(argsDict: object = {}, isSuperCall = false) {
+	constructor(argsDict: object = {}) {
 	/*
 	A mobject is initialized by providing a dictionary (object)
 	of parameters (argsDict).
 	*/
-
-		// First call all superclass constructors with no parameters at all
-		super() //{}, true)
-		//if (isSuperCall) { return }
-
-		// Now we are back in the lowest-class constructor
-
-		// Complement the constructor's arguments with default values.
-		let initialArgs = Object.assign(this.allDefaults(), argsDict)
+		super()
+		let initialArgs = Object.assign(this.defaults(), argsDict)
 		this.setAttributes(initialArgs)
+		
 		this.setup()
 		this.update()
-		
 	}
 
-	allDefaults(): object {
-		return Object.assign(Object.getPrototypeOf(this).allDefaults(), this.defaults())
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'view'
+		])
 	}
 
 	defaults(): object {
@@ -79,7 +74,7 @@ and logic for drawing and user interaction.
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		return {
+		return Object.assign(super.defaults(), {
 			// The meaning of these properties is explained in the sections further below.
 
 			// position
@@ -111,15 +106,7 @@ and logic for drawing and user interaction.
 			savedScreenEventHandler: null,
 			eventTarget: null,
 			screenEventHistory: []
-		}
-	}
-
-	allReadonlyProperties(): Array<string> {
-		return Object.getPrototypeOf(this).allReadonlyProperties().concat(this.readonlyProperties())
-	}
-
-	readonlyProperties(): Array<string> {
-		return []
+		})
 	}
 
 	setup() {

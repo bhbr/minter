@@ -9,9 +9,9 @@ export class WavyCreator extends SpanningCreator {
 	nbSources: number
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			nbSources: 1
-		}
+		})
 	}
 
 	createdMobject(): Wavy {

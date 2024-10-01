@@ -9,10 +9,10 @@ export class Line extends Polygon {
 	endPoint: Vertex
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin()
-		}
+		})
 	}
 
 	/*

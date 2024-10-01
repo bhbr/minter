@@ -11,6 +11,12 @@ export class CurvedLine extends VMobject {
 	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'bezierPoints'
+		])
+	}
+
 	_bezierPoints: VertexArray
 
 	get bezierPoints(): VertexArray { return this._bezierPoints }
@@ -29,9 +35,9 @@ export class CurvedLine extends VMobject {
 	closed: boolean // a closed CurvedLine is a CurvedShape
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			closed: false
-		}
+		})
 	}
 
 	updateBezierPoints() { }

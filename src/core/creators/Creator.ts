@@ -10,11 +10,11 @@ export class Creator extends Mobject {
 	creationStroke: Array<Vertex>
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			creationStroke: [],
 			creation: null,
 			screenEventHandler: ScreenEventHandler.Self
-		}
+		})
 	}
 
 	get parent(): Board {

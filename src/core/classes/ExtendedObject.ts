@@ -64,6 +64,12 @@ export class ExtendedObject {
 		let propertyArgsDict: object = {}
 		let accessorArgsDict: object = {}
 		for (let [key, value] of Object.entries(argsDict)) {
+
+			if (this.readonlyProperties().includes(key) && this[key] != undefined) {
+				console.error(`Cannot reassign property ${key} (to ${value.toString()}) on ${this.constructor.name}`)
+				continue
+			}
+
 			if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
 				propertyArgsDict[key] = value
 			} else {
@@ -84,7 +90,7 @@ export class ExtendedObject {
 			
 		if (setter != undefined) {
 			
-			if (Object.keys(this.allReadonlyProperties()).includes(key) && this[key] != undefined) {
+			if (this.readonlyProperties().includes(key) && this[key] != undefined) {
 				console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
 				return
 			}
@@ -113,10 +119,10 @@ export class ExtendedObject {
 		this.setAttributes(updateDict)
 	}
 
-	allDefaults(): object { return {} }
+	defaults(): object { return {} }
 	// filled upon subclassing
 
-	allReadonlyProperties(): Array<string> { return [] }
+	readonlyProperties(): Array<string> { return [] }
 
 	assureProperty(key: string, cons: any) {
 	// for proper initialization:

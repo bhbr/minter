@@ -40,12 +40,12 @@ export class SidebarButton extends Circle {
 	activeKeyboard: boolean
 
 	constructor(argsDict: object = {}, isSuperCall = false) {
-		super(argsDict, isSuperCall)
+		super(argsDict)
 		buttonDict[this.constructor.name] = this.constructor
 	}
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			strokeWidth: 0,
 			optionSpacing: 25,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -64,7 +64,7 @@ export class SidebarButton extends Circle {
 			viewHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 0.5,
 			activeKeyboard: true
-		}
+		})
 	}
 
 	setup() {

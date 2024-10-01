@@ -98,9 +98,9 @@ export class MultiplyBox extends BinaryOperatorBox {
 
 export class DivideBox extends BinaryOperatorBox {
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			operator: "/"
-		}
+		})
 	}
 }
 

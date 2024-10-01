@@ -15,16 +15,16 @@ which can be linked to such-exposed variables of other mobjects.
 	inputNames: Array<string>
 	outputNames: Array<string>
 	inputList: InputList
-	outputList: OutputList
+	outputList: OutputList 
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			inputNames: [],
 			outputNames: [],
 			screenEventHandler: ScreenEventHandler.Self,
 			inputList: new InputList(),
 			outputList: new OutputList()
-		}
+		})
 	}
 
 	// this declares that the parent mobject will always be a board

@@ -13,14 +13,14 @@ export class Rectangle extends Polygon {
 	p4: Vertex // = (0, height)
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			width: 200,
 			height: 100,
 			p1: Vertex.origin(),
 			p2: new Vertex(200, 0),
 			p3: new Vertex(200, 100),
 			p4: new Vertex(0, 100)
-		}
+		})
 	}
 
 	setup() {

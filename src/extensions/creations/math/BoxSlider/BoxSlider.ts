@@ -36,7 +36,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	scrubStartingPoint: Vertex
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			min: 0,
 			max: 1,
 			value: 0.6,
@@ -63,7 +63,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				verticalAlign: 'center',
 				fontSize: 20
 			})
-		}
+		})
 	}
 
 	setup() {
@@ -94,14 +94,14 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.outerBar.update({
 			width: this.width,
 			height: this.height,
-			fillColor: this.backgroundColor
+			//fillColor: this.backgroundColor
 		}, false)
 
 		this.filledBar.update({
 			width: this.width,
 			height: a * this.height,
 			anchor:  new Vertex(0, this.height - a * this.height),
-			fillColor: this.barFillColor
+			//fillColor: this.barFillColor
 		}, false)
 
 		this.updateLabel()

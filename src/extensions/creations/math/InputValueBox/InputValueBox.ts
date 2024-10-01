@@ -15,7 +15,7 @@ export class InputValueBox extends Linkable {
 	background: Rectangle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: [],
@@ -26,7 +26,7 @@ export class InputValueBox extends Linkable {
 				fillColor: Color.black()
 			}),
 			inputBox: document.createElement('input')
-		}
+		})
 	}
 
 	onPointerUp(e: ScreenEvent) {

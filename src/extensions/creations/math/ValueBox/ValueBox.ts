@@ -12,7 +12,7 @@ export class ValueBox extends Linkable {
 	background: Rectangle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: ['value'],
@@ -23,7 +23,7 @@ export class ValueBox extends Linkable {
 			}),
 			valueLabel: new TextLabel(),
 			value: 1
-		}
+		})
 	}
 
 	setup() {

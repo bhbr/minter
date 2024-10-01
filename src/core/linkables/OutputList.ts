@@ -18,7 +18,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	mobject: Mobject
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			mobject: null,
 			outputNames: [],
 			linkHooks: [],
@@ -27,7 +27,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			fillOpacity: 0.2,
 			strokeWidth: 0,
 			width: IO_LIST_WIDTH
-		}
+		})
 	}
 
 	setup() {

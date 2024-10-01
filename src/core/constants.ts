@@ -1,6 +1,10 @@
 
 import { Color } from 'core/classes/Color'
 
+export const SIDEBAR_WIDTH = 150
+export const PAPER_WIDTH = 1216
+export const PAGE_HEIGHT = 1024
+
 export const TAU = 2 * Math.PI
 export const PI = TAU / 2
 export const DEGREES = TAU / 360

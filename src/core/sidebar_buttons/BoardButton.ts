@@ -4,9 +4,9 @@ import { CreativeButton } from './CreativeButton'
 export class BoardButton extends CreativeButton {
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			creations: ['board']
-		}
+		})
 	}
 
 }

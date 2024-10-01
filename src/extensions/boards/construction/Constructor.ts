@@ -15,12 +15,12 @@ export class Constructor extends Creator {
 	endPoint: Vertex
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
 			penFillOpacity: 0.0
-		}
+		})
 	}
 
 }

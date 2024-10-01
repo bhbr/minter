@@ -19,12 +19,12 @@ linkable mobjects
 	linkLine: Line
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			dependency: new Dependency(),
 			startBullet: new LinkBullet(),
 			endBullet: new LinkBullet(),
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
-		}
+		})
 	}
 
 	setup() {

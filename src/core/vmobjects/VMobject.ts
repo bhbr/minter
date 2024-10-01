@@ -53,7 +53,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 	}
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			fillColor: Color.white(),
 			fillOpacity: 0,
 			strokeColor: Color.white(),
@@ -61,7 +61,14 @@ TODO: support mutiple paths e. g. for shapes with holes
 			vertices: new VertexArray(),
 			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 			path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
-		}
+		})
+	}
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'svg',
+			'path'
+		])
 	}
 
 	setup() {

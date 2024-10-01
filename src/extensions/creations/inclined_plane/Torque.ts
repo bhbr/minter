@@ -18,11 +18,11 @@ export class Torque extends Polygon {
 	}
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			strokeWidth: 0,
 			fillColor: new Color(0, 0.5, 0.5),
 			fillOpacity: 0.5
-		}
+		})
 	}
 
 	lever(): Vertex {

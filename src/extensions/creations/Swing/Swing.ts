@@ -23,7 +23,7 @@ export class Swing extends Linkable {
 	weight: Circle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			maxLength: 300,
 			length: 1,
 			mass: 0.2,
@@ -43,7 +43,7 @@ export class Swing extends Linkable {
 				fillOpacity: 1
 			}),
 			initialTime: Date.now()
-		}
+		})
 	}
 
 	setup() {

@@ -13,7 +13,7 @@ export class ColorSample extends Linkable {
 	circle: Circle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			color: Color.white(),
 			viewWidth: 2 * RADIUS,
 			viewHeight: 2 * RADIUS,
@@ -25,7 +25,7 @@ export class ColorSample extends Linkable {
 				midpoint: new Vertex(RADIUS, RADIUS),
 				fillOpacity: 1
 			})
-		}
+		})
 	}
 
 	setup() {

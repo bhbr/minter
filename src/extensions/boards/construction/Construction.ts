@@ -35,7 +35,7 @@ export class Construction extends Board {
 	declare Creator: ConstructingConMobject
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			points: [],
 			constructedMobjects: [],
 			buttonNames: [
@@ -43,7 +43,7 @@ export class Construction extends Board {
 				'StraitButton',
 				'ConCircleButton'
 			]
-		}
+		})
 	}
 
 	setup() {

@@ -6,10 +6,10 @@ export class CreativeButton extends SidebarButton {
 	creations: Array<string>
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			creations: [],
 			outgoingMessage: { create: 'freehand' }
-		}
+		})
 	}
 
 	setup() {

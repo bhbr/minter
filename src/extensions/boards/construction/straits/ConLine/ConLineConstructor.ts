@@ -7,9 +7,9 @@ export class ConLineConstructor extends ConStraitConstructor {
 	line: ConLine
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			line: new ConLine()
-		}
+		})
 	}
 
 	setup() {

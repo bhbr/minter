@@ -10,9 +10,9 @@ export class SpanningCreator extends Creator {
 	rectangle: Rectangle
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			rectangle: new Rectangle()
-		}
+		})
 	}
 
 	setup() {

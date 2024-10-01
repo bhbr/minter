@@ -14,7 +14,7 @@ export class Freehand extends Creator {
 	penStrokeLength: number
 	
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penStrokeLength: 2.0,
@@ -23,23 +23,16 @@ export class Freehand extends Creator {
 				opacity: 1.0
 			}),
 			screenEventHandler: ScreenEventHandler.Below
-		}
+		})
 	}
 
 	setup() {
 		super.setup()
-		this.update({
-			penStrokeColor: Color.red()
-		})
 		this.line.update({
 			vertices: this.creationStroke
 		})
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
 		this.add(this.line)
-
-		console.log(this)
-		console.log(Object.getOwnPropertyDescriptor(this, 'penStrokeWidth'))
-		console.log(Object.getOwnPropertyDescriptor(this, 'penStrokeLength'))
 	}
 
 	

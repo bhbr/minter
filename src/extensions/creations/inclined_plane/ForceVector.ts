@@ -20,7 +20,7 @@ export class ForceVector extends ConStrait {
 	color: Color
 
 	defaults(): object {
-		return {
+		return Object.assign(super.defaults(), {
 			size: 1,
 			scale: 100,
 			direction: 0,
@@ -37,7 +37,7 @@ export class ForceVector extends ConStrait {
 				fillOpacity: 1,
 				strokeWidth: 0	
 			})
-		}
+		})
 	}
 
 	setup() {
