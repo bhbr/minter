@@ -10,12 +10,11 @@ export class ConStraitConstructor extends Constructor {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			startFreePoint: new FreePoint(),
 			endFreePoint: new FreePoint()
-		})
+		}
 	}
 
 	setup() {

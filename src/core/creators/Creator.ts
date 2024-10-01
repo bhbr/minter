@@ -9,17 +9,12 @@ export class Creator extends Mobject {
 	creation?: Mobject
 	creationStroke: Array<Vertex>
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			creationStroke: [],
-			creation: null
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			creation: null,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
 	get parent(): Board {

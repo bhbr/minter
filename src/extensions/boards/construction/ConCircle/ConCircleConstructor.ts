@@ -11,15 +11,14 @@ export class ConCircleConstructor extends Constructor {
 	freeOuterPoint: FreePoint
 	circle: ConCircle
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			strokeWidth: 1,
 			fillOpacity: 0,
 			freeMidpoint : new FreePoint(),
 			freeOuterPoint: new FreePoint(),
 			circle: new ConCircle()
-
-		})
+		}
 	}
 
 	setup() {

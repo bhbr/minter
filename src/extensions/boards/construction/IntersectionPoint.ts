@@ -14,10 +14,10 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			midpoint: new Vertex(NaN, NaN)
-		})
+		}
 	}
 
 	updateModel(argsDict: object = {}) {

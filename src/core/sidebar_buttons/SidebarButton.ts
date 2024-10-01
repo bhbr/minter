@@ -25,8 +25,8 @@ export class SidebarButton extends Circle {
 	
 	currentModeIndex: number
 	previousIndex: number
-	_baseColor: Color
-	_locationIndex: number
+	baseColor: Color
+	locationIndex: number
 	optionSpacing: number
 	touchStart: Vertex
 	active: boolean
@@ -44,17 +44,12 @@ export class SidebarButton extends Circle {
 		buttonDict[this.constructor.name] = this.constructor
 	}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			strokeWidth: 0,
 			optionSpacing: 25,
 			screenEventHandler: ScreenEventHandler.Self,
-			label: new TextLabel()
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+			label: new TextLabel(),
 			currentModeIndex: 0,
 			previousIndex: 0,
 			baseColor: Color.gray(0.4),
@@ -67,9 +62,9 @@ export class SidebarButton extends Circle {
 			radius: BUTTON_RADIUS,
 			viewWidth: 2 * BUTTON_RADIUS,
 			viewHeight: 2 * BUTTON_RADIUS,
-			fillOpacity: 1,
+			fillOpacity: 0.5,
 			activeKeyboard: true
-		})
+		}
 	}
 
 	setup() {
@@ -88,18 +83,6 @@ export class SidebarButton extends Circle {
 	}
 
 	numberOfIndices(): number { return this.messages.length }
-	
-	get baseColor(): Color { return this._baseColor }
-	set baseColor(newColor: Color) {
-		this._baseColor = newColor
-		this.fillColor = newColor
-	}
-	
-	get locationIndex(): number { return this._locationIndex }
-	set locationIndex(newIndex: number) {
-		this._locationIndex = newIndex
-		this.update({ midpoint: buttonCenter(this._locationIndex) })
-	}
 
 	colorForIndex(i: number): Color {
 		return this.baseColor
@@ -206,6 +189,7 @@ export class SidebarButton extends Circle {
 
 	updateModel(argsDict: object = {}) {
 		super.updateModel(argsDict)
+		super.updateModel({ midpoint: buttonCenter(this.locationIndex) })
 		this.updateLabel()
 	}
 	

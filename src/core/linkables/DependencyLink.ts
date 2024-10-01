@@ -18,13 +18,13 @@ linkable mobjects
 	endBullet: LinkBullet
 	linkLine: Line
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			dependency: new Dependency(),
 			startBullet: new LinkBullet(),
 			endBullet: new LinkBullet(),
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
-		})
+		}
 	}
 
 	setup() {

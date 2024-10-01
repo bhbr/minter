@@ -17,19 +17,14 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			inputNames: [],
 			outputNames: [],
-			screenEventHandler: ScreenEventHandler.Self
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			screenEventHandler: ScreenEventHandler.Self,
 			inputList: new InputList(),
 			outputList: new OutputList()
-		})
+		}
 	}
 
 	// this declares that the parent mobject will always be a board

@@ -6,11 +6,10 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	segment: ConSegment
 
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			segment: new ConSegment()
-		})
+		}
 	}
 
 	setup() {

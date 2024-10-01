@@ -22,18 +22,12 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			maxLength: 300,
 			length: 1,
 			mass: 0.2,
 			initialAngle: 0,
-			initialTime: 0
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
 			fixtureWidth: 50,
 			fixtureHeight: 20,
 			initialSpeed: 0,
@@ -49,7 +43,7 @@ export class Swing extends Linkable {
 				fillOpacity: 1
 			}),
 			initialTime: Date.now()
-		})
+		}
 	}
 
 	setup() {

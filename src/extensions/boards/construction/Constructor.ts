@@ -14,13 +14,13 @@ export class Constructor extends Creator {
 	startPoint: Vertex
 	endPoint: Vertex
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
 			penFillOpacity: 0.0
-		})
+		}
 	}
 
 }

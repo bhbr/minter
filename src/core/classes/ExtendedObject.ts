@@ -84,7 +84,7 @@ export class ExtendedObject {
 			
 		if (setter != undefined) {
 			
-			if (Object.keys(this.fixedArgs()).includes(key) && this[key] != undefined) {
+			if (Object.keys(this.allReadonlyProperties()).includes(key) && this[key] != undefined) {
 				console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
 				return
 			}
@@ -113,9 +113,10 @@ export class ExtendedObject {
 		this.setAttributes(updateDict)
 	}
 
-
-	fixedArgs(): object { return {} }
+	allDefaults(): object { return {} }
 	// filled upon subclassing
+
+	allReadonlyProperties(): Array<string> { return [] }
 
 	assureProperty(key: string, cons: any) {
 	// for proper initialization:

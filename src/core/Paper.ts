@@ -17,8 +17,8 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			children: [],
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,
@@ -26,16 +26,11 @@ export class Paper extends Board {
 			activeKeyboard: true,
 			view: document.querySelector('#paper_id') as HTMLDivElement,
 			viewWidth: 1216,
-			viewHeight: 1024
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			viewHeight: 1024,
 			expanded: true,
 			expandedPadding: 0,
 			currentColor: Color.white()
-		})
+		}
 	}
 
 	setup() {

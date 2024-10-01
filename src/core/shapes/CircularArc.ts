@@ -27,18 +27,13 @@ export class CircularArc extends CurvedLine {
 		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			midpoint: Vertex.origin(),
 			radius: DEFAULT_RADIUS,
 			angle: TAU / 4,
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
 			nbPoints: 32
-		})
+		}
 	}
 
 	updateModel(argsDict: object = {}) {

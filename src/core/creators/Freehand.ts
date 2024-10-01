@@ -11,31 +11,35 @@ export class Freehand extends Creator {
 	line: Polygon
 	penStrokeColor: Color
 	penStrokeWidth: number
+	penStrokeLength: number
 	
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			penStrokeColor: Color.white(),
-			penStrokeWidth: 1.0
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			penStrokeWidth: 1.0,
+			penStrokeLength: 2.0,
 			line: new Polygon({
 				closed: false,
 				opacity: 1.0
 			}),
 			screenEventHandler: ScreenEventHandler.Below
-		})
+		}
 	}
 
 	setup() {
 		super.setup()
+		this.update({
+			penStrokeColor: Color.red()
+		})
 		this.line.update({
 			vertices: this.creationStroke
 		})
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
 		this.add(this.line)
+
+		console.log(this)
+		console.log(Object.getOwnPropertyDescriptor(this, 'penStrokeWidth'))
+		console.log(Object.getOwnPropertyDescriptor(this, 'penStrokeLength'))
 	}
 
 	

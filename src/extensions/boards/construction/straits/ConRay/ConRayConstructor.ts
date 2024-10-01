@@ -6,10 +6,10 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			ray: new ConRay()
-		})
+		}
 	}
 
 	setup() {

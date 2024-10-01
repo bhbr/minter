@@ -5,17 +5,12 @@ import { Vertex } from 'core/classes/vertex/Vertex'
 
 export class BoxStepper extends BoxSlider {
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			min: 0,
-			max: 10
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			max: 10,
 			precision: 0
-		})
+		}
 	}
 
 	onPointerMove(e: ScreenEvent) {

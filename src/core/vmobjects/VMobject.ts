@@ -52,21 +52,16 @@ TODO: support mutiple paths e. g. for shapes with holes
 		return `${x} ${y}`
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			fillColor: Color.white(),
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
 			vertices: new VertexArray(),
 			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 			path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
-		})
+		}
 	}
 
 	setup() {

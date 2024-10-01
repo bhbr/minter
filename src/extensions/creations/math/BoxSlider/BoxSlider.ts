@@ -35,8 +35,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			min: 0,
 			max: 1,
 			value: 0.6,
@@ -46,12 +46,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5),
 			screenEventHandler: ScreenEventHandler.Self,
-			precision: 3
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			precision: 3,
 			inputNames: [],
 			outputNames: ['value'],
 			outerBar: new Rectangle({
@@ -68,7 +63,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				verticalAlign: 'center',
 				fontSize: 20
 			})
-		})
+		}
 	}
 
 	setup() {

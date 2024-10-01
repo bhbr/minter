@@ -20,17 +20,12 @@ export class Toggle extends Mobject {
 		return this.mobject[this.propertyName]
 	}
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			state: false,
 			mobject: null,
 			propertyName: '',
-			labelText: ''
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			labelText: '',
 			circle: new Circle({
 				radius: 10,
 				fillColor: Color.clear()
@@ -44,7 +39,7 @@ export class Toggle extends Mobject {
 				viewHeight: 20
 			}),
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
 	setup() {

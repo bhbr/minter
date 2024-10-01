@@ -7,10 +7,10 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			swing: new Swing()
-		})
+		}
 	}
 
 	setup() {

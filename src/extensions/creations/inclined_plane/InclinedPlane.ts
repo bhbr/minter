@@ -10,15 +10,10 @@ export class InclinedPlane extends Polygon {
 	inclination: number
 	midpoint: Vertex
 
-	defaultArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			midpoint: Vertex.origin(),
-			inclination: 0
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+			inclination: 0,
 			fillColor: Color.white(),
 			fillOpacity: 0.5,
 			vertices: new VertexArray([
@@ -26,7 +21,7 @@ export class InclinedPlane extends Polygon {
 				Vertex.origin(),
 				Vertex.origin()
 			])
-		})
+		}
 	}
 
 	getWidth(): number {

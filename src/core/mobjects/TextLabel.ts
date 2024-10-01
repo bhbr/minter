@@ -12,15 +12,15 @@ export class TextLabel extends Mobject {
 	borderWidth: number
 	fontSize: number
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			color: Color.white(),
 			borderColor: Color.white(),
 			borderWidth: 1
-		})
+		}
 	}
 
 	setup() {

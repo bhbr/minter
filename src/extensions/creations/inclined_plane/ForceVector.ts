@@ -19,18 +19,12 @@ export class ForceVector extends ConStrait {
 	footRadius: number
 	color: Color
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			size: 1,
 			scale: 100,
 			direction: 0,
 			color: Color.white(),
-			strokeWidth: 3
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
 			tipOpeningAngle: 60 * DEGREES,
 			tipSize: 10,
 			footRadius: 4,
@@ -43,7 +37,7 @@ export class ForceVector extends ConStrait {
 				fillOpacity: 1,
 				strokeWidth: 0	
 			})
-		})
+		}
 	}
 
 	setup() {

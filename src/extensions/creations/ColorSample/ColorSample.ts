@@ -12,14 +12,9 @@ export class ColorSample extends Linkable {
 	color: Color
 	circle: Circle
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			color: Color.white()
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
+			color: Color.white(),
 			viewWidth: 2 * RADIUS,
 			viewHeight: 2 * RADIUS,
 			inputNames: ['red', 'green', 'blue', 'alpha'],
@@ -30,7 +25,7 @@ export class ColorSample extends Linkable {
 				midpoint: new Vertex(RADIUS, RADIUS),
 				fillOpacity: 1
 			})
-		})
+		}
 	}
 
 	setup() {

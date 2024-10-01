@@ -14,8 +14,8 @@ export class RoundedRectangle extends CurvedShape {
 	p4: Vertex
 	cornerRadius: number
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			width: 200,
 			height: 100,
 			cornerRadius: 10,
@@ -23,7 +23,7 @@ export class RoundedRectangle extends CurvedShape {
 			p2: new Vertex(200, 0),
 			p3: new Vertex(200, 100),
 			p4: new Vertex(0, 100),
-		})
+		}
 	}
 
 	updateBezierPoints() {

@@ -9,14 +9,9 @@ export class PlayButton extends SimpleButton {
 
 	mobject: Playable
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			text: 'play'
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
+			text: 'play',
 			viewWidth: 40,
 			viewHeight: 20,
 			backgroundColor: Color.black(),
@@ -24,7 +19,7 @@ export class PlayButton extends SimpleButton {
 			borderColor: Color.white(),
 			borderWidth: 1,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
 	action() {

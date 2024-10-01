@@ -13,8 +13,8 @@ import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleB
 
 export class DemoSidebar extends Sidebar {
 	
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			availableButtonClasses: [
 				DragButton,
 				LinkButton,
@@ -27,6 +27,6 @@ export class DemoSidebar extends Sidebar {
 				SwingButton,
 				ColorSampleButton
 			]
-		})
+		}
 	}
 }

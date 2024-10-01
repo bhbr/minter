@@ -6,10 +6,10 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			line: new ConLine()
-		})
+		}
 	}
 
 	setup() {

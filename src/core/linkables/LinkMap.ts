@@ -17,14 +17,14 @@ export class LinkMap extends Mobject {
 	openBullet?: LinkBullet
 	openLink?: DependencyLink
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			linkList: [],
 			connectedHooks: [],
 			openBullet: null,
 			openLink: null,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
 	get parent(): Board {

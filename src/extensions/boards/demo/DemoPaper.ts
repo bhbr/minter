@@ -25,8 +25,8 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class DemoPaper extends Paper {
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'slider': BoxSliderCreator,
@@ -52,8 +52,7 @@ export class DemoPaper extends Paper {
 				'SwingButton',
 				'ColorSampleButton'
 			]
-
-		})
+		}
 	}
 
 	setup() {

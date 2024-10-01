@@ -29,8 +29,17 @@ export class Sidebar extends Mobject {
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
+			view: document.querySelector('#sidebar_id') as HTMLElement,
+			availableButtonClasses: [
+				DragButton,
+				LinkButton
+			],
+			buttons: [
+				new DragButton(),
+				new LinkButton()
+			],
 			viewWidth: 150,
 			viewHeight: 1024,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -42,21 +51,7 @@ export class Sidebar extends Mobject {
 				width: this.viewWidth,
 				height: this.viewHeight
 			})
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			view: document.querySelector('#sidebar_id') as HTMLElement,
-			availableButtonClasses: [
-				DragButton,
-				LinkButton
-			],
-			buttons: [
-				new DragButton(),
-				new LinkButton()
-			]
-		})
+		}
 	}
 
 	setup() {

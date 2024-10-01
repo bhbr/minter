@@ -6,10 +6,10 @@ export class CurvedShape extends CurvedLine {
 	A closed CurvedLine is a CurvedShape
 	*/
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			closed: true
-		})
+		}
 	}
 
 }

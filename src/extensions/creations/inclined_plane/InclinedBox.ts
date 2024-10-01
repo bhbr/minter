@@ -12,10 +12,10 @@ export class InclinedBox extends Polygon {
 	height: number
 	_rotationAngle: number
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			rotationAngle: 0
-		})
+		}
 	}
 
 	get centerOfMass(): Vertex {

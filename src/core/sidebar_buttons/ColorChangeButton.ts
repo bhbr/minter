@@ -9,19 +9,13 @@ export class ColorChangeButton extends SidebarButton {
 
 	colorNames: Array<string>
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
+			outgoingMessage: {},
+			colorNames: Object.keys(COLOR_PALETTE),
 			optionSpacing: 15,
 			showLabel: false
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
-			showLabel: true,
-			outgoingMessage: {},
-			colorNames: Object.keys(COLOR_PALETTE)
-		})
+		}
 	}
 
 	setup() {

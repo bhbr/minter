@@ -11,8 +11,8 @@ export class ValueBox extends Linkable {
 	valueLabel: TextLabel
 	background: Rectangle
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: ['value'],
@@ -21,14 +21,9 @@ export class ValueBox extends Linkable {
 			background: new Rectangle({
 				fillColor: Color.black()
 			}),
-			valueLabel: new TextLabel()
-		})
-	}
-
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+			valueLabel: new TextLabel(),
 			value: 1
-		})
+		}
 	}
 
 	setup() {

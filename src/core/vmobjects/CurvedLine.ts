@@ -28,10 +28,10 @@ export class CurvedLine extends VMobject {
 
 	closed: boolean // a closed CurvedLine is a CurvedShape
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			closed: false
-		})
+		}
 	}
 
 	updateBezierPoints() { }

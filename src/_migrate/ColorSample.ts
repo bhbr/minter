@@ -12,8 +12,8 @@
 // 	circle: Circle
 // 	radius: number
 
-// 	fixedArgs(): object {
-// 		return Object.assign(super.fixedArgs(), {
+// 	defaults(): object {
+// 		return {
 // 			radius: RADIUS,
 // 			viewWidth: 2 * RADIUS,
 // 			viewHeight: 2 * RADIUS,

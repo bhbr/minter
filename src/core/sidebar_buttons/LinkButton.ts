@@ -3,12 +3,12 @@ import { ToggleButton } from './ToggleButton'
 
 export class LinkButton extends ToggleButton {
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			messages: [{ link: true }],
 			outgoingMessage: { link: false },
 			text: 'link'
-		})
+		}
 	}
 
 	setup() {

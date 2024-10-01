@@ -34,21 +34,16 @@ export class Construction extends Board {
 	constructedMobjects: Array<ConMobject>
 	declare Creator: ConstructingConMobject
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			points: [],
-			constructedMobjects: []
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			constructedMobjects: [],
 			buttonNames: [
 				'DragButton',
 				'StraitButton',
 				'ConCircleButton'
 			]
-		})
+		}
 	}
 
 	setup() {

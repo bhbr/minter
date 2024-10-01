@@ -17,8 +17,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			mobject: null,
 			inputNames: [],
 			linkHooks: [],
@@ -27,7 +27,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			fillOpacity: 0.2,
 			strokeWidth: 0,
 			width: IO_LIST_WIDTH
-		})
+		}
 	}
 
 	setup() {

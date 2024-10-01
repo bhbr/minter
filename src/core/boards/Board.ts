@@ -63,8 +63,8 @@ The content children can also be dragged and panned.
 	// the map of dependencies between the linkable content children
 	linkMap: LinkMap
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			screenEventHandler: ScreenEventHandler.Self,
 			contentChildren: [],
 			expanded: false,
@@ -82,12 +82,7 @@ The content children can also be dragged and panned.
 			},
 			creationStroke: [],
 			creationMode: 'freehand',
-			sidebar: null
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			sidebar: null,
 			expandButton: new ExpandButton(),
 			linkMap: new LinkMap(),
 			creator: null,
@@ -100,7 +95,7 @@ The content children can also be dragged and panned.
 				strokeWidth: 2.0,
 				screenEventHandler: ScreenEventHandler.Parent
 			})
-		})
+		}
 	}
 
 	setup() {

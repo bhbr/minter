@@ -44,8 +44,8 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			viewWidth: 500,
 			viewHeight: 300,
 			inclination: 20 * DEGREES,
@@ -56,12 +56,7 @@ export class InclinedScene extends Linkable implements Playable {
 			simulationInterval: null,
 			glidingStarted: null,
 			showTorques: false,
-			torqueOrigin: Vertex.origin()
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			torqueOrigin: Vertex.origin(),
 			inputNames: [
 				'inclination'
 			],
@@ -96,7 +91,7 @@ export class InclinedScene extends Linkable implements Playable {
 			}),
 			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
 			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
-		})
+		}
 	}
 
 	setup() {

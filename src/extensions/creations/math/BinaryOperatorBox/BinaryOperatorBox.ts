@@ -14,16 +14,11 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorLabel: TextLabel
 	operatorDict: object
 
-	defaultsArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			operand1: 0,
 			operand2: 0,
-			operator: "+"
-		})
-	}
-
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+			operator: "+",
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result'],
 			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
@@ -33,7 +28,7 @@ export class BinaryOperatorBox extends ValueBox {
 				fillOpacity: 1.0
 			}),
 			operatorLabel: new TextLabel()
-		})
+		}
 	}
 
 	setup() {
@@ -78,39 +73,36 @@ export class AddBox extends BinaryOperatorBox {
 
 	declare operator: '+'
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			operator: "+"
-		})
+		}
 	}
 }
 
 export class SubtractBox extends BinaryOperatorBox {
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			operator: "–"
-		})
+		}
 	}
 }
 
 export class MultiplyBox extends BinaryOperatorBox {
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			operator: "&times;"
-		})
+		}
 	}
 }
 
 export class DivideBox extends BinaryOperatorBox {
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			operator: "/"
-		})
+		}
 	}
 }
-
-
-
 
 
 

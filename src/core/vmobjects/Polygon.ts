@@ -9,10 +9,10 @@ export class Polygon extends VMobject {
 
 	closed: boolean
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			closed: true
-		})
+		}
 	}
 
 	static makePathString(vertices: VertexArray, closed: boolean): string {

@@ -3,12 +3,12 @@ import { ToggleButton } from './ToggleButton'
 
 export class DragButton extends ToggleButton {
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			messages: [{ drag: true }],
 			outgoingMessage: { drag: false },
 			text: 'drag'
-		})
+		}
 	}
 
 }

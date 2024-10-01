@@ -17,12 +17,12 @@ export class Torque extends Polygon {
 		this.anchor = newValue
 	}
 
-	fixedArgs(): object {
-		return Object.assign(super.fixedArgs(), {
+	defaults(): object {
+		return {
 			strokeWidth: 0,
 			fillColor: new Color(0, 0.5, 0.5),
 			fillOpacity: 0.5
-		})
+		}
 	}
 
 	lever(): Vertex {

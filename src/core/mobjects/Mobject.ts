@@ -43,15 +43,10 @@ and logic for drawing and user interaction.
 	its midpoint should. A Circle's anchor acts like
 	a computed property.)
 	
-	It also allows to control the setting of fixed and default
+	It also allows to control the setting of default
 	state variables.
 
-	A mobject is created in two steps:
-
-
 	*/
-
-	readonlyProperties: Array<string>
 
 	constructor(argsDict: object = {}, isSuperCall = false) {
 	/*
@@ -60,50 +55,33 @@ and logic for drawing and user interaction.
 	*/
 
 		// First call all superclass constructors with no parameters at all
-		super({}, true)
-		if (isSuperCall) { return }
+		super() //{}, true)
+		//if (isSuperCall) { return }
 
 		// Now we are back in the lowest-class constructor
 
-		let initialArgs = this.initialArgs(argsDict)
+		// Complement the constructor's arguments with default values.
+		let initialArgs = Object.assign(this.allDefaults(), argsDict)
 		this.setAttributes(initialArgs)
-
 		this.setup()
-		
 		this.update()
 		
 	}
 
-	initialArgs(argsDict: object = {}): object {
-	/*
-	Adjust the constructor's arguments in light
-	of default and fixed values.
-	*/
-
-		// Given values supercede default values
-		let initialArgs = this.defaultArgs()
-		Object.assign(initialArgs, argsDict)
-		Object.assign(initialArgs, this.fixedArgs())
-		return initialArgs
+	allDefaults(): object {
+		return Object.assign(Object.getPrototypeOf(this).allDefaults(), this.defaults())
 	}
 
-	defaultArgs(): object {
+	defaults(): object {
 	/*
 	Default values of properties (declared
 	in the sections that follow).
 	This list is complemented in subclasses
-	by overriding the method like this:
-
-		defaultArgs(): object {
-			return Object.assign(super.defaultArgs(), {
-				...
-			})
-		}
+	by overriding the method.
 	*/
 		return {
 			// The meaning of these properties is explained in the sections further below.
 
-			readonlyProperties: [],
 			// position
 			transform: Transform.identity(),
 			viewWidth: 100,
@@ -136,14 +114,12 @@ and logic for drawing and user interaction.
 		}
 	}
 
-	fixedArgs(): object {
-	// These are property values that cannot be changed,
-	// either by arguments given to the constructor
-	// or in a subclass.
-	// For declaring fixed properties in a Mobject
-	// subclass, override this method as described
-	// further up in defaultArgs().
-		return {}
+	allReadonlyProperties(): Array<string> {
+		return Object.getPrototypeOf(this).allReadonlyProperties().concat(this.readonlyProperties())
+	}
+
+	readonlyProperties(): Array<string> {
+		return []
 	}
 
 	setup() {
@@ -363,7 +339,7 @@ and logic for drawing and user interaction.
 	//////////////////////////////////////////////////////////
 
 
-	view?: HTMLDivElement
+	view: HTMLDivElement
 	// the following properties encode CSS properties
 	opacity: number
 	visible: boolean
@@ -371,6 +347,7 @@ and logic for drawing and user interaction.
 	drawBorder: boolean
 
 	setupView() {
+		if (this.view == null) { return }
 		this.view['mobject'] = this
 		if (this.parent) {
 			this.parent.view.appendChild(this.view)
@@ -738,6 +715,15 @@ and logic for drawing and user interaction.
 		this.setAttributes(argsDict)
 		this.updateSubmobModels()
 
+		if (this.view != null) {
+			this.view.setAttribute('screen-event-handler', this.screenEventHandler.toString())
+			if (this.screenEventHandler == ScreenEventHandler.Below) {
+				this.view.style['pointer-events'] = 'none'
+			} else {
+				this.view.style['pointer-events'] = 'auto'
+			}
+		}
+
 		let targetsAndUpdateDicts: Array<[Mobject, object]> = []
 
 		for (let dep of this.dependencies || []) {
@@ -844,27 +830,13 @@ and logic for drawing and user interaction.
 
 
 	eventTarget?: Mobject
-	_screenEventHandler: ScreenEventHandler
+	screenEventHandler: ScreenEventHandler
 	savedScreenEventHandler?: ScreenEventHandler
 	dragAnchorStart?: Vertex
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
 
-	get screenEventHandler(): ScreenEventHandler {
-		return this._screenEventHandler
-	}
-
-	set screenEventHandler(newValue: ScreenEventHandler) {
-		this.view.setAttribute('screen-event-handler', newValue.toString())
-		this._screenEventHandler = newValue
-		if (this.view == undefined) { return }
-		if (this.screenEventHandler == ScreenEventHandler.Below) {
-			this.view.style['pointer-events'] = 'none'
-		} else {
-			this.view.style['pointer-events'] = 'auto'
-		}
-	}
 
 	/*
 	The following empty methods need to be declared here

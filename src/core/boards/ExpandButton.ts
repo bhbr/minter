@@ -7,15 +7,15 @@ import { Color } from 'core/classes/Color'
 
 export class ExpandButton extends TextLabel {
 
-	defaultArgs(): object {
-		return Object.assign(super.defaultArgs(), {
+	defaults(): object {
+		return {
 			viewWidth: 30,
 			viewHeight: 30,
 			anchor: Vertex.origin(),
 			screenEventHandler: ScreenEventHandler.Self,
 			backgroundColor: Color.gray(0.25),
 			color: Color.white()
-		})
+		}
 	}
 
 	get parent(): Board {
