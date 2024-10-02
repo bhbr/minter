@@ -56,18 +56,20 @@ export class CindyCanvas extends Linkable implements Playable {
 	setup() {
 		super.setup()
 
-		this.outerFrame.update({
-			width: this.viewWidth,
-			height: this.viewHeight
-		})
-		this.add(this.outerFrame)
-
 		this.innerCanvas = new Mobject({
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
 			screenEventHandler: ScreenEventHandler.Auto
 		})
 		this.add(this.innerCanvas)
+
+		this.outerFrame.update({
+			width: this.viewWidth,
+			height: this.viewHeight,
+			screenEventHandler: ScreenEventHandler.Below
+		})
+		this.add(this.outerFrame)
+
 		this.innerCanvas.view.style['pointer-events'] = 'auto'
 
 		this.update({
@@ -78,7 +80,8 @@ export class CindyCanvas extends Linkable implements Playable {
 		Object.assign(this.port, {
 			id: this.id,
 			width: this.viewWidth,
-			height: this.viewHeight
+			height: this.viewHeight,
+			started: false
 		})
 
 		this.playButton.update({
@@ -87,19 +90,6 @@ export class CindyCanvas extends Linkable implements Playable {
 		this.add(this.playButton)
 
 		this.cindySetup()
-	}
-
-	initCode() {
-		return `resetclock();`
-	}
-
-	drawCode() {
-		return `drawcmd();`
-	}
-
-	mousemoveCode(): string {
-		// do not redraw until I say so
-		return ''
 	}
 
 	cindySetup() {
@@ -121,21 +111,20 @@ export class CindyCanvas extends Linkable implements Playable {
 		mousemoveScript.textContent = this.mousemoveCode()
 		document.body.appendChild(mousemoveScript)
 
-		let argsDict: object = {
-			scripts: `${this.id}*`,
-			animation: { autoplay: false },
-			ports: [this.port],
-			geometry: this.geometry()
-		}
-		this.core = CindyJS.newInstance(argsDict)
+		this.startCore()
 	}
 
-	startUp() {
-		if (document.readyState === 'complete') {
-			this.play()
-		} else {
-			document.addEventListener('DOMContentLoaded', function(e: Event) { this.play(); }.bind(this))
-		}
+	initCode() {
+		return `resetclock();`
+	}
+
+	drawCode() {
+		return `drawcmd();`
+	}
+
+	mousemoveCode(): string {
+		// do not redraw until I say so
+		return ''
 	}
 
 	play() {
@@ -145,11 +134,17 @@ export class CindyCanvas extends Linkable implements Playable {
 		}
 		this.core.play()
 		this.playState = 'play'
+		this.outerFrame.update({
+			screenEventHandler: ScreenEventHandler.Below
+		})
 	}
 
 	pause() {
 		this.core.pause()
 		this.playState = 'pause'
+		this.outerFrame.update({
+			screenEventHandler: ScreenEventHandler.Self
+		})
 	}
 
 	togglePlayState() {
@@ -163,6 +158,9 @@ export class CindyCanvas extends Linkable implements Playable {
 	stop() {
 		this.core.stop()
 		this.playState = 'stop'
+		this.outerFrame.update({
+			screenEventHandler: ScreenEventHandler.Self
+		})
 	}
 
 	geometry(): Array<any> { return [] }
@@ -176,6 +174,15 @@ export class CindyCanvas extends Linkable implements Playable {
 		}
 	}
 
+	startCore() {
+		this.core = CindyJS.newInstance({
+			scripts: `${this.id}*`,
+			animation: { autoplay: false },
+			ports: [this.port],
+			geometry: this.geometry()
+		})
+	}
+
 	reload(argsDict: object = {}) {
 		let initScript = document.querySelector(`#${this.id}init`)
 		initScript.textContent = this.initCode()
@@ -183,14 +190,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		drawScript.textContent = this.drawCode()
 		let mousemoveScript = document.querySelector(`#${this.id}mousemove`)
 		mousemoveScript.textContent = this.mousemoveCode()
-		let args: object = {
-			scripts: `${this.id}*`,
-			animation: { autoplay: false },
-			ports: [this.port],
-			geometry: this.geometry()
-		}
-		this.core = CindyJS.newInstance(args)
-		this.startUp()
+		this.startCore()
 	}
 
 }
