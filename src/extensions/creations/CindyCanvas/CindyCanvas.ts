@@ -18,6 +18,17 @@ export class CindyCanvas extends Linkable implements Playable {
 	innerCanvas: Mobject
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'port',
+			'id',
+			'core',
+			'outerFrame',
+			'innerCanvas',
+			'playButton'
+		])
+	}
 	
 	defaults(): object {
 		return Object.assign(super.defaults(), {

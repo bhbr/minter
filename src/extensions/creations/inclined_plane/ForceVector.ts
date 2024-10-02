@@ -19,6 +19,17 @@ export class ForceVector extends ConStrait {
 	footRadius: number
 	color: Color
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'foot',
+			'tip',
+			'scale',
+			'tipOpeningAngle',
+			'tipSize',
+			'footRadius'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			size: 1,

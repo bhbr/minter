@@ -6,6 +6,12 @@ import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class SimpleButton extends TextLabel {
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'screenEventHandler'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			viewWidth: 40,

@@ -10,6 +10,12 @@ export class InclinedPlane extends Polygon {
 	inclination: number
 	midpoint: Vertex
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'length'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			midpoint: Vertex.origin(),

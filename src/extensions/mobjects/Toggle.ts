@@ -16,6 +16,17 @@ export class Toggle extends Mobject {
 	label: TextLabel
 	labelText: string
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'circle',
+			'bullet',
+			'mobject',
+			'propertyName',
+			'label',
+			'labelText'
+		])
+	}
+
 	value(): boolean {
 		return this.mobject[this.propertyName]
 	}

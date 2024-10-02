@@ -12,6 +12,12 @@ export class ColorSample extends Linkable {
 	color: Color
 	circle: Circle
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'circle'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			color: Color.white(),

@@ -17,6 +17,12 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject: Mobject
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'linkHooks'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			mobject: null,

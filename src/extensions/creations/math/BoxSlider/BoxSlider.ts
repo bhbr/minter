@@ -35,6 +35,18 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'width',
+			'outerBar',
+			'filledBar',
+			'label',
+			'fillColor',
+			'barFillColor',
+			'precision'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			min: 0,

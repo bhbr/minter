@@ -13,7 +13,7 @@ export class CurvedLine extends VMobject {
 
 	readonlyProperties(): Array<string> {
 		return super.readonlyProperties().concat([
-			'bezierPoints'
+			'closed'
 		])
 	}
 

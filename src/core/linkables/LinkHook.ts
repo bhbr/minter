@@ -12,6 +12,14 @@ export class LinkHook extends Circle {
 	name: string
 	type: "input" | "output"
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'mobject',
+			'name',
+			'type'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			mobject: new Mobject(),

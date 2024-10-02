@@ -17,6 +17,15 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList 
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'inputNames',
+			'outputNames',
+			'inputList',
+			'outputList'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			inputNames: [],

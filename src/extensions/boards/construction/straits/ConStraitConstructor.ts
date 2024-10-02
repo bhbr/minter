@@ -10,6 +10,13 @@ export class ConStraitConstructor extends Constructor {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'startFreePoint',
+			'endFreePoint'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			startFreePoint: new FreePoint(),

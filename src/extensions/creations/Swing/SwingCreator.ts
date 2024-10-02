@@ -7,6 +7,12 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'swing'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			swing: new Swing()

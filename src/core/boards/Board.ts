@@ -40,6 +40,18 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'sidebar',
+			'buttonNames',
+			'contentChildren',
+			'background',
+			'expandButton',
+			'linkMap',
+			'expandedPadding'
+		])
+	}
+
 	// a reference to the sidebar so we can change it
 	sidebar?: any
 	// by creating buttons named this:

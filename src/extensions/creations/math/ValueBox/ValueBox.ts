@@ -11,6 +11,13 @@ export class ValueBox extends Linkable {
 	valueLabel: TextLabel
 	background: Rectangle
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'valueLabel',
+			'background'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			viewWidth: 80,

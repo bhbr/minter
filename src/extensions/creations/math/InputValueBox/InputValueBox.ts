@@ -14,6 +14,13 @@ export class InputValueBox extends Linkable {
 	inputBox: HTMLInputElement
 	background: Rectangle
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'inputBox',
+			'background'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			viewWidth: 80,

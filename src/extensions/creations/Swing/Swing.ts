@@ -22,6 +22,16 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'fixtureWidth',
+			'fixtureHeight',
+			'fixture',
+			'string',
+			'weight'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			maxLength: 300,

@@ -14,8 +14,18 @@ export class CircularArc extends CurvedLine {
 
 	readonlyProperties(): Array<string> {
 		return super.readonlyProperties().concat([
-			'nbPoints'
+			'closed'
 		])
+	}
+
+	defaults(): object {
+		return Object.assign(super.defaults(), {
+			midpoint: Vertex.origin(),
+			radius: DEFAULT_RADIUS,
+			angle: TAU / 4,
+			nbPoints: 32,
+			closed: false
+		})
 	}
 
 	// A circle's midpoint is not implemented as its own property,
@@ -31,15 +41,6 @@ export class CircularArc extends CurvedLine {
 			throw 'No radius yet!'
 		}
 		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			midpoint: Vertex.origin(),
-			radius: DEFAULT_RADIUS,
-			angle: TAU / 4,
-			nbPoints: 32
-		})
 	}
 
 	updateModel(argsDict: object = {}) {

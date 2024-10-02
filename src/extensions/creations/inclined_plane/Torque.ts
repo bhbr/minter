@@ -17,6 +17,12 @@ export class Torque extends Polygon {
 		this.anchor = newValue
 	}
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'force'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			strokeWidth: 0,

@@ -17,6 +17,13 @@ export class LinkMap extends Mobject {
 	openBullet?: LinkBullet
 	openLink?: DependencyLink
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'linkList',
+			'connectedHooks'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			linkList: [],

@@ -18,6 +18,15 @@ linkable mobjects
 	endBullet: LinkBullet
 	linkLine: Line
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'Dependency',
+			'startBullet',
+			'endBullet',
+			'linkLine'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			dependency: new Dependency(),

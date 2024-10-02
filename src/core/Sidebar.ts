@@ -28,6 +28,13 @@ export class Sidebar extends Mobject {
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'background',
+			'availableButtonClasses'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			view: document.querySelector('#sidebar_id') as HTMLElement,

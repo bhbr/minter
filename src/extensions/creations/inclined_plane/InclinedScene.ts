@@ -44,6 +44,20 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'plane',
+			'box',
+			'initialBoxPositionAlongPlane',
+			'forces',
+			'torques',
+			'forceScale',
+			'boxStartCOM',
+			'playButton',
+			'showTorquesToggle'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			viewWidth: 500,

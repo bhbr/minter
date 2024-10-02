@@ -45,11 +45,11 @@ TODO: support mutiple paths e. g. for shapes with holes
 	svg: SVGSVGElement // child of view
 	path: SVGElement // child of svg
 
-	static stringFromPoint(point: Array<number>): string {
-		// a string representation for CSS
-		let x: number = point[0],
-			y: number = point[1]
-		return `${x} ${y}`
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'svg',
+			'path'
+		])
 	}
 
 	defaults(): object {
@@ -62,13 +62,6 @@ TODO: support mutiple paths e. g. for shapes with holes
 			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 			path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
 		})
-	}
-
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'svg',
-			'path'
-		])
 	}
 
 	setup() {
@@ -100,6 +93,13 @@ TODO: support mutiple paths e. g. for shapes with holes
 		this.path.style['fill-opacity'] = this.fillOpacity.toString()
 		this.path.style['stroke'] = this.strokeColor.toHex()
 		this.path.style['stroke-width'] = this.strokeWidth.toString()
+	}
+	
+	static stringFromPoint(point: Array<number>): string {
+		// a string representation for CSS
+		let x: number = point[0],
+			y: number = point[1]
+		return `${x} ${y}`
 	}
 
 	pathString(): string {

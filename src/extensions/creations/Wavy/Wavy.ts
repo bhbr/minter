@@ -10,6 +10,12 @@ export class Wavy extends CindyCanvas {
 	sourceYPosition: number
 	color: Color
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'sourceYPosition'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],

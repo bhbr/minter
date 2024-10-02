@@ -14,6 +14,15 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'geoMob1',
+			'geoMob2',
+			'index',
+			'fillOpacity'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			midpoint: new Vertex(NaN, NaN)

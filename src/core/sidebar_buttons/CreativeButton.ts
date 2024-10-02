@@ -5,6 +5,12 @@ export class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'creations'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			creations: [],

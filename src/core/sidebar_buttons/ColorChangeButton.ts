@@ -9,6 +9,13 @@ export class ColorChangeButton extends SidebarButton {
 
 	colorNames: Array<string>
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'colorNames'
+		])
+	}
+
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			outgoingMessage: {},

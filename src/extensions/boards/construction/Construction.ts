@@ -32,7 +32,14 @@ export class Construction extends Board {
 	
 	points: Array<ConPoint>
 	constructedMobjects: Array<ConMobject>
-	declare Creator: ConstructingConMobject
+	declare creator: ConstructingConMobject
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'points',
+			'constructedMobjects'
+		])
+	}
 
 	defaults(): object {
 		return Object.assign(super.defaults(), {
@@ -129,8 +136,8 @@ export class Construction extends Board {
 			return
 		}
 		this.creationStroke.push(v)
-		this.Creator = this.createCreator(this.creationMode) as ConstructingConMobject
-		this.add(this.Creator)
+		this.creator = this.createCreator(this.creationMode) as ConstructingConMobject
+		this.add(this.creator)
 
 	}
 
@@ -147,7 +154,7 @@ export class Construction extends Board {
 				break
 			}
 		}
-		this.Creator.updateFromTip(p)
+		this.creator.updateFromTip(p)
 	}
 
 	addToContent(mob: Mobject) {

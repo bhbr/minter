@@ -9,6 +9,12 @@ export class PlayButton extends SimpleButton {
 
 	mobject: Playable
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'mobject'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			text: 'play',

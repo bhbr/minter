@@ -39,10 +39,15 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 
-	constructor(argsDict: object = {}, isSuperCall = false) {
-		super(argsDict)
-		buttonDict[this.constructor.name] = this.constructor
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'baseColor',
+			'optionSpacing',
+			'label',
+			'messages'
+		])
 	}
+
 
 	defaults(): object {
 		return Object.assign(super.defaults(), {
@@ -69,6 +74,7 @@ export class SidebarButton extends Circle {
 
 	setup() {
 		super.setup()
+		buttonDict[this.constructor.name] = this.constructor
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)

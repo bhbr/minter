@@ -14,6 +14,12 @@ export class Constructor extends Creator {
 	startPoint: Vertex
 	endPoint: Vertex
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'construction'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			penStrokeColor: Color.white(),

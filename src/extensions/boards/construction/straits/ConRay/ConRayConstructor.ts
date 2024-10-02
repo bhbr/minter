@@ -6,6 +6,12 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'ray'
+		])
+	}
+
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			ray: new ConRay()

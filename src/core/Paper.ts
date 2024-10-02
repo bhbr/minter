@@ -17,11 +17,6 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-		])
-	}
-
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			children: [],
