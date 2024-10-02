@@ -32,10 +32,12 @@ export class BoxSliderCreator extends Creator {
 
 	setup() {
 		super.setup()
-		this.creation = this.createMobject()
-		this.add(this.creation)
-		this.anchor = this.getStartPoint()
+		this.update({
+			creation: this.createMobject(),
+			anchor: this.getStartPoint()
+		})
 		if (this.creation == null) { return }
+		this.add(this.creation)
 		this.creation.update({
 			min: this.min,
 			max: this.max,

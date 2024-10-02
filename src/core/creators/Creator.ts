@@ -25,11 +25,11 @@ export class Creator extends Mobject {
 	}
 
 	getStartPoint(): Vertex {
-		return this.creationStroke[0]
+		return this.creationStroke[0] ?? this.anchor
 	}
 
 	getEndPoint(): Vertex {
-		return this.creationStroke[this.creationStroke.length - 1]
+		return this.creationStroke[this.creationStroke.length - 1] ?? this.anchor
 	}
 
 	dissolve() {

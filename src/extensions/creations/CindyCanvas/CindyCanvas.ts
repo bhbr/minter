@@ -39,7 +39,17 @@ export class CindyCanvas extends Linkable implements Playable {
 			}),
 			playedOnce: false,
 			playState: 'stop',
-			drawBorder: true
+			drawBorder: true,
+			port: {
+				transform: [{
+					visibleRect: [0, 1, 1, 0]
+				}]
+			}
+			/*
+			core has no default because it is read-only and
+			will be created in cindySetup as a CindyJS instance
+			with state-dependent arguments
+			*/
 		})
 	}
 
@@ -60,17 +70,16 @@ export class CindyCanvas extends Linkable implements Playable {
 		this.add(this.innerCanvas)
 		this.innerCanvas.view.style['pointer-events'] = 'auto'
 
-		this.id = `${this.constructor.name}-${Math.floor(1000 * Math.random())}`
+		this.update({
+			id: `${this.constructor.name}-${Math.floor(1000 * Math.random())}`
+		})
 		this.innerCanvas.view.id = this.id
 
-		this.port = {
+		Object.assign(this.port, {
 			id: this.id,
 			width: this.viewWidth,
-			height: this.viewHeight,
-			transform: [{
-				visibleRect: [0, 1, 1, 0]
-			}]
-		}
+			height: this.viewHeight
+		})
 
 		this.playButton.update({
 			mobject: this

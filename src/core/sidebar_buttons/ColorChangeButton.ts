@@ -15,7 +15,6 @@ export class ColorChangeButton extends SidebarButton {
 		])
 	}
 
-
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			outgoingMessage: {},

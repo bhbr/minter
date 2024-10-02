@@ -140,7 +140,7 @@ and logic for drawing and user interaction.
 
 
 	/*
-	Mainly the transform just has an anchor
+	Most often the transform just has an anchor
 	that describes where the mobject is
 	located in its parent's frame.
 	But the transform can also include a scale

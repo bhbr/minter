@@ -25,7 +25,9 @@ export class Rectangle extends Polygon {
 
 	setup() {
 		super.setup()
-		this.vertices = new VertexArray([this.p1, this.p2, this.p3, this.p4])
+		this.update({
+			vertices: new VertexArray([this.p1, this.p2, this.p3, this.p4])
+		})
 	}
 
 	updateModel(argsDict: object = {}) {

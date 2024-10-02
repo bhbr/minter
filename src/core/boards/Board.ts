@@ -113,9 +113,11 @@ The content children can also be dragged and panned.
 	setup() {
 		super.setup()
 		
-		this.viewWidth = this.expanded ? this.expandedWidth() : this.compactWidth
-		this.viewHeight = this.expanded ? this.expandedHeight() : this.compactHeight
-		this.anchor = this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
+		this.update({
+			viewWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
+			viewHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
+			anchor: this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
+		})
 
 		this.addDependency('viewWidth', this.background, 'width')
 		this.addDependency('viewHeight', this.background, 'height')

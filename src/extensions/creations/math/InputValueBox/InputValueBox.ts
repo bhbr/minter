@@ -47,10 +47,7 @@ export class InputValueBox extends Linkable {
 
 	setup() {
 		super.setup()
-		this.background = new Rectangle({
-			width: this.viewWidth,
-			height: this.viewHeight
-		})
+		this.add(this.background)
 		this.inputBox.setAttribute('type', 'text')
 		this.inputBox.style.width = '90%'
 		this.inputBox.style.padding = '3px 3px'
@@ -59,14 +56,13 @@ export class InputValueBox extends Linkable {
 		this.inputBox.style.textAlign = 'center'
 		this.inputBox.style.verticalAlign = 'center'
 		this.inputBox.style.fontSize = '20px'
-		this.add(this.background)
 		this.view.appendChild(this.inputBox)
 		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
 	updateModel(argsDict: object = {}) {
 		super.updateModel(argsDict)
-		this.background = new Rectangle({
+		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight
 		})

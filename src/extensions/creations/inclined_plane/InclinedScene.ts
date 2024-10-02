@@ -147,8 +147,10 @@ export class InclinedScene extends Linkable implements Playable {
 		this.forces.add(this.normalForce)
 		this.forces.add(this.staticFrictionForce)
 
-		this.showTorques = false
-		this.torqueOrigin = this.box.llCorner()
+		this.update({
+			showTorques: false,
+			torqueOrigin: this.box.llCorner()
+		})
 
 		this.gravityTorque = new Torque({
 			anchor: this.torqueOrigin,
@@ -169,7 +171,7 @@ export class InclinedScene extends Linkable implements Playable {
 		this.torques.add(this.staticFrictionTorque)
 
 		this.add(this.torques)
-		this.showTorques = false
+		// this.showTorques = false
 	}
 
 	get showTorques(): boolean {

@@ -10,9 +10,8 @@ export class ConStrait extends Line {
 
 	updateModel(argsDict: object = {}) {
 		super.updateModel(argsDict)
-		let p: Vertex = this.drawingStartPoint()
-		let q: Vertex = this.drawingEndPoint()
-		this.vertices = new VertexArray([p, q])
+		this.vertices[0] = this.drawingStartPoint()
+		this.vertices[1] = this.drawingEndPoint()
 	}
 
 }

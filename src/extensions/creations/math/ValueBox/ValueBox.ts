@@ -51,7 +51,7 @@ export class ValueBox extends Linkable {
 
 	updateModel(argsDict) {
 		super.updateModel(argsDict)
-		this.background = new Rectangle({
+		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight
 		})

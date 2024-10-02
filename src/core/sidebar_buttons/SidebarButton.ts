@@ -30,6 +30,7 @@ export class SidebarButton extends Circle {
 	optionSpacing: number
 	touchStart: Vertex
 	active: boolean
+	activeScalingFactor: number
 	showLabel: boolean
 	text: string
 	label: TextLabel
@@ -44,7 +45,8 @@ export class SidebarButton extends Circle {
 			'baseColor',
 			'optionSpacing',
 			'label',
-			'messages'
+			'messages',
+			'activeScalingFactor'
 		])
 	}
 
@@ -60,6 +62,7 @@ export class SidebarButton extends Circle {
 			baseColor: Color.gray(0.4),
 			locationIndex: 0,
 			active: false,
+			activeScalingFactor: 1.2,
 			showLabel: true,
 			text: 'text',
 			fontSize: 12,
@@ -78,13 +81,15 @@ export class SidebarButton extends Circle {
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
+		this.update({
+			fillColor: this.baseColor
+		})
 		this.label.update({
 			viewWidth: 2 * this.radius,
 			viewHeight: 2 * this.radius,
 			text: this.text
 		}, false)
-		let fontSize = this.fontSize ?? 12
-		this.label.view.style['font-size'] = `${fontSize}px`
+		this.label.view.style['font-size'] = `${this.fontSize}px`
 		this.label.view.style['color'] = Color.white().toHex()
 	}
 
@@ -108,13 +113,13 @@ export class SidebarButton extends Circle {
 	commonButtonDown() {
 		if (this.active) { return }
 		this.messagePaper(this.messages[0])
-		this.active = true
 		this.update({
-			radius: 1.2 * this.radius,
-			previousIndex: this.currentModeIndex,
-			fontSize: this.fontSize * 1.2
+			active: true,
+			radius: this.radius * this.activeScalingFactor,
+			fontSize: this.fontSize * this.activeScalingFactor,
+			previousIndex: this.currentModeIndex
 		})
-		this.label.view.style.setProperty('font-size', `${1.2*this.fontSize}px`)
+		this.label.view.style.setProperty('font-size', `${this.fontSize}px`)
 		this.label.update({
 			viewWidth: 2 * this.radius,
 			viewHeight: 2 * this.radius			
@@ -147,12 +152,12 @@ export class SidebarButton extends Circle {
 		let dx: number = this.currentModeIndex * this.optionSpacing
 		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		
-		this.active = false
-		this.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.update({
-			radius: this.radius/1.2,
+			active: false,
+			fillColor: this.colorForIndex(this.currentModeIndex),
 			midpoint: newMidpoint,
-			fontSize: this.fontSize / 1.2
+			radius: this.radius / this.activeScalingFactor,
+			fontSize: this.fontSize / this.activeScalingFactor
 		})
 		this.label.view.style.setProperty('font-size', `${this.fontSize}px`)
 		this.label.update({
@@ -203,7 +208,9 @@ export class SidebarButton extends Circle {
 		if (newIndex == this.currentModeIndex || newIndex == -1) { return }
 		this.currentModeIndex = newIndex
 		let message: object = this.messages[this.currentModeIndex]
-		this.fillColor = this.colorForIndex(this.currentModeIndex)
+		this.update({
+			fillColor: this.colorForIndex(this.currentModeIndex)
+		})
 		if (withMessage as boolean) { this.messagePaper(message) }
  
 		this.update()
@@ -215,7 +222,7 @@ export class SidebarButton extends Circle {
 
 		//let c = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.update({
-			radius: this.radius * 1.2,
+			radius: this.radius * this.activeScalingFactor,
 			midpoint: this.midpoint.translatedBy(this.optionSpacing, 0)
 		})
 		this.updateModeIndex(this.currentModeIndex + 1, true)
@@ -227,7 +234,7 @@ export class SidebarButton extends Circle {
 		let dx: number = this.optionSpacing * (this.currentModeIndex - 1)
 		//this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.update({
-			radius: this.radius / 1.2,
+			radius: this.radius / this.activeScalingFactor,
 			midpoint: this.midpoint.translatedBy(-this.optionSpacing, 0)
 		})
 		this.updateModeIndex(this.currentModeIndex - 1, true)
