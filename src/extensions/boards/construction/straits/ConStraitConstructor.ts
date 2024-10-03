@@ -42,9 +42,10 @@ export class ConStraitConstructor extends Constructor {
 		this.endFreePoint.update({ midpoint: this.endPoint })
 	}
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q)
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		super.updateFromTip(q, redraw)
 		this.update()
+		if (redraw) { this.redraw() }
 	}
 
 	dissolve() {

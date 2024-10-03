@@ -36,7 +36,7 @@ export class Creator extends Mobject {
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.getStartPoint()
-		})
+		}, true)
 		this.parent.addToContent(this.creation)
 		this.parent.remove(this)
 		this.parent.creator = null
@@ -46,8 +46,9 @@ export class Creator extends Mobject {
 		return new Mobject()
 	}
 
-	updateFromTip(q: Vertex) {
+	updateFromTip(q: Vertex, redraw: boolean = true) {
 		this.creationStroke.push(q)
+		if (redraw) { this.redraw() }
 	}
 
 }

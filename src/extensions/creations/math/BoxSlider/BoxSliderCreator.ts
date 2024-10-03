@@ -54,19 +54,20 @@ export class BoxSliderCreator extends Creator {
 		return this.creation || new BoxSlider()
 	}
 
-	updateFromTip(q: Vertex) {
+	updateFromTip(q: Vertex, redraw: boolean = true) {
 		this.update({ // This shouldn't be necessary, fix
 			fillColor: Color.black()
-		})
+		}, redraw)
 		if (this.creation === null) { return }
 		this.creation.update({
 			height: q.y - this.getStartPoint().y,
 			//fillColor: gray(0.5) // This shouldn't be necessary, fix
-		})
+		}, redraw)
 		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)
-		})
+		}, redraw)
 		this.creation.hideLinks()
+		if (redraw) { this.redraw() }
 	}
 
 	dissolve() {

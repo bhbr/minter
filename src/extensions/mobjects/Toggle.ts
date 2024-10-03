@@ -90,12 +90,12 @@ export class Toggle extends Mobject {
 		}
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, redraw)
 		this.label.update({
 			text: this.labelText,
 			anchor: this.circle.urCorner().translatedBy(5, 0)
-		})
+		}, redraw)
 	}
 
 

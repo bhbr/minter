@@ -83,8 +83,8 @@ export class Wavy extends CindyCanvas {
 		return ret
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		this.nbSources = Math.floor(this.nbSources)
 
 		if (this.core == undefined || this.sourcePositions().length == 0) { return }
@@ -93,6 +93,7 @@ export class Wavy extends CindyCanvas {
 		}
 		let code = `drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););`
 		this.core.evokeCS(code)
+		if (redraw) { this.redraw() }
 	}
 
 

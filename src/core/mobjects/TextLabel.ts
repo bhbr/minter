@@ -32,9 +32,13 @@ export class TextLabel extends Mobject {
 		this.view.style.fontSize = `${this.fontSize}px`
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	// update(argsDict: object = {}, redraw: boolean = false) {
+	// 	super.update(argsDict, false)
+	// 	if (redraw) { this.redraw() }
+	// }
 
+	redraw() {
+		super.redraw()
 		//// internal dependencies
 		this.view.innerHTML = this.text
 		this.view.style.color = (this.color ?? Color.white()).toHex()
@@ -62,7 +66,6 @@ export class TextLabel extends Mobject {
 			this.view.style.justifyContent = 'flex-end'
 			break
 		}
-
 	}
 
 }

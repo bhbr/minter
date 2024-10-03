@@ -63,8 +63,8 @@ export class RoundedRectangle extends CurvedShape {
 		} catch { }
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 
 		//// internal dependencies
 		this.viewWidth = this.width
@@ -75,6 +75,7 @@ export class RoundedRectangle extends CurvedShape {
 		this.p3.y = this.height
 		this.p4.y = this.height
 
+		if (redraw) { this.redraw() }
 	}
 
 }

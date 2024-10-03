@@ -198,10 +198,11 @@ export class SidebarButton extends Circle {
 		}
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
-		super.updateModel({ midpoint: buttonCenter(this.locationIndex) })
+	update(argsDict: object = {}, redraw: boolean = true) {
+		argsDict['midpoint'] = buttonCenter(this.locationIndex)
+		super.update(argsDict, false)
 		this.updateLabel()
+		if (redraw) { this.redraw() }
 	}
 	
 	updateModeIndex(newIndex: number, withMessage: any = {}) {

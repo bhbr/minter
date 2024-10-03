@@ -209,14 +209,15 @@ export class InclinedScene extends Linkable implements Playable {
 		return bottomLeft.add(topRight.subtract(bottomLeft).scaledBy(relativePosition))
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		argsDict['torqueOrigin'] = this.box.llCorner()
-		super.updateModel(argsDict)
+		super.update(argsDict, false)
 		let v = new Vertex(0, -this.box.height / 2).rotatedBy(this.inclination)
 		let newCOM = this.vertexAlongPlane(this.initialBoxPositionAlongPlane).translatedBy(v)
-		this.box.updateModel({
+		this.box.update({
 			centerOfMass: newCOM
 		})
+		if (redraw) { this.redraw() }
 	}
 
 	play() {

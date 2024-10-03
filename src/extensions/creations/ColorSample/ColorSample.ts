@@ -56,11 +56,11 @@ export class ColorSample extends Linkable {
 		let c = this.color.alpha = newValue
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
-		this.circle.updateModel({
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, redraw)
+		this.circle.update({
 			fillColor: this.color
-		})
+		}, redraw)
 	}
 
 }

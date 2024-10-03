@@ -13,8 +13,8 @@ export class ValueBoxCreator extends DraggingCreator {
 		})
 	}
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q)
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		super.updateFromTip(q, redraw)
 		this.creation.hideLinks()
 	}
 }

@@ -49,12 +49,12 @@ export class ValueBox extends Linkable {
 		this.add(this.valueLabel)
 	}
 
-	updateModel(argsDict) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight
-		})
+		}, redraw)
 
 		var labelText = `${this.value.toPrecision(3)}`
 		if (isNaN(this.value) || !isFinite(this.value)) {
@@ -65,7 +65,9 @@ export class ValueBox extends Linkable {
 			width: this.viewWidth,
 			height: this.viewHeight,
 			text: labelText
-		})
+		}, redraw)
+
+		if (redraw) { this.redraw() }
 	}
 
 

@@ -34,7 +34,7 @@ export class PlayButton extends SimpleButton {
 	}
 
 	toggleLabel() {
-		this.updateModel({
+		this.update({
 			text: (this.text == 'play') ? 'pause' : 'play'
 		})
 		

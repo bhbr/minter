@@ -24,7 +24,7 @@ export class ConLineConstructor extends ConStraitConstructor {
 		this.line.update({
 			startPoint: this.startFreePoint.midpoint,
 			endPoint: this.endFreePoint.midpoint
-		} ,false)
+		})
 		this.startFreePoint.addDependency('midpoint', this.line, 'startPoint')
 		this.endFreePoint.addDependency('midpoint', this.line, 'endPoint')
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')

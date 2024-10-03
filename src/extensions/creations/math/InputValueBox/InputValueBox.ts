@@ -60,12 +60,12 @@ export class InputValueBox extends Linkable {
 		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, redraw)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight
-		})
+		}, redraw)
 
 	}
 
@@ -78,7 +78,7 @@ export class InputValueBox extends Linkable {
 				button.activeKeyboard = true
 			}
 		}
-		this.updateModel({
+		this.update({
 			value: Number(this.inputBox.value)
 		})
 	}

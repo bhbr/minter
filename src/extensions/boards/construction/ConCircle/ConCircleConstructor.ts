@@ -76,10 +76,10 @@ export class ConCircleConstructor extends Constructor {
 		this.construction.integrate(this)
 	}
 
-	// remove?
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
-	}
+	// // remove?
+	// update(argsDict: object = {}, redraw: boolean = true) {
+	// 	super.update(argsDict, redraw)
+	// }
 
 
 }

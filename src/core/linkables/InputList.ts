@@ -39,7 +39,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	setup() {
 		super.setup()
 		this.createHookList()
-		this.update({ height: this.getHeight() }, false)
+		this.update({ height: this.getHeight() })
 	}
 
 	getHeight(): number {
@@ -88,7 +88,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		if (argsDict['inputNames'] !== undefined) {
 			this.createHookList()
 		}
@@ -97,7 +97,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		let v = new Vertex(p2[0] - p1[0], p2[1] - p1[1] - IO_LIST_OFFSET)
 		argsDict['anchor'] = this.anchor.translatedBy(v)
 		argsDict['height'] = this.getHeight()
-		super.updateModel(argsDict)
+		super.update(argsDict, redraw)
 	}
 }
 

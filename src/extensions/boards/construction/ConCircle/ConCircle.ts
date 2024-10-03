@@ -26,12 +26,12 @@ on its circumference. The radius (and anchor) is updated automatically.
 		this.view.style['pointer-events'] = 'none'
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		let p = argsDict['midpoint'] || this.midpoint
 		let q = argsDict['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
 		argsDict['radius'] = r
-		super.updateModel(argsDict)
+		super.update(argsDict, redraw)
 	}
 
 }

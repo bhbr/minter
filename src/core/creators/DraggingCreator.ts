@@ -23,11 +23,12 @@ export class DraggingCreator extends Creator {
 		})
 	}
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q)
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		super.updateFromTip(q, false)
 		this.creation.update({
 			anchor: q
-		})
+		}, redraw)
+		if (redraw) { this.redraw() }
 	}
 
 	dissolve() {

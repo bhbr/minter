@@ -61,13 +61,13 @@ export class ForceVector extends ConStrait {
 		this.addDependency('startPoint', this.foot, 'midpoint')
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		let newStartPoint = argsDict['startPoint'] ?? this.startPoint
 		let newDirection = argsDict['direction'] ?? this.direction
 		let unitVector = new Vertex(Math.cos(newDirection), -Math.sin(newDirection))
 		let length = this.size * this.scale - this.tipSize
 		argsDict['endPoint'] = newStartPoint.translatedBy(unitVector.scaledBy(length))
-		super.updateModel(argsDict)
+		super.update(argsDict, false)
 
 		this.strokeColor = this.color
 		if (this.size * this.scale < 5) {
@@ -86,6 +86,8 @@ export class ForceVector extends ConStrait {
 			tipPoint1,
 			tipPoint2
 		])
+
+		if (redraw) { this.redraw() }
 	}
 
 	drawingEndPoint(): Vertex {

@@ -140,14 +140,15 @@ The content children can also be dragged and panned.
 
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
-		this.background.updateModel({
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
+		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight,
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight
 		})
+		if  (redraw) { this.redraw() }
 	}
 
 

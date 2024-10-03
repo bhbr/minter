@@ -29,7 +29,7 @@ export class IntersectionPoint extends ConPoint {
 		})
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
@@ -39,7 +39,7 @@ export class IntersectionPoint extends ConPoint {
 				argsDict['midpoint'] = mp
 			}
 		}
-		super.updateModel(argsDict)
+		super.update(argsDict, redraw)
 	}
 
 	intersectionCoords(): Vertex {

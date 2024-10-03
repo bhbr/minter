@@ -38,13 +38,14 @@ export class InclinedPlane extends Polygon {
 		return this.length * Math.sin(this.inclination)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		let w = this.getWidth()
 		let h = this.getHeight()
 		this.vertices[0].copyFrom(this.midpoint.translatedBy(-w/2, h/2))
 		this.vertices[1].copyFrom(this.midpoint.translatedBy(w/2, h/2))
 		this.vertices[2].copyFrom(this.midpoint.translatedBy(w/2, -h/2))
+		if (redraw) { this.redraw() }
 	}
 
 }

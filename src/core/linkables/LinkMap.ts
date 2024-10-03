@@ -224,24 +224,25 @@ export class LinkMap extends Mobject {
 		startHook.mobject.update()
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		for (let trio of this.connectedHooks) {
 			let sh = trio[0]
 			let link = trio[1]
 			let eh = trio[2]
-			link.startBullet.updateModel({
+			link.startBullet.update({
 				midpoint: sh.positionInLinkMap()
 			})
-			link.linkLine.updateModel({
+			link.linkLine.update({
 				startPoint: sh.positionInLinkMap(),
 				endPoint: eh.positionInLinkMap()
 			})
-			link.endBullet.updateModel({
+			link.endBullet.update({
 				midpoint: eh.positionInLinkMap()
 			})
 
 		}
+		if (redraw) { this.redraw() }
 	}
 
 }

@@ -59,6 +59,7 @@ and logic for drawing and user interaction.
 		
 		this.setup()
 		this.update()
+		this.redraw()
 	}
 
 	readonlyProperties(): Array<string> {
@@ -347,7 +348,7 @@ and logic for drawing and user interaction.
 		// by default, the mobject can draw outside its view's borders
 	}
 
-	redrawView() {
+	redraw() {
 		if (!this.view) { return }
 		this.view.style.transform = this.transform.withoutAnchor().toCSSString()
 		this.view.style.left = `${this.anchor.x.toString()}px`
@@ -370,24 +371,24 @@ and logic for drawing and user interaction.
 
 	// Drawing methods //
 
-	redrawSelf() { }
-	/*
-	Redraw just yourself, not your children (submobs),
-	overridden in subclasses
-	*/
+	// redrawSelf() { }
+	// /*
+	// Redraw just yourself, not your children (submobs),
+	// overridden in subclasses
+	// */
 
-	redraw(recursive = true) {
-		// redraw yourself and your children
-		try {
-			if (!this.view) { return }
-			this.redrawView()
-			this.redrawSelf()
-			if (!recursive) { return }
-			for (let submob of this.children || []) {
-				submob.redraw()
-			}
-		} catch { }
-	}
+	// redraw(recursive = true) {
+	// 	// redraw yourself and your children
+	// 	try {
+	// 		if (!this.view) { return }
+	// 		this.redrawView()
+	// 		this.redrawSelf()
+	// 		if (!recursive) { return }
+	// 		for (let submob of this.children || []) {
+	// 			submob.redraw()
+	// 		}
+	// 	} catch { }
+	// }
 
 
 	// Show and hide //
@@ -696,11 +697,11 @@ and logic for drawing and user interaction.
 
 	// Update methods //
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 	// Update just the properties and what depends on them, without redrawing
 		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
 		this.setAttributes(argsDict)
-		this.updateSubmobModels()
+		//this.updateSubmobModels()
 
 		if (this.view != null) {
 			this.view.setAttribute('screen-event-handler', this.screenEventHandler.toString())
@@ -743,36 +744,38 @@ and logic for drawing and user interaction.
 		for (let pair of targetsAndUpdateDicts) {
 			let target = pair[0]
 			let updateDict = pair[1]
-			target.updateModel(updateDict)
+			target.update(updateDict)
 		}
+
+		if (redraw) { this.redraw() }
 	}
 
-	updateSubmobModels() {
-		for (let submob of this.children || []) {
-			if (!this.dependsOn(submob)) { // prevent dependency loops
-				submob.updateModel()
-			}
-		}
-	}
+	// updateSubmobModels() {
+	// 	for (let submob of this.children || []) {
+	// 		if (!this.dependsOn(submob)) { // prevent dependency loops
+	// 			submob.update()
+	// 		}
+	// 	}
+	// }
 
-	update(argsDict: object = {}, redraw = true) {
-	// Update with or without redrawing
-		this.updateModel(argsDict)
-		if (redraw) {
-			this.redraw()
-		}
-		for (let depmob of this.dependents()) {
-			depmob.update({}, redraw)
-		}
-	}
+	// update(argsDict: object = {}, redraw = true) {
+	// // Update with or without redrawing
+	// 	this.update(argsDict)
+	// 	if (redraw) {
+	// 		this.redraw()
+	// 	}
+	// 	for (let depmob of this.dependents()) {
+	// 		depmob.update({}, redraw)
+	// 	}
+	// }
 
-	updateFrom(mob: Mobject, attrs: Array<string>, redraw = true) {
-		let updateDict: object = {}
-		for (let attr of attrs) {
-			updateDict[attr] = mob[attr]
-		}
-		this.update(updateDict, redraw)
-	}
+	// updateFrom(mob: Mobject, attrs: Array<string>, redraw = true) {
+	// 	let updateDict: object = {}
+	// 	for (let attr of attrs) {
+	// 		updateDict[attr] = mob[attr]
+	// 	}
+	// 	this.update(updateDict, redraw)
+	// }
 
 	consolidateTransformAndAnchor(argsDict: object = {}): object {
 	/*

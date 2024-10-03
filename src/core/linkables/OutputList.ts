@@ -83,7 +83,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 		if (argsDict['outputNames'] !== undefined) {
 			this.createHookList()
 		}
@@ -91,7 +91,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		let p2: Vertex = (this.mobject != null) ? this.mobject.localBottomCenter() : Vertex.origin()
 		argsDict['anchor'] = this.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] + IO_LIST_OFFSET)
 		argsDict['height'] = this.getHeight()
-		super.updateModel(argsDict)
+		super.update(argsDict, redraw)
 	}
 }
 

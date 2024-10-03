@@ -32,8 +32,8 @@ export class SwingCreator extends Creator {
 		return this.swing
 	}
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q)
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		super.updateFromTip(q, redraw)
 		var dr: Vertex = q.subtract(this.getStartPoint())
 		dr = dr.subtract(new Vertex(this.viewWidth/2, this.swing.fixtureHeight))
 		let length: number = dr.norm()
@@ -42,7 +42,7 @@ export class SwingCreator extends Creator {
 			maxLength: length,
 			length: 1,
 			initialAngle: angle
-		})
+		}, redraw)
 		this.swing.hideLinks()
 	}
 

@@ -39,8 +39,8 @@ export class Torque extends Polygon {
 		return Vertex.outerProduct(this.lever(), this.force.mereVector())
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		let r = this.lever()
 		let F = this.force.asVectorOnScreen()
 		if (Math.abs(this.size() * this.force.scale) < 5) { // in square pixels
@@ -53,6 +53,7 @@ export class Torque extends Polygon {
 				F
 			])
 		}
+		if (redraw) { this.redraw() }
 	}
 
 }

@@ -91,13 +91,12 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 
 		//// internal dependencies
 		this.viewWidth = this.width
 		this.viewHeight = this.height
-		this.redrawView()
 
 		//// updating submobs
 		let a: number = this.normalizedValue()
@@ -107,25 +106,26 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			width: this.width,
 			height: this.height,
 			//fillColor: this.backgroundColor
-		}, false)
+		}, redraw)
 
 		this.filledBar.update({
 			width: this.width,
 			height: a * this.height,
 			anchor:  new Vertex(0, this.height - a * this.height),
 			//fillColor: this.barFillColor
-		}, false)
+		}, redraw)
 
-		this.updateLabel()
+		this.updateLabel(redraw)
 
+		if (redraw) { this.redraw() }
 	}
 
-	updateLabel() {
+	updateLabel(redraw: boolean = true) {
 		this.label.update({
 			text: this.value.toPrecision(this.precision).toString(),
 			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
 			viewWidth: this.width
-		}, false)
+		}, redraw)
 	}
 
 	onPointerDown(e: ScreenEvent) {

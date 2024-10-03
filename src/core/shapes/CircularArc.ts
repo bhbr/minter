@@ -43,7 +43,7 @@ export class CircularArc extends CurvedLine {
 		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 	/*
 	Since midpoint is just an alias for a shifted anchor, there is possible
 	confusion when updating a Circle/CircularArc with a new midpoint, anchor
@@ -82,7 +82,7 @@ export class CircularArc extends CurvedLine {
 		argsDict['viewWidth'] = 2 * updatedRadius
 		argsDict['viewHeight'] = 2 * updatedRadius
 
-		super.updateModel(argsDict)
+		super.update(argsDict, redraw)
 	}
 
 	updateBezierPoints() {

@@ -76,9 +76,9 @@
 // 		})
 // 	}
 
-// 	updateModel(argsDict) {
-// 		super.updateModel(argsDict)
-// 		this.circle.updateModel({
+// 	update(argsDict) {
+// 		super.update(argsDict)
+// 		this.circle.update({
 // 			radius: this.radius,
 // 			midpoint: new Vertex(this.radius, this.radius),
 // 			fillColor: this.color

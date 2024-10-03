@@ -40,13 +40,14 @@ export class InclinedBox extends Polygon {
 		})
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		let w2 = this.width / 2
 		let h2 = this.height / 2
 		this.vertices = new VertexArray([
 			[-w2, -h2], [-w2, h2], [w2, h2], [w2 ,-h2]
 		])
+		if (redraw) { this.redraw() }
 	}
 
 	topDirection(): number {

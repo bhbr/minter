@@ -28,10 +28,11 @@ export class Line extends Polygon {
 		return this.endPoint
 	}
 
-	updateModel(argsDict: object = {}) {
-		super.updateModel(argsDict)
+	update(argsDict: object = {}, redraw: boolean = true) {
+		super.update(argsDict, false)
 		let p: Vertex = this.drawingStartPoint()
 		let q: Vertex = this.drawingEndPoint()
 		this.vertices = new VertexArray([p, q])
+		if (redraw) { this.redraw() }
 	}
 }

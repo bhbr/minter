@@ -24,7 +24,7 @@ export class ConPoint extends Circle {
 	setup() {
 		super.setup()
 		if (!this.midpoint || this.midpoint.isNaN()) {
-			this.update({ midpoint: Vertex.origin() }, false)
+			this.update({ midpoint: Vertex.origin() })
 		}
 
 	}

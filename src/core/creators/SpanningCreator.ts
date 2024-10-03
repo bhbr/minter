@@ -40,9 +40,10 @@ export class SpanningCreator extends Creator {
 	}
 
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q)
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		super.updateFromTip(q, false)
 		this.update()
+		if (redraw) { this.redraw() }
 	}
 
 	dissolve() {

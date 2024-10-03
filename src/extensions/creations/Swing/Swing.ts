@@ -94,22 +94,24 @@ export class Swing extends Linkable {
 		return 50 * this.mass ** 0.5
 	}
 
-	updateModel(argsDict: object = {}) {
+	update(argsDict: object = {}, redraw: boolean = true) {
 
 		argsDict['viewHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 
-		super.updateModel(argsDict)
+		super.update(argsDict, false)
 
 		let angle: number = argsDict['initialAngle'] ?? this.angle()
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(- angle).scaledBy(this.pixelLength()).add(this.string.startPoint)
 
-		this.string.updateModel({
+		this.string.update({
 			endPoint: newEndPoint
-		})
-		this.weight.updateModel({
+		}, redraw)
+		this.weight.update({
 			radius: this.weightRadius(),
 			midpoint: newEndPoint
-		})
+		}, redraw)
+	
+		if (redraw) { this.redraw() }
 	}
 
 	run() {

@@ -84,7 +84,8 @@ TODO: support mutiple paths e. g. for shapes with holes
 		addPointerUp(this.path, this.capturedOnPointerUp.bind(this))
 	}
 
-	redrawSelf() {
+	redraw() {
+		super.redraw()
 		let pathString: string = this.pathString()
 		if (pathString.includes('NaN')) { return }
 		this.path.setAttribute('d', pathString)
@@ -94,7 +95,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 		this.path.style['stroke'] = this.strokeColor.toHex()
 		this.path.style['stroke-width'] = this.strokeWidth.toString()
 	}
-	
+
 	static stringFromPoint(point: Array<number>): string {
 		// a string representation for CSS
 		let x: number = point[0],

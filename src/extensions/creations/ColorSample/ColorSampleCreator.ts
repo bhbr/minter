@@ -13,8 +13,9 @@ export class ColorSampleCreator extends DraggingCreator {
 		})
 	}
 
-	updateFromTip(q: Vertex) {
-		super.updateFromTip(q.translatedBy(-this.creation.circle.radius, -this.creation.circle.radius))
+	updateFromTip(q: Vertex, redraw: boolean = true) {
+		let r = this.creation.circle.radius
+		super.updateFromTip(q.translatedBy(-r, -r), redraw)
 		this.creation.hideLinks()
 	}
 }
