@@ -38,8 +38,8 @@ export class Creator extends Mobject {
 			anchor: this.getStartPoint()
 		}, true)
 		this.parent.addToContent(this.creation)
-		this.parent.remove(this)
 		this.parent.creator = null
+		this.parent.remove(this)
 	}
 
 	createMobject(): Mobject {

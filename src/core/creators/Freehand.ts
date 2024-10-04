@@ -37,10 +37,6 @@ export class Freehand extends Creator {
 
 	updateFromTip(q: Vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
-		if (this.line.vertices.length > 10) {
-			console.log('more than ten')
-		}
-
 		if (redraw) {
 			this.line.redraw()
 			this.redraw()
@@ -61,7 +57,8 @@ export class Freehand extends Creator {
 		})
 
 		let par = this.parent
-		this.parent.remove(this)
+		par.creator = null
+		par.remove(this)
 		if (this.visible) {
 			par.addToContent(this)
 		}

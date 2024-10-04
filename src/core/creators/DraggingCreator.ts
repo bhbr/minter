@@ -19,7 +19,8 @@ export class DraggingCreator extends Creator {
 			width: 50,
 			height: 50,
 			fillColor: Color.red(),
-			fillOpacity: 1.0
+			fillOpacity: 1.0,
+			anchor: this.creationStroke[0]
 		})
 	}
 
@@ -37,6 +38,8 @@ export class DraggingCreator extends Creator {
 			anchor: this.getEndPoint()
 		})
 		this.parent.addToContent(this.creation)
+		this.parent.creator = null
+		this.parent.remove(this)
 	}
 
 }

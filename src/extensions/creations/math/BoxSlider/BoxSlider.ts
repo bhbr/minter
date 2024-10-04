@@ -37,13 +37,9 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	readonlyProperties(): Array<string> {
 		return super.readonlyProperties().concat([
-			'width',
 			'outerBar',
 			'filledBar',
-			'label',
-			'fillColor',
-			'barFillColor',
-			'precision'
+			'label'
 		])
 	}
 
