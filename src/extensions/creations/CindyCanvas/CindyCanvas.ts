@@ -33,6 +33,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	defaults(): object {
 		return Object.assign(super.defaults(), {
 			screenEventHandler: ScreenEventHandler.Self,
+			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			playButton: new PlayButton({
 				anchor: new Vertex(5, 5)
@@ -56,7 +57,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	setup() {
 		super.setup()
 
-		this.innerCanvas = new Mobject({
+		this.innerCanvas.update({
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
 			screenEventHandler: ScreenEventHandler.Auto
@@ -66,7 +67,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		this.outerFrame.update({
 			width: this.viewWidth,
 			height: this.viewHeight,
-			screenEventHandler: ScreenEventHandler.Below
+			screenEventHandler: ScreenEventHandler.Parent
 		})
 		this.add(this.outerFrame)
 
@@ -89,29 +90,38 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 		this.add(this.playButton)
 
-		this.cindySetup()
+		this.createScripts()
+		this.startCore()
 	}
 
-	cindySetup() {
+	createScripts() {
+		this.createInitScript()
+		this.createDrawScript()
+		this.createMouseMoveScript()
+	}
+
+	createInitScript() {
 		let initScript = document.createElement('script')
 		initScript.setAttribute('type', 'text/x-cindyscript')
 		initScript.setAttribute('id', `${this.id}init`)
 		initScript.textContent = this.initCode()
 		document.body.appendChild(initScript)
+	}
 
+	createDrawScript() {
 		let drawScript = document.createElement('script')
 		drawScript.setAttribute('type', 'text/x-cindyscript')
 		drawScript.setAttribute('id', `${this.id}draw`)
 		drawScript.textContent = this.drawCode()
 		document.body.appendChild(drawScript)
+	}
 
-		let mousemoveScript = document.createElement('script')
-		mousemoveScript.setAttribute('type', 'text/x-cindyscript')
-		mousemoveScript.setAttribute('id', `${this.id}mousemove`)
-		mousemoveScript.textContent = this.mousemoveCode()
-		document.body.appendChild(mousemoveScript)
-
-		this.startCore()
+	createMouseMoveScript() {
+		let mouseMoveScript = document.createElement('script')
+		mouseMoveScript.setAttribute('type', 'text/x-cindyscript')
+		mouseMoveScript.setAttribute('id', `${this.id}mousemove`)
+		mouseMoveScript.textContent = this.mouseMoveCode()
+		document.body.appendChild(mouseMoveScript)
 	}
 
 	initCode() {
@@ -122,7 +132,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		return `drawcmd();`
 	}
 
-	mousemoveCode(): string {
+	mouseMoveCode(): string {
 		// do not redraw until I say so
 		return ''
 	}
@@ -143,7 +153,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		this.core.pause()
 		this.playState = 'pause'
 		this.outerFrame.update({
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Parent
 		})
 	}
 
@@ -168,9 +178,9 @@ export class CindyCanvas extends Linkable implements Playable {
 	setDragging(flag: boolean) {
 		super.setDragging(flag)
 		if (flag) {
-			this.innerCanvas.screenEventHandler = ScreenEventHandler.Parent
+			this.outerFrame.screenEventHandler = ScreenEventHandler.Parent
 		} else {
-			this.innerCanvas.screenEventHandler = ScreenEventHandler.Auto
+			this.outerFrame.screenEventHandler = ScreenEventHandler.Below
 		}
 	}
 
@@ -188,8 +198,8 @@ export class CindyCanvas extends Linkable implements Playable {
 		initScript.textContent = this.initCode()
 		let drawScript = document.querySelector(`#${this.id}draw`)
 		drawScript.textContent = this.drawCode()
-		let mousemoveScript = document.querySelector(`#${this.id}mousemove`)
-		mousemoveScript.textContent = this.mousemoveCode()
+		let mouseMoveScript = document.querySelector(`#${this.id}mousemove`)
+		mouseMoveScript.textContent = this.mouseMoveCode()
 		this.startCore()
 	}
 
