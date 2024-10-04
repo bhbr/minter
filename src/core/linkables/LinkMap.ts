@@ -42,12 +42,12 @@ export class LinkMap extends Mobject {
 	}
 
 	hookAtLocation(p: Vertex): LinkHook | null {
-		for (let h of (this.parent as Board).innerInputHooks()) {
+		for (let h of this.parent.innerInputHooks()) {
 			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}
 		}
-		for (let h of (this.parent as Board).innerOutputHooks()) {
+		for (let h of this.parent.innerOutputHooks()) {
 			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}

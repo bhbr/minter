@@ -39,17 +39,14 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	setup() {
 		super.setup()
 		this.createHookList()
-		this.update({ height: this.getHeight() })
+		this.update({ height: this.getHeight() }, false)
 	}
 
 	getHeight(): number {
 	// calculate the height from the number of inputs
-		if (this.inputNames == undefined) { return 0 }
+		if (this.inputNames == null) { return 0 }
 		if (this.inputNames.length == 0) { return 0 }
-		else {
-			let h = 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * (this.inputNames.length - 1)
-			return h
-		}
+		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * (this.inputNames.length - 1) }
 	}
 
 	createHookList() {
@@ -73,7 +70,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			this.add(label)
 			let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i])
 			hook.update({ midpoint: m })
-			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING/2)
+			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2)
 			label.update({ anchor: a })
 			this.linkHooks.push(hook)
 		}
@@ -89,15 +86,13 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	}
 
 	update(argsDict: object = {}, redraw: boolean = true) {
-		if (argsDict['inputNames'] !== undefined) {
-			this.createHookList()
-		}
-		let p1: Vertex = this.bottomCenter()
-		let p2: Vertex = (this.mobject != null) ? this.mobject.localTopCenter() : Vertex.origin()
-		let v = new Vertex(p2[0] - p1[0], p2[1] - p1[1] - IO_LIST_OFFSET)
-		argsDict['anchor'] = this.anchor.translatedBy(v)
-		argsDict['height'] = this.getHeight()
-		super.update(argsDict, redraw)
+		super.update(argsDict, false)
+		this.height = this.getHeight()
+		this.createHookList()
+		if (this.mobject == null) { return }
+		super.update({
+			anchor: new Vertex(this.mobject.viewWidth / 2 - this.viewWidth / 2, -IO_LIST_OFFSET - this.getHeight())
+		}, redraw)
 	}
 }
 

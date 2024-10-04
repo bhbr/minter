@@ -58,6 +58,10 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.add(this.outputList)
 		this.outputList.hide()
+		this.addDependency('viewHeight', this.inputList, null)
+		this.addDependency('viewWidth', this.inputList, null)
+		this.addDependency('viewHeight', this.outputList, null)
+		this.addDependency('viewWidth', this.outputList, null)
 	}
 
 	showLinks() {

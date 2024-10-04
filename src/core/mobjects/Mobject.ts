@@ -11,12 +11,12 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
 import { Paper } from 'core/Paper'
+import { DRAW_BORDERS } from 'core/constants'
 
 /*
 For debugging; draw the border of the mobject's view
 (a HTMLDivelement) via a CSS property
 */
-export const DRAW_BORDER: boolean = false
 
 export class Mobject extends ExtendedObject {
 
@@ -93,7 +93,7 @@ and logic for drawing and user interaction.
 			visible: true,
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
-			drawBorder: DRAW_BORDER,
+			drawBorder: DRAW_BORDERS,
 
 			// hierarchy
 			_parent: null,
@@ -368,28 +368,6 @@ and logic for drawing and user interaction.
 		}
 		return true
 	}
-
-	// Drawing methods //
-
-	// redrawSelf() { }
-	// /*
-	// Redraw just yourself, not your children (submobs),
-	// overridden in subclasses
-	// */
-
-	// redraw(recursive = true) {
-	// 	// redraw yourself and your children
-	// 	try {
-	// 		if (!this.view) { return }
-	// 		this.redrawView()
-	// 		this.redrawSelf()
-	// 		if (!recursive) { return }
-	// 		for (let submob of this.children || []) {
-	// 			submob.redraw()
-	// 		}
-	// 	} catch { }
-	// }
-
 
 	// Show and hide //
 

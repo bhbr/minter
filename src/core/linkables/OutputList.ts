@@ -54,23 +54,25 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		this.linkHooks = []
 		for (let i = 0; i < this.outputNames.length; i++) {
 			let name = this.outputNames[i]
-			let h = new LinkHook({
+			let hook = new LinkHook({
 				mobject: this.mobject,
 				name: name,
 				type: 'output'
 			})
-			let t = new TextLabel({
+			let label = new TextLabel({
 				text: name,
 				horizontalAlign: 'left',
 				verticalAlign: 'center',
 				viewHeight: HOOK_VERTICAL_SPACING,
 				viewWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
 			})
-			this.add(h)
-			this.add(t)
-			h.update({ midpoint: new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i]) })
-			t.update({ anchor: h.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING/2) })
-			this.linkHooks.push(h)
+			this.add(hook)
+			this.add(label)
+			let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i])
+			hook.update({ midpoint: m })
+			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2)
+			label.update({ anchor: a })
+			this.linkHooks.push(hook)
 		}
 	}
 
@@ -84,14 +86,15 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	}
 
 	update(argsDict: object = {}, redraw: boolean = true) {
-		if (argsDict['outputNames'] !== undefined) {
-			this.createHookList()
-		}
-		let p1: Vertex = this.topCenter()
-		let p2: Vertex = (this.mobject != null) ? this.mobject.localBottomCenter() : Vertex.origin()
-		argsDict['anchor'] = this.anchor.translatedBy(p2[0] - p1[0], p2[1] - p1[1] + IO_LIST_OFFSET)
-		argsDict['height'] = this.getHeight()
-		super.update(argsDict, redraw)
+		super.update(argsDict, false)
+		this.height = this.getHeight()
+		this.createHookList()
+		if (this.mobject == null) { return }
+		console.log(this.mobject)
+		console.log(this.mobject.viewWidth, this.mobject.viewHeight)
+		super.update({
+			anchor: new Vertex(this.mobject.viewWidth / 2 - this.viewWidth / 2, this.mobject.viewHeight + IO_LIST_OFFSET)
+		}, redraw)
 	}
 }
 
