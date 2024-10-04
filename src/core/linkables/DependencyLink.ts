@@ -38,11 +38,17 @@ linkable mobjects
 
 	setup() {
 		super.setup()
-		this.add(this.startBullet)
-		this.add(this.linkLine)
-		this.add(this.endBullet)
 		this.startBullet.addDependency('midpoint', this.linkLine, 'startPoint')
+		this.linkLine.update({
+			startPoint: this.startBullet.midpoint
+		})
 		this.endBullet.addDependency('midpoint', this.linkLine, 'endPoint')
+		this.linkLine.update({
+			endPoint: this.endBullet.midpoint
+		})
+		this.add(this.startBullet)
+		this.add(this.endBullet)
+		this.add(this.linkLine)
 	}
 
 }

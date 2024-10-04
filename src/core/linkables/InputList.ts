@@ -68,9 +68,9 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			})
 			this.add(hook)
 			this.add(label)
-			let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i])
+			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i)
 			hook.update({ midpoint: m })
-			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2)
+			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
 			label.update({ anchor: a })
 			this.linkHooks.push(hook)
 		}
@@ -91,7 +91,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		this.createHookList()
 		if (this.mobject == null) { return }
 		super.update({
-			anchor: new Vertex(this.mobject.viewWidth / 2 - this.viewWidth / 2, -IO_LIST_OFFSET - this.getHeight())
+			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
 		}, redraw)
 	}
 }

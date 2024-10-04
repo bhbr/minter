@@ -90,10 +90,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		this.height = this.getHeight()
 		this.createHookList()
 		if (this.mobject == null) { return }
-		console.log(this.mobject)
-		console.log(this.mobject.viewWidth, this.mobject.viewHeight)
 		super.update({
-			anchor: new Vertex(this.mobject.viewWidth / 2 - this.viewWidth / 2, this.mobject.viewHeight + IO_LIST_OFFSET)
+			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), this.mobject.viewHeight + IO_LIST_OFFSET)
 		}, redraw)
 	}
 }
