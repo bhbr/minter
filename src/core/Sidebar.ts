@@ -84,7 +84,7 @@ export class Sidebar extends Mobject {
 		this.buttons.push(button)
 		button.update({
 			midpoint: buttonCenter(i),
-			lcoationIndex: i
+			locationIndex: i
 		})
 	}
 

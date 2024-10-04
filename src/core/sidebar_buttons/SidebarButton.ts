@@ -199,7 +199,7 @@ export class SidebarButton extends Circle {
 	}
 
 	update(argsDict: object = {}, redraw: boolean = true) {
-		argsDict['midpoint'] = buttonCenter(this.locationIndex)
+		//argsDict['midpoint'] = buttonCenter(this.locationIndex)
 		super.update(argsDict, false)
 		this.updateLabel()
 		if (redraw) { this.redraw() }
@@ -214,28 +214,20 @@ export class SidebarButton extends Circle {
 		})
 		if (withMessage as boolean) { this.messagePaper(message) }
  
-		this.update()
+		//this.update()
 	}
 	
 	selectNextOption() {
 		if (this.currentModeIndex == this.messages.length - 1) { return }
-		let dx: number = this.optionSpacing * (this.currentModeIndex + 1)
-
-		//let c = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.update({
-			radius: this.radius * this.activeScalingFactor,
 			midpoint: this.midpoint.translatedBy(this.optionSpacing, 0)
 		})
 		this.updateModeIndex(this.currentModeIndex + 1, true)
 	}
 	
-	
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
-		let dx: number = this.optionSpacing * (this.currentModeIndex - 1)
-		//this.midpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
 		this.update({
-			radius: this.radius / this.activeScalingFactor,
 			midpoint: this.midpoint.translatedBy(-this.optionSpacing, 0)
 		})
 		this.updateModeIndex(this.currentModeIndex - 1, true)
