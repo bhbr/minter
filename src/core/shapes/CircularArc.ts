@@ -49,8 +49,8 @@ export class CircularArc extends CurvedLine {
 	confusion when updating a Circle/CircularArc with a new midpoint, anchor
 	and/or radius.
 	This is resolved here:
-		- updating the midpoint changes the anchor with the given new or existing radius
-		- updating just the radius keeps the midpoint where it is (anchor changes)
+		- updating the midpoint changes the anchor using the given new or existing radius
+		- updating just the radius keeps the midpoint where it is (the anchor changes instead)
 	*/
 
 		// read all possible new values

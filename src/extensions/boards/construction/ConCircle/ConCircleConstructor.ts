@@ -32,12 +32,8 @@ export class ConCircleConstructor extends Constructor {
 	setup() {
 		super.setup()
 
-		let sp = this.construction.snappedPointForVertex(this.startPoint)
-		let sp1 = (sp === null) ? this.startPoint : sp.midpoint
-
-		this.add(this.freeMidpoint)
-		this.add(this.freeOuterPoint)
-		this.add(this.circle)
+		let sp = this.construction.snappedPointForVertex(this.getStartPoint())
+		let sp1 = (sp === null) ? this.getStartPoint() : sp.midpoint
 
 		this.addDependency('penStrokeColor', this.freeMidpoint, 'strokeColor')
 		this.addDependency('penFillColor', this.freeMidpoint, 'fillColor')
@@ -48,14 +44,13 @@ export class ConCircleConstructor extends Constructor {
 		this.freeMidpoint.addDependency('midpoint', this.circle, 'midpoint')
 		this.freeOuterPoint.addDependency('midpoint', this.circle, 'outerPoint')
 
-
 		this.freeMidpoint.update({
 			midpoint: sp1,
 			strokeColor: this.penStrokeColor,
 			fillColor: this.penFillColor
 		}, false)
 		this.freeOuterPoint.update({
-			midpoint: this.endPoint,
+			midpoint: this.getEndPoint(),
 			strokeColor: this.penStrokeColor,
 			fillColor: this.penFillColor
 		}, false)
@@ -64,6 +59,10 @@ export class ConCircleConstructor extends Constructor {
 			outerPoint: this.freeOuterPoint.midpoint,
 			fillOpacity: 0
 		}, false)
+
+		this.add(this.freeMidpoint)
+		this.add(this.freeOuterPoint)
+		this.add(this.circle)
 	}
 
 	updateFromTip(q: Vertex) {
@@ -71,16 +70,6 @@ export class ConCircleConstructor extends Constructor {
 		this.freeOuterPoint.update({ midpoint: q })
 		this.update()
 	}
-
-	dissolve() {
-		this.construction.integrate(this)
-	}
-
-	// // remove?
-	// update(argsDict: object = {}, redraw: boolean = true) {
-	// 	super.update(argsDict, redraw)
-	// }
-
 
 }
 

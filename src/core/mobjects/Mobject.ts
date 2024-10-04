@@ -56,7 +56,7 @@ and logic for drawing and user interaction.
 		super()
 		let initialArgs = Object.assign(this.defaults(), argsDict)
 		this.setAttributes(initialArgs)
-		
+
 		this.setup()
 		this.update()
 		this.redraw()
@@ -648,7 +648,7 @@ and logic for drawing and user interaction.
 		return otherMobject.allDependents().includes(this)
 	}
 
-	addDependency(outputName: string | null, target: Mobject, inputName: string | null) {
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, refresh: boolean = true) {
 		if (this.dependsOn(target)) {
 			throw 'Circular dependency!'
 		}
@@ -659,6 +659,11 @@ and logic for drawing and user interaction.
 			inputName: inputName
 		})
 		this.dependencies.push(dep)
+		if (refresh) {
+			target.update({
+				inputName: this['outputName']
+			})
+		}
 	}
 
 	removeDependency(dep: Dependency) {
@@ -676,6 +681,7 @@ and logic for drawing and user interaction.
 	// Update methods //
 
 	update(argsDict: object = {}, redraw: boolean = true) {
+
 	// Update just the properties and what depends on them, without redrawing
 		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
 		this.setAttributes(argsDict)
@@ -695,7 +701,7 @@ and logic for drawing and user interaction.
 		for (let dep of this.dependencies || []) {
 
 			let output: any = this[dep.outputName] // value or function, may be undefined
-			var outputValue: any
+			var outputValue: any = null
 			if (typeof output === 'function') {
 				outputValue = output.bind(this)()
 			} else if (output !== undefined && output !== null) {
@@ -727,33 +733,6 @@ and logic for drawing and user interaction.
 
 		if (redraw) { this.redraw() }
 	}
-
-	// updateSubmobModels() {
-	// 	for (let submob of this.children || []) {
-	// 		if (!this.dependsOn(submob)) { // prevent dependency loops
-	// 			submob.update()
-	// 		}
-	// 	}
-	// }
-
-	// update(argsDict: object = {}, redraw = true) {
-	// // Update with or without redrawing
-	// 	this.update(argsDict)
-	// 	if (redraw) {
-	// 		this.redraw()
-	// 	}
-	// 	for (let depmob of this.dependents()) {
-	// 		depmob.update({}, redraw)
-	// 	}
-	// }
-
-	// updateFrom(mob: Mobject, attrs: Array<string>, redraw = true) {
-	// 	let updateDict: object = {}
-	// 	for (let attr of attrs) {
-	// 		updateDict[attr] = mob[attr]
-	// 	}
-	// 	this.update(updateDict, redraw)
-	// }
 
 	consolidateTransformAndAnchor(argsDict: object = {}): object {
 	/*

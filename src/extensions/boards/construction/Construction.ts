@@ -26,13 +26,12 @@ import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 
 export type ConMobject = ConStrait | ConCircle
-export type ConstructingConMobject = ConStraitConstructor | ConCircleConstructor
 
 export class Construction extends Board {
 	
 	points: Array<ConPoint>
 	constructedMobjects: Array<ConMobject>
-	declare creator: ConstructingConMobject
+	declare creator: Constructor
 
 	readonlyProperties(): Array<string> {
 		return super.readonlyProperties().concat([
@@ -136,9 +135,8 @@ export class Construction extends Board {
 			return
 		}
 		this.creationStroke.push(v)
-		this.creator = this.createCreator(this.creationMode) as ConstructingConMobject
+		this.creator = this.createCreator(this.creationMode) as Constructor
 		this.add(this.creator)
-
 	}
 
 	creating(e: ScreenEvent) {
@@ -167,13 +165,10 @@ export class Construction extends Board {
 		}
 	}
 
-
-
-
-	integrate(mob: ConstructingConMobject) {
+	integrate(mob: Constructor) {
 		this.remove(mob)
-		let p1: ConPoint = this.snappedPointForVertex(mob.startPoint) ?? new FreePoint({ midpoint: mob.startPoint })
-		let p2: ConPoint = this.snappedPointForVertex(mob.endPoint) ?? new FreePoint({ midpoint: mob.endPoint })
+		let p1: ConPoint = this.snappedPointForVertex(mob.getStartPoint()) ?? new FreePoint({ midpoint: mob.getStartPoint() })
+		let p2: ConPoint = this.snappedPointForVertex(mob.getEndPoint()) ?? new FreePoint({ midpoint: mob.getEndPoint() })
 		this.addToContent(p1)
 		this.addToContent(p2)
 
@@ -194,6 +189,8 @@ export class Construction extends Board {
 			cm = mob.circle
 			p1.addDependency('midpoint', cm, 'midpoint')
 			p2.addDependency('midpoint', cm, 'outerPoint')
+		} else {
+			return
 		}
 		this.add(cm)
 		this.intersectWithRest(cm)

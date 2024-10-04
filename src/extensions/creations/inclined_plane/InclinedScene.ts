@@ -261,11 +261,6 @@ export class InclinedScene extends Linkable implements Playable {
 		}
 	}
 
-	onPointerDown(e: ScreenEvent) {
-		console.log('Scene')
-		console.log(this.eventTargetMobjectChain(e))
-	}
-
 
 
 

@@ -29,4 +29,11 @@ export class Constructor extends Creator {
 		})
 	}
 
+	dissolve() {
+		this.construction.integrate(this)
+		this.construction.creator = null
+		this.construction.remove(this)
+	}
+
+
 }

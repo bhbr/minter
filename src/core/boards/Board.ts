@@ -126,7 +126,7 @@ The content children can also be dragged and panned.
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 		this.add(this.expandButton)
-		this.expandButton.hide()
+		//this.expandButton.hide()
 
 		this.addDependency('expandedWidth', this.linkMap, 'viewWidth')
 		this.addDependency('expandedHeight', this.linkMap, 'viewHeight')
@@ -325,11 +325,10 @@ The content children can also be dragged and panned.
 				break
 			case 'create':
 				this.creationMode = value
-				if (this.creator == null) {
-					return
-				}
+				if (this.creator == null) { return }
 				this.remove(this.creator)
 				this.creator = this.createCreator(this.creationMode)
+				console.log(this.creationMode)
 				this.add(this.creator)
 				break
 			case 'link':
@@ -391,8 +390,9 @@ The content children can also be dragged and panned.
 	}
 
 	endCreating(e: ScreenEvent) {
-		this.creator.dissolve()
 		this.creationStroke = new VertexArray()
+		if (this.creator == null) { return }
+		this.creator.dissolve()
 	}
 
 

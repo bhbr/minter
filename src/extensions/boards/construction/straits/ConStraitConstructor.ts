@@ -26,30 +26,27 @@ export class ConStraitConstructor extends Constructor {
 
 	setup() {
 		super.setup()
-		let sp = this.construction.snappedPointForVertex(this.startPoint)
-		let sp1 = (sp === null) ? this.startPoint : sp.midpoint
+		let sp = this.construction.snappedPointForVertex(this.getStartPoint())
+		let sp1 = (sp === null) ? this.getStartPoint() : sp.midpoint
 		
 		this.add(this.startFreePoint)
 		this.add(this.endFreePoint)
-		this.endPoint = this.endPoint ?? sp1.copy()
 		this.addDependency('penStrokeColor', this.startFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.startFreePoint, 'fillColor')
 		this.addDependency('penStrokeColor', this.endFreePoint, 'strokeColor')
 		this.addDependency('penFillColor', this.endFreePoint, 'fillColor')
-		this.addDependency('endPoint', this.endFreePoint, 'midpoint')
+		this.addDependency('getEndPoint', this.endFreePoint, 'midpoint')
 
 		this.startFreePoint.update({ midpoint: sp1 })
-		this.endFreePoint.update({ midpoint: this.endPoint })
+		this.endFreePoint.update({
+			midpoint: this.getEndPoint() ?? sp1.copy()
+		})
 	}
 
 	updateFromTip(q: Vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		this.update()
 		if (redraw) { this.redraw() }
-	}
-
-	dissolve() {
-		this.construction.integrate(this)
 	}
 
 }

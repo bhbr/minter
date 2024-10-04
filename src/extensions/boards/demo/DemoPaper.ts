@@ -76,7 +76,6 @@ export class DemoPaper extends Paper {
 
 		rect.add(circ)
 		this.addToContent(rect)
-		console.log(ScreenEventHandler[rect.screenEventHandler])
 
 		circ.update({
 			strokeWidth: 10
@@ -104,6 +103,12 @@ export class DemoPaper extends Paper {
 		wavy.play()
 		wavy.stop()
 
+		let cons = new Construction({
+			compactAnchor: new Vertex(500, 100),
+			compactWidth: 200,
+			compactHeight: 100
+		})
+		this.addToContent(cons)
 
 
 	}

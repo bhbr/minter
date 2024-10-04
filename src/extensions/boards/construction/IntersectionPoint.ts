@@ -94,8 +94,8 @@ export class IntersectionPoint extends ConPoint {
 		this.mu = (AB.y*AC.x - AB.x*AC.y)/det
 		let Q: Vertex = A.add(AB.multiply(this.lambda))
 
-		let intersectionFlag1: boolean = (strait1.constructor.name == 'ConLine' && this.lambda >= 0 && this.lambda <= 1) || (strait1.constructor.name == 'ConRay' && this.lambda >= 0) || (strait1.constructor.name == 'ConLine')
-		let intersectionFlag2: boolean = (strait2.constructor.name == 'ConLine' && this.mu >= 0 && this.mu <= 1) || (strait2.constructor.name == 'ConRay' && this.mu >= 0) || (strait2.constructor.name == 'ConLine')
+		let intersectionFlag1: boolean = (strait1.constructor.name == 'ConSegment' && this.lambda >= 0 && this.lambda <= 1) || (strait1.constructor.name == 'ConRay' && this.lambda >= 0) || (strait1.constructor.name == 'ConLine')
+		let intersectionFlag2: boolean = (strait2.constructor.name == 'ConSegment' && this.mu >= 0 && this.mu <= 1) || (strait2.constructor.name == 'ConRay' && this.mu >= 0) || (strait2.constructor.name == 'ConLine')
 
 		return (intersectionFlag1 && intersectionFlag2) ? Q : new Vertex(NaN, NaN)
 
