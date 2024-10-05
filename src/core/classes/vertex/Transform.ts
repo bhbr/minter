@@ -10,18 +10,20 @@ export class Transform extends ExtendedObject {
 	scale: number
 	shift: Vertex
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.passedByValue = true
-		this.assureProperty('anchor', Vertex)
-		this.assureProperty('shift', Vertex)
-
-		this.setDefaults({
+	defaults(): object {
+		return Object.assign(super.defaults(), {
+			passedByValue: true,
 			anchor: Vertex.origin(),
 			angle: 0,
 			scale: 1,
 			shift: Vertex.origin()
 		})
+	}
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'passedByValue'
+		])
 	}
 
 	static identity(): Transform { return new Transform() }
@@ -77,7 +79,14 @@ export class Transform extends ExtendedObject {
 		return ct
 	}
 
-	copyFrom(t: Transform) { this.setAttributes(t) }
+	copyFrom(t: Transform) {
+		let argsDict: object = {}
+		for (let prop of t.properties()) {
+			if (t.isReadonly(prop)) { continue }
+			argsDict[prop] = t[prop]
+		}
+		this.setAttributes(argsDict)
+	}
 
 	rightComposedWith(t: Transform): Transform {
 		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)

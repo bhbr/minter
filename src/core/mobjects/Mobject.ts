@@ -53,9 +53,7 @@ and logic for drawing and user interaction.
 	A mobject is initialized by providing a dictionary (object)
 	of parameters (argsDict).
 	*/
-		super()
-		let initialArgs = Object.assign(this.defaults(), argsDict)
-		this.setAttributes(initialArgs)
+		super(argsDict)
 
 		this.setup()
 		this.update()

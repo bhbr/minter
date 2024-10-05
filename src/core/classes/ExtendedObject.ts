@@ -18,10 +18,11 @@ export class ExtendedObject {
 	passedByValue: boolean
 
 	constructor(argsDict: object = {}, superCall = true) {
-		// this signature needs to align with the constructor signature os Mobject,
+		// this signature needs to align with the constructor signature of Mobject,
 		// where the roll of superCall will become clear
-		this.passedByValue = false // the default is pass-by-reference
-		this.setAttributes(argsDict)
+
+		let initialArgs = Object.assign(this.defaults(), argsDict)
+		this.setAttributes(initialArgs)
 	}
 
 	properties(): Array<string> {
@@ -119,35 +120,17 @@ export class ExtendedObject {
 		this.setAttributes(updateDict)
 	}
 
-	defaults(): object { return {} }
+	defaults(): object {
+		return {
+			passedByValue: false
+		}
+	}
 	// filled upon subclassing
 
 	readonlyProperties(): Array<string> { return [] }
 
-	assureProperty(key: string, cons: any) {
-	// for proper initialization:
-	// this initializes a property
-	// just in case it is uninitialized
-	// (so a properly initialized property
-	// does not get overwritten by mistake either)
-		if (this[key] == undefined) { this[key] = new cons() }
-	}
-
-	setDefaults(argsDict: object = {}) {
-	// we often cannot set default values for properties as declarations alone
-	// (before and outside the methods) as these get set too late
-	// (at the end of the constructor)
-	// instead we call setDefaults at the appropriate time earlier in the constructor
-
-	// the argsDict is considered as soft suggestions, only for properties
-	// that have not yet been set
-	// this is in opposition to setAttributes which has the mandate
-	// to overwrite existing properties
-		let undefinedKVPairs: object = {}
-		for (let [key, value] of Object.entries(argsDict)) {
-			if (this[key] == undefined) { undefinedKVPairs[key] = value }
-		}
-		this.setAttributes(undefinedKVPairs)
+	isReadonly(prop: string): boolean {
+		return this.readonlyProperties().includes(prop)
 	}
 
 	copy(): ExtendedObject {
