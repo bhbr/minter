@@ -3,8 +3,8 @@ import { ToggleButton } from './ToggleButton'
 
 export class LinkButton extends ToggleButton {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			messages: [{ link: true }],
 			outgoingMessage: { link: false },
 			text: 'link'

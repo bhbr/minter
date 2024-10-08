@@ -44,26 +44,32 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'plane',
-			'box',
-			'initialBoxPositionAlongPlane',
-			'forces',
-			'torques',
-			'forceScale',
-			'boxStartCOM',
-			'playButton',
-			'showTorquesToggle'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			plane: new InclinedPlane({
+				length: 500
+			}),
+			box: new InclinedBox({
+				width: 100,
+				height: 75
+			}),
+			initialBoxPositionAlongPlane: 0.8,
+			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
+			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
+			playButton: new PlayButton(),
+			showTorquesToggle: new Toggle({
+				propertyName: 'showTorques',
+				labelText: 'show torques',
+				anchor: new Vertex(10, 50)
+			})
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			viewWidth: 500,
 			viewHeight: 300,
 			inclination: 20 * DEGREES,
-			initialBoxPositionAlongPlane: 0.8,
 			staticFrictionNumber: 0.5,
 			running: false,
 			simulationStartTime: null,
@@ -76,14 +82,6 @@ export class InclinedScene extends Linkable implements Playable {
 			],
 			forceScale: ForceVector,
 			screenEventHandler: ScreenEventHandler.Self,
-			playButton: new PlayButton(),
-			box: new InclinedBox({
-				width: 100,
-				height: 75
-			}),
-			plane: new InclinedPlane({
-				length: 500
-			}),
 			gravityForce: new ForceVector({
 				direction: 3/4 * TAU,
 				scale: FORCE_SCALE,
@@ -98,13 +96,6 @@ export class InclinedScene extends Linkable implements Playable {
 				scale: FORCE_SCALE,
 				color: Color.green()
 			}),
-			showTorquesToggle: new Toggle({
-				propertyName: 'showTorques',
-				labelText: 'show torques',
-				anchor: new Vertex(10, 50)
-			}),
-			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
-			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
 		})
 	}
 
@@ -209,9 +200,9 @@ export class InclinedScene extends Linkable implements Playable {
 		return bottomLeft.add(topRight.subtract(bottomLeft).scaledBy(relativePosition))
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		argsDict['torqueOrigin'] = this.box.llCorner()
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		args['torqueOrigin'] = this.box.llCorner()
+		super.update(args, false)
 		let v = new Vertex(0, -this.box.height / 2).rotatedBy(this.inclination)
 		let newCOM = this.vertexAlongPlane(this.initialBoxPositionAlongPlane).translatedBy(v)
 		this.box.update({

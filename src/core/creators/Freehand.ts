@@ -13,17 +13,28 @@ export class Freehand extends Creator {
 	penStrokeWidth: number
 	penStrokeLength: number
 	
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penStrokeLength: 2.0,
 			line: new Polygon({
 				closed: false,
 				opacity: 1.0
-			}),
+			})
+		})
+	}
+
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			screenEventHandler: ScreenEventHandler.Below
 		})
+	}
+
+	immutableProperties(): Array<string> {
+		return super.immutableProperties().concat([
+			'line'
+		])
 	}
 
 	setup() {

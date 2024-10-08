@@ -11,15 +11,15 @@ export class ValueBox extends Linkable {
 	valueLabel: TextLabel
 	background: Rectangle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			'valueLabel',
 			'background'
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: ['value'],
@@ -49,8 +49,8 @@ export class ValueBox extends Linkable {
 		this.add(this.valueLabel)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight

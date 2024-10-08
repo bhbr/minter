@@ -8,8 +8,8 @@ export class Line extends Polygon {
 	startPoint: Vertex
 	endPoint: Vertex
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin()
 		})
@@ -28,8 +28,8 @@ export class Line extends Polygon {
 		return this.endPoint
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		let p: Vertex = this.drawingStartPoint()
 		let q: Vertex = this.drawingEndPoint()
 		this.vertices = new VertexArray([p, q])

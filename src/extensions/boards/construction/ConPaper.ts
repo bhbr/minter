@@ -3,8 +3,8 @@ import { Construction } from './Construction'
 
 export class ConPaper extends Construction {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			buttonNames: [
 				'DragButton',
 				'StraitButton',

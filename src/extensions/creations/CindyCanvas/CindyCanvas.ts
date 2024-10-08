@@ -19,33 +19,33 @@ export class CindyCanvas extends Linkable implements Playable {
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'port',
-			'id',
-			'core',
-			'outerFrame',
-			'innerCanvas',
-			'playButton'
-		])
-	}
-	
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			screenEventHandler: ScreenEventHandler.Self,
-			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle(),
-			playButton: new PlayButton({
-				anchor: new Vertex(5, 5)
-			}),
-			playedOnce: false,
-			playState: 'stop',
-			drawBorder: true,
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			port: {
 				transform: [{
 					visibleRect: [0, 1, 1, 0]
 				}]
-			}
+			},
+			innerCanvas: new Mobject(),
+			outerFrame: new Rectangle(),
+			playButton: new PlayButton({
+				anchor: new Vertex(5, 5)
+			})
+		})
+	}
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'id'
+		])
+	}
+	
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			screenEventHandler: ScreenEventHandler.Self,
+			playedOnce: false,
+			playState: 'stop',
+			drawBorder: true,
 			/*
 			core has no default because it is read-only and
 			will be created in cindySetup as a CindyJS instance
@@ -193,7 +193,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 	}
 
-	reload(argsDict: object = {}) {
+	reload(args: object = {}) {
 		let initScript = document.querySelector(`#${this.id}init`)
 		initScript.textContent = this.initCode()
 		let drawScript = document.querySelector(`#${this.id}draw`)

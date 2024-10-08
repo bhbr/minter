@@ -22,8 +22,8 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			'fixtureWidth',
 			'fixtureHeight',
 			'fixture',
@@ -32,8 +32,8 @@ export class Swing extends Linkable {
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			maxLength: 300,
 			length: 1,
 			mass: 0.2,
@@ -94,13 +94,13 @@ export class Swing extends Linkable {
 		return 50 * this.mass ** 0.5
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
+	update(args: object = {}, redraw: boolean = true) {
 
-		argsDict['viewHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
+		args['viewHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 
-		super.update(argsDict, false)
+		super.update(args, false)
 
-		let angle: number = argsDict['initialAngle'] ?? this.angle()
+		let angle: number = args['initialAngle'] ?? this.angle()
 		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(- angle).scaledBy(this.pixelLength()).add(this.string.startPoint)
 
 		this.string.update({

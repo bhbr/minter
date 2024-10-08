@@ -5,15 +5,14 @@ export class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'creations'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			creations: []
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			creations: [],
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			outgoingMessage: { create: 'freehand' }
 		})
 	}

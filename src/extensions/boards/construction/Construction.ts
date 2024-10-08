@@ -33,15 +33,8 @@ export class Construction extends Board {
 	constructedMobjects: Array<ConMobject>
 	declare creator: Constructor
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'points',
-			'constructedMobjects'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			points: [],
 			constructedMobjects: [],
 			buttonNames: [

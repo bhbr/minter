@@ -12,25 +12,24 @@ export class ColorSample extends Linkable {
 	color: Color
 	circle: Circle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'circle'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			circle : new Circle({
+				radius: RADIUS,
+				midpoint: new Vertex(RADIUS, RADIUS),
+				fillOpacity: 1
+			})
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			color: Color.white(),
 			viewWidth: 2 * RADIUS,
 			viewHeight: 2 * RADIUS,
 			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
 			screenEventHandler: ScreenEventHandler.Self,
-			circle : new Circle({
-				radius: RADIUS,
-				midpoint: new Vertex(RADIUS, RADIUS),
-				fillOpacity: 1
-			})
 		})
 	}
 
@@ -56,8 +55,8 @@ export class ColorSample extends Linkable {
 		let c = this.color.alpha = newValue
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
 		this.circle.update({
 			fillColor: this.color
 		}, redraw)

@@ -6,8 +6,8 @@ export class Ellipse extends CurvedShape {
 	majorAxis: number
 	minorAxis: number
 
-	defaults() {
-		return Object.assign(super.defaults(), {
+	defaultValues() {
+		return Object.assign(super.defaultValues(), {
 			majorAxis: 200,
 			minorAxis: 100
 		})

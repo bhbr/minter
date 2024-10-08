@@ -11,8 +11,8 @@ A link bullet gets dragged onto a link hook to create
 a dependency between two linkable mobjects.
 */
 	
-	defaults(): object {
-		return Object.assign(super.defaults(), {        
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {        
 			radius: BULLET_RADIUS,
 			fillOpacity: 1,
 			strokeColor: Color.white()

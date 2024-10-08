@@ -7,8 +7,8 @@ import { Color } from 'core/classes/Color'
 
 export class ExpandButton extends TextLabel {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			viewWidth: 30,
 			viewHeight: 30,
 			anchor: Vertex.origin(),

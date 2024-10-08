@@ -5,19 +5,17 @@ import { Color } from 'core/classes/Color'
 
 export class ConPoint extends Circle {
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'radius',
-			'fillOpacity'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			radius: 7.0,
+			fillOpacity: 1.0
+		})
 	}
 
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			radius: 7.0,
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			fillColor: Color.white(),
-			fillOpacity: 1.0
 		})
 	}
 

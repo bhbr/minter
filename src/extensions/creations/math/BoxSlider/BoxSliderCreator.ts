@@ -14,15 +14,14 @@ export class BoxSliderCreator extends Creator {
 	min: number
 	max: number
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'width'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			width: 70,
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			width: 70,
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			height: 0,
 			fillColor: Color.black(),
 			min: 0,

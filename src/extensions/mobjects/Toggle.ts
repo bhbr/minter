@@ -16,8 +16,8 @@ export class Toggle extends Mobject {
 	label: TextLabel
 	labelText: string
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			'circle',
 			'bullet',
 			'mobject',
@@ -31,8 +31,8 @@ export class Toggle extends Mobject {
 		return this.mobject[this.propertyName]
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			state: false,
 			mobject: null,
 			propertyName: '',
@@ -90,8 +90,8 @@ export class Toggle extends Mobject {
 		}
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
 		this.label.update({
 			text: this.labelText,
 			anchor: this.circle.urCorner().translatedBy(5, 0)

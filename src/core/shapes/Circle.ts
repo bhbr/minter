@@ -6,15 +6,9 @@ export class Circle extends CircularArc {
 	/*
 	A Circle is a CircularArc whose angle equals TAU = 2*PI.
 	*/
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'angle',
-			'closed'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			angle: TAU,
 			closed: true
 		})

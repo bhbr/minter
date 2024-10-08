@@ -5,8 +5,8 @@ import { Vertex } from 'core/classes/vertex/Vertex'
 
 export class BoxStepper extends BoxSlider {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			min: 0,
 			max: 10,
 			precision: 0

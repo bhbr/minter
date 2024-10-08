@@ -17,11 +17,11 @@ export class PhysicsPaper extends Paper {
 
 	scene: InclinedScene
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			scene: new InclinedScene({
-			anchor: new Vertex(100, 100)
-		}),
+				anchor: new Vertex(100, 100)
+			}),
 			creationConstructors: {
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,

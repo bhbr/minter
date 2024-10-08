@@ -23,8 +23,8 @@ export class Torque extends Polygon {
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			strokeWidth: 0,
 			fillColor: new Color(0, 0.5, 0.5),
 			fillOpacity: 0.5
@@ -39,8 +39,8 @@ export class Torque extends Polygon {
 		return Vertex.outerProduct(this.lever(), this.force.mereVector())
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		let r = this.lever()
 		let F = this.force.asVectorOnScreen()
 		if (Math.abs(this.size() * this.force.scale) < 5) { // in square pixels

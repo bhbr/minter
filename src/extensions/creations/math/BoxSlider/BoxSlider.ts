@@ -35,28 +35,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'outerBar',
-			'filledBar',
-			'label'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			min: 0,
-			max: 1,
-			value: 0.6,
-			height: 200,
-			width: 70,
-			strokeColor: Color.white(),
-			fillColor: Color.black(),
-			barFillColor: Color.gray(0.5),
-			screenEventHandler: ScreenEventHandler.Self,
-			precision: 3,
-			inputNames: [],
-			outputNames: ['value'],
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			outerBar: new Rectangle({
 				fillColor: Color.black(),
 				fillOpacity: 1,
@@ -74,6 +54,23 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		})
 	}
 
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			min: 0,
+			max: 1,
+			value: 0.6,
+			height: 200,
+			width: 70,
+			strokeColor: Color.white(),
+			fillColor: Color.black(),
+			barFillColor: Color.gray(0.5),
+			screenEventHandler: ScreenEventHandler.Self,
+			precision: 3,
+			inputNames: [],
+			outputNames: ['value']
+		})
+	}
+
 	setup() {
 		super.setup()
 		this.add(this.outerBar)
@@ -87,8 +84,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		return (this.value - this.min) / (this.max - this.min)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 
 		//// internal dependencies
 		this.viewWidth = this.width

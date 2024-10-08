@@ -17,17 +17,16 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject: Mobject
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkHooks'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			linkHooks: []
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			mobject: null,
 			outputNames: [],
-			linkHooks: [],
 			cornerRadius: 20,
 			fillColor: Color.white(),
 			fillOpacity: 0.2,
@@ -85,8 +84,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.height = this.getHeight()
 		this.createHookList()
 		if (this.mobject == null) { return }

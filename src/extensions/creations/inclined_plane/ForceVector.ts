@@ -19,27 +19,8 @@ export class ForceVector extends ConStrait {
 	footRadius: number
 	color: Color
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'foot',
-			'tip',
-			'scale',
-			'tipOpeningAngle',
-			'tipSize',
-			'footRadius'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			size: 1,
-			scale: 100,
-			direction: 0,
-			color: Color.white(),
-			tipOpeningAngle: 60 * DEGREES,
-			tipSize: 10,
-			footRadius: 4,
-			strokeWidth: 3,
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			tip: new Polygon({
 				fillOpacity: 1,
 				strokeWidth: 0
@@ -47,7 +28,20 @@ export class ForceVector extends ConStrait {
 			foot: new Circle({
 				fillOpacity: 1,
 				strokeWidth: 0	
-			})
+			}),
+			scale: 100,
+			tipOpeningAngle: 60 * DEGREES,
+			tipSize: 10,
+			footRadius: 4
+		})
+	}
+
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			size: 1,
+			direction: 0,
+			color: Color.white(),
+			strokeWidth: 3,
 		})
 	}
 
@@ -61,13 +55,13 @@ export class ForceVector extends ConStrait {
 		this.addDependency('startPoint', this.foot, 'midpoint')
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		let newStartPoint = argsDict['startPoint'] ?? this.startPoint
-		let newDirection = argsDict['direction'] ?? this.direction
+	update(args: object = {}, redraw: boolean = true) {
+		let newStartPoint = args['startPoint'] ?? this.startPoint
+		let newDirection = args['direction'] ?? this.direction
 		let unitVector = new Vertex(Math.cos(newDirection), -Math.sin(newDirection))
 		let length = this.size * this.scale - this.tipSize
-		argsDict['endPoint'] = newStartPoint.translatedBy(unitVector.scaledBy(length))
-		super.update(argsDict, false)
+		args['endPoint'] = newStartPoint.translatedBy(unitVector.scaledBy(length))
+		super.update(args, false)
 
 		this.strokeColor = this.color
 		if (this.size * this.scale < 5) {

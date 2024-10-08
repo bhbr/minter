@@ -1,5 +1,5 @@
 
-// Problem: When updating a Mobject with setAttributes(argsDict),
+// Problem: When updating a Mobject with setAttributes(args),
 // some attributes should only be copied (passed by value),
 // not linked (passed by reference). This mainly concerns Vertex.
 // E. g. if one Mobject's anchor is set to another's by reference,
@@ -13,15 +13,29 @@
 // is taken into account when updating a Mobject's attribute with
 // such an ExtendedObject as argument.
 
+import { Mutability, DefaultsDict } from './DefaultsDict'
+
 export class ExtendedObject {
 
 	passedByValue: boolean
+	private fullyInitialized: boolean
 
-	constructor(argsDict: object = {}, superCall = true) {
-		// this signature needs to align with the constructor signature os Mobject,
-		// where the roll of superCall will become clear
-		this.passedByValue = false // the default is pass-by-reference
-		this.setAttributes(argsDict)
+	constructor(props: object = {}) {
+
+		this.fullyInitialized = false
+		let def = this.defaults()
+
+		let initialArgs = def.subclass(props)
+		this.setProperties(initialArgs.readonly)
+		this.setProperties(initialArgs.immutable)
+		this.setProperties(initialArgs.mutable)
+		let prop = this.properties()
+		for (let key of prop) {
+			if (this[key] === undefined) {
+				console.warn(`Undefined properties in ${this}`)
+			}
+		}
+		this.fullyInitialized = true
 	}
 
 	properties(): Array<string> {
@@ -55,34 +69,70 @@ export class ExtendedObject {
 		else { return undefined }
 	}
 
-	setAttributes(argsDict: object = {}) {
-		// update the object with the given attribute names and values
+	isReadonly(prop: string): boolean { return this.defaults().isReadonly(prop) }
+	isImmutable(prop: string): boolean { return this.defaults().isImmutable(prop) }
+	isMutable(prop: string): boolean { return this.defaults().isMutable(prop) }
+
+	setProperties(args: object = {}) {
+		// update the object with the given property names and values
 		// always change an object via this method,
 		// it will automatically check for mutability
 		// and pick the right setter method
 
-		let propertyArgsDict: object = {}
-		let accessorArgsDict: object = {}
-		for (let [key, value] of Object.entries(argsDict)) {
 
-			if (this.readonlyProperties().includes(key) && this[key] != undefined) {
-				console.error(`Cannot reassign property ${key} (to ${value.toString()}) on ${this.constructor.name}`)
+		let accessorArgs: object = {}
+		let otherPropertyArgs: object = {}
+
+		for (let [key, value] of Object.entries(args)) {
+
+			if (this.isReadonly(key) && this[key] !== undefined) {
+				console.warn(`Readonly property ${key} cannot be set to value ${value}`)
+				continue
+			}
+
+			if (this.isImmutable(key) && this[key] !== undefined) {
+				console.warn(`Immutable property ${key} cannot be set to value ${value}`)
 				continue
 			}
 
 			if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
-				propertyArgsDict[key] = value
+				otherPropertyArgs[key] = value
 			} else {
-				accessorArgsDict[key] = value
+				accessorArgs[key] = value
 			}
+
 		}
 
-		for (let [key, value] of Object.entries(propertyArgsDict)) {
+		for (let [key, value] of Object.entries(accessorArgs)) {
 			this.setValue(key, value)
 		}
-		for (let [key, value] of Object.entries(accessorArgsDict)) {
+		for (let [key, value] of Object.entries(otherPropertyArgs)) {
 			this.setValue(key, value)
 		}
+
+		// let accessorArgs: object = {}
+		// let otherPropertyArgs: object = {}
+
+		// for (let [key, dict] of Object.entries(args)) {
+
+		// 	if (dict.mutable === 'never' || (dict.mutable == 'once' && this[key] !== undefined)) {
+		// 		console.error(`Cannot reassign property ${key} (to ${dict.value.toString()}) on ${this.constructor.name}`)
+		// 		continue
+		// 	}
+
+		// 	if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
+		// 		otherPropertyArgs[key] = dict.value
+		// 	} else {
+		// 		accessorArgs[key] = dict.value
+		// 	}
+		// }
+
+		// for (let [key, value] of Object.entries(accessorArgs)) {
+		// 	this.setValue(key, value)
+		// }
+		// for (let [key, value] of Object.entries(otherPropertyArgs)) {
+		// 	this.setValue(key, value)
+		// }
 	}
 
 	setValue(key: string, value: any) {
@@ -90,10 +140,10 @@ export class ExtendedObject {
 			
 		if (setter != undefined) {
 			
-			if (this.readonlyProperties().includes(key) && this[key] != undefined) {
-				console.warn(`Cannot reassign property ${key} on ${this.constructor.name}`)
-				return
-			}
+			// if (this.isImmutable(key) && this[key] !== undefined) {
+			// 	console.warn(`Cannot reassign property ${key} (to ${value.toString()}) on ${this.constructor.name}`)
+			// 	return
+			// }
 			setter.call(this, value)
 			
 		} else {
@@ -111,27 +161,15 @@ export class ExtendedObject {
 		}
 	}
 
-	copyAttributesFrom(obj: ExtendedObject, attrs: Array<string>) {
+	copyPropertiesFrom(obj: ExtendedObject, props: Array<string>) {
 		let updateDict: object = {}
-		for (let attr of attrs) {
-			updateDict[attr] = obj[attr]
+		for (let prop of props) {
+			updateDict[prop] = obj[prop]
 		}
-		this.setAttributes(updateDict)
+		this.setProperties(updateDict)
 	}
-
-	defaults(): object { return {} }
-	// filled upon subclassing
 
 	readonlyProperties(): Array<string> { return [] }
-
-	assureProperty(key: string, cons: any) {
-	// for proper initialization:
-	// this initializes a property
-	// just in case it is uninitialized
-	// (so a properly initialized property
-	// does not get overwritten by mistake either)
-		if (this[key] == undefined) { this[key] = new cons() }
-	}
 
 	setDefaults(argsDict: object = {}) {
 	// we often cannot set default values for properties as declarations alone
@@ -147,12 +185,20 @@ export class ExtendedObject {
 		for (let [key, value] of Object.entries(argsDict)) {
 			if (this[key] == undefined) { undefinedKVPairs[key] = value }
 		}
-		this.setAttributes(undefinedKVPairs)
+		this.setProperties(undefinedKVPairs)
+	}
+
+	defaults(): DefaultsDict {
+		return new DefaultsDict({
+			immutable: {
+				passedByValue: false
+			}
+		})
 	}
 
 	copy(): ExtendedObject {
 		let obj = new ExtendedObject()
-		obj.copyAttributesFrom(this, Object.keys(this))
+		obj.copyPropertiesFrom(this, Object.keys(this))
 		return obj
 	}
 

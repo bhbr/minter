@@ -48,34 +48,26 @@ and logic for drawing and user interaction.
 
 	*/
 
-	constructor(argsDict: object = {}) {
+	constructor(args: object = {}) {
 	/*
 	A mobject is initialized by providing a dictionary (object)
-	of parameters (argsDict).
+	of parameters (args).
 	*/
-		super()
-		let initialArgs = Object.assign(this.defaults(), argsDict)
-		this.setAttributes(initialArgs)
+		super(args)
 
 		this.setup()
 		this.update()
 		this.redraw()
 	}
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'view'
-		])
-	}
-
-	defaults(): object {
+	defaultValues(): object {
 	/*
 	Default values of properties (declared
 	in the sections that follow).
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		return Object.assign(super.defaults(), {
+		return Object.assign(super.defaultValues(), {
 			// The meaning of these properties is explained in the sections further below.
 
 			// position
@@ -108,6 +100,13 @@ and logic for drawing and user interaction.
 			eventTarget: null,
 			screenEventHistory: []
 		})
+	}
+
+	immutableProperties(): Array<string> {
+		return super.immutableProperties().concat([
+			'view',
+			'children'
+		])
 	}
 
 	setup() {
@@ -443,14 +442,14 @@ and logic for drawing and user interaction.
 	animationDuration: number
 	animationInterval: number
 
-	animate(argsDict: object = {}, seconds: number) {
+	animate(args: object = {}, seconds: number) {
 	// Calling this method launches an animation
 
 		// Create mobject copies
 		this.interpolationStartCopy = deepCopy(this)
 		this.interpolationStartCopy.clearScreenEventHistory()
 		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
-		this.interpolationStopCopy.update(argsDict, false)
+		this.interpolationStopCopy.update(args, false)
 
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
@@ -459,7 +458,7 @@ and logic for drawing and user interaction.
 
 		this.animationInterval = window.setInterval(
 			function() {
-				this.updateAnimation(Object.keys(argsDict))
+				this.updateAnimation(Object.keys(args))
 			}
 			.bind(this), dt)
 		// this.animationInterval is a reference number
@@ -472,8 +471,8 @@ and logic for drawing and user interaction.
 	updateAnimation(keys: Array<string>) {
 	// This method gets called at regular intervals during the animation
 		let weight = (Date.now() - this.animationTimeStart) / this.animationDuration
-		let newArgsDict = this.interpolatedAnimationArgs(keys, weight)
-		this.update(newArgsDict)
+		let newargs = this.interpolatedAnimationArgs(keys, weight)
+		this.update(newargs)
 	}
 
 	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {
@@ -680,11 +679,11 @@ and logic for drawing and user interaction.
 
 	// Update methods //
 
-	update(argsDict: object = {}, redraw: boolean = true) {
+	update(args: object = {}, redraw: boolean = true) {
 
 	// Update just the properties and what depends on them, without redrawing
-		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
-		this.setAttributes(argsDict)
+		args = this.consolidateTransformAndAnchor(args) // see below
+		this.setProperties(args)
 		//this.updateSubmobModels()
 
 		if (this.view != null) {
@@ -734,14 +733,14 @@ and logic for drawing and user interaction.
 		if (redraw) { this.redraw() }
 	}
 
-	consolidateTransformAndAnchor(argsDict: object = {}): object {
+	consolidateTransformAndAnchor(args: object = {}): object {
 	/*
-	argsDict may contain updated values for the anchor, the transform, or both.
+	args may contain updated values for the anchor, the transform, or both.
 	Since this.anchor == this.transform.anchor, this may be contradictory
-	information. This method fixes argsDict.
+	information. This method fixes args.
 	*/
-		let newAnchor: any = argsDict['anchor']
-		var newTransform: any = argsDict['transform']
+		let newAnchor: any = args['anchor']
+		var newTransform: any = args['transform']
 
 		if (newTransform) {
 			let nt: Transform = newTransform as Transform
@@ -761,11 +760,11 @@ and logic for drawing and user interaction.
 			in there (if given, otherwise the old anchor).
 			*/
 			newTransform = this.transform
-			newTransform.anchor = argsDict['anchor'] ?? this.anchor
+			newTransform.anchor = args['anchor'] ?? this.anchor
 		}
-		delete argsDict['anchor']
-		argsDict['transform'] = newTransform
-		return argsDict
+		delete args['anchor']
+		args['transform'] = newTransform
+		return args
 	}
 
 
@@ -783,7 +782,6 @@ and logic for drawing and user interaction.
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
-
 
 	/*
 	The following empty methods need to be declared here

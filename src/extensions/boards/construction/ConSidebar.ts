@@ -7,8 +7,8 @@ import { ConCircleButton } from './ConCircle/ConCircleButton'
 
 export class ConSidebar extends Sidebar {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			availableButtonClasses: [
 				DragButton,
 				StraitButton,

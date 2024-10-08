@@ -12,8 +12,8 @@ export class Rectangle extends Polygon {
 	p3: Vertex // = (width, height)
 	p4: Vertex // = (0, height)
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			width: 200,
 			height: 100,
 			p1: Vertex.origin(),
@@ -30,8 +30,8 @@ export class Rectangle extends Polygon {
 		})
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 
 		//// internal dependencies
 		this.viewWidth = this.width

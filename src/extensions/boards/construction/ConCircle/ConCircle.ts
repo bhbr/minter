@@ -11,8 +11,8 @@ on its circumference. The radius (and anchor) is updated automatically.
 
 	outerPoint: Vertex
 
-	defaults() {
-		return Object.assign(super.defaults(), {
+	defaultValues() {
+		return Object.assign(super.defaultValues(), {
 			strokeColor: Color.white(),
 			fillColor: Color.white(),
 			fillOpacity: 0,
@@ -20,18 +20,17 @@ on its circumference. The radius (and anchor) is updated automatically.
 		})
 	}
 
-
 	setup() {
 		super.setup()
 		this.view.style['pointer-events'] = 'none'
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		let p = argsDict['midpoint'] || this.midpoint
-		let q = argsDict['outerPoint'] || this.outerPoint
+	update(args: object = {}, redraw: boolean = true) {
+		let p = args['midpoint'] || this.midpoint
+		let q = args['outerPoint'] || this.outerPoint
 		let r = p.subtract(q).norm()
-		argsDict['radius'] = r
-		super.update(argsDict, redraw)
+		args['radius'] = r
+		super.update(args, redraw)
 	}
 
 }

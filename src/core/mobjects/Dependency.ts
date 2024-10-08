@@ -13,14 +13,14 @@ updating code in Mobject.
 	target: Mobject
 	inputName: string | null
 
-	constructor(argsDict: object = {}) {
+	constructor(args: object = {}) {
 
-		this.source = argsDict['source']
-		this.outputName = argsDict['outputName']
+		this.source = args['source']
+		this.outputName = args['outputName']
 		if (this.outputName === undefined) { this.outputName = null }
 
-		this.target = argsDict['target']
-		this.inputName = argsDict['inputName']
+		this.target = args['target']
+		this.inputName = args['inputName']
 		if (this.inputName === undefined) { this.inputName = null }
 			
 	}

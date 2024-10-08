@@ -17,17 +17,15 @@ export class LinkMap extends Mobject {
 	openBullet?: LinkBullet
 	openLink?: DependencyLink
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkList',
-			'connectedHooks'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			linkList: [],
+			connectedHooks: []
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			linkList: [],
-			connectedHooks: [],
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			openBullet: null,
 			openLink: null,
 			screenEventHandler: ScreenEventHandler.Self
@@ -224,8 +222,8 @@ export class LinkMap extends Mobject {
 		startHook.mobject.update()
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		for (let trio of this.connectedHooks) {
 			let sh = trio[0]
 			let link = trio[1]

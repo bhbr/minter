@@ -14,32 +14,37 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			fillOpacity: 1
+		})
+	}
+
 	readonlyProperties(): Array<string> {
 		return super.readonlyProperties().concat([
 			'geoMob1',
 			'geoMob2',
-			'index',
-			'fillOpacity'
+			'index'
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			midpoint: new Vertex(NaN, NaN)
 		})
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
+	update(args: object = {}, redraw: boolean = true) {
 		let mp: Vertex = this.intersectionCoords()
 		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
 			if (!this.midpoint.equals(mp)) {
-				argsDict['midpoint'] = mp
+				args['midpoint'] = mp
 			}
 		}
-		super.update(argsDict, redraw)
+		super.update(args, redraw)
 	}
 
 	intersectionCoords(): Vertex {

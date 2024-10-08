@@ -12,8 +12,8 @@ export class TextLabel extends Mobject {
 	borderWidth: number
 	fontSize: number
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
@@ -32,8 +32,8 @@ export class TextLabel extends Mobject {
 		this.view.style.fontSize = `${this.fontSize}px`
 	}
 
-	// update(argsDict: object = {}, redraw: boolean = false) {
-	// 	super.update(argsDict, false)
+	// update(args: object = {}, redraw: boolean = false) {
+	// 	super.update(args, false)
 	// 	if (redraw) { this.redraw() }
 	// }
 

@@ -6,14 +6,8 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'line'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			line: new ConLine()
 		})
 	}

@@ -14,22 +14,8 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorLabel: TextLabel
 	operatorDict: object
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'operator',
-			'operatorSign',
-			'operatorLabel',
-			'operatorDict'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			operand1: 0,
-			operand2: 0,
-			operator: "+",
-			inputNames: ['operand1', 'operand2'],
-			outputNames: ['result'],
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
 			operatorSign: new Circle({
 				radius: 10,
@@ -37,6 +23,21 @@ export class BinaryOperatorBox extends ValueBox {
 				fillOpacity: 1.0
 			}),
 			operatorLabel: new TextLabel()
+		})
+	}
+
+	readonlyProperties(): Array<string> {
+		return super.readonlyProperties().concat([
+			'operator'
+		])
+	}
+
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			operand1: 0,
+			operand2: 0,
+			inputNames: ['operand1', 'operand2'],
+			outputNames: ['result'],
 		})
 	}
 
@@ -71,40 +72,40 @@ export class BinaryOperatorBox extends ValueBox {
 		return 0
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		argsDict['value'] = this.result()
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		args['value'] = this.result()
+		super.update(args, redraw)
 	}
 
 }
 
 export class AddBox extends BinaryOperatorBox {
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			operator: '+'
 		})
 	}
 }
 
 export class SubtractBox extends BinaryOperatorBox {
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			operator: "–"
 		})
 	}
 }
 
 export class MultiplyBox extends BinaryOperatorBox {
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			operator: "&times;"
 		})
 	}
 }
 
 export class DivideBox extends BinaryOperatorBox {
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			operator:  "/"
 		})
 	}

@@ -3,8 +3,8 @@ import { CreativeButton } from './CreativeButton'
 
 export class BoardButton extends CreativeButton {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			creations: ['board']
 		})
 	}

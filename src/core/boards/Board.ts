@@ -40,16 +40,44 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'sidebar',
-			'buttonNames',
-			'contentChildren',
-			'background',
-			'expandButton',
-			'linkMap',
-			'expandedPadding'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+		})
+	}
+
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			expandedPadding: { value: 20, mutable: 'never' },
+			contentChildren: { value: [], mutable: 'never' },
+			expandButton: { value: new ExpandButton(), mutable: 'never' },
+			linkMap: { value: new LinkMap(), mutable: 'never' },
+			background: { value: new RoundedRectangle({
+				anchor: Vertex.origin(),
+				cornerRadius: 50,
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeColor: Color.white(),
+				strokeWidth: 2.0,
+				screenEventHandler: ScreenEventHandler.Parent
+			}), mutable: 'never' },
+			screenEventHandler: { value: ScreenEventHandler.Self, mutable: 'always' },
+			expanded: { value: false, mutable: 'always' },
+			compactWidth: { value: 400, mutable: 'always' }, // defined below in the section 'expand and contract'
+			compactHeight: { value: 300, mutable: 'always' }, // idem
+			compactAnchor: { value: Vertex.origin(), mutable: 'always' },
+			creationConstructors: { value: {
+				'board': BoardCreator
+			}, mutable: 'always' },
+			buttonNames: { value: [
+				'DragButton',
+				'LinkButton',
+				'BoardButton'
+			], mutable: 'always' },
+			creationStroke: { value: [], mutable: 'always' },
+			creationMode: { value: 'freehand', mutable: 'always' },
+			creator: { value: null, mutable: 'always' },
+			sidebar: { value: null, mutable: 'always' }
+		})
 	}
 
 	// a reference to the sidebar so we can change it
@@ -74,41 +102,6 @@ The content children can also be dragged and panned.
 
 	// the map of dependencies between the linkable content children
 	linkMap: LinkMap
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			screenEventHandler: ScreenEventHandler.Self,
-			contentChildren: [],
-			expanded: false,
-			compactWidth: 400, // defined below in the section 'expand and contract'
-			compactHeight: 300, // idem
-			compactAnchor: Vertex.origin(),
-			expandedPadding: 20,
-			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'BoardButton'
-			],
-			creationConstructors: {
-				'board': BoardCreator
-			},
-			creationStroke: [],
-			creationMode: 'freehand',
-			sidebar: null,
-			expandButton: new ExpandButton(),
-			linkMap: new LinkMap(),
-			creator: null,
-			background: new RoundedRectangle({
-				anchor: Vertex.origin(),
-				cornerRadius: 50,
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
-				strokeColor: Color.white(),
-				strokeWidth: 2.0,
-				screenEventHandler: ScreenEventHandler.Parent
-			})
-		})
-	}
 
 	setup() {
 		super.setup()
@@ -140,8 +133,8 @@ The content children can also be dragged and panned.
 
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight,

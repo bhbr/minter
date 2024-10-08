@@ -8,26 +8,23 @@ import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_RADIUS, BULLET_RADIUS } from './consta
 
 export class LinkHook extends Circle {
 
-	mobject: Linkable
+	mobject?: Linkable
 	name: string
-	type: "input" | "output"
+	type: 'input' | 'output'
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'mobject',
-			'name',
-			'type'
-		])
-	}
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			mobject: new Mobject(),
-			name: "default",
-			type: "input",
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			name: 'default',
+			type: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white()
+		})
+	}
+
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
+			mobject: null,
 		})
 	}
 

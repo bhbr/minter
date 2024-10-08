@@ -14,8 +14,8 @@ export class RoundedRectangle extends CurvedShape {
 	p4: Vertex
 	cornerRadius: number
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			width: 200,
 			height: 100,
 			cornerRadius: 10,
@@ -63,8 +63,8 @@ export class RoundedRectangle extends CurvedShape {
 		} catch { }
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 
 		//// internal dependencies
 		this.viewWidth = this.width

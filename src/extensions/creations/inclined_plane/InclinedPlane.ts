@@ -16,8 +16,8 @@ export class InclinedPlane extends Polygon {
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			midpoint: Vertex.origin(),
 			inclination: 0,
 			fillColor: Color.white(),
@@ -38,8 +38,8 @@ export class InclinedPlane extends Polygon {
 		return this.length * Math.sin(this.inclination)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		let w = this.getWidth()
 		let h = this.getHeight()
 		this.vertices[0].copyFrom(this.midpoint.translatedBy(-w/2, h/2))

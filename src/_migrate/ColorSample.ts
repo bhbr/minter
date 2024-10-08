@@ -12,7 +12,7 @@
 // 	circle: Circle
 // 	radius: number
 
-// 	defaults(): object {
+// 	defaultValues(): object {
 // 		return {
 // 			radius: RADIUS,
 // 			viewWidth: 2 * RADIUS,
@@ -76,8 +76,8 @@
 // 		})
 // 	}
 
-// 	update(argsDict) {
-// 		super.update(argsDict)
+// 	update(args) {
+// 		super.update(args)
 // 		this.circle.update({
 // 			radius: this.radius,
 // 			midpoint: new Vertex(this.radius, this.radius),

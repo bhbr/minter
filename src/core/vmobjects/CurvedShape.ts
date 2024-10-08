@@ -6,8 +6,8 @@ export class CurvedShape extends CurvedLine {
 	A closed CurvedLine is a CurvedShape
 	*/
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			closed: true
 		})
 	}

@@ -17,8 +17,8 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			children: [],
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,

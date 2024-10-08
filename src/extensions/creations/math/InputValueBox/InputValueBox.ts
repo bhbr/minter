@@ -14,15 +14,15 @@ export class InputValueBox extends Linkable {
 	inputBox: HTMLInputElement
 	background: Rectangle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			'inputBox',
 			'background'
 		])
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: [],
@@ -60,8 +60,8 @@ export class InputValueBox extends Linkable {
 		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight

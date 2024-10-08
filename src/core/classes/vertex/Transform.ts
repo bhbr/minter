@@ -1,124 +1,147 @@
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { TAU, PI, DEGREES } from 'core/constants'
-import { Vertex } from './Vertex'
-import { VertexArray } from './VertexArray'
+// import { ExtendedObject } from 'core/classes/ExtendedObject'
+// import { TAU, PI, DEGREES } from 'core/constants'
+// import { Vertex } from './Vertex'
+// import { VertexArray } from './VertexArray'
 
-export class Transform extends ExtendedObject {
+// export class Transform extends ExtendedObject {
 
-	anchor: Vertex
-	angle: number
-	scale: number
-	shift: Vertex
+// 	anchor: Vertex
+// 	angle: number
+// 	scale: number
+// 	shift: Vertex
 
-	constructor(argsDict: object = {}) {
-		super(argsDict)
-		this.passedByValue = true
-		this.assureProperty('anchor', Vertex)
-		this.assureProperty('shift', Vertex)
+	// constructor(argsDict: object = {}) {
+	// 	super(argsDict)
+	// 	this.passedByValue = true
+	// 	this.assureProperty('anchor', Vertex)
+	// 	this.assureProperty('shift', Vertex)
 
-		this.setDefaults({
-			anchor: Vertex.origin(),
-			angle: 0,
-			scale: 1,
-			shift: Vertex.origin()
-		})
-	}
+	// 	this.setDefaults({
+	// 		anchor: Vertex.origin(),
+	// 		angle: 0,
+	// 		scale: 1,
+	// 		shift: Vertex.origin()
+	// 	})
+	// }
 
-	static identity(): Transform { return new Transform() }
+// 	defaultValues(): object {
+// 		return Object.assign(super.defaultValues(), {
+// 			passedByValue: true,
+// 			anchor: Vertex.origin(),
+// 			angle: 0,
+// 			scale: 1,
+// 			shift: Vertex.origin()
+// 		})
+// 	}
 
-	det(): number { return this.scale ** 2 }
+// 	fixedValues(): object {
+// 		return Object.assign(super.fixedValues(), {
+// 			'passedByValue'
+// 		])
+// 	}
 
-	toCSSString(): string {
-		let str1: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px) `
-		let str2: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px) `
-		let str3: string = this.scale == 1 ? `` : `scale(${this.scale}) `
-		let str4: string = this.angle == 0 ? `` : `rotate(${-this.angle / DEGREES}deg) `
-		let str5: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px) `
+// 	static identity(): Transform { return new Transform() }
 
-		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
-	}
+// 	det(): number { return this.scale ** 2 }
 
-	a(): number { return this.scale * Math.cos(this.angle) }
-	b(): number { return this.scale * Math.sin(this.angle) }
-	c(): number { return -this.scale * Math.sin(this.angle) }
-	d(): number { return this.scale * Math.cos(this.angle) }
-	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
-	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
+// 	toCSSString(): string {
+// 		let str1: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px) `
+// 		let str2: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px) `
+// 		let str3: string = this.scale == 1 ? `` : `scale(${this.scale}) `
+// 		let str4: string = this.angle == 0 ? `` : `rotate(${-this.angle / DEGREES}deg) `
+// 		let str5: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px) `
 
-	inverse(): Transform {
-		let t = new Transform({
-			anchor: this.anchor,
-			angle: -this.angle,
-			scale: 1/this.scale
-		})
-		t.shift = t.appliedTo(this.shift).opposite()
-		return t
-	}
+// 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
+// 	}
 
-	appliedTo(p: Vertex): Vertex {
-		return new Vertex(
-			this.a() * p.x + this.b() * p.y + this.e(),
-			this.c() * p.x + this.d() * p.y + this.f()
-		)
-	}
+// 	a(): number { return this.scale * Math.cos(this.angle) }
+// 	b(): number { return this.scale * Math.sin(this.angle) }
+// 	c(): number { return -this.scale * Math.sin(this.angle) }
+// 	d(): number { return this.scale * Math.cos(this.angle) }
+// 	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
+// 	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
 
-	appliedToVertices(vertices: Array<Vertex>): VertexArray {
-	// This method accepts also an undertyped argument
-		let ret = new VertexArray()
-		for (let v of vertices) {
-			ret.push(this.appliedTo(v))
-		}
-		return ret
-	}
+// 	inverse(): Transform {
+// 		let t = new Transform({
+// 			anchor: this.anchor,
+// 			angle: -this.angle,
+// 			scale: 1/this.scale
+// 		})
+// 		t.shift = t.appliedTo(this.shift).opposite()
+// 		return t
+// 	}
 
-	copy(): Transform {
-		let ct = new Transform()
-		ct.copyFrom(this)
-		return ct
-	}
+// 	appliedTo(p: Vertex): Vertex {
+// 		return new Vertex(
+// 			this.a() * p.x + this.b() * p.y + this.e(),
+// 			this.c() * p.x + this.d() * p.y + this.f()
+// 		)
+// 	}
 
-	copyFrom(t: Transform) { this.setAttributes(t) }
+// 	appliedToVertices(vertices: Array<Vertex>): VertexArray {
+// 	// This method accepts also an undertyped argument
+// 		let ret = new VertexArray()
+// 		for (let v of vertices) {
+// 			ret.push(this.appliedTo(v))
+// 		}
+// 		return ret
+// 	}
 
-	rightComposedWith(t: Transform): Transform {
-		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)
-		let w: Vertex = this.shift.add(this.anchor).subtract(t.anchor)
-		return new Transform({
-			anchor: t.anchor,
-			scale: this.scale * t.scale,
-			angle: this.angle + t.angle,
-			shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
-		})
-	}
+// 	copy(): Transform {
+// 		let ct = new Transform()
+// 		ct.copyFrom(this)
+// 		return ct
+// 	}
 
-	rightComposeWith(t: Transform) {
-		this.copyFrom(this.rightComposedWith(t))
-	}
+// 	copyFrom(t: Transform) {
+// 		let args: object = {}
+// 		for (let prop of t.properties()) {
+// 			if (t.isReadonly(prop)) { continue }
+// 			args[prop] = t[prop]
+// 		}
+// 		this.setAttributes(args)
+// 	}
 
-	leftComposeWith(t: Transform) {
-		this.copyFrom(this.leftComposedWith(t))
-	}
+// 	rightComposedWith(t: Transform): Transform {
+// 		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)
+// 		let w: Vertex = this.shift.add(this.anchor).subtract(t.anchor)
+// 		return new Transform({
+// 			anchor: t.anchor,
+// 			scale: this.scale * t.scale,
+// 			angle: this.angle + t.angle,
+// 			shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
+// 		})
+// 	}
 
-	leftComposedWith(t: Transform): Transform {
-		return t.rightComposedWith(this)
-	}
+// 	rightComposeWith(t: Transform) {
+// 		this.copyFrom(this.rightComposedWith(t))
+// 	}
 
-	interpolate(newTransform: Transform, weight: number) {
-		return new Transform({
-			anchor: this.anchor.interpolate(newTransform.anchor, weight),
-			angle: (1 - weight) * this.angle + weight * newTransform.angle,
-			scale: (1 - weight) * this.scale + weight * newTransform.scale,
-			shift: this.shift.interpolate(newTransform.shift, weight)
-		})
-	}
+// 	leftComposeWith(t: Transform) {
+// 		this.copyFrom(this.leftComposedWith(t))
+// 	}
 
-	withoutAnchor(): Transform {
-		let t = this.copy()
-		t.anchor = Vertex.origin()
-		return t
-	}
+// 	leftComposedWith(t: Transform): Transform {
+// 		return t.rightComposedWith(this)
+// 	}
 
-	toString(): string {
-		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
-	}
-}
+// 	interpolate(newTransform: Transform, weight: number) {
+// 		return new Transform({
+// 			anchor: this.anchor.interpolate(newTransform.anchor, weight),
+// 			angle: (1 - weight) * this.angle + weight * newTransform.angle,
+// 			scale: (1 - weight) * this.scale + weight * newTransform.scale,
+// 			shift: this.shift.interpolate(newTransform.shift, weight)
+// 		})
+// 	}
+
+// 	withoutAnchor(): Transform {
+// 		let t = this.copy()
+// 		t.anchor = Vertex.origin()
+// 		return t
+// 	}
+
+// 	toString(): string {
+// 		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
+// 	}
+// }
 

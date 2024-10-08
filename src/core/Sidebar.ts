@@ -28,16 +28,22 @@ export class Sidebar extends Mobject {
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'background',
-			'availableButtonClasses'
-		])
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
+			view: document.querySelector('#sidebar_id') as HTMLElement,
+			background: new Rectangle({
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeWidth: 0,
+				screenEventHandler: ScreenEventHandler.Parent,
+				width: SIDEBAR_WIDTH,
+				height: PAGE_HEIGHT
+			})
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			view: document.querySelector('#sidebar_id') as HTMLElement,
+	defaultValues(): object {
+		return Object.assign(super.defaultValues(), {
 			availableButtonClasses: [
 				DragButton,
 				LinkButton
@@ -48,15 +54,7 @@ export class Sidebar extends Mobject {
 			],
 			viewWidth: SIDEBAR_WIDTH,
 			viewHeight: PAGE_HEIGHT,
-			screenEventHandler: ScreenEventHandler.Self,
-			background: new Rectangle({
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
-				strokeWidth: 0,
-				screenEventHandler: ScreenEventHandler.Parent,
-				width: SIDEBAR_WIDTH,
-				height: PAGE_HEIGHT
-			})
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 

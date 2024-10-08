@@ -25,8 +25,8 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class DemoPaper extends Paper {
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
+	fixedValues(): object {
+		return Object.assign(super.fixedValues(), {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'slider': BoxSliderCreator,
