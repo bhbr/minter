@@ -1,142 +1,187 @@
-export type Mutability = 'mutable' | 'immutable' | 'readonly'
 
 export class DefaultsDict {
 
-	mutable: object
-	immutable: object
 	readonly: object
+	immutable: object
+	mutable: object
+	className: string
 
-	constructor(args: object = {}) {
-		this.mutable = args['mutable'] || {}
-		this.immutable = args['immutable'] || {}
-		this.readonly = args['readonly'] || {}
+	constructor(args: object, className: string = '') {
+		this.readonly = {}
+		this.immutable = {}
+		this.mutable = {}
+		this.className = className
+		this.subclass(args)
 	}
 
-	mutableKeys() {
-		return Object.keys(this.mutable)
-	}
-
-	immutableKeys() {
-		return Object.keys(this.immutable)
-	}
-
-	readonlyKeys() {
-		return Object.keys(this.readonly)
-	}
-
-	mutability(arg: string): Mutability | null {
-		if (this.mutableKeys().includes(arg)) {
-			return 'mutable'
+	static hasDefaultsDictFormat(obj: object): boolean {
+		var flag: boolean = true
+		for (let key of Object.keys(obj)) {
+			flag = flag && ['readonly', 'immutable', 'mutable'].includes(key)
 		}
-		if (this.immutableKeys().includes(arg)) {
-			return 'immutable'
+		return flag
+	}
+
+	subclass(newDefaults: object): DefaultsDict {
+		var flag: boolean = true
+		if (!DefaultsDict.hasDefaultsDictFormat(newDefaults)) {
+			console.error(`Incorrect defaults format for class ${this.className}`)
+			return
 		}
-		if (this.readonlyKeys().includes(arg)) {
-			return 'readonly'
-		}
-		return null
-	}
-
-	isMutable(prop: string): boolean {
-		return this.mutability(prop) == 'mutable'
-	}
-
-	isImmutable(prop: string): boolean {
-		return this.mutability(prop) == 'immutable'
-	}
-
-	isReadonly(prop: string): boolean {
-		return this.mutability(prop) == 'readonly'
-	}
-
-	valueFor(prop: string): any {
-		return this[this.mutability(prop)][prop]
-	}
-
-	isDefined(prop: string): boolean {
-		return this.valueFor(prop) !== undefined
-	}
-
-	keys(): Array<string> {
-		return this.mutableKeys().concat(this.immutableKeys()).concat(this.readonlyKeys())
-	}
-
-	static hasDefaultDictFormat(dict: object): boolean {
-		for (let key of Object.keys(dict)) {
-			if (!(['mutable', 'immutable', 'readonly'].includes(key))) {
-				return false
+		for (let rKey of Object.keys(this.readonly ?? {})) {
+			if (Object.keys(newDefaults['readonly'] ?? {}).includes(rKey)
+				|| Object.keys(newDefaults['immutable'] ?? {}).includes(rKey)
+				|| Object.keys(newDefaults['mutable'] ?? {}).includes(rKey)) {
+				console.error(`Readonly property ${rKey} cannot be changed in defaults for class ${this.className}`)
+				flag = false
 			}
 		}
-		return true
-	}
-
-	subclassWithDefaultsDict(def: object) {
-
-		let defDict = new DefaultsDict(def)
-
-		let rSubclassDict = {}
-
-		for (let rKey of this.readonlyKeys()) {
-			if (defDict.isMutable(rKey)) {
-				console.warn(`Readonly property ${rKey} cannot be subclassed to mutable`)
-			} else if (defDict.isImmutable(rKey)) {
-				console.warn(`Readonly property ${rKey} cannot be subclassed to immutable`)
-			} else if (defDict.isReadonly(rKey) && this.readonly[rKey] !== undefined) {
-				console.warn(`Readonly property ${rKey} cannot be redefined`)
-			} else {
-				rSubclassDict[rKey] = defDict.readonly[rKey]
+		for (let iKey of Object.keys(this.immutable ?? {})) {
+			if (Object.keys(newDefaults['mutable'] ?? {}).includes(iKey)) {
+				console.error(`Immutable property ${iKey} cannot be changed to mutable in defaults for class ${this.className}`)
+				flag = false
 			}
 		}
 
-		for (let rKey of defDict.readonlyKeys()) {
-			if (!(this.readonlyKeys().includes(rKey))) {
-				rSubclassDict[rKey] = defDict.readonly[rKey]
-			}
+		if (flag) {
+			this.readonly = Object.assign(this.readonly, newDefaults['readonly'] ?? {})
+			this.immutable = Object.assign(this.immutable, newDefaults['immutable'] ?? {})
+			this.mutable = Object.assign(this.mutable, newDefaults['mutable'] ?? {})
 		}
-
-		for (let [key, value] of Object.entries(rSubclassDict)) {
-			this.readonly[key] = value
-		}
-
-		let iSubclassDict = {}
-
-		for (let iKey of this.immutableKeys()) {
-			if (defDict.isMutable(iKey)) {
-				console.warn(`Immutable property ${iKey} cannot be subclassed to mutable`)
-			} else {
-				iSubclassDict[iKey] = defDict.immutable[iKey]
-			}
-		}
-
-		for (let iKey of defDict.immutableKeys()) {
-			if (!this.immutableKeys().includes(iKey)) {
-				iSubclassDict[iKey] = defDict.immutable[iKey]
-			}
-		}
-
-		for (let [key, value] of Object.entries(iSubclassDict)) {
-			this.immutable[key] = value
-		}
-
-		this.mutable = Object.assign(this.mutable, defDict.mutable)
 		return this
-
 	}
-
-	subclassWithPropertyValues(args: object) {
-		let def = new DefaultsDict()
-		for (let [prop, value] of Object.entries(args)) {
-			def[this.mutability(prop)][prop] = value
-		}
-		return this.subclassWithDefaultsDict(def)
-	}
-
-	subclass(args: object) {
-		if (DefaultsDict.hasDefaultDictFormat(args)) {
-			return this.subclassWithDefaultsDict(args)
-		} else {
-			return this.subclassWithPropertyValues(args)
-		}
-	}
-
 }
+
+
+// type Mutability = 'mutable' |'immutable' | 'readonly'
+
+// class PropertyDeclaration {
+
+// 	mutability: Mutability
+// 	defaultValue: any
+
+// 	constructor(obj: any = {}) {
+// 		if (!PropertyDeclaration.hasPDFormat(obj)) {
+// 			console.error('Invalid property declaration format')
+// 		}
+// 		Object.assign(this, obj)
+// 	}
+
+// 	static hasPDFormat(obj: any) {
+// 		let keys = Object.keys(obj)
+// 		return (keys.includes('mutability')
+// 			&& keys.includes('defaultValue')
+// 			&& keys.length == 2)
+// 	}
+
+// 	static convert(obj: any): PropertyDeclaration {
+// 		return new PropertyDeclaration(obj)
+// 	}
+
+// 	replaceWith(newPD: PropertyDeclaration) {
+// 		if (this.mutability === 'readonly') {
+// 			console.error('Readonly property cannot be subclassed')
+// 		}
+// 		if (this.mutability === 'immutable'
+// 			&& newPD.mutability === 'mutable') {
+// 			console.error('Immutable property cannot be subclassed as mutable')
+// 		}
+// 		Object.assign(this, newPD)
+// 	}
+
+// }
+
+// export class PropertyDeclarationDict extends Map<string, PropertyDeclaration> {
+
+// 	constructor(obj: any = {}) {
+// 		super()
+// 		this.subclass(obj)
+// 	}
+
+// 	static hasPDDFormat(obj: any): boolean {
+// 		return Object.values(obj).every(
+// 			(value) => PropertyDeclaration.hasPDFormat(value)
+// 		)
+// 	}
+
+// 	static hasStackedPDDFormat(obj: any): boolean {
+// 		let hasMutabilityKeys = Object.keys(obj).every(
+// 			(key) => ['readonly', 'immutable', 'mutable'].includes(key)
+// 		)
+// 		if (!hasMutabilityKeys)  return false
+// 		return Object.values(obj).every(
+// 			(value1) => Object.values(value1).every(
+// 				(value2) => PropertyDeclaration.hasPDFormat(value2)
+// 			)
+// 		)
+// 	}
+
+// 	static convert(obj: object): PropertyDeclarationDict {
+// 		return new PropertyDeclarationDict(obj)
+// 	}
+
+// 	static convertFromPDDFormat(obj: object): PropertyDeclarationDict {
+// 		return Object.assign(new PropertyDeclarationDict(), obj)
+// 	}
+
+// 	static convertFromStackedPDDFormat(obj: object): PropertyDeclarationDict {
+// 		let pdd = new PropertyDeclarationDict()
+// 		for (let [mutability, defaultValuesDict] of Object.entries(obj)) {
+// 			for (let [prop, defaultValue] of Object.entries(defaultValuesDict)) {
+// 				pdd[prop] = new PropertyDeclaration({
+// 					mutability: mutability,
+// 					defaultValue: defaultValue
+// 				})
+// 			}
+// 		}
+// 		return pdd
+// 	}
+
+// 	mutability(prop: string) {
+// 		return this[prop]['mutability']
+// 	}
+
+// 	isReadonly(prop: string) { return this.mutability(prop) == 'readonly' }
+// 	isImmutable(prop: string) { return this.mutability(prop) == 'immutable' }
+// 	isMutable(prop: string) { return this.mutability(prop) == 'mutable' }
+
+// 	subclassWithPD(prop: string, newPD: PropertyDeclaration) {
+// 		this[prop].replaceWith(newPD)
+// 	}
+
+// 	subclassWithPDD(pdd: object) {
+// 		for (let [prop, newPD] of Object.entries(pdd)) {
+// 			this.subclassWithPD(prop, newPD)
+// 		}
+// 	}
+
+// 	static convertStackedPDDFormatToPDDFormat(obj: any): object {
+// 		let convertedObj = {}
+// 		for (let [mutability, pdDict] of Object.entries(obj)) {
+// 			for (let [prop, defaultValue] of Object.entries(pdDict)) {
+// 				convertedObj[prop] = {
+// 					mutability: mutability,
+// 					defaultValue: defaultValue
+// 				}
+// 			}
+// 		}
+// 		return convertedObj
+// 	}
+
+// 	subclassWithStackedPDD(obj: object) {
+// 		this.subclassWithPDD(PropertyDeclarationDict.convertStackedPDDFormatToPDDFormat(obj))
+// 	}
+
+// 	subclass(obj: any) {
+// 		if (PropertyDeclarationDict.hasPDDFormat(obj)) {
+// 			this.subclassWithPDD(obj)
+// 			return
+// 		}
+// 		if (PropertyDeclarationDict.hasStackedPDDFormat(obj)) {
+// 			this.subclassWithStackedPDD(obj)
+// 			return
+// 		}
+// 		console.error('Wrong format for subclassing property declaration dict')
+// 	}
+
+// }
