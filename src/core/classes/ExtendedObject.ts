@@ -19,33 +19,19 @@ import { DefaultsDict } from './DefaultsDict'
 export class ExtendedObject {
 
 	defaultsDict: DefaultsDict
+	initComplete: boolean
 
 	defaults(): DefaultsDict {
 		return new DefaultsDict({}, this.constructor.name)	
 	}
 
 	constructor(args: object = {}) {
+		this.initComplete = false
 		this.defaultsDict = this.defaults()
-		if (!this.isCompatible(args)) {
-			return
-		}
-		let defValues = this.defaultValuesDict()
-		let initials = Object.assign(defValues, args)
-		this.update(initials)
+		this.update(this.defaultValuesDict())
+		this.update(args)
 		this.checkForUndefinedValues()
-	}
-
-	static flattenDefaults(def: object) {
-		let flattenedDef = {}
-		for (let [mutability, declarations] of Object.entries(def)) {
-			for (let [prop, defaultValue] of Object.entries(declarations)) {
-				flattenedDef[prop] = {
-					mutability: mutability,
-					defaultValue: defaultValue
-				}
-			}
-		}
-		return flattenedDef
+		this.initComplete = true
 	}
 
 	mutability(prop: string): string | null {
@@ -79,22 +65,22 @@ export class ExtendedObject {
 
 	properties(): Array<string> {
 		let array: Array<string> = []
-		let defs = this.defaultsDict
-		array = array.concat(Object.keys(defs.readonly))
-		array = array.concat(Object.keys(defs.immutable))
-		array = array.concat(Object.keys(defs.mutable))
+		let defs = this.defaultsDict ?? {}
+		array = array.concat(Object.keys(defs['readonly'] ?? {}))
+		array = array.concat(Object.keys(defs['immutable'] ?? {}))
+		array = array.concat(Object.keys(defs['mutable'] ?? {}))
 		return array
 	}
 
 	isCompatible(args: object): boolean {
 		var flag: boolean = true
 		for (let [prop, value] of Object.entries(args)) {
-			if (this.mutability(prop) === 'readonly' && this[prop] !== undefined) {
-				console.error(`Readonly property ${prop} cannot be set in ${this.constructor.name}`)
+			if (this.mutability(prop) === 'readonly' && (this[prop] !== undefined)) {
+				console.error(`Readonly property ${prop} cannot be set in object of class ${this.constructor.name}`)
 				flag = false
 			}
-			if (this.mutability(prop) === 'immutable' && this[prop] !== undefined) {
-				console.error(`Immutable property ${prop} cannot be changed in ${this.constructor.name}`)
+			if (this.mutability(prop) === 'immutable' && this[prop] !== undefined && this.initComplete) {
+				console.error(`Immutable property ${prop} cannot be changed in object of class ${this.constructor.name}`)
 				flag = false
 			}
 		}

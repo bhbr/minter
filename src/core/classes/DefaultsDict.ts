@@ -11,7 +11,7 @@ export class DefaultsDict {
 		this.immutable = {}
 		this.mutable = {}
 		this.className = className
-		this.subclass(args)
+		this.assign(args)
 	}
 
 	static hasDefaultsDictFormat(obj: object): boolean {
@@ -22,7 +22,7 @@ export class DefaultsDict {
 		return flag
 	}
 
-	subclass(newDefaults: object): DefaultsDict {
+	isCompatible(newDefaults: object): boolean {
 		var flag: boolean = true
 		if (!DefaultsDict.hasDefaultsDictFormat(newDefaults)) {
 			console.error(`Incorrect defaults format for class ${this.className}`)
@@ -32,23 +32,55 @@ export class DefaultsDict {
 			if (Object.keys(newDefaults['readonly'] ?? {}).includes(rKey)
 				|| Object.keys(newDefaults['immutable'] ?? {}).includes(rKey)
 				|| Object.keys(newDefaults['mutable'] ?? {}).includes(rKey)) {
-				console.error(`Readonly property ${rKey} cannot be changed in defaults for class ${this.className}`)
+				console.error(`Readonly property ${rKey} cannot be reassigned in defaults for class ${this.className}`)
 				flag = false
 			}
 		}
 		for (let iKey of Object.keys(this.immutable ?? {})) {
 			if (Object.keys(newDefaults['mutable'] ?? {}).includes(iKey)) {
-				console.error(`Immutable property ${iKey} cannot be changed to mutable in defaults for class ${this.className}`)
+				console.error(`Immutable property ${iKey} cannot be reassigned as mutable in defaults for class ${this.className}`)
 				flag = false
 			}
 		}
+		return flag
+	}
 
-		if (flag) {
-			this.readonly = Object.assign(this.readonly, newDefaults['readonly'] ?? {})
-			this.immutable = Object.assign(this.immutable, newDefaults['immutable'] ?? {})
-			this.mutable = Object.assign(this.mutable, newDefaults['mutable'] ?? {})
+	assign(newDefaults: object): DefaultsDict {
+		
+		if (!this.isCompatible(newDefaults)) {
+			console.error(`Incompatible defaults for class ${this.className}`)
+			return this
 		}
+		let flattenedOldDefaults = DefaultsDict.flatten(this)
+		let flattenedNewDefaults = DefaultsDict.flatten(newDefaults)
+		let flattenedUpdatedDefaults = Object.assign(flattenedOldDefaults, flattenedNewDefaults)
+		let stackedUpdatedDefaults = DefaultsDict.stack(flattenedUpdatedDefaults)
+		Object.assign(this, stackedUpdatedDefaults)
 		return this
+	}
+
+	static flatten(stackedDefaults: object): object {
+		let flattened = {}
+		for (let mutability of ['readonly', 'immutable', 'mutable']) {
+			for (let [prop, defaultValue] of Object.entries(stackedDefaults[mutability] ?? {})) {
+				flattened[prop] = {
+					mutability: mutability,
+					defaultValue: defaultValue
+				}
+			}
+		}
+		return flattened
+	}
+
+	static stack(flatDefaults: object): object {
+		let stacked = {}
+		stacked['readonly'] = {}
+		stacked['immutable'] = {}
+		stacked['mutable'] = {}
+		for (let [prop, dict] of Object.entries(flatDefaults)) {
+			stacked[dict['mutability']][prop] = dict['defaultValue']
+		}
+		return stacked
 	}
 }
 
