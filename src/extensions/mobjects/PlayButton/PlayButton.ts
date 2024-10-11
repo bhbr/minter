@@ -9,22 +9,21 @@ export class PlayButton extends SimpleButton {
 
 	mobject: Playable
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			'mobject'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			text: 'play',
-			viewWidth: 40,
-			viewHeight: 20,
-			backgroundColor: Color.black(),
-			color: Color.white(),
-			borderColor: Color.white(),
-			borderWidth: 1,
-			screenEventHandler: ScreenEventHandler.Self
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			immutable: {
+				mobject: undefined
+			},
+			mutable: {
+				text: 'play',
+				viewWidth: 40,
+				viewHeight: 20,
+				backgroundColor: Color.black(),
+				color: Color.white(),
+				borderColor: Color.white(),
+				borderWidth: 1,
+				screenEventHandler: ScreenEventHandler.Self
+			}
 		})
 	}
 

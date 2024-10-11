@@ -12,18 +12,17 @@ export class CircularArc extends CurvedLine {
 	angle: number
 	nbPoints: number // vertex resolution along the arc
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			closed: false
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			midpoint: Vertex.origin(),
-			radius: DEFAULT_RADIUS,
-			angle: TAU / 4,
-			nbPoints: 32
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				closed: false
+			},
+			mutable: {
+				midpoint: Vertex.origin(),
+				radius: DEFAULT_RADIUS,
+				angle: TAU / 4,
+				nbPoints: 32
+			}
 		})
 	}
 

@@ -3,9 +3,11 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class NumberButton extends CreativeButton {
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			creations: ['input', 'slider', 'stepper']
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				creations: ['input', 'slider', 'stepper']
+			}
 		})
 	}
 

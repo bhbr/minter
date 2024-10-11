@@ -19,41 +19,38 @@ export class CindyCanvas extends Linkable implements Playable {
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			port: {
-				transform: [{
-					visibleRect: [0, 1, 1, 0]
-				}]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				port: {
+					transform: [{
+						visibleRect: [0, 1, 1, 0]
+					}]
+				},
+				innerCanvas: new Mobject(),
+				outerFrame: new Rectangle(),
+				playButton: new PlayButton({
+					anchor: new Vertex(5, 5)
+				})
 			},
-			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle(),
-			playButton: new PlayButton({
-				anchor: new Vertex(5, 5)
-			})
+			immutable: {
+				id: undefined
+			},
+			mutable: {
+				screenEventHandler: ScreenEventHandler.Self,
+				playedOnce: false,
+				playState: 'stop',
+				drawBorder: true,
+				core: null
+				/*
+				core has no default because it is read-only and
+				will be created in cindySetup as a CindyJS instance
+				with state-dependent arguments
+				*/
+			}
 		})
-	}
-
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'id'
-		])
 	}
 	
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			screenEventHandler: ScreenEventHandler.Self,
-			playedOnce: false,
-			playState: 'stop',
-			drawBorder: true,
-			/*
-			core has no default because it is read-only and
-			will be created in cindySetup as a CindyJS instance
-			with state-dependent arguments
-			*/
-		})
-	}
-
 	setup() {
 		super.setup()
 
@@ -73,9 +70,6 @@ export class CindyCanvas extends Linkable implements Playable {
 
 		this.innerCanvas.view.style['pointer-events'] = 'auto'
 
-		this.update({
-			id: `${this.constructor.name}-${Math.floor(1000 * Math.random())}`
-		})
 		this.innerCanvas.view.id = this.id
 
 		Object.assign(this.port, {

@@ -13,22 +13,30 @@
 // is taken into account when updating a Mobject's attribute with
 // such an ExtendedObject as argument.
 
-import { DefaultsDict } from './DefaultsDict'
-
+import { Defaults } from './Defaults'
+import { remove } from 'core/functions/arrays'
+import { copy } from 'core/functions/copying'
 
 export class ExtendedObject {
 
-	defaultsDict: DefaultsDict
+	defaultsDict: object
+	passedByValue: boolean
 	initComplete: boolean
+	uninitializedProperties: Array<string>
 
-	defaults(): DefaultsDict {
-		return new DefaultsDict({}, this.constructor.name)	
+	defaults(): object {
+		return {
+			immutable: {
+				passedByValue: false
+			}
+		}
 	}
 
 	constructor(args: object = {}) {
 		this.initComplete = false
 		this.defaultsDict = this.defaults()
-		this.update(this.defaultValuesDict())
+		this.uninitializedProperties = this.properties()
+		this.update(this.defaultValues())
 		this.update(args)
 		this.checkForUndefinedValues()
 		this.initComplete = true
@@ -47,14 +55,26 @@ export class ExtendedObject {
 		return null
 	}
 
+	isReadonly(prop: string): boolean {
+		return this.mutability(prop) == 'readonly'
+	}
+
+	isImmutable(prop: string): boolean {
+		return this.mutability(prop) == 'immutable'
+	}
+
+	isMutable(prop: string): boolean {
+		return this.mutability(prop) == 'mutable'
+	}
+
 	defaultValue(prop: string): any {
-		let def = this.defaultsDict
+		let def = this.defaultsDict ?? this.defaults()
 		let mut = this.mutability(prop)
 		let dec = def[mut]
 		return dec[prop]
 	}
 
-	defaultValuesDict(): object {
+	defaultValues(): object {
 		let dict = {}
 		let props = this.properties()
 		for (let prop of props) {
@@ -65,43 +85,53 @@ export class ExtendedObject {
 
 	properties(): Array<string> {
 		let array: Array<string> = []
-		let defs = this.defaultsDict ?? {}
+		let defs = this.defaultsDict ?? this.defaults()
 		array = array.concat(Object.keys(defs['readonly'] ?? {}))
 		array = array.concat(Object.keys(defs['immutable'] ?? {}))
 		array = array.concat(Object.keys(defs['mutable'] ?? {}))
 		return array
 	}
 
-	isCompatible(args: object): boolean {
+	isCompatibleUpdate(args: object, className: string): boolean {
 		var flag: boolean = true
 		for (let [prop, value] of Object.entries(args)) {
-			if (this.mutability(prop) === 'readonly' && (this[prop] !== undefined)) {
-				console.error(`Readonly property ${prop} cannot be set in object of class ${this.constructor.name}`)
+			if (this.mutability(prop) === 'readonly'
+				&& (Object.getPrototypeOf(this).__lookupGetter__(prop) !== undefined)) {
+				console.log(args)
+				console.error(`Readonly property ${prop} cannot be set in object of class ${className}`)
 				flag = false
 			}
-			if (this.mutability(prop) === 'immutable' && this[prop] !== undefined && this.initComplete) {
-				console.error(`Immutable property ${prop} cannot be changed in object of class ${this.constructor.name}`)
+			if (this.mutability(prop) === 'immutable'
+				&& Object.getPrototypeOf(this).__lookupGetter__(prop) !== undefined
+				&& this.initComplete) {
+				console.error(`Immutable property ${prop} cannot be changed in object of class ${className}`)
 				flag = false
 			}
 		}
 		return flag
 	}
 
+	updateDefaults(oldDefaults: object, newDefaults: object): object {
+		return Defaults.update(oldDefaults, newDefaults, this.constructor.name)
+	}
+
 	update(args: object) {
-		if (!this.isCompatible(args)) { return }
+		if (!this.isCompatibleUpdate(args, this.constructor.name)) { return }
 		let accessorArgs: object = {}
 		let otherPropertyArgs: object = {}
 
-		for (let [key, value] of Object.entries(args)) {
-			if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
-	 			otherPropertyArgs[key] = value
+		for (let [prop, value] of Object.entries(args)) {
+			//if (Object.getPrototypeOf(this).__lookupGetter__(prop) === undefined) {
+	 		if (this.uninitializedProperties.includes(prop)) {
+	 			otherPropertyArgs[prop] = value
 	 		} else {
-	 			accessorArgs[key] = value
+	 			accessorArgs[prop] = value
 	 		}
 		}
 
 		for (let [prop, value] of Object.entries(otherPropertyArgs)) {
 			this.setValue(prop, value)
+
 		}
 		for (let [prop, value] of Object.entries(accessorArgs)) {
 			this.setValue(prop, value)
@@ -114,7 +144,19 @@ export class ExtendedObject {
 				console.error(`Property ${prop} remains undefined in object of class ${this.constructor.name}`)
 			}
 		}
+		if (this.uninitializedProperties.length != 0) {
+			console.error(`Remaining uninitialized properties in object of class ${this.constructor.name}: ${this.uninitializedProperties}`)
+		}
 	}
+
+
+
+
+
+
+
+
+
 
 	// passedByValue: boolean
 	// private fullyInitialized: boolean
@@ -234,8 +276,8 @@ export class ExtendedObject {
 	// 	// }
 	// }
 
-	setValue(key: string, value: any) {
-		let setter: any = this.setter(key)
+	setValue(prop: string, value: any) {
+		let setter: any = this.setter(prop)
 			
 		if (setter != undefined) {
 			
@@ -244,20 +286,35 @@ export class ExtendedObject {
 			// 	return
 			// }
 			setter.call(this, value)
-			
+			remove(this.uninitializedProperties, prop)
+
 		} else {
+
 			// we have an as-of-yet unknown property
-			if (value != undefined && value.passedByValue) {
+			if (value instanceof ExtendedObject && value.passedByValue) {
 				// create and copy (pass-by-value)
-				if (this[key] == undefined) {
-					this[key] = new value.constructor()
+				if (this[prop] == undefined) {
+					this[prop] = copy(value)
+					remove(this.uninitializedProperties, prop)
+				} else {
+					this[prop].copyFrom(value)
 				}
-				this[key].copyFrom(value) 
 			} else {
 				// just link (pass-by-reference)
-				this[key] = value
+				// or pass-by-value a non-object
+				this[prop] = value
+				remove(this.uninitializedProperties, prop)
 			}
 		}
+	}
+
+	copyFrom(obj: ExtendedObject) {
+		let args: object = {}
+		for (let prop of obj.properties()) {
+			if (obj.isReadonly(prop)) { continue }
+			args[prop] = obj[prop]
+		}
+		this.update(args)
 	}
 
 	// copyPropertiesFrom(obj: ExtendedObject, props: Array<string>) {

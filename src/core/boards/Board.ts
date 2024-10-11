@@ -40,43 +40,43 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			expandedPadding: { value: 20, mutable: 'never' },
-			contentChildren: { value: [], mutable: 'never' },
-			expandButton: { value: new ExpandButton(), mutable: 'never' },
-			linkMap: { value: new LinkMap(), mutable: 'never' },
-			background: { value: new RoundedRectangle({
-				anchor: Vertex.origin(),
-				cornerRadius: 50,
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
-				strokeColor: Color.white(),
-				strokeWidth: 2.0,
-				screenEventHandler: ScreenEventHandler.Parent
-			}), mutable: 'never' },
-			screenEventHandler: { value: ScreenEventHandler.Self, mutable: 'always' },
-			expanded: { value: false, mutable: 'always' },
-			compactWidth: { value: 400, mutable: 'always' }, // defined below in the section 'expand and contract'
-			compactHeight: { value: 300, mutable: 'always' }, // idem
-			compactAnchor: { value: Vertex.origin(), mutable: 'always' },
-			creationConstructors: { value: {
-				'board': BoardCreator
-			}, mutable: 'always' },
-			buttonNames: { value: [
-				'DragButton',
-				'LinkButton',
-				'BoardButton'
-			], mutable: 'always' },
-			creationStroke: { value: [], mutable: 'always' },
-			creationMode: { value: 'freehand', mutable: 'always' },
-			creator: { value: null, mutable: 'always' },
-			sidebar: { value: null, mutable: 'always' }
+	defaults(): object {
+		let eb = new ExpandButton()
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				expandedPadding: 20,
+				contentChildren: [],
+				expandButton: eb,
+				linkMap: new LinkMap(),
+				background: new RoundedRectangle({
+					anchor: Vertex.origin(),
+					cornerRadius: 50,
+					fillColor: Color.gray(0.1),
+					fillOpacity: 1.0,
+					strokeColor: Color.white(),
+					strokeWidth: 2.0,
+					screenEventHandler: ScreenEventHandler.Parent
+				})
+			},
+			mutable: {
+				screenEventHandler: ScreenEventHandler.Self,
+				expanded: false,
+				compactWidth: 400, // defined below in the section 'expand and contract'
+				compactHeight: 300, // idem
+				compactAnchor: Vertex.origin(),
+				creationConstructors: {
+					'board': BoardCreator
+				},
+				buttonNames: [
+					'DragButton',
+					'LinkButton',
+					'BoardButton'
+				],
+				creationStroke: [],
+				creationMode: 'freehand',
+				creator: null,
+				sidebar: null
+			}
 		})
 	}
 

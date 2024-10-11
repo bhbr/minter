@@ -5,11 +5,13 @@ import { Vertex } from 'core/classes/vertex/Vertex'
 
 export class BoxStepper extends BoxSlider {
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			min: 0,
-			max: 10,
-			precision: 0
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			mutable: {
+				min: 0,
+				max: 10,
+				precision: 0
+			}
 		})
 	}
 

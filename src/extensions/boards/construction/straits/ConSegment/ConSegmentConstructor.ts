@@ -6,9 +6,11 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	segment: ConSegment
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			segment: new ConSegment()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				segment: new ConSegment()
+			}
 		})
 	}
 

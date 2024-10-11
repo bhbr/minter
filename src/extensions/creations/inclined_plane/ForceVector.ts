@@ -19,29 +19,28 @@ export class ForceVector extends ConStrait {
 	footRadius: number
 	color: Color
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			tip: new Polygon({
-				fillOpacity: 1,
-				strokeWidth: 0
-			}),
-			foot: new Circle({
-				fillOpacity: 1,
-				strokeWidth: 0	
-			}),
-			scale: 100,
-			tipOpeningAngle: 60 * DEGREES,
-			tipSize: 10,
-			footRadius: 4
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			size: 1,
-			direction: 0,
-			color: Color.white(),
-			strokeWidth: 3,
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				tip: new Polygon({
+					fillOpacity: 1,
+					strokeWidth: 0
+				}),
+				foot: new Circle({
+					fillOpacity: 1,
+					strokeWidth: 0	
+				}),
+				scale: 100,
+				tipOpeningAngle: 60 * DEGREES,
+				tipSize: 10,
+				footRadius: 4
+			},
+			mutable: {
+				size: 1,
+				direction: 0,
+				color: Color.white(),
+				strokeWidth: 3,
+			}
 		})
 	}
 

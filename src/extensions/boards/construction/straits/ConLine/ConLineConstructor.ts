@@ -6,9 +6,11 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			line: new ConLine()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				line: new ConLine()
+			}
 		})
 	}
 

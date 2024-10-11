@@ -3,18 +3,22 @@ import { Board } from './Board'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Vertex } from 'core/classes/vertex/Vertex'
+import { Transform } from 'core/classes/vertex/Transform'
 import { Color } from 'core/classes/Color'
 
 export class ExpandButton extends TextLabel {
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			viewWidth: 30,
-			viewHeight: 30,
-			anchor: Vertex.origin(),
-			screenEventHandler: ScreenEventHandler.Self,
-			backgroundColor: Color.gray(0.25),
-			color: Color.white()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				viewWidth: 30,
+				viewHeight: 30,
+				transform: Transform.identity(),
+				anchor: Vertex.origin(),
+				screenEventHandler: ScreenEventHandler.Self,
+				backgroundColor: Color.gray(0.25),
+				color: Color.white()
+			}
 		})
 	}
 

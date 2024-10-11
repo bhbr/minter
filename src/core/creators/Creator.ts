@@ -9,11 +9,13 @@ export class Creator extends Mobject {
 	creation?: Mobject
 	creationStroke: Array<Vertex>
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			creationStroke: [],
-			creation: null,
-			screenEventHandler: ScreenEventHandler.Self
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			mutable: {
+				creationStroke: [],
+				creation: null,
+				screenEventHandler: ScreenEventHandler.Self
+			}
 		})
 	}
 

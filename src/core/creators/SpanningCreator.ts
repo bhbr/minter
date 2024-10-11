@@ -9,16 +9,12 @@ export class SpanningCreator extends Creator {
 	
 	rectangle: Rectangle
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			rectangle: new Rectangle()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				rectangle: new Rectangle()
+			}
 		})
-	}
-
-	immutableProperties(): Array<string> {
-		return super.immutableProperties().concat([
-			'rectangle'
-		])
 	}
 
 	setup() {

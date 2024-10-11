@@ -17,21 +17,20 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject: Mobject
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			linkHooks: []
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			mobject: null,
-			outputNames: [],
-			cornerRadius: 20,
-			fillColor: Color.white(),
-			fillOpacity: 0.2,
-			strokeWidth: 0,
-			width: IO_LIST_WIDTH
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				linkHooks: []
+			},
+			mutable: {
+				mobject: null,
+				outputNames: [],
+				cornerRadius: 20,
+				fillColor: Color.white(),
+				fillOpacity: 0.2,
+				strokeWidth: 0,
+				width: IO_LIST_WIDTH
+			}
 		})
 	}
 

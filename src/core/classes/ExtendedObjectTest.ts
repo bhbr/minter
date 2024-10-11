@@ -1,6 +1,5 @@
 
 import { ExtendedObject } from './ExtendedObject'
-import { DefaultsDict } from './DefaultsDict'
 
 class FirstClass extends ExtendedObject {
 
@@ -8,9 +7,8 @@ class FirstClass extends ExtendedObject {
 	b: number
 	c: number
 
-	defaults(): DefaultsDict {
-		let def = super.defaults()
-		return def.assign({
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
 			readonly: { },
 			immutable: {  },
 			mutable: {a: undefined  }
@@ -20,9 +18,8 @@ class FirstClass extends ExtendedObject {
 
 export class SecondClass extends FirstClass {
 
-	defaults(): DefaultsDict {
-		let def = super.defaults()
-		return def.assign({
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
 			readonly: {},
 			immutable: {},
 			mutable: {a: 1}

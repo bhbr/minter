@@ -44,58 +44,57 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			plane: new InclinedPlane({
-				length: 500
-			}),
-			box: new InclinedBox({
-				width: 100,
-				height: 75
-			}),
-			initialBoxPositionAlongPlane: 0.8,
-			forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
-			torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
-			playButton: new PlayButton(),
-			showTorquesToggle: new Toggle({
-				propertyName: 'showTorques',
-				labelText: 'show torques',
-				anchor: new Vertex(10, 50)
-			})
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			viewWidth: 500,
-			viewHeight: 300,
-			inclination: 20 * DEGREES,
-			staticFrictionNumber: 0.5,
-			running: false,
-			simulationStartTime: null,
-			simulationInterval: null,
-			glidingStarted: null,
-			showTorques: false,
-			torqueOrigin: Vertex.origin(),
-			inputNames: [
-				'inclination'
-			],
-			forceScale: ForceVector,
-			screenEventHandler: ScreenEventHandler.Self,
-			gravityForce: new ForceVector({
-				direction: 3/4 * TAU,
-				scale: FORCE_SCALE,
-				size: 2,
-				color: Color.red()
-			}),
-			normalForce: new ForceVector({
-				scale: FORCE_SCALE,
-				color: Color.blue()
-			}),
-			staticFrictionForce: new ForceVector({
-				scale: FORCE_SCALE,
-				color: Color.green()
-			}),
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				plane: new InclinedPlane({
+					length: 500
+				}),
+				box: new InclinedBox({
+					width: 100,
+					height: 75
+				}),
+				initialBoxPositionAlongPlane: 0.8,
+				forces: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
+				torques: new MGroup({ screenEventHandler: ScreenEventHandler.Below }),
+				playButton: new PlayButton(),
+				showTorquesToggle: new Toggle({
+					propertyName: 'showTorques',
+					labelText: 'show torques',
+					anchor: new Vertex(10, 50)
+				})
+			},
+			mutable: {
+				viewWidth: 500,
+				viewHeight: 300,
+				inclination: 20 * DEGREES,
+				staticFrictionNumber: 0.5,
+				running: false,
+				simulationStartTime: null,
+				simulationInterval: null,
+				glidingStarted: null,
+				showTorques: false,
+				torqueOrigin: Vertex.origin(),
+				inputNames: [
+					'inclination'
+				],
+				forceScale: ForceVector,
+				screenEventHandler: ScreenEventHandler.Self,
+				gravityForce: new ForceVector({
+					direction: 3/4 * TAU,
+					scale: FORCE_SCALE,
+					size: 2,
+					color: Color.red()
+				}),
+				normalForce: new ForceVector({
+					scale: FORCE_SCALE,
+					color: Color.blue()
+				}),
+				staticFrictionForce: new ForceVector({
+					scale: FORCE_SCALE,
+					color: Color.green()
+				})
+			}
 		})
 	}
 

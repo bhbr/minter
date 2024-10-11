@@ -12,21 +12,21 @@ export class LinkHook extends Circle {
 	name: string
 	type: 'input' | 'output'
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			name: 'default',
-			type: 'input',
-			radius: HOOK_RADIUS,
-			fillOpacity: 0,
-			strokeColor: Color.white()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				name: 'default',
+				type: 'input',
+				radius: HOOK_RADIUS,
+				fillOpacity: 0,
+				strokeColor: Color.white()
+			},
+			immutable: {
+				mobject: null
+			}
 		})
 	}
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			mobject: null,
-		})
-	}
 
 	positionInLinkMap(): Vertex {
 	// used e. g. for snapping

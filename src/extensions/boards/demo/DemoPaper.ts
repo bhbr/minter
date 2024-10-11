@@ -25,33 +25,35 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class DemoPaper extends Paper {
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			creationConstructors: {
-				'wavy': WavyCreator,
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
-				'value': ValueBoxCreator,
-				'input': InputValueBoxCreator,
-				'+': AddBoxCreator,
-				'–': SubtractBoxCreator,
-				'&times;': MultiplyBoxCreator,
-				'/': DivideBoxCreator,
-				'board': BoardCreator,
-				'cons': ConstructionCreator,
-				'swing': SwingCreator,
-				'color': ColorSampleCreator
-			},
-			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'ExtendedBoardButton',
-				'NumberButton',
-				'ArithmeticButton',
-				'WavyButton',
-				'SwingButton',
-				'ColorSampleButton'
-			]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				creationConstructors: {
+					'wavy': WavyCreator,
+					'slider': BoxSliderCreator,
+					'stepper': BoxStepperCreator,
+					'value': ValueBoxCreator,
+					'input': InputValueBoxCreator,
+					'+': AddBoxCreator,
+					'–': SubtractBoxCreator,
+					'&times;': MultiplyBoxCreator,
+					'/': DivideBoxCreator,
+					'board': BoardCreator,
+					'cons': ConstructionCreator,
+					'swing': SwingCreator,
+					'color': ColorSampleCreator
+				},
+				buttonNames: [
+					'DragButton',
+					'LinkButton',
+					'ExtendedBoardButton',
+					'NumberButton',
+					'ArithmeticButton',
+					'WavyButton',
+					'SwingButton',
+					'ColorSampleButton'
+				]
+			}
 		})
 	}
 

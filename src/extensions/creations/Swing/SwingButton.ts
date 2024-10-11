@@ -3,9 +3,11 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class SwingButton extends CreativeButton {
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			creations: ['swing']
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				creations: ['swing']
+			}
 		})
 	}
 	

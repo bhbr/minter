@@ -11,12 +11,14 @@ on its circumference. The radius (and anchor) is updated automatically.
 
 	outerPoint: Vertex
 
-	defaultValues() {
-		return Object.assign(super.defaultValues(), {
-			strokeColor: Color.white(),
-			fillColor: Color.white(),
-			fillOpacity: 0,
-			outerPoint: Vertex.origin()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			mutable: {
+				strokeColor: Color.white(),
+				fillColor: Color.white(),
+				fillOpacity: 0,
+				outerPoint: Vertex.origin()
+			}
 		})
 	}
 

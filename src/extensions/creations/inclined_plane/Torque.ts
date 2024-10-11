@@ -17,17 +17,16 @@ export class Torque extends Polygon {
 		this.anchor = newValue
 	}
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'force'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			strokeWidth: 0,
-			fillColor: new Color(0, 0.5, 0.5),
-			fillOpacity: 0.5
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			immutable: {
+				force: undefined
+			},
+			mutable: {
+				strokeWidth: 0,
+				fillColor: new Color(0, 0.5, 0.5),
+				fillOpacity: 0.5
+			}
 		})
 	}
 

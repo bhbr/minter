@@ -9,20 +9,22 @@ import { buttonDict } from 'core/sidebar_buttons/SidebarButton'
 
 export class PhysicsSidebar extends Sidebar {
 	
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			availableButtonClasses: [
-				DragButton,
-				LinkButton,
-				NumberButton,
-				WavyButton,
-				SwingButton
-			],
-			buttons: [
-				new DragButton(),
-				new LinkButton(),
-				new NumberButton()
-			]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				availableButtonClasses: [
+					DragButton,
+					LinkButton,
+					NumberButton,
+					WavyButton,
+					SwingButton
+				],
+				buttons: [
+					new DragButton(),
+					new LinkButton(),
+					new NumberButton()
+				]
+			}
 		})
 	}
 }

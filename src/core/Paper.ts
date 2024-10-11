@@ -17,19 +17,25 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			children: [],
-			screenEventHandler: ScreenEventHandler.Self,
-			expandedMobject: this,
-			pressedKeys: [],
-			activeKeyboard: true,
-			view: document.querySelector('#paper_id') as HTMLDivElement,
-			viewWidth: PAPER_WIDTH,
-			viewHeight: PAGE_HEIGHT,
-			expanded: true,
-			expandedPadding: 0,
-			currentColor: Color.white()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				view: document.querySelector('#paper_id') as HTMLDivElement,
+			},
+			immutable: {
+				children: []
+			},
+			mutable: {
+				screenEventHandler: ScreenEventHandler.Self,
+				expandedMobject: this,
+				pressedKeys: [],
+				activeKeyboard: true,
+				viewWidth: PAPER_WIDTH,
+				viewHeight: PAGE_HEIGHT,
+				expanded: true,
+				expandedPadding: 0,
+				currentColor: Color.white()
+			}
 		})
 	}
 

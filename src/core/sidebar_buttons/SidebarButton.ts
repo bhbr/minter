@@ -40,33 +40,31 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			baseColor: Color.gray(0.4),
-			optionSpacing: 25,
-			label: new TextLabel(),
-			messages: [],
-			activeScalingFactor: 1.2
-		})
-	}
-
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			strokeWidth: 0,
-			screenEventHandler: ScreenEventHandler.Self,
-			currentModeIndex: 0,
-			previousIndex: 0,
-			locationIndex: 0,
-			active: false,
-			showLabel: true,
-			text: 'text',
-			fontSize: 12,
-			radius: BUTTON_RADIUS,
-			viewWidth: 2 * BUTTON_RADIUS,
-			viewHeight: 2 * BUTTON_RADIUS,
-			fillOpacity: 0.5,
-			activeKeyboard: true
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				baseColor: Color.gray(0.4),
+				optionSpacing: 25,
+				label: new TextLabel(),
+				messages: [],
+				activeScalingFactor: 1.2
+			},
+			mutable: {
+				strokeWidth: 0,
+				screenEventHandler: ScreenEventHandler.Self,
+				currentModeIndex: 0,
+				previousIndex: 0,
+				locationIndex: 0,
+				active: false,
+				showLabel: true,
+				text: 'text',
+				fontSize: 12,
+				radius: BUTTON_RADIUS,
+				viewWidth: 2 * BUTTON_RADIUS,
+				viewHeight: 2 * BUTTON_RADIUS,
+				fillOpacity: 0.5,
+				activeKeyboard: true
+			}
 		})
 	}
 

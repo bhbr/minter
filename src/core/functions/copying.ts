@@ -4,7 +4,7 @@ export function copy(obj: any): any {
 
 	// numbers, string, booleans
 	// are passed by value anyway,
-	// so ne need to create an explicit copy
+	// so no need to create an explicit copy
 	if (typeof obj != 'object' || obj === null) {
 		return obj
 	}
@@ -23,7 +23,7 @@ export function copy(obj: any): any {
 	// Objects have a convenience method:
 	// assign all of the original object's
 	// properties to an empty object
-	return Object.assign({}, obj)
+	return Object.assign(new obj.constructor(), obj)
 	// This is a "shallow" copy though:
 	// Porperties that are objects will be shared
 	// with the original. Modifying or reassigning

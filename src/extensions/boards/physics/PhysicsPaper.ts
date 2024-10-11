@@ -17,22 +17,24 @@ export class PhysicsPaper extends Paper {
 
 	scene: InclinedScene
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			scene: new InclinedScene({
-				anchor: new Vertex(100, 100)
-			}),
-			creationConstructors: {
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
-				'value': ValueBoxCreator,
-				'input': InputValueBoxCreator
-			},
-			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'NumberButton'
-			]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				scene: new InclinedScene({
+					anchor: new Vertex(100, 100)
+				}),
+				creationConstructors: {
+					'slider': BoxSliderCreator,
+					'stepper': BoxStepperCreator,
+					'value': ValueBoxCreator,
+					'input': InputValueBoxCreator
+				},
+				buttonNames: [
+					'DragButton',
+					'LinkButton',
+					'NumberButton'
+				]
+			}
 		})
 	}
 

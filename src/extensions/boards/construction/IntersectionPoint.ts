@@ -14,23 +14,17 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			fillOpacity: 1
-		})
-	}
-
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'geoMob1',
-			'geoMob2',
-			'index'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			midpoint: new Vertex(NaN, NaN)
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				fillOpacity: 1,
+				geoMob1: undefined,
+				geoMob2: undefined,
+				index: undefined
+			},
+			mutable: {
+				midpoint: new Vertex(NaN, NaN)
+			}
 		})
 	}
 

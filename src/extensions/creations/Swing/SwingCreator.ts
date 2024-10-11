@@ -7,15 +7,11 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			'swing'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			swing: new Swing()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				swing: new Swing()
+			}
 		})
 	}
 

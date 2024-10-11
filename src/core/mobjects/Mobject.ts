@@ -60,53 +60,52 @@ and logic for drawing and user interaction.
 		this.redraw()
 	}
 
-	defaultValues(): object {
+	defaults(): object {
 	/*
 	Default values of properties (declared
 	in the sections that follow).
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		return Object.assign(super.defaultValues(), {
-			// The meaning of these properties is explained in the sections further below.
+		let superDefs = super.defaults()
+		let defs = this.updateDefaults(superDefs, {
+			immutable: {
+				view: document.createElement('div'),
+				children: [], // i. e. submobjects
+			},
+			mutable: {
+				// The meaning of these properties is explained in the sections further below.
 
-			// position
-			transform: Transform.identity(),
-			viewWidth: 100,
-			viewHeight: 100,
-			/*
-			Note: anchor is a property of transform
-			and exposed to the mobject itself
-			with a getter/setter.
-			*/
+				// position
+				transform: Transform.identity(),
+				viewWidth: 100,
+				viewHeight: 100,
+				/*
+				Note: anchor is a property of transform
+				and exposed to the mobject itself
+				with a getter/setter.
+				*/
 
-			// view
-			view: document.createElement('div'),
-			visible: true,
-			opacity: 1.0,
-			backgroundColor: Color.clear(),
-			drawBorder: DRAW_BORDERS,
+				// view
+				visible: true,
+				opacity: 1.0,
+				backgroundColor: Color.clear(),
+				drawBorder: DRAW_BORDERS,
 
-			// hierarchy
-			_parent: null,
-			children: [], // i. e. submobjects
+				// hierarchy
+				_parent: null,
 
-			// dependencies
-			dependencies: [],
+				// dependencies
+				dependencies: [],
 
-			// interactivity
-			screenEventHandler: ScreenEventHandler.Parent,
-			savedScreenEventHandler: null,
-			eventTarget: null,
-			screenEventHistory: []
+				// interactivity
+				screenEventHandler: ScreenEventHandler.Parent,
+				savedScreenEventHandler: null,
+				eventTarget: null,
+				screenEventHistory: []
+			}
 		})
-	}
-
-	immutableProperties(): Array<string> {
-		return super.immutableProperties().concat([
-			'view',
-			'children'
-		])
+		return defs
 	}
 
 	setup() {
@@ -156,10 +155,18 @@ and logic for drawing and user interaction.
 
 	// this.anchor is a synonym for this.transform.anchor
 	get anchor(): Vertex {
-		return this.transform.anchor
+		return (this.transform ?? Transform.identity()).anchor
 	}
 
 	set anchor(newValue: Vertex) {
+		if (this.isReadonly('anchor')) {
+			console.error(`Anchor is a readonly property on ${this.constructor.name}`)
+			return
+		}
+		if (this.isImmutable('anchor') && this.transform) {
+			console.error(`Anchor is an immutable property on ${this.constructor.name}`)
+			return
+		}
 		if (!this.transform) {
 			this.transform = Transform.identity()
 		}
@@ -682,8 +689,16 @@ and logic for drawing and user interaction.
 	update(args: object = {}, redraw: boolean = true) {
 
 	// Update just the properties and what depends on them, without redrawing
-		args = this.consolidateTransformAndAnchor(args) // see below
-		this.setProperties(args)
+
+		if (Object.keys(args).includes('anchor')
+			&& Object.keys(args).includes('transform')
+			&& !args['transform'].anchor.equals(args['anchor'])) {
+			args['transform'].anchor = args['anchor']
+			delete args['anchor']
+			console.warn(`Inconsistent anchor and transform anchor in update on ${this.constructor.name}`)
+		}
+
+		super.update(args)
 		//this.updateSubmobModels()
 
 		if (this.view != null) {
@@ -731,40 +746,6 @@ and logic for drawing and user interaction.
 		}
 
 		if (redraw) { this.redraw() }
-	}
-
-	consolidateTransformAndAnchor(args: object = {}): object {
-	/*
-	args may contain updated values for the anchor, the transform, or both.
-	Since this.anchor == this.transform.anchor, this may be contradictory
-	information. This method fixes args.
-	*/
-		let newAnchor: any = args['anchor']
-		var newTransform: any = args['transform']
-
-		if (newTransform) {
-			let nt: Transform = newTransform as Transform
-			if (nt.anchor.isZero()) {
-				/*
-				If the new transform has no anchor,
-				set it to the new anchor if given one.
-				Otherwise set it to your own anchor (i. e. it won't change).
-				*/
-				nt.anchor = newAnchor ?? this.anchor
-			}
-
-		} else {
-			/*
-			If there is no new transform value, still create
-			a copy of the existing one and put the new anchor
-			in there (if given, otherwise the old anchor).
-			*/
-			newTransform = this.transform
-			newTransform.anchor = args['anchor'] ?? this.anchor
-		}
-		delete args['anchor']
-		args['transform'] = newTransform
-		return args
 	}
 
 

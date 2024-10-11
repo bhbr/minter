@@ -33,15 +33,17 @@ export class Construction extends Board {
 	constructedMobjects: Array<ConMobject>
 	declare creator: Constructor
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			points: [],
-			constructedMobjects: [],
-			buttonNames: [
-				'DragButton',
-				'StraitButton',
-				'ConCircleButton'
-			]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				points: [],
+				constructedMobjects: [],
+				buttonNames: [
+					'DragButton',
+					'StraitButton',
+					'ConCircleButton'
+				]
+			}
 		})
 	}
 

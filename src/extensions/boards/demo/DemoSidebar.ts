@@ -14,21 +14,23 @@ import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleB
 
 export class DemoSidebar extends Sidebar {
 	
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			availableButtonClasses: [
-				DragButton,
-				LinkButton,
-				ExtendedBoardButton,
-				BoardButton,
-				StraitButton,
-				ConCircleButton,
-				NumberButton,
-				ArithmeticButton,
-				WavyButton,
-				SwingButton,
-				ColorSampleButton
-			]
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				availableButtonClasses: [
+					DragButton,
+					LinkButton,
+					ExtendedBoardButton,
+					BoardButton,
+					StraitButton,
+					ConCircleButton,
+					NumberButton,
+					ArithmeticButton,
+					WavyButton,
+					SwingButton,
+					ColorSampleButton
+				]
+			}
 		})
 	}
 }

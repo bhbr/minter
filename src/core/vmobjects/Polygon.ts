@@ -9,9 +9,11 @@ export class Polygon extends VMobject {
 
 	closed: boolean
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			closed: true
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				closed: true
+			}
 		})
 	}
 

@@ -11,10 +11,14 @@ export class CurvedLine extends VMobject {
 	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			closed: true
+	defaults(): object {
+		let superDefs = super.defaults()
+		let defs = this.updateDefaults(superDefs, {
+			immutable: {
+				closed: true
+			}
 		})
+		return defs
 	}
 
 	_bezierPoints: VertexArray
@@ -33,12 +37,6 @@ export class CurvedLine extends VMobject {
 	}
 
 	closed: boolean // a closed CurvedLine is a CurvedShape
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			closed: false
-		})
-	}
 
 	updateBezierPoints() { }
 	// implemented by subclasses

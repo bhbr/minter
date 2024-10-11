@@ -10,23 +10,22 @@ export class InclinedPlane extends Polygon {
 	inclination: number
 	midpoint: Vertex
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'length'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			midpoint: Vertex.origin(),
-			inclination: 0,
-			fillColor: Color.white(),
-			fillOpacity: 0.5,
-			vertices: new VertexArray([
-				Vertex.origin(),
-				Vertex.origin(),
-				Vertex.origin()
-			])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			immutable: {
+				length: undefined
+			},
+			mutable: {
+				midpoint: Vertex.origin(),
+				inclination: 0,
+				fillColor: Color.white(),
+				fillOpacity: 0.5,
+				vertices: new VertexArray([
+					Vertex.origin(),
+					Vertex.origin(),
+					Vertex.origin()
+				])
+			}
 		})
 	}
 

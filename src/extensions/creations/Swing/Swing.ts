@@ -22,37 +22,31 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			'fixtureWidth',
-			'fixtureHeight',
-			'fixture',
-			'string',
-			'weight'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			maxLength: 300,
-			length: 1,
-			mass: 0.2,
-			initialAngle: 0,
-			fixtureWidth: 50,
-			fixtureHeight: 20,
-			initialSpeed: 0,
-			inputNames: ['length', 'mass'],
-			outputNames: ['angle', 'period'],
-			fixture: new Rectangle({
-				fillColor: Color.white(),
-				fillOpacity: 1
-			}),
-			string: new Line(),
-			weight: new Circle({
-				fillColor: Color.white(),
-				fillOpacity: 1
-			}),
-			initialTime: Date.now()
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				fixtureWidth: 50,
+				fixtureHeight: 20,
+				fixture: new Rectangle({
+					fillColor: Color.white(),
+					fillOpacity: 1
+				}),
+				string: new Line(),
+				weight: new Circle({
+					fillColor: Color.white(),
+					fillOpacity: 1
+				}),
+			},
+			mutable: {
+				maxLength: 300,
+				length: 1,
+				mass: 0.2,
+				initialAngle: 0,
+				initialSpeed: 0,
+				initialTime: Date.now(),
+				inputNames: ['length', 'mass'],
+				outputNames: ['angle', 'period']
+			}
 		})
 	}
 

@@ -35,39 +35,38 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			outerBar: new Rectangle({
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				outerBar: new Rectangle({
+					fillColor: Color.black(),
+					fillOpacity: 1,
+					strokeColor: Color.white()
+				}),
+				filledBar: new Rectangle({
+					fillOpacity: 0.5
+				}),
+				label: new TextLabel({
+					viewHeight: 25,
+					horizontalAlign: 'center',
+					verticalAlign: 'center',
+					fontSize: 20
+				})
+			},
+			mutable: {
+				min: 0,
+				max: 1,
+				value: 0.6,
+				height: 200,
+				width: 70,
+				strokeColor: Color.white(),
 				fillColor: Color.black(),
-				fillOpacity: 1,
-				strokeColor: Color.white()
-			}),
-			filledBar: new Rectangle({
-				fillOpacity: 0.5
-			}),
-			label: new TextLabel({
-				viewHeight: 25,
-				horizontalAlign: 'center',
-				verticalAlign: 'center',
-				fontSize: 20
-			})
-		})
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			min: 0,
-			max: 1,
-			value: 0.6,
-			height: 200,
-			width: 70,
-			strokeColor: Color.white(),
-			fillColor: Color.black(),
-			barFillColor: Color.gray(0.5),
-			screenEventHandler: ScreenEventHandler.Self,
-			precision: 3,
-			inputNames: [],
-			outputNames: ['value']
+				barFillColor: Color.gray(0.5),
+				screenEventHandler: ScreenEventHandler.Self,
+				precision: 3,
+				inputNames: [],
+				outputNames: ['value']
+			}
 		})
 	}
 

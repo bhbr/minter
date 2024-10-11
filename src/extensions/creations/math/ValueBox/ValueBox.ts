@@ -11,25 +11,22 @@ export class ValueBox extends Linkable {
 	valueLabel: TextLabel
 	background: Rectangle
 
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {
-			'valueLabel',
-			'background'
-		])
-	}
-
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			viewWidth: 80,
-			viewHeight: 40,
-			inputNames: ['value'],
-			outputNames: ['value'],
-			strokeWidth: 0.0,
-			background: new Rectangle({
-				fillColor: Color.black()
-			}),
-			valueLabel: new TextLabel(),
-			value: 1
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				background: new Rectangle({
+					fillColor: Color.black()
+				}),
+				valueLabel: new TextLabel()
+			},
+			mutable: {
+				viewWidth: 80,
+				viewHeight: 40,
+				inputNames: ['value'],
+				outputNames: ['value'],
+				strokeWidth: 0.0,
+				value: 1
+			}
 		})
 	}
 

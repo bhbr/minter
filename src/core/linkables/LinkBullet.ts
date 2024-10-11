@@ -10,12 +10,14 @@ export class LinkBullet extends Circle {
 A link bullet gets dragged onto a link hook to create
 a dependency between two linkable mobjects.
 */
-	
-	fixedValues(): object {
-		return Object.assign(super.fixedValues(), {        
-			radius: BULLET_RADIUS,
-			fillOpacity: 1,
-			strokeColor: Color.white()
+
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			readonly: {	     
+				radius: BULLET_RADIUS,
+				fillOpacity: 1,
+				strokeColor: Color.white()
+			}
 		})
 	}
 

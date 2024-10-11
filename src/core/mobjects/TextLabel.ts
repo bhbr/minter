@@ -12,15 +12,17 @@ export class TextLabel extends Mobject {
 	borderWidth: number
 	fontSize: number
 
-	defaultValues(): object {
-		return Object.assign(super.defaultValues(), {
-			text: 'text',
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
-			color: Color.white(),
-			borderColor: Color.white(),
-			borderWidth: 1,
-			fontSize: 12
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			mutable: {
+				text: 'text',
+				horizontalAlign: 'center',
+				verticalAlign: 'center',
+				color: Color.white(),
+				borderColor: Color.white(),
+				borderWidth: 1,
+				fontSize: 12
+			}
 		})
 	}
 

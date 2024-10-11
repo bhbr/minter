@@ -6,10 +6,12 @@ export class Ellipse extends CurvedShape {
 	majorAxis: number
 	minorAxis: number
 
-	defaultValues() {
-		return Object.assign(super.defaultValues(), {
-			majorAxis: 200,
-			minorAxis: 100
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			mutable: {
+				majorAxis: 200,
+				minorAxis: 100
+			}
 		})
 	}
 

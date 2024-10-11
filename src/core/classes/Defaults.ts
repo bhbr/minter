@@ -1,18 +1,5 @@
 
-export class DefaultsDict {
-
-	readonly: object
-	immutable: object
-	mutable: object
-	className: string
-
-	constructor(args: object, className: string = '') {
-		this.readonly = {}
-		this.immutable = {}
-		this.mutable = {}
-		this.className = className
-		this.assign(args)
-	}
+export class Defaults {
 
 	static hasDefaultsDictFormat(obj: object): boolean {
 		var flag: boolean = true
@@ -22,41 +9,40 @@ export class DefaultsDict {
 		return flag
 	}
 
-	isCompatible(newDefaults: object): boolean {
+	static areCompatibleDefaults(oldDefaults: object, newDefaults: object, className: string): boolean {
 		var flag: boolean = true
-		if (!DefaultsDict.hasDefaultsDictFormat(newDefaults)) {
-			console.error(`Incorrect defaults format for class ${this.className}`)
+		if (!Defaults.hasDefaultsDictFormat(newDefaults)) {
+			console.error(`Incorrect defaults format for class ${this.constructor.name}`)
 			return
 		}
-		for (let rKey of Object.keys(this.readonly ?? {})) {
+		for (let rKey of Object.keys(oldDefaults['readonly'] ?? {})) {
 			if (Object.keys(newDefaults['readonly'] ?? {}).includes(rKey)
 				|| Object.keys(newDefaults['immutable'] ?? {}).includes(rKey)
 				|| Object.keys(newDefaults['mutable'] ?? {}).includes(rKey)) {
-				console.error(`Readonly property ${rKey} cannot be reassigned in defaults for class ${this.className}`)
+				console.error(`Readonly property ${rKey} cannot be reassigned in defaults for class ${className}`)
 				flag = false
 			}
 		}
-		for (let iKey of Object.keys(this.immutable ?? {})) {
+		for (let iKey of Object.keys(oldDefaults['immutable'] ?? {})) {
 			if (Object.keys(newDefaults['mutable'] ?? {}).includes(iKey)) {
-				console.error(`Immutable property ${iKey} cannot be reassigned as mutable in defaults for class ${this.className}`)
+				console.error(`Immutable property ${iKey} cannot be reassigned as mutable in defaults for class ${className}`)
 				flag = false
 			}
 		}
 		return flag
 	}
 
-	assign(newDefaults: object): DefaultsDict {
+	static update(oldDefaults: object, newDefaults: object, className: string): object {
 		
-		if (!this.isCompatible(newDefaults)) {
-			console.error(`Incompatible defaults for class ${this.className}`)
-			return this
+		if (!Defaults.areCompatibleDefaults(oldDefaults, newDefaults, className)) {
+			console.error(`Incompatible defaults for class ${className}`)
+			return oldDefaults
 		}
-		let flattenedOldDefaults = DefaultsDict.flatten(this)
-		let flattenedNewDefaults = DefaultsDict.flatten(newDefaults)
+		let flattenedOldDefaults = Defaults.flatten(oldDefaults)
+		let flattenedNewDefaults = Defaults.flatten(newDefaults)
 		let flattenedUpdatedDefaults = Object.assign(flattenedOldDefaults, flattenedNewDefaults)
-		let stackedUpdatedDefaults = DefaultsDict.stack(flattenedUpdatedDefaults)
-		Object.assign(this, stackedUpdatedDefaults)
-		return this
+		let stackedUpdatedDefaults = Defaults.stack(flattenedUpdatedDefaults)
+		return Object.assign(oldDefaults, stackedUpdatedDefaults)
 	}
 
 	static flatten(stackedDefaults: object): object {
