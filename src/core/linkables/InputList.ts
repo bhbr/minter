@@ -17,23 +17,30 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkHooks'
-		])
+	constructor(args: object = {}) {
+		super(args)
 	}
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			mobject: null,
-			inputNames: [],
-			linkHooks: [],
-			cornerRadius: 20,
-			fillColor: Color.white(),
-			fillOpacity: 0.2,
-			strokeWidth: 0,
-			width: IO_LIST_WIDTH
+		let superDefs = super.defaults()
+		let defs = this.updateDefaults(superDefs, {
+			readonly: {
+				linkHooks: [],
+				fillColor: Color.white(),
+				fillOpacity: 0.2,
+				cornerRadius: 20,
+				strokeWidth: 0,
+				width: IO_LIST_WIDTH
+			},
+			immutable: {
+				mobject: null
+			},
+			mutable: {
+				inputNames: []
+			}
 		})
+		console.log(defs)
+		return defs
 	}
 
 	setup() {
@@ -68,12 +75,16 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			})
 			this.add(hook)
 			this.add(label)
-			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i)
+			this.positionHookAndLabel(hook, label, i)
+			this.linkHooks.push(hook)
+		}
+	}
+
+	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
+			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index)
 			hook.update({ midpoint: m })
 			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
 			label.update({ anchor: a })
-			this.linkHooks.push(hook)
-		}
 	}
 
 	hookNamed(name: string): LinkHook | null {
@@ -85,8 +96,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.height = this.getHeight()
 		this.createHookList()
 		if (this.mobject == null) { return }

@@ -9,6 +9,7 @@ export const HOOK_RADIUS: number = 9
 export const HOOK_INSET_X: number = 15
 export const HOOK_INSET_Y: number = 15
 export const HOOK_VERTICAL_SPACING: number = 25
+export const HOOK_HORIZONTAL_SPACING: number = 200
 export const HOOK_LABEL_INSET: number = 30
 
 // geometry of link lines between bullets
