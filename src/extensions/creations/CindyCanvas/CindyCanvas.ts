@@ -30,7 +30,8 @@ export class CindyCanvas extends Linkable implements Playable {
 				innerCanvas: new Mobject(),
 				outerFrame: new Rectangle(),
 				playButton: new PlayButton({
-					anchor: new Vertex(5, 5)
+					anchor: new Vertex(5, 5),
+					mobject: this
 				})
 			},
 			immutable: {
@@ -50,7 +51,7 @@ export class CindyCanvas extends Linkable implements Playable {
 			}
 		})
 	}
-	
+
 	setup() {
 		super.setup()
 
@@ -77,10 +78,6 @@ export class CindyCanvas extends Linkable implements Playable {
 			width: this.viewWidth,
 			height: this.viewHeight,
 			started: false
-		})
-
-		this.playButton.update({
-			mobject: this
 		})
 		this.add(this.playButton)
 

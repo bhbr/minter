@@ -38,6 +38,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
 			readonly: {
+				inputNames: [],
+				outputNames: ['value'],
 				outerBar: new Rectangle({
 					fillColor: Color.black(),
 					fillOpacity: 1,
@@ -63,9 +65,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				fillColor: Color.black(),
 				barFillColor: Color.gray(0.5),
 				screenEventHandler: ScreenEventHandler.Self,
-				precision: 3,
-				inputNames: [],
-				outputNames: ['value']
+				precision: 3
 			}
 		})
 	}

@@ -14,7 +14,7 @@ export class CircularArc extends CurvedLine {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
+			immutable: {
 				closed: false
 			},
 			mutable: {

@@ -46,8 +46,10 @@ export class SidebarButton extends Circle {
 				baseColor: Color.gray(0.4),
 				optionSpacing: 25,
 				label: new TextLabel(),
-				messages: [],
 				activeScalingFactor: 1.2
+			},
+			immutable: {
+				messages: []
 			},
 			mutable: {
 				strokeWidth: 0,

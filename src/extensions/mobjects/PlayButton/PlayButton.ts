@@ -11,6 +11,9 @@ export class PlayButton extends SimpleButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				screenEventHandler: ScreenEventHandler.Self
+			},
 			immutable: {
 				mobject: undefined
 			},
@@ -21,8 +24,7 @@ export class PlayButton extends SimpleButton {
 				backgroundColor: Color.black(),
 				color: Color.white(),
 				borderColor: Color.white(),
-				borderWidth: 1,
-				screenEventHandler: ScreenEventHandler.Self
+				borderWidth: 1
 			}
 		})
 	}

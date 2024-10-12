@@ -34,12 +34,33 @@ export class ExtendedObject {
 
 	constructor(args: object = {}) {
 		this.initComplete = false
-		this.defaultsDict = this.defaults()
 		this.uninitializedProperties = this.properties()
-		this.update(this.defaultValues())
-		this.update(args)
+		this.defaultsDict = this.defaults()
+		let def = this.defaultValues()
+		let init = Object.assign(def, args)
+		this.initializeProperties(init)
 		this.checkForUndefinedValues()
 		this.initComplete = true
+	}
+
+	initializeProperties(defaultValues: object) {
+		let flag: boolean = false //(this.constructor.name == 'InputList')
+		for (let [prop, value] of Object.entries(defaultValues)) {
+			if (flag) { console.log(`setting ${prop}`) }
+			// check for existing accessor (getter/setter)
+			let setter = this.setter(prop)
+			if (setter !== undefined) { 
+				setter.call(this, value)
+			} else {
+				Object.defineProperty(this, prop, {
+					value: value,
+					writable: this.isMutable(prop)
+				})
+			}
+			if (flag) { console.log('before removal:', this.uninitializedProperties) }
+			remove(this.uninitializedProperties, prop)
+			if (flag) { console.log('after removal:', this.uninitializedProperties) }
+		}
 	}
 
 	mutability(prop: string): string | null {
@@ -96,13 +117,11 @@ export class ExtendedObject {
 		var flag: boolean = true
 		for (let [prop, value] of Object.entries(args)) {
 			if (this.mutability(prop) === 'readonly'
-				&& (Object.getPrototypeOf(this).__lookupGetter__(prop) !== undefined)) {
-				console.log(args)
+				&& this.initComplete) {
 				console.error(`Readonly property ${prop} cannot be set in object of class ${className}`)
 				flag = false
 			}
 			if (this.mutability(prop) === 'immutable'
-				&& Object.getPrototypeOf(this).__lookupGetter__(prop) !== undefined
 				&& this.initComplete) {
 				console.error(`Immutable property ${prop} cannot be changed in object of class ${className}`)
 				flag = false
@@ -115,14 +134,45 @@ export class ExtendedObject {
 		return Defaults.update(oldDefaults, newDefaults, this.constructor.name)
 	}
 
+	isGetter(prop: string): boolean {
+		return this.propertyDescriptor(prop)['get'] !== undefined
+	}
+
+	isSetter(prop: string): boolean {
+		return this.setter(prop) !== undefined
+	}
+
+	propertyDescriptors(): object {
+		let pds = {}
+		var obj = this
+		while (obj) {
+			pds = Object.assign(pds, Object.getOwnPropertyDescriptors(obj))
+		}
+		return pds
+	}
+
+	propertyDescriptor(prop: string) {
+		return this.propertyDescriptors[prop]
+	}
+
+	getter(prop: string): any {
+		let pd = this.propertyDescriptor(prop)
+		return (pd === undefined) ? undefined : pd.get
+	}
+
+	setter(prop: string): any {
+		let pd = this.propertyDescriptor(prop)
+		return (pd === undefined) ? undefined : pd.set
+	}
+
+
 	update(args: object) {
 		if (!this.isCompatibleUpdate(args, this.constructor.name)) { return }
 		let accessorArgs: object = {}
 		let otherPropertyArgs: object = {}
 
 		for (let [prop, value] of Object.entries(args)) {
-			//if (Object.getPrototypeOf(this).__lookupGetter__(prop) === undefined) {
-	 		if (this.uninitializedProperties.includes(prop)) {
+			if (!this.isSetter(prop)) {
 	 			otherPropertyArgs[prop] = value
 	 		} else {
 	 			accessorArgs[prop] = value
@@ -149,163 +199,31 @@ export class ExtendedObject {
 		}
 	}
 
-
-
-
-
-
-
-
-
-
-	// passedByValue: boolean
-	// private fullyInitialized: boolean
-
-	// constructor(props: object = {}) {
-
-	// 	this.fullyInitialized = false
-	// 	let def = this.defaults()
-
-	// 	let initialArgs = def.subclass(props)
-	// 	this.setProperties(initialArgs.readonly)
-	// 	this.setProperties(initialArgs.immutable)
-	// 	this.setProperties(initialArgs.mutable)
-	// 	let prop = this.properties()
-	// 	for (let key of prop) {
-	// 		if (this[key] === undefined) {
-	// 			console.warn(`Undefined properties in ${this}`)
-	// 		}
-	// 	}
-	// 	this.fullyInitialized = true
-	// }
-
-	// properties(): Array<string> {
-	// 	// get a list of all of the objects property names, from most specific to most abstract
-	// 	let obj: object = this
-	// 	let properties: Array<string> = []
-	// 	// this loop walks up the superclass hierarchy and collects all inherited properties
-	// 	while (obj.constructor.name != 'Object') {
-	// 		properties.push(...Object.getOwnPropertyNames(obj))
-	// 		obj = Object.getPrototypeOf(obj)
-	// 	}
-	// 	return properties
-	// }
-
-	setter(key: string): any {
-		// when updating a Mobject with mob.setAttributes({key: value}),
-		// "key can refer to either:
-		//  - a property (mob["key"]) or
-		//  - an accessor (getter/setter mob.key)
-		// this picks the right one to call in setAttributes
-		// so we don't create properties that shouldn't be objects in their own right
-		let descriptor: any = undefined
-		if (this.properties().includes(key)) {
-			let obj: object = this
-			while (obj.constructor.name != 'Object' && descriptor == undefined) {
-				descriptor = Object.getOwnPropertyDescriptor(obj, key)
-				obj = Object.getPrototypeOf(obj)
-			}
-		}
-		if (descriptor != undefined) { return descriptor.set }
-		else { return undefined }
-	}
-
-	// isReadonly(prop: string): boolean { return this.defaults().isReadonly(prop) }
-	// isImmutable(prop: string): boolean { return this.defaults().isImmutable(prop) }
-	// isMutable(prop: string): boolean { return this.defaults().isMutable(prop) }
-
-	// setProperties(args: object = {}) {
-	// 	// update the object with the given property names and values
-	// 	// always change an object via this method,
-	// 	// it will automatically check for mutability
-	// 	// and pick the right setter method
-
-
-	// 	let accessorArgs: object = {}
-	// 	let otherPropertyArgs: object = {}
-
-	// 	for (let [key, value] of Object.entries(args)) {
-
-	// 		if (this.isReadonly(key) && this[key] !== undefined) {
-	// 			console.warn(`Readonly property ${key} cannot be set to value ${value}`)
-	// 			continue
-	// 		}
-
-	// 		if (this.isImmutable(key) && this[key] !== undefined) {
-	// 			console.warn(`Immutable property ${key} cannot be set to value ${value}`)
-	// 			continue
-	// 		}
-
-	// 		if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
-	// 			otherPropertyArgs[key] = value
-	// 		} else {
-	// 			accessorArgs[key] = value
-	// 		}
-
-	// 	}
-
-	// 	for (let [key, value] of Object.entries(accessorArgs)) {
-	// 		this.setValue(key, value)
-	// 	}
-	// 	for (let [key, value] of Object.entries(otherPropertyArgs)) {
-	// 		this.setValue(key, value)
-	// 	}
-
-	// 	// let accessorArgs: object = {}
-	// 	// let otherPropertyArgs: object = {}
-
-	// 	// for (let [key, dict] of Object.entries(args)) {
-
-	// 	// 	if (dict.mutable === 'never' || (dict.mutable == 'once' && this[key] !== undefined)) {
-	// 	// 		console.error(`Cannot reassign property ${key} (to ${dict.value.toString()}) on ${this.constructor.name}`)
-	// 	// 		continue
-	// 	// 	}
-
-	// 	// 	if (Object.getPrototypeOf(this).__lookupGetter__(key) === undefined) {
-	// 	// 		otherPropertyArgs[key] = dict.value
-	// 	// 	} else {
-	// 	// 		accessorArgs[key] = dict.value
-	// 	// 	}
-	// 	// }
-
-	// 	// for (let [key, value] of Object.entries(accessorArgs)) {
-	// 	// 	this.setValue(key, value)
-	// 	// }
-	// 	// for (let [key, value] of Object.entries(otherPropertyArgs)) {
-	// 	// 	this.setValue(key, value)
-	// 	// }
-	// }
-
 	setValue(prop: string, value: any) {
 		let setter: any = this.setter(prop)
 			
 		if (setter != undefined) {
-			
-			// if (this.isImmutable(key) && this[key] !== undefined) {
-			// 	console.warn(`Cannot reassign property ${key} (to ${value.toString()}) on ${this.constructor.name}`)
-			// 	return
-			// }
 			setter.call(this, value)
-			remove(this.uninitializedProperties, prop)
-
 		} else {
-
 			// we have an as-of-yet unknown property
 			if (value instanceof ExtendedObject && value.passedByValue) {
 				// create and copy (pass-by-value)
 				if (this[prop] == undefined) {
 					this[prop] = copy(value)
-					remove(this.uninitializedProperties, prop)
 				} else {
 					this[prop].copyFrom(value)
 				}
 			} else {
 				// just link (pass-by-reference)
 				// or pass-by-value a non-object
-				this[prop] = value
-				remove(this.uninitializedProperties, prop)
+				try {
+					this[prop] = value
+				} catch {
+					console.error(`Could not assign value ${value} to ${this.mutability(prop)} property ${prop} on ${this.constructor.name}`)
+				}
 			}
 		}
+		remove(this.uninitializedProperties, prop)
 	}
 
 	copyFrom(obj: ExtendedObject) {
@@ -317,50 +235,6 @@ export class ExtendedObject {
 		this.update(args)
 	}
 
-	// copyPropertiesFrom(obj: ExtendedObject, props: Array<string>) {
-	// 	let updateDict: object = {}
-	// 	for (let prop of props) {
-	// 		updateDict[prop] = obj[prop]
-	// 	}
-	// 	this.setProperties(updateDict)
-	// }
-
-	// readonlyProperties(): Array<string> { return [] }
-
-	// setDefaults(argsDict: object = {}) {
-	// // we often cannot set default values for properties as declarations alone
-	// // (before and outside the methods) as these get set too late
-	// // (at the end of the constructor)
-	// // instead we call setDefaults at the appropriate time earlier in the constructor
-
-	// // the argsDict is considered as soft suggestions, only for properties
-	// // that have not yet been set
-	// // this is in opposition to setAttributes which has the mandate
-	// // to overwrite existing properties
-	// 	let undefinedKVPairs: object = {}
-	// 	for (let [key, value] of Object.entries(argsDict)) {
-	// 		if (this[key] == undefined) { undefinedKVPairs[key] = value }
-	// 	}
-	// 	this.setProperties(undefinedKVPairs)
-	// }
-
-	// defaults(): DefaultsDict {
-	// 	return new DefaultsDict({
-	// 		immutable: {
-	// 			passedByValue: false
-	// 		}
-	// 	})
-	// }
-
-	// copy(): ExtendedObject {
-	// 	let obj = new ExtendedObject()
-	// 	obj.copyPropertiesFrom(this, Object.keys(this))
-	// 	return obj
-	// }
-
-	// toString(): string {
-	// 	return this.constructor.name
-	// }
 
 }
 

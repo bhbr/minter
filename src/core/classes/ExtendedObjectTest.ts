@@ -4,33 +4,31 @@ import { ExtendedObject } from './ExtendedObject'
 class FirstClass extends ExtendedObject {
 
 	a: number
-	b: number
-	c: number
+
+	get b(): number {
+		return this.a
+	}
+
+	set b(newValue: number) {
+		this.a = newValue
+	}
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
 			readonly: { },
 			immutable: {  },
-			mutable: {a: undefined  }
+			mutable: { b: 1 }
 		})
 	}
 }
 
-export class SecondClass extends FirstClass {
-
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
-			readonly: {},
-			immutable: {},
-			mutable: {a: 1}
-		})
-	}
-}
+class SecondClass extends FirstClass {}
 
 export function extendedObjectTest() {
 
-	let B = new SecondClass({a: 2})
-	B.update({a: 3})
-	console.log(B)
+	let C = new FirstClass()
+	console.log(C)
+	let D = new SecondClass()
+	console.log(D)
 
 }

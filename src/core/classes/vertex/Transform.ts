@@ -12,7 +12,8 @@ export class Transform extends ExtendedObject {
 	shift: Vertex
 
 	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+		let def = super.defaults()
+		let newDef = this.updateDefaults(def, {
 			readonly: {
 				passedByValue: true
 			},
@@ -23,6 +24,7 @@ export class Transform extends ExtendedObject {
 				shift: Vertex.origin()
 			}
 		})
+		return newDef
 	}
 
 	static identity(): Transform { return new Transform() }

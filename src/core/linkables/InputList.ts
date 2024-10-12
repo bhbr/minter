@@ -17,22 +17,24 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkHooks'
-		])
+	constructor(args: object = {}) {
+		super(args)
 	}
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			mobject: null,
-			inputNames: [],
-			linkHooks: [],
-			cornerRadius: 20,
-			fillColor: Color.white(),
-			fillOpacity: 0.2,
-			strokeWidth: 0,
-			width: IO_LIST_WIDTH
+		return this.updateDefaults(super.defaults(), {
+			readonly: {
+				linkHooks: [],
+				cornerRadius: 20,
+				fillColor: Color.white(),
+				fillOpacity: 0.2,
+				strokeWidth: 0,
+				width: IO_LIST_WIDTH
+			},
+			mutable: {
+				mobject: null,
+				inputNames: []
+			}
 		})
 	}
 
@@ -51,7 +53,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.inputNames.length; i++) {
 			let name = this.inputNames[i]
 			let hook = new LinkHook({

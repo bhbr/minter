@@ -49,7 +49,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.outputNames.length; i++) {
 			let name = this.outputNames[i]
 			let hook = new LinkHook({

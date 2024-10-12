@@ -18,13 +18,14 @@ which can be linked to such-exposed variables of other mobjects.
 	outputList: OutputList 
 
 	defaults(): object {
-		let il = new InputList()
 		return this.updateDefaults(super.defaults(), {
 			readonly: {
-				inputNames: [],
-				outputNames: [],
-				inputList: il,
+				inputList: new InputList(),
 				outputList: new OutputList()
+			},
+			immutable: {
+				inputNames: [],
+				outputNames: []
 			},
 			mutable: {
 				screenEventHandler: ScreenEventHandler.Self

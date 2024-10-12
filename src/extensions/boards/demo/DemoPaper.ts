@@ -97,7 +97,8 @@ export class DemoPaper extends Paper {
 		let wavy = new Wavy({
 			anchor: new Vertex(400, 150),
 			viewWidth: 200,
-			viewHeight: 200
+			viewHeight: 200,
+			id: 'wavy1'
 		})
 
 		this.addToContent(slider)

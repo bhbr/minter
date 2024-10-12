@@ -21,6 +21,8 @@ export class Paper extends Board {
 		return this.updateDefaults(super.defaults(), {
 			readonly: {
 				view: document.querySelector('#paper_id') as HTMLDivElement,
+				expandedPadding: 0,
+				expanded: true
 			},
 			immutable: {
 				children: []
@@ -32,8 +34,6 @@ export class Paper extends Board {
 				activeKeyboard: true,
 				viewWidth: PAPER_WIDTH,
 				viewHeight: PAGE_HEIGHT,
-				expanded: true,
-				expandedPadding: 0,
 				currentColor: Color.white()
 			}
 		})

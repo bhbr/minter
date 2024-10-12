@@ -688,15 +688,18 @@ and logic for drawing and user interaction.
 
 	update(args: object = {}, redraw: boolean = true) {
 
-	// Update just the properties and what depends on them, without redrawing
-
-		if (Object.keys(args).includes('anchor')
-			&& Object.keys(args).includes('transform')
-			&& !args['transform'].anchor.equals(args['anchor'])) {
-			args['transform'].anchor = args['anchor']
-			delete args['anchor']
-			console.warn(`Inconsistent anchor and transform anchor in update on ${this.constructor.name}`)
+		if (Object.keys(args).includes('transform')) {
+			this.transform = args['transform']
 		}
+		if (Object.keys(args).includes('anchor')) {
+			this.anchor = args['anchor']
+			if (Object.keys(args).includes('transform')
+				&& this.anchor == this.transform.anchor) {
+				console.warn(`Inconsistent anchor and transform anchor in update on ${this.constructor.name}`)
+			}
+		}
+		delete args['transform']
+		delete args['anchor']
 
 		super.update(args)
 		//this.updateSubmobModels()

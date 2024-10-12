@@ -44,7 +44,6 @@ The content children can also be dragged and panned.
 		let eb = new ExpandButton()
 		return this.updateDefaults(super.defaults(), {
 			readonly: {
-				expandedPadding: 20,
 				contentChildren: [],
 				expandButton: eb,
 				linkMap: new LinkMap(),
@@ -57,6 +56,9 @@ The content children can also be dragged and panned.
 					strokeWidth: 2.0,
 					screenEventHandler: ScreenEventHandler.Parent
 				})
+			},
+			immutable: {
+				expandedPadding: 20
 			},
 			mutable: {
 				screenEventHandler: ScreenEventHandler.Self,
@@ -179,7 +181,7 @@ The content children can also be dragged and panned.
 	}
 
 	expandStateChange() {
-		this.expanded = true
+		if (!this.expanded) { this.update({ expanded: true }) }
 		getPaper().expandedMobject = this
 		this.enableContent()
 		if (this.parent != undefined) {
