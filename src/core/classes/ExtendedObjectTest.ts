@@ -3,21 +3,22 @@ import { ExtendedObject } from './ExtendedObject'
 
 class FirstClass extends ExtendedObject {
 
-	a: number
+	//a: number
+	_b: number
 
 	get b(): number {
-		return this.a
+		return this._b
 	}
 
 	set b(newValue: number) {
-		this.a = newValue
+		this._b = newValue
 	}
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: { },
-			immutable: {  },
-			mutable: { b: 1 }
+			readonly: { a: 1},
+			immutable: { b: 2 },
+			mutable: { }
 		})
 	}
 }
@@ -26,9 +27,11 @@ class SecondClass extends FirstClass {}
 
 export function extendedObjectTest() {
 
-	let C = new FirstClass()
-	console.log(C)
-	let D = new SecondClass()
-	console.log(D)
-
+	let C = new FirstClass({a: 2})
+	let desc1 = C.propertyDescriptor('a')
+	let desc2 = C.propertyDescriptor('b')
+	let desc3 = C.propertyDescriptor('c')
+	console.log('a', desc1)
+	console.log('b', desc2)
+	console.log('c', desc3)
 }

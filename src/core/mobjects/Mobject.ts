@@ -78,6 +78,7 @@ and logic for drawing and user interaction.
 
 				// position
 				transform: Transform.identity(),
+				anchor: Vertex.origin(),
 				viewWidth: 100,
 				viewHeight: 100,
 				/*
@@ -686,23 +687,22 @@ and logic for drawing and user interaction.
 
 	// Update methods //
 
+	synchronizeUpdateArguments(args: object = {}): object {
+
+		let a = args['anchor']
+		if (a !== undefined) {
+			let t = args['transform'] ?? this.transform ?? Transform.identity()
+			t.anchor = a
+			args['transform'] = t
+			delete args['anchor']
+		}
+		return args
+
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 
-		if (Object.keys(args).includes('transform')) {
-			this.transform = args['transform']
-		}
-		if (Object.keys(args).includes('anchor')) {
-			this.anchor = args['anchor']
-			if (Object.keys(args).includes('transform')
-				&& this.anchor == this.transform.anchor) {
-				console.warn(`Inconsistent anchor and transform anchor in update on ${this.constructor.name}`)
-			}
-		}
-		delete args['transform']
-		delete args['anchor']
-
 		super.update(args)
-		//this.updateSubmobModels()
 
 		if (this.view != null) {
 			this.view.setAttribute('screen-event-handler', this.screenEventHandler.toString())

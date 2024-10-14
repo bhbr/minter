@@ -65,8 +65,12 @@ export class LinkMap extends Mobject {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		let p = this.localEventVertex(e)
-		p = this.hookAtLocation(p).positionInLinkMap()
+		let q = this.localEventVertex(e)
+		console.log(q)
+		let h = this.hookAtLocation(q)
+		console.log(h)
+		let p = h.positionInLinkMap()
+		console.log(p)
 		this.openBullet = this.bulletAtLocation(p)
 		if (this.hookAtLocation(p) === null) { return }
 		if (this.openBullet === null) {

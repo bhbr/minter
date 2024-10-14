@@ -34,19 +34,24 @@ export class ExtendedObject {
 
 	constructor(args: object = {}) {
 		this.initComplete = false
-		this.uninitializedProperties = this.properties()
+		// if (this.constructor.name == 'Transform') {
+		// 	console.log(this.propertyDescriptors())
+		// 	console.log('properties:', this.properties())
+		// 	console.log('setters:', this.setters())
+		// 	console.log('initializable:', this.initializableProperties())
+		// }
+		this.uninitializedProperties = this.initializableProperties()
 		this.defaultsDict = this.defaults()
-		let def = this.defaultValues()
-		let init = Object.assign(def, args)
-		this.initializeProperties(init)
+		let defs = this.defaultValues()
+		let inits = Object.assign(defs, args)
+		let syncedInits = this.synchronizeUpdateArguments(inits)
+		this.initializeProperties(syncedInits)
 		this.checkForUndefinedValues()
 		this.initComplete = true
 	}
 
 	initializeProperties(defaultValues: object) {
-		let flag: boolean = false //(this.constructor.name == 'InputList')
 		for (let [prop, value] of Object.entries(defaultValues)) {
-			if (flag) { console.log(`setting ${prop}`) }
 			// check for existing accessor (getter/setter)
 			let setter = this.setter(prop)
 			if (setter !== undefined) { 
@@ -57,10 +62,16 @@ export class ExtendedObject {
 					writable: this.isMutable(prop)
 				})
 			}
-			if (flag) { console.log('before removal:', this.uninitializedProperties) }
 			remove(this.uninitializedProperties, prop)
-			if (flag) { console.log('after removal:', this.uninitializedProperties) }
 		}
+	}
+
+	initializableProperties(): Array<string> {
+		let arr = this.properties()
+		for (let prop of this.setters()) {
+			remove(arr, prop)
+		}
+		return arr
 	}
 
 	mutability(prop: string): string | null {
@@ -139,7 +150,10 @@ export class ExtendedObject {
 	}
 
 	isSetter(prop: string): boolean {
-		return this.setter(prop) !== undefined
+		let pd = this.propertyDescriptor(prop)
+		if (pd === undefined) { return false }
+		let s = pd['set']
+		return s !== undefined
 	}
 
 	propertyDescriptors(): object {
@@ -147,12 +161,39 @@ export class ExtendedObject {
 		var obj = this
 		while (obj) {
 			pds = Object.assign(pds, Object.getOwnPropertyDescriptors(obj))
+			obj = Object.getPrototypeOf(obj)
 		}
-		return pds
+		let myPds = {}
+		for (let prop of this.properties()) {
+			myPds[prop] = pds[prop]
+		}
+		return myPds
 	}
 
-	propertyDescriptor(prop: string) {
-		return this.propertyDescriptors[prop]
+	propertyDescriptor(prop: string): PropertyDescriptor | undefined {
+		let pds = this.propertyDescriptors()
+		return pds[prop]
+	}
+
+
+	getters(): Array<string> {
+		let ret: Array<string> = []
+		for (let prop of this.properties()) {
+			if (this.isGetter(prop)) {
+				ret.push(prop)
+			}
+		}
+		return ret
+	}
+
+	setters(): Array<string> {
+		let ret: Array<string> = []
+		for (let prop of this.properties()) {
+			if (this.isSetter(prop)) {
+				ret.push(prop)
+			}
+		}
+		return ret
 	}
 
 	getter(prop: string): any {
@@ -165,6 +206,9 @@ export class ExtendedObject {
 		return (pd === undefined) ? undefined : pd.set
 	}
 
+	synchronizeUpdateArguments(args: object = {}) {
+		return args
+	}
 
 	update(args: object) {
 		if (!this.isCompatibleUpdate(args, this.constructor.name)) { return }

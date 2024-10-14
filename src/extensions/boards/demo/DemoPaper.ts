@@ -71,7 +71,7 @@ export class DemoPaper extends Paper {
 		let circ = new Circle({
 			midpoint: new Vertex(50, 50),
 			radius: 25,
-			fillColor: Color.green(),
+			fillColor: Color.blue(),
 			fillOpacity: 0.5,
 			screenEventHandler: ScreenEventHandler.Parent
 		})
@@ -112,7 +112,7 @@ export class DemoPaper extends Paper {
 			compactHeight: 100
 		})
 		this.addToContent(cons)
-
+		console.log('done')
 
 	}
 }

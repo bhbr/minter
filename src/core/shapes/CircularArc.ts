@@ -18,7 +18,8 @@ export class CircularArc extends CurvedLine {
 				closed: false
 			},
 			mutable: {
-				midpoint: Vertex.origin(),
+				anchor: undefined,
+				midpoint: new Vertex(DEFAULT_RADIUS, DEFAULT_RADIUS),
 				radius: DEFAULT_RADIUS,
 				angle: TAU / 4,
 				nbPoints: 32
@@ -41,7 +42,7 @@ export class CircularArc extends CurvedLine {
 		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
+	synchronizeUpdateArguments(args: object = {}): object {
 	/*
 	Since midpoint is just an alias for a shifted anchor, there is possible
 	confusion when updating a Circle/CircularArc with a new midpoint, anchor
@@ -79,8 +80,7 @@ export class CircularArc extends CurvedLine {
 		let updatedRadius = (r !== undefined) ? r : this.radius
 		args['viewWidth'] = 2 * updatedRadius
 		args['viewHeight'] = 2 * updatedRadius
-
-		super.update(args, redraw)
+		return args
 	}
 
 	updateBezierPoints() {
