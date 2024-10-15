@@ -12,13 +12,15 @@ export class CurvedLine extends VMobject {
 	*/
 
 	defaults(): object {
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			immutable: {
-				closed: true
-			}
+		return this.updateDefaults(super.defaults(), {
+			closed: true
 		})
-		return defs
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			closed: 'on_init'
+		})
 	}
 
 	_bezierPoints: VertexArray

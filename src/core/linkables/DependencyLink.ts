@@ -20,14 +20,22 @@ linkable mobjects
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				dependency: new Dependency(),
-				startBullet: new LinkBullet(),
-				endBullet: new LinkBullet(),
-				linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
-			}
+			dependency: new Dependency(),
+			startBullet: new LinkBullet(),
+			endBullet: new LinkBullet(),
+			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
 		})
 	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			dependency: 'never',
+			startBullet: 'on_init',
+			endBullet: 'on_init',
+			linkLine: 'never'
+		})
+	}
+
 
 	setup() {
 		super.setup()

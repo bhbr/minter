@@ -5,11 +5,17 @@ export class LinkButton extends ToggleButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				messages: [{ link: true }],
-				outgoingMessage: { link: false },
-				text: 'link'
-			}
+			messages: [{ link: true }],
+			outgoingMessage: { link: false },
+			text: 'link'
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			messages: 'never',
+			outgoingMessage: 'never',
+			text: 'never'
 		})
 	}
 

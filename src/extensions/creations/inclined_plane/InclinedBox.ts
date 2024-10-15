@@ -14,9 +14,7 @@ export class InclinedBox extends Polygon {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				rotationAngle: 0
-			}
+			rotationAngle: 0
 		})
 	}
 

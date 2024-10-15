@@ -14,16 +14,12 @@ export class CircularArc extends CurvedLine {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				closed: false
-			},
-			mutable: {
-				anchor: undefined,
-				midpoint: new Vertex(DEFAULT_RADIUS, DEFAULT_RADIUS),
-				radius: DEFAULT_RADIUS,
-				angle: TAU / 4,
-				nbPoints: 32
-			}
+			closed: false,
+			anchor: undefined,
+			midpoint: new Vertex(DEFAULT_RADIUS, DEFAULT_RADIUS),
+			radius: DEFAULT_RADIUS,
+			angle: TAU / 4,
+			nbPoints: 32
 		})
 	}
 

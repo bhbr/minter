@@ -46,21 +46,22 @@ TODO: support mutiple paths e. g. for shapes with holes
 	path: SVGElement // child of svg
 
 	defaults(): object {
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			readonly: {
-				svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-				path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
-			},
-			mutable: {
-				fillColor: Color.white(),
-				fillOpacity: 0,
-				strokeColor: Color.white(),
-				strokeWidth: 1,
-				vertices: new VertexArray()
-			}
+		return this.updateDefaults(super.defaults(), {
+			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+			path: document.createElementNS('http://www.w3.org/2000/svg', 'path'),
+			fillColor: Color.white(),
+			fillOpacity: 0,
+			strokeColor: Color.white(),
+			strokeWidth: 1,
+			vertices: new VertexArray()
 		})
-		return defs
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			svg: 'never',
+			path: 'never'
+		})
 	}
 
 	setup() {

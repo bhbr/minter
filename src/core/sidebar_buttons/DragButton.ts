@@ -5,11 +5,17 @@ export class DragButton extends ToggleButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				messages: [{ drag: true }],
-				outgoingMessage: { drag: false },
-				text: 'drag'
-			}
+			messages: [{ drag: true }],
+			outgoingMessage: { drag: false },
+			text: 'drag'
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			messages: 'never',
+			outgoingMessage: 'never',
+			text: 'never'
 		})
 	}
 

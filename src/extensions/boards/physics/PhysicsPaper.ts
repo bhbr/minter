@@ -19,22 +19,28 @@ export class PhysicsPaper extends Paper {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				scene: new InclinedScene({
-					anchor: new Vertex(100, 100)
-				}),
-				creationConstructors: {
-					'slider': BoxSliderCreator,
-					'stepper': BoxStepperCreator,
-					'value': ValueBoxCreator,
-					'input': InputValueBoxCreator
-				},
-				buttonNames: [
-					'DragButton',
-					'LinkButton',
-					'NumberButton'
-				]
-			}
+			scene: new InclinedScene({
+				anchor: new Vertex(100, 100)
+			}),
+			creationConstructors: {
+				'slider': BoxSliderCreator,
+				'stepper': BoxStepperCreator,
+				'value': ValueBoxCreator,
+				'input': InputValueBoxCreator
+			},
+			buttonNames: [
+				'DragButton',
+				'LinkButton',
+				'NumberButton'
+			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			scene: 'never',
+			creationConstructors: 'never',
+			buttonNames: 'never'
 		})
 	}
 

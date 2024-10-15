@@ -8,10 +8,8 @@ export class Ellipse extends CurvedShape {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				majorAxis: 200,
-				minorAxis: 100
-			}
+			majorAxis: 200,
+			minorAxis: 100
 		})
 	}
 

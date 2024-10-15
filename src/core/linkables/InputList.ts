@@ -23,18 +23,25 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				linkHooks: [],
-				cornerRadius: 20,
-				fillColor: Color.white(),
-				fillOpacity: 0.2,
-				strokeWidth: 0,
-				width: IO_LIST_WIDTH
-			},
-			mutable: {
-				mobject: null,
-				inputNames: []
-			}
+			linkHooks: [],
+			cornerRadius: 20,
+			fillColor: Color.white(),
+			fillOpacity: 0.2,
+			strokeWidth: 0,
+			width: IO_LIST_WIDTH,
+			mobject: null,
+			inputNames: []
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkHooks: 'never',
+			cornerRadius: 'never',
+			fillColor: 'never',
+			fillOpacity: 'never',
+			strokeWidth: 'never',
+			width: 'never'
 		})
 	}
 

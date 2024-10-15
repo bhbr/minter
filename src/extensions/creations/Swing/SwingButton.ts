@@ -5,10 +5,13 @@ export class SwingButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['swing']
-			}
+			creations: ['swing']
 		})
 	}
 	
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
+		})
+	}
 }

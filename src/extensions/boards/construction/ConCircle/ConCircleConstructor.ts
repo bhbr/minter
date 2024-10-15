@@ -13,15 +13,19 @@ export class ConCircleConstructor extends Constructor {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				freeMidpoint : new FreePoint(),
-				freeOuterPoint: new FreePoint(),
-				circle: new ConCircle()
-			},
-			mutable: {
-				strokeWidth: 1,
-				fillOpacity: 0
-			}
+			freeMidpoint : new FreePoint(),
+			freeOuterPoint: new FreePoint(),
+			circle: new ConCircle(),
+			strokeWidth: 1,
+			fillOpacity: 0
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			freeMidpoint: 'never',
+			freeOuterPoint: 'never',
+			circle: 'never'
 		})
 	}
 

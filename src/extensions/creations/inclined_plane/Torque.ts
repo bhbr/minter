@@ -19,14 +19,16 @@ export class Torque extends Polygon {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				force: undefined
-			},
-			mutable: {
-				strokeWidth: 0,
-				fillColor: new Color(0, 0.5, 0.5),
-				fillOpacity: 0.5
-			}
+			force: undefined,
+			strokeWidth: 0,
+			fillColor: new Color(0, 0.5, 0.5),
+			fillOpacity: 0.5
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			force: 'on_init'
 		})
 	}
 

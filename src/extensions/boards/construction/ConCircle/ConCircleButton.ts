@@ -5,9 +5,13 @@ export class ConCircleButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['circle']
-			}
+			creations: ['circle']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
 		})
 	}
 }

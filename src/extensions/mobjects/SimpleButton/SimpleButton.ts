@@ -8,15 +8,13 @@ export class SimpleButton extends TextLabel {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				viewWidth: 40,
-				viewHeight: 20,
-				backgroundColor: Color.black(),
-				color: Color.white(),
-				borderColor: Color.white(),
-				borderWidth: 1,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			viewWidth: 40,
+			viewHeight: 20,
+			backgroundColor: Color.black(),
+			color: Color.white(),
+			borderColor: Color.white(),
+			borderWidth: 1,
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 

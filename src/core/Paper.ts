@@ -19,23 +19,24 @@ export class Paper extends Board {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				view: document.querySelector('#paper_id') as HTMLDivElement,
-				expandedPadding: 0,
-				expanded: true
-			},
-			immutable: {
-				children: []
-			},
-			mutable: {
-				screenEventHandler: ScreenEventHandler.Self,
-				expandedMobject: this,
-				pressedKeys: [],
-				activeKeyboard: true,
-				viewWidth: PAPER_WIDTH,
-				viewHeight: PAGE_HEIGHT,
-				currentColor: Color.white()
-			}
+			view: document.querySelector('#paper_id') as HTMLDivElement,
+			expandedPadding: 0,
+			expanded: true,
+			screenEventHandler: ScreenEventHandler.Self,
+			expandedMobject: this,
+			pressedKeys: [],
+			activeKeyboard: true,
+			viewWidth: PAPER_WIDTH,
+			viewHeight: PAGE_HEIGHT,
+			currentColor: Color.white()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			view: 'never',
+			expandedPadding: 'never',
+			expanded: 'never'
 		})
 	}
 

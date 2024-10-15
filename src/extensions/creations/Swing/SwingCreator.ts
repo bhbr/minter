@@ -9,9 +9,13 @@ export class SwingCreator extends Creator {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				swing: new Swing()
-			}
+			swing: new Swing()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			swing: 'never'
 		})
 	}
 

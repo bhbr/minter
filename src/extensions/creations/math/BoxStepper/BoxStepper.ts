@@ -7,11 +7,9 @@ export class BoxStepper extends BoxSlider {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				min: 0,
-				max: 10,
-				precision: 0
-			}
+			min: 0,
+			max: 10,
+			precision: 0
 		})
 	}
 

@@ -6,14 +6,9 @@ export class CurvedShape extends CurvedLine {
 	A closed CurvedLine is a CurvedShape
 	*/
 
-	defaults(): object {
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			readonly: {
-				closed: true
-			}
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			closed: 'never'
 		})
-		return defs
 	}
-
 }

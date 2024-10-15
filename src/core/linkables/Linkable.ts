@@ -19,17 +19,20 @@ which can be linked to such-exposed variables of other mobjects.
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				inputList: new InputList(),
-				outputList: new OutputList()
-			},
-			immutable: {
-				inputNames: [],
-				outputNames: []
-			},
-			mutable: {
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			inputList: new InputList(),
+			outputList: new OutputList(),
+			inputNames: [],
+			outputNames: [],			
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			inputList: 'never',
+			outputList: 'never',
+			inputNames: 'in_subclass',
+			outputNames: 'in_subclass'
 		})
 	}
 

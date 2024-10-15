@@ -8,9 +8,13 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				segment: new ConSegment()
-			}
+			segment: new ConSegment()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			segment: 'never'
 		})
 	}
 

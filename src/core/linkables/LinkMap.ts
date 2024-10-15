@@ -19,15 +19,18 @@ export class LinkMap extends Mobject {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				linkList: [],
-				connectedHooks: []
-			},
-			mutable: {
-				openBullet: null,
-				openLink: null,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			linkList: [],
+			connectedHooks: [],
+			openBullet: null,
+			openLink: null,
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkList: 'never',
+			connectedHooks: 'never'
 		})
 	}
 
@@ -66,11 +69,8 @@ export class LinkMap extends Mobject {
 
 	onPointerDown(e: ScreenEvent) {
 		let q = this.localEventVertex(e)
-		console.log(q)
 		let h = this.hookAtLocation(q)
-		console.log(h)
 		let p = h.positionInLinkMap()
-		console.log(p)
 		this.openBullet = this.bulletAtLocation(p)
 		if (this.hookAtLocation(p) === null) { return }
 		if (this.openBullet === null) {

@@ -21,34 +21,41 @@ export class CindyCanvas extends Linkable implements Playable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				port: {
-					transform: [{
-						visibleRect: [0, 1, 1, 0]
-					}]
-				},
-				innerCanvas: new Mobject(),
-				outerFrame: new Rectangle(),
-				playButton: new PlayButton({
-					anchor: new Vertex(5, 5),
-					mobject: this
-				})
+			port: {
+				transform: [{
+					visibleRect: [0, 1, 1, 0]
+				}]
 			},
-			immutable: {
-				id: undefined
-			},
-			mutable: {
-				screenEventHandler: ScreenEventHandler.Self,
-				playedOnce: false,
-				playState: 'stop',
-				drawBorder: true,
-				core: null
-				/*
-				core has no default because it is read-only and
-				will be created in cindySetup as a CindyJS instance
-				with state-dependent arguments
-				*/
-			}
+			innerCanvas: new Mobject(),
+			outerFrame: new Rectangle(),
+			playButton: new PlayButton({
+				anchor: new Vertex(5, 5),
+				mobject: this
+			}),
+
+			id: undefined,
+
+			screenEventHandler: ScreenEventHandler.Self,
+			playedOnce: false,
+			playState: 'stop',
+			drawBorder: true,
+			core: null
+			/*
+			core has no default because it is read-only and
+			will be created in cindySetup as a CindyJS instance
+			with state-dependent arguments
+			*/
+		})
+	}
+
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			port: 'never',
+			innerCanvas: 'never',
+			outerFrame: 'never',
+			playButton: 'never',
+			id: 'on_init'
 		})
 	}
 

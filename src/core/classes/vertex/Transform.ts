@@ -12,19 +12,19 @@ export class Transform extends ExtendedObject {
 	shift: Vertex
 
 	defaults(): object {
-		let def = super.defaults()
-		let newDef = this.updateDefaults(def, {
-			readonly: {
-				passedByValue: true
-			},
-			mutable: {
-				anchor: Vertex.origin(),
-				angle: 0,
-				scale: 1,
-				shift: Vertex.origin()
-			}
+		return this.updateDefaults(super.defaults(), {
+			passedByValue: true,
+			anchor: Vertex.origin(),
+			angle: 0,
+			scale: 1,
+			shift: Vertex.origin()
 		})
-		return newDef
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			passedByValue: 'never'
+		})
 	}
 
 	static identity(): Transform { return new Transform() }

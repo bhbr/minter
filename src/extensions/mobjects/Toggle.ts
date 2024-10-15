@@ -18,30 +18,34 @@ export class Toggle extends Mobject {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				circle: new Circle({
-					radius: 10,
-					fillColor: Color.clear()
-				}),
-				bullet: new Circle({
-					radius: 7,
-					fillColor: Color.white(),
-					strokeWidth: 0
-				}),
-				label: new TextLabel({
-					viewHeight: 20
-				})
-			},
-			immutable: {
-				mobject: undefined,
-				propertyName: undefined,
-				labelText: undefined,
-			},
-			mutable: {
-				state: false,
-				mobject: null,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			circle: new Circle({
+				radius: 10,
+				fillColor: Color.clear()
+			}),
+			bullet: new Circle({
+				radius: 7,
+				fillColor: Color.white(),
+				strokeWidth: 0
+			}),
+			label: new TextLabel({
+				viewHeight: 20
+			}),
+			mobject: undefined,
+			propertyName: undefined,
+			labelText: undefined,
+			state: false,
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			circle: 'never',
+			bullet: 'never',
+			label: 'never',
+			mobject: 'on_init',
+			propertyName: 'on_init',
+			labelText: 'on_init'
 		})
 	}
 

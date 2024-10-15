@@ -13,140 +13,116 @@
 // is taken into account when updating a Mobject's attribute with
 // such an ExtendedObject as argument.
 
-import { Defaults } from './Defaults'
 import { remove } from 'core/functions/arrays'
 import { copy } from 'core/functions/copying'
 
-export class ExtendedObject {
+class BaseExtendedObject {
 
-	defaultsDict: object
+	defaults(): object { return {} }
+	mutabilities(): object { return {} }
+	mutability(prop: string): string { return 'always' }
+}
+
+export class ExtendedObject extends BaseExtendedObject {
+
+	_defaults: object
+	_mutabilities: object
 	passedByValue: boolean
 	initComplete: boolean
-	uninitializedProperties: Array<string>
+	properties: Array<string>
 
 	defaults(): object {
-		return {
-			immutable: {
-				passedByValue: false
-			}
-		}
+		return this.updateDefaults(super.defaults(), {
+			passedByValue: false
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			passedByValue: 'in_subclass'
+		})
 	}
 
 	constructor(args: object = {}) {
+		super()
 		this.initComplete = false
-		// if (this.constructor.name == 'Transform') {
-		// 	console.log(this.propertyDescriptors())
-		// 	console.log('properties:', this.properties())
-		// 	console.log('setters:', this.setters())
-		// 	console.log('initializable:', this.initializableProperties())
-		// }
-		this.uninitializedProperties = this.initializableProperties()
-		this.defaultsDict = this.defaults()
-		let defs = this.defaultValues()
-		let inits = Object.assign(defs, args)
-		let syncedInits = this.synchronizeUpdateArguments(inits)
-		this.initializeProperties(syncedInits)
-		this.checkForUndefinedValues()
-		this.initComplete = true
+		this.properties = []
+		this.setMutabilities()
+		this.setDefaults()
+		let ok = this.checkPermissions(args)
+		if (ok) {
+			let inits = Object.assign(this._defaults, args)
+			inits = this.synchronizeUpdateArguments(inits)
+			this.setProperties(inits)
+			this.initComplete = true
+		}
 	}
 
-	initializeProperties(defaultValues: object) {
-		for (let [prop, value] of Object.entries(defaultValues)) {
-			// check for existing accessor (getter/setter)
-			let setter = this.setter(prop)
-			if (setter !== undefined) { 
-				setter.call(this, value)
-			} else {
-				Object.defineProperty(this, prop, {
-					value: value,
-					writable: this.isMutable(prop)
-				})
+	setMutabilities() {
+		let oldMutabilities = super.mutabilities()
+		let newMutabilities = this.mutabilities()
+		this._mutabilities = {}
+		for (let [prop, newMutability] of Object.entries(newMutabilities)) {
+			let oldMutability = oldMutabilities[prop]
+			var valid: boolean = true
+			if (oldMutability === 'never'
+				&& newMutability != 'never') {
+				valid = false				
+			} else if (oldMutability === 'in_subclass'
+				&& (newMutability === 'on_init' || newMutability === 'always')) {
+				valid = false
+			} else if (oldMutability === 'on_init'
+				&& newMutability === 'always') {
+				valid = false
 			}
-			remove(this.uninitializedProperties, prop)
-		}
-	}
-
-	initializableProperties(): Array<string> {
-		let arr = this.properties()
-		for (let prop of this.setters()) {
-			remove(arr, prop)
-		}
-		return arr
-	}
-
-	mutability(prop: string): string | null {
-		if (Object.keys(this.defaultsDict['readonly']).includes(prop)) {
-			return 'readonly'
-		}
-		if (Object.keys(this.defaultsDict['immutable']).includes(prop)) {
-			return 'immutable'
-		}
-		if (Object.keys(this.defaultsDict['mutable']).includes(prop)) {
-			return 'mutable'
-		}
-		return null
-	}
-
-	isReadonly(prop: string): boolean {
-		return this.mutability(prop) == 'readonly'
-	}
-
-	isImmutable(prop: string): boolean {
-		return this.mutability(prop) == 'immutable'
-	}
-
-	isMutable(prop: string): boolean {
-		return this.mutability(prop) == 'mutable'
-	}
-
-	defaultValue(prop: string): any {
-		let def = this.defaultsDict ?? this.defaults()
-		let mut = this.mutability(prop)
-		let dec = def[mut]
-		return dec[prop]
-	}
-
-	defaultValues(): object {
-		let dict = {}
-		let props = this.properties()
-		for (let prop of props) {
-			dict[prop] = this.defaultValue(prop)
-		}
-		return dict
-	}
-
-	properties(): Array<string> {
-		let array: Array<string> = []
-		let defs = this.defaultsDict ?? this.defaults()
-		array = array.concat(Object.keys(defs['readonly'] ?? {}))
-		array = array.concat(Object.keys(defs['immutable'] ?? {}))
-		array = array.concat(Object.keys(defs['mutable'] ?? {}))
-		return array
-	}
-
-	isCompatibleUpdate(args: object, className: string): boolean {
-		var flag: boolean = true
-		for (let [prop, value] of Object.entries(args)) {
-			if (this.mutability(prop) === 'readonly'
-				&& this.initComplete) {
-				console.error(`Readonly property ${prop} cannot be set in object of class ${className}`)
-				flag = false
+			if (!valid) {
+				throw `Mutability of property ${prop} in ${this.constructor.name} cannot be changed from ${oldMutability} to ${newMutability}`
+				return
 			}
-			if (this.mutability(prop) === 'immutable'
-				&& this.initComplete) {
-				console.error(`Immutable property ${prop} cannot be changed in object of class ${className}`)
-				flag = false
-			}
+			this._mutabilities[prop] = newMutability
 		}
-		return flag
+	}
+
+	mutability(prop: string): string {
+		return this._mutabilities[prop] ?? 'always'
+	}
+
+	setDefaults() {
+		this._defaults = this.defaults()
 	}
 
 	updateDefaults(oldDefaults: object, newDefaults: object): object {
-		return Defaults.update(oldDefaults, newDefaults, this.constructor.name)
+		for (let [prop, value] of Object.entries(newDefaults)) {
+			let oldMutability = super.mutability(prop) ?? 'always'
+			if (oldMutability === 'never') {
+				throw `Property ${prop} on ${this.constructor.name} cannot be assigned a new default value`
+				return
+			}
+			oldDefaults[prop] = value
+		}
+		return oldDefaults
 	}
 
-	isGetter(prop: string): boolean {
-		return this.propertyDescriptor(prop)['get'] !== undefined
+	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
+		return Object.assign(oldMutabilities, newMutabilities)
+	}
+
+	checkPermissions(args): boolean {
+		for (let prop of Object.keys(args)) {
+			let mutability = this.mutability(prop)
+			if (mutability === 'never' || mutability === 'in_subclass') {
+				throw `The property ${prop} on ${this.constructor.name} cannot be changed on initialization`
+				return false
+			} else if (mutability === 'on_init' && this.initComplete) {
+				throw `The property ${prop} on ${this.constructor.name} cannot be changed after initialization`
+				return false
+			}
+		}
+		return true
+	}
+
+	synchronizeUpdateArguments(args: object): object {
+		return args
 	}
 
 	isSetter(prop: string): boolean {
@@ -163,11 +139,7 @@ export class ExtendedObject {
 			pds = Object.assign(pds, Object.getOwnPropertyDescriptors(obj))
 			obj = Object.getPrototypeOf(obj)
 		}
-		let myPds = {}
-		for (let prop of this.properties()) {
-			myPds[prop] = pds[prop]
-		}
-		return myPds
+		return pds
 	}
 
 	propertyDescriptor(prop: string): PropertyDescriptor | undefined {
@@ -175,43 +147,22 @@ export class ExtendedObject {
 		return pds[prop]
 	}
 
-
-	getters(): Array<string> {
-		let ret: Array<string> = []
-		for (let prop of this.properties()) {
-			if (this.isGetter(prop)) {
-				ret.push(prop)
-			}
-		}
-		return ret
-	}
-
-	setters(): Array<string> {
-		let ret: Array<string> = []
-		for (let prop of this.properties()) {
-			if (this.isSetter(prop)) {
-				ret.push(prop)
-			}
-		}
-		return ret
-	}
-
-	getter(prop: string): any {
-		let pd = this.propertyDescriptor(prop)
-		return (pd === undefined) ? undefined : pd.get
-	}
-
 	setter(prop: string): any {
 		let pd = this.propertyDescriptor(prop)
 		return (pd === undefined) ? undefined : pd.set
 	}
 
-	synchronizeUpdateArguments(args: object = {}) {
-		return args
+	update(args: object = {}) {
+		let ok = this.checkPermissions(args)
+		if (ok) {
+			this.setProperties(args)
+		}
 	}
 
-	update(args: object) {
-		if (!this.isCompatibleUpdate(args, this.constructor.name)) { return }
+	setProperties(args: object = {}) {
+
+		args = this.synchronizeUpdateArguments(args)
+
 		let accessorArgs: object = {}
 		let otherPropertyArgs: object = {}
 
@@ -224,61 +175,50 @@ export class ExtendedObject {
 		}
 
 		for (let [prop, value] of Object.entries(otherPropertyArgs)) {
-			this.setValue(prop, value)
+			this.setProperty(prop, value)
+			this.properties.push(prop)
 
 		}
 		for (let [prop, value] of Object.entries(accessorArgs)) {
-			this.setValue(prop, value)
+			this.setProperty(prop, value)
+			this.properties.push(prop)
 		}
 	}
 
-	checkForUndefinedValues() {
-		for (let prop of this.properties()) {
-			if (this[prop] === undefined) {
-				console.error(`Property ${prop} remains undefined in object of class ${this.constructor.name}`)
-			}
-		}
-		if (this.uninitializedProperties.length != 0) {
-			console.error(`Remaining uninitialized properties in object of class ${this.constructor.name}: ${this.uninitializedProperties}`)
-		}
-	}
-
-	setValue(prop: string, value: any) {
-		let setter: any = this.setter(prop)
-			
-		if (setter != undefined) {
-			setter.call(this, value)
+	setProperty(prop: string, value: any) {
+		let desc = this.propertyDescriptor(prop)
+		if (desc === undefined) {
+			Object.defineProperty(this, prop, {
+				value: value,
+				writable: (this.mutability(prop) === 'always')
+			})
 		} else {
-			// we have an as-of-yet unknown property
-			if (value instanceof ExtendedObject && value.passedByValue) {
-				// create and copy (pass-by-value)
-				if (this[prop] == undefined) {
-					this[prop] = copy(value)
-				} else {
-					this[prop].copyFrom(value)
-				}
+			let setter = this.setter(prop)
+			if (setter !== undefined) {
+				setter.call(this, value)
 			} else {
-				// just link (pass-by-reference)
-				// or pass-by-value a non-object
-				try {
-					this[prop] = value
-				} catch {
-					console.error(`Could not assign value ${value} to ${this.mutability(prop)} property ${prop} on ${this.constructor.name}`)
-				}
+				this[prop] = value
 			}
 		}
-		remove(this.uninitializedProperties, prop)
 	}
 
 	copyFrom(obj: ExtendedObject) {
 		let args: object = {}
-		for (let prop of obj.properties()) {
-			if (obj.isReadonly(prop)) { continue }
+		for (let prop of obj.properties) {
+			let mut = this.mutability(prop)
+			if (mut !== 'always') {
+				//throw `Property ${prop} on ${this.constructor.name} cannot be copied from other object`
+				continue
+			}
 			args[prop] = obj[prop]
 		}
 		this.update(args)
 	}
 
+	isMutable(prop: string) {
+		return (this.mutability(prop) === 'always'
+			|| (this.mutability(prop) === 'on_init' && !this.initComplete))
+	}
 
 }
 

@@ -14,21 +14,23 @@ export class ColorSample extends Linkable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				circle : new Circle({
-					radius: RADIUS,
-					midpoint: new Vertex(RADIUS, RADIUS),
-					fillOpacity: 1
-				})
-			},
-			mutable: {
-				color: Color.white(),
-				viewWidth: 2 * RADIUS,
-				viewHeight: 2 * RADIUS,
-				inputNames: ['red', 'green', 'blue', 'alpha'],
-				outputNames: ['color'],
-				screenEventHandler: ScreenEventHandler.Self,	
-			}
+			circle : new Circle({
+				radius: RADIUS,
+				midpoint: new Vertex(RADIUS, RADIUS),
+				fillOpacity: 1
+			}),
+			color: Color.white(),
+			viewWidth: 2 * RADIUS,
+			viewHeight: 2 * RADIUS,
+			inputNames: ['red', 'green', 'blue', 'alpha'],
+			outputNames: ['color'],
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			circle: 'never'
 		})
 	}
 

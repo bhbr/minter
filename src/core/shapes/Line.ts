@@ -10,10 +10,8 @@ export class Line extends Polygon {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				startPoint: Vertex.origin(),
-				endPoint: Vertex.origin()
-			}
+			startPoint: Vertex.origin(),
+			endPoint: Vertex.origin()
 		})
 	}
 

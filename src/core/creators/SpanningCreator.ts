@@ -11,9 +11,13 @@ export class SpanningCreator extends Creator {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				rectangle: new Rectangle()
-			}
+			rectangle: new Rectangle()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			rectangle: 'never'
 		})
 	}
 

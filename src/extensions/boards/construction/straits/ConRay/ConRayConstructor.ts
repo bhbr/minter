@@ -8,9 +8,13 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				ray: new ConRay()
-			}
+			ray: new ConRay()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			ray: 'never'
 		})
 	}
 

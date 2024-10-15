@@ -15,19 +15,15 @@ export class RoundedRectangle extends CurvedShape {
 	cornerRadius: number
 
 	defaults(): object {
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			mutable: {
-				width: 200,
-				height: 100,
-				cornerRadius: 10,
-				p1: Vertex.origin(),
-				p2: new Vertex(200, 0),
-				p3: new Vertex(200, 100),
-				p4: new Vertex(0, 100)
-			}
+		return this.updateDefaults(super.defaults(), {
+			width: 200,
+			height: 100,
+			cornerRadius: 10,
+			p1: Vertex.origin(),
+			p2: new Vertex(200, 0),
+			p3: new Vertex(200, 100),
+			p4: new Vertex(0, 100)
 		})
-		return defs
 	}
 
 	updateBezierPoints() {

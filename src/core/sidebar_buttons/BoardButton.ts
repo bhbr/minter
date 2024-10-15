@@ -5,10 +5,16 @@ export class BoardButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				creations: ['board']
-			}
+			creations: ['board']
 		})
 	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
+		})
+	}
+
+
 
 }

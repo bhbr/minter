@@ -24,29 +24,35 @@ export class Swing extends Linkable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				fixtureWidth: 50,
-				fixtureHeight: 20,
-				fixture: new Rectangle({
-					fillColor: Color.white(),
-					fillOpacity: 1
-				}),
-				string: new Line(),
-				weight: new Circle({
-					fillColor: Color.white(),
-					fillOpacity: 1
-				}),
-			},
-			mutable: {
-				maxLength: 300,
-				length: 1,
-				mass: 0.2,
-				initialAngle: 0,
-				initialSpeed: 0,
-				initialTime: Date.now(),
-				inputNames: ['length', 'mass'],
-				outputNames: ['angle', 'period']
-			}
+			fixtureWidth: 50,
+			fixtureHeight: 20,
+			fixture: new Rectangle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			string: new Line(),
+			weight: new Circle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			maxLength: 300,
+			length: 1,
+			mass: 0.2,
+			initialAngle: 0,
+			initialSpeed: 0,
+			initialTime: Date.now(),
+			inputNames: ['length', 'mass'],
+			outputNames: ['angle', 'period']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			fixtureWidth: 'never',
+			fixtureHeight: 'never',
+			fixture: 'never',
+			string: 'never',
+			weight: 'never'
 		})
 	}
 

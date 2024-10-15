@@ -37,36 +37,42 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				inputNames: [],
-				outputNames: ['value'],
-				outerBar: new Rectangle({
-					fillColor: Color.black(),
-					fillOpacity: 1,
-					strokeColor: Color.white()
-				}),
-				filledBar: new Rectangle({
-					fillOpacity: 0.5
-				}),
-				label: new TextLabel({
-					viewHeight: 25,
-					horizontalAlign: 'center',
-					verticalAlign: 'center',
-					fontSize: 20
-				})
-			},
-			mutable: {
-				min: 0,
-				max: 1,
-				value: 0.6,
-				height: 200,
-				width: 70,
-				strokeColor: Color.white(),
+			inputNames: [],
+			outputNames: ['value'],
+			outerBar: new Rectangle({
 				fillColor: Color.black(),
-				barFillColor: Color.gray(0.5),
-				screenEventHandler: ScreenEventHandler.Self,
-				precision: 3
-			}
+				fillOpacity: 1,
+				strokeColor: Color.white()
+			}),
+			filledBar: new Rectangle({
+				fillOpacity: 0.5
+			}),
+			label: new TextLabel({
+				viewHeight: 25,
+				horizontalAlign: 'center',
+				verticalAlign: 'center',
+				fontSize: 20
+			}),
+			min: 0,
+			max: 1,
+			value: 0.6,
+			height: 200,
+			width: 70,
+			strokeColor: Color.white(),
+			fillColor: Color.black(),
+			barFillColor: Color.gray(0.5),
+			screenEventHandler: ScreenEventHandler.Self,
+			precision: 3
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			inputNames: 'never',
+			outputNames: 'never',
+			outerBar: 'never',
+			filledBar: 'never',
+			label: 'never'
 		})
 	}
 

@@ -3,7 +3,7 @@ import { ExtendedObject } from './ExtendedObject'
 
 class FirstClass extends ExtendedObject {
 
-	//a: number
+	a: number
 	_b: number
 
 	get b(): number {
@@ -16,22 +16,78 @@ class FirstClass extends ExtendedObject {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: { a: 1},
-			immutable: { b: 2 },
-			mutable: { }
+			a: 1,
+			_b: 2
+		})
+	}
+
+	defs(): object {
+		return {d:1}
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			a: 'always',
+			b: 'on_init'
+		})
+	}
+
+	synchronizeUpdateArguments(args: object): object {
+		if (Object.keys(args).includes('_b')) {
+			console.warn('Args contain _b')
+			delete args['_b']
+		}
+		return args
+	}
+
+	allDefs(): object {
+		var all = {}
+		var obj = this
+		while (obj.constructor.name !== 'BaseExtendedObject') {
+			console.log(obj)
+			all = Object.assign(all, obj.defs())
+			obj = Object.create(Object.getPrototypeOf(obj))
+		}
+		return all
+	}
+}
+
+class SecondClass extends FirstClass {
+
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			a: 3,
+			b: 10
+		})
+	}
+
+	defs(): object {
+		return {e:2}
+	}
+
+	// mutabilities(): object {
+	// 	return this.updateMutabilities(super.mutabilities(), {
+	// 		b: 'never'
+	// 	})
+	// }
+}
+
+class ThirdClass extends SecondClass {
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			b: -1
 		})
 	}
 }
 
-class SecondClass extends FirstClass {}
-
 export function extendedObjectTest() {
 
-	let C = new FirstClass({a: 2})
-	let desc1 = C.propertyDescriptor('a')
-	let desc2 = C.propertyDescriptor('b')
-	let desc3 = C.propertyDescriptor('c')
-	console.log('a', desc1)
-	console.log('b', desc2)
-	console.log('c', desc3)
+	let A = new ThirdClass({b: -2})
+	A.update({_b: -3})
+	console.log((A as FirstClass).defs())
+
+
+
+
+
 }

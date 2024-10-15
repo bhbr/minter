@@ -16,15 +16,17 @@ export class Constructor extends Creator {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				construction: undefined // defined in constructor arguments
-			},
-			mutable: {
-				penStrokeColor: Color.white(),
-				penStrokeWidth: 1.0,
-				penFillColor: Color.white(),
-				penFillOpacity: 0.0
-			}
+			construction: undefined, // defined in constructor arguments
+			penStrokeColor: Color.white(),
+			penStrokeWidth: 1.0,
+			penFillColor: Color.white(),
+			penFillOpacity: 0.0
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			construction: 'never'
 		})
 	}
 

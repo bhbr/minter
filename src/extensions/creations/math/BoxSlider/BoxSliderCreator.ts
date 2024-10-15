@@ -16,15 +16,17 @@ export class BoxSliderCreator extends Creator {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				width: 70
-			},
-			mutable: {
-				height: 0,
-				fillColor: Color.black(),
-				min: 0,
-				max: 1
-			}
+			width: 70,
+			height: 0,
+			fillColor: Color.black(),
+			min: 0,
+			max: 1
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			width: 'in_subclass'
 		})
 	}
 

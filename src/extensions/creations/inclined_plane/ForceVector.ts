@@ -21,26 +21,33 @@ export class ForceVector extends ConStrait {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				tip: new Polygon({
-					fillOpacity: 1,
-					strokeWidth: 0
-				}),
-				foot: new Circle({
-					fillOpacity: 1,
-					strokeWidth: 0	
-				}),
-				scale: 100,
-				tipOpeningAngle: 60 * DEGREES,
-				tipSize: 10,
-				footRadius: 4
-			},
-			mutable: {
-				size: 1,
-				direction: 0,
-				color: Color.white(),
-				strokeWidth: 3,
-			}
+			tip: new Polygon({
+				fillOpacity: 1,
+				strokeWidth: 0
+			}),
+			foot: new Circle({
+				fillOpacity: 1,
+				strokeWidth: 0	
+			}),
+			scale: 100,
+			tipOpeningAngle: 60 * DEGREES,
+			tipSize: 10,
+			footRadius: 4,
+
+			size: 1,
+			direction: 0,
+			color: Color.white(),
+			strokeWidth: 3
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			tip: 'never',
+			foot: 'never',
+			tipOpeningAngle: 'never',
+			tipSize: 'never',
+			footRadius: 'never'
 		})
 	}
 
