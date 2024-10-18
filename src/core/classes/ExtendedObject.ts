@@ -157,10 +157,31 @@ export class ExtendedObject extends BaseExtendedObject {
 	update(args: object = {}) {
 		let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
 		if (ok) {
+			args = this.removeUnchangedProperties(args)
 			this.setProperties(args)
 		} else {
 			this.checkPermissions(args)
 		}
+	}
+
+	removeUnchangedProperties(args: object): object {
+		for (let [prop, value] of Object.entries(args)) {
+			if (this[prop] === undefined) { continue }
+			if (typeof value != 'object') {
+				if (this[prop] == value) {
+					delete args[prop]
+				}
+			} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
+				if (this[prop].equals(value)) {
+					delete args[prop]
+				}
+			} else {
+				if (this[prop] == value) {
+					delete args[prop]
+				}
+			}
+		}
+		return args
 	}
 
 	setProperties(args: object = {}) {

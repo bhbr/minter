@@ -28,7 +28,7 @@ export class SwingCreator extends Creator {
 		this.swing.hideLinks()
 	}
 
-	createdMobject(): Swing {
+	createMobject(): Swing {
 		return this.swing
 	}
 
@@ -37,7 +37,7 @@ export class SwingCreator extends Creator {
 		var dr: Vertex = q.subtract(this.getStartPoint())
 		dr = dr.subtract(new Vertex(this.viewWidth/2, this.swing.fixtureHeight))
 		let length: number = dr.norm()
-		let angle: number = Math.atan2(dr.x, dr.y)
+		let angle: number = -Math.atan2(dr.x, dr.y)
 		this.swing.update({
 			maxLength: length,
 			length: 1,
@@ -51,6 +51,7 @@ export class SwingCreator extends Creator {
 		this.swing.update({
 			initialTime: Date.now()
 		})
+		this.swing.outputList.update()
 		this.swing.run()
 	}
 

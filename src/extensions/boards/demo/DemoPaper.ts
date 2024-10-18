@@ -11,6 +11,7 @@ import { ConstructionCreator } from 'extensions/boards/construction/Construction
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { BoxStepper } from 'extensions/creations/math/BoxStepper/BoxStepper'
+import { Swing } from 'extensions/creations/Swing/Swing'
 
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Color } from 'core/classes/Color'
@@ -109,6 +110,12 @@ export class DemoPaper extends Paper {
 		})
 
 		this.addToContent(stepper)
+
+		let swing = new Swing({
+			anchor: new Vertex(400, 300)
+		})
+
+		this.addToContent(swing)
 
 	}
 }

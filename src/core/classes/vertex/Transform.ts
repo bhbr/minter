@@ -121,5 +121,26 @@ export class Transform extends ExtendedObject {
 	toString(): string {
 		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
 	}
+
+	equals(t: Transform): boolean {
+		let tolerance = 1e-6
+		return (this.a() - t.a() < tolerance
+			 && this.b() - t.b() < tolerance
+			 && this.c() - t.c() < tolerance
+			 && this.d() - t.d() < tolerance
+			 && this.e() - t.e() < tolerance
+			 && this.f() - t.f() < tolerance)
+	}
+
+
+
+
+
+
+
+
+
+
+
 }
 
