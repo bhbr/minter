@@ -96,8 +96,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	update(argsDict: object = {}, redraw: boolean = true) {
 		super.update(argsDict, false)
 		this.height = this.getHeight()
-		this.createHookList()
 		if (this.mobject == null) { return }
+		if (argsDict['inputNames'] !== undefined) {
+			this.setup()
+		}
 		super.update({
 			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
 		}, redraw)

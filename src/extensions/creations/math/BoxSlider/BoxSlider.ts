@@ -81,7 +81,13 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.add(this.outerBar)
 		this.add(this.filledBar)
 		this.add(this.label)
-		this.update()
+		this.addDependency('width', this.outerBar, 'width')
+		this.addDependency('height', this.outerBar, 'height')
+		this.update({
+			viewWidth: this.width,
+			viewHeight: this.height
+		})
+		this.outputList.update()
 	}
 
 	normalizedValue(): number {
@@ -92,25 +98,20 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 
-		//// internal dependencies
-		this.viewWidth = this.width
-		this.viewHeight = this.height
+		if (args['width'] !== undefined || args['height'] !== undefined) {
+			//// internal dependencies
+			this.viewWidth = this.width
+			this.viewHeight = this.height
+		}
 
 		//// updating submobs
 		let a: number = this.normalizedValue()
 		if (isNaN(a)) { return }
 
-		this.outerBar.update({
-			width: this.width,
-			height: this.height,
-			//fillColor: this.backgroundColor
-		}, redraw)
-
 		this.filledBar.update({
 			width: this.width,
 			height: a * this.height,
-			anchor:  new Vertex(0, this.height - a * this.height),
-			//fillColor: this.barFillColor
+			anchor: new Vertex(0, this.height - a * this.height)
 		}, redraw)
 
 		this.updateLabel(redraw)
@@ -120,7 +121,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	updateLabel(redraw: boolean = true) {
 		this.label.update({
-			text: this.value.toPrecision(this.precision).toString(),
+			text: this.value.toString(),
 			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
 			viewWidth: this.width
 		}, redraw)
@@ -133,9 +134,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	onPointerMove(e: ScreenEvent) {
 		let scrubVector: Vertex = eventVertex(e).subtract(this.scrubStartingPoint)
-		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
-		this.value = Math.max(Math.min(this.value, this.max), this.min)
-		this.update()
+		var newValue = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
+		newValue = Math.max(Math.min(newValue, this.max), this.min)
+		newValue = Math.round(newValue * 10**this.precision) / 10**this.precision
+		this.update({ value: newValue})
 	}
 
 }

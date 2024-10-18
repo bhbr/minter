@@ -21,10 +21,6 @@ class FirstClass extends ExtendedObject {
 		})
 	}
 
-	defs(): object {
-		return {d:1}
-	}
-
 	mutabilities(): object {
 		return this.updateMutabilities(super.mutabilities(), {
 			a: 'always',
@@ -39,17 +35,6 @@ class FirstClass extends ExtendedObject {
 		}
 		return args
 	}
-
-	allDefs(): object {
-		var all = {}
-		var obj = this
-		while (obj.constructor.name !== 'BaseExtendedObject') {
-			console.log(obj)
-			all = Object.assign(all, obj.defs())
-			obj = Object.create(Object.getPrototypeOf(obj))
-		}
-		return all
-	}
 }
 
 class SecondClass extends FirstClass {
@@ -59,10 +44,6 @@ class SecondClass extends FirstClass {
 			a: 3,
 			b: 10
 		})
-	}
-
-	defs(): object {
-		return {e:2}
 	}
 
 	// mutabilities(): object {
@@ -82,9 +63,8 @@ class ThirdClass extends SecondClass {
 
 export function extendedObjectTest() {
 
-	let A = new ThirdClass({b: -2})
-	A.update({_b: -3})
-	console.log((A as FirstClass).defs())
+	let A = new SecondClass()
+	console.log(A.a)
 
 
 

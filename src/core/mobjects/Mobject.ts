@@ -746,9 +746,12 @@ and logic for drawing and user interaction.
 		for (let pair of targetsAndUpdateDicts) {
 			let target = pair[0]
 			let updateDict = pair[1]
-			target.update(updateDict)
+			if (Object.keys(updateDict).includes('null')) {
+				target.update()
+			} else {
+				target.update(updateDict)
+			}
 		}
-
 		if (redraw) { this.redraw() }
 	}
 

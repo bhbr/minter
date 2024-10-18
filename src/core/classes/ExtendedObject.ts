@@ -50,12 +50,13 @@ export class ExtendedObject extends BaseExtendedObject {
 		this.setMutabilities()
 		this.setDefaults()
 		let ok = this.checkPermissions(args)
-		if (ok) {
-			let inits = Object.assign(this._defaults, args)
-			inits = this.synchronizeUpdateArguments(inits)
-			this.setProperties(inits)
-			this.initComplete = true
-		}
+		if (!ok) { return }
+
+		let inits = Object.assign(this._defaults, args)
+		inits = this.synchronizeUpdateArguments(inits)
+		this.setProperties(inits)
+		this.properties = Object.keys(inits)
+		this.initComplete = true
 	}
 
 	setMutabilities() {
@@ -92,15 +93,16 @@ export class ExtendedObject extends BaseExtendedObject {
 	}
 
 	updateDefaults(oldDefaults: object, newDefaults: object): object {
+		let updatedDefaults = copy(oldDefaults)
 		for (let [prop, value] of Object.entries(newDefaults)) {
 			let oldMutability = super.mutability(prop) ?? 'always'
 			if (oldMutability === 'never') {
 				throw `Property ${prop} on ${this.constructor.name} cannot be assigned a new default value`
 				return
 			}
-			oldDefaults[prop] = value
+			updatedDefaults[prop] = value
 		}
-		return oldDefaults
+		return updatedDefaults
 	}
 
 	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
@@ -153,9 +155,11 @@ export class ExtendedObject extends BaseExtendedObject {
 	}
 
 	update(args: object = {}) {
-		let ok = this.checkPermissions(args)
+		let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
 		if (ok) {
 			this.setProperties(args)
+		} else {
+			this.checkPermissions(args)
 		}
 	}
 
@@ -176,12 +180,10 @@ export class ExtendedObject extends BaseExtendedObject {
 
 		for (let [prop, value] of Object.entries(otherPropertyArgs)) {
 			this.setProperty(prop, value)
-			this.properties.push(prop)
 
 		}
 		for (let [prop, value] of Object.entries(accessorArgs)) {
 			this.setProperty(prop, value)
-			this.properties.push(prop)
 		}
 	}
 

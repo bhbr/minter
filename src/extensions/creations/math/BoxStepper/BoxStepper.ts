@@ -9,23 +9,14 @@ export class BoxStepper extends BoxSlider {
 		return this.updateDefaults(super.defaults(), {
 			min: 0,
 			max: 10,
+			value: 6,
 			precision: 0
 		})
 	}
 
-	onPointerMove(e: ScreenEvent) {
-		let scrubVector: Vertex = eventVertex(e).subtract(this.scrubStartingPoint)
-		this.value = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
-		this.value = Math.max(Math.min(Math.floor(this.value), this.max), this.min)
-		this.update()
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			precision: 'never'
+		})
 	}
-
-	updateLabel() {
-		this.label.update({
-			text: this.value.toString(),
-			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
-			viewWidth: this.width
-		}, false)
-	}
-
 }
