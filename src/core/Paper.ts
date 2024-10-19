@@ -43,6 +43,7 @@ export class Paper extends Board {
 	setup() {
 		super.setup()
 		this.expandButton.hide()
+		this.expandedInputList.hide()
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		document.addEventListener('keydown', this.boundButtonDownByKey)

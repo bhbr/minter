@@ -24,6 +24,8 @@ import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
+import { ExpandedBoardInputList } from './ExpandedBoardInputList'
+import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
 
 declare var paper: any
 declare interface Window { webkit?: any }
@@ -54,9 +56,7 @@ The content children can also be dragged and panned.
 				strokeWidth: 2.0,
 				screenEventHandler: ScreenEventHandler.Parent
 			}),
-			
 			expandedPadding: 20,
-
 			screenEventHandler: ScreenEventHandler.Self,
 			expanded: false,
 			compactWidth: 400, // defined below in the section 'expand and contract'
@@ -73,7 +73,8 @@ The content children can also be dragged and panned.
 			creationStroke: [],
 			creationMode: 'freehand',
 			creator: null,
-			sidebar: null
+			sidebar: null,
+			expandedInputList: new ExpandedBoardInputList()
 		})
 	}
 
@@ -130,7 +131,14 @@ The content children can also be dragged and panned.
 
 		this.addDependency('expandedWidth', this.linkMap, 'viewWidth')
 		this.addDependency('expandedHeight', this.linkMap, 'viewHeight')
-		
+
+		this.expandedInputList.update({
+			height: EXPANDED_IO_LIST_HEIGHT,
+			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET)
+		})
+		this.add(this.expandedInputList)
+
 		if (this.contracted) {
 			this.contractStateChange()
 		} else {
@@ -204,6 +212,7 @@ The content children can also be dragged and panned.
 				getPaper().sidebar = this.sidebar
 			}
 		}
+		this.expandedInputList.show()
 	}
 
 	expand() {
@@ -229,6 +238,7 @@ The content children can also be dragged and panned.
 		this.expandButton.update({
 			text: '+'
 		})
+		this.expandedInputList.hide()
 	}
 
 	contract() {
@@ -453,6 +463,7 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+	expandedInputList: ExpandedBoardInputList
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable

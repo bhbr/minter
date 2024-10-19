@@ -28,7 +28,7 @@ export class LinkHook extends Circle {
 			radius: 'never',
 			fillOpacity: 'never',
 			strokeColor: 'never',
-			name: 'on_init',
+			name: 'always',
 			type: 'on_init',
 			mobject: 'on_init'
 		})

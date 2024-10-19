@@ -40,8 +40,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			cornerRadius: 'never',
 			fillColor: 'never',
 			fillOpacity: 'never',
-			strokeWidth: 'never',
-			width: 'never'
+			strokeWidth: 'never'
 		})
 	}
 
