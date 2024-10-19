@@ -213,7 +213,8 @@ export class ExtendedObject extends BaseExtendedObject {
 		if (desc === undefined) {
 			Object.defineProperty(this, prop, {
 				value: value,
-				writable: (this.mutability(prop) === 'always')
+				writable: (this.mutability(prop) === 'always'),
+				enumerable: true
 			})
 		} else {
 			let setter = this.setter(prop)
