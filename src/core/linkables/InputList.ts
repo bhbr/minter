@@ -101,7 +101,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		super.update(args, false)
 		this.height = this.getHeight()
 		if (this.mobject == null) { return }
-		if (argsDict['inputNames'] !== undefined) {
+		if (args['inputNames'] !== undefined) {
 			this.setup()
 		}
 		super.update({
