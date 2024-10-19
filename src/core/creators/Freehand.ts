@@ -53,12 +53,11 @@ export class Freehand extends Creator {
 	dissolve() {
 		this.line.adjustFrame()
 
-		let dr = this.line.anchor.copy()
 		this.line.update({
 			anchor: Vertex.origin()
 		})
 		this.update({
-			anchor: this.anchor.translatedBy(dr),
+			anchor: this.anchor,
 			viewWidth: this.line.getWidth(),
 			viewHeight: this.line.getHeight()
 		})
