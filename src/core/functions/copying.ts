@@ -83,6 +83,7 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 	}
 
 	memo.push([obj, newObj])
+	
 	for (let [key, value] of Object.entries(obj)) {
 
 			var copiedValue: any
@@ -101,17 +102,24 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 				newObj[key] = y
 			}
 	}
-	if (obj.svg != undefined) {
+
+	if (isInstance(obj, 'VMobject')) {
 		newObj.svg = obj.svg.cloneNode()
 		newObj.path = obj.path.cloneNode()
 		newObj.view.appendChild(newObj.svg)
 		newObj.svg.appendChild(newObj.path)
 	}
 	return newObj
-
 }
 
-
+export function isInstance(obj: object, className: string): boolean {
+		var par: object = obj
+		while (par) {
+			if (par.constructor.name === className) { return true }
+			par = Object.getPrototypeOf(par)
+		}
+		return false
+}
 
 
 
