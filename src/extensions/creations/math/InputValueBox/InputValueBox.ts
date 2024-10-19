@@ -16,20 +16,23 @@ export class InputValueBox extends Linkable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				background: new Rectangle({
-					fillColor: Color.black()
-				}),
-				inputBox: document.createElement('input')
-			},
-			mutable: {
-				viewWidth: 80,
-				viewHeight: 40,
-				inputNames: [],
-				outputNames: ['value'],
-				strokeWidth: 0.0,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			background: new Rectangle({
+				fillColor: Color.black()
+			}),
+			inputBox: document.createElement('input'),
+			viewWidth: 80,
+			viewHeight: 40,
+			inputNames: [],
+			outputNames: ['value'],
+			strokeWidth: 0.0,
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			background: 'never',
+			inputBox: 'never'
 		})
 	}
 

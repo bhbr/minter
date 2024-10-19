@@ -13,15 +13,17 @@ export class Transform extends ExtendedObject {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				passedByValue: true
-			},
-			mutable: {
-				anchor: Vertex.origin(),
-				angle: 0,
-				scale: 1,
-				shift: Vertex.origin()
-			}
+			passedByValue: true,
+			anchor: Vertex.origin(),
+			angle: 0,
+			scale: 1,
+			shift: Vertex.origin()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			passedByValue: 'never'
 		})
 	}
 
@@ -119,5 +121,26 @@ export class Transform extends ExtendedObject {
 	toString(): string {
 		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
 	}
+
+	equals(t: Transform): boolean {
+		let tolerance = 1e-6
+		return (this.a() - t.a() < tolerance
+			 && this.b() - t.b() < tolerance
+			 && this.c() - t.c() < tolerance
+			 && this.d() - t.d() < tolerance
+			 && this.e() - t.e() < tolerance
+			 && this.f() - t.f() < tolerance)
+	}
+
+
+
+
+
+
+
+
+
+
+
 }
 

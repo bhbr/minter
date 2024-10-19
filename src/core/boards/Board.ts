@@ -41,42 +41,49 @@ The content children can also be dragged and panned.
 */
 
 	defaults(): object {
-		let eb = new ExpandButton()
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				expandedPadding: 20,
-				contentChildren: [],
-				expandButton: eb,
-				linkMap: new LinkMap(),
-				background: new RoundedRectangle({
-					anchor: Vertex.origin(),
-					cornerRadius: 50,
-					fillColor: Color.gray(0.1),
-					fillOpacity: 1.0,
-					strokeColor: Color.white(),
-					strokeWidth: 2.0,
-					screenEventHandler: ScreenEventHandler.Parent
-				})
+			contentChildren: [],
+			expandButton: new ExpandButton(),
+			linkMap: new LinkMap(),
+			background: new RoundedRectangle({
+				anchor: Vertex.origin(),
+				cornerRadius: 50,
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeColor: Color.white(),
+				strokeWidth: 2.0,
+				screenEventHandler: ScreenEventHandler.Parent
+			}),
+			
+			expandedPadding: 20,
+
+			screenEventHandler: ScreenEventHandler.Self,
+			expanded: false,
+			compactWidth: 400, // defined below in the section 'expand and contract'
+			compactHeight: 300, // idem
+			compactAnchor: Vertex.origin(),
+			creationConstructors: {
+				'board': BoardCreator
 			},
-			mutable: {
-				screenEventHandler: ScreenEventHandler.Self,
-				expanded: false,
-				compactWidth: 400, // defined below in the section 'expand and contract'
-				compactHeight: 300, // idem
-				compactAnchor: Vertex.origin(),
-				creationConstructors: {
-					'board': BoardCreator
-				},
-				buttonNames: [
-					'DragButton',
-					'LinkButton',
-					'BoardButton'
-				],
-				creationStroke: [],
-				creationMode: 'freehand',
-				creator: null,
-				sidebar: null
-			}
+			buttonNames: [
+				'DragButton',
+				'LinkButton',
+				'BoardButton'
+			],
+			creationStroke: [],
+			creationMode: 'freehand',
+			creator: null,
+			sidebar: null
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			contentChildren: 'never',
+			expandButton: 'never',
+			linkMap: 'never',
+			background: 'never',
+			expandedPadding: 'in_subclass'
 		})
 	}
 
@@ -179,7 +186,7 @@ The content children can also be dragged and panned.
 	}
 
 	expandStateChange() {
-		this.expanded = true
+		if (!this.expanded) { this.update({ expanded: true }) }
 		getPaper().expandedMobject = this
 		this.enableContent()
 		if (this.parent != undefined) {

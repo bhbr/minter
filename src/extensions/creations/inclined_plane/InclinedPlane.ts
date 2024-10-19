@@ -12,20 +12,22 @@ export class InclinedPlane extends Polygon {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				length: undefined
-			},
-			mutable: {
-				midpoint: Vertex.origin(),
-				inclination: 0,
-				fillColor: Color.white(),
-				fillOpacity: 0.5,
-				vertices: new VertexArray([
-					Vertex.origin(),
-					Vertex.origin(),
-					Vertex.origin()
-				])
-			}
+			length: undefined,
+			midpoint: Vertex.origin(),
+			inclination: 0,
+			fillColor: Color.white(),
+			fillOpacity: 0.5,
+			vertices: new VertexArray([
+				Vertex.origin(),
+				Vertex.origin(),
+				Vertex.origin()
+			])
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			length: 'on_init'
 		})
 	}
 

@@ -19,18 +19,25 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				linkHooks: []
-			},
-			mutable: {
-				mobject: null,
-				outputNames: [],
-				cornerRadius: 20,
-				fillColor: Color.white(),
-				fillOpacity: 0.2,
-				strokeWidth: 0,
-				width: IO_LIST_WIDTH
-			}
+			linkHooks: [],
+			mobject: null,
+			outputNames: [],
+			cornerRadius: 20,
+			fillColor: Color.white(),
+			fillOpacity: 0.2,
+			strokeWidth: 0,
+			width: IO_LIST_WIDTH
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkHooks: 'never',
+			cornerRadius: 'never',
+			fillColor: 'never',
+			fillOpacity: 'never',
+			strokeWidth: 'never',
+			width: 'never'
 		})
 	}
 
@@ -49,7 +56,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.outputNames.length; i++) {
 			let name = this.outputNames[i]
 			let hook = new LinkHook({

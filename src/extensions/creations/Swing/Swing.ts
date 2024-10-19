@@ -24,29 +24,35 @@ export class Swing extends Linkable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				fixtureWidth: 50,
-				fixtureHeight: 20,
-				fixture: new Rectangle({
-					fillColor: Color.white(),
-					fillOpacity: 1
-				}),
-				string: new Line(),
-				weight: new Circle({
-					fillColor: Color.white(),
-					fillOpacity: 1
-				}),
-			},
-			mutable: {
-				maxLength: 300,
-				length: 1,
-				mass: 0.2,
-				initialAngle: 0,
-				initialSpeed: 0,
-				initialTime: Date.now(),
-				inputNames: ['length', 'mass'],
-				outputNames: ['angle', 'period']
-			}
+			fixtureWidth: 50,
+			fixtureHeight: 20,
+			fixture: new Rectangle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			string: new Line(),
+			weight: new Circle({
+				fillColor: Color.white(),
+				fillOpacity: 1
+			}),
+			maxLength: 300,
+			length: 1,
+			mass: 0.2,
+			initialAngle: 0,
+			initialSpeed: 0,
+			initialTime: Date.now(),
+			inputNames: ['length', 'mass'],
+			outputNames: ['angle', 'period']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			fixtureWidth: 'never',
+			fixtureHeight: 'never',
+			fixture: 'never',
+			string: 'never',
+			weight: 'never'
 		})
 	}
 
@@ -59,14 +65,15 @@ export class Swing extends Linkable {
 			width: this.fixtureWidth,
 			height: this.fixtureHeight,
 			anchor: new Vertex((this.viewWidth - this.fixtureWidth) / 2, 0)
-		}, false)
+		}, true)
 		this.string.update({
 			startPoint: new Vertex(this.viewWidth / 2, this.fixtureHeight)
 		})
 		this.weight.update({
 			radius: this.weightRadius()
 		})
-
+		this.viewHeight = this.fixtureHeight + this.pixelLength() + this.weightRadius()
+		this.outputList.update()
 	}
 
 
@@ -91,6 +98,10 @@ export class Swing extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 
 		args['viewHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
+		args = this.removeUnchangedProperties(args)
+		if (args['viewHeight'] !== undefined) {
+			this.outputList.update()
+		}
 
 		super.update(args, false)
 
@@ -104,7 +115,7 @@ export class Swing extends Linkable {
 			radius: this.weightRadius(),
 			midpoint: newEndPoint
 		}, redraw)
-	
+
 		if (redraw) { this.redraw() }
 	}
 

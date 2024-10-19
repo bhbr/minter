@@ -7,8 +7,8 @@ import { ConCircle } from './ConCircle/ConCircle'
 
 export class IntersectionPoint extends ConPoint {
 
-	geomob1: ConMobject
-	geomob2: ConMobject
+	conMob1: ConMobject
+	conMob2: ConMobject
 	index: number
 	fillOpacity: number = 0
 	lambda: number = NaN
@@ -16,21 +16,26 @@ export class IntersectionPoint extends ConPoint {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				fillOpacity: 1,
-				geoMob1: undefined,
-				geoMob2: undefined,
-				index: undefined
-			},
-			mutable: {
-				midpoint: new Vertex(NaN, NaN)
-			}
+			fillOpacity: 1,
+			conMob1: undefined,
+			conMob2: undefined,
+			index: undefined,
+			midpoint: new Vertex(NaN, NaN)
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			fillOpacity: 'never',
+			conMob1: 'never',
+			conMob2: 'never',
+			index: 'never'
 		})
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
 		let mp: Vertex = this.intersectionCoords()
-		if (mp.isNaN() || !this.geomob1.visible || !this.geomob2.visible) {
+		if (mp.isNaN() || !this.conMob1.visible || !this.conMob2.visible) {
 			this.recursiveHide()
 		} else {
 			this.recursiveShow()
@@ -42,14 +47,14 @@ export class IntersectionPoint extends ConPoint {
 	}
 
 	intersectionCoords(): Vertex {
-		if (this.geomob1 instanceof ConStrait && this.geomob2 instanceof ConCircle) {
-			return this.arrowCircleIntersection(this.geomob1, this.geomob2, this.index)
-		} else if (this.geomob1 instanceof ConCircle && this.geomob2 instanceof ConStrait) {
-			return this.arrowCircleIntersection(this.geomob2, this.geomob1, this.index)
-		} else if (this.geomob1 instanceof ConStrait && this.geomob2 instanceof ConStrait) {
-			return this.arrowArrowIntersection(this.geomob1, this.geomob2)
-		} else if (this.geomob1 instanceof ConCircle && this.geomob2 instanceof ConCircle) {
-			return this.circleCircleIntersection(this.geomob1, this.geomob2, this.index)
+		if (this.conMob1 instanceof ConStrait && this.conMob2 instanceof ConCircle) {
+			return this.arrowCircleIntersection(this.conMob1, this.conMob2, this.index)
+		} else if (this.conMob1 instanceof ConCircle && this.conMob2 instanceof ConStrait) {
+			return this.arrowCircleIntersection(this.conMob2, this.conMob1, this.index)
+		} else if (this.conMob1 instanceof ConStrait && this.conMob2 instanceof ConStrait) {
+			return this.arrowArrowIntersection(this.conMob1, this.conMob2)
+		} else if (this.conMob1 instanceof ConCircle && this.conMob2 instanceof ConCircle) {
+			return this.circleCircleIntersection(this.conMob1, this.conMob2, this.index)
 		} else {
 			return new Vertex(NaN, NaN)
 		}

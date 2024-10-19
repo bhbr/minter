@@ -9,10 +9,15 @@ export class Circle extends CircularArc {
 	
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				angle: TAU,
-				closed: true
-			}
+			angle: TAU,
+			closed: true
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			angle: 'never',
+			closed: 'never'
 		})
 	}
 

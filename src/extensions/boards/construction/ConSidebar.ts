@@ -9,18 +9,23 @@ export class ConSidebar extends Sidebar {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				availableButtonClasses: [
-					DragButton,
-					StraitButton,
-					ConCircleButton
-				],
-				buttons: [
-					new DragButton(),
-					new StraitButton(),
-					new ConCircleButton()
-				]
-			}
+			availableButtonClasses: [
+				DragButton,
+				StraitButton,
+				ConCircleButton
+			],
+			buttons: [
+				new DragButton(),
+				new StraitButton(),
+				new ConCircleButton()
+			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			availableButtonClasses: 'never',
+			buttons: 'never'
 		})
 	}
 }

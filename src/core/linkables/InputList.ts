@@ -22,25 +22,27 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	}
 
 	defaults(): object {
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			readonly: {
-				linkHooks: [],
-				fillColor: Color.white(),
-				fillOpacity: 0.2,
-				cornerRadius: 20,
-				strokeWidth: 0,
-				width: IO_LIST_WIDTH
-			},
-			immutable: {
-				mobject: null
-			},
-			mutable: {
-				inputNames: []
-			}
+		return this.updateDefaults(super.defaults(), {
+			linkHooks: [],
+			cornerRadius: 20,
+			fillColor: Color.white(),
+			fillOpacity: 0.2,
+			strokeWidth: 0,
+			width: IO_LIST_WIDTH,
+			mobject: null,
+			inputNames: []
 		})
-		console.log(defs)
-		return defs
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkHooks: 'never',
+			cornerRadius: 'never',
+			fillColor: 'never',
+			fillOpacity: 'never',
+			strokeWidth: 'never',
+			width: 'never'
+		})
 	}
 
 	setup() {
@@ -58,7 +60,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.inputNames.length; i++) {
 			let name = this.inputNames[i]
 			let hook = new LinkHook({
@@ -99,8 +100,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.height = this.getHeight()
-		this.createHookList()
 		if (this.mobject == null) { return }
+		if (argsDict['inputNames'] !== undefined) {
+			this.setup()
+		}
 		super.update({
 			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
 		}, redraw)

@@ -35,15 +35,21 @@ export class Construction extends Board {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				points: [],
-				constructedMobjects: [],
-				buttonNames: [
-					'DragButton',
-					'StraitButton',
-					'ConCircleButton'
-				]
-			}
+			points: [],
+			constructedMobjects: [],
+			buttonNames: [
+				'DragButton',
+				'StraitButton',
+				'ConCircleButton'
+			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			points: 'never',
+			constructedMobjects: 'never',
+			buttonNames: 'never'
 		})
 	}
 
@@ -194,20 +200,20 @@ export class Construction extends Board {
 		p2.update({ strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor })
 	}
 
-	intersectWithRest(geomob1: ConMobject) {
-		for (let geomob2 of this.constructedMobjects) {
-			if (geomob1 == geomob2) { continue }
-			let nbPoints: number = (geomob1 instanceof ConStrait && geomob2 instanceof ConStrait) ? 1 : 2
+	intersectWithRest(conMob1: ConMobject) {
+		for (let conMob2 of this.constructedMobjects) {
+			if (conMob1 == conMob2) { continue }
+			let nbPoints: number = (conMob1 instanceof ConStrait && conMob2 instanceof ConStrait) ? 1 : 2
 			for (let i = 0; i < nbPoints; i++) {
 				let p: IntersectionPoint = new IntersectionPoint({
-					geomob1: geomob1,
-					geomob2: geomob2,
+					conMob1: conMob1,
+					conMob2: conMob2,
 					index: i
 				})
 				let isNewPoint: boolean = this.addPoint(p)
 				if (isNewPoint) {
-					geomob1.addDependent(p)
-					geomob2.addDependent(p)
+					conMob1.addDependent(p)
+					conMob2.addDependent(p)
 				}
 			}
 		}

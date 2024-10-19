@@ -67,45 +67,47 @@ and logic for drawing and user interaction.
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		let superDefs = super.defaults()
-		let defs = this.updateDefaults(superDefs, {
-			immutable: {
-				view: document.createElement('div'),
-				children: [], // i. e. submobjects
-			},
-			mutable: {
-				// The meaning of these properties is explained in the sections further below.
+		return this.updateDefaults(super.defaults(), {
+			view: document.createElement('div'),
+			children: [], // i. e. submobjects
+			// The meaning of these properties is explained in the sections further below.
 
-				// position
-				transform: Transform.identity(),
-				viewWidth: 100,
-				viewHeight: 100,
-				/*
-				Note: anchor is a property of transform
-				and exposed to the mobject itself
-				with a getter/setter.
-				*/
+			// position
+			transform: Transform.identity(),
+			anchor: Vertex.origin(),
+			viewWidth: 100,
+			viewHeight: 100,
+			/*
+			Note: anchor is a property of transform
+			and exposed to the mobject itself
+			with a getter/setter.
+			*/
 
-				// view
-				visible: true,
-				opacity: 1.0,
-				backgroundColor: Color.clear(),
-				drawBorder: DRAW_BORDERS,
+			// view
+			visible: true,
+			opacity: 1.0,
+			backgroundColor: Color.clear(),
+			drawBorder: DRAW_BORDERS,
 
-				// hierarchy
-				_parent: null,
+			// hierarchy
+			_parent: null,
 
-				// dependencies
-				dependencies: [],
+			// dependencies
+			dependencies: [],
 
-				// interactivity
-				screenEventHandler: ScreenEventHandler.Parent,
-				savedScreenEventHandler: null,
-				eventTarget: null,
-				screenEventHistory: []
-			}
+			// interactivity
+			screenEventHandler: ScreenEventHandler.Parent,
+			savedScreenEventHandler: null,
+			eventTarget: null,
+			screenEventHistory: []
 		})
-		return defs
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			view: 'on_init',
+			children: 'never'
+		})
 	}
 
 	setup() {
@@ -159,14 +161,14 @@ and logic for drawing and user interaction.
 	}
 
 	set anchor(newValue: Vertex) {
-		if (this.isReadonly('anchor')) {
-			console.error(`Anchor is a readonly property on ${this.constructor.name}`)
-			return
-		}
-		if (this.isImmutable('anchor') && this.transform) {
-			console.error(`Anchor is an immutable property on ${this.constructor.name}`)
-			return
-		}
+		// if (!this.isMutable('anchor')) {
+		// 	console.error(`Anchor is a readonly property on ${this.constructor.name}`)
+		// 	return
+		// }
+		// if (this.isImmutable('anchor') && this.transform) {
+		// 	console.error(`Anchor is an immutable property on ${this.constructor.name}`)
+		// 	return
+		// }
 		if (!this.transform) {
 			this.transform = Transform.identity()
 		}
@@ -686,20 +688,22 @@ and logic for drawing and user interaction.
 
 	// Update methods //
 
+	synchronizeUpdateArguments(args: object = {}): object {
+
+		let a = args['anchor']
+		if (a !== undefined) {
+			let t = args['transform'] ?? this.transform ?? Transform.identity()
+			t.anchor = a
+			args['transform'] = t
+			delete args['anchor']
+		}
+		return args
+
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 
-	// Update just the properties and what depends on them, without redrawing
-
-		if (Object.keys(args).includes('anchor')
-			&& Object.keys(args).includes('transform')
-			&& !args['transform'].anchor.equals(args['anchor'])) {
-			args['transform'].anchor = args['anchor']
-			delete args['anchor']
-			console.warn(`Inconsistent anchor and transform anchor in update on ${this.constructor.name}`)
-		}
-
 		super.update(args)
-		//this.updateSubmobModels()
 
 		if (this.view != null) {
 			this.view.setAttribute('screen-event-handler', this.screenEventHandler.toString())
@@ -742,9 +746,12 @@ and logic for drawing and user interaction.
 		for (let pair of targetsAndUpdateDicts) {
 			let target = pair[0]
 			let updateDict = pair[1]
-			target.update(updateDict)
+			if (Object.keys(updateDict).includes('null')) {
+				target.update()
+			} else {
+				target.update(updateDict)
+			}
 		}
-
 		if (redraw) { this.redraw() }
 	}
 

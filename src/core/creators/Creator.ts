@@ -11,11 +11,9 @@ export class Creator extends Mobject {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			mutable: {
-				creationStroke: [],
-				creation: null,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			creationStroke: [],
+			creation: null,
+			screenEventHandler: ScreenEventHandler.Self
 		})
 	}
 

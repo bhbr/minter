@@ -14,16 +14,23 @@ export class LinkHook extends Circle {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				name: 'default',
-				type: 'input',
-				radius: HOOK_RADIUS,
-				fillOpacity: 0,
-				strokeColor: Color.white()
-			},
-			immutable: {
-				mobject: null
-			}
+			name: 'default',
+			type: 'input',
+			radius: HOOK_RADIUS,
+			fillOpacity: 0,
+			strokeColor: Color.white(),
+			mobject: null
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			radius: 'never',
+			fillOpacity: 'never',
+			strokeColor: 'never',
+			name: 'on_init',
+			type: 'on_init',
+			mobject: 'on_init'
 		})
 	}
 

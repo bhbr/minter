@@ -11,19 +11,22 @@ export class PlayButton extends SimpleButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				mobject: undefined
-			},
-			mutable: {
-				text: 'play',
-				viewWidth: 40,
-				viewHeight: 20,
-				backgroundColor: Color.black(),
-				color: Color.white(),
-				borderColor: Color.white(),
-				borderWidth: 1,
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			screenEventHandler: ScreenEventHandler.Self,
+			mobject: undefined,
+			text: 'play',
+			viewWidth: 40,
+			viewHeight: 20,
+			backgroundColor: Color.black(),
+			color: Color.white(),
+			borderColor: Color.white(),
+			borderWidth: 1
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			screenEventHandler: 'never',
+			mobject: 'on_init'
 		})
 	}
 

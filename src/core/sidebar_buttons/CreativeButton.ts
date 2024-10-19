@@ -7,12 +7,14 @@ export class CreativeButton extends SidebarButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			immutable: {
-				creations: []
-			},
-			mutable: {
-				outgoingMessage: { create: 'freehand' }
-			}
+			creations: [],
+			outgoingMessage: { create: 'freehand' }
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'on_init'
 		})
 	}
 

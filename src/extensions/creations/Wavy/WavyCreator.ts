@@ -10,9 +10,13 @@ export class WavyCreator extends SpanningCreator {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				nbSources: 1
-			}
+			nbSources: 1
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			nbSources: 'on_init'
 		})
 	}
 

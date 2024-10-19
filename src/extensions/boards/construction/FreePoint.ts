@@ -6,9 +6,13 @@ export class FreePoint extends ConPoint {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				screenEventHandler: ScreenEventHandler.Parent
-			}
+			screenEventHandler: ScreenEventHandler.Parent
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			screenEventHandler: 'never'
 		})
 	}
 

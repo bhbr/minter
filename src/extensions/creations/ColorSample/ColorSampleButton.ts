@@ -5,9 +5,13 @@ export class ColorSampleButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['color']
-			}
+			creations: ['color']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
 		})
 	}
 

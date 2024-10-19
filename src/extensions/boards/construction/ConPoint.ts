@@ -7,13 +7,16 @@ export class ConPoint extends Circle {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				radius: 7.0,
-				fillOpacity: 1.0
-			},
-			mutable: {
-				fillColor: Color.white()
-			}
+			radius: 7.0,
+			fillOpacity: 1.0,
+			fillColor: Color.white()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			radius: 'never',
+			fillOpacity: 'never'
 		})
 	}
 

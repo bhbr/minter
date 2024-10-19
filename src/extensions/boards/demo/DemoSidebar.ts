@@ -16,21 +16,25 @@ export class DemoSidebar extends Sidebar {
 	
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				availableButtonClasses: [
-					DragButton,
-					LinkButton,
-					ExtendedBoardButton,
-					BoardButton,
-					StraitButton,
-					ConCircleButton,
-					NumberButton,
-					ArithmeticButton,
-					WavyButton,
-					SwingButton,
-					ColorSampleButton
-				]
-			}
+			availableButtonClasses: [
+				DragButton,
+				LinkButton,
+				ExtendedBoardButton,
+				BoardButton,
+				StraitButton,
+				ConCircleButton,
+				NumberButton,
+				ArithmeticButton,
+				WavyButton,
+				SwingButton,
+				ColorSampleButton
+			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			availableButtonClasses: 'never'
 		})
 	}
 }

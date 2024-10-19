@@ -11,20 +11,24 @@ export class PhysicsSidebar extends Sidebar {
 	
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				availableButtonClasses: [
-					DragButton,
-					LinkButton,
-					NumberButton,
-					WavyButton,
-					SwingButton
-				],
-				buttons: [
-					new DragButton(),
-					new LinkButton(),
-					new NumberButton()
-				]
-			}
+			availableButtonClasses: [
+				DragButton,
+				LinkButton,
+				NumberButton,
+				WavyButton,
+				SwingButton
+			],
+			buttons: [
+				new DragButton(),
+				new LinkButton(),
+				new NumberButton()
+			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			availableButtonClasses: 'never'
 		})
 	}
 }

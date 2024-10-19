@@ -9,24 +9,6 @@ import { Color } from 'core/classes/Color'
 export class BoxSliderCreator extends Creator {
 
 	declare creation?: BoxSlider
-	width: number
-	height: number
-	min: number
-	max: number
-
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				width: 70
-			},
-			mutable: {
-				height: 0,
-				fillColor: Color.black(),
-				min: 0,
-				max: 1
-			}
-		})
-	}
 
 	setup() {
 		super.setup()
@@ -36,30 +18,20 @@ export class BoxSliderCreator extends Creator {
 		})
 		if (this.creation == null) { return }
 		this.add(this.creation)
-		this.creation.update({
-			min: this.min,
-			max: this.max,
-			value: 0.4 * this.min + 0.6 * this.max,
-			width: this.width,
-			height: 1,
-			fillColor: Color.black(),
-			barFillColor: Color.gray(0.5)
-		})
 		this.creation.hideLinks()
 	}
 
 	createMobject(): BoxSlider {
-		return this.creation || new BoxSlider()
+		return this.creation || new BoxSlider({ height: 0 })
 	}
 
 	updateFromTip(q: Vertex, redraw: boolean = true) {
-		this.update({ // This shouldn't be necessary, fix
-			fillColor: Color.black()
-		}, redraw)
+		// this.update({ // This shouldn't be necessary, fix
+		// 	fillColor: Color.black()
+		// }, redraw)
 		if (this.creation === null) { return }
 		this.creation.update({
 			height: q.y - this.getStartPoint().y,
-			//fillColor: gray(0.5) // This shouldn't be necessary, fix
 		}, redraw)
 		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)

@@ -13,11 +13,17 @@ a dependency between two linkable mobjects.
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {	     
-				radius: BULLET_RADIUS,
-				fillOpacity: 1,
-				strokeColor: Color.white()
-			}
+			radius: BULLET_RADIUS,
+			fillOpacity: 1,
+			strokeColor: Color.white()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			radius: 'never',
+			fillOpacity: 'never',
+			strokeColor: 'never'
 		})
 	}
 

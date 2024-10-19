@@ -5,9 +5,13 @@ export class StraitButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['line', 'segment', 'ray']
-			}
+			creations: ['line', 'segment', 'ray']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
 		})
 	}
 }

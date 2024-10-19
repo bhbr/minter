@@ -5,9 +5,13 @@ export class ConButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['cons']
-			}
+			creations: ['cons']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
 		})
 	}
 

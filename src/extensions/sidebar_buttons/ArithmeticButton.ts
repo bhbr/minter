@@ -5,10 +5,13 @@ export class ArithmeticButton extends CreativeButton {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				creations: ['+', '–', '&times;', '/']
-			}
+			creations: ['+', '–', '&times;', '/']
 		})
 	}
 
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creations: 'never'
+		})
+	}
 }

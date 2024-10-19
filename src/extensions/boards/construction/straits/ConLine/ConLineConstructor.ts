@@ -8,9 +8,13 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				line: new ConLine()
-			}
+			line: new ConLine()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			line: 'never'
 		})
 	}
 

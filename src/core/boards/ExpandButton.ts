@@ -10,15 +10,25 @@ export class ExpandButton extends TextLabel {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				viewWidth: 30,
-				viewHeight: 30,
-				transform: Transform.identity(),
-				anchor: Vertex.origin(),
-				screenEventHandler: ScreenEventHandler.Self,
-				backgroundColor: Color.gray(0.25),
-				color: Color.white()
-			}
+			viewWidth: 30,
+			viewHeight: 30,
+			transform: Transform.identity(),
+			anchor: Vertex.origin(),
+			screenEventHandler: ScreenEventHandler.Self,
+			backgroundColor: Color.gray(0.25),
+			color: Color.white()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			viewWidth: 'never',
+			viewHeight: 'never',
+			transform: 'never',
+			anchor: 'never',
+			screenEventHandler: 'never',
+			backgroundColor: 'never',
+			color: 'never'
 		})
 	}
 

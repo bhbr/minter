@@ -13,20 +13,23 @@ export class ValueBox extends Linkable {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				background: new Rectangle({
-					fillColor: Color.black()
-				}),
-				valueLabel: new TextLabel()
-			},
-			mutable: {
-				viewWidth: 80,
-				viewHeight: 40,
-				inputNames: ['value'],
-				outputNames: ['value'],
-				strokeWidth: 0.0,
-				value: 1
-			}
+			background: new Rectangle({
+				fillColor: Color.black()
+			}),
+			valueLabel: new TextLabel(),
+			viewWidth: 80,
+			viewHeight: 40,
+			inputNames: ['value'],
+			outputNames: ['value'],
+			strokeWidth: 0.0,
+			value: 1
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			background: 'never',
+			valueLabel: 'never'
 		})
 	}
 

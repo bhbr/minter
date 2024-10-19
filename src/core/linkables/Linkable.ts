@@ -18,17 +18,21 @@ which can be linked to such-exposed variables of other mobjects.
 	outputList: OutputList 
 
 	defaults(): object {
-		let il = new InputList()
 		return this.updateDefaults(super.defaults(), {
-			readonly: {
-				inputNames: [],
-				outputNames: [],
-				inputList: il,
-				outputList: new OutputList()
-			},
-			mutable: {
-				screenEventHandler: ScreenEventHandler.Self
-			}
+			inputList: new InputList(),
+			outputList: new OutputList(),
+			inputNames: [],
+			outputNames: [],			
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			inputList: 'never',
+			outputList: 'never',
+			inputNames: 'in_subclass',
+			outputNames: 'in_subclass'
 		})
 	}
 
@@ -54,10 +58,6 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.add(this.outputList)
 		this.outputList.hide()
-		this.addDependency('viewHeight', this.inputList, null)
-		this.addDependency('viewWidth', this.inputList, null)
-		this.addDependency('viewHeight', this.outputList, null)
-		this.addDependency('viewWidth', this.outputList, null)
 	}
 
 	showLinks() {
