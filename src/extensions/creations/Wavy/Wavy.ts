@@ -10,21 +10,23 @@ export class Wavy extends CindyCanvas {
 	sourceYPosition: number
 	color: Color
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'sourceYPosition'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			sourceYPosition: 0.2,
 			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],
 			outputNames: [],
 			wavelength: 0.25,
 			frequency: 0,
 			nbSources: 1,
-			sourceYPosition: 0.2,
 			color: Color.green()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			sourceYPosition: 'on_init',
+			inputNames: 'in_subclass',
+			outputNames: 'in_subclass'
 		})
 	}
 
@@ -83,13 +85,13 @@ export class Wavy extends CindyCanvas {
 		return ret
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.nbSources = Math.floor(this.nbSources)
 
 		if (this.core == undefined || this.sourcePositions().length == 0) { return }
-		if (argsDict['nbSources'] != undefined) {
-			this.reload(argsDict)
+		if (args['nbSources'] != undefined) {
+			this.reload(args)
 		}
 		let code = `drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););`
 		this.core.evokeCS(code)

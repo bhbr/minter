@@ -6,10 +6,9 @@ export class CurvedShape extends CurvedLine {
 	A closed CurvedLine is a CurvedShape
 	*/
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			closed: true
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			closed: 'never'
 		})
 	}
-
 }

@@ -14,25 +14,25 @@ export class InputValueBox extends Linkable {
 	inputBox: HTMLInputElement
 	background: Rectangle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'inputBox',
-			'background'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			background: new Rectangle({
+				fillColor: Color.black()
+			}),
+			inputBox: document.createElement('input'),
 			viewWidth: 80,
 			viewHeight: 40,
 			inputNames: [],
 			outputNames: ['value'],
 			strokeWidth: 0.0,
-			screenEventHandler: ScreenEventHandler.Self,
-			background: new Rectangle({
-				fillColor: Color.black()
-			}),
-			inputBox: document.createElement('input')
+			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			background: 'never',
+			inputBox: 'never'
 		})
 	}
 
@@ -60,8 +60,8 @@ export class InputValueBox extends Linkable {
 		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight

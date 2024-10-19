@@ -4,15 +4,15 @@ import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
 
 export class FreePoint extends ConPoint {
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'screenEventHandler'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			screenEventHandler: ScreenEventHandler.Parent
+		})
 	}
 
-	defaults() {
-		return Object.assign(super.defaults(), {
-			screenEventHandler: ScreenEventHandler.Parent
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			screenEventHandler: 'never'
 		})
 	}
 

@@ -13,7 +13,7 @@ export class InclinedBox extends Polygon {
 	_rotationAngle: number
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			rotationAngle: 0
 		})
 	}
@@ -40,8 +40,8 @@ export class InclinedBox extends Polygon {
 		})
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		let w2 = this.width / 2
 		let h2 = this.height / 2
 		this.vertices = new VertexArray([

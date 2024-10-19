@@ -40,38 +40,40 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'baseColor',
-			'optionSpacing',
-			'label',
-			'messages',
-			'activeScalingFactor'
-		])
-	}
-
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			strokeWidth: 0,
+		return this.updateDefaults(super.defaults(), {
+
+			baseColor: Color.gray(0.4),
 			optionSpacing: 25,
-			screenEventHandler: ScreenEventHandler.Self,
 			label: new TextLabel(),
+			activeScalingFactor: 1.2,
+
+			messages: [],
+
+			strokeWidth: 0,
+			screenEventHandler: ScreenEventHandler.Self,
 			currentModeIndex: 0,
 			previousIndex: 0,
-			baseColor: Color.gray(0.4),
 			locationIndex: 0,
 			active: false,
-			activeScalingFactor: 1.2,
 			showLabel: true,
 			text: 'text',
 			fontSize: 12,
-			messages: [],
 			radius: BUTTON_RADIUS,
 			viewWidth: 2 * BUTTON_RADIUS,
 			viewHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 0.5,
 			activeKeyboard: true
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			baseColor: 'in_subclass',
+			optionSpacing: 'never',
+			label: 'never',
+			activeScalingFactor: 'never',
+			messages: 'on_init'
 		})
 	}
 
@@ -198,9 +200,9 @@ export class SidebarButton extends Circle {
 		}
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		//argsDict['midpoint'] = buttonCenter(this.locationIndex)
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		//args['midpoint'] = buttonCenter(this.locationIndex)
+		super.update(args, false)
 		this.updateLabel()
 		if (redraw) { this.redraw() }
 	}

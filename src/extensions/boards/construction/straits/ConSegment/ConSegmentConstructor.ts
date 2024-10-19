@@ -6,15 +6,15 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	segment: ConSegment
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'segment'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			segment: new ConSegment()
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			segment: new ConSegment()
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			segment: 'never'
 		})
 	}
 

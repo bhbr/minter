@@ -10,8 +10,14 @@ export class SpanningCreator extends Creator {
 	rectangle: Rectangle
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			rectangle: new Rectangle()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			rectangle: 'never'
 		})
 	}
 
@@ -42,7 +48,10 @@ export class SpanningCreator extends Creator {
 
 	updateFromTip(q: Vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
-		this.update()
+		this.update({
+			viewWidth: this.getWidth(),
+			viewHeight: this.getHeight()
+		})
 		if (redraw) { this.redraw() }
 	}
 

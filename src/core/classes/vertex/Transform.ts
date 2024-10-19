@@ -1,3 +1,4 @@
+
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { TAU, PI, DEGREES } from 'core/constants'
 import { Vertex } from './Vertex'
@@ -11,7 +12,7 @@ export class Transform extends ExtendedObject {
 	shift: Vertex
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			passedByValue: true,
 			anchor: Vertex.origin(),
 			angle: 0,
@@ -20,10 +21,10 @@ export class Transform extends ExtendedObject {
 		})
 	}
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'passedByValue'
-		])
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			passedByValue: 'never'
+		})
 	}
 
 	static identity(): Transform { return new Transform() }
@@ -81,11 +82,11 @@ export class Transform extends ExtendedObject {
 
 	copyFrom(t: Transform) {
 		let argsDict: object = {}
-		for (let prop of t.properties()) {
-			if (t.isReadonly(prop)) { continue }
+		for (let prop of t.properties) {
+			if (t.mutability(prop) !== 'always') { continue }
 			argsDict[prop] = t[prop]
 		}
-		this.setAttributes(argsDict)
+		this.setProperties(argsDict)
 	}
 
 	rightComposedWith(t: Transform): Transform {
@@ -129,5 +130,26 @@ export class Transform extends ExtendedObject {
 	toString(): string {
 		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
 	}
+
+	equals(t: Transform): boolean {
+		let tolerance = 1e-6
+		return (this.a() - t.a() < tolerance
+			 && this.b() - t.b() < tolerance
+			 && this.c() - t.c() < tolerance
+			 && this.d() - t.d() < tolerance
+			 && this.e() - t.e() < tolerance
+			 && this.f() - t.f() < tolerance)
+	}
+
+
+
+
+
+
+
+
+
+
+
 }
 

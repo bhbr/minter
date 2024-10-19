@@ -48,22 +48,15 @@ and logic for drawing and user interaction.
 
 	*/
 
-	constructor(argsDict: object = {}) {
+	constructor(args: object = {}) {
 	/*
 	A mobject is initialized by providing a dictionary (object)
-	of parameters (argsDict).
+	of parameters (args).
 	*/
-		super(argsDict)
-
+		super(args)
 		this.setup()
 		this.update()
 		this.redraw()
-	}
-
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'view'
-		])
 	}
 
 	defaults(): object {
@@ -73,11 +66,14 @@ and logic for drawing and user interaction.
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			view: document.createElement('div'),
+			children: [], // i. e. submobjects
 			// The meaning of these properties is explained in the sections further below.
 
 			// position
 			transform: Transform.identity(),
+			anchor: Vertex.origin(),
 			viewWidth: 100,
 			viewHeight: 100,
 			/*
@@ -87,7 +83,6 @@ and logic for drawing and user interaction.
 			*/
 
 			// view
-			view: document.createElement('div'),
 			visible: true,
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
@@ -95,7 +90,6 @@ and logic for drawing and user interaction.
 
 			// hierarchy
 			_parent: null,
-			children: [], // i. e. submobjects
 
 			// dependencies
 			dependencies: [],
@@ -105,6 +99,13 @@ and logic for drawing and user interaction.
 			savedScreenEventHandler: null,
 			eventTarget: null,
 			screenEventHistory: []
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			view: 'on_init',
+			children: 'never'
 		})
 	}
 
@@ -155,10 +156,18 @@ and logic for drawing and user interaction.
 
 	// this.anchor is a synonym for this.transform.anchor
 	get anchor(): Vertex {
-		return this.transform.anchor
+		return (this.transform ?? Transform.identity()).anchor
 	}
 
 	set anchor(newValue: Vertex) {
+		// if (!this.isMutable('anchor')) {
+		// 	console.error(`Anchor is a readonly property on ${this.constructor.name}`)
+		// 	return
+		// }
+		// if (this.isImmutable('anchor') && this.transform) {
+		// 	console.error(`Anchor is an immutable property on ${this.constructor.name}`)
+		// 	return
+		// }
 		if (!this.transform) {
 			this.transform = Transform.identity()
 		}
@@ -441,14 +450,14 @@ and logic for drawing and user interaction.
 	animationDuration: number
 	animationInterval: number
 
-	animate(argsDict: object = {}, seconds: number) {
+	animate(args: object = {}, seconds: number) {
 	// Calling this method launches an animation
 
 		// Create mobject copies
 		this.interpolationStartCopy = deepCopy(this)
 		this.interpolationStartCopy.clearScreenEventHistory()
 		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
-		this.interpolationStopCopy.update(argsDict, false)
+		this.interpolationStopCopy.update(args, false)
 
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
@@ -457,7 +466,7 @@ and logic for drawing and user interaction.
 
 		this.animationInterval = window.setInterval(
 			function() {
-				this.updateAnimation(Object.keys(argsDict))
+				this.updateAnimation(Object.keys(args))
 			}
 			.bind(this), dt)
 		// this.animationInterval is a reference number
@@ -470,8 +479,8 @@ and logic for drawing and user interaction.
 	updateAnimation(keys: Array<string>) {
 	// This method gets called at regular intervals during the animation
 		let weight = (Date.now() - this.animationTimeStart) / this.animationDuration
-		let newArgsDict = this.interpolatedAnimationArgs(keys, weight)
-		this.update(newArgsDict)
+		let newargs = this.interpolatedAnimationArgs(keys, weight)
+		this.update(newargs)
 	}
 
 	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {
@@ -678,12 +687,22 @@ and logic for drawing and user interaction.
 
 	// Update methods //
 
-	update(argsDict: object = {}, redraw: boolean = true) {
+	synchronizeUpdateArguments(args: object = {}): object {
 
-	// Update just the properties and what depends on them, without redrawing
-		argsDict = this.consolidateTransformAndAnchor(argsDict) // see below
-		this.setAttributes(argsDict)
-		//this.updateSubmobModels()
+		let a = args['anchor']
+		if (a !== undefined) {
+			let t = args['transform'] ?? this.transform ?? Transform.identity()
+			t.anchor = a
+			args['transform'] = t
+			delete args['anchor']
+		}
+		return args
+
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+
+		super.update(args)
 
 		if (this.view != null) {
 			this.view.setAttribute('screen-event-handler', this.screenEventHandler.toString())
@@ -726,44 +745,13 @@ and logic for drawing and user interaction.
 		for (let pair of targetsAndUpdateDicts) {
 			let target = pair[0]
 			let updateDict = pair[1]
-			target.update(updateDict)
-		}
-
-		if (redraw) { this.redraw() }
-	}
-
-	consolidateTransformAndAnchor(argsDict: object = {}): object {
-	/*
-	argsDict may contain updated values for the anchor, the transform, or both.
-	Since this.anchor == this.transform.anchor, this may be contradictory
-	information. This method fixes argsDict.
-	*/
-		let newAnchor: any = argsDict['anchor']
-		var newTransform: any = argsDict['transform']
-
-		if (newTransform) {
-			let nt: Transform = newTransform as Transform
-			if (nt.anchor.isZero()) {
-				/*
-				If the new transform has no anchor,
-				set it to the new anchor if given one.
-				Otherwise set it to your own anchor (i. e. it won't change).
-				*/
-				nt.anchor = newAnchor ?? this.anchor
+			if (Object.keys(updateDict).includes('null')) {
+				target.update()
+			} else {
+				target.update(updateDict)
 			}
-
-		} else {
-			/*
-			If there is no new transform value, still create
-			a copy of the existing one and put the new anchor
-			in there (if given, otherwise the old anchor).
-			*/
-			newTransform = this.transform
-			newTransform.anchor = argsDict['anchor'] ?? this.anchor
 		}
-		delete argsDict['anchor']
-		argsDict['transform'] = newTransform
-		return argsDict
+		if (redraw) { this.redraw() }
 	}
 
 
@@ -781,7 +769,6 @@ and logic for drawing and user interaction.
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
-
 
 	/*
 	The following empty methods need to be declared here

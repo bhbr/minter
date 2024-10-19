@@ -14,29 +14,29 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorLabel: TextLabel
 	operatorDict: object
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'operator',
-			'operatorSign',
-			'operatorLabel',
-			'operatorDict'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			operand1: 0,
-			operand2: 0,
-			operator: "+",
-			inputNames: ['operand1', 'operand2'],
-			outputNames: ['result'],
+		return this.updateDefaults(super.defaults(), {
 			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
 			operatorSign: new Circle({
 				radius: 10,
 				fillColor: Color.black(),
 				fillOpacity: 1.0
 			}),
-			operatorLabel: new TextLabel()
+			operatorLabel: new TextLabel(),
+			operator: undefined,
+			operand1: 0,
+			operand2: 0,
+			inputNames: ['operand1', 'operand2'],
+			outputNames: ['result']
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			operatorDict: 'in_subclass',
+			operatorSign: 'never',
+			operatorLabel: 'never',
+			operator: 'on_init'
 		})
 	}
 
@@ -71,41 +71,61 @@ export class BinaryOperatorBox extends ValueBox {
 		return 0
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		argsDict['value'] = this.result()
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		args['value'] = this.result()
+		super.update(args, redraw)
 	}
 
 }
 
 export class AddBox extends BinaryOperatorBox {
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			operator: '+'
+		})
+	}
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			operator: 'never'
 		})
 	}
 }
 
 export class SubtractBox extends BinaryOperatorBox {
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			operator: "–"
+		return this.updateDefaults(super.defaults(), {
+			operator: '–'
+		})
+	}
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			operator: 'never'
 		})
 	}
 }
 
 export class MultiplyBox extends BinaryOperatorBox {
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			operator: "&times;"
+		return this.updateDefaults(super.defaults(), {
+			operator: '&times;'
+		})
+	}
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			operator: 'never'
 		})
 	}
 }
 
 export class DivideBox extends BinaryOperatorBox {
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			operator:  "/"
+		return this.updateDefaults(super.defaults(), {
+			operator: '/'
+		})
+	}
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			operator: 'never'
 		})
 	}
 }

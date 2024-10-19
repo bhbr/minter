@@ -10,14 +10,9 @@ export class InclinedPlane extends Polygon {
 	inclination: number
 	midpoint: Vertex
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'length'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			length: undefined,
 			midpoint: Vertex.origin(),
 			inclination: 0,
 			fillColor: Color.white(),
@@ -30,6 +25,12 @@ export class InclinedPlane extends Polygon {
 		})
 	}
 
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			length: 'on_init'
+		})
+	}
+
 	getWidth(): number {
 		return this.length * Math.cos(this.inclination)
 	}
@@ -38,8 +39,8 @@ export class InclinedPlane extends Polygon {
 		return this.length * Math.sin(this.inclination)
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		let w = this.getWidth()
 		let h = this.getHeight()
 		this.vertices[0].copyFrom(this.midpoint.translatedBy(-w/2, h/2))

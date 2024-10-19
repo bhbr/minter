@@ -18,10 +18,10 @@ export class PhysicsPaper extends Paper {
 	scene: InclinedScene
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			scene: new InclinedScene({
-			anchor: new Vertex(100, 100)
-		}),
+				anchor: new Vertex(100, 100)
+			}),
 			creationConstructors: {
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
@@ -33,6 +33,14 @@ export class PhysicsPaper extends Paper {
 				'LinkButton',
 				'NumberButton'
 			]
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			scene: 'never',
+			creationConstructors: 'never',
+			buttonNames: 'never'
 		})
 	}
 

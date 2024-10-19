@@ -45,22 +45,22 @@ TODO: support mutiple paths e. g. for shapes with holes
 	svg: SVGSVGElement // child of view
 	path: SVGElement // child of svg
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'svg',
-			'path'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
+			path: document.createElementNS('http://www.w3.org/2000/svg', 'path'),
 			fillColor: Color.white(),
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
-			vertices: new VertexArray(),
-			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-			path: document.createElementNS('http://www.w3.org/2000/svg', 'path')
+			vertices: new VertexArray()
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			svg: 'never',
+			path: 'never'
 		})
 	}
 

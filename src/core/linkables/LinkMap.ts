@@ -17,20 +17,20 @@ export class LinkMap extends Mobject {
 	openBullet?: LinkBullet
 	openLink?: DependencyLink
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkList',
-			'connectedHooks'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			linkList: [],
 			connectedHooks: [],
 			openBullet: null,
 			openLink: null,
 			screenEventHandler: ScreenEventHandler.Self
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkList: 'never',
+			connectedHooks: 'never'
 		})
 	}
 
@@ -68,8 +68,9 @@ export class LinkMap extends Mobject {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		let p = this.localEventVertex(e)
-		p = this.hookAtLocation(p).positionInLinkMap()
+		let q = this.localEventVertex(e)
+		let h = this.hookAtLocation(q)
+		let p = h.positionInLinkMap()
 		this.openBullet = this.bulletAtLocation(p)
 		if (this.hookAtLocation(p) === null) { return }
 		if (this.openBullet === null) {
@@ -224,8 +225,8 @@ export class LinkMap extends Mobject {
 		startHook.mobject.update()
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		for (let trio of this.connectedHooks) {
 			let sh = trio[0]
 			let link = trio[1]

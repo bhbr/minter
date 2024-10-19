@@ -17,22 +17,31 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkHooks'
-		])
+	constructor(args: object = {}) {
+		super(args)
 	}
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			mobject: null,
-			inputNames: [],
+		return this.updateDefaults(super.defaults(), {
 			linkHooks: [],
 			cornerRadius: 20,
 			fillColor: Color.white(),
 			fillOpacity: 0.2,
 			strokeWidth: 0,
-			width: IO_LIST_WIDTH
+			width: IO_LIST_WIDTH,
+			mobject: null,
+			inputNames: []
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkHooks: 'never',
+			cornerRadius: 'never',
+			fillColor: 'never',
+			fillOpacity: 'never',
+			strokeWidth: 'never',
+			width: 'never'
 		})
 	}
 
@@ -51,7 +60,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.inputNames.length; i++) {
 			let name = this.inputNames[i]
 			let hook = new LinkHook({
@@ -68,12 +76,16 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			})
 			this.add(hook)
 			this.add(label)
-			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i)
+			this.positionHookAndLabel(hook, label, i)
+			this.linkHooks.push(hook)
+		}
+	}
+
+	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
+			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index)
 			hook.update({ midpoint: m })
 			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
 			label.update({ anchor: a })
-			this.linkHooks.push(hook)
-		}
 	}
 
 	hookNamed(name: string): LinkHook | null {
@@ -85,11 +97,13 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.height = this.getHeight()
-		this.createHookList()
 		if (this.mobject == null) { return }
+		if (argsDict['inputNames'] !== undefined) {
+			this.setup()
+		}
 		super.update({
 			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
 		}, redraw)

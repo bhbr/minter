@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "outDir": "../../lib/core",
+        "baseUrl": "../../src",
+        "allowJs": true,
+        "target": "es2021",
+        "sourceMap": true,
+         "lib": [
+            "dom",
+            "dom.iterable",
+            "es2021",
+        ],
+        "paths": {
+            "classes/*": ["../../src/core/classes/*"],
+            "_tests/*": ["../../src/core/_tests/*"]
+        }
+    },
+    "include": [
+        "../../src/core/classes/*",
+        "../../src/core/_tests/*",
+    ]
+}

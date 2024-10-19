@@ -11,32 +11,13 @@ export class Toggle extends Mobject {
 
 	circle: Circle
 	bullet: Circle
-	mobject?: Mobject
+	mobject: Mobject
 	propertyName: string
 	label: TextLabel
 	labelText: string
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'circle',
-			'bullet',
-			'mobject',
-			'propertyName',
-			'label',
-			'labelText'
-		])
-	}
-
-	value(): boolean {
-		return this.mobject[this.propertyName]
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			state: false,
-			mobject: null,
-			propertyName: '',
-			labelText: '',
+		return this.updateDefaults(super.defaults(), {
 			circle: new Circle({
 				radius: 10,
 				fillColor: Color.clear()
@@ -49,8 +30,27 @@ export class Toggle extends Mobject {
 			label: new TextLabel({
 				viewHeight: 20
 			}),
+			mobject: undefined,
+			propertyName: undefined,
+			labelText: undefined,
+			state: false,
 			screenEventHandler: ScreenEventHandler.Self
 		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			circle: 'never',
+			bullet: 'never',
+			label: 'never',
+			mobject: 'on_init',
+			propertyName: 'on_init',
+			labelText: 'on_init'
+		})
+	}
+
+	value(): boolean {
+		return this.mobject[this.propertyName]
 	}
 
 	setup() {
@@ -90,8 +90,8 @@ export class Toggle extends Mobject {
 		}
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, redraw)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
 		this.label.update({
 			text: this.labelText,
 			anchor: this.circle.urCorner().translatedBy(5, 0)

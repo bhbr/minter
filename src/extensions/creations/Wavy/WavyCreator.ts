@@ -8,15 +8,15 @@ export class WavyCreator extends SpanningCreator {
 
 	nbSources: number
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'nbSources'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			nbSources: 1
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			nbSources: 1
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			nbSources: 'on_init'
 		})
 	}
 

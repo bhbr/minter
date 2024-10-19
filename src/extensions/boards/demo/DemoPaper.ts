@@ -10,6 +10,8 @@ import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
+import { BoxStepper } from 'extensions/creations/math/BoxStepper/BoxStepper'
+import { Swing } from 'extensions/creations/Swing/Swing'
 
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Color } from 'core/classes/Color'
@@ -26,7 +28,7 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 export class DemoPaper extends Paper {
 
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'slider': BoxSliderCreator,
@@ -55,6 +57,13 @@ export class DemoPaper extends Paper {
 		})
 	}
 
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			creationConstructors: 'never',
+			buttonNames: 'never'
+		})
+	}
+
 	setup() {
 		super.setup()
 		let rect = new Rectangle({
@@ -69,7 +78,7 @@ export class DemoPaper extends Paper {
 		let circ = new Circle({
 			midpoint: new Vertex(50, 50),
 			radius: 25,
-			fillColor: Color.green(),
+			fillColor: Color.blue(),
 			fillOpacity: 0.5,
 			screenEventHandler: ScreenEventHandler.Parent
 		})
@@ -89,27 +98,24 @@ export class DemoPaper extends Paper {
 
 		let slider = new BoxSlider({
 			anchor: new Vertex(250, 50),
-			height: 150
+			height: 250,
+			drawBorder: true
 		})
-
-		let wavy = new Wavy({
-			anchor: new Vertex(400, 150),
-			viewWidth: 200,
-			viewHeight: 200
-		})
-
 		this.addToContent(slider)
-		this.addToContent(wavy)
-		wavy.play()
-		wavy.stop()
 
-		let cons = new Construction({
-			compactAnchor: new Vertex(500, 100),
-			compactWidth: 200,
-			compactHeight: 100
+		let stepper = new BoxStepper({
+			anchor: new Vertex(500, 100),
+			height: 100,
+			drawBorder: true
 		})
-		this.addToContent(cons)
 
+		this.addToContent(stepper)
+
+		let swing = new Swing({
+			anchor: new Vertex(400, 300)
+		})
+
+		this.addToContent(swing)
 
 	}
 }

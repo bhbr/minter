@@ -17,22 +17,27 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject: Mobject
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'linkHooks'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			linkHooks: [],
 			mobject: null,
 			outputNames: [],
-			linkHooks: [],
 			cornerRadius: 20,
 			fillColor: Color.white(),
 			fillOpacity: 0.2,
 			strokeWidth: 0,
 			width: IO_LIST_WIDTH
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			linkHooks: 'never',
+			cornerRadius: 'never',
+			fillColor: 'never',
+			fillOpacity: 'never',
+			strokeWidth: 'never',
+			width: 'never'
 		})
 	}
 
@@ -51,7 +56,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
 		for (let i = 0; i < this.outputNames.length; i++) {
 			let name = this.outputNames[i]
 			let hook = new LinkHook({
@@ -85,8 +89,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		return null
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.height = this.getHeight()
 		this.createHookList()
 		if (this.mobject == null) { return }

@@ -17,22 +17,22 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList 
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'inputNames',
-			'outputNames',
-			'inputList',
-			'outputList'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			inputList: new InputList(),
+			outputList: new OutputList(),
+			inputNames: [],
+			outputNames: [],			
+			screenEventHandler: ScreenEventHandler.Self
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			inputNames: [],
-			outputNames: [],
-			screenEventHandler: ScreenEventHandler.Self,
-			inputList: new InputList(),
-			outputList: new OutputList()
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			inputList: 'never',
+			outputList: 'never',
+			inputNames: 'in_subclass',
+			outputNames: 'in_subclass'
 		})
 	}
 
@@ -58,10 +58,6 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.add(this.outputList)
 		this.outputList.hide()
-		this.addDependency('viewHeight', this.inputList, null)
-		this.addDependency('viewWidth', this.inputList, null)
-		this.addDependency('viewHeight', this.outputList, null)
-		this.addDependency('viewWidth', this.outputList, null)
 	}
 
 	showLinks() {

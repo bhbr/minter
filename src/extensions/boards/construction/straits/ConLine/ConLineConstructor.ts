@@ -6,15 +6,15 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'line'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			line: new ConLine()
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			line: new ConLine()
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			line: 'never'
 		})
 	}
 

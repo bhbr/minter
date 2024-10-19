@@ -19,38 +19,43 @@ export class CindyCanvas extends Linkable implements Playable {
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'port',
-			'id',
-			'core',
-			'outerFrame',
-			'innerCanvas',
-			'playButton'
-		])
-	}
-	
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			screenEventHandler: ScreenEventHandler.Self,
-			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle(),
-			playButton: new PlayButton({
-				anchor: new Vertex(5, 5)
-			}),
-			playedOnce: false,
-			playState: 'stop',
-			drawBorder: true,
+		return this.updateDefaults(super.defaults(), {
 			port: {
 				transform: [{
 					visibleRect: [0, 1, 1, 0]
 				}]
-			}
+			},
+			innerCanvas: new Mobject(),
+			outerFrame: new Rectangle(),
+			playButton: new PlayButton({
+				anchor: new Vertex(5, 5),
+				mobject: this
+			}),
+
+			id: undefined,
+
+			screenEventHandler: ScreenEventHandler.Self,
+			playedOnce: false,
+			playState: 'stop',
+			drawBorder: true,
+			core: null
 			/*
 			core has no default because it is read-only and
 			will be created in cindySetup as a CindyJS instance
 			with state-dependent arguments
 			*/
+		})
+	}
+
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			port: 'never',
+			innerCanvas: 'never',
+			outerFrame: 'never',
+			playButton: 'never',
+			id: 'on_init'
 		})
 	}
 
@@ -73,9 +78,6 @@ export class CindyCanvas extends Linkable implements Playable {
 
 		this.innerCanvas.view.style['pointer-events'] = 'auto'
 
-		this.update({
-			id: `${this.constructor.name}-${Math.floor(1000 * Math.random())}`
-		})
 		this.innerCanvas.view.id = this.id
 
 		Object.assign(this.port, {
@@ -83,10 +85,6 @@ export class CindyCanvas extends Linkable implements Playable {
 			width: this.viewWidth,
 			height: this.viewHeight,
 			started: false
-		})
-
-		this.playButton.update({
-			mobject: this
 		})
 		this.add(this.playButton)
 
@@ -193,7 +191,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 	}
 
-	reload(argsDict: object = {}) {
+	reload(args: object = {}) {
 		let initScript = document.querySelector(`#${this.id}init`)
 		initScript.textContent = this.initCode()
 		let drawScript = document.querySelector(`#${this.id}draw`)

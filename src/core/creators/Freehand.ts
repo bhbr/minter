@@ -1,6 +1,6 @@
 
 import { Creator } from 'core/creators/Creator'
-import { Polygon } from 'core/vmobjects/Polygon'
+import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
 import { Circle } from 'core/shapes/Circle'
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Color } from 'core/classes/Color'
@@ -8,21 +8,28 @@ import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class Freehand extends Creator {
 
-	line: Polygon
+	line: PolygonalLine
 	penStrokeColor: Color
 	penStrokeWidth: number
 	penStrokeLength: number
 	
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			penStrokeColor: Color.white(),
-			penStrokeWidth: 1.0,
-			penStrokeLength: 2.0,
-			line: new Polygon({
+		return this.updateDefaults(super.defaults(), {
+			screenEventHandler: ScreenEventHandler.Below,
+			line: new PolygonalLine({
 				closed: false,
 				opacity: 1.0
 			}),
-			screenEventHandler: ScreenEventHandler.Below
+			penStrokeColor: Color.white(),
+			penStrokeWidth: 1.0,
+			penStrokeLength: 2.0
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			screenEventHandler: 'never',
+			line: 'never'
 		})
 	}
 

@@ -11,21 +11,21 @@ export class ConCircleConstructor extends Constructor {
 	freeOuterPoint: FreePoint
 	circle: ConCircle
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'freeMidpoint',
-			'freeOuterPoint',
-			'circle'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
-			strokeWidth: 1,
-			fillOpacity: 0,
+		return this.updateDefaults(super.defaults(), {
 			freeMidpoint : new FreePoint(),
 			freeOuterPoint: new FreePoint(),
-			circle: new ConCircle()
+			circle: new ConCircle(),
+			strokeWidth: 1,
+			fillOpacity: 0
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			freeMidpoint: 'never',
+			freeOuterPoint: 'never',
+			circle: 'never'
 		})
 	}
 

@@ -18,23 +18,24 @@ linkable mobjects
 	endBullet: LinkBullet
 	linkLine: Line
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'Dependency',
-			'startBullet',
-			'endBullet',
-			'linkLine'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
 			dependency: new Dependency(),
 			startBullet: new LinkBullet(),
 			endBullet: new LinkBullet(),
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH })
 		})
 	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			dependency: 'never',
+			startBullet: 'on_init',
+			endBullet: 'on_init',
+			linkLine: 'never'
+		})
+	}
+
 
 	setup() {
 		super.setup()

@@ -10,22 +10,23 @@ export class Constructor extends Creator {
 	penStrokeWidth: number
 	penFillColor: Color
 	penFillOpacity: number
-	construction: Construction
+	construction?: Construction
 	startPoint: Vertex
 	endPoint: Vertex
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'construction'
-		])
-	}
-
 	defaults(): object {
-		return Object.assign(super.defaults(), {
+		return this.updateDefaults(super.defaults(), {
+			construction: undefined, // defined in constructor arguments
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
 			penFillOpacity: 0.0
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			construction: 'never'
 		})
 	}
 

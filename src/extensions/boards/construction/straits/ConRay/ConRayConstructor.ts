@@ -6,15 +6,15 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'ray'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			ray: new ConRay()
+		})
 	}
 
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			ray: new ConRay()
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			ray: 'never'
 		})
 	}
 

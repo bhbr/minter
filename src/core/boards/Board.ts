@@ -40,16 +40,51 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-	readonlyProperties(): Array<string> {
-		return super.readonlyProperties().concat([
-			'sidebar',
-			'buttonNames',
-			'contentChildren',
-			'background',
-			'expandButton',
-			'linkMap',
-			'expandedPadding'
-		])
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			contentChildren: [],
+			expandButton: new ExpandButton(),
+			linkMap: new LinkMap(),
+			background: new RoundedRectangle({
+				anchor: Vertex.origin(),
+				cornerRadius: 50,
+				fillColor: Color.gray(0.1),
+				fillOpacity: 1.0,
+				strokeColor: Color.white(),
+				strokeWidth: 2.0,
+				screenEventHandler: ScreenEventHandler.Parent
+			}),
+			
+			expandedPadding: 20,
+
+			screenEventHandler: ScreenEventHandler.Self,
+			expanded: false,
+			compactWidth: 400, // defined below in the section 'expand and contract'
+			compactHeight: 300, // idem
+			compactAnchor: Vertex.origin(),
+			creationConstructors: {
+				'board': BoardCreator
+			},
+			buttonNames: [
+				'DragButton',
+				'LinkButton',
+				'BoardButton'
+			],
+			creationStroke: [],
+			creationMode: 'freehand',
+			creator: null,
+			sidebar: null
+		})
+	}
+
+	mutabilities(): object {
+		return this.updateMutabilities(super.mutabilities(), {
+			contentChildren: 'never',
+			expandButton: 'never',
+			linkMap: 'never',
+			background: 'never',
+			expandedPadding: 'in_subclass'
+		})
 	}
 
 	// a reference to the sidebar so we can change it
@@ -74,41 +109,6 @@ The content children can also be dragged and panned.
 
 	// the map of dependencies between the linkable content children
 	linkMap: LinkMap
-
-	defaults(): object {
-		return Object.assign(super.defaults(), {
-			screenEventHandler: ScreenEventHandler.Self,
-			contentChildren: [],
-			expanded: false,
-			compactWidth: 400, // defined below in the section 'expand and contract'
-			compactHeight: 300, // idem
-			compactAnchor: Vertex.origin(),
-			expandedPadding: 20,
-			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'BoardButton'
-			],
-			creationConstructors: {
-				'board': BoardCreator
-			},
-			creationStroke: [],
-			creationMode: 'freehand',
-			sidebar: null,
-			expandButton: new ExpandButton(),
-			linkMap: new LinkMap(),
-			creator: null,
-			background: new RoundedRectangle({
-				anchor: Vertex.origin(),
-				cornerRadius: 50,
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
-				strokeColor: Color.white(),
-				strokeWidth: 2.0,
-				screenEventHandler: ScreenEventHandler.Parent
-			})
-		})
-	}
 
 	setup() {
 		super.setup()
@@ -140,8 +140,8 @@ The content children can also be dragged and panned.
 
 	}
 
-	update(argsDict: object = {}, redraw: boolean = true) {
-		super.update(argsDict, false)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
 		this.background.update({
 			width: this.viewWidth,
 			height: this.viewHeight,
@@ -186,7 +186,7 @@ The content children can also be dragged and panned.
 	}
 
 	expandStateChange() {
-		this.expanded = true
+		if (!this.expanded) { this.update({ expanded: true }) }
 		getPaper().expandedMobject = this
 		this.enableContent()
 		if (this.parent != undefined) {
