@@ -30,9 +30,7 @@ which can be linked to such-exposed variables of other mobjects.
 	mutabilities(): object {
 		return this.updateMutabilities(super.mutabilities(), {
 			inputList: 'never',
-			outputList: 'never',
-			inputNames: 'in_subclass',
-			outputNames: 'in_subclass'
+			outputList: 'never'
 		})
 	}
 
@@ -95,6 +93,20 @@ which can be linked to such-exposed variables of other mobjects.
 	// (doesn't work at present)
 		super.dragging(e)
 		this.parent.linkMap.update()
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['inputNames'] !== undefined) {
+			this.inputList.update({
+				inputNames: args['inputNames']
+			}, true)
+		}
+		if (args['outputNames'] !== undefined) {
+			this.outputList.update({
+				outputNames: args['outputNames']
+			}, true)
+		}
 	}
 
 }

@@ -2,15 +2,30 @@
 import { LinkHook } from 'core/linkables/LinkHook'
 import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
+import { ExpandedBoardInputList}  from './ExpandedBoardInputList'
+import { Color } from 'core/classes/Color'
 
 export class EditableLinkHook extends LinkHook {
 	
 	inputBox: HTMLInputElement
+	declare _parent: ExpandedBoardInputList
+	previousValue: string
+	index: number
+
+	get parent(): ExpandedBoardInputList {
+		return this._parent
+	}
+
+	set parent(newValue: ExpandedBoardInputList) {
+		this._parent = newValue
+	}
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
 			inputBox: document.createElement('input'),
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			previousValue: '',
+			index: 0
 		})
 	}
 
@@ -20,12 +35,12 @@ export class EditableLinkHook extends LinkHook {
 		this.inputBox.style.width = '90%'
 		this.inputBox.style.padding = '3px 3px'
 		this.inputBox.style.color = 'white'
-		this.inputBox.style.backgroundColor = 'black'
+		this.inputBox.style.backgroundColor = Color.gray(0.2).toCSS()
 		this.inputBox.style.textAlign = 'left'
 		this.inputBox.style.verticalAlign = 'center'
 		this.inputBox.style.fontSize = '20px'
 		this.inputBox.style.position = 'absolute'
-		this.inputBox.style.top = '0px'
+		this.inputBox.style.top = '-7px'
 		this.inputBox.style.left = '30px'
 		this.inputBox.style.width = '150px'
 		this.view.appendChild(this.inputBox)
@@ -34,6 +49,11 @@ export class EditableLinkHook extends LinkHook {
 
 	onPointerUp(e: ScreenEvent) {
 		this.inputBox.focus()
+		this.inputBox.style.backgroundColor = Color.black().toCSS()
+		this.activateKeyboard()
+	}
+
+	activateKeyboard() {
 		document.addEventListener('keydown', this.boundKeyPressed)
 		getPaper().activeKeyboard = false
 		for (let button of getSidebar().buttons) {
@@ -41,10 +61,22 @@ export class EditableLinkHook extends LinkHook {
 		}
 	}
 
+	deactivateKeyboard() {
+		document.removeEventListener('keydown', this.boundKeyPressed)
+		getPaper().activeKeyboard = true
+		for (let button of getSidebar().buttons) {
+			button.activeKeyboard = true
+		}
+	}
+
 	boundKeyPressed(e: ScreenEvent) { }
 
 	keyPressed(e: KeyboardEvent) {
 		if (e.which != 13) { return }
+		if (this.inputBox.value == '') {
+			this.inputBox.value = this.previousValue
+			return
+		}
 		this.inputBox.blur()
 		getPaper().activeKeyboard = true
 		if (!isTouchDevice) {
@@ -52,9 +84,16 @@ export class EditableLinkHook extends LinkHook {
 				button.activeKeyboard = true
 			}
 		}
+		if (this.inputBox.value == this.previousValue) { return }
+		if (this.previousValue == '') {
+			this.parent.createNewHook()
+		}
+		this.previousValue = this.inputBox.value
+		
 		this.update({
 			name: this.inputBox.value
 		})
-		console.log(this.name)
+		this.parent.updateInputNames()
+		this.deactivateKeyboard()
 	}
 }

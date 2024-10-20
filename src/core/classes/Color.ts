@@ -29,7 +29,7 @@ export class Color {
 	}
 
 	toCSS(): string {
-		return `rgb(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`
+		return `rgba(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`
 	}
 
 	toString(): string {

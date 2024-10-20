@@ -459,6 +459,9 @@ and logic for drawing and user interaction.
 		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
 		this.interpolationStopCopy.update(args, false)
 
+		//console.log(this.interpolationStartCopy.anchor)
+		//console.log(this.interpolationStopCopy.anchor)
+
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
 		this.animationTimeStart = Date.now()
@@ -479,8 +482,8 @@ and logic for drawing and user interaction.
 	updateAnimation(keys: Array<string>) {
 	// This method gets called at regular intervals during the animation
 		let weight = (Date.now() - this.animationTimeStart) / this.animationDuration
-		let newargs = this.interpolatedAnimationArgs(keys, weight)
-		this.update(newargs)
+		let newArgs = this.interpolatedAnimationArgs(keys, weight)
+		this.update(newArgs, true)
 	}
 
 	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {

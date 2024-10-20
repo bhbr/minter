@@ -14,7 +14,7 @@ export class LinkHook extends Circle {
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
-			name: 'default',
+			name: '',
 			type: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,

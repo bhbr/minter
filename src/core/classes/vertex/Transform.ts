@@ -133,12 +133,12 @@ export class Transform extends ExtendedObject {
 
 	equals(t: Transform): boolean {
 		let tolerance = 1e-6
-		return (this.a() - t.a() < tolerance
-			 && this.b() - t.b() < tolerance
-			 && this.c() - t.c() < tolerance
-			 && this.d() - t.d() < tolerance
-			 && this.e() - t.e() < tolerance
-			 && this.f() - t.f() < tolerance)
+		return (Math.abs(this.a() - t.a()) < tolerance
+			 && Math.abs(this.b() - t.b()) < tolerance
+			 && Math.abs(this.c() - t.c()) < tolerance
+			 && Math.abs(this.d() - t.d()) < tolerance
+			 && Math.abs(this.e() - t.e()) < tolerance
+			 && Math.abs(this.f() - t.f()) < tolerance)
 	}
 
 

@@ -26,6 +26,7 @@ import { getPaper } from 'core/functions/getters'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
+import { IO_LIST_OFFSET } from 'core/linkables/constants'
 
 declare var paper: any
 declare interface Window { webkit?: any }
@@ -126,6 +127,8 @@ The content children can also be dragged and panned.
 		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
 		this.add(this.expandButton)
 		//this.expandButton.hide()
 
@@ -135,14 +138,21 @@ The content children can also be dragged and panned.
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET)
+			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET),
+			mobject: this
 		})
 		this.add(this.expandedInputList)
 
 		if (this.contracted) {
 			this.contractStateChange()
+			this.inputList.show()
+			this.outputList.show()
+			this.expandedInputList.hide()
 		} else {
 			this.expandStateChange()
+			this.inputList.hide()
+			this.outputList.hide()
+			this.expandedInputList.show()
 		}
 		this.hideLinksOfContent()
 
@@ -239,6 +249,10 @@ The content children can also be dragged and panned.
 			text: '+'
 		})
 		this.expandedInputList.hide()
+		this.inputList.update({
+			anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
+		}, true)
+		//this.outputList.positionSelf()
 	}
 
 	contract() {
@@ -264,13 +278,17 @@ The content children can also be dragged and panned.
 
 	disableContent() {
 		for (let mob of this.contentChildren) {
-			mob.disable()
+			if (mob.screenEventHandler == ScreenEventHandler.Self) {
+				mob.disable()
+			}
 		}
 	}
 
 	enableContent() {
 		for (let mob of this.contentChildren) {
-			mob.enable()
+			if (mob.savedScreenEventHandler == ScreenEventHandler.Self) {
+				mob.enable()
+			}
 		}
 	}
 
@@ -316,7 +334,6 @@ The content children can also be dragged and panned.
 			})
 		}
 	}
-
 
 	removeFromContent(mob: Linkable) {
 		remove(this.contentChildren, mob)
@@ -534,27 +551,6 @@ The content children can also be dragged and panned.
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

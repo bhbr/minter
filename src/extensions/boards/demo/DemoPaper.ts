@@ -66,57 +66,14 @@ export class DemoPaper extends Paper {
 
 	setup() {
 		super.setup()
-		let rect = new Rectangle({
-			anchor: new Vertex(100, 100),
-			width: 100,
-			height: 100,
-			fillColor: Color.red(),
-			fillOpacity: 0.5,
-			screenEventHandler: ScreenEventHandler.Self
+		
+		let board = new Board({
+			compactAnchor: new Vertex(100, 100),
+			compactWidth: 300,
+			compactHeight: 200
 		})
 
-		let circ = new Circle({
-			midpoint: new Vertex(50, 50),
-			radius: 25,
-			fillColor: Color.blue(),
-			fillOpacity: 0.5,
-			screenEventHandler: ScreenEventHandler.Parent
-		})
-
-		rect.add(circ)
-		this.addToContent(rect)
-
-		circ.update({
-			strokeWidth: 10
-		})
-
-		rect.onPointerDown = (e: ScreenEvent) => {
-			console.log(rect.localEventVertex(e))
-			console.log(screenEventTypeAsString(e))
-			console.log(screenEventDeviceAsString(e))
-		}
-
-		let slider = new BoxSlider({
-			anchor: new Vertex(250, 50),
-			height: 250,
-			drawBorder: true
-		})
-		this.addToContent(slider)
-
-		let stepper = new BoxStepper({
-			anchor: new Vertex(500, 100),
-			height: 100,
-			drawBorder: true
-		})
-
-		this.addToContent(stepper)
-
-		let swing = new Swing({
-			anchor: new Vertex(400, 300)
-		})
-
-		this.addToContent(swing)
-
+		this.addToContent(board)
 	}
 }
 

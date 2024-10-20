@@ -9,11 +9,15 @@ import { EditableLinkHook } from './EditableLinkHook'
 
 export class ExpandedBoardInputList extends InputList {
 
-	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
-			let m = new Vertex(HOOK_INSET_X + HOOK_HORIZONTAL_SPACING * index, HOOK_INSET_Y)
-			hook.update({ midpoint: m })
-			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
-			label.update({ anchor: a })
+	positionHook(hook: EditableLinkHook, index: number) {
+			let m = new Vertex(
+				HOOK_INSET_X + hook.radius + HOOK_HORIZONTAL_SPACING * index,
+				HOOK_INSET_Y + hook.radius
+				)
+			hook.update({
+				midpoint: m,
+				index: index
+			})
 	}
 
 	getHeight(): number {
@@ -22,8 +26,23 @@ export class ExpandedBoardInputList extends InputList {
 
 	setup() {
 		super.setup()
-		let hook = new EditableLinkHook()
-		this.add(hook)
+		this.createNewHook()
 	}
+
+	createNewHook() {
+		let hook = new EditableLinkHook()
+		this.positionHook(hook, this.linkHooks.length)
+		this.add(hook)
+		this.linkHooks.push(hook)
+	}
+
+	updateInputNames() {
+		let newInputNames: Array<string> = this.linkHooks.map((hook) => hook.name)
+		newInputNames.pop() // last hook is new and empty
+		this.mobject.update({
+			inputNames: newInputNames
+		})
+	}
+
 
 }

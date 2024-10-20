@@ -36,7 +36,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	mutabilities(): object {
 		return this.updateMutabilities(super.mutabilities(), {
-			linkHooks: 'never',
 			cornerRadius: 'never',
 			fillColor: 'never',
 			fillOpacity: 'never',
@@ -59,6 +58,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
+		this.linkHooks = []
+		for (let submob of this.submobs) {
+			this.remove(submob)
+		}
 		for (let i = 0; i < this.inputNames.length; i++) {
 			let name = this.inputNames[i]
 			let hook = new LinkHook({
@@ -81,10 +84,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	}
 
 	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
-			let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index)
-			hook.update({ midpoint: m })
-			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
-			label.update({ anchor: a })
+		let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index)
+		hook.update({ midpoint: m })
+		let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
+		label.update({ anchor: a })
 	}
 
 	hookNamed(name: string): LinkHook | null {
@@ -98,14 +101,20 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
-		this.height = this.getHeight()
 		if (this.mobject == null) { return }
-		if (args['inputNames'] !== undefined) {
-			this.setup()
-		}
+		if (this.constructor.name == 'ExpandedBoardInputList') { return }
+
+		if (args['inputNames'] === undefined) { return }
+
+		this.createHookList()
+		this.height = this.getHeight()
+		this.positionSelf()
+	}
+
+	positionSelf() {
 		super.update({
 			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
-		}, redraw)
+		}, true)
 	}
 }
 
