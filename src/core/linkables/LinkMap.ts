@@ -52,6 +52,11 @@ export class LinkMap extends Mobject {
 				return h
 			}
 		}
+		for (let h of this.parent.outerInputHooks()) {
+			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
 		return null
 	}
 
@@ -70,6 +75,7 @@ export class LinkMap extends Mobject {
 	onPointerDown(e: ScreenEvent) {
 		let q = this.localEventVertex(e)
 		let h = this.hookAtLocation(q)
+		if (h === null) { return }
 		let p = h.positionInLinkMap()
 		this.openBullet = this.bulletAtLocation(p)
 		if (this.hookAtLocation(p) === null) { return }
@@ -111,6 +117,7 @@ export class LinkMap extends Mobject {
 	}
 
 	onPointerMove(e: ScreenEvent) {
+		if (this.openBullet === null) { return }
 		var p = this.localEventVertex(e)
 		
 		let hooks = this.compatibleHooks()
@@ -170,6 +177,7 @@ export class LinkMap extends Mobject {
 		if (this.openBullet === this.openLink.startBullet) {
 			// input looking for an output
 			extend(hooks, this.parent.innerOutputHooks())
+			extend(hooks, this.parent.outerInputHooks())
 			for (let h of this.connectedMobjectOfOpenLink().outputHooks()) {
 				remove(hooks, h)
 			}
@@ -205,7 +213,6 @@ export class LinkMap extends Mobject {
 	createNewDependency() {
 
 		if (this.openBullet == this.openLink.startBullet) {
-
 			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
 			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
 			this.createNewDependencyBetweenHooks(startHook, endHook)

@@ -1,5 +1,5 @@
 
-import { InputList } from 'core/linkables/InputList'
+import { OutputList } from 'core/linkables/OutputList'
 import { LinkHook } from 'core/linkables/LinkHook'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Vertex } from 'core/classes/vertex/Vertex'
@@ -7,7 +7,7 @@ import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } f
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { EditableLinkHook } from './EditableLinkHook'
 
-export class ExpandedBoardInputList extends InputList {
+export class ExpandedBoardInputList extends OutputList {
 
 	positionHook(hook: EditableLinkHook, index: number) {
 			let m = new Vertex(
@@ -30,7 +30,9 @@ export class ExpandedBoardInputList extends InputList {
 	}
 
 	createNewHook() {
-		let hook = new EditableLinkHook()
+		let hook = new EditableLinkHook({
+			mobject: this.mobject
+		})
 		this.positionHook(hook, this.linkHooks.length)
 		this.add(hook)
 		this.linkHooks.push(hook)
@@ -44,5 +46,14 @@ export class ExpandedBoardInputList extends InputList {
 		})
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		let newMob = args['mobject']
+		if (newMob !== undefined) {
+			this.linkHooks.forEach((hook) => hook.update({
+				mobject: newMob
+			}, false))
+		}
+	}
 
 }

@@ -459,9 +459,6 @@ and logic for drawing and user interaction.
 		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
 		this.interpolationStopCopy.update(args, false)
 
-		//console.log(this.interpolationStartCopy.anchor)
-		//console.log(this.interpolationStopCopy.anchor)
-
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
 		this.animationTimeStart = Date.now()

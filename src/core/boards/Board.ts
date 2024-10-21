@@ -16,6 +16,9 @@ import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { Sidebar } from 'core/Sidebar'
 import { LinkHook } from 'core/linkables/LinkHook'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
+import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
+import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
+import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { Color } from 'core/classes/Color'
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Creator } from 'core/creators/Creator'
@@ -64,12 +67,18 @@ The content children can also be dragged and panned.
 			compactHeight: 300, // idem
 			compactAnchor: Vertex.origin(),
 			creationConstructors: {
-				'board': BoardCreator
+				'board': BoardCreator,
+				'input': InputValueBoxCreator,
+				'slider': BoxSliderCreator,
+				'stepper': BoxStepperCreator,
+				'color': ColorSampleCreator
 			},
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
-				'BoardButton'
+				'BoardButton',
+				'NumberButton',
+				'ColorSampleButton'
 			],
 			creationStroke: [],
 			creationMode: 'freehand',
@@ -168,7 +177,6 @@ The content children can also be dragged and panned.
 		})
 		if  (redraw) { this.redraw() }
 	}
-
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -355,7 +363,6 @@ The content children can also be dragged and panned.
 				if (this.creator == null) { return }
 				this.remove(this.creator)
 				this.creator = this.createCreator(this.creationMode)
-				console.log(this.creationMode)
 				this.add(this.creator)
 				break
 			case 'link':
@@ -529,6 +536,11 @@ The content children can also be dragged and panned.
 			}
 		}
 		return arr
+	}
+
+	outerInputHooks(): Array<LinkHook> {
+		let lh = this.expandedInputList.linkHooks
+		return lh.slice(0, lh.length - 1)
 	}
 
 

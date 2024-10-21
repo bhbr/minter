@@ -32,12 +32,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	mutabilities(): object {
 		return this.updateMutabilities(super.mutabilities(), {
-			linkHooks: 'never',
 			cornerRadius: 'never',
 			fillColor: 'never',
 			fillOpacity: 'never',
-			strokeWidth: 'never',
-			width: 'never'
+			strokeWidth: 'never'
 		})
 	}
 
@@ -56,6 +54,10 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	createHookList() {
 	// create the hooks (empty circles) and their labels
+		this.linkHooks = []
+		for (let submob of this.submobs) {
+			this.remove(submob)
+		}
 		for (let i = 0; i < this.outputNames.length; i++) {
 			let name = this.outputNames[i]
 			let hook = new LinkHook({
@@ -72,12 +74,15 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			})
 			this.add(hook)
 			this.add(label)
-			let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * i])
-			hook.update({ midpoint: m })
-			let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2)
-			label.update({ anchor: a })
 			this.linkHooks.push(hook)
 		}
+	}
+
+	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
+		let m = new Vertex([HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index])
+		hook.update({ midpoint: m })
+		let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2)
+		label.update({ anchor: a })
 	}
 
 	hookNamed(name): LinkHook | null {
@@ -91,12 +96,21 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
-		this.height = this.getHeight()
-		this.createHookList()
 		if (this.mobject == null) { return }
+		if (this.constructor.name == 'ExpandedBoardInputList') { return }
+
+		if (args['outputNames'] === undefined) { return }
+
+		this.createHookList()
+		this.height = this.getHeight()
+		if (this.mobject == null) { return }
+		this.positionSelf()
+	}
+
+	positionSelf() {
 		super.update({
 			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), this.mobject.viewHeight + IO_LIST_OFFSET)
-		}, redraw)
+		}, true)
 	}
 }
 

@@ -17,10 +17,6 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	constructor(args: object = {}) {
-		super(args)
-	}
-
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
 			linkHooks: [],
