@@ -57,6 +57,11 @@ export class LinkMap extends Mobject {
 				return h
 			}
 		}
+		for (let h of this.parent.outerOutputHooks()) {
+			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
 		return null
 	}
 
@@ -121,6 +126,7 @@ export class LinkMap extends Mobject {
 		var p = this.localEventVertex(e)
 		
 		let hooks = this.compatibleHooks()
+		console.log(hooks)
 		for (let h of hooks) {
 			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				this.openBullet.update({
@@ -185,6 +191,7 @@ export class LinkMap extends Mobject {
 		} else {
 			// output looking for an input
 			extend(hooks, this.parent.innerInputHooks())
+			extend(hooks, this.parent.outerOutputHooks())
 			for (let h of this.connectedMobjectOfOpenLink().inputHooks()) {
 				remove(hooks, h)
 			}

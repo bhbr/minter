@@ -1,7 +1,6 @@
 
-import { isTouchDevice } from 'core/mobjects/screen_events'
-
 export const LOG_STACK_RESOLUTION = Infinity
+let isTouchDevice: boolean = (document.body.className == 'ipad')
 
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
@@ -82,7 +81,6 @@ export function log(msg: any) {
 	if (stackSize() > LOG_STACK_RESOLUTION) { return }
 	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
 }
-
 
 
 

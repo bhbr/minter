@@ -342,7 +342,7 @@ and logic for drawing and user interaction.
 	drawBorder: boolean
 
 	setupView() {
-		if (this.view == null) { return }
+		if (!this.view) { return }
 		this.view['mobject'] = this
 		if (this.parent) {
 			this.parent.view.appendChild(this.view)
@@ -452,15 +452,14 @@ and logic for drawing and user interaction.
 
 	animate(args: object = {}, seconds: number) {
 	// Calling this method launches an animation
-
 		// Create mobject copies
-		this.interpolationStartCopy = deepCopy(this)
+		this.interpolationStartCopy = this
 		this.interpolationStartCopy.clearScreenEventHistory()
-		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy)
+		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy, false)
 		this.interpolationStopCopy.update(args, false)
-
+		
 		// all times in ms bc that is what setInterval and setTimeout expect
-		let dt = 10
+		let dt = 50
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds * 1000
 

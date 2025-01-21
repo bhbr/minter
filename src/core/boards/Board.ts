@@ -28,6 +28,7 @@ import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
+import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
 import { IO_LIST_OFFSET } from 'core/linkables/constants'
 
@@ -84,7 +85,8 @@ The content children can also be dragged and panned.
 			creationMode: 'freehand',
 			creator: null,
 			sidebar: null,
-			expandedInputList: new ExpandedBoardInputList()
+			expandedInputList: new ExpandedBoardInputList(),
+			expandedOutputList: new ExpandedBoardOutputList()
 		})
 	}
 
@@ -152,16 +154,26 @@ The content children can also be dragged and panned.
 		})
 		this.add(this.expandedInputList)
 
+		this.expandedOutputList.update({
+			height: EXPANDED_IO_LIST_HEIGHT,
+			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT),
+			mobject: this
+		})
+		this.add(this.expandedOutputList)
+
 		if (this.contracted) {
 			this.contractStateChange()
-			this.inputList.show()
-			this.outputList.show()
-			this.expandedInputList.hide()
+			// this.inputList.show()
+			// this.outputList.show()
+			// this.expandedInputList.hide()
+			// this.expandedOutputList.hide()
 		} else {
-			this.expandStateChange()
-			this.inputList.hide()
-			this.outputList.hide()
-			this.expandedInputList.show()
+			// this.expandStateChange()
+			// this.inputList.hide()
+			// this.outputList.hide()
+			// this.expandedInputList.show()
+			// this.expandedOutputList.show()
 		}
 		this.hideLinksOfContent()
 
@@ -218,6 +230,8 @@ The content children can also be dragged and panned.
 		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
 		}
+		this.expandedInputList.show()
+		this.expandedOutputList.show()
 		this.expandButton.update({
 			text: '–'
 		})
@@ -230,7 +244,6 @@ The content children can also be dragged and panned.
 				getPaper().sidebar = this.sidebar
 			}
 		}
-		this.expandedInputList.show()
 	}
 
 	expand() {
@@ -239,7 +252,7 @@ The content children can also be dragged and panned.
 			viewWidth: this.expandedWidth(),
 			viewHeight: this.expandedHeight(),
 			anchor: this.expandedAnchor()
-		}, 0.5)
+		}, 1)
 		this.initSidebar()
 	}
 
@@ -257,10 +270,13 @@ The content children can also be dragged and panned.
 			text: '+'
 		})
 		this.expandedInputList.hide()
-		this.inputList.update({
-			anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
-		}, true)
-		//this.outputList.positionSelf()
+		this.expandedOutputList.hide()
+		// this.inputList.update({
+		// 	anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
+		// }, true)
+		// this.outputList.update({
+		// 	anchor: new Vertex(0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET)
+		// }, true)
 	}
 
 	contract() {
@@ -269,7 +285,8 @@ The content children can also be dragged and panned.
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
-		}, 0.5)
+		}, 1)
+
 		if (this.parent instanceof Board) {
 			this.messageSidebar({ 'init': convertArrayToString(this.parent.buttonNames) })
 		}
@@ -488,6 +505,7 @@ The content children can also be dragged and panned.
 	//////////////////////////////////////////////////////////
 
 	expandedInputList: ExpandedBoardInputList
+	expandedOutputList: ExpandedBoardOutputList
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -507,6 +525,8 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
+		// this.expandedInputList.show()
+		// this.expandedOutputList.show()
 	}
 	
 	hideLinksOfContent() {
@@ -516,6 +536,8 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()
 		}
+		// this.expandedInputList.hide()
+		// this.expandedOutputList.hide()
 	}
 
 	innerInputHooks(): Array<LinkHook> {
@@ -540,6 +562,11 @@ The content children can also be dragged and panned.
 
 	outerInputHooks(): Array<LinkHook> {
 		let lh = this.expandedInputList.linkHooks
+		return lh.slice(0, lh.length - 1)
+	}
+
+	outerOutputHooks(): Array<LinkHook> {
+		let lh = this.expandedOutputList.linkHooks
 		return lh.slice(0, lh.length - 1)
 	}
 

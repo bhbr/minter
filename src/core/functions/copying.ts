@@ -31,7 +31,7 @@ export function copy(obj: any): any {
 	// and vice versa
 }
 
-export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
+export function deepCopy(obj: any, withHTML: boolean = true, memo: Array<Array<object>> = []): any {
 
 	// A deep copy recursively creates copies of all the objects
 	// encountered as properties. Shared objects (i. e.
@@ -65,7 +65,7 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 			if (alreadyCopied) {
 				newObj.push(copiedValue)
 			} else {
-				let y = deepCopy(value, memo)
+				let y = deepCopy(value, withHTML, memo)
 				newObj.push(y)
 				memo.push([value, y])
 			}
@@ -73,17 +73,23 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 		return newObj
 	}
 
-	var newObj = Object.create(obj.constructor.prototype)
+	let newObj: object
 	if (obj.constructor.name == 'HTMLDivElement') {
-		newObj = document.createElement('div')
+		newObj = withHTML ? document.createElement('div') : null
 	} else if (obj.constructor.name == 'HTMLSVGElement') {
-		newObj = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+		newObj = withHTML ? document.createElementNS('http://www.w3.org/2000/svg', 'svg') : null
 	} else if (obj.constructor.name == 'HTMLPathElement') {
-		newObj = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+		newObj = withHTML ? document.createElementNS('http://www.w3.org/2000/svg', 'path') : null
+	} else {
+		newObj = Object.create(obj.constructor.prototype)
 	}
 
 	memo.push([obj, newObj])
-	
+
+	if (newObj === null) {
+		return newObj
+	}
+
 	for (let [key, value] of Object.entries(obj)) {
 
 			var copiedValue: any
@@ -98,16 +104,16 @@ export function deepCopy(obj: any, memo: Array<Array<object>> = []): any {
 			if (alreadyCopied) {
 				newObj[key] = copiedValue
 			} else {
-				let y = deepCopy(value, memo)
+				let y = deepCopy(value, withHTML, memo)
 				newObj[key] = y
 			}
 	}
 
-	if (isInstance(obj, 'VMobject')) {
-		newObj.svg = obj.svg.cloneNode()
-		newObj.path = obj.path.cloneNode()
-		newObj.view.appendChild(newObj.svg)
-		newObj.svg.appendChild(newObj.path)
+	if (withHTML && isInstance(obj, 'VMobject')) {
+		newObj['svg'] = obj.svg.cloneNode()
+		newObj['path'] = obj.path.cloneNode()
+		newObj['view'].appendChild(newObj['svg'])
+		newObj['svg'].appendChild(newObj['path'])
 	}
 	return newObj
 }

@@ -24,6 +24,7 @@ import { Wavy } from 'extensions/creations/Wavy/Wavy'
 import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
 import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 
 export class DemoPaper extends Paper {
 
@@ -67,13 +68,6 @@ export class DemoPaper extends Paper {
 	setup() {
 		super.setup()
 		
-		let board = new Board({
-			compactAnchor: new Vertex(100, 100),
-			compactWidth: 300,
-			compactHeight: 200
-		})
-
-		this.addToContent(board)
 	}
 }
 

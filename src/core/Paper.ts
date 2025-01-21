@@ -65,6 +65,7 @@ export class Paper extends Board {
 	}
 
 	getMessage(message: object) {
+		if (Object.keys(message).length == 0) { return }
 		let key: string = Object.keys(message)[0]
 		let value: string | boolean | number | Array<string> = Object.values(message)[0]
 		if (value == "true") { value = true }

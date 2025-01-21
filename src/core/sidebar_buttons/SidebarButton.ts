@@ -49,6 +49,7 @@ export class SidebarButton extends Circle {
 			activeScalingFactor: 1.2,
 
 			messages: [],
+			outgoingMessage: {},
 
 			strokeWidth: 0,
 			screenEventHandler: ScreenEventHandler.Self,

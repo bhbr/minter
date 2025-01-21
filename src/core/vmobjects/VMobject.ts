@@ -42,8 +42,8 @@ TODO: support mutiple paths e. g. for shapes with holes
 	strokeColor: Color
 	strokeWidth: number
 
-	svg: SVGSVGElement // child of view
-	path: SVGElement // child of svg
+	svg?: SVGSVGElement // child of view
+	path?: SVGElement // child of svg
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
@@ -65,7 +65,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 	}
 
 	setup() {
-
+		if (!this.svg || !this.path || !this.view) { return }
 		// setup the svg
 		this.svg['mobject'] = this
 		this.svg.setAttribute('class', 'mobject-svg')
@@ -86,6 +86,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 
 	redraw() {
 		super.redraw()
+		if (!this.svg || !this.path || !this.view) { return }
 		let pathString: string = this.pathString()
 		if (pathString.includes('NaN')) { return }
 		this.path.setAttribute('d', pathString)
