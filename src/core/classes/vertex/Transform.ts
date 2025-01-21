@@ -41,20 +41,24 @@ export class Transform extends ExtendedObject {
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
 	}
 
+	toMatrix(): string {
+		return `[[${this.a()} ${this.b()}] [${this.c()} ${this.d()}]]; [${this.e()} ${this.f()}]`
+	}
+
 	a(): number { return this.scale * Math.cos(this.angle) }
 	b(): number { return this.scale * Math.sin(this.angle) }
 	c(): number { return -this.scale * Math.sin(this.angle) }
 	d(): number { return this.scale * Math.cos(this.angle) }
-	e(): number { return (1 - this.a()) * this.anchor.x + (1 - this.b()) * this.anchor.y + this.shift.x }
-	f(): number { return (1 - this.c()) * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
+	e(): number { return (1 - this.a()) * this.anchor.x - this.b() * this.anchor.y + this.shift.x }
+	f(): number { return -this.c() * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
 
 	inverse(): Transform {
 		let t = new Transform({
-			anchor: this.anchor,
 			angle: -this.angle,
 			scale: 1/this.scale
 		})
 		t.shift = t.appliedTo(this.shift).opposite()
+		t.anchor = this.anchor
 		return t
 	}
 
@@ -66,7 +70,7 @@ export class Transform extends ExtendedObject {
 	}
 
 	appliedToVertices(vertices: Array<Vertex>): VertexArray {
-	// This method accepts also an undertyped argument
+	// This method also accepts an undertyped argument
 		let ret = new VertexArray()
 		for (let v of vertices) {
 			ret.push(this.appliedTo(v))

@@ -1,6 +1,7 @@
 
 import { Transform } from './Transform'
 import { VertexArray } from './VertexArray'
+import { copy } from 'core/functions/copying'
 
 export class Vertex extends Array {
 
@@ -35,7 +36,7 @@ export class Vertex extends Array {
 
 	static new(...args: Array<any>): Vertex {
 		let x: any = args[0]
-		if (x instanceof Vertex) { return x }
+		if (x instanceof Vertex) { return copy(x) }
 		else { return new Vertex(...args) }
 	}
 
@@ -46,7 +47,7 @@ export class Vertex extends Array {
 	closeTo(otherVertex: Vertex, tolerance: number = 1e-6): boolean {
 		if (this.isNaN() || otherVertex.isNaN()) { return false }
 		if (!tolerance) { tolerance = 1 }
-		return (this.subtract(otherVertex).norm() < tolerance)
+		return (this.subtract(otherVertex).norm2() < tolerance**2)
 	}
 
 	isZero() { return this.x == 0 && this.y == 0 }

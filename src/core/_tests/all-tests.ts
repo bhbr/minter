@@ -57,8 +57,24 @@ import {
 	Vertex_called_with_no_args_is_zero_vertex,
 	Vertex_origin_is_zero_vertex,
 	Vertex_called_with_two_numbers_has_them_as_components,
+	Vertex_called_with_array_has_its_entries_as_components,
+	Vertex_called_with_vertex_creates_a_copy,
+
+	A_vertex_is_close_to_itself,
+	A_vertex_equals_itself
 } from 'core/classes/vertex/_tests/Vertex_tests'
 
+import {
+	A_transform_transforms_a_vertex_as_expected,
+	The_identity_transform_leaves_a_vertex_unchanged,
+	Even_an_identity_transform_with_nonzero_anchor_leaves_a_vertex_unchanged,
+	Transforms_concatenate_properly,
+	A_transform_s_inverse_undoes_the_transform,
+	A_transform_times_its_inverse_equals_the_identity,
+	A_transform_equals_itself,
+	A_transform_s_inverse_s_inverse_is_the_original_transform,
+	A_transform_s_determinant_is_computed_properly
+} from 'core/classes/vertex/_tests/Transform_tests'
 
 function runTest(test: () => boolean) {
 	let replacements = {
@@ -138,6 +154,25 @@ runTest(An_immutable_property_cannot_be_updated)
 runTest(Vertex_called_with_no_args_is_zero_vertex)
 runTest(Vertex_origin_is_zero_vertex)
 runTest(Vertex_called_with_two_numbers_has_them_as_components)
+runTest(Vertex_called_with_array_has_its_entries_as_components)
+runTest(Vertex_called_with_vertex_creates_a_copy)
+
+runTest(A_vertex_is_close_to_itself)
+runTest(A_vertex_equals_itself)
+
+
+
+// Transform test
+
+runTest(A_transform_transforms_a_vertex_as_expected)
+runTest(The_identity_transform_leaves_a_vertex_unchanged)
+runTest(Even_an_identity_transform_with_nonzero_anchor_leaves_a_vertex_unchanged)
+runTest(Transforms_concatenate_properly)
+runTest(A_transform_s_inverse_undoes_the_transform)
+runTest(A_transform_times_its_inverse_equals_the_identity)
+runTest(A_transform_equals_itself)
+runTest(A_transform_s_inverse_s_inverse_is_the_original_transform)
+runTest(A_transform_s_determinant_is_computed_properly)
 
 
 
