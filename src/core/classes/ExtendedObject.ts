@@ -16,6 +16,7 @@
 import { remove } from 'core/functions/arrays'
 import { copy } from 'core/functions/copying'
 
+
 class BaseExtendedObject {
 
 	defaults(): object { return {} }
@@ -27,9 +28,17 @@ export class ExtendedObject extends BaseExtendedObject {
 
 	_defaults: object
 	_mutabilities: object
-	passedByValue: boolean
+	_superclassMutabilities: object
+	// passedByValue: boolean
 	initComplete: boolean
 	properties: Array<string>
+	static mutabilityOrder = {
+		'always': 0,
+		'on_init': 1,
+		'in_subclass': 2,
+		'never': 3
+	}
+
 
 	defaults(): object {
 		return this.updateDefaults(super.defaults(), {
@@ -44,49 +53,58 @@ export class ExtendedObject extends BaseExtendedObject {
 	}
 
 	constructor(args: object = {}) {
-		super()
+	 	super()
 		this.initComplete = false
 		this.properties = []
 		this.setMutabilities()
 		this.setDefaults()
 		let ok = this.checkPermissions(args)
 		if (!ok) { return }
-
 		let inits = Object.assign(this._defaults, args)
-		inits = this.synchronizeUpdateArguments(inits)
+		//inits = this.synchronizeUpdateArguments(inits)
 		this.setProperties(inits)
 		this.properties = Object.keys(inits)
-		this.initComplete = true
+	 	this.initComplete = true
+	}
+
+	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
+		if (this._superclassMutabilities === undefined) {
+		 	this._superclassMutabilities = {}
+		}
+		if (!this.areCompatibleMutabilities(oldMutabilities, newMutabilities)) {
+			throw `Incompatible mutabilities`
+		}
+		Object.assign(this._superclassMutabilities, oldMutabilities)
+		return Object.assign(oldMutabilities, newMutabilities)
+	}
+
+	areCompatibleMutabilities(oldMutabilities: object, newMutabilities: object): boolean {
+		for (let [prop, newMut] of Object.entries(newMutabilities)) {
+			let oldMut = oldMutabilities[prop]
+			if (oldMut === undefined) { continue }
+			if (ExtendedObject.mutabilityOrder[newMut] < ExtendedObject.mutabilityOrder[oldMut]) {
+				return false
+			}
+		}
+		return true
 	}
 
 	setMutabilities() {
-		let oldMutabilities = super.mutabilities()
-		let newMutabilities = this.mutabilities()
-		this._mutabilities = {}
-		for (let [prop, newMutability] of Object.entries(newMutabilities)) {
-			let oldMutability = oldMutabilities[prop]
-			var valid: boolean = true
-			if (oldMutability === 'never'
-				&& newMutability != 'never') {
-				valid = false				
-			} else if (oldMutability === 'in_subclass'
-				&& (newMutability === 'on_init' || newMutability === 'always')) {
-				valid = false
-			} else if (oldMutability === 'on_init'
-				&& newMutability === 'always') {
-				valid = false
-			}
-			if (!valid) {
-				throw `Mutability of property ${prop} in ${this.constructor.name} cannot be changed from ${oldMutability} to ${newMutability}`
-				return
-			}
-			this._mutabilities[prop] = newMutability
-		}
+		Object.defineProperty(this, '_mutabilities', {
+			value: this.mutabilities(),
+			writable: false,
+			enumerable: true
+		})
+		Object.freeze(this._mutabilities)
 	}
 
 	mutability(prop: string): string {
 		return this._mutabilities[prop] ?? 'always'
 	}
+
+	// superclassMutability(prop: string): string {
+	// 	return this._superclassMutabilities[prop] ?? (this.properties.includes(prop) ? 'always' : 'never')
+	// }
 
 	setDefaults() {
 		this._defaults = this.defaults()
@@ -95,18 +113,14 @@ export class ExtendedObject extends BaseExtendedObject {
 	updateDefaults(oldDefaults: object, newDefaults: object): object {
 		let updatedDefaults = copy(oldDefaults)
 		for (let [prop, value] of Object.entries(newDefaults)) {
-			let oldMutability = super.mutability(prop) ?? 'always'
-			if (oldMutability === 'never') {
-				throw `Property ${prop} on ${this.constructor.name} cannot be assigned a new default value`
-				return
+			let oldMutability = this.mutability(prop) //this.superclassMutability(prop) ?? this.mutability(prop) ?? 'always'
+			if (oldMutability === 'never' && Object.keys(updatedDefaults).includes(prop)) {
+				// immutable property cannot be assigned a new default value
+				throw `The immutable property ${prop} on object ${this.constructor.name} cannot be assigned new default value ${value}`
 			}
 			updatedDefaults[prop] = value
 		}
-		return updatedDefaults
-	}
-
-	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
-		return Object.assign(oldMutabilities, newMutabilities)
+	 	return updatedDefaults
 	}
 
 	checkPermissions(args): boolean {
@@ -123,9 +137,9 @@ export class ExtendedObject extends BaseExtendedObject {
 		return true
 	}
 
-	synchronizeUpdateArguments(args: object): object {
-		return args
-	}
+	// synchronizeUpdateArguments(args: object): object {
+	// 	return args
+	// }
 
 	isSetter(prop: string): boolean {
 		let pd = this.propertyDescriptor(prop)
@@ -154,39 +168,39 @@ export class ExtendedObject extends BaseExtendedObject {
 		return (pd === undefined) ? undefined : pd.set
 	}
 
-	update(args: object = {}) {
-		let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
-		if (ok) {
-			args = this.removeUnchangedProperties(args)
-			this.setProperties(args)
-		} else {
-			this.checkPermissions(args)
-		}
-	}
+	// update(args: object = {}) {
+	// 	let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
+	// 	if (ok) {
+	// 		args = this.removeUnchangedProperties(args)
+	// 		this.setProperties(args)
+	// 	} else {
+	// 		this.checkPermissions(args)
+	// 	}
+	// }
 
-	removeUnchangedProperties(args: object): object {
-		for (let [prop, value] of Object.entries(args)) {
-			if (this[prop] === undefined) { continue }
-			if (typeof value != 'object' || value === null) {
-				if (this[prop] === value) {
-					delete args[prop]
-				}
-			} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
-				if (this[prop].equals(value)) {
-					delete args[prop]
-				}
-			} else {
-				if (this[prop] == value) {
-					delete args[prop]
-				}
-			}
-		}
-		return args
-	}
+	// removeUnchangedProperties(args: object): object {
+	// 	for (let [prop, value] of Object.entries(args)) {
+	// 		if (this[prop] === undefined) { continue }
+	// 		if (typeof value != 'object' || value === null) {
+	// 			if (this[prop] === value) {
+	// 				delete args[prop]
+	// 			}
+	// 		} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
+	// 			if (this[prop].equals(value)) {
+	// 				delete args[prop]
+	// 			}
+	// 		} else {
+	// 			if (this[prop] == value) {
+	// 				delete args[prop]
+	// 			}
+	// 		}
+	// 	}
+	// 	return args
+	// }
 
 	setProperties(args: object = {}) {
 
-		args = this.synchronizeUpdateArguments(args)
+	// 	args = this.synchronizeUpdateArguments(args)
 
 		let accessorArgs: object = {}
 		let otherPropertyArgs: object = {}
@@ -205,7 +219,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		}
 		for (let [prop, value] of Object.entries(accessorArgs)) {
 			this.setProperty(prop, value)
-		}
+	 	}
 	}
 
 	setProperty(prop: string, value: any) {
@@ -226,23 +240,23 @@ export class ExtendedObject extends BaseExtendedObject {
 		}
 	}
 
-	copyFrom(obj: ExtendedObject) {
-		let args: object = {}
-		for (let prop of obj.properties) {
-			let mut = this.mutability(prop)
-			if (mut !== 'always') {
-				//throw `Property ${prop} on ${this.constructor.name} cannot be copied from other object`
-				continue
-			}
-			args[prop] = obj[prop]
-		}
-		this.update(args)
-	}
+	// copyFrom(obj: ExtendedObject) {
+	// 	let args: object = {}
+	// 	for (let prop of obj.properties) {
+	// 		let mut = this.mutability(prop)
+	// 		if (mut !== 'always') {
+	// 			throw `Property ${prop} on ${this.constructor.name} cannot be copied from other object`
+	// 			continue
+	// 		}
+	// 		args[prop] = obj[prop]
+	// 	}
+	// 	this.update(args)
+	// }
 
-	isMutable(prop: string) {
-		return (this.mutability(prop) === 'always'
-			|| (this.mutability(prop) === 'on_init' && !this.initComplete))
-	}
+	// isMutable(prop: string) {
+	// 	return (this.mutability(prop) === 'always'
+	// 		|| (this.mutability(prop) === 'on_init' && !this.initComplete))
+	// }
 
 }
 

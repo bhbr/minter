@@ -1,3 +1,110 @@
-import { extendedObjectTest } from 'core/classes/ExtendedObjectTest'
+import {
+	An_object_s_mutability_object_cannot_be_reassigned,
+	A_property_s_mutability_cannot_be_changed_on_an_object,
 
-extendedObjectTest()
+	A_mutable_property_can_be_changed_after_object_creation,
+	A_mutable_property_will_be_changed_properly_after_object_creation,
+	An_initializable_property_cannot_be_changed_after_object_creation,
+	A_subclassable_property_cannot_be_changed_after_object_creation,
+	An_immutable_property_cannot_be_changed_after_object_creation,
+
+	A_mutable_property_can_be_changed_on_object_creation,
+	A_mutable_property_will_be_changed_properly_on_object_creation,
+	An_initializable_property_can_be_changed_on_object_creation,
+	An_initializable_property_will_be_changed_properly_on_object_creation,
+	A_subclassable_property_cannot_be_changed_on_object_creation,
+	An_immutable_property_cannot_be_changed_on_object_creation,
+
+	A_mutable_property_can_be_changed_in_subclass,
+	A_mutable_property_will_be_changed_properly_in_subclass,
+	An_initializable_property_can_be_changed_in_subclass,
+	An_initializable_property_will_be_changed_properly_in_subclass,
+	A_subclassable_property_can_be_changed_in_subclass,
+	A_subclassable_property_will_be_changed_properly_in_subclass,
+	An_immutable_property_cannot_be_changed_in_subclass,
+
+	An_immutable_property_cannot_become_subclassable_in_subclass,
+	An_immutable_property_cannot_become_initializable_in_subclass,
+	An_immutable_property_cannot_become_mutable_in_subclass,
+
+	A_subclassable_property_can_become_immutable_in_subclass,
+	A_subclassable_property_cannot_become_initializable_in_subclass,
+	A_subclassable_property_cannot_become_mutable_in_subclass,
+} from 'core/classes/_tests/ExtendedObject_tests'
+
+	// Properties_have_a_default_value,
+	// Non_immutable_properties_can_have_another_default_value_in_subclass,
+	// Non_subclassable_properties_cannot_have_another_default_value_in_subclass,
+	// A_property_can_become_immutable_in_a_subclass,
+	// Properties_with_mutability_always_can_be_set_in_the_constructor,
+	// Properties_with_mutability_always_can_be_updated
+
+import {
+	Vertex_called_with_no_args_is_zero_vertex,
+	Vertex_origin_is_zero_vertex,
+	Vertex_called_with_two_numbers_has_them_as_components
+} from 'core/classes/vertex/_tests/Vertex_tests'
+
+function runTest(test: () => boolean) {
+	let replacements = {
+		"_s_": "'s_",
+		"___": "_'_", 
+		"_": " "
+	}
+	let testAssertion = test.name
+	for (let [key, value] of Object.entries(replacements)) {
+		testAssertion = testAssertion.replaceAll(key, value)
+	}
+	if (test()) {
+		console.log(`%c PASSED: ${testAssertion} `, 'background-color: #070')
+	} else {
+		console.error(`FAILED: ${testAssertion}`)
+	}
+}
+
+runTest(An_object_s_mutability_object_cannot_be_reassigned)
+runTest(A_property_s_mutability_cannot_be_changed_on_an_object)
+
+runTest(A_mutable_property_can_be_changed_after_object_creation)
+runTest(A_mutable_property_will_be_changed_properly_after_object_creation)
+runTest(An_initializable_property_cannot_be_changed_after_object_creation)
+runTest(A_subclassable_property_cannot_be_changed_after_object_creation)
+runTest(An_immutable_property_cannot_be_changed_after_object_creation)
+
+runTest(A_mutable_property_can_be_changed_on_object_creation)
+runTest(A_mutable_property_will_be_changed_properly_on_object_creation)
+runTest(An_initializable_property_can_be_changed_on_object_creation)
+runTest(An_initializable_property_will_be_changed_properly_on_object_creation)
+runTest(A_subclassable_property_cannot_be_changed_on_object_creation)
+runTest(An_immutable_property_cannot_be_changed_on_object_creation)
+
+runTest(A_mutable_property_can_be_changed_in_subclass)
+runTest(A_mutable_property_will_be_changed_properly_in_subclass)
+runTest(An_initializable_property_can_be_changed_in_subclass)
+runTest(An_initializable_property_will_be_changed_properly_in_subclass)
+runTest(A_subclassable_property_can_be_changed_in_subclass)
+runTest(A_subclassable_property_will_be_changed_properly_in_subclass)
+runTest(An_immutable_property_cannot_be_changed_in_subclass)
+
+runTest(An_immutable_property_cannot_become_subclassable_in_subclass)
+runTest(An_immutable_property_cannot_become_initializable_in_subclass)
+runTest(An_immutable_property_cannot_become_mutable_in_subclass)
+
+runTest(A_subclassable_property_can_become_immutable_in_subclass)
+runTest(A_subclassable_property_cannot_become_initializable_in_subclass)
+runTest(A_subclassable_property_cannot_become_mutable_in_subclass)
+
+// runTest(Properties_have_a_default_value)
+// runTest(Non_immutable_properties_can_have_another_default_value_in_subclass)
+// runTest(Non_subclassable_properties_cannot_have_another_default_value_in_subclass)
+// runTest(A_property_can_become_immutable_in_a_subclass)
+
+// runTest(Properties_with_mutability_always_can_be_set_in_the_constructor)
+// runTest(Properties_with_mutability_always_can_be_updated)
+
+// runTest(Vertex_called_with_no_args_is_zero_vertex)
+// runTest(Vertex_origin_is_zero_vertex)
+// runTest(Vertex_called_with_two_numbers_has_them_as_components)
+
+
+
