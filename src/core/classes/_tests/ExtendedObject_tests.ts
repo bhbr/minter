@@ -658,21 +658,59 @@ export function A_mutable_property_can_become_initializable_in_subclass_and_have
 	}
 }
 
+//////////////
+// UPDATING //
+//////////////
 
 
+export function A_mutable_property_can_be_updated(): boolean {
+	let A = new FirstClass()
+	try {
+		A.update({ mutableProperty: 10 })
+		return true
+	} catch {
+		return false
+	}
+}
 
+export function A_mutable_property_can_be_updated_to_the_correct_value(): boolean {
+	let A = new FirstClass()
+	try {
+		A.update({ mutableProperty: 10 })
+		return (A.mutableProperty === 10)
+	} catch {
+		return false
+	}
+}
 
+export function An_initializable_property_cannot_be_updated(): boolean {
+	let A = new FirstClass()
+	try {
+		A.update({ initializableProperty: 20 })
+		return false
+	} catch {
+		return true
+	}
+}
 
+export function A_subclassable_property_cannot_be_updated(): boolean {
+	let A = new FirstClass()
+	try {
+		A.update({ subclassableProperty: 30 })
+		return false
+	} catch {
+		return true
+	}
+}
 
-
-// export function Properties_with_mutability_always_can_be_updated(): boolean {
-// 	let A = new FirstClass()
-// 	A.update({propertyMutableAlways: 5})
-// 	return (A.mutableProperty == 5)
-// }
-
-
-
-
+export function An_immutable_property_cannot_be_updated(): boolean {
+	let A = new FirstClass()
+	try {
+		A.update({ immutableProperty: 40 })
+		return false
+	} catch {
+		return true
+	}
+}
 
 

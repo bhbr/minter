@@ -58,7 +58,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		this.properties = []
 		this.setMutabilities()
 		this.setDefaults()
-		let ok = this.checkPermissions(args)
+		let ok = this.checkPermissionsOnUpdateDict(args)
 		if (!ok) { return }
 		let inits = Object.assign(this._defaults, args)
 		//inits = this.synchronizeUpdateArguments(inits)
@@ -123,7 +123,7 @@ export class ExtendedObject extends BaseExtendedObject {
 	 	return updatedDefaults
 	}
 
-	checkPermissions(args): boolean {
+	checkPermissionsOnUpdateDict(args): boolean {
 		for (let prop of Object.keys(args)) {
 			let mutability = this.mutability(prop)
 			if (mutability === 'never' || mutability === 'in_subclass') {
@@ -168,35 +168,35 @@ export class ExtendedObject extends BaseExtendedObject {
 		return (pd === undefined) ? undefined : pd.set
 	}
 
-	// update(args: object = {}) {
-	// 	let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
-	// 	if (ok) {
-	// 		args = this.removeUnchangedProperties(args)
-	// 		this.setProperties(args)
-	// 	} else {
-	// 		this.checkPermissions(args)
-	// 	}
-	// }
+	update(args: object = {}) {
+		let ok = Object.keys(args).every((prop) => this.mutability(prop) == 'always')
+		if (ok) {
+			args = this.removeUnchangedProperties(args)
+			this.setProperties(args)
+		} else {
+			this.checkPermissionsOnUpdateDict(args)
+		}
+	}
 
-	// removeUnchangedProperties(args: object): object {
-	// 	for (let [prop, value] of Object.entries(args)) {
-	// 		if (this[prop] === undefined) { continue }
-	// 		if (typeof value != 'object' || value === null) {
-	// 			if (this[prop] === value) {
-	// 				delete args[prop]
-	// 			}
-	// 		} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
-	// 			if (this[prop].equals(value)) {
-	// 				delete args[prop]
-	// 			}
-	// 		} else {
-	// 			if (this[prop] == value) {
-	// 				delete args[prop]
-	// 			}
-	// 		}
-	// 	}
-	// 	return args
-	// }
+	removeUnchangedProperties(args: object): object {
+		for (let [prop, value] of Object.entries(args)) {
+			if (this[prop] === undefined) { continue }
+			if (typeof value != 'object' || value === null) {
+				if (this[prop] === value) {
+					delete args[prop]
+				}
+			} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
+				if (this[prop].equals(value)) {
+					delete args[prop]
+				}
+			} else {
+				if (this[prop] == value) {
+					delete args[prop]
+				}
+			}
+		}
+		return args
+	}
 
 	setProperties(args: object = {}) {
 
