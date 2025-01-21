@@ -98,13 +98,13 @@ export class ExtendedObject extends BaseExtendedObject {
 		Object.freeze(this._mutabilities)
 	}
 
-	mutability(prop: string): string {
-		return this._mutabilities[prop] ?? 'always'
+	mutability(prop: string): string | null {
+		return this._mutabilities[prop] ?? null
 	}
 
-	// superclassMutability(prop: string): string {
-	// 	return this._superclassMutabilities[prop] ?? (this.properties.includes(prop) ? 'always' : 'never')
-	// }
+	superclassMutability(prop: string): string | null {
+		return this._superclassMutabilities[prop] ?? null
+	}
 
 	setDefaults() {
 		this._defaults = this.defaults()
@@ -113,7 +113,7 @@ export class ExtendedObject extends BaseExtendedObject {
 	updateDefaults(oldDefaults: object, newDefaults: object): object {
 		let updatedDefaults = copy(oldDefaults)
 		for (let [prop, value] of Object.entries(newDefaults)) {
-			let oldMutability = this.mutability(prop) //this.superclassMutability(prop) ?? this.mutability(prop) ?? 'always'
+			let oldMutability = this.superclassMutability(prop) ?? this.mutability(prop) ?? 'always'
 			if (oldMutability === 'never' && Object.keys(updatedDefaults).includes(prop)) {
 				// immutable property cannot be assigned a new default value
 				throw `The immutable property ${prop} on object ${this.constructor.name} cannot be assigned new default value ${value}`
