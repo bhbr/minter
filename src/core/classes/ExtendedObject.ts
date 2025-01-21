@@ -40,9 +40,30 @@ export class ExtendedObject extends BaseExtendedObject {
 	}
 
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
-			passedByValue: false
+
+	constructor(args: object = {}) {
+	 	super()
+		this.initComplete = false
+		this.setMutabilities()
+		this.setDefaults()
+		this.properties = Object.keys(this.defaults())
+		this.setUnsetMutabilities()
+
+		let ok = this.checkPermissionsOnUpdateDict(args)
+		if (!ok) {
+			throw `Constructor arguments incompatible with mutabilities on ${this.constructor.name}`
+		}
+		let inits = Object.assign(this._defaults, args)
+		//inits = this.synchronizeUpdateArguments(inits)
+		this.setProperties(inits)
+	 	this.initComplete = true
+	}
+
+	setMutabilities() {
+		Object.defineProperty(this, '_mutabilities', {
+			value: this.mutabilities(),
+			writable: false,
+			enumerable: true
 		})
 	}
 
@@ -50,21 +71,6 @@ export class ExtendedObject extends BaseExtendedObject {
 		return this.updateMutabilities(super.mutabilities(), {
 			passedByValue: 'in_subclass'
 		})
-	}
-
-	constructor(args: object = {}) {
-	 	super()
-		this.initComplete = false
-		this.properties = []
-		this.setMutabilities()
-		this.setDefaults()
-		let ok = this.checkPermissionsOnUpdateDict(args)
-		if (!ok) { return }
-		let inits = Object.assign(this._defaults, args)
-		//inits = this.synchronizeUpdateArguments(inits)
-		this.setProperties(inits)
-		this.properties = Object.keys(inits)
-	 	this.initComplete = true
 	}
 
 	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
@@ -88,26 +94,32 @@ export class ExtendedObject extends BaseExtendedObject {
 		}
 		return true
 	}
+	
+	mutability(prop: string): string {
+		return this._mutabilities[prop]
+	}
 
-	setMutabilities() {
-		Object.defineProperty(this, '_mutabilities', {
-			value: this.mutabilities(),
-			writable: false,
-			enumerable: true
-		})
+	superclassMutability(prop: string): string {
+		return this._superclassMutabilities[prop]
+	}
+
+	setUnsetMutabilities() {
+		for (let prop of this.properties) {
+			if (this.mutability(prop) === undefined) {
+				this._mutabilities[prop] = 'always'
+			}
+		}
 		Object.freeze(this._mutabilities)
-	}
-
-	mutability(prop: string): string | null {
-		return this._mutabilities[prop] ?? null
-	}
-
-	superclassMutability(prop: string): string | null {
-		return this._superclassMutabilities[prop] ?? null
 	}
 
 	setDefaults() {
 		this._defaults = this.defaults()
+	}
+
+	defaults(): object {
+		return this.updateDefaults(super.defaults(), {
+			passedByValue: false
+		})
 	}
 
 	updateDefaults(oldDefaults: object, newDefaults: object): object {

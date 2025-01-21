@@ -48,8 +48,18 @@ class FirstClass extends ExtendedObject {
 
 
 
+export function Every_property_has_a_mutability(): boolean {
+	let A = new FirstClass()
+	for (let prop of A.properties) {
+		if (A.mutability(prop) === null || A.mutability(prop) === undefined) {
+			return false
+		}
+	}
+	return true
+}
 
-export function Properties_have_a_default_value(): boolean {
+
+export function Every_property_has_a_default_value(): boolean {
 	let A = new FirstClass() // default values: see above
 	return (
 		A.mutableProperty == 1
@@ -305,7 +315,6 @@ export function An_immutable_property_cannot_be_changed_in_subclass(): boolean {
 ///////////////////////////////////////////////
 // CHANGING MUTABILITY AFTER OBJECT CREATION //
 ///////////////////////////////////////////////
-
 
 export function An_object_s_mutability_object_cannot_be_reassigned(): boolean {
 	let A = new FirstClass()

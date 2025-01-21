@@ -1,5 +1,6 @@
 import {
-	Properties_have_a_default_value,
+	Every_property_has_a_mutability,
+	Every_property_has_a_default_value,
 
 	A_mutable_property_can_be_changed_after_object_creation,
 	A_mutable_property_will_be_changed_properly_after_object_creation,
@@ -48,15 +49,16 @@ import {
 	A_mutable_property_can_be_updated_to_the_correct_value,
 	An_initializable_property_cannot_be_updated,
 	A_subclassable_property_cannot_be_updated,
-	An_immutable_property_cannot_be_updated,
+	An_immutable_property_cannot_be_updated
 
 } from 'core/classes/_tests/ExtendedObject_tests'
 
 import {
 	Vertex_called_with_no_args_is_zero_vertex,
 	Vertex_origin_is_zero_vertex,
-	Vertex_called_with_two_numbers_has_them_as_components
+	Vertex_called_with_two_numbers_has_them_as_components,
 } from 'core/classes/vertex/_tests/Vertex_tests'
+
 
 function runTest(test: () => boolean) {
 	let replacements = {
@@ -75,7 +77,10 @@ function runTest(test: () => boolean) {
 	}
 }
 
-runTest(Properties_have_a_default_value)
+// ExtendedObject tests
+
+runTest(Every_property_has_a_mutability)
+runTest(Every_property_has_a_default_value)
 
 runTest(A_mutable_property_can_be_changed_after_object_creation)
 runTest(A_mutable_property_will_be_changed_properly_after_object_creation)
@@ -126,9 +131,21 @@ runTest(An_initializable_property_cannot_be_updated)
 runTest(A_subclassable_property_cannot_be_updated)
 runTest(An_immutable_property_cannot_be_updated)
 
-// runTest(Vertex_called_with_no_args_is_zero_vertex)
-// runTest(Vertex_origin_is_zero_vertex)
-// runTest(Vertex_called_with_two_numbers_has_them_as_components)
+
+
+// Vertex tests
+
+runTest(Vertex_called_with_no_args_is_zero_vertex)
+runTest(Vertex_origin_is_zero_vertex)
+runTest(Vertex_called_with_two_numbers_has_them_as_components)
+
+
+
+
+
+
+
+
 
 
 
