@@ -12,8 +12,8 @@ export class ColorSample extends Linkable {
 	color: Color
 	circle: Circle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			circle : new Circle({
 				radius: RADIUS,
 				midpoint: new Vertex(RADIUS, RADIUS),
@@ -25,13 +25,13 @@ export class ColorSample extends Linkable {
 			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			circle: 'never'
-		})
+		}
 	}
 
 	setup() {

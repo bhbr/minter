@@ -17,8 +17,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject: Mobject
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			linkHooks: [],
 			mobject: null,
 			outputNames: [],
@@ -27,16 +27,16 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			fillOpacity: 0.2,
 			strokeWidth: 0,
 			width: IO_LIST_WIDTH
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			cornerRadius: 'never',
 			fillColor: 'never',
 			fillOpacity: 'never',
 			strokeWidth: 'never'
-		})
+		}
 	}
 
 	setup() {

@@ -12,15 +12,15 @@ export class Rectangle extends Polygon {
 	p3: Vertex // = (width, height)
 	p4: Vertex // = (0, height)
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			width: 200,
 			height: 100,
 			p1: Vertex.origin(),
 			p2: new Vertex(200, 0),
 			p3: new Vertex(200, 100),
 			p4: new Vertex(0, 100)
-		})
+		}
 	}
 
 	setup() {

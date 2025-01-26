@@ -40,9 +40,8 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
-
+	ownDefaults(): object {
+		return {
 			baseColor: Color.gray(0.4),
 			optionSpacing: 25,
 			label: new TextLabel(),
@@ -65,17 +64,17 @@ export class SidebarButton extends Circle {
 			viewHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 0.5,
 			activeKeyboard: true
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			baseColor: 'in_subclass',
 			optionSpacing: 'never',
 			label: 'never',
 			activeScalingFactor: 'never',
 			messages: 'on_init'
-		})
+		}
 	}
 
 	setup() {

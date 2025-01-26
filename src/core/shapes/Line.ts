@@ -8,11 +8,11 @@ export class Line extends Polygon {
 	startPoint: Vertex
 	endPoint: Vertex
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			startPoint: Vertex.origin(),
 			endPoint: Vertex.origin()
-		})
+		}
 	}
 
 	/*

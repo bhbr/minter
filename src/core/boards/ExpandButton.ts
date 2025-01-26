@@ -8,8 +8,8 @@ import { Color } from 'core/classes/Color'
 
 export class ExpandButton extends TextLabel {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			viewWidth: 30,
 			viewHeight: 30,
 			transform: Transform.identity(),
@@ -17,11 +17,11 @@ export class ExpandButton extends TextLabel {
 			screenEventHandler: ScreenEventHandler.Self,
 			backgroundColor: Color.gray(0.25),
 			color: Color.white()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			viewWidth: 'never',
 			viewHeight: 'never',
 			transform: 'never',
@@ -29,7 +29,7 @@ export class ExpandButton extends TextLabel {
 			screenEventHandler: 'never',
 			backgroundColor: 'never',
 			color: 'never'
-		})
+		}
 	}
 
 	get parent(): Board {

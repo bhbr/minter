@@ -113,7 +113,7 @@ export function A_transform_s_determinant_is_computed_properly(): boolean {
 	})
 	let d1 = t.det()
 	let d2 = t.a() * t.d() - t.b() * t.c()
-	return Math.abs((d1 - d2) / d1) < 1e-6
+	return (Math.abs((d1 - d2) / d1) < 1e-6)
 }
 
 

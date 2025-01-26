@@ -10,8 +10,8 @@ export class Wavy extends CindyCanvas {
 	sourceYPosition: number
 	color: Color
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			sourceYPosition: 0.2,
 			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],
 			outputNames: [],
@@ -19,15 +19,15 @@ export class Wavy extends CindyCanvas {
 			frequency: 0,
 			nbSources: 1,
 			color: Color.green()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			sourceYPosition: 'on_init',
 			inputNames: 'in_subclass',
 			outputNames: 'in_subclass'
-		})
+		}
 	}
 
 	initCode(): string {

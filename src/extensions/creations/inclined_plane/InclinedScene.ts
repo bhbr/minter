@@ -44,8 +44,8 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 				plane: new InclinedPlane({
 					length: 500
 				}),
@@ -92,11 +92,11 @@ export class InclinedScene extends Linkable implements Playable {
 					scale: FORCE_SCALE,
 					color: Color.green()
 				})
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			plane: 'never',
 			box: 'never',
 			initialBoxPositionAlongPlane: 'on_init',
@@ -104,7 +104,7 @@ export class InclinedScene extends Linkable implements Playable {
 			torques: 'never',
 			playButton: 'never',
 			showTorquesToggle: 'never'
-		})
+		}
 	}
 
 	setup() {

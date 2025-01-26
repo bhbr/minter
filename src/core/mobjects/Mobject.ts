@@ -33,10 +33,10 @@ and logic for drawing and user interaction.
 
 	/*
 	Subclasses dot NOT get their own explicit constructor.
-	This is to cleanly separate the stateless and stateful 
-	setup processes (explained below).
+	The state is completely set by defaults().
+	Any additional actions are performed afterwards in setup().
 	
-	Subclasses may also have a quite different setup
+	Subclasses may also have quite a different setup
 	than their superclass, and would otherwise have to undo
 	a lot of the superclass's constructor setup.
 	(E. g. a Circle's anchor should not be set, instead
@@ -59,14 +59,14 @@ and logic for drawing and user interaction.
 		this.redraw()
 	}
 
-	defaults(): object {
+	ownDefaults(): object {
 	/*
 	Default values of properties (declared
 	in the sections that follow).
 	This list is complemented in subclasses
 	by overriding the method.
 	*/
-		return this.updateDefaults(super.defaults(), {
+		return {
 			view: document.createElement('div'),
 			children: [], // i. e. submobjects
 			// The meaning of these properties is explained in the sections further below.
@@ -99,14 +99,14 @@ and logic for drawing and user interaction.
 			savedScreenEventHandler: null,
 			eventTarget: null,
 			screenEventHistory: []
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			view: 'on_init',
 			children: 'never'
-		})
+		}
 	}
 
 	setup() {
@@ -666,9 +666,13 @@ and logic for drawing and user interaction.
 		})
 		this.dependencies.push(dep)
 		if (refresh) {
-			target.update({
-				inputName: this['outputName']
-			})
+			let dict = {}
+			if (typeof this[outputName] === 'function') {
+				dict[inputName] = this[outputName]()
+			} else {
+				dict[inputName] = this[outputName]
+			}
+			target.update(dict)
 		}
 	}
 

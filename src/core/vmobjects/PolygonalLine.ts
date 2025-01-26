@@ -9,16 +9,16 @@ export class PolygonalLine extends VMobject {
 
 	closed: boolean
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			closed: true
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			closed: 'on_init'
-		})
+		}
 	}
 
 	static makePathString(vertices: VertexArray, closed: boolean): string {

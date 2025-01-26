@@ -19,8 +19,8 @@ export class ForceVector extends ConStrait {
 	footRadius: number
 	color: Color
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			tip: new Polygon({
 				fillOpacity: 1,
 				strokeWidth: 0
@@ -38,17 +38,17 @@ export class ForceVector extends ConStrait {
 			direction: 0,
 			color: Color.white(),
 			strokeWidth: 3
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			tip: 'never',
 			foot: 'never',
 			tipOpeningAngle: 'never',
 			tipSize: 'never',
 			footRadius: 'never'
-		})
+		}
 	}
 
 	setup() {

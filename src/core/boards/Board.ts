@@ -31,8 +31,9 @@ import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
 import { IO_LIST_OFFSET } from 'core/linkables/constants'
+import { Paper } from 'core/Paper'
 
-declare var paper: any
+declare var paper: Paper
 declare interface Window { webkit?: any }
 
 export class Board extends Linkable {
@@ -47,8 +48,8 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			contentChildren: [],
 			expandButton: new ExpandButton(),
 			linkMap: new LinkMap(),
@@ -87,17 +88,17 @@ The content children can also be dragged and panned.
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
 			expandedOutputList: new ExpandedBoardOutputList()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			contentChildren: 'never',
 			expandButton: 'never',
 			linkMap: 'never',
 			background: 'never',
 			expandedPadding: 'in_subclass'
-		})
+		}
 	}
 
 	// a reference to the sidebar so we can change it

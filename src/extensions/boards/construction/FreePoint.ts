@@ -4,16 +4,16 @@ import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
 
 export class FreePoint extends ConPoint {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			screenEventHandler: ScreenEventHandler.Parent
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			screenEventHandler: 'never'
-		})
+		}
 	}
 
 	onPointerDown(e: ScreenEvent) {

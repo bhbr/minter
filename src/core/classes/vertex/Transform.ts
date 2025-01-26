@@ -11,20 +11,20 @@ export class Transform extends ExtendedObject {
 	scale: number
 	shift: Vertex
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			passedByValue: true,
 			anchor: Vertex.origin(),
 			angle: 0,
 			scale: 1,
 			shift: Vertex.origin()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			passedByValue: 'never'
-		})
+		}
 	}
 
 	static identity(): Transform { return new Transform() }
@@ -55,10 +55,12 @@ export class Transform extends ExtendedObject {
 	inverse(): Transform {
 		let t = new Transform({
 			angle: -this.angle,
-			scale: 1/this.scale
+			scale: 1 / this.scale
 		})
-		t.shift = t.appliedTo(this.shift).opposite()
-		t.anchor = this.anchor
+		t.update({
+			shift: t.appliedTo(this.shift).opposite(),
+			anchor: this.anchor
+		})
 		return t
 	}
 
@@ -82,15 +84,6 @@ export class Transform extends ExtendedObject {
 		let ct = new Transform()
 		ct.copyFrom(this)
 		return ct
-	}
-
-	copyFrom(t: Transform) {
-		let argsDict: object = {}
-		for (let prop of t.properties) {
-			if (t.mutability(prop) !== 'always') { continue }
-			argsDict[prop] = t[prop]
-		}
-		this.setProperties(argsDict)
 	}
 
 	rightComposedWith(t: Transform): Transform {

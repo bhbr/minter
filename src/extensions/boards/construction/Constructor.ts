@@ -14,20 +14,20 @@ export class Constructor extends Creator {
 	startPoint: Vertex
 	endPoint: Vertex
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			construction: undefined, // defined in constructor arguments
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penFillColor: Color.white(),
 			penFillOpacity: 0.0
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			construction: 'never'
-		})
+		}
 	}
 
 	dissolve() {

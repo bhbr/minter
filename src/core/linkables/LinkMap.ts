@@ -17,21 +17,21 @@ export class LinkMap extends Mobject {
 	openBullet?: LinkBullet
 	openLink?: DependencyLink
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			linkList: [],
 			connectedHooks: [],
 			openBullet: null,
 			openLink: null,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			linkList: 'never',
 			connectedHooks: 'never'
-		})
+		}
 	}
 
 	get parent(): Board {

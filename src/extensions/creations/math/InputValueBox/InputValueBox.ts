@@ -14,8 +14,8 @@ export class InputValueBox extends Linkable {
 	inputBox: HTMLInputElement
 	background: Rectangle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			background: new Rectangle({
 				fillColor: Color.black()
 			}),
@@ -26,14 +26,14 @@ export class InputValueBox extends Linkable {
 			outputNames: ['value'],
 			strokeWidth: 0.0,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			background: 'never',
 			inputBox: 'never'
-		})
+		}
 	}
 
 	onPointerUp(e: ScreenEvent) {

@@ -19,8 +19,8 @@ export class CindyCanvas extends Linkable implements Playable {
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			port: {
 				transform: [{
 					visibleRect: [0, 1, 1, 0]
@@ -29,8 +29,7 @@ export class CindyCanvas extends Linkable implements Playable {
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			playButton: new PlayButton({
-				anchor: new Vertex(5, 5),
-				mobject: this
+				anchor: new Vertex(5, 5)
 			}),
 
 			id: undefined,
@@ -45,18 +44,18 @@ export class CindyCanvas extends Linkable implements Playable {
 			will be created in cindySetup as a CindyJS instance
 			with state-dependent arguments
 			*/
-		})
+		}
 	}
 
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			port: 'never',
 			innerCanvas: 'never',
 			outerFrame: 'never',
 			playButton: 'never',
 			id: 'on_init'
-		})
+		}
 	}
 
 	setup() {
@@ -87,7 +86,9 @@ export class CindyCanvas extends Linkable implements Playable {
 			started: false
 		})
 		this.add(this.playButton)
-
+		this.playButton.update({
+			mobject: this
+		})
 		this.createScripts()
 		this.startCore()
 	}

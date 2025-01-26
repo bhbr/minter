@@ -21,13 +21,13 @@ export class EditableLinkHook extends LinkHook {
 		this._parent = newValue
 	}
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			inputBox: document.createElement('input'),
 			screenEventHandler: ScreenEventHandler.Self,
 			previousValue: '',
 			index: 0
-		})
+		}
 	}
 
 	setup() {

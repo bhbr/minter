@@ -9,8 +9,8 @@ export class PlayButton extends SimpleButton {
 
 	mobject: Playable
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			screenEventHandler: ScreenEventHandler.Self,
 			mobject: undefined,
 			text: 'play',
@@ -20,14 +20,13 @@ export class PlayButton extends SimpleButton {
 			color: Color.white(),
 			borderColor: Color.white(),
 			borderWidth: 1
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
-			screenEventHandler: 'never',
-			mobject: 'on_init'
-		})
+	ownMutabilities(): object {
+		return {
+			screenEventHandler: 'never'
+		}
 	}
 
 	action() {

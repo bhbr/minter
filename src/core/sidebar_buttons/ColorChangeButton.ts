@@ -9,19 +9,19 @@ export class ColorChangeButton extends SidebarButton {
 
 	colorNames: Array<string>
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			colorNames: Object.keys(COLOR_PALETTE),
 			outgoingMessage: {},
 			optionSpacing: 15,
 			showLabel: false
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			colorNames: 'in_subclass'
-		})
+		}
 	}
 
 	setup() {

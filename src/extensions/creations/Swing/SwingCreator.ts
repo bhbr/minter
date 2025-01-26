@@ -7,16 +7,16 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			swing: new Swing()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			swing: 'never'
-		})
+		}
 	}
 
 	setup() {

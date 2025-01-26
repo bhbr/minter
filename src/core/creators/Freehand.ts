@@ -13,8 +13,8 @@ export class Freehand extends Creator {
 	penStrokeWidth: number
 	penStrokeLength: number
 	
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			screenEventHandler: ScreenEventHandler.Below,
 			line: new PolygonalLine({
 				closed: false,
@@ -23,14 +23,14 @@ export class Freehand extends Creator {
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
 			penStrokeLength: 2.0
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			screenEventHandler: 'never',
 			line: 'never'
-		})
+		}
 	}
 
 	setup() {

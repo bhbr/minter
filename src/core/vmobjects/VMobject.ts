@@ -45,8 +45,8 @@ TODO: support mutiple paths e. g. for shapes with holes
 	svg?: SVGSVGElement // child of view
 	path?: SVGElement // child of svg
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
 			path: document.createElementNS('http://www.w3.org/2000/svg', 'path'),
 			fillColor: Color.white(),
@@ -54,14 +54,14 @@ TODO: support mutiple paths e. g. for shapes with holes
 			strokeColor: Color.white(),
 			strokeWidth: 1,
 			vertices: new VertexArray()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			svg: 'never',
 			path: 'never'
-		})
+		}
 	}
 
 	setup() {

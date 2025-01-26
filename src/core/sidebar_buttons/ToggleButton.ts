@@ -4,6 +4,10 @@ import { BUTTON_SCALE_FACTOR } from './button_geometry'
 
 export class ToggleButton extends SidebarButton {
 
+	ownDefaults(): object {
+		return {}
+	}
+
 	commonButtonUp() {
 		this.currentModeIndex = 0
 		super.commonButtonUp()

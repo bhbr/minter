@@ -3,15 +3,15 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class ArithmeticButton extends CreativeButton {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			creations: ['+', '–', '&times;', '/']
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			creations: 'never'
-		})
+		}
 	}
 }

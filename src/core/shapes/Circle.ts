@@ -7,18 +7,18 @@ export class Circle extends CircularArc {
 	A Circle is a CircularArc whose angle equals TAU = 2*PI.
 	*/
 	
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			angle: TAU,
 			closed: true
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			angle: 'never',
 			closed: 'never'
-		})
+		}
 	}
 
 }

@@ -28,8 +28,8 @@ export class Sidebar extends Mobject {
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			view: document.querySelector('#sidebar_id') as HTMLElement,
 			background: new Rectangle({
 				fillColor: Color.gray(0.1),
@@ -51,14 +51,14 @@ export class Sidebar extends Mobject {
 			viewWidth: SIDEBAR_WIDTH,
 			viewHeight: PAGE_HEIGHT,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			view: 'never',
 			background: 'never'
-		})
+		}
 	}
 
 	setup() {

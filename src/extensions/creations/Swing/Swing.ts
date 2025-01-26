@@ -22,8 +22,8 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			fixtureWidth: 50,
 			fixtureHeight: 20,
 			fixture: new Rectangle({
@@ -43,17 +43,17 @@ export class Swing extends Linkable {
 			initialTime: Date.now(),
 			inputNames: ['length', 'mass'],
 			outputNames: ['angle', 'period']
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			fixtureWidth: 'never',
 			fixtureHeight: 'never',
 			fixture: 'never',
 			string: 'never',
 			weight: 'never'
-		})
+		}
 	}
 
 	setup() {

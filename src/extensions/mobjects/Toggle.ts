@@ -16,8 +16,8 @@ export class Toggle extends Mobject {
 	label: TextLabel
 	labelText: string
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			circle: new Circle({
 				radius: 10,
 				fillColor: Color.clear()
@@ -35,18 +35,18 @@ export class Toggle extends Mobject {
 			labelText: undefined,
 			state: false,
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			circle: 'never',
 			bullet: 'never',
 			label: 'never',
 			mobject: 'on_init',
 			propertyName: 'on_init',
 			labelText: 'on_init'
-		})
+		}
 	}
 
 	value(): boolean {

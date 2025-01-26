@@ -3,16 +3,16 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class WavyButton extends CreativeButton {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			creations: ['wavy']
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			creations: 'never'
-		})
+		}
 	}
 }
 

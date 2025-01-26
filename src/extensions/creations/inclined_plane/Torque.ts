@@ -17,19 +17,19 @@ export class Torque extends Polygon {
 		this.anchor = newValue
 	}
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			force: undefined,
 			strokeWidth: 0,
 			fillColor: new Color(0, 0.5, 0.5),
 			fillOpacity: 0.5
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			force: 'on_init'
-		})
+		}
 	}
 
 	lever(): Vertex {

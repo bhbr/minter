@@ -14,24 +14,25 @@
 // such an ExtendedObject as argument.
 
 import { remove } from 'core/functions/arrays'
-import { copy } from 'core/functions/copying'
+import { copy, equalObjects } from 'core/functions/copying'
 
 
 class BaseExtendedObject {
 
-	defaults(): object { return {} }
-	mutabilities(): object { return {} }
+	ownDefaults(): object { return {} }
+	ownMutabilities(): object { return {} }
 	mutability(prop: string): string { return 'always' }
 }
 
 export class ExtendedObject extends BaseExtendedObject {
 
-	_defaults: object
+	_classHierarchy: Array<string>
 	_mutabilities: object
-	_superclassMutabilities: object
-	// passedByValue: boolean
-	initComplete: boolean
-	properties: Array<string>
+	_hierarchicalMutabilities: object
+	_hierarchicalDefaults: object
+	_defaults: object
+	_initComplete: boolean
+	_checkPermissions: boolean
 	static mutabilityOrder = {
 		'always': 0,
 		'on_init': 1,
@@ -39,109 +40,202 @@ export class ExtendedObject extends BaseExtendedObject {
 		'never': 3
 	}
 
-
+	static compatibleMutabilities(oldMut, newMut): boolean {
+		return (ExtendedObject.mutabilityOrder[newMut] >= ExtendedObject.mutabilityOrder[oldMut])
+	}
 
 	constructor(args: object = {}) {
 	 	super()
-		this.initComplete = false
-		this.setMutabilities()
-		this.setDefaults()
-		this.properties = Object.keys(this.defaults())
-		this.setUnsetMutabilities()
-
-		let ok = this.checkPermissionsOnUpdateDict(args)
-		if (!ok) {
-			throw `Constructor arguments incompatible with mutabilities on ${this.constructor.name}`
+		this._initComplete = false
+		this._classHierarchy = []
+		this._hierarchicalMutabilities = {}
+		this._hierarchicalDefaults = {}
+		var previousMutabilities = {}
+		var previousDefaults = {}
+		var obj = Object.getPrototypeOf(this)
+		let prototypes: Array<ExtendedObject> = []
+		while (obj.constructor.name != 'BaseExtendedObject') {
+			prototypes.push(obj)
+			this._classHierarchy.push(obj.constructor.name)
+			obj = Object.getPrototypeOf(obj)
 		}
-		let inits = Object.assign(this._defaults, args)
-		//inits = this.synchronizeUpdateArguments(inits)
-		this.setProperties(inits)
-	 	this.initComplete = true
-	}
 
-	setMutabilities() {
+		prototypes.reverse()
+		this._classHierarchy.reverse()
+
+		for (let obj of prototypes) {
+			let newMutabilities = obj.ownMutabilities()
+			if (!equalObjects(previousMutabilities, newMutabilities)) {
+				this._hierarchicalMutabilities[obj.constructor.name] = newMutabilities
+				previousMutabilities = newMutabilities
+			} else {
+				this._hierarchicalMutabilities[obj.constructor.name] = {}
+			}
+			let newDefaults = obj.ownDefaults()
+			if (!equalObjects(previousDefaults, newDefaults)) {
+				this._hierarchicalDefaults[obj.constructor.name] = newDefaults
+				previousDefaults = newDefaults
+			} else {
+				this._hierarchicalDefaults[obj.constructor.name] = {}
+			}
+		}
+
 		Object.defineProperty(this, '_mutabilities', {
-			value: this.mutabilities(),
+			value: {},
 			writable: false,
 			enumerable: true
 		})
-	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
-			passedByValue: 'in_subclass'
-		})
-	}
-
-	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
-		if (this._superclassMutabilities === undefined) {
-		 	this._superclassMutabilities = {}
-		}
-		if (!this.areCompatibleMutabilities(oldMutabilities, newMutabilities)) {
-			throw `Incompatible mutabilities`
-		}
-		Object.assign(this._superclassMutabilities, oldMutabilities)
-		return Object.assign(oldMutabilities, newMutabilities)
-	}
-
-	areCompatibleMutabilities(oldMutabilities: object, newMutabilities: object): boolean {
-		for (let [prop, newMut] of Object.entries(newMutabilities)) {
-			let oldMut = oldMutabilities[prop]
-			if (oldMut === undefined) { continue }
-			if (ExtendedObject.mutabilityOrder[newMut] < ExtendedObject.mutabilityOrder[oldMut]) {
-				return false
+		for (let cls of this._classHierarchy) {
+			let mutDict = this._hierarchicalMutabilities[cls]
+			for (let [prop, mut] of Object.entries(mutDict)) {
+				if (Object.keys(this._mutabilities).includes(prop)) {
+					let oldMut = this._mutabilities[prop]
+					if (!ExtendedObject.compatibleMutabilities(oldMut, mut)) {
+						throw `Incompatible mutabilites in class ${cls}`
+					}
+				}
+				this._mutabilities[prop] = mut
 			}
 		}
-		return true
-	}
-	
-	mutability(prop: string): string {
-		return this._mutabilities[prop]
-	}
 
-	superclassMutability(prop: string): string {
-		return this._superclassMutabilities[prop]
-	}
+		this._defaults = {}
 
-	setUnsetMutabilities() {
-		for (let prop of this.properties) {
-			if (this.mutability(prop) === undefined) {
+		let previousMutabilities2 = {}
+		for (let cls of this._classHierarchy) {
+			let defDict = this._hierarchicalDefaults[cls]
+			let mutDict = this._hierarchicalMutabilities[cls]
+			for (let [prop, def] of Object.entries(defDict)) {
+				if (previousMutabilities2[prop] === 'never') {
+					throw `Trying to reassign immutable property ${prop} in class ${cls}`
+				} else {
+					this._defaults[prop] = def
+				}
+				if (previousMutabilities2[prop] === undefined) {
+					previousMutabilities2[prop] = mutDict[prop] ?? 'always'
+				}
+			}
+		}
+
+		for (let cls of this._classHierarchy) {
+			let mutDict = this._hierarchicalMutabilities[cls]
+			for (let [prop, mut] of Object.entries(mutDict)) {
+				this._mutabilities[prop] = mut
+			}
+		}
+
+		for (let prop of Object.keys(this._defaults)) {
+			if (!Object.keys(this._mutabilities).includes(prop)) {
 				this._mutabilities[prop] = 'always'
 			}
 		}
+
+		let inits = this.updateInits(this._defaults, args)
+		this.setProperties(inits)
 		Object.freeze(this._mutabilities)
+		this._initComplete = true
 	}
 
-	setDefaults() {
-		this._defaults = this.defaults()
+	ownMutabilities(): object {
+		return {
+			passedByValue: 'in_subclass'
+		}
 	}
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	properties(): Array<string> {
+		let ret: Array<string> = []
+		for (let [cls, defDict] of Object.entries(this._hierarchicalDefaults)) {
+			for (let prop of Object.keys(defDict)) {
+				if (!ret.includes(prop)) {
+					ret.push(prop)
+				}
+			}
+		}
+		return ret
+		//return Object.keys(this._defaults)
+	}
+	
+	mutability(prop: string): string {
+		return this._mutabilities[prop] ?? 'always'
+	}
+
+	mutabilities(): object {
+		let ret = {}
+		for (let prop of this.properties()) {
+			ret[prop] = this.mutability(prop)
+		}
+		return ret
+	}
+
+	ownDefaults(): object {
+		return {
 			passedByValue: false
-		})
+		}
 	}
+
+	// defaultValue(prop: string): any {
+	// 	var retDef: any = null
+	// 	for (let [cls, defDict] of Object.entries(this._defaults)) {
+
+	// 		let newDef = defDict[prop]
+	// 		if (newDef === undefined) { continue }
+	// 		if (retDef == null) {
+	// 			retDef = newDef
+	// 			continue
+	// 		}
+	// 		if (ExtendedObject.mutabilityOrder[newMut] >= ExtendedObject.mutabilityOrder[retMut]) {
+	// 			retMut = newMut
+	// 		} else {
+	// 			throw `Incompatible mutabilities in class ${this.constructor.name}`
+	// 		}
+	// 	}
+	// 	return retMut ?? 'always'
+	// }
+
 
 	updateDefaults(oldDefaults: object, newDefaults: object): object {
-		let updatedDefaults = copy(oldDefaults)
-		for (let [prop, value] of Object.entries(newDefaults)) {
-			let oldMutability = this.superclassMutability(prop) ?? this.mutability(prop) ?? 'always'
-			if (oldMutability === 'never' && Object.keys(updatedDefaults).includes(prop)) {
+		return {}
+	}
+	// 	let updatedDefaults = copy(oldDefaults)
+	// 	for (let [prop, value] of Object.entries(newDefaults)) {
+	// 		if (this._checkPermissions) {
+	// 			let supMut = this.superclassMutability(prop)
+	// 			let myMut = this.mutability(prop)
+	// 			let mutability = supMut ?? myMut
+	// 			if (mutability === 'never' && Object.keys(updatedDefaults).includes(prop)) {
+	// 				// immutable property cannot be assigned a new default value
+	// 				throw `The property ${prop} on object ${this.constructor.name} cannot be assigned new default value ${value}`
+	// 			}
+	// 		}
+	// 		updatedDefaults[prop] = value
+	// 	}
+	//  	return updatedDefaults
+	// }
+
+	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
+		return {}
+	}
+
+	updateInits(oldInits: object, newInits: object): object {
+		let updatedInits = copy(oldInits)
+		for (let [prop, value] of Object.entries(newInits)) {
+			let mutability = this._mutabilities[prop] ?? 'always'
+			if ((mutability === 'never' || mutability == 'in_subclass') && Object.keys(updatedInits).includes(prop)) {
 				// immutable property cannot be assigned a new default value
-				throw `The immutable property ${prop} on object ${this.constructor.name} cannot be assigned new default value ${value}`
+				throw `The property ${prop} on object ${this.constructor.name} cannot be assigned new initial value ${value}`
 			}
-			updatedDefaults[prop] = value
+			updatedInits[prop] = value
 		}
-	 	return updatedDefaults
+	 	return updatedInits
 	}
 
 	checkPermissionsOnUpdateDict(args): boolean {
 		for (let prop of Object.keys(args)) {
-			let mutability = this.mutability(prop)
+			let mutability = this._mutabilities[prop]
 			if (mutability === 'never' || mutability === 'in_subclass') {
 				throw `The property ${prop} on ${this.constructor.name} cannot be changed on initialization`
 				return false
-			} else if (mutability === 'on_init' && this.initComplete) {
+			} else if (mutability === 'on_init' && this._initComplete) {
 				throw `The property ${prop} on ${this.constructor.name} cannot be changed after initialization`
 				return false
 			}
@@ -250,11 +344,21 @@ export class ExtendedObject extends BaseExtendedObject {
 				this[prop] = value
 			}
 		}
+		//this._properties.push(prop)
+	}
+
+	copyFrom(obj: ExtendedObject) {
+		let argsDict: object = {}
+		for (let prop of obj.properties()) {
+			if (obj.mutability(prop) !== 'always') { continue }
+			argsDict[prop] = obj[prop]
+		}
+		this.setProperties(argsDict)
 	}
 
 	// copyFrom(obj: ExtendedObject) {
 	// 	let args: object = {}
-	// 	for (let prop of obj.properties) {
+	// 	for (let prop of obj.properties()) {
 	// 		let mut = this.mutability(prop)
 	// 		if (mut !== 'always') {
 	// 			throw `Property ${prop} on ${this.constructor.name} cannot be copied from other object`

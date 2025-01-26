@@ -17,8 +17,8 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			view: document.querySelector('#paper_id') as HTMLDivElement,
 			expandedPadding: 0,
 			expanded: true,
@@ -29,19 +29,20 @@ export class Paper extends Board {
 			viewWidth: PAPER_WIDTH,
 			viewHeight: PAGE_HEIGHT,
 			currentColor: Color.white()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			view: 'never',
 			expandedPadding: 'never',
 			expanded: 'never'
-		})
+		}
 	}
 
 	setup() {
 		super.setup()
+		this.expandedMobject = this
 		this.expandButton.hide()
 		this.expandedInputList.hide()
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)

@@ -89,7 +89,7 @@ export function deepCopy(obj: any, withHTML: boolean = true, memo: Array<Array<o
 	if (newObj === null) {
 		return newObj
 	}
-
+	
 	for (let [key, value] of Object.entries(obj)) {
 
 			var copiedValue: any
@@ -127,8 +127,20 @@ export function isInstance(obj: object, className: string): boolean {
 		return false
 }
 
-
-
+export function equalObjects(obj1: object, obj2: object) {
+	let a = Object.keys(obj1)
+	let b = Object.keys(obj2)
+	for (let key of a) {
+		if (!b.includes(key)) { return false }
+	}
+	for (let key of b) {
+		if (!a.includes(key)) { return false }
+	}
+	for (let prop of a) {
+		if (obj1[prop] != obj2[prop]) { return false }
+	}
+	return true
+}
 
 
 

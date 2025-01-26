@@ -6,16 +6,16 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			ray: new ConRay()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			ray: 'never'
-		})
+		}
 	}
 
 	setup() {

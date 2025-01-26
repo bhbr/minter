@@ -12,15 +12,15 @@ export class CircularArc extends CurvedLine {
 	angle: number
 	nbPoints: number // vertex resolution along the arc
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			closed: false,
 			anchor: undefined,
 			midpoint: new Vertex(DEFAULT_RADIUS, DEFAULT_RADIUS),
 			radius: DEFAULT_RADIUS,
 			angle: TAU / 4,
 			nbPoints: 32
-		})
+		}
 	}
 
 	// A circle's midpoint is not implemented as its own property,

@@ -3,16 +3,16 @@ import { CreativeButton } from './CreativeButton'
 
 export class BoardButton extends CreativeButton {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			creations: ['board']
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			creations: 'never'
-		})
+		}
 	}
 
 

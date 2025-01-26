@@ -11,22 +11,22 @@ export class ConCircleConstructor extends Constructor {
 	freeOuterPoint: FreePoint
 	circle: ConCircle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			freeMidpoint : new FreePoint(),
 			freeOuterPoint: new FreePoint(),
 			circle: new ConCircle(),
 			strokeWidth: 1,
 			fillOpacity: 0
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			freeMidpoint: 'never',
 			freeOuterPoint: 'never',
 			circle: 'never'
-		})
+		}
 	}
 
 	setup() {

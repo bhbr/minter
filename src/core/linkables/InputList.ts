@@ -17,8 +17,8 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	linkHooks: Array<LinkHook>
 	mobject?: Linkable // the mobject whose input this list represents
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			linkHooks: [],
 			cornerRadius: 20,
 			fillColor: Color.white(),
@@ -27,16 +27,16 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			width: IO_LIST_WIDTH,
 			mobject: null,
 			inputNames: []
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			cornerRadius: 'never',
 			fillColor: 'never',
 			fillOpacity: 'never',
 			strokeWidth: 'never'
-		})
+		}
 	}
 
 	setup() {

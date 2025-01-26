@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "outDir": "../../lib/core",
+        "outDir": "../../lib",
         "baseUrl": "../../src",
         "allowJs": true,
         "target": "es2021",

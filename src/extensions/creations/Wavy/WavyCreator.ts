@@ -8,21 +8,22 @@ export class WavyCreator extends SpanningCreator {
 
 	nbSources: number
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			nbSources: 1
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			nbSources: 'on_init'
-		})
+		}
 	}
 
 	createdMobject(): Wavy {
+		let p = this.getStartPoint()
 		return new Wavy({
-			anchor: this.getStartPoint(),
+			anchor: p,
 			viewWidth: this.viewWidth,
 			viewHeight: this.viewHeight,
 			nbSources: this.nbSources

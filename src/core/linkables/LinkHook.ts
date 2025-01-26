@@ -12,25 +12,25 @@ export class LinkHook extends Circle {
 	name: string
 	type: 'input' | 'output'
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			name: '',
 			type: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			mobject: null
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			radius: 'never',
 			fillOpacity: 'never',
 			strokeColor: 'never',
 			name: 'always',
 			type: 'on_init'
-		})
+		}
 	}
 
 

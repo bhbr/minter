@@ -33,8 +33,8 @@ export class Construction extends Board {
 	constructedMobjects: Array<ConMobject>
 	declare creator: Constructor
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			points: [],
 			constructedMobjects: [],
 			buttonNames: [
@@ -42,15 +42,15 @@ export class Construction extends Board {
 				'StraitButton',
 				'ConCircleButton'
 			]
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			points: 'never',
 			constructedMobjects: 'never',
 			buttonNames: 'never'
-		})
+		}
 	}
 
 	setup() {

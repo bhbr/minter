@@ -28,8 +28,8 @@ import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 
 export class DemoPaper extends Paper {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'slider': BoxSliderCreator,
@@ -55,14 +55,14 @@ export class DemoPaper extends Paper {
 				'SwingButton',
 				'ColorSampleButton'
 			]
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			creationConstructors: 'never',
 			buttonNames: 'never'
-		})
+		}
 	}
 
 	setup() {

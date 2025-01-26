@@ -35,8 +35,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: Vertex
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			inputNames: [],
 			outputNames: ['value'],
 			outerBar: new Rectangle({
@@ -63,17 +63,17 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			barFillColor: Color.gray(0.5),
 			screenEventHandler: ScreenEventHandler.Self,
 			precision: 3
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			inputNames: 'never',
 			outputNames: 'never',
 			outerBar: 'never',
 			filledBar: 'never',
 			label: 'never'
-		})
+		}
 	}
 
 	setup() {

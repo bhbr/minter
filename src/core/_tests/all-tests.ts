@@ -1,3 +1,5 @@
+import { equalObjectsAreEqual } from 'core/functions/_tests/copying_tests'
+
 import {
 	Every_property_has_a_mutability,
 	Every_property_has_a_default_value,
@@ -36,20 +38,23 @@ import {
 	An_initializable_property_can_become_immutable_in_subclass,
 	An_initializable_property_can_become_immutable_and_have_a_new_default_value_in_subclass,
 	An_initializable_property_can_become_subclassable_in_subclass,
-	An_initializable_property_can_become_subclassable_in_subclass_and_have_a_new_default_value_in_subclass,
+	An_initializable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass,
 	An_initializable_property_cannot_become_mutable_in_subclass,
 	A_mutable_property_can_become_immutable_in_subclass,
-	A_mutable_property_can_become_immutable_in_subclass_and_have_a_new_default_value_in_subclass,
+	A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subclass,
+	A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_1,
+	A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_2,
 	A_mutable_property_can_become_subclassable_in_subclass,
-	A_mutable_property_can_become_subclassable_in_subclass_and_have_a_new_default_value_in_subclass,
+	A_mutable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass,
 	A_mutable_property_can_become_initializable_in_subclass,
-	A_mutable_property_can_become_initializable_in_subclass_and_have_a_new_default_value_in_subclass,
+	A_mutable_property_can_become_initializable_and_have_a_new_default_value_in_subclass,
 
 	A_mutable_property_can_be_updated,
 	A_mutable_property_can_be_updated_to_the_correct_value,
 	An_initializable_property_cannot_be_updated,
 	A_subclassable_property_cannot_be_updated,
-	An_immutable_property_cannot_be_updated
+	An_immutable_property_cannot_be_updated,
+	An_immutable_property_can_be_added_in_a_subclass
 
 } from 'core/classes/_tests/ExtendedObject_tests'
 
@@ -76,6 +81,10 @@ import {
 	A_transform_s_determinant_is_computed_properly
 } from 'core/classes/vertex/_tests/Transform_tests'
 
+import {
+	Anchors_of_nested_mobjects_transform_properly
+} from 'core/mobjects/_tests/Mobject_tests'
+
 function runTest(test: () => boolean) {
 	let replacements = {
 		"_s_": "'s_",
@@ -92,6 +101,10 @@ function runTest(test: () => boolean) {
 		console.error(`FAILED: ${testAssertion}`)
 	}
 }
+
+
+
+runTest(equalObjectsAreEqual)
 
 // ExtendedObject tests
 
@@ -132,20 +145,23 @@ runTest(A_subclassable_property_cannot_become_mutable_in_subclass)
 runTest(An_initializable_property_can_become_immutable_in_subclass)
 runTest(An_initializable_property_can_become_immutable_and_have_a_new_default_value_in_subclass)
 runTest(An_initializable_property_can_become_subclassable_in_subclass)
-runTest(An_initializable_property_can_become_subclassable_in_subclass_and_have_a_new_default_value_in_subclass)
+runTest(An_initializable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass)
 runTest(An_initializable_property_cannot_become_mutable_in_subclass)
 runTest(A_mutable_property_can_become_immutable_in_subclass)
-runTest(A_mutable_property_can_become_immutable_in_subclass_and_have_a_new_default_value_in_subclass)
+runTest(A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subclass)
+runTest(A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_1)
+runTest(A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_2)
 runTest(A_mutable_property_can_become_subclassable_in_subclass)
-runTest(A_mutable_property_can_become_subclassable_in_subclass_and_have_a_new_default_value_in_subclass)
+runTest(A_mutable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass)
 runTest(A_mutable_property_can_become_initializable_in_subclass)
-runTest(A_mutable_property_can_become_initializable_in_subclass_and_have_a_new_default_value_in_subclass)
+runTest(A_mutable_property_can_become_initializable_and_have_a_new_default_value_in_subclass)
 
 runTest(A_mutable_property_can_be_updated)
 runTest(A_mutable_property_can_be_updated_to_the_correct_value)
 runTest(An_initializable_property_cannot_be_updated)
 runTest(A_subclassable_property_cannot_be_updated)
 runTest(An_immutable_property_cannot_be_updated)
+runTest(An_immutable_property_can_be_added_in_a_subclass)
 
 
 
@@ -175,7 +191,9 @@ runTest(A_transform_s_inverse_s_inverse_is_the_original_transform)
 runTest(A_transform_s_determinant_is_computed_properly)
 
 
+// Mobject tests
 
+runTest(Anchors_of_nested_mobjects_transform_properly)
 
 
 

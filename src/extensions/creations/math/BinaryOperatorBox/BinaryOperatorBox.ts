@@ -14,8 +14,8 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorLabel: TextLabel
 	operatorDict: object
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
 			operatorSign: new Circle({
 				radius: 10,
@@ -28,16 +28,16 @@ export class BinaryOperatorBox extends ValueBox {
 			operand2: 0,
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result']
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			operatorDict: 'in_subclass',
 			operatorSign: 'never',
 			operatorLabel: 'never',
 			operator: 'on_init'
-		})
+		}
 	}
 
 	setup() {
@@ -79,57 +79,56 @@ export class BinaryOperatorBox extends ValueBox {
 }
 
 export class AddBox extends BinaryOperatorBox {
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			operator: '+'
-		})
+		}
 	}
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			operator: 'never'
-		})
+		}
 	}
 }
 
 export class SubtractBox extends BinaryOperatorBox {
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			operator: '–'
-		})
+		}
 	}
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			operator: 'never'
-		})
+		}
 	}
 }
 
 export class MultiplyBox extends BinaryOperatorBox {
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			operator: '&times;'
-		})
+		}
 	}
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			operator: 'never'
-		})
+		}
 	}
 }
 
 export class DivideBox extends BinaryOperatorBox {
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			operator: '/'
-		})
+		}
 	}
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			operator: 'never'
-		})
+		}
 	}
 }
-
 
 
 

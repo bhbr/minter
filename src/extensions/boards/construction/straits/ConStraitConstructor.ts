@@ -10,18 +10,18 @@ export class ConStraitConstructor extends Constructor {
 	startFreePoint: FreePoint
 	endFreePoint: FreePoint
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			startFreePoint: new FreePoint(),
 			endFreePoint: new FreePoint()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			startFreePoint: 'never',
 			endFreePoint: 'never'
-		})
+		}
 	}
 
 	setup() {

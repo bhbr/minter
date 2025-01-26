@@ -6,16 +6,16 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			line: new ConLine()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			line: 'never'
-		})
+		}
 	}
 
 	setup() {

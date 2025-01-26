@@ -12,8 +12,8 @@ export class TextLabel extends Mobject {
 	borderWidth: number
 	fontSize: number
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			text: 'text',
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
@@ -21,7 +21,7 @@ export class TextLabel extends Mobject {
 			borderColor: Color.white(),
 			borderWidth: 1,
 			fontSize: 12
-		})
+		}
 	}
 
 	setup() {

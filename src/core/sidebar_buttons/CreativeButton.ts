@@ -5,17 +5,17 @@ export class CreativeButton extends SidebarButton {
 
 	creations: Array<string>
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			creations: [],
 			outgoingMessage: { create: 'freehand' }
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			creations: 'on_init'
-		})
+		}
 	}
 
 	setup() {

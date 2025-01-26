@@ -11,16 +11,16 @@ export class CurvedLine extends VMobject {
 	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			closed: true
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			closed: 'on_init'
-		})
+		}
 	}
 
 	_bezierPoints: VertexArray

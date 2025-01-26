@@ -3,20 +3,20 @@ import { Construction } from './Construction'
 
 export class ConPaper extends Construction {
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			buttonNames: [
 				'DragButton',
 				'StraitButton',
 				'ConCircleButton'
 			]
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			buttonNames: 'never'
-		})
+		}
 	}
 
 }

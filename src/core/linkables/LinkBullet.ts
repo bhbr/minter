@@ -11,20 +11,20 @@ A link bullet gets dragged onto a link hook to create
 a dependency between two linkable mobjects.
 */
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			radius: BULLET_RADIUS,
 			fillOpacity: 1,
 			strokeColor: Color.white()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			radius: 'never',
 			fillOpacity: 'never',
 			strokeColor: 'never'
-		})
+		}
 	}
 
 	get parent(): DependencyLink {

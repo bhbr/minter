@@ -17,21 +17,21 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList 
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
 			inputNames: [],
 			outputNames: [],			
 			screenEventHandler: ScreenEventHandler.Self
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			inputList: 'never',
 			outputList: 'never'
-		})
+		}
 	}
 
 	// this declares that the parent mobject will always be a board

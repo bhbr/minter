@@ -14,23 +14,23 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			fillOpacity: 1,
 			conMob1: undefined,
 			conMob2: undefined,
 			index: undefined,
 			midpoint: new Vertex(NaN, NaN)
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			fillOpacity: 'never',
 			conMob1: 'never',
 			conMob2: 'never',
 			index: 'never'
-		})
+		}
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

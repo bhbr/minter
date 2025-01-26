@@ -9,16 +9,16 @@ export class SpanningCreator extends Creator {
 	
 	rectangle: Rectangle
 
-	defaults(): object {
-		return this.updateDefaults(super.defaults(), {
+	ownDefaults(): object {
+		return {
 			rectangle: new Rectangle()
-		})
+		}
 	}
 
-	mutabilities(): object {
-		return this.updateMutabilities(super.mutabilities(), {
+	ownMutabilities(): object {
+		return {
 			rectangle: 'never'
-		})
+		}
 	}
 
 	setup() {
