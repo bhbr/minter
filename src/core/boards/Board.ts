@@ -165,16 +165,16 @@ The content children can also be dragged and panned.
 
 		if (this.contracted) {
 			this.contractStateChange()
-			// this.inputList.show()
-			// this.outputList.show()
-			// this.expandedInputList.hide()
-			// this.expandedOutputList.hide()
+			this.inputList.show()
+			this.outputList.show()
+			this.expandedInputList.hide()
+			this.expandedOutputList.hide()
 		} else {
-			// this.expandStateChange()
-			// this.inputList.hide()
-			// this.outputList.hide()
-			// this.expandedInputList.show()
-			// this.expandedOutputList.show()
+			this.expandStateChange()
+			this.inputList.hide()
+			this.outputList.hide()
+			this.expandedInputList.show()
+			this.expandedOutputList.show()
 		}
 		this.hideLinksOfContent()
 
@@ -272,12 +272,12 @@ The content children can also be dragged and panned.
 		})
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
-		// this.inputList.update({
-		// 	anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
-		// }, true)
-		// this.outputList.update({
-		// 	anchor: new Vertex(0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET)
-		// }, true)
+		this.inputList.update({
+			anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
+		}, true)
+		this.outputList.update({
+			anchor: new Vertex(0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET)
+		}, true)
 	}
 
 	contract() {
@@ -526,8 +526,8 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
-		// this.expandedInputList.show()
-		// this.expandedOutputList.show()
+		this.expandedInputList.show()
+		this.expandedOutputList.show()
 	}
 	
 	hideLinksOfContent() {
@@ -537,8 +537,8 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()
 		}
-		// this.expandedInputList.hide()
-		// this.expandedOutputList.hide()
+		this.expandedInputList.hide()
+		this.expandedOutputList.hide()
 	}
 
 	innerInputHooks(): Array<LinkHook> {
