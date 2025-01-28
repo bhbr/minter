@@ -248,12 +248,12 @@ The content children can also be dragged and panned.
 	}
 
 	expand() {
-		this.expandStateChange()
 		 this.animate({
 		 	viewWidth: this.expandedWidth(),
 		 	viewHeight: this.expandedHeight(),
 		 	anchor: this.expandedAnchor()
-		}, 1)
+		}, 0.5)
+		this.expandStateChange()
 		this.initSidebar()
 	}
 
@@ -281,12 +281,12 @@ The content children can also be dragged and panned.
 	}
 
 	contract() {
-		this.contractStateChange()
 		this.animate({
 			viewWidth: this.compactWidth,
 			viewHeight: this.compactHeight,
 			anchor: this.compactAnchor
-		}, 1)
+		}, 0.5)
+		this.contractStateChange()
 
 		if (this.parent instanceof Board) {
 			this.messageSidebar({ 'init': convertArrayToString(this.parent.buttonNames) })

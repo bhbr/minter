@@ -459,7 +459,7 @@ and logic for drawing and user interaction.
 		this.interpolationStopCopy.update(args, false)
 		
 		// all times in ms bc that is what setInterval and setTimeout expect
-		let dt = 50
+		let dt = 10
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds * 1000
 
