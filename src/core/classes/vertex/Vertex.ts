@@ -78,7 +78,7 @@ export class Vertex extends Array {
 	}
 
 	translatedBy(w1: number | Array<number> | Vertex, w2?: number): Vertex {
-		return this.imageUnder(new Transform({shift: new Vertex(w1, w2)}))
+		return this.add(new Vertex(w1, w2))
 	}
 
 	translateBy(w1: number | Array<number> | Vertex, w2?: number) {
@@ -94,8 +94,11 @@ export class Vertex extends Array {
 	}
 
 	scaledBy(scale: number, center: Vertex = Vertex.origin()): Vertex {
-		let s = new Transform({scale: scale, anchor: center})
-		return this.imageUnder(s)
+		if (center.isZero()) {
+			return this.multiply(scale)
+		} else {
+			return this.subtract(center).multiply(scale).add(center)
+		}
 	}
 
 	scaleBy(scale: number, center: Vertex = Vertex.origin()) {
@@ -110,8 +113,8 @@ export class Vertex extends Array {
 		this.scaleBy(1 / this.norm())
 	}
 
-	add(otherVertex: Vertex): Vertex { return this.translatedBy(otherVertex) }
-	multiply(factor: number): Vertex { return this.scaledBy(factor) }
+	add(otherVertex: Vertex): Vertex { return new Vertex(this.x + otherVertex.x, this.y + otherVertex.y) }
+	multiply(factor: number): Vertex { return new Vertex(factor * this.x, factor * this.y) }
 	divide(factor: number): Vertex { return this.multiply(1/factor) }
 	opposite(): Vertex { return this.multiply(-1) }
 	subtract(otherVertex: Vertex): Vertex { return this.add(otherVertex.opposite()) }
