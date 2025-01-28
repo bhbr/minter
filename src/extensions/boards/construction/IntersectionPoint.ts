@@ -4,19 +4,19 @@ import { ConMobject } from './Construction'
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { ConStrait } from './straits/ConStrait'
 import { ConCircle } from './ConCircle/ConCircle'
+import { Color } from 'core/classes/Color'
 
 export class IntersectionPoint extends ConPoint {
 
 	conMob1: ConMobject
 	conMob2: ConMobject
 	index: number
-	fillOpacity: number = 0
 	lambda: number = NaN
 	mu: number = NaN
 
 	ownDefaults(): object {
 		return {
-			fillOpacity: 1,
+			fillOpacity: 0,
 			conMob1: undefined,
 			conMob2: undefined,
 			index: undefined,
@@ -27,9 +27,9 @@ export class IntersectionPoint extends ConPoint {
 	ownMutabilities(): object {
 		return {
 			fillOpacity: 'never',
-			conMob1: 'never',
-			conMob2: 'never',
-			index: 'never'
+			conMob1: 'on_init',
+			conMob2: 'on_init',
+			index: 'on_init'
 		}
 	}
 
@@ -68,12 +68,12 @@ export class IntersectionPoint extends ConPoint {
 
 		let a: number = A.subtract(B).norm2()
 		let b: number = 2 * C.subtract(A).dot(A.subtract(B))
-		let c: number = C.subtract(A).norm2() - r**2
-		let d: number = b**2 - 4*a*c
+		let c: number = C.subtract(A).norm2() - r ** 2
+		let d: number = b ** 2 - 4 * a * c
 
-		this.lambda = (-b + (index == 0 ? -1 : 1) * d**0.5)/(2*a)
+		this.lambda = (-b + (index == 0 ? -1 : 1) * d ** 0.5) / (2 * a)
 		let P: Vertex = A.add(B.subtract(A).multiply(this.lambda))
-		if (strait.constructor.name == 'ConLine') {
+		if (strait.constructor.name == 'ConSegment') {
 			if (this.lambda < 0 || this.lambda > 1) { P = new Vertex(NaN, NaN) }
 		} else if (strait.constructor.name == 'ConRay') {
 			if (this.lambda < 0) { P = new Vertex(NaN, NaN) }
@@ -92,14 +92,20 @@ export class IntersectionPoint extends ConPoint {
 		let CD = D.subtract(C)
 		let AC = C.subtract(A)
 
-		let det: number = (AB.x*CD.y - AB.y*CD.x)
+		let det: number = (AB.x * CD.y - AB.y * CD.x)
 		if (det == 0) { return new Vertex(NaN, NaN) } // parallel lines
-		this.lambda = (CD.y*AC.x - CD.x*AC.y)/det
-		this.mu = (AB.y*AC.x - AB.x*AC.y)/det
+		this.lambda = (CD.y * AC.x - CD.x * AC.y) / det
+		this.mu = (AB.y * AC.x - AB.x * AC.y) / det
 		let Q: Vertex = A.add(AB.multiply(this.lambda))
 
-		let intersectionFlag1: boolean = (strait1.constructor.name == 'ConSegment' && this.lambda >= 0 && this.lambda <= 1) || (strait1.constructor.name == 'ConRay' && this.lambda >= 0) || (strait1.constructor.name == 'ConLine')
-		let intersectionFlag2: boolean = (strait2.constructor.name == 'ConSegment' && this.mu >= 0 && this.mu <= 1) || (strait2.constructor.name == 'ConRay' && this.mu >= 0) || (strait2.constructor.name == 'ConLine')
+		let intersectionFlag1: boolean =
+			(strait1.constructor.name == 'ConSegment' && this.lambda >= 0 && this.lambda <= 1)
+			|| (strait1.constructor.name == 'ConRay' && this.lambda >= 0)
+			|| (strait1.constructor.name == 'ConLine')
+		let intersectionFlag2: boolean =
+			(strait2.constructor.name == 'ConSegment' && this.mu >= 0 && this.mu <= 1)
+			|| (strait2.constructor.name == 'ConRay' && this.mu >= 0)
+			|| (strait2.constructor.name == 'ConLine')
 
 		return (intersectionFlag1 && intersectionFlag2) ? Q : new Vertex(NaN, NaN)
 
@@ -112,17 +118,17 @@ export class IntersectionPoint extends ConPoint {
 		let r1: number = circle1.radius
 		let r2: number = circle2.radius
 
-		let R: number = 0.5*(r1**2 - r2**2 - A.norm2() + B.norm2())
+		let R: number = 0.5 * (r1 ** 2 - r2 ** 2 - A.norm2() + B.norm2())
 		let r: number = (A.x - B.x)/(B.y - A.y)
-		let s: number = R/(B.y - A.y)
+		let s: number = R / (B.y - A.y)
 
-		let a: number = 1 + r**2
-		let b: number = 2*(r*s - A.x - r*A.y)
-		let c: number = (A.y - s)**2 + A.x**2 - r1**2
-		let d: number = b**2 - 4*a*c
+		let a: number = 1 + r ** 2
+		let b: number = 2 * (r * s - A.x - r * A.y)
+		let c: number = (A.y - s) ** 2 + A.x ** 2 - r1 ** 2
+		let d: number = b ** 2 - 4 * a * c
 
-		let x: number = (-b + (index == 0 ? -1 : 1) * d**0.5)/(2*a)
-		let y: number = r*x + s
+		let x: number = (-b + (index == 0 ? -1 : 1) * d ** 0.5) / (2 * a)
+		let y: number = r * x + s
 		let p: Vertex = new Vertex(x, y)
 		return p
 

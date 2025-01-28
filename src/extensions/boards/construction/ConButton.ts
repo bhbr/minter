@@ -5,7 +5,7 @@ export class ConButton extends CreativeButton {
 
 	ownDefaults(): object {
 		return {
-			creations: ['cons']
+			creations: ['geo']
 		}
 	}
 

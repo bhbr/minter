@@ -6,6 +6,10 @@ export class ConLineConstructor extends ConStraitConstructor {
 
 	line: ConLine
 
+	constructor(args: object = {}) {
+		super(args)
+	}
+
 	ownDefaults(): object {
 		return {
 			line: new ConLine()

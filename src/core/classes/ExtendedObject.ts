@@ -152,7 +152,6 @@ export class ExtendedObject extends BaseExtendedObject {
 			}
 		}
 		return ret
-		//return Object.keys(this._defaults)
 	}
 	
 	mutability(prop: string): string {
@@ -171,49 +170,6 @@ export class ExtendedObject extends BaseExtendedObject {
 		return {
 			passedByValue: false
 		}
-	}
-
-	// defaultValue(prop: string): any {
-	// 	var retDef: any = null
-	// 	for (let [cls, defDict] of Object.entries(this._defaults)) {
-
-	// 		let newDef = defDict[prop]
-	// 		if (newDef === undefined) { continue }
-	// 		if (retDef == null) {
-	// 			retDef = newDef
-	// 			continue
-	// 		}
-	// 		if (ExtendedObject.mutabilityOrder[newMut] >= ExtendedObject.mutabilityOrder[retMut]) {
-	// 			retMut = newMut
-	// 		} else {
-	// 			throw `Incompatible mutabilities in class ${this.constructor.name}`
-	// 		}
-	// 	}
-	// 	return retMut ?? 'always'
-	// }
-
-
-	updateDefaults(oldDefaults: object, newDefaults: object): object {
-		return {}
-	}
-	// 	let updatedDefaults = copy(oldDefaults)
-	// 	for (let [prop, value] of Object.entries(newDefaults)) {
-	// 		if (this._checkPermissions) {
-	// 			let supMut = this.superclassMutability(prop)
-	// 			let myMut = this.mutability(prop)
-	// 			let mutability = supMut ?? myMut
-	// 			if (mutability === 'never' && Object.keys(updatedDefaults).includes(prop)) {
-	// 				// immutable property cannot be assigned a new default value
-	// 				throw `The property ${prop} on object ${this.constructor.name} cannot be assigned new default value ${value}`
-	// 			}
-	// 		}
-	// 		updatedDefaults[prop] = value
-	// 	}
-	//  	return updatedDefaults
-	// }
-
-	updateMutabilities(oldMutabilities: object, newMutabilities: object): object {
-		return {}
 	}
 
 	updateInits(oldInits: object, newInits: object): object {
@@ -243,9 +199,9 @@ export class ExtendedObject extends BaseExtendedObject {
 		return true
 	}
 
-	// synchronizeUpdateArguments(args: object): object {
-	// 	return args
-	// }
+	synchronizeUpdateArguments(args: object): object {
+		return args
+	}
 
 	isSetter(prop: string): boolean {
 		let pd = this.propertyDescriptor(prop)
@@ -306,12 +262,12 @@ export class ExtendedObject extends BaseExtendedObject {
 
 	setProperties(args: object = {}) {
 
-	// 	args = this.synchronizeUpdateArguments(args)
+	 	let syncedArgs = this.synchronizeUpdateArguments(args)
 
 		let accessorArgs: object = {}
 		let otherPropertyArgs: object = {}
 
-		for (let [prop, value] of Object.entries(args)) {
+		for (let [prop, value] of Object.entries(syncedArgs)) {
 			if (!this.isSetter(prop)) {
 	 			otherPropertyArgs[prop] = value
 	 		} else {
@@ -344,7 +300,6 @@ export class ExtendedObject extends BaseExtendedObject {
 				this[prop] = value
 			}
 		}
-		//this._properties.push(prop)
 	}
 
 	copyFrom(obj: ExtendedObject) {
@@ -369,10 +324,9 @@ export class ExtendedObject extends BaseExtendedObject {
 	// 	this.update(args)
 	// }
 
-	// isMutable(prop: string) {
-	// 	return (this.mutability(prop) === 'always'
-	// 		|| (this.mutability(prop) === 'on_init' && !this.initComplete))
-	// }
+	isMutable(prop: string) {
+		return (this.mutability(prop) === 'always')
+	}
 
 }
 

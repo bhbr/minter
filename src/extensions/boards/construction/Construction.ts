@@ -73,11 +73,11 @@ export class Construction extends Board {
 	}
 
 	addPoint(p: ConPoint): boolean {
-		for (let q of this.points) {
-			if (this.snapped(p.midpoint, q.midpoint)) {
-				return false
-			}
-		}
+		// for (let q of this.points) {
+		// 	if (this.snapped(p.midpoint, q.midpoint)) {
+		// 		return false
+		// 	}
+		// }
 		this.add(p)
 		this.points.push(p)
 		return true
@@ -211,10 +211,10 @@ export class Construction extends Board {
 					index: i
 				})
 				let isNewPoint: boolean = this.addPoint(p)
-				if (isNewPoint) {
+				//if (isNewPoint) {
 					conMob1.addDependent(p)
 					conMob2.addDependent(p)
-				}
+				//}
 			}
 		}
 	}
@@ -233,10 +233,9 @@ export class Construction extends Board {
 		} else {
 			this.startCreating(e)
 		}
-
 	}
-
 }
+
 
 
 

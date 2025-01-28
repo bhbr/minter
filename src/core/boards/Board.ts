@@ -249,10 +249,10 @@ The content children can also be dragged and panned.
 
 	expand() {
 		this.expandStateChange()
-		this.animate({
-			viewWidth: this.expandedWidth(),
-			viewHeight: this.expandedHeight(),
-			anchor: this.expandedAnchor()
+		 this.animate({
+		 	viewWidth: this.expandedWidth(),
+		 	viewHeight: this.expandedHeight(),
+		 	anchor: this.expandedAnchor()
 		}, 1)
 		this.initSidebar()
 	}

@@ -1,7 +1,7 @@
 
 import { remove } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
-import { deepCopy } from 'core/functions/copying'
+import { copy, deepCopy } from 'core/functions/copying'
 import { getPaper } from 'core/functions/getters'
 import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, ScreenEvent, screenEventType, ScreenEventType, isTouchDevice } from './screen_events'
 import { Vertex } from 'core/classes/vertex/Vertex'
@@ -691,16 +691,15 @@ and logic for drawing and user interaction.
 	// Update methods //
 
 	synchronizeUpdateArguments(args: object = {}): object {
-
+		let syncedArgs: object = copy(args)
 		let a = args['anchor']
 		if (a !== undefined) {
 			let t = args['transform'] ?? this.transform ?? Transform.identity()
 			t.anchor = a
-			args['transform'] = t
-			delete args['anchor']
+			syncedArgs['transform'] = t
+			delete syncedArgs['anchor']
 		}
-		return args
-
+		return syncedArgs
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

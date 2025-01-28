@@ -4,6 +4,7 @@ import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { ExtendedBoardButton } from 'extensions/sidebar_buttons/ExtendedBoardButton'
 import { BoardButton } from 'core/sidebar_buttons/BoardButton'
+import { ConButton } from 'extensions/boards/construction/ConButton'
 import { StraitButton } from 'extensions/boards/construction/straits/StraitButton'
 import { ConCircleButton } from 'extensions/boards/construction/ConCircle/ConCircleButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
@@ -21,8 +22,9 @@ export class DemoSidebar extends Sidebar {
 				LinkButton,
 				ExtendedBoardButton,
 				BoardButton,
-				StraitButton,
+				ConButton,
 				ConCircleButton,
+				StraitButton,
 				NumberButton,
 				ArithmeticButton,
 				WavyButton,

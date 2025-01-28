@@ -16,7 +16,7 @@ export class ConPoint extends Circle {
 	ownMutabilities(): object {
 		return {
 			radius: 'never',
-			fillOpacity: 'never'
+			fillOpacity: 'in_subclass'
 		}
 	}
 

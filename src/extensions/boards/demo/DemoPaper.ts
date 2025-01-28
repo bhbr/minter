@@ -12,6 +12,10 @@ import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { BoxStepper } from 'extensions/creations/math/BoxStepper/BoxStepper'
 import { Swing } from 'extensions/creations/Swing/Swing'
+import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
+import { ConRayConstructor } from 'extensions/boards/construction/straits/ConRay/ConRayConstructor'
+import { ConSegmentConstructor } from 'extensions/boards/construction/straits/ConSegment/ConSegmentConstructor'
+import { ConCircleConstructor } from 'extensions/boards/construction/ConCircle/ConCircleConstructor'
 
 import { Vertex } from 'core/classes/vertex/Vertex'
 import { Color } from 'core/classes/Color'
@@ -41,9 +45,13 @@ export class DemoPaper extends Paper {
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
 				'board': BoardCreator,
-				'cons': ConstructionCreator,
 				'swing': SwingCreator,
-				'color': ColorSampleCreator
+				'color': ColorSampleCreator,
+				'geo': ConstructionCreator,
+				'line': ConLineConstructor,
+				'ray': ConRayConstructor,
+				'segment': ConSegmentConstructor,
+				'circle': ConCircleConstructor
 			},
 			buttonNames: [
 				'DragButton',
@@ -51,6 +59,7 @@ export class DemoPaper extends Paper {
 				'ExtendedBoardButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'ConButton',
 				'WavyButton',
 				'SwingButton',
 				'ColorSampleButton'

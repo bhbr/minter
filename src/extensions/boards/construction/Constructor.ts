@@ -26,7 +26,7 @@ export class Constructor extends Creator {
 
 	ownMutabilities(): object {
 		return {
-			construction: 'never'
+			construction: 'on_init'
 		}
 	}
 
