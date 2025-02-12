@@ -10,14 +10,14 @@ import { EditableLinkHook } from './EditableLinkHook'
 export class ExpandedBoardInputList extends OutputList {
 
 	positionHook(hook: EditableLinkHook, index: number) {
-			let m: vertex = [
-				HOOK_INSET_X + hook.radius + HOOK_HORIZONTAL_SPACING * index,
-				HOOK_INSET_Y + hook.radius
-			]
-			hook.update({
-				midpoint: m,
-				index: index
-			})
+		let m: vertex = [
+			HOOK_INSET_X + hook.radius + HOOK_HORIZONTAL_SPACING * index,
+			HOOK_INSET_Y + hook.radius
+		]
+		hook.update({
+			midpoint: m,
+			index: index
+		})
 	}
 
 	getHeight(): number {

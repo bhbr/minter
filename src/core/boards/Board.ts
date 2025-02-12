@@ -7,7 +7,6 @@ import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { Freehand } from 'core/creators/Freehand'
 import { ExpandButton } from './ExpandButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
@@ -15,7 +14,6 @@ import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { Sidebar } from 'core/Sidebar'
 import { LinkHook } from 'core/linkables/LinkHook'
-import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
@@ -230,8 +228,6 @@ The content children can also be dragged and panned.
 		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
 		}
-		this.expandedInputList.show()
-		this.expandedOutputList.show()
 		this.expandButton.update({
 			text: '–'
 		})

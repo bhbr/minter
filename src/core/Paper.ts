@@ -124,6 +124,15 @@ export class Paper extends Board {
 	expand() { }
 	contract() { }
 
+
+	showLinksOfContent() {
+	// toggled by 'link' button in sidebar
+		this.add(this.linkMap)
+		for (let submob of this.linkableChildren()) {
+			submob.showLinks()
+		}
+	}
+
 }
 
 
