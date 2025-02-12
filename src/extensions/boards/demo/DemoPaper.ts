@@ -17,7 +17,7 @@ import { ConRayConstructor } from 'extensions/boards/construction/straits/ConRay
 import { ConSegmentConstructor } from 'extensions/boards/construction/straits/ConSegment/ConSegmentConstructor'
 import { ConCircleConstructor } from 'extensions/boards/construction/ConCircle/ConCircleConstructor'
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler, screenEventTypeAsString, screenEventDeviceAsString } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'

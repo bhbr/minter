@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Mobject } from 'core/mobjects/Mobject'
 import { Linkable } from './Linkable'
 import { Circle } from 'core/shapes/Circle'
@@ -34,7 +34,7 @@ export class LinkHook extends Circle {
 	}
 
 
-	positionInLinkMap(): Vertex {
+	positionInLinkMap(): vertex {
 	// used e. g. for snapping
 		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent.parent)
 	}

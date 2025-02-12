@@ -1,7 +1,7 @@
 
 import { Creator } from 'core/creators/Creator'
 import { Swing } from './Swing'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexSubtract, vertexNorm } from 'core/functions/vertex'
 
 export class SwingCreator extends Creator {
 
@@ -32,12 +32,12 @@ export class SwingCreator extends Creator {
 		return this.swing
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
-		var dr: Vertex = q.subtract(this.getStartPoint())
-		dr = dr.subtract(new Vertex(this.viewWidth/2, this.swing.fixtureHeight))
-		let length: number = dr.norm()
-		let angle: number = -Math.atan2(dr.x, dr.y)
+		var dr: vertex = vertexSubtract(q, this.getStartPoint())
+		dr = vertexSubtract(dr, [this.viewWidth/2, this.swing.fixtureHeight])
+		let length: number = vertexNorm(dr)
+		let angle: number = -Math.atan2(dr[0], dr[1])
 		this.swing.update({
 			maxLength: length,
 			length: 1,

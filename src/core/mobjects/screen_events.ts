@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 
 (window as any).emulatePen = false
@@ -39,7 +39,7 @@ export enum ScreenEventHandler {
 	*/
 }
 
-export function eventVertex(e: ScreenEvent): Vertex {
+export function eventVertex(e: ScreenEvent): vertex {
 /*
 subtract the sidebar's width if necessary
 i. e. if running in the browser (minter.html)
@@ -54,7 +54,7 @@ instead of in the app (paper.html)
 	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }
 	else { t = e.changedTouches[0] }
-	return new Vertex(t.pageX - sidebarWidth, t.pageY)
+	return [t.pageX - sidebarWidth, t.pageY]
 }
 
 export function screenEventType(e: ScreenEvent): ScreenEventType {

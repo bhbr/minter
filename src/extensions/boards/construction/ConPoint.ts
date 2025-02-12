@@ -1,6 +1,6 @@
 
 import { Circle } from 'core/shapes/Circle'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexIsNaN, vertexOrigin } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 
 export class ConPoint extends Circle {
@@ -22,8 +22,8 @@ export class ConPoint extends Circle {
 
 	setup() {
 		super.setup()
-		if (!this.midpoint || this.midpoint.isNaN()) {
-			this.update({ midpoint: Vertex.origin() })
+		if (!this.midpoint || vertexIsNaN(this.midpoint)) {
+			this.update({ midpoint: vertexOrigin() })
 		}
 
 	}

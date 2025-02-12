@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Dependency } from 'core/mobjects/Dependency'
 import { Line } from 'core/shapes/Line'
 import { Mobject } from 'core/mobjects/Mobject'

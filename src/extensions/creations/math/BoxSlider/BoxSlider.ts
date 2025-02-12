@@ -1,6 +1,6 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { eventVertex, ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
@@ -33,7 +33,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	// scrubbing
 	valueBeforeScrubbing: number
-	scrubStartingPoint: Vertex
+	scrubStartingPoint: vertex
 
 	ownDefaults(): object {
 		return {
@@ -111,7 +111,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.filledBar.update({
 			width: this.width,
 			height: a * this.height,
-			anchor: new Vertex(0, this.height - a * this.height)
+			anchor: [0, this.height - a * this.height]
 		}, redraw)
 
 		this.updateLabel(redraw)
@@ -122,7 +122,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	updateLabel(redraw: boolean = true) {
 		this.label.update({
 			text: this.value.toString(),
-			anchor: new Vertex(this.width/2 - this.width/2, this.height/2 - 25/2),
+			anchor: [this.width/2 - this.width/2, this.height/2 - 25/2],
 			viewWidth: this.width
 		}, redraw)
 	}
@@ -133,8 +133,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		let scrubVector: Vertex = eventVertex(e).subtract(this.scrubStartingPoint)
-		var newValue = this.valueBeforeScrubbing - scrubVector.y/this.height * (this.max - this.min)
+		let scrubVector: vertex = vertexSubtract(eventVertex(e), this.scrubStartingPoint)
+		var newValue = this.valueBeforeScrubbing - scrubVector[1]/this.height * (this.max - this.min)
 		newValue = Math.max(Math.min(newValue, this.max), this.min)
 		newValue = Math.round(newValue * 10**this.precision) / 10**this.precision
 		this.update({ value: newValue})

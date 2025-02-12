@@ -1,7 +1,7 @@
 
 import { ColorSample } from 'extensions/creations/ColorSample/ColorSample'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexTranslatedBy } from 'core/functions/vertex'
 
 export class ColorSampleCreator extends DraggingCreator {
 	
@@ -13,9 +13,9 @@ export class ColorSampleCreator extends DraggingCreator {
 		})
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		let r = this.creation.circle.radius
-		super.updateFromTip(q.translatedBy(-r, -r), redraw)
+		super.updateFromTip(vertexTranslatedBy(q, [-r, -r]), redraw)
 		this.creation.hideLinks()
 	}
 }

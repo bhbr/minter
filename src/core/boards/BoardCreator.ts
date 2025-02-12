@@ -1,7 +1,7 @@
 
 import { SpanningCreator } from 'core/creators/SpanningCreator'
 import { Board } from './Board'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 
 
 export class BoardCreator extends SpanningCreator {

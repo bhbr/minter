@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexAdd, vertexCentrallyRotatedBy, vertexCentrallyScaledBy } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { Linkable } from 'core/linkables/Linkable'
 import { Line } from 'core/shapes/Line'
@@ -64,10 +64,10 @@ export class Swing extends Linkable {
 		this.fixture.update({
 			width: this.fixtureWidth,
 			height: this.fixtureHeight,
-			anchor: new Vertex((this.viewWidth - this.fixtureWidth) / 2, 0)
+			anchor: [(this.viewWidth - this.fixtureWidth) / 2, 0]
 		}, true)
 		this.string.update({
-			startPoint: new Vertex(this.viewWidth / 2, this.fixtureHeight)
+			startPoint: [this.viewWidth / 2, this.fixtureHeight]
 		})
 		this.weight.update({
 			radius: this.weightRadius()
@@ -75,7 +75,6 @@ export class Swing extends Linkable {
 		this.viewHeight = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 		this.outputList.update()
 	}
-
 
 	angle(): number {
 		let dt: number = (Date.now() - this.initialTime) % this.period()
@@ -106,7 +105,7 @@ export class Swing extends Linkable {
 		super.update(args, false)
 
 		let angle: number = args['initialAngle'] ?? this.angle()
-		let newEndPoint: Vertex = (new Vertex(0, 1)).rotatedBy(- angle).scaledBy(this.pixelLength()).add(this.string.startPoint)
+		let newEndPoint: vertex = vertexAdd(vertexCentrallyScaledBy(vertexCentrallyRotatedBy([0, 1], - angle), this.pixelLength()), this.string.startPoint)
 
 		this.string.update({
 			endPoint: newEndPoint

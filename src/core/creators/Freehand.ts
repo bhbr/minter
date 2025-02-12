@@ -2,7 +2,7 @@
 import { Creator } from 'core/creators/Creator'
 import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
 import { Circle } from 'core/shapes/Circle'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
@@ -42,7 +42,7 @@ export class Freehand extends Creator {
 		this.add(this.line)
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		if (redraw) {
 			this.line.redraw()

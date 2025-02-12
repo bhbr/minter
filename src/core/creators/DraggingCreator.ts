@@ -2,7 +2,7 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { Creator } from './Creator'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Linkable } from 'core/linkables/Linkable'
 
@@ -24,7 +24,7 @@ export class DraggingCreator extends Creator {
 		})
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.creation.update({
 			anchor: q

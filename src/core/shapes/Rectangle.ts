@@ -1,32 +1,31 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, vertexOrigin } from 'core/functions/vertex'
 import { Polygon } from 'core/vmobjects/Polygon'
 
 export class Rectangle extends Polygon {
 
 	width: number
 	height: number
-	p1: Vertex // top left is always (0, 0) (in its own frame)
-	p2: Vertex // = (width, 0)
-	p3: Vertex // = (width, height)
-	p4: Vertex // = (0, height)
+	p1: vertex // top left is always (0, 0) (in its own frame)
+	p2: vertex // = (width, 0)
+	p3: vertex // = (width, height)
+	p4: vertex // = (0, height)
 
 	ownDefaults(): object {
 		return {
 			width: 200,
 			height: 100,
-			p1: Vertex.origin(),
-			p2: new Vertex(200, 0),
-			p3: new Vertex(200, 100),
-			p4: new Vertex(0, 100)
+			p1: vertexOrigin(),
+			p2: [200, 0],
+			p3: [200, 100],
+			p4: [0, 100]
 		}
 	}
 
 	setup() {
 		super.setup()
 		this.update({
-			vertices: new VertexArray([this.p1, this.p2, this.p3, this.p4])
+			vertices: [this.p1, this.p2, this.p3, this.p4]
 		})
 	}
 
@@ -37,10 +36,10 @@ export class Rectangle extends Polygon {
 		this.viewWidth = this.width
 		this.viewHeight = this.height
 
-		this.p2.x = this.width
-		this.p3.x = this.width
-		this.p3.y = this.height
-		this.p4.y = this.height
+		this.p2[0] = this.width
+		this.p3[0] = this.width
+		this.p3[1] = this.height
+		this.p4[1] = this.height
 
 		if (redraw) { this.redraw() }
 	}

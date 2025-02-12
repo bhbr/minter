@@ -2,7 +2,7 @@
 import { InputList } from 'core/linkables/InputList'
 import { LinkHook } from 'core/linkables/LinkHook'
 import { TextLabel } from 'core/mobjects/TextLabel'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'core/linkables/constants'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { EditableLinkHook } from './EditableLinkHook'
@@ -10,10 +10,10 @@ import { EditableLinkHook } from './EditableLinkHook'
 export class ExpandedBoardOutputList extends InputList {
 
 	positionHook(hook: EditableLinkHook, index: number) {
-			let m = new Vertex(
+			let m: vertex = [
 				HOOK_INSET_X + hook.radius + HOOK_HORIZONTAL_SPACING * index,
 				HOOK_INSET_Y + hook.radius
-				)
+			]
 			hook.update({
 				midpoint: m,
 				index: index

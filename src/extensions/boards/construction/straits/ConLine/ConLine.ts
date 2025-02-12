@@ -1,17 +1,17 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { ConStrait } from '../ConStrait'
 
 export class ConLine extends ConStrait {
 
-	drawingStartPoint(): Vertex {
+	drawingStartPoint(): vertex {
 		if (this.startPoint == this.endPoint) { return this.startPoint }
-		return this.endPoint.add(this.startPoint.subtract(this.endPoint).multiply(100))
+		return vertexAdd(this.endPoint, vertexMultiply(vertexSubtract(this.startPoint, this.endPoint), 100))
 	}
 
-	drawingEndPoint(): Vertex {
+	drawingEndPoint(): vertex {
 		if (this.startPoint == this.endPoint) { return this.endPoint }
-		return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
+		return vertexAdd(this.startPoint, vertexMultiply(vertexSubtract(this.endPoint, this.startPoint), 100))
 	}
 
 }

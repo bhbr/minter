@@ -2,7 +2,7 @@
 import { Creator } from 'core/creators/Creator'
 import { Color } from 'core/classes/Color'
 import { Construction } from 'extensions/boards/construction/Construction'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 
 export class Constructor extends Creator {
 
@@ -11,8 +11,8 @@ export class Constructor extends Creator {
 	penFillColor: Color
 	penFillOpacity: number
 	construction?: Construction
-	startPoint: Vertex
-	endPoint: Vertex
+	startPoint: vertex
+	endPoint: vertex
 
 	ownDefaults(): object {
 		return {

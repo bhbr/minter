@@ -4,9 +4,8 @@ import { log } from 'core/functions/logging'
 import { copy, deepCopy } from 'core/functions/copying'
 import { getPaper } from 'core/functions/getters'
 import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, ScreenEvent, screenEventType, ScreenEventType, isTouchDevice } from './screen_events'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { Transform } from 'core/classes/vertex/Transform'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, isVertex, isVertexArray, vertexOrigin, vertexInterpolate, vertexArrayInterpolate, vertexCloseTo, vertexAdd, vertexSubtract } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
@@ -73,7 +72,7 @@ and logic for drawing and user interaction.
 
 			// position
 			transform: Transform.identity(),
-			anchor: Vertex.origin(),
+			anchor: vertexOrigin(),
 			viewWidth: 100,
 			viewHeight: 100,
 			/*
@@ -155,19 +154,11 @@ and logic for drawing and user interaction.
 	// (Note: the view itself is declared further below)
 
 	// this.anchor is a synonym for this.transform.anchor
-	get anchor(): Vertex {
+	get anchor(): vertex {
 		return (this.transform ?? Transform.identity()).anchor
 	}
 
-	set anchor(newValue: Vertex) {
-		// if (!this.isMutable('anchor')) {
-		// 	console.error(`Anchor is a readonly property on ${this.constructor.name}`)
-		// 	return
-		// }
-		// if (this.isImmutable('anchor') && this.transform) {
-		// 	console.error(`Anchor is an immutable property on ${this.constructor.name}`)
-		// 	return
-		// }
+	set anchor(newValue: vertex) {
 		if (!this.transform) {
 			this.transform = Transform.identity()
 		}
@@ -197,7 +188,7 @@ and logic for drawing and user interaction.
 		throw 'relativeTransform requires a direct ancestor'
 	}
 
-	transformLocalPoint(point: Vertex, frame?: Mobject): Vertex {
+	transformLocalPoint(point: vertex, frame?: Mobject): vertex {
 	/*
 	Given a point (Vertex) in local coordinates,
 	compute its coordinates in the given ancestor
@@ -213,39 +204,39 @@ and logic for drawing and user interaction.
 	e. g. VMobjects.
 	*/
 
-	viewULCorner(frame?: Mobject): Vertex {
-		return this.transformLocalPoint(Vertex.origin(), frame)
+	viewULCorner(frame?: Mobject): vertex {
+		return this.transformLocalPoint(vertexOrigin(), frame)
 	}
 
-	viewURCorner(frame?: Mobject): Vertex {
-		return this.transformLocalPoint(new Vertex(this.viewWidth, 0), frame)
+	viewURCorner(frame?: Mobject): vertex {
+		return this.transformLocalPoint([this.viewWidth, 0], frame)
 	}
 
-	viewLLCorner(frame?: Mobject): Vertex {
-		return this.transformLocalPoint(new Vertex(0, this.viewHeight), frame)
+	viewLLCorner(frame?: Mobject): vertex {
+		return this.transformLocalPoint([0, this.viewHeight], frame)
 	}
 
-	viewLRCorner(frame?: Mobject): Vertex {
-		return this.transformLocalPoint(new Vertex(this.viewWidth, this.viewHeight), frame)
+	viewLRCorner(frame?: Mobject): vertex {
+		return this.transformLocalPoint([this.viewWidth, this.viewHeight], frame)
 	}
 
-	viewXMin(frame?: Mobject): number { return this.viewULCorner(frame).x }
-	viewXMax(frame?: Mobject): number { return this.viewLRCorner(frame).x }
-	viewYMin(frame?: Mobject): number { return this.viewULCorner(frame).y }
-	viewYMax(frame?: Mobject): number { return this.viewLRCorner(frame).y }
+	viewXMin(frame?: Mobject): number { return this.viewULCorner(frame)[0] }
+	viewXMax(frame?: Mobject): number { return this.viewLRCorner(frame)[0] }
+	viewYMin(frame?: Mobject): number { return this.viewULCorner(frame)[1] }
+	viewYMax(frame?: Mobject): number { return this.viewLRCorner(frame)[1] }
 
-	viewCenter(frame?: Mobject): Vertex {
-		let p = this.transformLocalPoint(new Vertex(this.viewWidth/2, this.viewHeight/2), frame)
+	viewCenter(frame?: Mobject): vertex {
+		let p = this.transformLocalPoint([this.viewWidth/2, this.viewHeight/2], frame)
 		return p
 	}
 
-	viewMidX(frame?: Mobject): number { return this.viewCenter(frame).x }
-	viewMidY(frame?: Mobject): number { return this.viewCenter(frame).y }
+	viewMidX(frame?: Mobject): number { return this.viewCenter(frame)[0] }
+	viewMidY(frame?: Mobject): number { return this.viewCenter(frame)[1] }
 
-	viewLeftCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMin(frame), this.viewMidY(frame)) }
-	viewRightCenter(frame?: Mobject): Vertex { return new Vertex(this.viewXMax(frame), this.viewMidY(frame)) }
-	viewTopCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMin(frame)) }
-	viewBottomCenter(frame?: Mobject): Vertex { return new Vertex(this.viewMidX(frame), this.viewYMax(frame)) }
+	viewLeftCenter(frame?: Mobject): vertex { return [this.viewXMin(frame), this.viewMidY(frame)] }
+	viewRightCenter(frame?: Mobject): vertex { return [this.viewXMax(frame), this.viewMidY(frame)] }
+	viewTopCenter(frame?: Mobject): vertex { return [this.viewMidX(frame), this.viewYMin(frame)] }
+	viewBottomCenter(frame?: Mobject): vertex { return [this.viewMidX(frame), this.viewYMax(frame)] }
 
 	/*
 	Equivalent (by default) versions without "view" in the name
@@ -253,47 +244,47 @@ and logic for drawing and user interaction.
 	its vertices.
 	*/
 
-	ulCorner(frame?: Mobject): Vertex { return this.viewULCorner(frame) }
-	urCorner(frame?: Mobject): Vertex { return this.viewURCorner(frame) }
-	llCorner(frame?: Mobject): Vertex { return this.viewLLCorner(frame) }
-	lrCorner(frame?: Mobject): Vertex { return this.viewLRCorner(frame) }
+	ulCorner(frame?: Mobject): vertex { return this.viewULCorner(frame) }
+	urCorner(frame?: Mobject): vertex { return this.viewURCorner(frame) }
+	llCorner(frame?: Mobject): vertex { return this.viewLLCorner(frame) }
+	lrCorner(frame?: Mobject): vertex { return this.viewLRCorner(frame) }
 
 	xMin(frame?: Mobject): number { return this.viewXMin(frame) }
 	xMax(frame?: Mobject): number { return this.viewXMax(frame) }
 	yMin(frame?: Mobject): number { return this.viewYMin(frame) }
 	yMax(frame?: Mobject): number { return this.viewYMax(frame) }
 
-	center(frame?: Mobject): Vertex { return this.viewCenter(frame) }
+	center(frame?: Mobject): vertex { return this.viewCenter(frame) }
 
 	midX(frame?: Mobject): number { return this.viewMidX(frame) }
 	midY(frame?: Mobject): number { return this.viewMidY(frame) }
 
-	leftCenter(frame?: Mobject): Vertex { return this.viewLeftCenter(frame) }
-	rightCenter(frame?: Mobject): Vertex { return this.viewRightCenter(frame) }
-	topCenter(frame?: Mobject): Vertex { return this.viewTopCenter(frame) }
-	bottomCenter(frame?: Mobject): Vertex { return this.viewBottomCenter(frame) }
+	leftCenter(frame?: Mobject): vertex { return this.viewLeftCenter(frame) }
+	rightCenter(frame?: Mobject): vertex { return this.viewRightCenter(frame) }
+	topCenter(frame?: Mobject): vertex { return this.viewTopCenter(frame) }
+	bottomCenter(frame?: Mobject): vertex { return this.viewBottomCenter(frame) }
 
 	// Local versions (relative to own coordinate system)
 
-	localULCorner(): Vertex { return this.ulCorner(this) }
-	localURCorner(): Vertex { return this.urCorner(this) }
-	localLLCorner(): Vertex { return this.llCorner(this) }
-	localLRCorner(): Vertex { return this.lrCorner(this) }
+	localULCorner(): vertex { return this.ulCorner(this) }
+	localURCorner(): vertex { return this.urCorner(this) }
+	localLLCorner(): vertex { return this.llCorner(this) }
+	localLRCorner(): vertex { return this.lrCorner(this) }
 
 	localXMin(): number { return this.xMin(this) }
 	localXMax(): number { return this.xMax(this) }
 	localYMin(): number { return this.yMin(this) }
 	localYMax(): number { return this.yMax(this) }
 
-	localCenter(): Vertex { return this.center(this) }
+	localCenter(): vertex { return this.center(this) }
 
 	localMidX(): number { return this.midX(this) }
 	localMidY(): number { return this.midY(this) }
 
-	localLeftCenter(): Vertex { return this.leftCenter(this) }
-	localRightCenter(): Vertex { return this.rightCenter(this) }
-	localTopCenter(): Vertex { return this.topCenter(this) }
-	localBottomCenter(): Vertex { return this.bottomCenter(this) }
+	localLeftCenter(): vertex { return this.leftCenter(this) }
+	localRightCenter(): vertex { return this.rightCenter(this) }
+	localTopCenter(): vertex { return this.topCenter(this) }
+	localBottomCenter(): vertex { return this.bottomCenter(this) }
 
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }
@@ -306,11 +297,10 @@ and logic for drawing and user interaction.
 
 		for (let [key, value] of Object.entries(this)) {
 			var newValue: any
-			if (value instanceof Vertex) {
+			if (isVertex(value)) {
 				newValue = inverseShift.appliedTo(value)
-			} else if (value instanceof Array && value.length > 0) {
+			} else if (isVertexArray(value)) {
 				newValue = []
-				if (!(value[0] instanceof Vertex)) { continue }
 				for (let v of value) {
 					newValue.push(inverseShift.appliedTo(v))
 				}
@@ -358,8 +348,8 @@ and logic for drawing and user interaction.
 	redraw() {
 		if (!this.view) { return }
 		this.view.style.transform = this.transform.withoutAnchor().toCSSString()
-		this.view.style.left = `${this.anchor.x.toString()}px`
-		this.view.style.top = `${this.anchor.y.toString()}px`
+		this.view.style.left = `${this.anchor[0].toString()}px`
+		this.view.style.top = `${this.anchor[1].toString()}px`
 		this.view.style.width = `${this.viewWidth.toString()}px`
 		this.view.style.height = `${this.viewHeight.toString()}px`
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
@@ -494,14 +484,14 @@ and logic for drawing and user interaction.
 			let stopValue: any = this.interpolationStopCopy[key]
 			if (typeof startValue ==  'number') {
 				returnValues[key] = (1 - weight) * startValue + weight * stopValue
-			} else if (startValue instanceof Vertex) {
-				returnValues[key] = startValue.interpolate(stopValue as Vertex, weight)
+			} else if (isVertex(startValue)) {
+				returnValues[key] = vertexInterpolate(startValue, stopValue as vertex, weight)
 			} else if (startValue instanceof Transform) {
 				returnValues[key] = startValue.interpolate(stopValue as Transform, weight)
 			} else if (startValue instanceof Color) {
 				returnValues[key] = startValue.interpolate(stopValue as Color, weight)
-			} else if (startValue instanceof VertexArray) {
-				returnValues[key] = startValue.interpolate(stopValue as VertexArray, weight)
+			} else if (isVertexArray(startValue)) {
+				returnValues[key] = vertexArrayInterpolate(startValue, stopValue as vertexArray, weight)
 			}
 		}
 		return returnValues
@@ -767,7 +757,7 @@ and logic for drawing and user interaction.
 	eventTarget?: Mobject
 	screenEventHandler: ScreenEventHandler
 	savedScreenEventHandler?: ScreenEventHandler
-	dragAnchorStart?: Vertex
+	dragAnchorStart?: vertex
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
@@ -986,13 +976,13 @@ and logic for drawing and user interaction.
 
 	// Local coordinates for use in custom event methods
 
-	localEventVertex(e: ScreenEvent): Vertex {
+	localEventVertex(e: ScreenEvent): vertex {
 	/*
 	eventVertex(e) gives the coordinates in the topmost
 	mobject's frame (paper or sidebar). This method here
 	finds them in the mobject's local frame.
 	*/
-		let p: Vertex = eventVertex(e)
+		let p: vertex = eventVertex(e)
 		let rt = this.relativeTransform(getPaper())
 		let q = rt.inverse().appliedTo(p)
 		return q
@@ -1016,12 +1006,12 @@ and logic for drawing and user interaction.
 		let minIndex = Math.max(0, this.screenEventHistory.length - 5)
 		for (var i = minIndex; i < this.screenEventHistory.length; i++) {
 			let e2 = this.screenEventHistory[i]
-			if (eventVertex(e).closeTo(eventVertex(e2), 2)) {
+			if (vertexCloseTo(eventVertex(e), eventVertex(e2), 2)) {
 				// too close
 				if (screenEventType(e) == screenEventType(e2) && screenEventType(e) != ScreenEventType.Move) {
 					return true
 				}
-			} else if (!eventVertex(e).closeTo(eventVertex(e2), 200)) {
+			} else if (!vertexCloseTo(eventVertex(e), eventVertex(e2), 200)) {
 				// too far, this can't be either
 				// (TODO: multiple touches)
 				return true
@@ -1112,12 +1102,12 @@ and logic for drawing and user interaction.
 	}
 
 	startDragging(e: ScreenEvent) {
-		this.dragAnchorStart = this.anchor.subtract(eventVertex(e))
+		this.dragAnchorStart = vertexSubtract(this.anchor, eventVertex(e))
 	}
 
 	dragging(e: ScreenEvent) {
 		this.update({
-			anchor: eventVertex(e).add(this.dragAnchorStart)
+			anchor: vertexAdd(eventVertex(e), this.dragAnchorStart)
 		})
 	}
 

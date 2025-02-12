@@ -2,7 +2,7 @@
 import { Linkable } from 'core/linkables/Linkable'
 import { LinkMap } from 'core/linkables/LinkMap'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
@@ -20,7 +20,6 @@ import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/In
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
 import { Creator } from 'core/creators/Creator'
 import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
@@ -54,7 +53,7 @@ The content children can also be dragged and panned.
 			expandButton: new ExpandButton(),
 			linkMap: new LinkMap(),
 			background: new RoundedRectangle({
-				anchor: Vertex.origin(),
+				anchor: vertexOrigin(),
 				cornerRadius: 50,
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
@@ -67,7 +66,7 @@ The content children can also be dragged and panned.
 			expanded: false,
 			compactWidth: 400, // defined below in the section 'expand and contract'
 			compactHeight: 300, // idem
-			compactAnchor: Vertex.origin(),
+			compactAnchor: vertexOrigin(),
 			creationConstructors: {
 				'board': BoardCreator,
 				'input': InputValueBoxCreator,
@@ -130,7 +129,7 @@ The content children can also be dragged and panned.
 		this.update({
 			viewWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
 			viewHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
-			anchor: this.expanded ? this.expandedAnchor() : this.compactAnchor.copy()
+			anchor: this.expanded ? this.expandedAnchor() : vertexCopy(this.compactAnchor)
 		})
 
 		this.addDependency('viewWidth', this.background, 'width')
@@ -150,7 +149,7 @@ The content children can also be dragged and panned.
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET),
+			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
 			mobject: this
 		})
 		this.add(this.expandedInputList)
@@ -158,7 +157,7 @@ The content children can also be dragged and panned.
 		this.expandedOutputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: new Vertex(this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT),
+			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
 			mobject: this
 		})
 		this.add(this.expandedOutputList)
@@ -199,13 +198,13 @@ The content children can also be dragged and panned.
 
 	compactWidth: number
 	compactHeight: number
-	compactAnchor: Vertex
+	compactAnchor: vertex
 	expandedPadding: number
 
 	expanded: boolean
 
-	expandedAnchor(): Vertex {
-		return new Vertex(this.expandedPadding, this.expandedPadding)
+	expandedAnchor(): vertex {
+		return [this.expandedPadding, this.expandedPadding]
 	}
 
 	expandedWidth(): number {
@@ -273,10 +272,10 @@ The content children can also be dragged and panned.
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
 		this.inputList.update({
-			anchor: new Vertex(0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET)
+			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET]
 		}, true)
 		this.outputList.update({
-			anchor: new Vertex(0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET)
+			anchor: [0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET]
 		}, true)
 	}
 
@@ -333,7 +332,7 @@ The content children can also be dragged and panned.
 	it is replaced by a new creating mobject.
 	*/
 	creator?: Creator
-	creationStroke: VertexArray
+	creationStroke: vertexArray
 	creationMode: string
 
 	// a dictionary of constructors to use
@@ -431,7 +430,7 @@ The content children can also be dragged and panned.
 	}
 
 	creating(e: ScreenEvent) {
-		let v: Vertex = this.localEventVertex(e)
+		let v: vertex = this.localEventVertex(e)
 		this.creationStroke.push(v)
 		this.creator.updateFromTip(v)
 	}
@@ -442,7 +441,7 @@ The content children can also be dragged and panned.
 	}
 
 	endCreating(e: ScreenEvent) {
-		this.creationStroke = new VertexArray()
+		this.creationStroke = []
 		if (this.creator == null) { return }
 		this.creator.dissolve()
 	}
@@ -454,25 +453,25 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-	panPointStart?: Vertex
+	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = eventVertex(e)
 
 		for (let mob of this.contentChildren) {
-			mob.dragAnchorStart = mob.anchor.copy()
+			mob.dragAnchorStart = vertexCopy(mob.anchor)
 		}
 	}
 
 	panning(e: ScreenEvent) {
 		let panPoint = eventVertex(e)
-		let dr = panPoint.subtract(this.panPointStart)
+		let dr = vertexSubtract(panPoint, this.panPointStart)
 
 		for (let mob of this.contentChildren) {
-			let newAnchor: Vertex = mob.dragAnchorStart.add(dr)
+			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
 			mob.update({ anchor: newAnchor })
-			mob.view.style.left = `${newAnchor.x}px`
-			mob.view.style.top = `${newAnchor.y}px`
+			mob.view.style.left = `${newAnchor[0]}px`
+			mob.view.style.top = `${newAnchor[1]}px`
 		}
 		this.linkMap.update()
 	}

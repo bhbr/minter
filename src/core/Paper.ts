@@ -2,7 +2,7 @@
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
 import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
 import { PAPER_WIDTH, PAGE_HEIGHT, COLOR_PALETTE } from 'core/constants'
@@ -117,8 +117,8 @@ export class Paper extends Board {
 		}
 	}
 
-	expandedAnchor(): Vertex {
-		return isTouchDevice ? Vertex.origin() : new Vertex(150, 0)
+	expandedAnchor(): vertex {
+		return isTouchDevice ? vertexOrigin() : [150, 0]
 	}
 
 	expand() { }

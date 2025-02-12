@@ -1,7 +1,7 @@
 
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexTranslatedBy } from 'core/functions/vertex'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from './button_geometry'
 import { TextLabel } from 'core/mobjects/TextLabel'
@@ -28,7 +28,7 @@ export class SidebarButton extends Circle {
 	baseColor: Color
 	locationIndex: number
 	optionSpacing: number
-	touchStart: Vertex
+	touchStart: vertex
 	active: boolean
 	activeScalingFactor: number
 	showLabel: boolean
@@ -152,7 +152,7 @@ export class SidebarButton extends Circle {
 	commonButtonUp() {
 		this.currentModeIndex = 0
 		let dx: number = this.currentModeIndex * this.optionSpacing
-		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
 		
 		this.update({
 			active: false,
@@ -222,7 +222,7 @@ export class SidebarButton extends Circle {
 	selectNextOption() {
 		if (this.currentModeIndex == this.messages.length - 1) { return }
 		this.update({
-			midpoint: this.midpoint.translatedBy(this.optionSpacing, 0)
+			midpoint: vertexTranslatedBy(this.midpoint, [this.optionSpacing, 0])
 		})
 		this.updateModeIndex(this.currentModeIndex + 1, true)
 	}
@@ -230,7 +230,7 @@ export class SidebarButton extends Circle {
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
 		this.update({
-			midpoint: this.midpoint.translatedBy(-this.optionSpacing, 0)
+			midpoint: vertexTranslatedBy(this.midpoint, [-this.optionSpacing, 0])
 		})
 		this.updateModeIndex(this.currentModeIndex - 1, true)
 	}
@@ -245,15 +245,15 @@ export class SidebarButton extends Circle {
 		if (e instanceof MouseEvent) { t = e }
 		else { t = e.changedTouches[0] }
 	
-		let p: Vertex = eventVertex(e)
-		var dx: number = p.x - this.touchStart.x
+		let p: vertex = eventVertex(e)
+		var dx: number = p[0] - this.touchStart[0]
 
 		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
 		newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1)
 		dx += this.previousIndex * this.optionSpacing
 		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
 
-		let newMidpoint = new Vertex(buttonCenter(this.locationIndex).x + dx, buttonCenter(this.locationIndex).y)
+		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
 		
 		this.updateModeIndex(newIndex, true)
 		this.update({ midpoint: newMidpoint })

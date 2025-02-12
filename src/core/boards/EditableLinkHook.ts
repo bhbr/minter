@@ -4,7 +4,7 @@ import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/sc
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { ExpandedBoardInputList}  from './ExpandedBoardInputList'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 
 export class EditableLinkHook extends LinkHook {
 	
@@ -98,7 +98,7 @@ export class EditableLinkHook extends LinkHook {
 		this.deactivateKeyboard()
 	}
 
-	positionInLinkMap(): Vertex {
+	positionInLinkMap(): vertex {
 	// used e. g. for snapping
 		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent)
 	}

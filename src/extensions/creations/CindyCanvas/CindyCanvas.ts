@@ -1,6 +1,6 @@
 
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Mobject } from 'core/mobjects/Mobject'
 import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
@@ -29,7 +29,7 @@ export class CindyCanvas extends Linkable implements Playable {
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			playButton: new PlayButton({
-				anchor: new Vertex(5, 5)
+				anchor: [5, 5]
 			}),
 
 			id: undefined,

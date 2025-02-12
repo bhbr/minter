@@ -1,12 +1,11 @@
 
 import { Line } from 'core/shapes/Line'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray } from 'core/functions/vertex'
 
 export class ConStrait extends Line {
 
-	drawingStartPoint(): Vertex { return this.startPoint }
-	drawingEndPoint(): Vertex { return this.endPoint }
+	drawingStartPoint(): vertex { return this.startPoint }
+	drawingEndPoint(): vertex { return this.endPoint }
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)

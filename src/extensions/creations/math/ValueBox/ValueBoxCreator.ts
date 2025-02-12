@@ -1,7 +1,7 @@
 
 import { ValueBox } from './ValueBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 
 export class ValueBoxCreator extends DraggingCreator {
 	
@@ -13,7 +13,7 @@ export class ValueBoxCreator extends DraggingCreator {
 		})
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		this.creation.hideLinks()
 	}

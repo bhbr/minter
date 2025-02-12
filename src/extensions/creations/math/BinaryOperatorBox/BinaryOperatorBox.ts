@@ -3,7 +3,6 @@ import { ValueBox } from '../ValueBox/ValueBox'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
 
 export class BinaryOperatorBox extends ValueBox {
 
@@ -43,7 +42,7 @@ export class BinaryOperatorBox extends ValueBox {
 	setup() {
 		super.setup()
 		this.operatorSign.update({
-			midpoint: new Vertex(this.viewWidth / 2, 0)
+			midpoint: [this.viewWidth / 2, 0]
 		})
 		this.operatorLabel.update({
 			text: this.operatorDict[this.operator],

@@ -1,7 +1,7 @@
 
 import { InputValueBox } from 'extensions/creations/math/InputValueBox/InputValueBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 
 export class InputValueBoxCreator extends DraggingCreator {
 	
@@ -13,7 +13,7 @@ export class InputValueBoxCreator extends DraggingCreator {
 		})
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		this.creation.hideLinks()
 	}

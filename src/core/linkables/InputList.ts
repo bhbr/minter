@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexTranslatedBy } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { Linkable } from './Linkable'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
@@ -80,9 +80,9 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 	}
 
 	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
-		let m = new Vertex(HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index)
+		let m: vertex = [HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index]
 		hook.update({ midpoint: m })
-		let a = hook.midpoint.translatedBy(HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING)
+		let a = vertexTranslatedBy(hook.midpoint, [HOOK_LABEL_INSET, -0.5 * HOOK_VERTICAL_SPACING])
 		label.update({ anchor: a })
 	}
 
@@ -109,7 +109,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 
 	positionSelf() {
 		super.update({
-			anchor: new Vertex(0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight())
+			anchor: [0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight()]
 		}, true)
 	}
 }

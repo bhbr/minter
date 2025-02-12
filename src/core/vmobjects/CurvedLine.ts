@@ -1,6 +1,6 @@
 
 import { VMobject } from './VMobject'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertexArray } from 'core/functions/vertex'
 
 export class CurvedLine extends VMobject {
 	/*
@@ -23,13 +23,13 @@ export class CurvedLine extends VMobject {
 		}
 	}
 
-	_bezierPoints: VertexArray
+	_bezierPoints: vertexArray
 
-	get bezierPoints(): VertexArray { return this._bezierPoints }
+	get bezierPoints(): vertexArray { return this._bezierPoints }
 	
-	set bezierPoints(newValue: VertexArray) {
+	set bezierPoints(newValue: vertexArray) {
 		this._bezierPoints = newValue
-		let v = new VertexArray()
+		let v: vertexArray = []
 		let i: number = 0
 		for (let p of this.bezierPoints) {
 			if (i % 3 == 1) { v.push(p) }
@@ -49,8 +49,8 @@ export class CurvedLine extends VMobject {
 		if (redraw) { this.redraw() }
 	}
 
-	static makePathString(bezierPoints: VertexArray, closed: boolean = false): string {
-		let points: VertexArray = bezierPoints
+	static makePathString(bezierPoints: vertexArray, closed: boolean = false): string {
+		let points: vertexArray = bezierPoints
 		if (points == undefined || points.length == 0) { return '' }
 
 		// there should be 3n + 1 points

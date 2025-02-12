@@ -1,7 +1,6 @@
 
 import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
 import { ScreenEvent, eventVertex } from 'core/mobjects/screen_events'
-import { Vertex } from 'core/classes/vertex/Vertex'
 
 export class BoxStepper extends BoxSlider {
 

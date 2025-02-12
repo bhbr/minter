@@ -1,6 +1,6 @@
 
 import { Circle } from 'core/shapes/Circle'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 
 export class ConCircle extends Circle {
@@ -9,14 +9,14 @@ For constructions. A circle defined by its midpoint and a point
 on its circumference. The radius (and anchor) is updated automatically.
 */
 
-	outerPoint: Vertex
+	outerPoint: vertex
 
 	ownDefaults(): object {
 		return {
 			strokeColor: Color.white(),
 			fillColor: Color.white(),
 			fillOpacity: 0,
-			outerPoint: Vertex.origin()
+			outerPoint: vertexOrigin()
 		}
 	}
 

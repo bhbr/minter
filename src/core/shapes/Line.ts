@@ -1,17 +1,16 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, vertexOrigin } from 'core/functions/vertex'
 import { Polygon } from 'core/vmobjects/Polygon'
 
 export class Line extends Polygon {
 
-	startPoint: Vertex
-	endPoint: Vertex
+	startPoint: vertex
+	endPoint: vertex
 
 	ownDefaults(): object {
 		return {
-			startPoint: Vertex.origin(),
-			endPoint: Vertex.origin()
+			startPoint: vertexOrigin(),
+			endPoint: vertexOrigin()
 		}
 	}
 
@@ -30,9 +29,9 @@ export class Line extends Polygon {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
-		let p: Vertex = this.drawingStartPoint()
-		let q: Vertex = this.drawingEndPoint()
-		this.vertices = new VertexArray([p, q])
+		let p: vertex = this.drawingStartPoint()
+		let q: vertex = this.drawingEndPoint()
+		this.vertices = [p, q]
 		if (redraw) { this.redraw() }
 	}
 }

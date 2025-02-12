@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { ConCircle } from './ConCircle'
 import { Constructor } from '../Constructor'
 import { FreePoint } from '../FreePoint'
@@ -65,7 +65,7 @@ export class ConCircleConstructor extends Constructor {
 		this.add(this.circle)
 	}
 
-	updateFromTip(q: Vertex) {
+	updateFromTip(q: vertex) {
 		super.updateFromTip(q)
 		this.freeOuterPoint.update({ midpoint: q })
 		this.update()

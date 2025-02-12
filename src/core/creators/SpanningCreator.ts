@@ -2,7 +2,7 @@
 import { Creator } from './Creator'
 import { Color } from 'core/classes/Color'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Mobject } from 'core/mobjects/Mobject'
 
 export class SpanningCreator extends Creator {
@@ -30,23 +30,23 @@ export class SpanningCreator extends Creator {
 
 	}
 
-	topLeftVertex(): Vertex {
-		return new Vertex(
-			Math.min(this.getStartPoint().x, this.getEndPoint().x),
-			Math.min(this.getStartPoint().y, this.getEndPoint().y)
-		)
+	topLeftVertex(): vertex {
+		return [
+			Math.min(this.getStartPoint()[0], this.getEndPoint()[0]),
+			Math.min(this.getStartPoint()[1], this.getEndPoint()[1])
+		]
 	}
 
 	getWidth(): number {
-		return Math.abs(this.getStartPoint().x - this.getEndPoint().x)
+		return Math.abs(this.getStartPoint()[0] - this.getEndPoint()[0])
 	}
 
 	getHeight(): number {
-		return Math.abs(this.getStartPoint().y - this.getEndPoint().y)
+		return Math.abs(this.getStartPoint()[1] - this.getEndPoint()[1])
 	}
 
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.update({
 			viewWidth: this.getWidth(),

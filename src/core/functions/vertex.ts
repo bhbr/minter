@@ -1,7 +1,19 @@
 
-import { Transform } from './Transform'
+import { Transform } from 'core/classes/Transform/Transform'
 
 export type vertex = Array<number>
+export type vertexArray = Array<vertex>
+
+export function isVertex(obj: any): boolean {
+	if (!(obj instanceof Array)) { return false }
+	if (obj.length != 2) { return false }
+	return (typeof obj[0] == 'number') && (typeof obj[1] == 'number')
+}
+
+export function isVertexArray(obj: any): boolean {
+	if (!(obj instanceof Array)) { return false }
+	return obj.every((el) => isVertex(el))
+}
 
 export function vertexX(v: vertex): number { return v[0] }
 export function vertexY(v: vertex): number { return v[1] }
@@ -64,14 +76,14 @@ export function vertexTranslateBy(v: vertex, w: vertex) {
 	vertexCopyFrom(v, vertexTranslatedBy(v, w))
 }
 
-function vertexCentrallyRotatedBy(v: vertex, angle: number): vertex {
+export function vertexCentrallyRotatedBy(v: vertex, angle: number): vertex {
 	let c = Math.cos(angle)
 	let s = Math.sin(angle)
 	return [c * v[0] + s * v[1], -s * v[0] + c * v[1]]
 }
 
 export function vertexRotatedBy(v: vertex, angle: number, center: vertex): vertex {
-	if (center == undefined || vertexIsZero(center)) {
+	if (vertexIsZero(center)) {
 		return vertexCentrallyRotatedBy(v, angle)
 	}
 	let w = vertexSubtract(v, center)
@@ -79,19 +91,18 @@ export function vertexRotatedBy(v: vertex, angle: number, center: vertex): verte
 	return vertexAdd(rw, center)
 }
 
-function vertexCentrallyRotateBy(v: vertex, angle: number) {
+export function vertexCentrallyRotateBy(v: vertex, angle: number) {
 	vertexCopyFrom(v, vertexCentrallyRotatedBy(v, angle))
 }
 
 export function vertexRotateBy(v: vertex, angle: number, center: vertex) {
-	if (center == undefined) {
+	if (vertexIsZero(center)) {
 		vertexCopyFrom(v, vertexCentrallyRotatedBy(v, angle))
 	}
 	vertexCopyFrom(v, vertexRotatedBy(v, angle, center))
 }
 
-
-function vertexCentrallyScaledBy(v: vertex, scale: number): vertex {
+export function vertexCentrallyScaledBy(v: vertex, scale: number): vertex {
 	return [scale * v[0], scale * v[1]]
 }
 
@@ -163,5 +174,28 @@ export function vertexInnerProduct(v: vertex, w: vertex): number {
 
 export function vertexOuterProduct(v: vertex, w: vertex): number {
 	return v[0] * w[1] - v[1] * w[0]
+}
+
+
+
+export function vertexArrayInterpolate(vtxArray1: vertexArray, vtxArray2: vertexArray, weight): vertexArray {
+	let interpolatedVertexArray: vertexArray = []
+	for (let i = 0; i < vtxArray1.length; i++) {
+		interpolatedVertexArray.push(
+			vertexInterpolate(vtxArray1[i], vtxArray2[i], weight)
+		)
+	}
+	return interpolatedVertexArray
+}
+
+export function vertexArrayImageUnder(vtxArray: vertexArray, transform: Transform): vertexArray {
+	let image: vertexArray = []
+	for (let i = 0; i < vtxArray.length; i++) {
+		image.push(
+			vertexImageUnder(vtxArray[i], transform)
+		)
+	}
+	return image
+}
 
 

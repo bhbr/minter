@@ -2,7 +2,7 @@
 import { Circle } from 'core/shapes/Circle'
 import { BULLET_RADIUS } from './constants'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { DependencyLink } from './DependencyLink'
 
 export class LinkBullet extends Circle {
@@ -34,7 +34,7 @@ a dependency between two linkable mobjects.
 		super.parent = newValue
 	}
 
-	positionInLinkMap(): Vertex {
+	positionInLinkMap(): vertex {
 	// used e. g. for snapping
 		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent.parent)
 	}

@@ -1,5 +1,5 @@
 import { SpanningCreator } from 'core/creators/SpanningCreator'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Construction } from 'extensions/boards/construction/Construction'
 

@@ -1,23 +1,22 @@
 
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { TAU, PI, DEGREES } from 'core/constants'
-import { Vertex } from './Vertex'
-import { VertexArray } from './VertexArray'
+import { vertex, vertexOrigin, vertexIsZero, vertexX, vertexY, vertexOpposite, vertexAdd, vertexSubtract, vertexCentrallyRotatedBy, vertexCentrallyScaledBy, vertexTranslatedBy, vertexInterpolate } from 'core/functions/vertex'
 
 export class Transform extends ExtendedObject {
 
-	anchor: Vertex
+	anchor: vertex
 	angle: number
 	scale: number
-	shift: Vertex
+	shift: vertex
 
 	ownDefaults(): object {
 		return {
 			passedByValue: true,
-			anchor: Vertex.origin(),
+			anchor: vertexOrigin(),
 			angle: 0,
 			scale: 1,
-			shift: Vertex.origin()
+			shift: vertexOrigin()
 		}
 	}
 
@@ -32,11 +31,11 @@ export class Transform extends ExtendedObject {
 	det(): number { return this.scale ** 2 }
 
 	toCSSString(): string {
-		let str1: string = this.shift.isZero() ? `` : `translate(${this.shift.x}px,${this.shift.y}px) `
-		let str2: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${-this.anchor.x}px,${-this.anchor.y}px) `
+		let str1: string = vertexIsZero(this.shift) ? `` : `translate(${this.shift[0]}px,${this.shift[1]}px) `
+		let str2: string = vertexIsZero(this.anchor) || (this.scale == 1 && this.angle == 0) ? `` : `translate(${-this.anchor[0]}px,${-this.anchor[1]}px) `
 		let str3: string = this.scale == 1 ? `` : `scale(${this.scale}) `
 		let str4: string = this.angle == 0 ? `` : `rotate(${-this.angle / DEGREES}deg) `
-		let str5: string = this.anchor.isZero() || (this.scale == 1 && this.angle == 0) ? `` : `translate(${this.anchor.x}px,${this.anchor.y}px) `
+		let str5: string = vertexIsZero(this.anchor) || (this.scale == 1 && this.angle == 0) ? `` : `translate(${this.anchor[0]}px,${this.anchor[1]}px) `
 
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
 	}
@@ -49,8 +48,8 @@ export class Transform extends ExtendedObject {
 	b(): number { return this.scale * Math.sin(this.angle) }
 	c(): number { return -this.scale * Math.sin(this.angle) }
 	d(): number { return this.scale * Math.cos(this.angle) }
-	e(): number { return (1 - this.a()) * this.anchor.x - this.b() * this.anchor.y + this.shift.x }
-	f(): number { return -this.c() * this.anchor.x + (1 - this.d()) * this.anchor.y + this.shift.y }
+	e(): number { return (1 - this.a()) * this.anchor[0] - this.b() * this.anchor[1] + this.shift[0] }
+	f(): number { return -this.c() * this.anchor[0] + (1 - this.d()) * this.anchor[1] + this.shift[1] }
 
 	inverse(): Transform {
 		let t = new Transform({
@@ -58,22 +57,22 @@ export class Transform extends ExtendedObject {
 			scale: 1 / this.scale
 		})
 		t.update({
-			shift: t.appliedTo(this.shift).opposite(),
+			shift: vertexOpposite(t.appliedTo(this.shift)),
 			anchor: this.anchor
 		})
 		return t
 	}
 
-	appliedTo(p: Vertex): Vertex {
-		return new Vertex(
-			this.a() * p.x + this.b() * p.y + this.e(),
-			this.c() * p.x + this.d() * p.y + this.f()
-		)
+	appliedTo(p: vertex): vertex {
+		return [
+			this.a() * p[0] + this.b() * p[1] + this.e(),
+			this.c() * p[0] + this.d() * p[1] + this.f()
+		]
 	}
 
-	appliedToVertices(vertices: Array<Vertex>): VertexArray {
+	appliedToVertices(vertices: Array<vertex>): Array<vertex> {
 	// This method also accepts an undertyped argument
-		let ret = new VertexArray()
+		let ret: Array<vertex> = []
 		for (let v of vertices) {
 			ret.push(this.appliedTo(v))
 		}
@@ -87,13 +86,13 @@ export class Transform extends ExtendedObject {
 	}
 
 	rightComposedWith(t: Transform): Transform {
-		let v: Vertex = t.shift.add(t.anchor).subtract(this.anchor)
-		let w: Vertex = this.shift.add(this.anchor).subtract(t.anchor)
+		let v: vertex = vertexSubtract(vertexAdd(t.shift, t.anchor), this.anchor)
+		let w: vertex = vertexSubtract(vertexAdd(this.shift, this.anchor), t.anchor)
 		return new Transform({
 			anchor: t.anchor,
 			scale: this.scale * t.scale,
 			angle: this.angle + t.angle,
-			shift: v.rotatedBy(this.angle).scaledBy(this.scale).translatedBy(w)
+			shift: vertexTranslatedBy(vertexCentrallyScaledBy(vertexCentrallyRotatedBy(v, this.angle), this.scale), w)
 		})
 	}
 
@@ -111,16 +110,16 @@ export class Transform extends ExtendedObject {
 
 	interpolate(newTransform: Transform, weight: number) {
 		return new Transform({
-			anchor: this.anchor.interpolate(newTransform.anchor, weight),
+			anchor: vertexInterpolate(this.anchor, newTransform.anchor, weight),
 			angle: (1 - weight) * this.angle + weight * newTransform.angle,
 			scale: (1 - weight) * this.scale + weight * newTransform.scale,
-			shift: this.shift.interpolate(newTransform.shift, weight)
+			shift: vertexInterpolate(this.shift, newTransform.shift, weight)
 		})
 	}
 
 	withoutAnchor(): Transform {
 		let t = this.copy()
-		t.anchor = Vertex.origin()
+		t.anchor = vertexOrigin()
 		return t
 	}
 

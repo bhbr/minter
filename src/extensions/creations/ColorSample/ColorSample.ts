@@ -2,7 +2,7 @@
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
 import { Linkable } from 'core/linkables/Linkable'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex } from 'core/functions/vertex'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 let RADIUS = 30
@@ -16,7 +16,7 @@ export class ColorSample extends Linkable {
 		return {
 			circle : new Circle({
 				radius: RADIUS,
-				midpoint: new Vertex(RADIUS, RADIUS),
+				midpoint: [RADIUS, RADIUS],
 				fillOpacity: 1
 			}),
 			color: Color.white(),

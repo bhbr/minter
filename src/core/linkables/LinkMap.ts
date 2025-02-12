@@ -5,7 +5,7 @@ import { Linkable } from './Linkable'
 import { DependencyLink } from './DependencyLink'
 import { LinkBullet } from './LinkBullet'
 import { LinkHook } from './LinkHook'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexCloseTo, vertexEquals } from 'core/functions/vertex'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { remove, extend } from 'core/functions/arrays'
 import { SNAPPING_DISTANCE } from './constants'
@@ -41,36 +41,36 @@ export class LinkMap extends Mobject {
 		super.parent = newValue
 	}
 
-	hookAtLocation(p: Vertex): LinkHook | null {
+	hookAtLocation(p: vertex): LinkHook | null {
 		for (let h of this.parent.innerInputHooks()) {
-			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}
 		}
 		for (let h of this.parent.innerOutputHooks()) {
-			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}
 		}
 		for (let h of this.parent.outerInputHooks()) {
-			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}
 		}
 		for (let h of this.parent.outerOutputHooks()) {
-			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				return h
 			}
 		}
 		return null
 	}
 
-	bulletAtLocation(p: Vertex): LinkBullet | null {
+	bulletAtLocation(p: vertex): LinkBullet | null {
 		for (let link of this.linkList) {
-			if (link.startBullet.positionInLinkMap().closeTo(p, SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(link.startBullet.positionInLinkMap(), p, SNAPPING_DISTANCE)) {
 				return link.startBullet
 			}
-			if (link.endBullet.positionInLinkMap().closeTo(p, SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(link.endBullet.positionInLinkMap(), p, SNAPPING_DISTANCE)) {
 				return link.endBullet
 			}
 		}
@@ -128,7 +128,7 @@ export class LinkMap extends Mobject {
 		let hooks = this.compatibleHooks()
 		console.log(hooks)
 		for (let h of hooks) {
-			if (p.closeTo(h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
 				this.openBullet.update({
 					midpoint: h.positionInLinkMap()
 				})
@@ -144,12 +144,12 @@ export class LinkMap extends Mobject {
 	hookForBullet(bullet: LinkBullet): LinkHook | null {
 		if (bullet === null) { return null }
 		for (let hook of this.parent.innerInputHooks()) {
-			if (bullet.positionInLinkMap().equals(hook.positionInLinkMap())) {
+			if (vertexEquals(bullet.positionInLinkMap(), hook.positionInLinkMap())) {
 				return hook
 			}
 		}
 		for (let hook of this.parent.innerOutputHooks()) {
-			if (bullet.positionInLinkMap().equals(hook.positionInLinkMap())) {
+			if (vertexEquals(bullet.positionInLinkMap(), hook.positionInLinkMap())) {
 				return hook
 			}
 		}

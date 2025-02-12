@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Creator } from 'core/creators/Creator'
 import { BoxSlider } from './BoxSlider'
 import { Linkable } from 'core/linkables/Linkable'
@@ -25,13 +25,13 @@ export class BoxSliderCreator extends Creator {
 		return this.creation || new BoxSlider({ height: 0 })
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		// this.update({ // This shouldn't be necessary, fix
 		// 	fillColor: Color.black()
 		// }, redraw)
 		if (this.creation === null) { return }
 		this.creation.update({
-			height: q.y - this.getStartPoint().y,
+			height: q[1] - this.getStartPoint()[1],
 		}, redraw)
 		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)
@@ -46,9 +46,9 @@ export class BoxSliderCreator extends Creator {
 		this.creation.update({
 			anchor: this.anchor
 		})
-		this.creation.outerBar.update({ anchor: new Vertex(0, 0) }) // necessary?
+		this.creation.outerBar.update({ anchor: vertexOrigin() }) // necessary?
 		this.creation.label.update({
-			anchor: new Vertex(this.creation.width/2 - this.creation.label.viewWidth/2, this.creation.height/2 - this.creation.label.viewHeight/2)
+			anchor: [this.creation.width/2 - this.creation.label.viewWidth/2, this.creation.height/2 - this.creation.label.viewHeight/2]
 		})
 
 	}

@@ -1,5 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexCopy } from 'core/functions/vertex'
 import { FreePoint } from '../FreePoint'
 import { Construction } from '../Construction'
 import { Constructor } from '../Constructor'
@@ -39,11 +39,11 @@ export class ConStraitConstructor extends Constructor {
 
 		this.startFreePoint.update({ midpoint: sp1 })
 		this.endFreePoint.update({
-			midpoint: this.getEndPoint() ?? sp1.copy()
+			midpoint: this.getEndPoint() ?? vertexCopy(sp1)
 		})
 	}
 
-	updateFromTip(q: Vertex, redraw: boolean = true) {
+	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		this.update()
 		if (redraw) { this.redraw() }

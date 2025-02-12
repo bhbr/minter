@@ -2,9 +2,8 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { Transform } from 'core/classes/vertex/Transform'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform/Transform'
 import { remove } from 'core/functions/arrays'
 import { deepCopy } from 'core/functions/copying'
 import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'core/mobjects/screen_events'
@@ -35,7 +34,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 
 */
 
-	vertices: VertexArray
+	vertices: vertexArray
 
 	fillColor: Color
 	fillOpacity: number // 0 to 1
@@ -53,7 +52,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			strokeWidth: 1,
-			vertices: new VertexArray()
+			vertices: []
 		}
 	}
 
@@ -110,14 +109,14 @@ TODO: support mutiple paths e. g. for shapes with holes
 		return ''
 	}
 
-	relativeVertices(frame?: Mobject): VertexArray {
+	relativeVertices(frame?: Mobject): vertexArray {
 	// the vertices are in local coordinates, convert them to the given frame of an ancestor mobject
-		let returnValue: VertexArray = this.relativeTransform(frame).appliedToVertices(this.vertices)
-		if (returnValue == undefined) { return new VertexArray() }
+		let returnValue: vertexArray = this.relativeTransform(frame).appliedToVertices(this.vertices)
+		if (returnValue == undefined) { return [] }
 		else { return returnValue }
 	}
 
-	globalVertices(): VertexArray {
+	globalVertices(): vertexArray {
 	// uses default frame = paper
 		return this.relativeVertices()
 	}
@@ -139,11 +138,11 @@ TODO: support mutiple paths e. g. for shapes with holes
 	localXMin(): number {
 		let xMin: number = Infinity
 		if (this.vertices != undefined) {
-			for (let p of this.vertices) { xMin = Math.min(xMin, p.x) }
+			for (let p of this.vertices) { xMin = Math.min(xMin, p[0]) }
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				xMin = Math.min(xMin, mob.localXMin() + mob.anchor.x)
+				xMin = Math.min(xMin, mob.localXMin() + mob.anchor[0])
 			}
 		}
 		return xMin
@@ -152,11 +151,11 @@ TODO: support mutiple paths e. g. for shapes with holes
 	localXMax(): number {
 		let xMax: number = -Infinity
 		if (this.vertices != undefined) {
-			for (let p of this.vertices) { xMax = Math.max(xMax, p.x) }
+			for (let p of this.vertices) { xMax = Math.max(xMax, p[0]) }
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				xMax = Math.max(xMax, mob.localXMax() + mob.anchor.x)
+				xMax = Math.max(xMax, mob.localXMax() + mob.anchor[0])
 			}
 		}
 		return xMax
@@ -165,11 +164,11 @@ TODO: support mutiple paths e. g. for shapes with holes
 	localYMin(): number {
 		let yMin: number = Infinity
 		if (this.vertices != undefined) {
-			for (let p of this.vertices) { yMin = Math.min(yMin, p.y) }
+			for (let p of this.vertices) { yMin = Math.min(yMin, p[1]) }
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				yMin = Math.min(yMin, mob.localYMin() + mob.anchor.y)
+				yMin = Math.min(yMin, mob.localYMin() + mob.anchor[1])
 			}
 		}
 		return yMin
@@ -181,11 +180,11 @@ TODO: support mutiple paths e. g. for shapes with holes
 
 		}
 		if (this.vertices != undefined) {
-			for (let p of this.vertices) { yMax = Math.max(yMax, p.y) }
+			for (let p of this.vertices) { yMax = Math.max(yMax, p[1]) }
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				yMax = Math.max(yMax, mob.localYMax() + mob.anchor.y)
+				yMax = Math.max(yMax, mob.localYMax() + mob.anchor[1])
 			}
 		}
 		return yMax
@@ -194,36 +193,36 @@ TODO: support mutiple paths e. g. for shapes with holes
 	localMidX(): number { return (this.localXMin() + this.localXMax()) / 2 }
 	localMidY(): number { return (this.localYMin() + this.localYMax()) / 2 }
 
-	localULCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMin())}
-	localURCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMin())}
-	localLLCorner(): Vertex { return new Vertex(this.localXMin(), this.localYMax())}
-	localLRCorner(): Vertex { return new Vertex(this.localXMax(), this.localYMax())}
+	localULCorner(): vertex { return [this.localXMin(), this.localYMin()] }
+	localURCorner(): vertex { return [this.localXMax(), this.localYMin()] }
+	localLLCorner(): vertex { return [this.localXMin(), this.localYMax()] }
+	localLRCorner(): vertex { return [this.localXMax(), this.localYMax()] }
 
-	localCenter(): Vertex { return new Vertex(this.localMidX(), this.localMidY()) }
-	localLeftCenter(): Vertex { return new Vertex(this.localXMin(), this.localMidY()) }
-	localRightCenter(): Vertex { return new Vertex(this.localXMax(), this.localMidY()) }
-	localTopCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMin()) }
-	localBottomCenter(): Vertex { return new Vertex(this.localMidX(), this.localYMax()) }
+	localCenter(): vertex { return [this.localMidX(), this.localMidY()] }
+	localLeftCenter(): vertex { return [this.localXMin(), this.localMidY()] }
+	localRightCenter(): vertex { return [this.localXMax(), this.localMidY()] }
+	localTopCenter(): vertex { return [this.localMidX(), this.localYMin()] }
+	localBottomCenter(): vertex { return [this.localMidX(), this.localYMax()] }
 
-	ulCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localULCorner(), frame) }
-	urCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localURCorner(), frame) }
-	llCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLLCorner(), frame) }
-	lrCorner(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLRCorner(), frame) }
+	ulCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localULCorner(), frame) }
+	urCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localURCorner(), frame) }
+	llCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLLCorner(), frame) }
+	lrCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLRCorner(), frame) }
 
-	center(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localCenter(), frame) }
+	center(frame?: Mobject): vertex { return this.transformLocalPoint(this.localCenter(), frame) }
 
-	xMin(frame?: Mobject): number { return this.ulCorner(frame).x }
-	xMax(frame?: Mobject): number { return this.lrCorner(frame).x }
-	yMin(frame?: Mobject): number { return this.ulCorner(frame).y }
-	yMax(frame?: Mobject): number { return this.lrCorner(frame).y }
+	xMin(frame?: Mobject): number { return this.ulCorner(frame)[0] }
+	xMax(frame?: Mobject): number { return this.lrCorner(frame)[0] }
+	yMin(frame?: Mobject): number { return this.ulCorner(frame)[1] }
+	yMax(frame?: Mobject): number { return this.lrCorner(frame)[1] }
 
-	midX(frame?: Mobject): number { return this.center(frame).x }
-	midY(frame?: Mobject): number { return this.center(frame).y }
+	midX(frame?: Mobject): number { return this.center(frame)[0] }
+	midY(frame?: Mobject): number { return this.center(frame)[1] }
 
-	leftCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localLeftCenter(), frame) }
-	rightCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
-	topCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localTopCenter(), frame) }
-	bottomCenter(frame?: Mobject): Vertex { return this.transformLocalPoint(this.localBottomCenter(), frame) }
+	leftCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLeftCenter(), frame) }
+	rightCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
+	topCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localTopCenter(), frame) }
+	bottomCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localBottomCenter(), frame) }
 
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }

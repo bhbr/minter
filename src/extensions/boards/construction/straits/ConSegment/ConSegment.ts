@@ -1,15 +1,14 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, vertexSubtract, vertexNorm2 } from 'core/functions/vertex'
 import { ConStrait } from '../ConStrait'
 
 export class ConSegment extends ConStrait {
 
-	vectorComponents(): Vertex {
-		return this.endPoint.subtract(this.startPoint)
+	vectorComponents(): vertex {
+		return vertexSubtract(this.endPoint, this.startPoint)
 	}
 
-	norm2(): number { return this.vectorComponents().norm2() }
+	norm2(): number { return vertexNorm2(this.vectorComponents()) }
 	norm():number { return Math.sqrt(this.norm2()) }
 
 }

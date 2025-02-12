@@ -1,7 +1,6 @@
 
 import { CurvedLine } from 'core/vmobjects/CurvedLine'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexArray, vertexTranslatedBy, vertexCentrallyScaledBy } from 'core/functions/vertex'
 import { DEGREES, TAU } from 'core/constants'
 
 const DEFAULT_RADIUS = 10
@@ -16,7 +15,7 @@ export class CircularArc extends CurvedLine {
 		return {
 			closed: false,
 			anchor: undefined,
-			midpoint: new Vertex(DEFAULT_RADIUS, DEFAULT_RADIUS),
+			midpoint: [DEFAULT_RADIUS, DEFAULT_RADIUS],
 			radius: DEFAULT_RADIUS,
 			angle: TAU / 4,
 			nbPoints: 32
@@ -25,17 +24,17 @@ export class CircularArc extends CurvedLine {
 
 	// A circle's midpoint is not implemented as its own property,
 	// that needs to be kept in sync with its anchor
-	get midpoint(): Vertex {
+	get midpoint(): vertex {
 		if (this.radius === undefined) {
 			throw 'No radius yet!'
 		}
-		return this.anchor.translatedBy(this.radius, this.radius)
+		return vertexTranslatedBy(this.anchor, [this.radius, this.radius])
 	}
-	set midpoint(newValue: Vertex) {
+	set midpoint(newValue: vertex) {
 		if (this.radius === undefined) {
 			throw 'No radius yet!'
 		}
-		this.anchor = newValue.translatedBy(-this.radius, -this.radius)
+		this.anchor = vertexTranslatedBy(newValue, [-this.radius, -this.radius])
 	}
 
 	synchronizeUpdateArguments(args: object = {}): object {
@@ -59,13 +58,13 @@ export class CircularArc extends CurvedLine {
 
 		// adjust the anchor according to the given parameters
 		if (r !== undefined && !m && !a) { // only r given
-			args['anchor'] = this.midpoint.translatedBy(-r, -r)
+			args['anchor'] = vertexTranslatedBy(this.midpoint, [-r, -r])
 		} else if (r === undefined && m && !a) { // only m given
-			args['anchor'] = m.translatedBy(-this.radius, -this.radius)
+			args['anchor'] = vertexTranslatedBy(m, [-this.radius, -this.radius])
 		} else if (r === undefined && !m && a) { // only a given
 			// nothing to adjust
 		} else if (r !== undefined && m) { // r and m given, but no a
-			args['anchor'] = m.translatedBy(-r, -r)
+			args['anchor'] = vertexTranslatedBy(m, [-r, -r])
 		} else if (r !== undefined && !m && a) { // r and a given
 			// nothing to adjust
 		} 
@@ -80,24 +79,24 @@ export class CircularArc extends CurvedLine {
 	}
 
 	updateBezierPoints() {
-		let newBezierPoints = new VertexArray()
+		let newBezierPoints: vertexArray = []
 		let d: number = this.radius * 4/3 * Math.tan(this.angle/(4*this.nbPoints))
 		for (let i = 0; i <= this.nbPoints; i++) {
 			let theta: number = i/this.nbPoints * this.angle
-			let radialUnitVector = new Vertex(Math.cos(theta), Math.sin(theta))
-			let tangentUnitVector = new Vertex(-Math.sin(theta), Math.cos(theta))
-			let anchorPoint: Vertex = radialUnitVector.scaledBy(this.radius)
+			let radialUnitVector: vertex = [Math.cos(theta), Math.sin(theta)]
+			let tangentUnitVector: vertex = [-Math.sin(theta), Math.cos(theta)]
+			let anchorPoint: vertex = vertexCentrallyScaledBy(radialUnitVector, this.radius)
 
-			let leftControlPoint: Vertex = anchorPoint.translatedBy(tangentUnitVector.scaledBy(-d))
-			let rightControlPoint: Vertex = anchorPoint.translatedBy(tangentUnitVector.scaledBy(d))
+			let leftControlPoint: vertex = vertexTranslatedBy(anchorPoint, vertexCentrallyScaledBy(tangentUnitVector, -d))
+			let rightControlPoint: vertex = vertexTranslatedBy(anchorPoint, vertexCentrallyScaledBy(tangentUnitVector, d))
 
 			if (i != 0) { newBezierPoints.push(leftControlPoint) }
 			newBezierPoints.push(anchorPoint)
 			if (i != this.nbPoints) { newBezierPoints.push(rightControlPoint) }
 		}
-		let translatedBezierPoints = new VertexArray()
+		let translatedBezierPoints: vertexArray = []
 		for (let i = 0; i < newBezierPoints.length; i++) {
-			translatedBezierPoints.push(newBezierPoints[i].translatedBy(this.radius, this.radius))
+			translatedBezierPoints.push(vertexTranslatedBy(newBezierPoints[i], [this.radius, this.radius]))
 		}
 		this.bezierPoints = translatedBezierPoints
 

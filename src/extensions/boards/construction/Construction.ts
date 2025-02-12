@@ -18,7 +18,7 @@ import { IntersectionPoint } from './IntersectionPoint'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexCloseTo } from 'core/functions/vertex'
 import { Creator } from 'core/creators/Creator'
 import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
@@ -61,11 +61,11 @@ export class Construction extends Board {
 		})
 	}
 
-	snapped(v1: Vertex, v2: Vertex): boolean {
-		return v1.closeTo(v2, 10)
+	snapped(v1: vertex, v2: vertex): boolean {
+		return vertexCloseTo(v1, v2, 10)
 	}
 
-	snappedPointForVertex(v: Vertex): ConPoint | null {
+	snappedPointForVertex(v: vertex): ConPoint | null {
 		for (let p of this.points) {
 			if (this.snapped(v, p.midpoint)) { return p }
 		}
@@ -145,9 +145,9 @@ export class Construction extends Board {
 			super.creating(e)
 			return
 		}
-		let p: Vertex = this.localEventVertex(e)
+		let p: vertex = this.localEventVertex(e)
 		for (let fq of this.points) {
-			let q: Vertex = fq.midpoint
+			let q: vertex = fq.midpoint
 			if (this.snapped(p, q)) {
 				p = q
 				break

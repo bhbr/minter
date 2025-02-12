@@ -1,12 +1,12 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { ConStrait } from '../ConStrait'
 
 export class ConRay extends ConStrait {
 
-	drawingEndPoint(): Vertex {
+	drawingEndPoint(): vertex {
 		if (this.startPoint == this.endPoint) { return this.endPoint }
-		return this.startPoint.add(this.endPoint.subtract(this.startPoint).multiply(100))
+		return vertexAdd(this.startPoint, vertexMultiply(vertexSubtract(this.endPoint, this.startPoint), 100))
 	}
 
 }

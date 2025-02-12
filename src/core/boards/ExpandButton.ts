@@ -2,8 +2,8 @@
 import { Board } from './Board'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { Transform } from 'core/classes/vertex/Transform'
+import { vertex, vertexOrigin } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform/Transform'
 import { Color } from 'core/classes/Color'
 
 export class ExpandButton extends TextLabel {
@@ -13,7 +13,7 @@ export class ExpandButton extends TextLabel {
 			viewWidth: 30,
 			viewHeight: 30,
 			transform: Transform.identity(),
-			anchor: Vertex.origin(),
+			anchor: vertexOrigin(),
 			screenEventHandler: ScreenEventHandler.Self,
 			backgroundColor: Color.gray(0.25),
 			color: Color.white()

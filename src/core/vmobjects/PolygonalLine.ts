@@ -1,6 +1,6 @@
 
 import { VMobject } from './VMobject'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertexArray, vertexIsNaN } from 'core/functions/vertex'
 
 export class PolygonalLine extends VMobject {
 	/*
@@ -21,12 +21,12 @@ export class PolygonalLine extends VMobject {
 		}
 	}
 
-	static makePathString(vertices: VertexArray, closed: boolean): string {
+	static makePathString(vertices: vertexArray, closed: boolean): string {
 		let pathString: string = ''
 		let v = vertices
 		if (v.length == 0) { return '' }
 		for (let point of v) {
-			if (point == undefined || point.isNaN()) {
+			if (point == undefined || vertexIsNaN(point)) {
 				pathString = ''
 				return pathString
 			}
