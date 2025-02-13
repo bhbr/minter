@@ -6,6 +6,7 @@ import { vertex } from 'core/functions/vertex'
 import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'core/linkables/constants'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { EditableLinkHook } from './EditableLinkHook'
+import { Board } from 'core/boards/Board'
 
 export class ExpandedBoardInputList extends OutputList {
 
@@ -18,6 +19,14 @@ export class ExpandedBoardInputList extends OutputList {
 			midpoint: m,
 			index: index
 		})
+	}
+
+	get parent(): Board {
+		return super.parent as Board
+	}
+
+	set parent(newValue: Board) {
+		super.parent = newValue
 	}
 
 	getHeight(): number {

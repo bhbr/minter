@@ -46,22 +46,27 @@ export class EditableLinkHook extends LinkHook {
 		this.inputBox.style.width = '150px'
 		this.view.appendChild(this.inputBox)
 		this.boundKeyPressed = this.keyPressed.bind(this)
+		this.boundActivateKeyboard = this.activateKeyboard.bind(this)
 	}
 
 	onPointerUp(e: ScreenEvent) {
 		console.log('pointer up')
 		this.inputBox.focus()
 		this.inputBox.style.backgroundColor = Color.black().toCSS()
-		this.activateKeyboard()
+		this.parent.parent.editingLinkName = true
+		document.addEventListener('keyup', this.boundActivateKeyboard)
 	}
 
 	activateKeyboard() {
+		document.removeEventListener('keyup', this.boundActivateKeyboard)
 		document.addEventListener('keydown', this.boundKeyPressed)
 		getPaper().activeKeyboard = false
 		for (let button of getSidebar().buttons) {
 			button.activeKeyboard = false
 		}
 	}
+
+	boundActivateKeyboard() { }
 
 	deactivateKeyboard() {
 		document.removeEventListener('keydown', this.boundKeyPressed)
@@ -80,6 +85,8 @@ export class EditableLinkHook extends LinkHook {
 			return
 		}
 		this.inputBox.blur()
+		this.parent.parent.editingLinkName = false
+		this.parent.parent.hideLinksOfContent()
 		getPaper().activeKeyboard = true
 		if (!isTouchDevice) {
 			for (let button of getSidebar().buttons) {

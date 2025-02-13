@@ -1,8 +1,9 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { LinkMap } from 'core/linkables/LinkMap'
+import { DependencyLink } from 'core/linkables/DependencyLink'
+import { LinkBullet } from 'core/linkables/LinkBullet'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtract } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtract, vertexCloseTo } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
@@ -27,7 +28,7 @@ import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSample
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
-import { IO_LIST_OFFSET } from 'core/linkables/constants'
+import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 
 declare var paper: Paper
@@ -49,7 +50,7 @@ The content children can also be dragged and panned.
 		return {
 			contentChildren: [],
 			expandButton: new ExpandButton(),
-			linkMap: new LinkMap(),
+			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
 				cornerRadius: 50,
@@ -84,7 +85,8 @@ The content children can also be dragged and panned.
 			creator: null,
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
-			expandedOutputList: new ExpandedBoardOutputList()
+			expandedOutputList: new ExpandedBoardOutputList(),
+			editingLinkName: false
 		}
 	}
 
@@ -119,7 +121,7 @@ The content children can also be dragged and panned.
 	expandButton: ExpandButton
 
 	// the map of dependencies between the linkable content children
-	linkMap: LinkMap
+	links: Array<DependencyLink>
 
 	setup() {
 		super.setup()
@@ -140,9 +142,6 @@ The content children can also be dragged and panned.
 		this.moveToTop(this.outputList)
 		this.add(this.expandButton)
 		//this.expandButton.hide()
-
-		this.addDependency('expandedWidth', this.linkMap, 'viewWidth')
-		this.addDependency('expandedHeight', this.linkMap, 'viewHeight')
 
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
@@ -231,7 +230,9 @@ The content children can also be dragged and panned.
 		this.expandButton.update({
 			text: '–'
 		})
-		this.moveToTop(this.linkMap)
+		for (let link of this.links) {
+			this.moveToTop(link)
+		}
 		this.sidebar = getPaper().sidebar
 		if (this.sidebar === null || this.sidebar === undefined) {
 			let sidebarView = document.querySelector('#sidebar_id')
@@ -381,9 +382,10 @@ The content children can also be dragged and panned.
 			case 'link':
 				if (value) {
 					this.showLinksOfContent()
-				} else {
+				} else if (!this.editingLinkName) {
 					this.hideLinksOfContent()
 				}
+				this.setLinking(value)
 		}
 	}
 
@@ -469,7 +471,9 @@ The content children can also be dragged and panned.
 			mob.view.style.left = `${newAnchor[0]}px`
 			mob.view.style.top = `${newAnchor[1]}px`
 		}
-		this.linkMap.update()
+		for (let link of this.links) {
+			link.update()
+		}
 	}
 
 	endPanning(e: ScreenEvent) { }
@@ -502,6 +506,7 @@ The content children can also be dragged and panned.
 
 	expandedInputList: ExpandedBoardInputList
 	expandedOutputList: ExpandedBoardOutputList
+	editingLinkName: boolean
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -517,23 +522,65 @@ The content children can also be dragged and panned.
 
 	showLinksOfContent() {
 	// toggled by 'link' button in sidebar
-		this.add(this.linkMap)
+		for (let link of this.links) {
+			this.add(link)
+		}
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
+
 		this.expandedInputList.show()
 		this.expandedOutputList.show()
 	}
 	
 	hideLinksOfContent() {
 	// toggled by 'link' button in sidebar
-		this.linkMap.abortLinkCreation()
-		this.remove(this.linkMap)
+		for (let link of this.links) {
+			link.abortLinkCreation()
+			this.remove(link)
+		}
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()
 		}
+
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
+	}
+
+	setLinking(flag: boolean) {
+		if (flag) {
+			this.savedOnPointerDown = this.onPointerDown
+			this.savedOnPointerMove = this.onPointerMove
+			this.savedOnPointerUp = this.onPointerUp
+			this.onPointerDown = this.startLinking
+			this.onPointerMove = this.linking
+			this.onPointerUp = this.endLinking
+		} else {
+			this.onPointerDown = this.savedOnPointerDown
+			this.onPointerMove = this.savedOnPointerMove
+			this.onPointerUp = this.savedOnPointerUp
+			this.savedOnPointerDown = (e: ScreenEvent) => { }
+			this.savedOnPointerMove = (e: ScreenEvent) => { }
+			this.savedOnPointerUp = (e: ScreenEvent) => { }
+		}
+	}
+
+	linkingEnabled(): boolean {
+		return (this.onPointerDown == this.startLinking)
+	}
+
+	startLinking(e: ScreenEvent) {
+		console.log('startLinking')
+		let p = eventVertex(e)
+		let hook = this.hookAtLocation(p)
+		console.log(hook)
+	}
+
+	linking(e: ScreenEvent) {
+	}
+
+	endLinking(e: ScreenEvent) {
+		console.log('endLinking')
 	}
 
 	innerInputHooks(): Array<LinkHook> {
@@ -567,6 +614,29 @@ The content children can also be dragged and panned.
 	}
 
 
+	hookAtLocation(p: vertex): LinkHook | null {
+		for (let h of this.innerInputHooks()) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
+		for (let h of this.innerOutputHooks()) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
+		for (let h of this.outerInputHooks()) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
+		for (let h of this.outerOutputHooks()) {
+			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+				return h
+			}
+		}
+		return null
+	}
 
 
 	//////////////////////////////////////////////////////////

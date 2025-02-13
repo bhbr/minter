@@ -6,6 +6,7 @@ import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, IO_LIST_OFFSET, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
+import { Linkable } from './Linkable'
 
 export class OutputList extends RoundedRectangle {
 /*
@@ -37,6 +38,14 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			fillOpacity: 'never',
 			strokeWidth: 'never'
 		}
+	}
+
+	get parent(): Linkable {
+		return super.parent as Linkable
+	}
+
+	set parent(newValue: Linkable) {
+		super.parent = newValue
 	}
 
 	setup() {

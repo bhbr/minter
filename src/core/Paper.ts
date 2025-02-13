@@ -127,7 +127,9 @@ export class Paper extends Board {
 
 	showLinksOfContent() {
 	// toggled by 'link' button in sidebar
-		this.add(this.linkMap)
+		for (let link of this.links) {
+			this.add(link)
+		}
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}

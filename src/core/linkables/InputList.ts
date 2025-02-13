@@ -39,6 +39,13 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 		}
 	}
 
+	get parent(): Linkable {
+		return super.parent as Linkable
+	}
+
+	set parent(newValue: Linkable) {
+		super.parent = newValue
+	}
 	setup() {
 		super.setup()
 		this.createHookList()
