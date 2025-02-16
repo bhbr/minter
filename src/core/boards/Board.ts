@@ -706,7 +706,6 @@ The content children can also be dragged and panned.
 				return h
 			}
 		}
-		console.log('no hooks found')
 		return null
 	}
 

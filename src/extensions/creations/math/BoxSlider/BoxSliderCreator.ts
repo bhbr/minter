@@ -26,9 +26,6 @@ export class BoxSliderCreator extends Creator {
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
-		// this.update({ // This shouldn't be necessary, fix
-		// 	fillColor: Color.black()
-		// }, redraw)
 		if (this.creation === null) { return }
 		this.creation.update({
 			height: q[1] - this.getStartPoint()[1],
@@ -44,12 +41,36 @@ export class BoxSliderCreator extends Creator {
 		super.dissolve()
 		if (this.creation === null) { return }
 		this.creation.update({
-			anchor: this.anchor
+			anchor: this.anchor,
+			viewHeight: this.creation.height
 		})
 		this.creation.outerBar.update({ anchor: vertexOrigin() }) // necessary?
 		this.creation.label.update({
 			anchor: [this.creation.width/2 - this.creation.label.viewWidth/2, this.creation.height/2 - this.creation.label.viewHeight/2]
 		})
+		this.creation.outputList.positionSelf()
 
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

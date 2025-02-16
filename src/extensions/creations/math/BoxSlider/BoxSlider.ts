@@ -98,9 +98,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 
-		if (args['width'] !== undefined || args['height'] !== undefined) {
-			//// internal dependencies
+		if (args['width'] !== undefined) {
 			this.viewWidth = this.width
+		}
+		if (args['height'] !== undefined) {
 			this.viewHeight = this.height
 		}
 
