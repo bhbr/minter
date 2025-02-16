@@ -61,11 +61,13 @@ which can be linked to such-exposed variables of other mobjects.
 	showLinks() {
 		this.inputList.show()
 		this.outputList.show()
+		this.disable()
 	}
 
 	hideLinks() {
 		this.inputList.hide()
 		this.outputList.hide()
+		this.enable()
 	}
 
 	inputHooks(): Array<LinkHook> {

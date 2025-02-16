@@ -792,14 +792,23 @@ and logic for drawing and user interaction.
 	(e. g. when dragging a CindyCanvas)
 	*/
 	disable() {
+		if (this.isDisabled()) { return }
 		this.savedScreenEventHandler = this.screenEventHandler
 		this.screenEventHandler = ScreenEventHandler.Parent // .Below?
 	}
 
 	enable() {
-		if (this.savedScreenEventHandler === null) { return }
+		if (this.isEnabled()) { return }
 		this.screenEventHandler = this.savedScreenEventHandler
 		this.savedScreenEventHandler = null
+	}
+
+	isEnabled(): boolean {
+		return (this.savedScreenEventHandler === null)
+	}
+
+	isDisabled(): boolean {
+		return !this.isEnabled()
 	}
 
 
@@ -843,7 +852,7 @@ and logic for drawing and user interaction.
 			m = targetMobChain.pop()
 			if (m === undefined) { return this }
 			if (m.screenEventHandler == ScreenEventHandler.Parent) {
-				return m.parent
+				continue
 			}
 			if ((m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
 				return m

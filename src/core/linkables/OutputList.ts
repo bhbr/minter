@@ -84,6 +84,7 @@ It is displayed on top of the mobject when the 'link' toggle button is held down
 			this.add(hook)
 			this.add(label)
 			this.linkHooks.push(hook)
+			this.positionHookAndLabel(hook, label, i)
 		}
 	}
 

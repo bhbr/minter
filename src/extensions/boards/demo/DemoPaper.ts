@@ -74,10 +74,6 @@ export class DemoPaper extends Paper {
 		}
 	}
 
-	setup() {
-		super.setup()
-		
-	}
 }
 
 

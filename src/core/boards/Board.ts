@@ -86,7 +86,11 @@ The content children can also be dragged and panned.
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
 			expandedOutputList: new ExpandedBoardOutputList(),
-			editingLinkName: false
+			editingLinkName: false,
+			openLink: null,
+			openHook: null,
+			openBullet: null,
+			compatibleHooks: []
 		}
 	}
 
@@ -119,9 +123,6 @@ The content children can also be dragged and panned.
 	*/
 	background: RoundedRectangle
 	expandButton: ExpandButton
-
-	// the map of dependencies between the linkable content children
-	links: Array<DependencyLink>
 
 	setup() {
 		super.setup()
@@ -507,6 +508,12 @@ The content children can also be dragged and panned.
 	expandedInputList: ExpandedBoardInputList
 	expandedOutputList: ExpandedBoardOutputList
 	editingLinkName: boolean
+	openLink?: DependencyLink
+	openHook?: LinkHook
+	openBullet?: LinkBullet
+	compatibleHooks: Array<LinkHook>
+	// the map of dependencies between the linkable content children
+	links: Array<DependencyLink>
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -555,6 +562,7 @@ The content children can also be dragged and panned.
 			this.onPointerDown = this.startLinking
 			this.onPointerMove = this.linking
 			this.onPointerUp = this.endLinking
+			this.showLinksOfContent()
 		} else {
 			this.onPointerDown = this.savedOnPointerDown
 			this.onPointerMove = this.savedOnPointerMove
@@ -562,6 +570,7 @@ The content children can also be dragged and panned.
 			this.savedOnPointerDown = (e: ScreenEvent) => { }
 			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnPointerUp = (e: ScreenEvent) => { }
+			this.hideLinksOfContent()
 		}
 	}
 
@@ -570,17 +579,79 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		console.log('startLinking')
-		let p = eventVertex(e)
-		let hook = this.hookAtLocation(p)
-		console.log(hook)
+		var p = eventVertex(e)
+		this.openHook = this.hookAtLocation(p)
+		if (this.openHook === null) { return }
+		p = this.openHook.parent.transformLocalPoint(this.openHook.midpoint, this)
+		let sb = new LinkBullet({ midpoint: p })
+		let eb = new LinkBullet({ midpoint: p })
+		this.openLink = new DependencyLink({
+			startBullet: sb,
+			endBullet: eb
+		})
+		this.add(this.openLink)
+		this.openBullet = eb
+		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
+		if (this.openLink === null) { return }
+		let p = this.localEventVertex(e)
+		for (let hook of this.compatibleHooks) {
+			let m = hook.positionInLinkMap()
+			if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
+				this.openBullet.update({
+					midpoint: m
+				})
+				return
+			}
+		}
+		this.openBullet.update({
+			midpoint: p
+		})
 	}
 
 	endLinking(e: ScreenEvent) {
-		console.log('endLinking')
+		let h = this.hookAtLocation(this.localEventVertex(e))
+		if (h === null) {
+			this.remove(this.openLink)
+		} else {
+			this.createNewDependency()
+			this.links.push(this.openLink)
+		}
+		this.openLink = null
+		this.openHook = null
+		this.openBullet = null
+		this.compatibleHooks = []
+	}
+
+	createNewDependency() {
+
+		if (this.openBullet == this.openLink.startBullet) {
+			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
+			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
+			this.createNewDependencyBetweenHooks(startHook, endHook)
+
+		} else if (this.openBullet == this.openLink.endBullet) {
+			let startHook = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
+			let endHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
+			this.createNewDependencyBetweenHooks(startHook, endHook)
+			//this.connectedHooks.push([startHook, this.openLink, endHook])
+
+		}
+	}
+
+	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
+		startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
+		startHook.mobject.update()
+	}
+
+	getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
+		if (hook.type == 'output') {
+			return this.innerInputHooks().concat(this.outerOutputHooks())
+		} else {
+			return this.innerOutputHooks().concat(this.outerInputHooks())
+		}
 	}
 
 	innerInputHooks(): Array<LinkHook> {
@@ -635,6 +706,7 @@ The content children can also be dragged and panned.
 				return h
 			}
 		}
+		console.log('no hooks found')
 		return null
 	}
 

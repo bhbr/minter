@@ -36,7 +36,7 @@ export class LinkHook extends Circle {
 
 	positionInLinkMap(): vertex {
 	// used e. g. for snapping
-		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent.parent)
+		return this.parent.transformLocalPoint(this.midpoint, this.mobject.parent)
 	}
 
 }

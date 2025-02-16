@@ -50,7 +50,6 @@ export class EditableLinkHook extends LinkHook {
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		console.log('pointer up')
 		this.inputBox.focus()
 		this.inputBox.style.backgroundColor = Color.black().toCSS()
 		this.parent.parent.editingLinkName = true

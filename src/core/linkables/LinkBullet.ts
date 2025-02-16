@@ -36,7 +36,7 @@ a dependency between two linkable mobjects.
 
 	positionInLinkMap(): vertex {
 	// used e. g. for snapping
-		return this.parent.transformLocalPoint(this.midpoint, this.parent.parent.parent)
+		return this.midpoint
 	}
 
 
