@@ -472,9 +472,7 @@ The content children can also be dragged and panned.
 			mob.view.style.left = `${newAnchor[0]}px`
 			mob.view.style.top = `${newAnchor[1]}px`
 		}
-		for (let link of this.links) {
-			link.update()
-		}
+		this.updateLinks()
 	}
 
 	endPanning(e: ScreenEvent) { }
@@ -625,6 +623,12 @@ The content children can also be dragged and panned.
 		this.compatibleHooks = []
 	}
 
+	updateLinks() {
+		for (let hook of this.allHooks()) {
+			hook.update() // updates start and end points of links
+		}
+	}
+
 	createNewDependency() {
 
 		if (this.openBullet == this.openLink.startBullet) {
@@ -636,13 +640,14 @@ The content children can also be dragged and panned.
 			let startHook = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
 			let endHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
 			this.createNewDependencyBetweenHooks(startHook, endHook)
-			//this.connectedHooks.push([startHook, this.openLink, endHook])
 
 		}
 	}
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
 		startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
+		startHook.addDependency('positionInLinkMap', this.openLink.startBullet, 'midpoint')
+		endHook.addDependency('positionInLinkMap', this.openLink.endBullet, 'midpoint')
 		startHook.mobject.update()
 	}
 
@@ -682,6 +687,13 @@ The content children can also be dragged and panned.
 	outerOutputHooks(): Array<LinkHook> {
 		let lh = this.expandedOutputList.linkHooks
 		return lh.slice(0, lh.length - 1)
+	}
+
+	allHooks(): Array<LinkHook> {
+		return this.innerInputHooks()
+			.concat(this.innerOutputHooks())
+			.concat(this.outerInputHooks())
+			.concat(this.outerOutputHooks())
 	}
 
 

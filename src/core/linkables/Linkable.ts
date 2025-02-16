@@ -94,9 +94,7 @@ which can be linked to such-exposed variables of other mobjects.
 	// so we can drag while showing the links
 	// (doesn't work at present)
 		super.dragging(e)
-		for (let link of this.parent.links) {
-			link.update()
-		}
+		this.parent.updateLinks()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
