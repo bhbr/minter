@@ -46,13 +46,13 @@ which can be linked to such-exposed variables of other mobjects.
 		super.setup()
 		this.inputList.update({
 			mobject: this,
-			inputNames: this.inputNames
+			linkNames: this.inputNames
 		})
 		this.add(this.inputList)
 		this.inputList.hide()
 		this.outputList.update({
 			mobject: this,
-			outputNames: this.outputNames
+			linkNames: this.outputNames
 		})
 		this.add(this.outputList)
 		this.outputList.hide()
@@ -101,12 +101,12 @@ which can be linked to such-exposed variables of other mobjects.
 		super.update(args, redraw)
 		if (args['inputNames'] !== undefined) {
 			this.inputList.update({
-				inputNames: args['inputNames']
+				linkNames: args['inputNames']
 			}, true)
 		}
 		if (args['outputNames'] !== undefined) {
 			this.outputList.update({
-				outputNames: args['outputNames']
+				linkNames: args['outputNames']
 			}, true)
 		}
 	}

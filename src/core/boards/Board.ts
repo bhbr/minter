@@ -15,6 +15,7 @@ import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { Sidebar } from 'core/Sidebar'
 import { LinkHook } from 'core/linkables/LinkHook'
+import { EditableLinkHook } from './EditableLinkHook'
 import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
@@ -174,7 +175,6 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.show()
 		}
 		this.hideLinksOfContent()
-
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -455,7 +455,7 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
-		this.panPointStart = eventVertex(e)
+		this.panPointStart = this.localEventVertex(e)
 
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.anchor)
@@ -463,7 +463,7 @@ The content children can also be dragged and panned.
 	}
 
 	panning(e: ScreenEvent) {
-		let panPoint = eventVertex(e)
+		let panPoint = this.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
 
 		for (let mob of this.contentChildren) {
@@ -577,8 +577,9 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		var p = eventVertex(e)
+		var p = this.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
+		console.log(this.openHook)
 		if (this.openHook === null) { return }
 		p = this.openHook.parent.transformLocalPoint(this.openHook.midpoint, this)
 		let sb = new LinkBullet({ midpoint: p })
@@ -613,6 +614,8 @@ The content children can also be dragged and panned.
 		let h = this.hookAtLocation(this.localEventVertex(e))
 		if (h === null) {
 			this.remove(this.openLink)
+		} else if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+			(h as EditableLinkHook).editName()
 		} else {
 			this.createNewDependency()
 			this.links.push(this.openLink)
@@ -680,13 +683,11 @@ The content children can also be dragged and panned.
 	}
 
 	outerInputHooks(): Array<LinkHook> {
-		let lh = this.expandedInputList.linkHooks
-		return lh.slice(0, lh.length - 1)
+		return this.expandedInputList.linkHooks
 	}
 
 	outerOutputHooks(): Array<LinkHook> {
-		let lh = this.expandedOutputList.linkHooks
-		return lh.slice(0, lh.length - 1)
+		return this.expandedOutputList.linkHooks
 	}
 
 	allHooks(): Array<LinkHook> {
@@ -698,23 +699,9 @@ The content children can also be dragged and panned.
 
 
 	hookAtLocation(p: vertex): LinkHook | null {
-		for (let h of this.innerInputHooks()) {
-			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
-				return h
-			}
-		}
-		for (let h of this.innerOutputHooks()) {
-			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
-				return h
-			}
-		}
-		for (let h of this.outerInputHooks()) {
-			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
-				return h
-			}
-		}
-		for (let h of this.outerOutputHooks()) {
-			if (vertexCloseTo(p, h.positionInLinkMap(), SNAPPING_DISTANCE)) {
+		for (let h of this.allHooks()) {
+			let q = h.positionInLinkMap()
+			if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
 				return h
 			}
 		}

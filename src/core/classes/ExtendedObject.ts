@@ -311,19 +311,6 @@ export class ExtendedObject extends BaseExtendedObject {
 		this.setProperties(argsDict)
 	}
 
-	// copyFrom(obj: ExtendedObject) {
-	// 	let args: object = {}
-	// 	for (let prop of obj.properties()) {
-	// 		let mut = this.mutability(prop)
-	// 		if (mut !== 'always') {
-	// 			throw `Property ${prop} on ${this.constructor.name} cannot be copied from other object`
-	// 			continue
-	// 		}
-	// 		args[prop] = obj[prop]
-	// 	}
-	// 	this.update(args)
-	// }
-
 	isMutable(prop: string) {
 		return (this.mutability(prop) === 'always')
 	}
