@@ -579,7 +579,6 @@ The content children can also be dragged and panned.
 	startLinking(e: ScreenEvent) {
 		var p = this.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
-		console.log(this.openHook)
 		if (this.openHook === null) { return }
 		p = this.openHook.parent.transformLocalPoint(this.openHook.midpoint, this)
 		let sb = new LinkBullet({ midpoint: p })
@@ -591,6 +590,7 @@ The content children can also be dragged and panned.
 		this.add(this.openLink)
 		this.openBullet = eb
 		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+		console.log(this.compatibleHooks)
 	}
 
 	linking(e: ScreenEvent) {
@@ -655,7 +655,8 @@ The content children can also be dragged and panned.
 	}
 
 	getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
-		if (hook.type == 'output') {
+		console.log(hook.type)
+		if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
 			return this.innerInputHooks().concat(this.outerOutputHooks())
 		} else {
 			return this.innerOutputHooks().concat(this.outerInputHooks())
