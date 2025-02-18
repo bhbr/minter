@@ -7,11 +7,13 @@ import { Color } from 'core/classes/Color'
 import { vertex } from 'core/functions/vertex'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Line } from 'core/shapes/Line'
+import { Board } from './Board'
 
 export class EditableLinkHook extends LinkHook {
 	
 	inputBox: HTMLInputElement
 	declare _parent: ExpandedBoardIOList
+	declare mobject: Board
 	previousValue: string
 	index: number
 	empty: boolean
@@ -63,8 +65,9 @@ export class EditableLinkHook extends LinkHook {
 		this.inputBox.style.top = '-7px'
 		this.inputBox.style.left = '30px'
 		this.inputBox.style.width = '150px'
-		if (!this.empty) {
-			this.view.appendChild(this.inputBox)
+		this.view.appendChild(this.inputBox)
+		if (this.empty) {
+			this.inputBox.style.visibility = 'hidden'
 		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.boundActivateKeyboard = this.activateKeyboard.bind(this)
@@ -89,7 +92,13 @@ export class EditableLinkHook extends LinkHook {
 		}
 	}
 
+	setViewVisibility(visibility: boolean) {
+		super.setViewVisibility(visibility)
+		this.inputBox.style.visibility = visibility ? 'visible' : 'hidden'
+	}
+
 	editName() {
+		this.inputBox.style.visibility = 'visible'
 		this.inputBox.focus()
 		this.inputBox.style.backgroundColor = Color.black().toCSS()
 		this.parent.parent.editingLinkName = true
@@ -121,10 +130,12 @@ export class EditableLinkHook extends LinkHook {
 		if (e.which != 13) { return }
 		if (this.inputBox.value == '') {
 			this.inputBox.value = this.previousValue
+			this.empty = false
 			return
 		}
 		this.inputBox.blur()
 		this.parent.parent.editingLinkName = false
+		this.remove(this.plusSign)
 		this.parent.parent.hideLinksOfContent()
 		getPaper().activeKeyboard = true
 		if (!isTouchDevice) {
@@ -134,7 +145,7 @@ export class EditableLinkHook extends LinkHook {
 		}
 		if (this.inputBox.value == this.previousValue) { return }
 		if (this.previousValue == '') {
-			this.parent.createNewHook()
+			this.parent.createNewHook(true)
 		}
 		this.previousValue = this.inputBox.value
 		
@@ -142,6 +153,7 @@ export class EditableLinkHook extends LinkHook {
 			name: this.inputBox.value
 		})
 		this.parent.updateLinkNames()
+		this.mobject.setLinking(false)
 		this.deactivateKeyboard()
 	}
 

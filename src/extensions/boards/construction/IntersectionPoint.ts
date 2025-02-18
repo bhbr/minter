@@ -36,9 +36,11 @@ export class IntersectionPoint extends ConPoint {
 	update(args: object = {}, redraw: boolean = true) {
 		let mp: vertex = this.intersectionCoords()
 		if (vertexIsNaN(mp) || !this.conMob1.visible || !this.conMob2.visible) {
-			this.recursiveHide()
+			this.hide()
+			this.hideDependents()
 		} else {
-			this.recursiveShow()
+			this.show()
+			this.showDependents()
 			if (!vertexEquals(this.midpoint, mp)) {
 				args['midpoint'] = mp
 			}

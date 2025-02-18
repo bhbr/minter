@@ -561,7 +561,7 @@ The content children can also be dragged and panned.
 			this.onPointerMove = this.linking
 			this.onPointerUp = this.endLinking
 			this.showLinksOfContent()
-		} else {
+		} else if (!this.editingLinkName) {
 			this.onPointerDown = this.savedOnPointerDown
 			this.onPointerMove = this.savedOnPointerMove
 			this.onPointerUp = this.savedOnPointerUp
@@ -590,7 +590,6 @@ The content children can also be dragged and panned.
 		this.add(this.openLink)
 		this.openBullet = eb
 		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
-		console.log(this.compatibleHooks)
 	}
 
 	linking(e: ScreenEvent) {
@@ -612,10 +611,13 @@ The content children can also be dragged and panned.
 
 	endLinking(e: ScreenEvent) {
 		let h = this.hookAtLocation(this.localEventVertex(e))
+			if (this.openLink !== null) {
+				this.remove(this.openLink)
+			}
 		if (h === null) {
-			this.remove(this.openLink)
 		} else if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
-			(h as EditableLinkHook).editName()
+			let ed = h as EditableLinkHook
+			ed.editName()
 		} else {
 			this.createNewDependency()
 			this.links.push(this.openLink)
@@ -655,7 +657,6 @@ The content children can also be dragged and panned.
 	}
 
 	getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
-		console.log(hook.type)
 		if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
 			return this.innerInputHooks().concat(this.outerOutputHooks())
 		} else {

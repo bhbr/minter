@@ -355,13 +355,21 @@ and logic for drawing and user interaction.
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		this.view.style.backgroundColor = this.backgroundColor.toCSS()
 		this.view.style.opacity = this.opacity.toString()
-		this.view.style.visibility = this.shouldBeDrawn() ? 'visible' : 'hidden'
+
+		this.setViewVisibility(this.shouldBeDrawn())
+	}
+
+	setViewVisibility(visibility: boolean) {
+		this.view.style.visibility = visibility ? 'visible' : 'hidden'
+		for (let submob of this.submobs) {
+			submob.setViewVisibility(submob.visible && visibility)
+		}
 	}
 
 	shouldBeDrawn(): boolean {
 		if (!this.visible) { return false }
 		for (let a of this.ancestors()) {
-			if (!a.visible) { return false}
+			if (!a.visible) { return false }
 		}
 		return true
 	}
@@ -369,52 +377,26 @@ and logic for drawing and user interaction.
 	// Show and hide //
 
 	show() {
-	// Show this mobject and all of its descendents
-		try {
-			if (!this.view) { return }
-			this.visible = true
-			for (let submob of this.children) {
-				submob.show()
-			} // we have to propagate visibility bc we have to for invisibility
-			this.redraw()
-		} catch {
-			console.warn(`Unsuccessfully tried to show ${this.constructor.name} (too soon?)`)
-		}
+		this.visible = true
+		this.setViewVisibility(this.visible)
 	}
 
 	hide() {
-	// Hide this mobject and all of its descendents
-		if (!this.view) {
-			console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (no view yet)`)
-			return
-		}
-		try {
-			this.visible = false
-			for (let submob of this.children) {
-				submob.hide()
-			} // we have to propagate invisibility
-			this.redraw()
-		} catch {
-			console.warn(`Unsuccessfully tried to hide ${this.constructor.name} (too soon?)`)
-		}
+		this.visible = false
+		this.setViewVisibility(this.visible)
 	}
 
-	recursiveShow() {
-	// Show this mobject and all mobjects that depend on it
-		this.show()
+	showDependents() {
 		for (let depmob of this.allDependents()) {
 			depmob.show()
 		}
 	}
 
-	recursiveHide() {
-	// Hide this mobject and all mobjects that depend on it
-		this.hide()
+	hideDependents() {
 		for (let depmob of this.allDependents()) {
 			depmob.hide()
 		}
 	}
-
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -426,10 +408,10 @@ and logic for drawing and user interaction.
 	/*
 	Animation is 'home-grown' (not via CSS).
 	Any numerical property (number, Color, Vertex,
-	VertexArray, Transform) can be animated.
+	number array, vertexArray, Transform) can be animated.
 	For this, we create two copies of the mobject,
 	and update the second copy with the desired
-	end values. Then at regular intervals,
+	end values. Then, at regular intervals,
 	we compute a convex combination of each property
 	and update this mobject with those.
 	*/
