@@ -137,13 +137,12 @@ The content children can also be dragged and panned.
 		this.addDependency('viewWidth', this.background, 'width')
 		this.addDependency('viewHeight', this.background, 'height')
 
-		this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+		//this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 		this.moveToTop(this.inputList)
 		this.moveToTop(this.outputList)
 		this.add(this.expandButton)
-		//this.expandButton.hide()
 
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
@@ -213,6 +212,10 @@ The content children can also be dragged and panned.
 		return getPaper().viewHeight - 2 * this.expandedPadding
 	}
 
+	getCompactWidth(): number {
+		return this.compactWidth
+	}
+
 	get contracted(): boolean {
 		return !this.expanded
 	}
@@ -270,7 +273,7 @@ The content children can also be dragged and panned.
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
 		this.inputList.update({
-			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), IO_LIST_OFFSET]
+			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), -IO_LIST_OFFSET - this.inputList.viewHeight]
 		}, true)
 		this.outputList.update({
 			anchor: [0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET]
@@ -510,7 +513,7 @@ The content children can also be dragged and panned.
 	openHook?: LinkHook
 	openBullet?: LinkBullet
 	compatibleHooks: Array<LinkHook>
-	// the map of dependencies between the linkable content children
+	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 
 	linkableChildren(): Array<Linkable> {
@@ -635,7 +638,6 @@ The content children can also be dragged and panned.
 	}
 
 	createNewDependency() {
-
 		if (this.openBullet == this.openLink.startBullet) {
 			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
 			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
@@ -645,7 +647,6 @@ The content children can also be dragged and panned.
 			let startHook = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
 			let endHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
 			this.createNewDependencyBetweenHooks(startHook, endHook)
-
 		}
 	}
 
@@ -698,7 +699,6 @@ The content children can also be dragged and panned.
 			.concat(this.outerInputHooks())
 			.concat(this.outerOutputHooks())
 	}
-
 
 	hookAtLocation(p: vertex): LinkHook | null {
 		for (let h of this.allHooks()) {

@@ -94,7 +94,7 @@ export class EditableLinkHook extends LinkHook {
 
 	setViewVisibility(visibility: boolean) {
 		super.setViewVisibility(visibility)
-		this.inputBox.style.visibility = visibility ? 'visible' : 'hidden'
+		this.inputBox.style.visibility = (visibility && !this.empty) ? 'visible' : 'hidden'
 	}
 
 	editName() {
@@ -154,6 +154,15 @@ export class EditableLinkHook extends LinkHook {
 		})
 		this.parent.updateLinkNames()
 		this.mobject.setLinking(false)
+		if (this.type === 'input') {
+			this.mobject.inputList.update({
+				linkNames: this.mobject.inputNames
+			})
+		} else if (this.type === 'output') {
+			this.mobject.outputList.update({
+				linkNames: this.mobject.outputNames
+			})
+		}
 		this.deactivateKeyboard()
 	}
 

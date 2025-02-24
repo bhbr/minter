@@ -1,5 +1,5 @@
 
-import { vertex, vertexTranslatedBy } from 'core/functions/vertex'
+import { vertex, vertexTranslatedBy, vertexOrigin } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { Linkable } from './Linkable'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
@@ -70,23 +70,27 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		}
 		for (let i = 0; i < this.linkNames.length; i++) {
 			let name = this.linkNames[i]
-			let hook = new LinkHook({
-				mobject: this.mobject,
-				name: name,
-				type: this.type
-			})
-			let label = new TextLabel({
-				text: name,
-				horizontalAlign: 'left',
-				verticalAlign: 'center',
-				viewHeight: HOOK_VERTICAL_SPACING,
-				viewWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
-			})
-			this.add(hook)
-			this.add(label)
-			this.linkHooks.push(hook)
-			this.positionHookAndLabel(hook, label, i)
+			this.createHookAndLabel(name)
 		}
+	}
+
+	createHookAndLabel(name: string) {
+		let hook = new LinkHook({
+			mobject: this.mobject,
+			name: name,
+			type: this.type
+		})
+		let label = new TextLabel({
+			text: name,
+			horizontalAlign: 'left',
+			verticalAlign: 'center',
+			viewHeight: HOOK_VERTICAL_SPACING,
+			viewWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
+		})
+		this.add(hook)
+		this.add(label)
+		this.linkHooks.push(hook)
+		this.positionHookAndLabel(hook, label, this.linkHooks.length - 1)
 	}
 
 	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
@@ -118,18 +122,17 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		this.positionSelf()
 	}
 
-
 	positionSelf() {
-		if (this.type === 'input') {
-			super.update({
-				anchor: [0.5 * (this.mobject.viewWidth - this.viewWidth), -IO_LIST_OFFSET - this.getHeight()]
-			}, true)
-		} else if (this.type === 'output') {
-			super.update({
-				anchor: [0.5 * (this.mobject.viewWidth - this.viewWidth), this.mobject.viewHeight + IO_LIST_OFFSET]
-			}, true)
-		}
+		super.update({
+			anchor: this.getAnchor()
+		}, true)
 	}
+
+	getAnchor(): vertex {
+		// placeholder, subclassed in InputList and OutputList
+		return vertexOrigin()
+	}
+
 }
 
 

@@ -1,5 +1,7 @@
 
 import { IOList } from './IOList'
+import { vertex } from 'core/functions/vertex'
+import { IO_LIST_OFFSET } from './constants'
 
 export class InputList extends IOList {
 
@@ -7,6 +9,10 @@ export class InputList extends IOList {
 		return {
 			type: 'input'
 		}
+	}
+
+	getAnchor(): vertex {
+		return [0.5 * (this.mobject.getCompactWidth() - this.viewWidth), -IO_LIST_OFFSET - this.getHeight()]
 	}
 
 }

@@ -12,6 +12,7 @@ import { Board } from 'core/boards/Board'
 export class ExpandedBoardIOList extends IOList {
 
 	emptyLinkHook: EditableLinkHook
+	declare _parent: Board
 
 	ownDefaults(): object {
 		return {

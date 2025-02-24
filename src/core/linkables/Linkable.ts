@@ -90,6 +90,10 @@ which can be linked to such-exposed variables of other mobjects.
 		return arr
 	}
 
+	getCompactWidth(): number {
+		return this.viewWidth
+	}
+
 	dragging(e: ScreenEvent) {
 	// so we can drag while showing the links
 	// (doesn't work at present)
