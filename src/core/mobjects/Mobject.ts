@@ -97,7 +97,11 @@ and logic for drawing and user interaction.
 			screenEventHandler: ScreenEventHandler.Parent,
 			savedScreenEventHandler: null,
 			eventTarget: null,
-			screenEventHistory: []
+			screenEventHistory: [],
+
+			// animation
+			animationStartArgs: {},
+			animationStopArgs: {}
 		}
 	}
 
@@ -409,27 +413,48 @@ and logic for drawing and user interaction.
 	Animation is 'home-grown' (not via CSS).
 	Any numerical property (number, Color, Vertex,
 	number array, vertexArray, Transform) can be animated.
-	For this, we create two copies of the mobject,
-	and update the second copy with the desired
-	end values. Then, at regular intervals,
-	we compute a convex combination of each property
+	For this, we create animationStopArgs (the given
+	animation arguments), and animationStartArgs
+	(the dict of corresponding current values).
+	Then, at regular intervals, we compute
+	a convex combination of each property
 	and update this mobject with those.
 	*/
 
-	interpolationStartCopy: this
-	interpolationStopCopy: this
 	animationTimeStart: number
 	animationDuration: number
 	animationInterval: number
 
+	animationStartArgs: object
+	animationStopArgs: object
+
+	static isAnimatable(args: object): boolean {
+		for (let [key, value] of Object.entries(args)) {
+			if ((typeof value ==  'number') 
+				|| isVertex(value)
+				|| isVertexArray(value)
+				|| value instanceof Transform
+				|| value instanceof Color)
+				{ continue }
+			else {
+				console.error(`Property ${key} on ${this.constructor.name} is not animatable`)
+				return false
+			}
+		}
+		return true
+	}
+
 	animate(args: object = {}, seconds: number) {
 	// Calling this method launches an animation
-		// Create mobject copies
-		this.interpolationStartCopy = this
-		this.interpolationStartCopy.clearScreenEventHistory()
-		this.interpolationStopCopy = deepCopy(this.interpolationStartCopy, false)
-		this.interpolationStopCopy.update(args, false)
-		
+		if (!Mobject.isAnimatable(args)) {
+			return
+		}
+
+		for (let key of Object.keys(args)) {
+			this.animationStartArgs[key] = copy(this[key])
+		}
+		this.animationStopArgs = args
+
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
 		this.animationTimeStart = Date.now()
@@ -462,18 +487,18 @@ and logic for drawing and user interaction.
 	*/
 		let returnValues: object = {}
 		for (let key of keys) {
-			let startValue: any = this.interpolationStartCopy[key]
-			let stopValue: any = this.interpolationStopCopy[key]
+			let startValue: any = this.animationStartArgs[key]
+			let stopValue: any = this.animationStopArgs[key]
 			if (typeof startValue ==  'number') {
 				returnValues[key] = (1 - weight) * startValue + weight * stopValue
 			} else if (isVertex(startValue)) {
 				returnValues[key] = vertexInterpolate(startValue, stopValue as vertex, weight)
+			} else if (isVertexArray(startValue)) {
+				returnValues[key] = vertexArrayInterpolate(startValue, stopValue as vertexArray, weight)
 			} else if (startValue instanceof Transform) {
 				returnValues[key] = startValue.interpolate(stopValue as Transform, weight)
 			} else if (startValue instanceof Color) {
 				returnValues[key] = startValue.interpolate(stopValue as Color, weight)
-			} else if (isVertexArray(startValue)) {
-				returnValues[key] = vertexArrayInterpolate(startValue, stopValue as vertexArray, weight)
 			}
 		}
 		return returnValues
@@ -483,8 +508,8 @@ and logic for drawing and user interaction.
 	// This method gets called at the end of the animation
 		window.clearInterval(this.animationInterval)
 		this.animationInterval = null
-		this.interpolationStartCopy = null
-		this.interpolationStopCopy = null
+		this.animationStartArgs = {}
+		this.animationStopArgs = {}
 	}
 
 
