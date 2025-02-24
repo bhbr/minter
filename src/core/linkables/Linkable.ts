@@ -34,12 +34,11 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
-	// this declares that the parent mobject will always be a board
-	get parent(): Board {
-		return super.parent as Board
+	get board(): Board {
+		return super.parent.parent as Board
 	}
-	set parent(newValue: Board) {
-		super.parent = newValue
+	set board(newValue: Board) {
+		super.parent = newValue.content
 	}
 
 	setup() {
@@ -98,7 +97,7 @@ which can be linked to such-exposed variables of other mobjects.
 	// so we can drag while showing the links
 	// (doesn't work at present)
 		super.dragging(e)
-		this.parent.updateLinks()
+		this.board.updateLinks()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

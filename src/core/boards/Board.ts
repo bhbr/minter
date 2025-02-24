@@ -31,6 +31,7 @@ import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
+import { MGroup } from 'core/mobjects/MGroup'
 
 declare var paper: Paper
 declare interface Window { webkit?: any }
@@ -50,6 +51,7 @@ The content children can also be dragged and panned.
 	ownDefaults(): object {
 		return {
 			contentChildren: [],
+			content: new MGroup(),
 			expandButton: new ExpandButton(),
 			links: [],
 			background: new RoundedRectangle({
@@ -98,6 +100,7 @@ The content children can also be dragged and panned.
 	ownMutabilities(): object {
 		return {
 			contentChildren: 'never',
+			content: 'never',
 			expandButton: 'never',
 			linkMap: 'never',
 			background: 'never',
@@ -118,6 +121,7 @@ The content children can also be dragged and panned.
 
 	// the submobs that will pan along (not e. g. the window chrome)
 	contentChildren: Array<Mobject>
+	content: MGroup
 
 	/*
 	Window chrome
@@ -137,9 +141,10 @@ The content children can also be dragged and panned.
 		this.addDependency('viewWidth', this.background, 'width')
 		this.addDependency('viewHeight', this.background, 'height')
 
-		//this.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+		this.content.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
+		this.add(this.content)
 		this.moveToTop(this.inputList)
 		this.moveToTop(this.outputList)
 		this.add(this.expandButton)
@@ -179,6 +184,12 @@ The content children can also be dragged and panned.
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.background.update({
+			width: this.viewWidth,
+			height: this.viewHeight,
+			viewWidth: this.viewWidth,
+			viewHeight: this.viewHeight
+		})
+		this.content.update({
 			width: this.viewWidth,
 			height: this.viewHeight,
 			viewWidth: this.viewWidth,
@@ -265,7 +276,7 @@ The content children can also be dragged and panned.
 		this.expanded = false
 		this.disableContent()
 		if (this.parent) {
-			getPaper().expandedMobject = this.parent as Board
+			getPaper().expandedMobject = this.board
 		}
 		this.expandButton.update({
 			text: '+'
@@ -341,7 +352,7 @@ The content children can also be dragged and panned.
 	creationConstructors: object
 
 	addToContent(mob: Mobject) {
-		this.add(mob)
+		this.content.add(mob)
 		this.contentChildren.push(mob)
 		if (this.contracted) {
 			mob.disable()
@@ -363,7 +374,7 @@ The content children can also be dragged and panned.
 
 	removeFromContent(mob: Linkable) {
 		remove(this.contentChildren, mob)
-		this.remove(mob)
+		this.content.remove(mob)
 	}
 
 
