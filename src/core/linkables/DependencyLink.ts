@@ -61,10 +61,6 @@ linkable mobjects
 		this.add(this.linkLine)
 	}
 
-	onPointerDown(e: ScreenEvent) {
-		let t = this.eventTargetMobject(e)
-		console.log(t)
-	}
 
 	abortLinkCreation() {
 		// todo
