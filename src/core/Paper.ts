@@ -28,7 +28,8 @@ export class Paper extends Board {
 			activeKeyboard: true,
 			viewWidth: PAPER_WIDTH,
 			viewHeight: PAGE_HEIGHT,
-			currentColor: Color.white()
+			currentColor: Color.white(),
+			drawShadow: false
 		}
 	}
 
@@ -36,7 +37,8 @@ export class Paper extends Board {
 		return {
 			view: 'never',
 			expandedPadding: 'never',
-			expanded: 'never'
+			expanded: 'never',
+			drawShadow: 'never'
 		}
 	}
 

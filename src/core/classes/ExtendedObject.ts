@@ -297,7 +297,12 @@ export class ExtendedObject extends BaseExtendedObject {
 			if (setter !== undefined) {
 				setter.call(this, value)
 			} else {
-				this[prop] = value
+				try {
+					this[prop] = value
+				} catch {
+					console.log(this, prop, value)
+					throw `Attempt to assign to readonly property`
+				}
 			}
 		}
 	}

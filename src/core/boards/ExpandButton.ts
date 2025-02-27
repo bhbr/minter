@@ -2,33 +2,39 @@
 import { Board } from './Board'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { vertex, vertexOrigin } from 'core/functions/vertex'
+import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { Color } from 'core/classes/Color'
+import { Circle } from 'core/shapes/Circle'
 
-export class ExpandButton extends TextLabel {
+export class ExpandButton extends Circle {
+
+	label: TextLabel
 
 	ownDefaults(): object {
 		return {
-			viewWidth: 30,
-			viewHeight: 30,
 			transform: Transform.identity(),
-			anchor: vertexOrigin(),
+			midpoint: [15, 15],
+			radius: 12,
 			screenEventHandler: ScreenEventHandler.Self,
-			backgroundColor: Color.gray(0.25),
-			color: Color.white()
+			backgroundColor: Color.clear(),
+			fillColor: Color.gray(0.25),
+			fillOpacity: 1,
+			strokeWidth: 0,
+			label: new TextLabel({
+				color: Color.white()
+			})
 		}
 	}
 
 	ownMutabilities(): object {
 		return {
-			viewWidth: 'never',
-			viewHeight: 'never',
 			transform: 'never',
-			anchor: 'never',
+			midpoint: 'never',
+			radius: 'never',
 			screenEventHandler: 'never',
 			backgroundColor: 'never',
-			color: 'never'
+			label: 'never'
 		}
 	}
 
@@ -42,5 +48,31 @@ export class ExpandButton extends TextLabel {
 	onTap(e: ScreenEvent) {
 		this.parent.toggleViewState()
 	}
+
+	setup() {
+		super.setup()
+		this.add(this.label)
+		this.label.update({
+			viewWidth: 2 * this.radius,
+			viewHeight: 2 * this.radius
+		})
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }	

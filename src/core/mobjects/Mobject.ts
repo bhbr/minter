@@ -85,6 +85,7 @@ and logic for drawing and user interaction.
 			visible: true,
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
+			drawShadow: false,
 			drawBorder: DRAW_BORDERS,
 
 			// hierarchy
@@ -333,6 +334,7 @@ and logic for drawing and user interaction.
 	opacity: number
 	visible: boolean
 	backgroundColor: Color
+	drawShadow: boolean
 	drawBorder: boolean
 
 	setupView() {
@@ -347,6 +349,10 @@ and logic for drawing and user interaction.
 		// 'absolute' positions this mobject relative (sic) to its parent
 		this.view.style.overflow = 'visible'
 		// by default, the mobject can draw outside its view's borders
+		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
+		if (this.drawShadow) {
+			this.view.style.filter = 'drop-shadow(2px 2px 5px)'
+		}
 	}
 
 	redraw() {
@@ -356,7 +362,6 @@ and logic for drawing and user interaction.
 		this.view.style.top = `${this.anchor[1].toString()}px`
 		this.view.style.width = `${this.viewWidth.toString()}px`
 		this.view.style.height = `${this.viewHeight.toString()}px`
-		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		this.view.style.backgroundColor = this.backgroundColor.toCSS()
 		this.view.style.opacity = this.opacity.toString()
 

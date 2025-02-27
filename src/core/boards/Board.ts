@@ -56,12 +56,13 @@ The content children can also be dragged and panned.
 			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
-				cornerRadius: 50,
+				cornerRadius: 25,
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
-				strokeColor: Color.white(),
-				strokeWidth: 2.0,
-				screenEventHandler: ScreenEventHandler.Parent
+				strokeColor: Color.gray(0.2),
+				strokeWidth: 1.0,
+				screenEventHandler: ScreenEventHandler.Parent,
+				drawShadow: true
 			}),
 			expandedPadding: 20,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -246,7 +247,7 @@ The content children can also be dragged and panned.
 		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
 		}
-		this.expandButton.update({
+		this.expandButton.label.update({
 			text: '–'
 		})
 		for (let link of this.links) {
@@ -282,12 +283,12 @@ The content children can also be dragged and panned.
 		if (this.parent) {
 			getPaper().expandedMobject = this.board
 		}
-		this.expandButton.update({
+		this.expandButton.label.update({
 			text: '+'
 		})
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
-		
+
 		this.inputList.update({
 			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), -IO_LIST_OFFSET - this.inputList.viewHeight]
 		}, true)

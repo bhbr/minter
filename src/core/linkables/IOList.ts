@@ -24,8 +24,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			mobject: null,
 			linkNames: [],
 			cornerRadius: 20,
-			fillColor: Color.white(),
-			fillOpacity: 0.2,
+			fillColor: Color.gray(0.2),
+			fillOpacity: 1.0,
 			strokeWidth: 0,
 			width: IO_LIST_WIDTH
 		}
