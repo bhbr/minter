@@ -64,18 +64,14 @@ export class ExpandedBoardIOList extends IOList {
 		this.linkHooks.push(hook)
 	}
 
-	updateLinkNames() {
+	getLinkNames(): Array<string> {
 		let newLinkNames: Array<string> = this.linkHooks.map((hook) => hook.name)
 		newLinkNames.pop() // last hook is new and empty
-		if (this.type === 'input') {
-			this.mobject.update({
-				inputNames: newLinkNames
-			})
-		} else if (this.type === 'output') {
-			this.mobject.update({
-				outputNames: newLinkNames
-			})
-		}
+		return newLinkNames
+	}
+
+	updateLinkNames() {
+		// implemented in subclasses
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

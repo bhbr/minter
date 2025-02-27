@@ -10,4 +10,10 @@ export class ExpandedBoardInputList extends ExpandedBoardIOList {
 		}
 	}
 
+	updateLinkNames() {
+		this.mobject.update({
+			inputNames: this.getLinkNames()
+		})
+	}
+
 }

@@ -227,6 +227,10 @@ The content children can also be dragged and panned.
 		return this.compactWidth
 	}
 
+	getCompactHeight(): number {
+		return this.compactHeight
+	}
+
 	get contracted(): boolean {
 		return !this.expanded
 	}
@@ -625,11 +629,19 @@ The content children can also be dragged and panned.
 
 	endLinking(e: ScreenEvent) {
 		let h = this.hookAtLocation(this.localEventVertex(e))
-			if (this.openLink !== null) {
-				this.remove(this.openLink)
-			}
+		if (this.openLink !== null) {
+			this.remove(this.openLink)
+		}
 		if (h === null) {
+			return
 		} else if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+			// click on a plus button to create a new hook
+			let ed = h as EditableLinkHook
+			ed.editName()
+		} else if (h.constructor.name === 'EditableLinkHook') {
+			// drag a link onto a plus button
+			this.createNewDependency()
+			this.links.push(this.openLink)
 			let ed = h as EditableLinkHook
 			ed.editName()
 		} else {

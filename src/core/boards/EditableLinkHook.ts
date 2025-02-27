@@ -128,9 +128,9 @@ export class EditableLinkHook extends LinkHook {
 
 	keyPressed(e: KeyboardEvent) {
 		if (e.which != 13) { return }
+		this.empty = false
 		if (this.inputBox.value == '') {
 			this.inputBox.value = this.previousValue
-			this.empty = false
 			return
 		}
 		this.inputBox.blur()

@@ -93,6 +93,10 @@ which can be linked to such-exposed variables of other mobjects.
 		return this.viewWidth
 	}
 
+	getCompactHeight(): number {
+		return this.viewHeight
+	}
+
 	dragging(e: ScreenEvent) {
 	// so we can drag while showing the links
 	// (doesn't work at present)
