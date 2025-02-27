@@ -55,7 +55,6 @@ export class Construction extends Board {
 
 	setup() {
 		super.setup()
-		this.view.style.overflow = 'hidden'
 		this.background.update({
 			fillColor: Color.black()
 		})
