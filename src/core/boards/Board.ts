@@ -287,12 +287,18 @@ The content children can also be dragged and panned.
 		})
 		this.expandedInputList.hide()
 		this.expandedOutputList.hide()
+		
 		this.inputList.update({
 			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), -IO_LIST_OFFSET - this.inputList.viewHeight]
 		}, true)
 		this.outputList.update({
 			anchor: [0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET]
 		}, true)
+
+		if (this.board !== null) {
+			this.messageSidebar({ 'init': convertArrayToString(this.board.buttonNames) })
+		}
+		this.sidebar = null
 	}
 
 	contract() {
@@ -302,11 +308,6 @@ The content children can also be dragged and panned.
 			anchor: this.compactAnchor
 		}, 0.5)
 		this.contractStateChange()
-
-		if (this.parent instanceof Board) {
-			this.messageSidebar({ 'init': convertArrayToString(this.parent.buttonNames) })
-		}
-		this.sidebar = null
 	}
 
 	toggleViewState() {

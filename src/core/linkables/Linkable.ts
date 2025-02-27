@@ -34,9 +34,17 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
-	get board(): Board {
-		return super.parent.parent as Board
+	get board(): Board | null {
+		let p = super.parent
+		if (p) {
+			let pp = (p as Mobject).parent
+			if (pp) {
+				return pp as Board
+			}
+		}
+		return null
 	}
+
 	set board(newValue: Board) {
 		super.parent = newValue.content
 	}
