@@ -59,7 +59,6 @@ export class DemoPaper extends Paper {
 				'ExtendedBoardButton',
 				'NumberButton',
 				'ArithmeticButton',
-				'ConButton',
 				'WavyButton',
 				'SwingButton',
 				'ColorSampleButton'

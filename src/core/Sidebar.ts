@@ -61,11 +61,12 @@ export class Sidebar extends Mobject {
 		}
 	}
 
-	setup() {
+	setup() { 
 		this.add(this.background)
 		this.view['mobject'] = this
-		let paper = getPaper()
-		if (paper != null) {
+		let maybePaper = getPaper()
+		if (maybePaper != undefined) {
+			let paper = maybePaper as Paper
 			paper.sidebar = this
 			this.background.update({
 				fillColor: paper.background.fillColor
@@ -122,7 +123,11 @@ export class Sidebar extends Mobject {
 		try {
 			(window as Window).webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
-			getPaper().getMessage(message)
+			let maybePaper = getPaper()
+			if (maybePaper != undefined) {
+				let paper = maybePaper as Paper
+				paper.getMessage(message)
+			}
 		}
 	}
 

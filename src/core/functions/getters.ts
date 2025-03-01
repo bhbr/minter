@@ -3,9 +3,13 @@ import { Paper } from 'core/Paper'
 import { Sidebar } from 'core/Sidebar'
 
 export function getPaper(): Paper {
-	return document.querySelector('#paper_id')['mobject']
+	let paperDiv = document.querySelector('#paper_id')
+	if (paperDiv == null) { return undefined }
+	return paperDiv['mobject']
 }
 
 export function getSidebar(): Sidebar {
-	return document.querySelector('#sidebar_id')['mobject']
+	let sidebarDiv = document.querySelector('#sidebar_id')
+	if (sidebarDiv == null) { return undefined }
+	return sidebarDiv['mobject']
 }

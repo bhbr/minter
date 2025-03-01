@@ -20,9 +20,8 @@ export class DemoSidebar extends Sidebar {
 			availableButtonClasses: [
 				DragButton,
 				LinkButton,
-				ExtendedBoardButton,
 				BoardButton,
-				ConButton,
+				ExtendedBoardButton,
 				ConCircleButton,
 				StraitButton,
 				NumberButton,
@@ -30,7 +29,17 @@ export class DemoSidebar extends Sidebar {
 				WavyButton,
 				SwingButton,
 				ColorSampleButton
-			]
+			],
+			buttons: [
+				new DragButton(),
+				new LinkButton(),
+				new ExtendedBoardButton(),
+				new NumberButton(),
+				new ArithmeticButton(),
+				new WavyButton(),
+				new SwingButton(),
+				new ColorSampleButton()
+			],
 		}
 	}
 
