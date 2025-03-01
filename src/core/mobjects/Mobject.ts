@@ -86,6 +86,7 @@ and logic for drawing and user interaction.
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
 			drawShadow: false,
+			savedDrawShadow: null,
 			drawBorder: DRAW_BORDERS,
 
 			// hierarchy
@@ -335,6 +336,7 @@ and logic for drawing and user interaction.
 	visible: boolean
 	backgroundColor: Color
 	drawShadow: boolean
+	savedDrawShadow: boolean | null
 	drawBorder: boolean
 
 	setupView() {
@@ -351,7 +353,7 @@ and logic for drawing and user interaction.
 		// by default, the mobject can draw outside its view's borders
 		this.view.style.border = this.drawBorder ? '1px dashed green' : 'none'
 		if (this.drawShadow) {
-			this.view.style.filter = 'drop-shadow(2px 2px 5px)'
+			this.enableShadow()
 		}
 	}
 
@@ -373,6 +375,23 @@ and logic for drawing and user interaction.
 		for (let submob of this.submobs) {
 			submob.setViewVisibility(submob.visible && visibility)
 		}
+	}
+
+	enableShadow() {
+		if (this.savedDrawShadow !== null) {
+			this.drawShadow = this.savedDrawShadow
+		}
+		this.savedDrawShadow = null
+		if (this.drawShadow) {
+			this.view.style.filter = 'drop-shadow(2px 2px 5px)'
+		}
+	}
+
+	disableShadow() {
+		this.savedDrawShadow = this.drawShadow
+		this.drawShadow = false
+		this.view.style.filter = ''
+		this.parent.update()
 	}
 
 	shouldBeDrawn(): boolean {
@@ -464,6 +483,7 @@ and logic for drawing and user interaction.
 		let dt = 10
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds * 1000
+		this.disableShadow()
 
 		this.animationInterval = window.setInterval(
 			function() {
@@ -515,6 +535,7 @@ and logic for drawing and user interaction.
 		this.animationInterval = null
 		this.animationStartArgs = {}
 		this.animationStopArgs = {}
+		this.enableShadow()
 	}
 
 
@@ -1124,6 +1145,7 @@ and logic for drawing and user interaction.
 
 	startDragging(e: ScreenEvent) {
 		this.dragAnchorStart = vertexSubtract(this.anchor, eventVertex(e))
+		this.disableShadow()
 	}
 
 	dragging(e: ScreenEvent) {
@@ -1134,6 +1156,7 @@ and logic for drawing and user interaction.
 
 	endDragging(e: ScreenEvent) {
 		this.dragAnchorStart = null
+		this.enableShadow()
 	}
 
 }

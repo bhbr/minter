@@ -336,6 +336,15 @@ The content children can also be dragged and panned.
 	}
 
 
+	enableShadow() {
+		this.background.enableShadow()
+		this.board.update()
+	}
+
+	disableShadow() {
+		this.background.disableShadow()
+		this.board.update()
+	}
 
 	//////////////////////////////////////////////////////////
 	//                                                      //

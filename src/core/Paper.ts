@@ -56,6 +56,7 @@ export class Paper extends Board {
 			strokeColor: Color.clear(),
 			strokeWidth: 0.0
 		})
+		this.background.disableShadow()
 	}
 
 	changeColorByName(newColorName: string) {
