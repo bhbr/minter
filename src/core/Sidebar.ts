@@ -78,6 +78,14 @@ export class Sidebar extends Mobject {
 		this.initialize(this.buttonNames())
 		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
+		
+		let height = window.innerHeight
+		this.update({
+			viewHeight: height
+		})
+		this.background.update({
+			height: height
+		})
 	}
 
 	addButton(button: SidebarButton) {

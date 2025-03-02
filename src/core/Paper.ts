@@ -5,7 +5,7 @@ import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, r
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { PAPER_WIDTH, PAGE_HEIGHT, COLOR_PALETTE } from 'core/constants'
+import { PAPER_WIDTH, PAGE_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
 import { StartPaper } from 'startPaper'
@@ -57,6 +57,17 @@ export class Paper extends Board {
 			strokeWidth: 0.0
 		})
 		this.background.disableShadow()
+
+		let width = window.innerWidth - (isTouchDevice ? 0 : SIDEBAR_WIDTH)
+		let height = window.innerHeight
+		this.update({
+			viewWidth: width,
+			viewHeight: height
+		})
+		this.background.update({
+			width: width,
+			height: height
+		})
 	}
 
 	changeColorByName(newColorName: string) {
