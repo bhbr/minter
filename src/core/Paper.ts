@@ -62,7 +62,7 @@ export class Paper extends Board {
 		let height = window.innerHeight
 		this.update({
 			viewWidth: width,
-			viewHeight: height
+			viewHeight: height 
 		})
 		this.background.update({
 			width: width,

@@ -21,7 +21,7 @@ import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderC
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
-import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
@@ -94,7 +94,8 @@ The content children can also be dragged and panned.
 			openLink: null,
 			openHook: null,
 			openBullet: null,
-			compatibleHooks: []
+			compatibleHooks: [],
+			creationTool: null
 		}
 	}
 
@@ -361,6 +362,7 @@ The content children can also be dragged and panned.
 	creator?: Creator
 	creationStroke: vertexArray
 	creationMode: string
+	creationTool: ScreenEventDevice | null
 
 	// a dictionary of constructors to use
 	// for creating new mobjects
@@ -423,6 +425,11 @@ The content children can also be dragged and panned.
 
 		switch (type) {
 			case 'freehand':
+				if (this.creationTool == ScreenEventDevice.Finger) {
+					console.log('no freehand')
+					return new Creator()
+				}
+				console.log('freehand')
 				let fh = new Freehand()
 				fh.line.update({
 					vertices: this.creationStroke
@@ -446,6 +453,13 @@ The content children can also be dragged and panned.
 	}
 
 	startCreating(e: ScreenEvent) {
+		this.creationTool = screenEventDevice(e)
+		console.log(this.creationTool)
+		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
+			console.log('startCreating return')
+			return
+		}
+		console.log('startCreating do not return')
 		this.creationStroke.push(this.localEventVertex(e))
 		this.creator = this.createCreator(this.creationMode)
 		this.add(this.creator)
@@ -458,6 +472,11 @@ The content children can also be dragged and panned.
 	}
 
 	creating(e: ScreenEvent) {
+		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
+			console.log('creating return')
+			return
+		}
+		console.log('creating do not return')
 		let v: vertex = this.localEventVertex(e)
 		this.creationStroke.push(v)
 		this.creator.updateFromTip(v)
@@ -470,6 +489,7 @@ The content children can also be dragged and panned.
 
 	endCreating(e: ScreenEvent) {
 		this.creationStroke = []
+		this.creationTool = null
 		if (this.creator == null) { return }
 		this.creator.dissolve()
 	}
