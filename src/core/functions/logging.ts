@@ -5,16 +5,14 @@ let isTouchDevice: boolean = (document.body.className == 'ipad')
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
 function logInto(obj: any, id: string) {
-	let msg = obj.toString()
-	let newLine: HTMLElement = document.createElement('p')
-	newLine.innerText = msg
+	let msg = obj.toString() + '\n'
 	let htmlConsole: HTMLElement = document.querySelector('#' + id)
-  	htmlConsole.appendChild(newLine)
+	htmlConsole.hidden = false
+	htmlConsole.append(msg)
 	
 	// push old log entries out the top of the scroll view
 	// (these lines don't work though)
 	htmlConsole.scrollTop = htmlConsole.scrollHeight
-	newLine.scrollIntoView()
 }
 
 export function logString(msg: any) {

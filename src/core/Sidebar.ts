@@ -15,6 +15,7 @@ import { Mobject } from 'core/mobjects/Mobject'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
+import { log } from 'core/functions/logging'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'startSidebar'
@@ -78,7 +79,7 @@ export class Sidebar extends Mobject {
 		this.initialize(this.buttonNames())
 		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
-		
+
 		let height = window.innerHeight
 		this.update({
 			viewHeight: height
@@ -115,6 +116,7 @@ export class Sidebar extends Mobject {
 	}
 
 	initialize(names: Array<string>) {
+		log('initialize')
 		this.clear()
 		for (let i = 0; i < names.length; i++) {
 			let button = this.createButton(names[i])
