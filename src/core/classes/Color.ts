@@ -74,6 +74,8 @@ export class Color {
 	static indigo(): Color { return new Color(0.5, 0, 1) }
 	static purple(): Color { return new Color(1, 0, 1) }
 
+	static random(): Color { return new Color(Math.random(), Math.random(), Math.random(), 1) }
+	static randomGray(): Color { return Color.gray(Math.random()) }
 }
 
 
