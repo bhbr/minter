@@ -505,9 +505,9 @@ The content children can also be dragged and panned.
 
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = this.localEventVertex(e)
-
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.anchor)
+			mob.disableShadow()
 		}
 	}
 
@@ -542,6 +542,11 @@ The content children can also be dragged and panned.
 			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnPointerUp = (e: ScreenEvent) => { }
 		}
+		for (let mob of this.contentChildren) {
+			mob.dragAnchorStart = null
+			mob.enableShadow()
+		}
+
 	}
 
 
