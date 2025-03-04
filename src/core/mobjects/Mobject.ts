@@ -10,7 +10,7 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
 import { Paper } from 'core/Paper'
-import { DRAW_BORDERS } from 'core/constants'
+import { DRAW_BORDERS, MAX_TAP_DELAY } from 'core/constants'
 
 /*
 For debugging; draw the border of the mobject's view
@@ -813,15 +813,15 @@ and logic for drawing and user interaction.
 	onLongPress(e: ScreenEvent) { }
 
 	onTouchDown(e: ScreenEvent) { log("touch down") }
-	onTouchMove(e: ScreenEvent) { log("touch move") }
+	onTouchMove(e: ScreenEvent) { }
 	onTouchUp(e: ScreenEvent) { log("touch up") }
-	onTouchTap(e: ScreenEvent) { }
+	onTouchTap(e: ScreenEvent) { log("touch tap") }
 	onMereTouchTap(e: ScreenEvent) { }
 	onDoubleTouchTap(e: ScreenEvent) { }
 	onLongTouchPress(e: ScreenEvent) { }
 
 	onPenDown(e: ScreenEvent) { log("pen down") }
-	onPenMove(e: ScreenEvent) { log("pen move") }
+	onPenMove(e: ScreenEvent) { }
 	onPenUp(e: ScreenEvent) { log("pen up") }
 	onPenTap(e: ScreenEvent) { }
 	onMerePenTap(e: ScreenEvent) { }
@@ -832,9 +832,9 @@ and logic for drawing and user interaction.
 		log("mouse down")
 		//log(screenEventDeviceAsString(e))
 	}
-	onMouseMove(e: ScreenEvent) { log("mouse move") }
+	onMouseMove(e: ScreenEvent) { }
 	onMouseUp(e: ScreenEvent) { log("mouse up") }
-	onMouseClick(e: ScreenEvent) { }
+	onMouseClick(e: ScreenEvent) { log("mouse click") }
 	onMereMouseClick(e: ScreenEvent) { }
 	onDoubleMouseClick(e: ScreenEvent) { }
 	onLongMousePress(e: ScreenEvent) { }
@@ -1171,11 +1171,13 @@ and logic for drawing and user interaction.
 		if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
 		//	log('case 1')
 			this.eventTarget.onPenDown(e)
+			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
 			this.screenEventDevice = ScreenEventDevice.Pen
 		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
 		//	log('case 2')
-			this.eventTarget.onPenUp(e)
+			this.eventTarget.rawOnPenUp(e)
+			this.registerScreenEvent(e)
 			this.resetPointer()
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
 		//	log('case 3')
@@ -1183,11 +1185,13 @@ and logic for drawing and user interaction.
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 		//	log('case 4')
 			this.eventTarget.onTouchDown(e)
+			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
 			this.screenEventDevice = ScreenEventDevice.Finger
 		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
 		//	log('case 5')
-			this.eventTarget.onTouchUp(e)
+			this.eventTarget.rawOnTouchUp(e)
+			this.registerScreenEvent(e)
 			this.resetPointer()
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
 		//	log('case 6')
@@ -1202,6 +1206,7 @@ and logic for drawing and user interaction.
 			} else {
 		//		log('case 7c')
 				this.eventTarget.onMouseDown(e)
+				this.registerScreenEvent(e)
 		//		log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Mouse`)
 				this.screenEventDevice = ScreenEventDevice.Mouse
 			}
@@ -1209,7 +1214,8 @@ and logic for drawing and user interaction.
 			if (this.screenEventDevice == ScreenEventDevice.Finger) {
 				if (isTouchDevice) {
 		//			log('case 8a1')
-					this.eventTarget.onTouchUp(e)
+					this.eventTarget.rawOnTouchUp(e)
+					this.registerScreenEvent(e)
 					this.resetPointer()
 				} else {
 		//			log('case 8a2')
@@ -1218,7 +1224,8 @@ and logic for drawing and user interaction.
 			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
 				if (isTouchDevice) {
 		//			log('case 8b1')
-					this.eventTarget.onPenUp(e)
+					this.eventTarget.rawOnPenUp(e)
+					this.registerScreenEvent(e)
 					this.resetPointer()
 				} else {
 		//			log('case 8b2')
@@ -1226,7 +1233,8 @@ and logic for drawing and user interaction.
 				}
 			} else {
 		//		log('case 8c')
-				this.eventTarget.onMouseUp(e)
+				this.eventTarget.rawOnMouseUp(e)
+					this.registerScreenEvent(e)
 				this.resetPointer()
 			}
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
@@ -1235,12 +1243,14 @@ and logic for drawing and user interaction.
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 		//	log('case 10')
 			this.eventTarget.onTouchDown(e)
+			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
 			this.screenEventDevice = ScreenEventDevice.Finger
 		//	log('using finger')
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
 		//	log('case 11')
 			this.eventTarget.onPenDown(e)
+			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
 			this.screenEventDevice = ScreenEventDevice.Pen
 		//	log('using pen')
@@ -1254,7 +1264,62 @@ and logic for drawing and user interaction.
 		window.setTimeout(function() {
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to null`)
 			this.screenEventDevice = null
-		}.bind(this), 500)
+		}.bind(this), 250)
+	}
+
+	registerScreenEvent(e: ScreenEvent) {
+		this.screenEventHistory.push(e)
+	}
+
+	rawOnTouchUp(e: ScreenEvent) {
+		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		//log(screenEventDescription(e2))
+		//log(screenEventDescription(e))
+		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
+			this.onTouchTap(e)
+			if (this.screenEventHistory.length == 3) {
+				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
+				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
+				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
+					this.onDoubleTouchTap(e)
+				}
+			}
+		}
+		this.onTouchUp(e)
+	}
+
+	rawOnPenUp(e: ScreenEvent) {
+		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		//log(screenEventDescription(e2))
+		//log(screenEventDescription(e))
+		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
+			this.onPenTap(e)
+			if (this.screenEventHistory.length == 3) {
+				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
+				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
+				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
+					this.onDoublePenTap(e)
+				}
+			}
+		}
+		this.onPenUp(e)
+	}
+
+	rawOnMouseUp(e: ScreenEvent) {
+		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		//log(screenEventDescription(e2))
+		//log(screenEventDescription(e))
+		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
+			this.onMouseClick(e)
+			if (this.screenEventHistory.length == 3) {
+				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
+				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
+				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
+					this.onDoubleMouseClick(e)
+				}
+			}
+		}
+		this.onMouseUp(e)
 	}
 
 	// Local coordinates for use in custom event methods
@@ -1270,82 +1335,6 @@ and logic for drawing and user interaction.
 		let q = rt.inverse().appliedTo(p)
 		return q
 	}
-
-
-	// Looking for duplicate events
-
-	// registerScreenEvent(e: ScreenEvent): boolean {
-	// 	//log('reg1')
-	// 	if (this.isDuplicate(e)) {
-	// 		//log('reg2')
-	// 		return false
-	// 	}
-	// 	//log('reg3')
-	// 	log('pushing')
-	// 	this.screenEventHistory.push(e)
-	// 	return true
-	// }
-
-	// isDuplicate(e: ScreenEvent): boolean {
-	// /*
-	// Duplicates can occur e. g. on an iPad where the same action
-	// triggers a TouchEvent and a MouseEvent. Here we are just looking at
-	// the screenEvent's type (down, move, up or cancel) and ignore
-	// the device to determine duplicates.
-	// */
-	// 	//log('dup1')
-	// 	log(`>>> looking for duplicates of ${screenEventDeviceAsString(e)}, ${screenEventTypeAsString(e)}, ${e.timeStamp}, ${eventVertex(e)}`)
-	// 	if (this.justRegisteredTap) {
-	// 		log('>>>>>>>>> duplicate because we just registered a tap')
-	// 		return true
-	// 	}
-	// 	let minIndex = Math.max(0, this.screenEventHistory.length - 5)
-	// 	for (var i = minIndex; i < this.screenEventHistory.length; i++) {
-	// 		let e2 = this.screenEventHistory[i]
-	// 		let deviceIsMouse = (screenEventDevice(e) == ScreenEventDevice.Mouse)
-	// 		let areCloseInSpace = vertexCloseTo(eventVertex(e), eventVertex(e2), 2)
-	// 		let areCloseInTime = (e.timeStamp - e2.timeStamp < 100)
-	// 		let areFarApart = !vertexCloseTo(eventVertex(e), eventVertex(e2), 200)
-	// 		let sameType = (screenEventType(e) == screenEventType(e2))
-	// 		let specialCase = (screenEventDevice(e2) == ScreenEventDevice.Pen && screenEventType(e2) == ScreenEventType.Down && screenEventDevice(e) == ScreenEventDevice.Mouse && screenEventType(e) == ScreenEventType.Up)
-	// 		log(`>>>>>> maybe ${screenEventDeviceAsString(e2)}, ${screenEventTypeAsString(e2)}, ${e2.timeStamp}, ${eventVertex(e2)}?`)
-
-	// 		if (!deviceIsMouse) {
-	// 			log('not a mouse')
-	// 			continue
-	// 		}
-
-	// 		if (!areCloseInSpace) {
-	// 			log('not close in space')
-	// 			continue
-	// 		}
-
-	// 		if (!areCloseInTime) {
-	// 			log('not close in time')
-	// 			continue
-	// 		}
-
-	// 		if (areFarApart) {
-	// 			log('>>>>>>>>> duplicate because too far apart')
-	// 			return true
-	// 		}
-
-	// 		if (sameType) {
-	// 			log('>>>>>>>>> duplicate because same type')
-	// 			return true
-	// 		}
-
-	// 		// if (specialCase) {
-	// 		// 	log('>>>>>>>>> duplicate because special case')
-	// 		// 	return true
-	// 		// }
-	// 		log('no')
-
-	// 	}
-	// 	log('>>>>>>>>> new event because nothing matches')
-	// 	//log('dup2')
-	// 	return false
-	// }
 
 
 	// Gesture recognizers
