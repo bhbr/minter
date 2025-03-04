@@ -10,7 +10,7 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
 import { Paper } from 'core/Paper'
-import { DRAW_BORDERS, MAX_TAP_DELAY, MERE_TAP_DELAY } from 'core/constants'
+import { DRAW_BORDERS, MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
 
 /*
 For debugging; draw the border of the mobject's view
@@ -804,47 +804,136 @@ and logic for drawing and user interaction.
 	so we can manipulate and override them later.
 	*/
 
-	onPointerDown(e: ScreenEvent) { }
-	onPointerMove(e: ScreenEvent) { }
-	onPointerUp(e: ScreenEvent) { }
-	onTap(e: ScreenEvent) { }
-	onMereTap(e: ScreenEvent) { }
-	onDoubleTap(e: ScreenEvent) { }
-	onLongPress(e: ScreenEvent) { }
+	onTouchDown(e: ScreenEvent) {
+		log("touch down")
+		this.onPointerDown(e)
+	}
 
-	onTouchDown(e: ScreenEvent) { log("touch down") }
-	onTouchMove(e: ScreenEvent) { }
-	onTouchUp(e: ScreenEvent) { log("touch up") }
-	onTouchTap(e: ScreenEvent) { log("touch tap") }
-	onMereTouchTap(e: ScreenEvent) { log("mere touch tap") }
-	onDoubleTouchTap(e: ScreenEvent) { log("double touch tap") }
-	onLongTouchPress(e: ScreenEvent) { }
+	onTouchMove(e: ScreenEvent) {
+		log("touch move")
+		this.onPointerMove(e)
+	}
 
-	onPenDown(e: ScreenEvent) { log("pen down") }
-	onPenMove(e: ScreenEvent) { }
-	onPenUp(e: ScreenEvent) { log("pen up") }
-	onPenTap(e: ScreenEvent) { log("pen tap") }
-	onMerePenTap(e: ScreenEvent) { log("mere pen tap") }
-	onDoublePenTap(e: ScreenEvent) { log("double pen tap")}
-	onLongPenPress(e: ScreenEvent) { }
+	onTouchUp(e: ScreenEvent) {
+		log("touch up")
+		this.onPointerUp(e)
+	}
+	
+	onTouchTap(e: ScreenEvent) {
+		log("touch tap")
+		this.onTap(e)
+	}
 
-	onMouseDown(e: ScreenEvent) { log("mouse down") }
-	onMouseMove(e: ScreenEvent) { }
-	onMouseUp(e: ScreenEvent) { log("mouse up") }
-	onMouseClick(e: ScreenEvent) { log("mouse click") }
-	onMereMouseClick(e: ScreenEvent) { log("mere mouse click") }
-	onDoubleMouseClick(e: ScreenEvent) { log("double mouse click") }
-	onLongMousePress(e: ScreenEvent) { }
+	onMereTouchTap(e: ScreenEvent) {
+		log("mere touch tap")
+		this.onMereTap(e)
+	}
+	onDoubleTouchTap(e: ScreenEvent) {
+		log("double touch tap")
+		this.onDoubleTap(e)
+	}
+	onLongTouchDown(e: ScreenEvent) {
+		log("long touch down")
+		this.onLongPress(e)
+	}
+
+	onPenDown(e: ScreenEvent) {
+		log("pen down")
+		this.onPointerDown(e)
+	}
+
+	onPenMove(e: ScreenEvent) {
+		log("pen move")
+		this.onPointerMove(e)
+	}
+
+	onPenUp(e: ScreenEvent) {
+		log("pen up")
+		this.onPointerUp(e)
+	}
+	
+	onPenTap(e: ScreenEvent) {
+		log("pen tap")
+		this.onTap(e)
+	}
+
+	onMerePenTap(e: ScreenEvent) {
+		log("mere pen tap")
+		this.onMereTap(e)
+	}
+
+	onDoublePenTap(e: ScreenEvent) {
+		log("double pen tap")
+		this.onDoubleTap(e)
+	}
+
+	onLongPenDown(e: ScreenEvent) {
+		log("long pen down")
+		this.onLongPress(e)
+	}
+
+	onMouseDown(e: ScreenEvent) {
+		log("mouse down")
+		this.onPointerDown(e)
+	}
+
+	onMouseMove(e: ScreenEvent) {
+		log("mouse move")
+		this.onPointerMove(e)
+	}
+
+	onMouseUp(e: ScreenEvent) {
+		log("mouse up")
+		this.onPointerUp(e)
+	}
+
+	onMouseClick(e: ScreenEvent) {
+		log("mouse click")
+		this.onTap(e)
+	}
+
+	onMereMouseClick(e: ScreenEvent) {
+		log("mere mouse click")
+		this.onMereTap(e)
+	}
+
+	onDoubleMouseClick(e: ScreenEvent) {
+		log("double mouse click")
+		this.onDoubleTap(e)
+	}
+
+	onLongMouseDown(e: ScreenEvent) {
+		log("long mouse down")
+		this.onLongPress(e)
+	}
+
+	onTap(e: ScreenEvent) {
+		log("tap")
+	}
+
+	onMereTap(e: ScreenEvent) {
+		log("mere tap")
+	}
+
+	onDoubleTap(e: ScreenEvent) {
+		log("double tap")
+	}
+
+	onLongPress(e: ScreenEvent) {
+		log("long press")
+	}
 
 	/*
 	Backup versions for temporarily disabling
 	interactivity on a mobject (e. g. while dragging)
 	*/
+
 	savedOnPointerDown(e: ScreenEvent) { }
 	savedOnPointerMove(e: ScreenEvent) { }
 	savedOnPointerUp(e: ScreenEvent) { }
 	savedOnTap(e: ScreenEvent) { }
 	savedOnMereTap(e: ScreenEvent) { }
+	savedOnDoubleTap(e: ScreenEvent) { }
 	savedOnLongPress(e: ScreenEvent) { }
 
 	savedOnTouchDown(e: ScreenEvent) { }
@@ -853,7 +942,7 @@ and logic for drawing and user interaction.
 	savedOnTouchTap(e: ScreenEvent) { }
 	savedOnMereTouchTap(e: ScreenEvent) { }
 	savedOnDoubleTouchTap(e: ScreenEvent) { }
-	savedOnLongTouchPress(e: ScreenEvent) { }
+	savedOnLongTouchDown(e: ScreenEvent) { }
 
 	savedOnPenDown(e: ScreenEvent) { }
 	savedOnPenMove(e: ScreenEvent) { }
@@ -861,7 +950,7 @@ and logic for drawing and user interaction.
 	savedOnPenTap(e: ScreenEvent) { }
 	savedOnMerePenTap(e: ScreenEvent) { }
 	savedOnDoublePenTap(e: ScreenEvent) { }
-	savedOnLongPenPress(e: ScreenEvent) { }
+	savedOnLongPenDown(e: ScreenEvent) { }
 
 	savedOnMouseDown(e: ScreenEvent) { }
 	savedOnMouseMove(e: ScreenEvent) { }
@@ -869,8 +958,19 @@ and logic for drawing and user interaction.
 	savedOnMouseClick(e: ScreenEvent) { }
 	savedOnMereMouseClick(e: ScreenEvent) { }
 	savedOnDoubleMouseClick(e: ScreenEvent) { }
-	savedOnLongMousePress(e: ScreenEvent) { }
+	savedOnLongMouseDown(e: ScreenEvent) { }
 
+	onPointerDown(e: ScreenEvent) {
+		log("pointer down")
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		log("pointer move")
+	}
+
+	onPointerUp(e: ScreenEvent) {
+		log("pointer up")
+	}
 
 	/*
 	Methods for temporarily disabling interactivity on a mobject
@@ -1038,12 +1138,12 @@ and logic for drawing and user interaction.
 		this.decideEventAction(e)
 		
 		// step 5
-		this.timeoutID = window.setTimeout(
-			function() {
-				target.onLongPress(e)
-				this.resetTimeout()
-			}.bind(this), 1000, e
-		)
+		// this.timeoutID = window.setTimeout(
+		// 	function() {
+		// 		target.onLongPress(e)
+		// 		this.resetTimeout()
+		// 	}.bind(this), 1000, e
+		// )
 	}
 
 	capturedOnPointerMove(e: ScreenEvent) {
@@ -1167,7 +1267,7 @@ and logic for drawing and user interaction.
 
 		if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
 		//	log('case 1')
-			this.eventTarget.onPenDown(e)
+			this.eventTarget.rawOnPenDown(e)
 			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
 			this.screenEventDevice = ScreenEventDevice.Pen
@@ -1181,7 +1281,7 @@ and logic for drawing and user interaction.
 			// ignore
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 		//	log('case 4')
-			this.eventTarget.onTouchDown(e)
+			this.eventTarget.rawOnTouchDown(e)
 			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
 			this.screenEventDevice = ScreenEventDevice.Finger
@@ -1202,7 +1302,7 @@ and logic for drawing and user interaction.
 				// ignore
 			} else {
 		//		log('case 7c')
-				this.eventTarget.onMouseDown(e)
+				this.eventTarget.rawOnMouseDown(e)
 				this.registerScreenEvent(e)
 		//		log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Mouse`)
 				this.screenEventDevice = ScreenEventDevice.Mouse
@@ -1239,14 +1339,14 @@ and logic for drawing and user interaction.
 		//	log('case 9')
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 		//	log('case 10')
-			this.eventTarget.onTouchDown(e)
+			this.eventTarget.rawOnTouchDown(e)
 			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
 			this.screenEventDevice = ScreenEventDevice.Finger
 		//	log('using finger')
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
 		//	log('case 11')
-			this.eventTarget.onPenDown(e)
+			this.eventTarget.rawOnPenDown(e)
 			this.registerScreenEvent(e)
 		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
 			this.screenEventDevice = ScreenEventDevice.Pen
@@ -1268,11 +1368,17 @@ and logic for drawing and user interaction.
 		this.screenEventHistory.push(e)
 	}
 
+	rawOnTouchDown(e: ScreenEvent) {
+		this.timeoutID = window.setTimeout(this.onLongTouchDown, LONG_PRESS_DURATION)
+		this.onTouchDown(e)
+	}
+
 	rawOnTouchUp(e: ScreenEvent) {
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		//log(screenEventDescription(e2))
 		//log(screenEventDescription(e))
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
+			window.clearTimeout(this.timeoutID)
 			this.onTouchTap(e)
 			window.setTimeout(function() {
 				if (this.screenEventHistory.length == 2) {
@@ -1288,6 +1394,11 @@ and logic for drawing and user interaction.
 			}
 		}
 		this.onTouchUp(e)
+	}
+
+	rawOnPenDown(e: ScreenEvent) {
+		this.timeoutID = window.setTimeout(this.onLongPenDown, LONG_PRESS_DURATION)
+		this.onPenDown(e)
 	}
 
 	rawOnPenUp(e: ScreenEvent) {
@@ -1310,6 +1421,11 @@ and logic for drawing and user interaction.
 			}
 		}
 		this.onPenUp(e)
+	}
+
+	rawOnMouseDown(e: ScreenEvent) {
+		this.timeoutID = window.setTimeout(this.onLongMouseDown, LONG_PRESS_DURATION)
+		this.onMouseDown(e)
 	}
 
 	rawOnMouseUp(e: ScreenEvent) {
@@ -1505,58 +1621,101 @@ and logic for drawing and user interaction.
 	setDragging(flag: boolean) {
 		if (flag) {
 			if (this.draggingEnabled()) { return }
-			this.savedOnPointerDown = this.onPointerDown
 			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnPointerMove = this.onPointerMove
 			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnPointerUp = this.onPointerUp
 			this.savedOnTouchUp = this.onTouchUp
+			this.savedOnTouchTap = this.onTouchTap
+			this.savedOnMereTouchTap = this.onMereTouchTap
+			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
+			this.savedOnLongTouchDown = this.onLongTouchDown
+
+			this.savedOnPenDown = this.onPenDown
+			this.savedOnPenMove = this.onPenMove
 			this.savedOnPenUp = this.onPenUp
+			this.savedOnPenTap = this.onPenTap
+			this.savedOnMerePenTap = this.onMerePenTap
+			this.savedOnDoublePenTap = this.onDoublePenTap
+			this.savedOnLongPenDown = this.onLongPenDown
+
+			this.savedOnMouseDown = this.onMouseDown
+			this.savedOnMouseMove = this.onMouseMove
 			this.savedOnMouseUp = this.onMouseUp
-			this.onPointerDown = this.startDragging
-			this.onPointerMove = this.dragging
-			this.onPointerUp = this.endDragging
-			this.onTouchDown = this.startDragging
-			this.onPointerMove = this.dragging
-			this.onTouchUp = this.endDragging
+			this.savedOnMouseClick = this.onMouseClick
+			this.savedOnMereMouseClick = this.onMereMouseClick
+			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
+			this.savedOnLongMouseDown = this.onLongMouseDown
+
 			this.onTouchDown = this.startDragging
 			this.onTouchMove = this.dragging
 			this.onTouchUp = this.endDragging
+			this.onMereTouchTap = (e: ScreenEvent) => { }
+			this.onDoubleTouchTap = (e: ScreenEvent) => { }
+			this.onLongTouchDown = (e: ScreenEvent) => { }
+
+			this.onPenDown = this.startDragging
+			this.onPenMove = this.dragging
+			this.onPenUp = this.endDragging
+			this.onMerePenTap = (e: ScreenEvent) => { }
+			this.onDoublePenTap = (e: ScreenEvent) => { }
+			this.onLongPenDown = (e: ScreenEvent) => { }
+
+			this.onMouseDown = this.startDragging
+			this.onMouseMove = this.dragging
+			this.onMouseUp = this.endDragging
+			this.onMereMouseClick = (e: ScreenEvent) => { }
+			this.onDoubleMouseClick = (e: ScreenEvent) => { }
+			this.onLongMouseDown = (e: ScreenEvent) => { }
 		} else {
 			if (!this.draggingEnabled()) { return }
-			this.onPointerDown = this.savedOnPointerDown
 			this.onTouchDown = this.savedOnTouchDown
-			this.onPenDown = this.savedOnPenDown
-			this.onMouseDown = this.savedOnMouseDown
-			this.onPointerMove = this.savedOnPointerMove
 			this.onTouchMove = this.savedOnTouchMove
-			this.onPenMove = this.savedOnPenMove
-			this.onMouseMove = this.savedOnMouseMove
-			this.onPointerUp = this.savedOnPointerUp
 			this.onTouchUp = this.savedOnTouchUp
+			this.onTouchTap = this.savedOnTouchTap
+			this.onMereTouchTap = this.savedOnMereTouchTap
+			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
+			this.onLongTouchDown = this.savedOnLongTouchDown
+
+			this.onPenDown = this.savedOnPenDown
+			this.onPenMove = this.savedOnPenMove
 			this.onPenUp = this.savedOnPenUp
+			this.onPenTap = this.savedOnPenTap
+			this.onMerePenTap = this.savedOnMerePenTap
+			this.onDoublePenTap = this.savedOnDoublePenTap
+			this.onLongPenDown = this.savedOnLongPenDown
+
+			this.onMouseDown = this.savedOnMouseDown
+			this.onMouseMove = this.savedOnMouseMove
 			this.onMouseUp = this.savedOnMouseUp
-			this.savedOnPointerDown = (e: ScreenEvent) => { }
+			this.onMouseClick = this.savedOnMouseClick
+			this.onMereMouseClick = this.savedOnMereMouseClick
+			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
+			this.onLongMouseDown = this.savedOnLongMouseDown
+
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnPointerUp = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
+			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
+			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
+			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
+
+			this.savedOnPenDown = (e: ScreenEvent) => { }
+			this.savedOnPenMove = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnMerePenTap = (e: ScreenEvent) => { }
+			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
+			this.savedOnLongPenDown = (e: ScreenEvent) => { }
+
+			this.savedOnMouseMove = (e: ScreenEvent) => { }
+			this.savedOnMouseDown = (e: ScreenEvent) => { }
 			this.savedOnMouseUp = (e: ScreenEvent) => { }
+			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
+			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
+			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
 		}
 	}
 
 	draggingEnabled(): boolean {
-		return (this.onPointerDown == this.startDragging)
+		return (this.onTouchDown == this.startDragging)
 	}
 
 	startDragging(e: ScreenEvent) {

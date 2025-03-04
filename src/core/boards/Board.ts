@@ -463,7 +463,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		//log("pointer move")
+		log("pointer move")
 		if (this.contracted) { return }
 		if (this.creationStroke.length == 0) { return }
 		this.creating(e)
@@ -525,52 +525,95 @@ The content children can also be dragged and panned.
 
 	setPanning(flag: boolean) {
 		if (flag) {
-			this.savedOnPointerDown = this.onPointerDown
 			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnPointerMove = this.onPointerMove
 			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnPointerUp = this.onPointerUp
 			this.savedOnTouchUp = this.onTouchUp
+			this.savedOnTouchTap = this.onTouchTap
+			this.savedOnMereTouchTap = this.onMereTouchTap
+			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
+			this.savedOnLongTouchDown = this.onLongTouchDown
+
+			this.savedOnPenDown = this.onPenDown
+			this.savedOnPenMove = this.onPenMove
 			this.savedOnPenUp = this.onPenUp
+			this.savedOnPenTap = this.onPenTap
+			this.savedOnMerePenTap = this.onMerePenTap
+			this.savedOnDoublePenTap = this.onDoublePenTap
+			this.savedOnLongPenDown = this.onLongPenDown
+
+			this.savedOnMouseDown = this.onMouseDown
+			this.savedOnMouseMove = this.onMouseMove
 			this.savedOnMouseUp = this.onMouseUp
-			this.onPointerDown = this.startPanning
-			this.onPointerMove = this.panning
-			this.onPointerUp = this.endPanning
-			this.onTouchDown = this.startPanning
-			this.onPointerMove = this.panning
-			this.onTouchUp = this.endPanning
+			this.savedOnMouseClick = this.onMouseClick
+			this.savedOnMereMouseClick = this.onMereMouseClick
+			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
+			this.savedOnLongMouseDown = this.onLongMouseDown
+
 			this.onTouchDown = this.startPanning
 			this.onTouchMove = this.panning
 			this.onTouchUp = this.endPanning
+			this.onMereTouchTap = (e: ScreenEvent) => { }
+			this.onDoubleTouchTap = (e: ScreenEvent) => { }
+			this.onLongTouchDown = (e: ScreenEvent) => { }
+
+			this.onPenDown = this.startPanning
+			this.onPenMove = this.panning
+			this.onPenUp = this.endPanning
+			this.onMerePenTap = (e: ScreenEvent) => { }
+			this.onDoublePenTap = (e: ScreenEvent) => { }
+			this.onLongPenDown = (e: ScreenEvent) => { }
+
+			this.onMouseDown = this.startPanning
+			this.onMouseMove = this.panning
+			this.onMouseUp = this.endPanning
+			this.onMereMouseClick = (e: ScreenEvent) => { }
+			this.onDoubleMouseClick = (e: ScreenEvent) => { }
+			this.onLongMouseDown = (e: ScreenEvent) => { }
 		} else {
-			this.onPointerDown = this.savedOnPointerDown
 			this.onTouchDown = this.savedOnTouchDown
-			this.onPenDown = this.savedOnPenDown
-			this.onMouseDown = this.savedOnMouseDown
-			this.onPointerMove = this.savedOnPointerMove
 			this.onTouchMove = this.savedOnTouchMove
-			this.onPenMove = this.savedOnPenMove
-			this.onMouseMove = this.savedOnMouseMove
-			this.onPointerUp = this.savedOnPointerUp
 			this.onTouchUp = this.savedOnTouchUp
+			this.onTouchTap = this.savedOnTouchTap
+			this.onMereTouchTap = this.savedOnMereTouchTap
+			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
+			this.onLongTouchDown = this.savedOnLongTouchDown
+
+			this.onPenDown = this.savedOnPenDown
+			this.onPenMove = this.savedOnPenMove
 			this.onPenUp = this.savedOnPenUp
+			this.onPenTap = this.savedOnPenTap
+			this.onMerePenTap = this.savedOnMerePenTap
+			this.onDoublePenTap = this.savedOnDoublePenTap
+			this.onLongPenDown = this.savedOnLongPenDown
+
+			this.onMouseDown = this.savedOnMouseDown
+			this.onMouseMove = this.savedOnMouseMove
 			this.onMouseUp = this.savedOnMouseUp
-			this.savedOnPointerDown = (e: ScreenEvent) => { }
+			this.onMouseClick = this.savedOnMouseClick
+			this.onMereMouseClick = this.savedOnMereMouseClick
+			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
+			this.onLongMouseDown = this.savedOnLongMouseDown
+
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnPointerUp = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
+			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
+			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
+			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
+
+			this.savedOnPenDown = (e: ScreenEvent) => { }
+			this.savedOnPenMove = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnMerePenTap = (e: ScreenEvent) => { }
+			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
+			this.savedOnLongPenDown = (e: ScreenEvent) => { }
+
+			this.savedOnMouseMove = (e: ScreenEvent) => { }
+			this.savedOnMouseDown = (e: ScreenEvent) => { }
 			this.savedOnMouseUp = (e: ScreenEvent) => { }
+			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
+			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
+			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
 		}
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = null
@@ -578,25 +621,24 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	onTap(e: ScreenEvent) { log("tap") }
-	onMereTap(e: ScreenEvent) { log("mere tap") }
-	onDoubleTap(e: ScreenEvent) { log("double tap") }
-	onLongPress(e: ScreenEvent) { log("long press") }
+	// onTap(e: ScreenEvent) { log("tap") }
+	// onMereTap(e: ScreenEvent) { log("mere tap") }
+	// onDoubleTap(e: ScreenEvent) { log("double tap") }
 
-	onTouchTap(e: ScreenEvent) { log("touch tap") }
-	onMereTouchTap(e: ScreenEvent) { log("mere touch tap") }
-	onDoubleTouchTap(e: ScreenEvent) { log("double touch tap") }
-	onLongTouchPress(e: ScreenEvent) { log("long touch press") }
+	// onTouchTap(e: ScreenEvent) { log("touch tap") }
+	// onMereTouchTap(e: ScreenEvent) { log("mere touch tap") }
+	// onDoubleTouchTap(e: ScreenEvent) { log("double touch tap") }
+	// onLongTouchPress(e: ScreenEvent) { log("long touch press") }
 
-	onPenTap(e: ScreenEvent) { log("pen tap") }
-	onMerePenTap(e: ScreenEvent) { log("mere pen tap") }
-	onDoublePenTap(e: ScreenEvent) { log("double pen tap") }
-	onLongPenPress(e: ScreenEvent) { log("long pen press") }
+	// onPenTap(e: ScreenEvent) { log("pen tap") }
+	// onMerePenTap(e: ScreenEvent) { log("mere pen tap") }
+	// onDoublePenTap(e: ScreenEvent) { log("double pen tap") }
+	// onLongPenPress(e: ScreenEvent) { log("long pen press") }
 
-	onMouseClick(e: ScreenEvent) { log("mouse click") }
-	onMereMouseClick(e: ScreenEvent) { log("mere mouse click") }
-	onDoubleMouseClick(e: ScreenEvent) { log("double mouse click") }
-	onLongMousePress(e: ScreenEvent) { log("long mouse press") }
+	// onMouseClick(e: ScreenEvent) { log("mouse click") }
+	// onMereMouseClick(e: ScreenEvent) { log("mere mouse click") }
+	// onDoubleMouseClick(e: ScreenEvent) { log("double mouse click") }
+	// onLongMousePress(e: ScreenEvent) { log("long mouse press") }
 
 
 
@@ -657,53 +699,96 @@ The content children can also be dragged and panned.
 
 	setLinking(flag: boolean) {
 		if (flag) {
-			this.savedOnPointerDown = this.onPointerDown
 			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnPointerMove = this.onPointerMove
 			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnPointerUp = this.onPointerUp
 			this.savedOnTouchUp = this.onTouchUp
+			this.savedOnTouchTap = this.onTouchTap
+			this.savedOnMereTouchTap = this.onMereTouchTap
+			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
+			this.savedOnLongTouchDown = this.onLongTouchDown
+
+			this.savedOnPenDown = this.onPenDown
+			this.savedOnPenMove = this.onPenMove
 			this.savedOnPenUp = this.onPenUp
+			this.savedOnPenTap = this.onPenTap
+			this.savedOnMerePenTap = this.onMerePenTap
+			this.savedOnDoublePenTap = this.onDoublePenTap
+			this.savedOnLongPenDown = this.onLongPenDown
+
+			this.savedOnMouseDown = this.onMouseDown
+			this.savedOnMouseMove = this.onMouseMove
 			this.savedOnMouseUp = this.onMouseUp
-			this.onPointerDown = this.startLinking
-			this.onPointerMove = this.linking
-			this.onPointerUp = this.endLinking
-			this.onTouchDown = this.startLinking
-			this.onPointerMove = this.linking
-			this.onTouchUp = this.endLinking
+			this.savedOnMouseClick = this.onMouseClick
+			this.savedOnMereMouseClick = this.onMereMouseClick
+			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
+			this.savedOnLongMouseDown = this.onLongMouseDown
+
 			this.onTouchDown = this.startLinking
 			this.onTouchMove = this.linking
 			this.onTouchUp = this.endLinking
+			this.onMereTouchTap = (e: ScreenEvent) => { }
+			this.onDoubleTouchTap = (e: ScreenEvent) => { }
+			this.onLongTouchDown = (e: ScreenEvent) => { }
+
+			this.onPenDown = this.startLinking
+			this.onPenMove = this.linking
+			this.onPenUp = this.endLinking
+			this.onMerePenTap = (e: ScreenEvent) => { }
+			this.onDoublePenTap = (e: ScreenEvent) => { }
+			this.onLongPenDown = (e: ScreenEvent) => { }
+
+			this.onMouseDown = this.startLinking
+			this.onMouseMove = this.linking
+			this.onMouseUp = this.endLinking
+			this.onMereMouseClick = (e: ScreenEvent) => { }
+			this.onDoubleMouseClick = (e: ScreenEvent) => { }
+			this.onLongMouseDown = (e: ScreenEvent) => { }
 			this.showLinksOfContent()
 		} else if (!this.editingLinkName) {
-			this.onPointerDown = this.savedOnPointerDown
 			this.onTouchDown = this.savedOnTouchDown
-			this.onPenDown = this.savedOnPenDown
-			this.onMouseDown = this.savedOnMouseDown
-			this.onPointerMove = this.savedOnPointerMove
 			this.onTouchMove = this.savedOnTouchMove
-			this.onPenMove = this.savedOnPenMove
-			this.onMouseMove = this.savedOnMouseMove
-			this.onPointerUp = this.savedOnPointerUp
 			this.onTouchUp = this.savedOnTouchUp
+			this.onTouchTap = this.savedOnTouchTap
+			this.onMereTouchTap = this.savedOnMereTouchTap
+			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
+			this.onLongTouchDown = this.savedOnLongTouchDown
+
+			this.onPenDown = this.savedOnPenDown
+			this.onPenMove = this.savedOnPenMove
 			this.onPenUp = this.savedOnPenUp
+			this.onPenTap = this.savedOnPenTap
+			this.onMerePenTap = this.savedOnMerePenTap
+			this.onDoublePenTap = this.savedOnDoublePenTap
+			this.onLongPenDown = this.savedOnLongPenDown
+
+			this.onMouseDown = this.savedOnMouseDown
+			this.onMouseMove = this.savedOnMouseMove
 			this.onMouseUp = this.savedOnMouseUp
-			this.savedOnPointerDown = (e: ScreenEvent) => { }
+			this.onMouseClick = this.savedOnMouseClick
+			this.onMereMouseClick = this.savedOnMereMouseClick
+			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
+			this.onLongMouseDown = this.savedOnLongMouseDown
+
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnPointerUp = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
+			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
+			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
+			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
+
+			this.savedOnPenDown = (e: ScreenEvent) => { }
+			this.savedOnPenMove = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnMerePenTap = (e: ScreenEvent) => { }
+			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
+			this.savedOnLongPenDown = (e: ScreenEvent) => { }
+
+			this.savedOnMouseMove = (e: ScreenEvent) => { }
+			this.savedOnMouseDown = (e: ScreenEvent) => { }
 			this.savedOnMouseUp = (e: ScreenEvent) => { }
+			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
+			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
+			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
 			this.hideLinksOfContent()
 		}
 	}

@@ -9,6 +9,7 @@ export const DRAW_BORDERS: boolean = false
 
 export const MAX_TAP_DELAY: number = 250
 export const MERE_TAP_DELAY: number = 250
+export const LONG_PRESS_DURATION: number = 1000
 
 export const TAU = 2 * Math.PI
 export const PI = TAU / 2
