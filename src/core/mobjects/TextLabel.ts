@@ -32,11 +32,6 @@ export class TextLabel extends Mobject {
 		this.view.style.fontSize = `${this.fontSize}px`
 	}
 
-	// update(args: object = {}, redraw: boolean = false) {
-	// 	super.update(args, false)
-	// 	if (redraw) { this.redraw() }
-	// }
-
 	redraw() {
 		super.redraw()
 		//// internal dependencies

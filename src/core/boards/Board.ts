@@ -445,9 +445,43 @@ The content children can also be dragged and panned.
 		}
 	}
 
+	onTouchDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onPenDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onMouseDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onTouchMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onPenMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onMouseMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onTouchUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onPenUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onMouseUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
 	onPointerDown(e: ScreenEvent) {
-		log("pointer down")
-		//log(screenEventDeviceAsString(e))
 		if (this.contracted) { return }
 		this.startCreating(e)
 	}
@@ -463,7 +497,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		log("pointer move")
 		if (this.contracted) { return }
 		if (this.creationStroke.length == 0) { return }
 		this.creating(e)
@@ -479,7 +512,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		log("pointer up")
 		if (this.contracted) { return }
 		this.endCreating(e)
 	}
@@ -524,7 +556,9 @@ The content children can also be dragged and panned.
 	endPanning(e: ScreenEvent) { }
 
 	setPanning(flag: boolean) {
+
 		if (flag) {
+
 			this.savedOnTouchDown = this.onTouchDown
 			this.savedOnTouchMove = this.onTouchMove
 			this.savedOnTouchUp = this.onTouchUp
@@ -552,6 +586,7 @@ The content children can also be dragged and panned.
 			this.onTouchDown = this.startPanning
 			this.onTouchMove = this.panning
 			this.onTouchUp = this.endPanning
+			this.onTouchTap = (e: ScreenEvent) => { }
 			this.onMereTouchTap = (e: ScreenEvent) => { }
 			this.onDoubleTouchTap = (e: ScreenEvent) => { }
 			this.onLongTouchDown = (e: ScreenEvent) => { }
@@ -559,6 +594,7 @@ The content children can also be dragged and panned.
 			this.onPenDown = this.startPanning
 			this.onPenMove = this.panning
 			this.onPenUp = this.endPanning
+			this.onPenTap = (e: ScreenEvent) => { }
 			this.onMerePenTap = (e: ScreenEvent) => { }
 			this.onDoublePenTap = (e: ScreenEvent) => { }
 			this.onLongPenDown = (e: ScreenEvent) => { }
@@ -566,10 +602,13 @@ The content children can also be dragged and panned.
 			this.onMouseDown = this.startPanning
 			this.onMouseMove = this.panning
 			this.onMouseUp = this.endPanning
+			this.onMouseClick = (e: ScreenEvent) => { }
 			this.onMereMouseClick = (e: ScreenEvent) => { }
 			this.onDoubleMouseClick = (e: ScreenEvent) => { }
 			this.onLongMouseDown = (e: ScreenEvent) => { }
+
 		} else {
+
 			this.onTouchDown = this.savedOnTouchDown
 			this.onTouchMove = this.savedOnTouchMove
 			this.onTouchUp = this.savedOnTouchUp
@@ -597,6 +636,7 @@ The content children can also be dragged and panned.
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
+			this.savedOnTouchTap = (e: ScreenEvent) => { }
 			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
 			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
 			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
@@ -604,6 +644,7 @@ The content children can also be dragged and panned.
 			this.savedOnPenDown = (e: ScreenEvent) => { }
 			this.savedOnPenMove = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnPenTap = (e: ScreenEvent) => { }
 			this.savedOnMerePenTap = (e: ScreenEvent) => { }
 			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
 			this.savedOnLongPenDown = (e: ScreenEvent) => { }
@@ -611,35 +652,18 @@ The content children can also be dragged and panned.
 			this.savedOnMouseMove = (e: ScreenEvent) => { }
 			this.savedOnMouseDown = (e: ScreenEvent) => { }
 			this.savedOnMouseUp = (e: ScreenEvent) => { }
+			this.savedOnMouseClick = (e: ScreenEvent) => { }
 			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
 			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
 			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
+
 		}
+
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = null
 			mob.enableShadow()
 		}
 	}
-
-	// onTap(e: ScreenEvent) { log("tap") }
-	// onMereTap(e: ScreenEvent) { log("mere tap") }
-	// onDoubleTap(e: ScreenEvent) { log("double tap") }
-
-	// onTouchTap(e: ScreenEvent) { log("touch tap") }
-	// onMereTouchTap(e: ScreenEvent) { log("mere touch tap") }
-	// onDoubleTouchTap(e: ScreenEvent) { log("double touch tap") }
-	// onLongTouchPress(e: ScreenEvent) { log("long touch press") }
-
-	// onPenTap(e: ScreenEvent) { log("pen tap") }
-	// onMerePenTap(e: ScreenEvent) { log("mere pen tap") }
-	// onDoublePenTap(e: ScreenEvent) { log("double pen tap") }
-	// onLongPenPress(e: ScreenEvent) { log("long pen press") }
-
-	// onMouseClick(e: ScreenEvent) { log("mouse click") }
-	// onMereMouseClick(e: ScreenEvent) { log("mere mouse click") }
-	// onDoubleMouseClick(e: ScreenEvent) { log("double mouse click") }
-	// onLongMousePress(e: ScreenEvent) { log("long mouse press") }
-
 
 
 	//////////////////////////////////////////////////////////
@@ -698,7 +722,11 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
+
 		if (flag) {
+
+			this.showLinksOfContent()
+
 			this.savedOnTouchDown = this.onTouchDown
 			this.savedOnTouchMove = this.onTouchMove
 			this.savedOnTouchUp = this.onTouchUp
@@ -726,6 +754,7 @@ The content children can also be dragged and panned.
 			this.onTouchDown = this.startLinking
 			this.onTouchMove = this.linking
 			this.onTouchUp = this.endLinking
+			this.onTouchTap = (e: ScreenEvent) => { }
 			this.onMereTouchTap = (e: ScreenEvent) => { }
 			this.onDoubleTouchTap = (e: ScreenEvent) => { }
 			this.onLongTouchDown = (e: ScreenEvent) => { }
@@ -733,6 +762,7 @@ The content children can also be dragged and panned.
 			this.onPenDown = this.startLinking
 			this.onPenMove = this.linking
 			this.onPenUp = this.endLinking
+			this.onPenTap = (e: ScreenEvent) => { }
 			this.onMerePenTap = (e: ScreenEvent) => { }
 			this.onDoublePenTap = (e: ScreenEvent) => { }
 			this.onLongPenDown = (e: ScreenEvent) => { }
@@ -740,11 +770,15 @@ The content children can also be dragged and panned.
 			this.onMouseDown = this.startLinking
 			this.onMouseMove = this.linking
 			this.onMouseUp = this.endLinking
+			this.onMouseClick = (e: ScreenEvent) => { }
 			this.onMereMouseClick = (e: ScreenEvent) => { }
 			this.onDoubleMouseClick = (e: ScreenEvent) => { }
 			this.onLongMouseDown = (e: ScreenEvent) => { }
-			this.showLinksOfContent()
+
 		} else if (!this.editingLinkName) {
+
+			this.hideLinksOfContent()
+
 			this.onTouchDown = this.savedOnTouchDown
 			this.onTouchMove = this.savedOnTouchMove
 			this.onTouchUp = this.savedOnTouchUp
@@ -772,6 +806,7 @@ The content children can also be dragged and panned.
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
+			this.savedOnTouchTap = (e: ScreenEvent) => { }
 			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
 			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
 			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
@@ -779,17 +814,18 @@ The content children can also be dragged and panned.
 			this.savedOnPenDown = (e: ScreenEvent) => { }
 			this.savedOnPenMove = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnPenTap = (e: ScreenEvent) => { }
 			this.savedOnMerePenTap = (e: ScreenEvent) => { }
 			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
 			this.savedOnLongPenDown = (e: ScreenEvent) => { }
 
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
 			this.savedOnMouseDown = (e: ScreenEvent) => { }
+			this.savedOnMouseMove = (e: ScreenEvent) => { }
 			this.savedOnMouseUp = (e: ScreenEvent) => { }
+			this.savedOnMouseClick = (e: ScreenEvent) => { }
 			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
 			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
 			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
-			this.hideLinksOfContent()
 		}
 	}
 

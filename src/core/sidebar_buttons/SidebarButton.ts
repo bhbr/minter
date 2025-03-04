@@ -7,6 +7,7 @@ import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from './button_geome
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Paper } from 'core/Paper'
 import { eventVertex, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
+import { log } from 'core/functions/logging'
 
 var paper: Paper = null
 
@@ -129,16 +130,70 @@ export class SidebarButton extends Circle {
 		this.updateLabel()
 	}
 	
+
+	onTouchDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onPenDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onMouseDown(e: ScreenEvent) {
+		this.onPointerDown(e)
+	}
+
+	onTouchMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onPenMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onMouseMove(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onTouchUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onPenUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onMouseUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+
 	onPointerDown(e: ScreenEvent) {
-		e.preventDefault()
-		e.stopPropagation()
 		this.commonButtonDown()
 		this.touchStart = eventVertex(e)
 	}
+	
+	onPointerMove(e: ScreenEvent) {
+	
+		let t: MouseEvent | Touch = null
+		if (e instanceof MouseEvent) { t = e }
+		else { t = e.changedTouches[0] }
+
+		let p: vertex = eventVertex(e)
+		var dx: number = p[0] - this.touchStart[0]
+
+		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
+		newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1)
+		dx += this.previousIndex * this.optionSpacing
+		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
+
+		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
+		
+		this.updateModeIndex(newIndex, true)
+		this.update({ midpoint: newMidpoint })
+	}
 
 	onPointerUp(e: ScreenEvent) {
-		e.preventDefault()
-		e.stopPropagation()
 		this.commonButtonUp()
 	}
 	
@@ -235,29 +290,7 @@ export class SidebarButton extends Circle {
 		this.updateModeIndex(this.currentModeIndex - 1, true)
 	}
 	
-	onPointerMove(e: ScreenEvent) {
-		if (e != null) {
-			e.preventDefault()
-			e.stopPropagation()
-		}
 	
-		let t: MouseEvent | Touch = null
-		if (e instanceof MouseEvent) { t = e }
-		else { t = e.changedTouches[0] }
-	
-		let p: vertex = eventVertex(e)
-		var dx: number = p[0] - this.touchStart[0]
-
-		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
-		newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1)
-		dx += this.previousIndex * this.optionSpacing
-		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
-
-		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
-		
-		this.updateModeIndex(newIndex, true)
-		this.update({ midpoint: newMidpoint })
-	}
 	
 }
 

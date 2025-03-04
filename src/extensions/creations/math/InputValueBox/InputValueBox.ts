@@ -44,6 +44,19 @@ export class InputValueBox extends Linkable {
 			button.activeKeyboard = false
 		}
 	}
+	
+	onTouchUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onPenUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
+	onMouseUp(e: ScreenEvent) {
+		this.onPointerUp(e)
+	}
+
 
 	setup() {
 		super.setup()

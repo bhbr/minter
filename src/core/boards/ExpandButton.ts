@@ -49,6 +49,18 @@ export class ExpandButton extends Circle {
 		this.parent.toggleViewState()
 	}
 
+	onTouchTap(e: ScreenEvent) {
+		this.onTap(e)
+	}
+
+	onPenTap(e: ScreenEvent) {
+		this.onTap(e)
+	}
+
+	onMouseClick(e: ScreenEvent) {
+		this.onTap(e)
+	}
+
 	setup() {
 		super.setup()
 		this.add(this.label)
