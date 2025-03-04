@@ -3,7 +3,7 @@ import { remove } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { copy, deepCopy } from 'core/functions/copying'
 import { getPaper } from 'core/functions/getters'
-import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, ScreenEvent, screenEventType, ScreenEventType, screenEventTypeAsString, screenEventDeviceAsString, isTouchDevice } from './screen_events'
+import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, ScreenEvent, screenEventType, ScreenEventType, screenEventTypeAsString, screenEventDeviceAsString, screenEventDescription, isTouchDevice } from './screen_events'
 import { vertex, vertexArray, isVertex, isVertexArray, vertexOrigin, vertexInterpolate, vertexArrayInterpolate, vertexCloseTo, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
@@ -100,6 +100,8 @@ and logic for drawing and user interaction.
 			savedScreenEventHandler: null,
 			eventTarget: null,
 			screenEventHistory: [],
+			screenEventDevice: null,
+			eventStartTime: 0,
 
 			// animation
 			animationStartArgs: {},
@@ -791,9 +793,11 @@ and logic for drawing and user interaction.
 	screenEventHandler: ScreenEventHandler
 	savedScreenEventHandler?: ScreenEventHandler
 	dragAnchorStart?: vertex
+	screenEventDevice?: ScreenEventDevice
 
 	screenEventHistory: Array<ScreenEvent>
 	timeoutID?: number
+	eventStartTime: number
 
 	/*
 	The following empty methods need to be declared here
@@ -808,21 +812,32 @@ and logic for drawing and user interaction.
 	onDoubleTap(e: ScreenEvent) { }
 	onLongPress(e: ScreenEvent) { }
 
-	onTouchDown(e: ScreenEvent) { }
-	onTouchMove(e: ScreenEvent) { }
-	onTouchUp(e: ScreenEvent) { }
+	onTouchDown(e: ScreenEvent) { log("touch down") }
+	onTouchMove(e: ScreenEvent) { log("touch move") }
+	onTouchUp(e: ScreenEvent) { log("touch up") }
 	onTouchTap(e: ScreenEvent) { }
 	onMereTouchTap(e: ScreenEvent) { }
 	onDoubleTouchTap(e: ScreenEvent) { }
 	onLongTouchPress(e: ScreenEvent) { }
 
-	onPenDown(e: ScreenEvent) { }
-	onPenMove(e: ScreenEvent) { }
-	onPenUp(e: ScreenEvent) { }
+	onPenDown(e: ScreenEvent) { log("pen down") }
+	onPenMove(e: ScreenEvent) { log("pen move") }
+	onPenUp(e: ScreenEvent) { log("pen up") }
 	onPenTap(e: ScreenEvent) { }
 	onMerePenTap(e: ScreenEvent) { }
 	onDoublePenTap(e: ScreenEvent) { }
 	onLongPenPress(e: ScreenEvent) { }
+
+	onMouseDown(e: ScreenEvent) {
+		log("mouse down")
+		//log(screenEventDeviceAsString(e))
+	}
+	onMouseMove(e: ScreenEvent) { log("mouse move") }
+	onMouseUp(e: ScreenEvent) { log("mouse up") }
+	onMouseClick(e: ScreenEvent) { }
+	onMereMouseClick(e: ScreenEvent) { }
+	onDoubleMouseClick(e: ScreenEvent) { }
+	onLongMousePress(e: ScreenEvent) { }
 
 	/*
 	Backup versions for temporarily disabling
@@ -850,6 +865,14 @@ and logic for drawing and user interaction.
 	savedOnMerePenTap(e: ScreenEvent) { }
 	savedOnDoublePenTap(e: ScreenEvent) { }
 	savedOnLongPenPress(e: ScreenEvent) { }
+
+	savedOnMouseDown(e: ScreenEvent) { }
+	savedOnMouseMove(e: ScreenEvent) { }
+	savedOnMouseUp(e: ScreenEvent) { }
+	savedOnMouseClick(e: ScreenEvent) { }
+	savedOnMereMouseClick(e: ScreenEvent) { }
+	savedOnDoubleMouseClick(e: ScreenEvent) { }
+	savedOnLongMousePress(e: ScreenEvent) { }
 
 
 	/*
@@ -976,6 +999,11 @@ and logic for drawing and user interaction.
 
 	capturedOnPointerDown(e: ScreenEvent) {
 
+		if (this.eventStartTime == 0) {
+			this.eventStartTime = e.timeStamp
+		}
+
+		//log("============================= captured pointer down =============================")
 		// step 1
 		let target = this.eventTargetMobject(e)
 		this.eventTarget = target
@@ -984,112 +1012,250 @@ and logic for drawing and user interaction.
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		//this.screenEventDevice = screenEventDevice(e)
 
-		console.log('captured pointer down')
-		console.log('previously:')
-		for (let ee of this.screenEventHistory) {
-			console.log(screenEventDeviceAsString(ee), screenEventTypeAsString(ee), ee.constructor.name, ee.timeStamp)
-		}
-		console.log('new:', screenEventDeviceAsString(e), screenEventTypeAsString(e), e.constructor.name, e.timeStamp)
+		//log(screenEventDescription(e, this.eventStartTime))
 		
-		// step 3
-		if (target.isDuplicate(e)) { return }
-		target.registerScreenEvent(e)
-		
-		// step 4
-		target.onPointerDown(e)
+		// // step 3
+		// let isNew = this.registerScreenEvent(e)
+		// if (!isNew) {
+		// 	return
+		// }
+		// // step 4
+		// target.onPointerDown(e)
 
-		if (screenEventDevice(e) == ScreenEventDevice.Finger) {
-			target.onTouchDown(e)
-		} else if (screenEventDevice(e) == ScreenEventDevice.Pen) {
-			target.onPenDown(e)
-		}
+		// switch (this.screenEventDevice) {
+		// case ScreenEventDevice.Finger:
+		// 	target.onTouchDown(e)
+		// 	break
+		// case ScreenEventDevice.Pen:
+		// 	target.onPenDown(e)
+		// 	break
+		// case ScreenEventDevice.Mouse:
+		// 	target.onMouseDown(e)
+		// 	break
+		// default:
+		// 	throw `Unknown pointer device ${screenEventDeviceAsString(e)}`
+		// }
+
+		this.decideEventAction(e)
 		
 		// step 5
-		target.timeoutID = window.setTimeout(
+		this.timeoutID = window.setTimeout(
 			function() {
 				target.onLongPress(e)
 				this.resetTimeout()
-			}.bind(this), 1000, e)
+			}.bind(this), 1000, e
+		)
 	}
 
 	capturedOnPointerMove(e: ScreenEvent) {
 
 		// step 1
 		let target = this.eventTarget
-		if (target == null) { return }
+		if (target == null || target.screenEventDevice == null) { return }
 		
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
-		
-		// step 3
-		if (target.isDuplicate(e)) { return }
-		target.registerScreenEvent(e)
+
+		// step 3 is skipped
 		
 		// step 4
-		target.onPointerMove(e)
+		//target.onPointerMove(e)
 
-		if (screenEventDevice(e) == ScreenEventDevice.Finger) {
+		switch (this.screenEventDevice) {
+		case ScreenEventDevice.Finger:
 			target.onTouchMove(e)
-		} else if (screenEventDevice(e) == ScreenEventDevice.Pen) {
+			break
+		case ScreenEventDevice.Pen:
 			target.onPenMove(e)
+			break
+		case ScreenEventDevice.Mouse:
+			target.onMouseMove(e)
+			break
+		default:
+			throw `Unknown pointer device ${target.screenEventDevice}`
 		}
 	
 		// step 5
-		target.resetTimeout()
+		this.resetTimeout()
 	}
 
 	capturedOnPointerUp(e: ScreenEvent) {
-
+		//log("============================== captured pointer up ==============================")
 		// step 1
 		let target = this.eventTarget
-		if (target == null) { return }
-		
+		//log('A')
+		if (target == null || target.screenEventDevice == null) { return }
+		//log('B')	
 		// step 2
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
+		//log('C')
 		e.stopPropagation()
+		//log('D')
+
+		//log(screenEventDescription(e, this.eventStartTime))
 		
-		console.log('captured pointer up')
-		console.log('previously:')
-		for (let ee of this.screenEventHistory) {
-			console.log(screenEventDeviceAsString(ee), screenEventTypeAsString(ee), ee.constructor.name, ee.timeStamp)
-		}
-		console.log('new:', screenEventDeviceAsString(e), screenEventTypeAsString(e), e.constructor.name, e.timeStamp)
 		
 
-		// step 3
-		if (target.isDuplicate(e)) {
-			console.log('found a duplicate', this.screenEventHistory, e)
-			return
-		}
-		target.registerScreenEvent(e)
+		// // step 3
+		// let isNew = this.registerScreenEvent(e)
+
+		// if (!this.justRegisteredTap) {
+		// 	this.justRegisteredTap = true
+		// 	log('TAP')
+		// 	window.setTimeout(function() {
+		// 		this.justRegisteredTap = false
+		// 		log('TAP UNDONE')
+		// 	}.bind(this), 500)
+		// }
+
+
+		// //log('E')
+		// if (!isNew) {
+		// 	return
+		// }
+		// //log('F')
+		// // step 4
+		// target.onPointerUp(e)
+		// //log('G')
+		// if (this.tapDetected()) { target.onTap(e) }
+		// if (this.mereTapDetected()) { target.onMereTap(e) }
+		// if (this.doubleTapDetected()) { target.onDoubleTap(e) }
+
+		// switch (this.screenEventDevice) {
+		// case ScreenEventDevice.Finger:
+		// 	target.onTouchUp(e)
+		// 	if (this.touchTapDetected()) { target.onTouchTap(e) }
+		// 	if (this.mereTouchTapDetected()) { target.onMereTouchTap(e) }
+		// 	if (this.doubleTouchTapDetected()) { target.onDoubleTouchTap(e) }
+		// 	break
+		// case ScreenEventDevice.Pen:
+		// 	target.onPenUp(e)
+		// 	if (this.penTapDetected()) { target.onPenTap(e) }
+		// 	if (this.merePenTapDetected()) { target.onMerePenTap(e) }
+		// 	if (this.doublePenTapDetected()) { target.onDoublePenTap(e) }
+		// 	break
+		// case ScreenEventDevice.Mouse:
+		// 	target.onMouseUp(e)
+		// 	if (this.mouseClickDetected()) { target.onMouseClick(e) }
+		// 	if (this.mereMouseClickDetected()) { target.onMereMouseClick(e) }
+		// 	if (this.doubleMouseClickDetected()) { target.onDoubleMouseClick(e) }
+		// 	break
+		// default:
+		// 	throw `Unknown pointer device ${this.screenEventDevice}`
+		// }
+
+		this.decideEventAction(e)
 		
-		// step 4
-		target.onPointerUp(e)
-		if (target.tapDetected()) { target.onTap(e) }
-		if (target.mereTapDetected()) { target.onMereTap(e) }
-		if (target.doubleTapDetected()) { target.onDoubleTap(e) }
-
-
-		if (screenEventDevice(e) == ScreenEventDevice.Finger) {
-			target.onTouchUp(e)
-			if (target.touchTapDetected()) { target.onTouchTap(e) }
-			if (target.mereTouchTapDetected()) { target.onMereTouchTap(e) }
-			if (target.doubleTouchTapDetected()) { target.onDoubleTouchTap(e) }
-		} else if (screenEventDevice(e) == ScreenEventDevice.Pen) {
-			target.onPenUp(e)
-			if (target.penTapDetected()) { target.onPenTap(e) }
-			if (target.merePenTapDetected()) { target.onMerePenTap(e) }
-			if (target.doublePenTapDetected()) { target.onDoublePenTap(e) }
-		}
-
 		// step 5
-		target.resetTimeout()
-		window.setTimeout(target.clearScreenEventHistory.bind(target), 500)
-		this.eventTarget = null
+		this.resetTimeout()
+		window.setTimeout(
+			function() {
+				this.clearScreenEventHistory()
+				this.eventTarget = null
+				//this.screenEventDevice = null
+			}
+			.bind(this), 1000
+		)
+
 	}
 
+	decideEventAction(e: ScreenEvent) {
+		let device = screenEventDevice(e)
+		let type = screenEventType(e)
+
+		//log(`DECIDING For ${e.constructor.name} ${screenEventDeviceAsString(e)} ${screenEventTypeAsString(e)}`)
+
+		if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
+		//	log('case 1')
+			this.eventTarget.onPenDown(e)
+		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
+			this.screenEventDevice = ScreenEventDevice.Pen
+		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
+		//	log('case 2')
+			this.eventTarget.onPenUp(e)
+			this.resetPointer()
+		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
+		//	log('case 3')
+			// ignore
+		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
+		//	log('case 4')
+			this.eventTarget.onTouchDown(e)
+		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
+			this.screenEventDevice = ScreenEventDevice.Finger
+		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
+		//	log('case 5')
+			this.eventTarget.onTouchUp(e)
+			this.resetPointer()
+		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
+		//	log('case 6')
+			// ignore
+		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Down) {
+			if (this.screenEventDevice == ScreenEventDevice.Finger) {
+		//		log('case 7a')
+				// ignore
+			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
+		//		log('case 7b')
+				// ignore
+			} else {
+		//		log('case 7c')
+				this.eventTarget.onMouseDown(e)
+		//		log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Mouse`)
+				this.screenEventDevice = ScreenEventDevice.Mouse
+			}
+		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
+			if (this.screenEventDevice == ScreenEventDevice.Finger) {
+				if (isTouchDevice) {
+		//			log('case 8a1')
+					this.eventTarget.onTouchUp(e)
+					this.resetPointer()
+				} else {
+		//			log('case 8a2')
+					// ignore
+				}
+			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
+				if (isTouchDevice) {
+		//			log('case 8b1')
+					this.eventTarget.onPenUp(e)
+					this.resetPointer()
+				} else {
+		//			log('case 8b2')
+					// ignore
+				}
+			} else {
+		//		log('case 8c')
+				this.eventTarget.onMouseUp(e)
+				this.resetPointer()
+			}
+		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
+			// ignore
+		//	log('case 9')
+		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
+		//	log('case 10')
+			this.eventTarget.onTouchDown(e)
+		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Finger`)
+			this.screenEventDevice = ScreenEventDevice.Finger
+		//	log('using finger')
+		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
+		//	log('case 11')
+			this.eventTarget.onPenDown(e)
+		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to Pen`)
+			this.screenEventDevice = ScreenEventDevice.Pen
+		//	log('using pen')
+		} else {
+		//	log('case 12')
+			// ignore
+		}
+	}
+
+	resetPointer() {
+		window.setTimeout(function() {
+		//	log(`switching from ${ScreenEventDevice[this.screenEventDevice]} to null`)
+			this.screenEventDevice = null
+		}.bind(this), 500)
+	}
 
 	// Local coordinates for use in custom event methods
 
@@ -1108,109 +1274,191 @@ and logic for drawing and user interaction.
 
 	// Looking for duplicate events
 
-	registerScreenEvent(e: ScreenEvent) {
-		if (this.isDuplicate(e)) { return }
-		this.screenEventHistory.push(e)
-	}
+	// registerScreenEvent(e: ScreenEvent): boolean {
+	// 	//log('reg1')
+	// 	if (this.isDuplicate(e)) {
+	// 		//log('reg2')
+	// 		return false
+	// 	}
+	// 	//log('reg3')
+	// 	log('pushing')
+	// 	this.screenEventHistory.push(e)
+	// 	return true
+	// }
 
-	isDuplicate(e: ScreenEvent): boolean {
-	/*
-	Duplicates can occur e. g. on an iPad where the same action
-	triggers a TouchEvent and a MouseEvent. Here we are just looking at
-	the screenEvent's type (down, move, up or cancel) and ignore
-	the device to determine duplicates.
-	*/
-		let minIndex = Math.max(0, this.screenEventHistory.length - 5)
-		for (var i = minIndex; i < this.screenEventHistory.length; i++) {
-			let e2 = this.screenEventHistory[i]
-			if (vertexCloseTo(eventVertex(e), eventVertex(e2), 2)) {
-				// too close
-				if (screenEventType(e) == screenEventType(e2)
-					&& screenEventType(e) != ScreenEventType.Move
-					&& e.timeStamp - e2.timeStamp < 100) {
-					return true
-				}
-			} else if (!vertexCloseTo(eventVertex(e), eventVertex(e2), 200)) {
-				// too far, this can't be either
-				// (TODO: multiple touches)
-				return true
-			}
-		}
-		return false
-	}
+	// isDuplicate(e: ScreenEvent): boolean {
+	// /*
+	// Duplicates can occur e. g. on an iPad where the same action
+	// triggers a TouchEvent and a MouseEvent. Here we are just looking at
+	// the screenEvent's type (down, move, up or cancel) and ignore
+	// the device to determine duplicates.
+	// */
+	// 	//log('dup1')
+	// 	log(`>>> looking for duplicates of ${screenEventDeviceAsString(e)}, ${screenEventTypeAsString(e)}, ${e.timeStamp}, ${eventVertex(e)}`)
+	// 	if (this.justRegisteredTap) {
+	// 		log('>>>>>>>>> duplicate because we just registered a tap')
+	// 		return true
+	// 	}
+	// 	let minIndex = Math.max(0, this.screenEventHistory.length - 5)
+	// 	for (var i = minIndex; i < this.screenEventHistory.length; i++) {
+	// 		let e2 = this.screenEventHistory[i]
+	// 		let deviceIsMouse = (screenEventDevice(e) == ScreenEventDevice.Mouse)
+	// 		let areCloseInSpace = vertexCloseTo(eventVertex(e), eventVertex(e2), 2)
+	// 		let areCloseInTime = (e.timeStamp - e2.timeStamp < 100)
+	// 		let areFarApart = !vertexCloseTo(eventVertex(e), eventVertex(e2), 200)
+	// 		let sameType = (screenEventType(e) == screenEventType(e2))
+	// 		let specialCase = (screenEventDevice(e2) == ScreenEventDevice.Pen && screenEventType(e2) == ScreenEventType.Down && screenEventDevice(e) == ScreenEventDevice.Mouse && screenEventType(e) == ScreenEventType.Up)
+	// 		log(`>>>>>> maybe ${screenEventDeviceAsString(e2)}, ${screenEventTypeAsString(e2)}, ${e2.timeStamp}, ${eventVertex(e2)}?`)
+
+	// 		if (!deviceIsMouse) {
+	// 			log('not a mouse')
+	// 			continue
+	// 		}
+
+	// 		if (!areCloseInSpace) {
+	// 			log('not close in space')
+	// 			continue
+	// 		}
+
+	// 		if (!areCloseInTime) {
+	// 			log('not close in time')
+	// 			continue
+	// 		}
+
+	// 		if (areFarApart) {
+	// 			log('>>>>>>>>> duplicate because too far apart')
+	// 			return true
+	// 		}
+
+	// 		if (sameType) {
+	// 			log('>>>>>>>>> duplicate because same type')
+	// 			return true
+	// 		}
+
+	// 		// if (specialCase) {
+	// 		// 	log('>>>>>>>>> duplicate because special case')
+	// 		// 	return true
+	// 		// }
+	// 		log('no')
+
+	// 	}
+	// 	log('>>>>>>>>> new event because nothing matches')
+	// 	//log('dup2')
+	// 	return false
+	// }
 
 
 	// Gesture recognizers
 
 	isTap(e1: ScreenEvent, e2: ScreenEvent, dt: number = 500): boolean {
 	// Do these two events together form a tap gesture?
-		return (screenEventType(e1) == ScreenEventType.Down
-			&& screenEventType(e2) == ScreenEventType.Up
-			&& Math.abs(e2.timeStamp - e1.timeStamp) < 500)
+		let flag1 = (screenEventType(e1) == ScreenEventType.Down)
+		let flag2 = (screenEventType(e2) == ScreenEventType.Up)
+		let flag3 = (Math.abs(e2.timeStamp - e1.timeStamp) < 500)
+		//log(`is tap? ${screenEventTypeAsString(e1)} ${screenEventTypeAsString(e2)} ${flag3}`)
+		return flag1 && flag2 && flag3
 	}
 
 	isTouchTap(e1: ScreenEvent, e2: ScreenEvent, dt: number = 500): boolean {
-		return this.isTap(e1, e2)
-			&& screenEventDevice(e1) == ScreenEventDevice.Finger
-			&& screenEventDevice(e2) == ScreenEventDevice.Finger
+		let flag1 = this.isTap(e1, e2)
+		let flag2 = (this.screenEventDevice == ScreenEventDevice.Finger)
+		return flag1 && flag2
 	}
 
 	isPenTap(e1: ScreenEvent, e2: ScreenEvent, dt: number = 500): boolean {
-		return this.isTap(e1, e2)
-			&& screenEventDevice(e1) == ScreenEventDevice.Pen
-			&& screenEventDevice(e2) == ScreenEventDevice.Pen
+		let flag1 = this.isTap(e1, e2)
+		let flag2 = (this.screenEventDevice == ScreenEventDevice.Pen)
+		return flag1 && flag2
+	}
+
+	isMouseClick(e1: ScreenEvent, e2: ScreenEvent, dt: number = 500): boolean {
+		let flag1 = this.isTap(e1, e2)
+		let flag2 = (this.screenEventDevice == ScreenEventDevice.Mouse)
+		return flag1 && flag2
 	}
 
 	tapDetected(): boolean {
 	// Have we just witnessed a tap?
-		if (this.screenEventHistory.length < 2) { return false }
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 2) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		return this.isTap(e1, e2)
 	}
 
 	touchTapDetected(): boolean {
-		if (this.screenEventHistory.length < 2) { return false }
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 2) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		return this.isTouchTap(e1, e2)
 	}
 
 	penTapDetected(): boolean {
-		if (this.screenEventHistory.length < 2) { return false }
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 2) { return false }
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 2]
 		let e2 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		return this.isPenTap(e1, e2)
 	}
 
+	mouseClickDetected(): boolean {
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 2) { return false }
+		let e1 = this.screenEventHistory[this.screenEventHistory.length - 2]
+		let e2 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		return this.isMouseClick(e1, e2)
+	}
+
 	doubleTapDetected(): boolean {
 	// Do these fours events together form a double tap gesture?
-		if (this.screenEventHistory.length < 4) { return false }
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 4]
-		let e2 = this.screenEventHistory[this.screenEventHistory.length - 3]
-		let e3 = this.screenEventHistory[this.screenEventHistory.length - 2]
-		let e4 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		return this.isTap(e1, e2) && this.isTap(e3, e4) && this.isTap(e1, e4, 1000)
+		//log("double tap?")
+		//log(this.screenEventHistory.map((e) => screenEventTypeAsString(e)))
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		log(noMoveEvents.map((e) => [screenEventDeviceAsString(e), screenEventTypeAsString(e)]))
+		if (noMoveEvents.length < 4) { return false }
+		let e1 = noMoveEvents[this.screenEventHistory.length - 4]
+		let e2 = noMoveEvents[this.screenEventHistory.length - 3]
+		let e3 = noMoveEvents[this.screenEventHistory.length - 2]
+		let e4 = noMoveEvents[this.screenEventHistory.length - 1]
+		let flag1 = this.isTap(e1, e2)
+		let flag2 = this.isTap(e3, e4)
+		let flag3 = this.isTap(e1, e4, 1000)
+		//log(`${flag1} ${flag2} ${flag3}`)
+		return flag1 && flag2 && flag3
 	}
 
 	doubleTouchTapDetected(): boolean {
 	// Do these fours events together form a double tap gesture?
-		if (this.screenEventHistory.length < 4) { return false }
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 4]
-		let e2 = this.screenEventHistory[this.screenEventHistory.length - 3]
-		let e3 = this.screenEventHistory[this.screenEventHistory.length - 2]
-		let e4 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 4) { return false }
+		let e1 = noMoveEvents[this.screenEventHistory.length - 4]
+		let e2 = noMoveEvents[this.screenEventHistory.length - 3]
+		let e3 = noMoveEvents[this.screenEventHistory.length - 2]
+		let e4 = noMoveEvents[this.screenEventHistory.length - 1]
 		return this.isTouchTap(e1, e2) && this.isTouchTap(e3, e4) && this.isTouchTap(e1, e4, 1000)
 	}
 
 	doublePenTapDetected(): boolean {
 	// Do these fours events together form a double tap gesture?
-		if (this.screenEventHistory.length < 4) { return false }
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 4]
-		let e2 = this.screenEventHistory[this.screenEventHistory.length - 3]
-		let e3 = this.screenEventHistory[this.screenEventHistory.length - 2]
-		let e4 = this.screenEventHistory[this.screenEventHistory.length - 1]
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 4) { return false }
+		let e1 = noMoveEvents[this.screenEventHistory.length - 4]
+		let e2 = noMoveEvents[this.screenEventHistory.length - 3]
+		let e3 = noMoveEvents[this.screenEventHistory.length - 2]
+		let e4 = noMoveEvents[this.screenEventHistory.length - 1]
 		return this.isPenTap(e1, e2) && this.isPenTap(e3, e4) && this.isPenTap(e1, e4, 1000)
+	}
+
+	doubleMouseClickDetected(): boolean {
+	// Do these fours events together form a double tap gesture?
+		let noMoveEvents = this.screenEventHistory.filter((e) => screenEventType(e) != ScreenEventType.Move)
+		if (noMoveEvents.length < 4) { return false }
+		let e1 = noMoveEvents[this.screenEventHistory.length - 4]
+		let e2 = noMoveEvents[this.screenEventHistory.length - 3]
+		let e3 = noMoveEvents[this.screenEventHistory.length - 2]
+		let e4 = noMoveEvents[this.screenEventHistory.length - 1]
+		return this.isMouseClick(e1, e2) && this.isMouseClick(e3, e4) && this.isMouseClick(e1, e4, 1000)
 	}
 
 	mereTapDetected(): boolean {
@@ -1223,6 +1471,10 @@ and logic for drawing and user interaction.
 
 	merePenTapDetected(): boolean {
 		return this.penTapDetected() && !this.doublePenTapDetected()
+	}
+
+	mereMouseClickDetected(): boolean {
+		return this.mouseClickDetected() && !this.doubleMouseClickDetected()
 	}
 
 
@@ -1255,12 +1507,15 @@ and logic for drawing and user interaction.
 			this.savedOnPointerDown = this.onPointerDown
 			this.savedOnTouchDown = this.onTouchDown
 			this.savedOnPenDown = this.onPenDown
+			this.savedOnMouseDown = this.onMouseDown
 			this.savedOnPointerMove = this.onPointerMove
 			this.savedOnTouchMove = this.onTouchMove
 			this.savedOnPenMove = this.onPenMove
+			this.savedOnMouseMove = this.onMouseMove
 			this.savedOnPointerUp = this.onPointerUp
 			this.savedOnTouchUp = this.onTouchUp
 			this.savedOnPenUp = this.onPenUp
+			this.savedOnMouseUp = this.onMouseUp
 			this.onPointerDown = this.startDragging
 			this.onPointerMove = this.dragging
 			this.onPointerUp = this.endDragging
@@ -1275,21 +1530,27 @@ and logic for drawing and user interaction.
 			this.onPointerDown = this.savedOnPointerDown
 			this.onTouchDown = this.savedOnTouchDown
 			this.onPenDown = this.savedOnPenDown
+			this.onMouseDown = this.savedOnMouseDown
 			this.onPointerMove = this.savedOnPointerMove
 			this.onTouchMove = this.savedOnTouchMove
 			this.onPenMove = this.savedOnPenMove
+			this.onMouseMove = this.savedOnMouseMove
 			this.onPointerUp = this.savedOnPointerUp
 			this.onTouchUp = this.savedOnTouchUp
 			this.onPenUp = this.savedOnPenUp
+			this.onMouseUp = this.savedOnMouseUp
 			this.savedOnPointerDown = (e: ScreenEvent) => { }
 			this.savedOnTouchDown = (e: ScreenEvent) => { }
 			this.savedOnPenDown = (e: ScreenEvent) => { }
+			this.savedOnMouseDown = (e: ScreenEvent) => { }
 			this.savedOnPointerMove = (e: ScreenEvent) => { }
 			this.savedOnTouchMove = (e: ScreenEvent) => { }
 			this.savedOnPenMove = (e: ScreenEvent) => { }
+			this.savedOnMouseMove = (e: ScreenEvent) => { }
 			this.savedOnPointerUp = (e: ScreenEvent) => { }
 			this.savedOnTouchUp = (e: ScreenEvent) => { }
 			this.savedOnPenUp = (e: ScreenEvent) => { }
+			this.savedOnMouseUp = (e: ScreenEvent) => { }
 		}
 	}
 
@@ -1298,17 +1559,20 @@ and logic for drawing and user interaction.
 	}
 
 	startDragging(e: ScreenEvent) {
+		log('pointer down, start dragging')
 		this.dragAnchorStart = vertexSubtract(this.anchor, eventVertex(e))
 		this.disableShadow()
 	}
 
 	dragging(e: ScreenEvent) {
+		log('pointer move, dragging')
 		this.update({
 			anchor: vertexAdd(eventVertex(e), this.dragAnchorStart)
 		})
 	}
 
 	endDragging(e: ScreenEvent) {
+		log('pointer up, end dragging')
 		this.dragAnchorStart = null
 		this.enableShadow()
 	}

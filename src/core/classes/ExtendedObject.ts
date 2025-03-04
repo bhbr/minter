@@ -15,6 +15,7 @@
 
 import { remove } from 'core/functions/arrays'
 import { copy, equalObjects } from 'core/functions/copying'
+import { log } from 'core/functions/logging'
 
 
 class BaseExtendedObject {
@@ -300,7 +301,7 @@ export class ExtendedObject extends BaseExtendedObject {
 				try {
 					this[prop] = value
 				} catch {
-					console.log(this, prop, value)
+					log(`${this}, ${prop}, ${value}`)
 					throw `Attempt to assign to readonly property`
 				}
 			}

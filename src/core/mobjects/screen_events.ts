@@ -2,7 +2,6 @@
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 
-(window as any).emulatePen = false
 export const isTouchDevice: boolean = (document.body.className == 'ipad')
 
 /*
@@ -22,6 +21,8 @@ export type ScreenEvent = MouseEvent | TouchEvent
 // this includes PointerEvent (subclass of MouseEvent)
 export enum ScreenEventDevice { Mouse, Finger, Pen, Unknown }
 export enum ScreenEventType { Down, Move, Up, Cancel, Unknown }
+(window as any).emulatedDevice = ScreenEventDevice.Mouse
+
 
 export enum ScreenEventHandler {
 	Auto, // don't interfere with event capturing
@@ -84,16 +85,16 @@ export function screenEventDevice(e: ScreenEvent): ScreenEventDevice {
 			return ScreenEventDevice.Unknown
 		}
 	} else {
-		if ((window as any).emulatePen) {
-			return ScreenEventDevice.Pen
-		} else {
-			return ScreenEventDevice.Finger
-		}
+		return (window as any).emulatedDevice
 	}
 }
 
 export function screenEventDeviceAsString(e: ScreenEvent): string {
 	return ScreenEventDevice[screenEventDevice(e)]
+}
+
+export function screenEventDescription(e: ScreenEvent, startTime: number = 0): String {
+	return `${e.constructor.name} ${screenEventDeviceAsString(e)} ${screenEventTypeAsString(e)} ${e.timeStamp - startTime} (${eventVertex(e)})`
 }
 
 /*

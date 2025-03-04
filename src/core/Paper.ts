@@ -113,7 +113,9 @@ export class Paper extends Board {
 		if(!availableKeys.includes(e.key)) { return }
 		this.pressedKeys.push(e.key)
 		if (e.key == 'Shift') {
-			(window as any).emulatePen = true
+			(window as any).emulatedDevice = ScreenEventDevice.Pen
+		} else if (e.key == 'Alt') {
+			(window as any).emulatedDevice = ScreenEventDevice.Finger
 		} else {
 			this.messageSidebar({'buttonDown': e.key})
 		}
@@ -124,8 +126,8 @@ export class Paper extends Board {
 		e.preventDefault()
 		e.stopPropagation()
 		remove(this.pressedKeys, e.key)
-		if (e.key == 'Shift') {
-			(window as any).emulatePen = false
+		if (e.key == 'Shift' || e.key == 'Alt') {
+			(window as any).emulatedDevice = ScreenEventDevice.Mouse
 		} else {
 			this.messageSidebar({'buttonUp': e.key})
 		}

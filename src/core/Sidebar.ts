@@ -116,7 +116,6 @@ export class Sidebar extends Mobject {
 	}
 
 	initialize(names: Array<string>) {
-		log('initialize')
 		this.clear()
 		for (let i = 0; i < names.length; i++) {
 			let button = this.createButton(names[i])
