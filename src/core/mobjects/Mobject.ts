@@ -10,7 +10,7 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
 import { Paper } from 'core/Paper'
-import { DRAW_BORDERS, MAX_TAP_DELAY } from 'core/constants'
+import { DRAW_BORDERS, MAX_TAP_DELAY, MERE_TAP_DELAY } from 'core/constants'
 
 /*
 For debugging; draw the border of the mobject's view
@@ -816,27 +816,24 @@ and logic for drawing and user interaction.
 	onTouchMove(e: ScreenEvent) { }
 	onTouchUp(e: ScreenEvent) { log("touch up") }
 	onTouchTap(e: ScreenEvent) { log("touch tap") }
-	onMereTouchTap(e: ScreenEvent) { }
-	onDoubleTouchTap(e: ScreenEvent) { }
+	onMereTouchTap(e: ScreenEvent) { log("mere touch tap") }
+	onDoubleTouchTap(e: ScreenEvent) { log("double touch tap") }
 	onLongTouchPress(e: ScreenEvent) { }
 
 	onPenDown(e: ScreenEvent) { log("pen down") }
 	onPenMove(e: ScreenEvent) { }
 	onPenUp(e: ScreenEvent) { log("pen up") }
-	onPenTap(e: ScreenEvent) { }
-	onMerePenTap(e: ScreenEvent) { }
-	onDoublePenTap(e: ScreenEvent) { }
+	onPenTap(e: ScreenEvent) { log("pen tap") }
+	onMerePenTap(e: ScreenEvent) { log("mere pen tap") }
+	onDoublePenTap(e: ScreenEvent) { log("double pen tap")}
 	onLongPenPress(e: ScreenEvent) { }
 
-	onMouseDown(e: ScreenEvent) {
-		log("mouse down")
-		//log(screenEventDeviceAsString(e))
-	}
+	onMouseDown(e: ScreenEvent) { log("mouse down") }
 	onMouseMove(e: ScreenEvent) { }
 	onMouseUp(e: ScreenEvent) { log("mouse up") }
 	onMouseClick(e: ScreenEvent) { log("mouse click") }
-	onMereMouseClick(e: ScreenEvent) { }
-	onDoubleMouseClick(e: ScreenEvent) { }
+	onMereMouseClick(e: ScreenEvent) { log("mere mouse click") }
+	onDoubleMouseClick(e: ScreenEvent) { log("double mouse click") }
 	onLongMousePress(e: ScreenEvent) { }
 
 	/*
@@ -1277,6 +1274,11 @@ and logic for drawing and user interaction.
 		//log(screenEventDescription(e))
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
 			this.onTouchTap(e)
+			window.setTimeout(function() {
+				if (this.screenEventHistory.length == 2) {
+					this.onMereTouchTap(e)
+				}
+			}.bind(this), MERE_TAP_DELAY)
 			if (this.screenEventHistory.length == 3) {
 				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
 				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
@@ -1294,6 +1296,11 @@ and logic for drawing and user interaction.
 		//log(screenEventDescription(e))
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
 			this.onPenTap(e)
+			window.setTimeout(function() {
+				if (this.screenEventHistory.length == 2) {
+					this.onMerePenTap(e)
+				}
+			}.bind(this), MERE_TAP_DELAY)
 			if (this.screenEventHistory.length == 3) {
 				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
 				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
@@ -1311,6 +1318,11 @@ and logic for drawing and user interaction.
 		//log(screenEventDescription(e))
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
 			this.onMouseClick(e)
+			window.setTimeout(function() {
+				if (this.screenEventHistory.length == 2) {
+					this.onMereMouseClick(e)
+				}
+			}.bind(this), MERE_TAP_DELAY)
 			if (this.screenEventHistory.length == 3) {
 				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
 				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
