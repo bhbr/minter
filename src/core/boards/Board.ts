@@ -445,42 +445,6 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	onTouchDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onPenDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onMouseDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onTouchMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onPenMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onMouseMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onTouchUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onPenUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onMouseUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
 	onPointerDown(e: ScreenEvent) {
 		if (this.contracted) { return }
 		this.startCreating(e)

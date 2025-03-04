@@ -27,42 +27,5 @@ export class FreePoint extends ConPoint {
 	onPointerUp(e: ScreenEvent) {
 		this.endDragging(e)
 	}
-	
-	onTouchDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onPenDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onMouseDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onTouchMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onPenMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onMouseMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onTouchUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onPenUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onMouseUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
 
 }

@@ -61,17 +61,6 @@ export class ColorChangeButton extends SidebarButton {
 		this.remove(this.label)
 	}
 
-	onTouchMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onPenMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onMouseMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
 }
 
 

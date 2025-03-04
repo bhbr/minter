@@ -141,32 +141,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.update({ value: newValue})
 	}
 
-
-	onTouchDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onPenDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onMouseDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onTouchMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onPenMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onMouseMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-
 }
 
 

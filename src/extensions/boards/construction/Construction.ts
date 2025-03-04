@@ -233,18 +233,7 @@ export class Construction extends Board {
 			this.startCreating(e)
 		}
 	}
-
-	onTouchDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onPenDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onMouseDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
+	
 }
 
 

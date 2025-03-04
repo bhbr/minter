@@ -801,27 +801,35 @@ and logic for drawing and user interaction.
 	so we can manipulate and override them later.
 	*/
 
-	onTouchDown(e: ScreenEvent) { }
-	onTouchMove(e: ScreenEvent) { }
-	onTouchUp(e: ScreenEvent) { }
-	onTouchTap(e: ScreenEvent) { }
-	onMereTouchTap(e: ScreenEvent) { }
-	onDoubleTouchTap(e: ScreenEvent) { }
-	onLongTouchDown(e: ScreenEvent) { }
-	onPenDown(e: ScreenEvent) { }
-	onPenMove(e: ScreenEvent) { }
-	onPenUp(e: ScreenEvent) { }
-	onPenTap(e: ScreenEvent) { }
-	onMerePenTap(e: ScreenEvent) { }
-	onDoublePenTap(e: ScreenEvent) { }
-	onLongPenDown(e: ScreenEvent) { }
-	onMouseDown(e: ScreenEvent) { }
-	onMouseMove(e: ScreenEvent) { }
-	onMouseUp(e: ScreenEvent) { }
-	onMouseClick(e: ScreenEvent) { }
-	onMereMouseClick(e: ScreenEvent) { }
-	onDoubleMouseClick(e: ScreenEvent) { }
-	onLongMouseDown(e: ScreenEvent) { }
+	onPointerDown(e: ScreenEvent) { }
+	onPointerMove(e: ScreenEvent) { }
+	onPointerUp(e: ScreenEvent) { }
+	onTap(e: ScreenEvent) { }
+	onMereTap(e: ScreenEvent) { }
+	onDoubleTap(e: ScreenEvent) { }
+	onLongPress(e: ScreenEvent) { }
+
+	onTouchDown(e: ScreenEvent) { this.onPointerDown(e) }
+	onTouchMove(e: ScreenEvent) { this.onPointerMove(e) }
+	onTouchUp(e: ScreenEvent) { this.onPointerUp(e) }
+	onTouchTap(e: ScreenEvent) { this.onTap(e) }
+	onMereTouchTap(e: ScreenEvent) { this.onMereTap(e) }
+	onDoubleTouchTap(e: ScreenEvent) { this.onDoubleTap(e) }
+	onLongTouchDown(e: ScreenEvent) { this.onLongPress(e) }
+	onPenDown(e: ScreenEvent) { this.onPointerDown(e) }
+	onPenMove(e: ScreenEvent) { this.onPointerMove(e) }
+	onPenUp(e: ScreenEvent) { this.onPointerUp(e) }
+	onPenTap(e: ScreenEvent) { this.onTap(e) }
+	onMerePenTap(e: ScreenEvent) { this.onMereTap(e) }
+	onDoublePenTap(e: ScreenEvent) { this.onDoubleTap(e) }
+	onLongPenDown(e: ScreenEvent) { this.onLongPress(e) }
+	onMouseDown(e: ScreenEvent) { this.onPointerDown(e) }
+	onMouseMove(e: ScreenEvent) { this.onPointerMove(e) }
+	onMouseUp(e: ScreenEvent) { this.onPointerUp(e) }
+	onMouseClick(e: ScreenEvent) { this.onTap(e) }
+	onMereMouseClick(e: ScreenEvent) { this.onMereTap(e) }
+	onDoubleMouseClick(e: ScreenEvent) { this.onDoubleTap(e) }
+	onLongMouseDown(e: ScreenEvent) { this.onLongPress(e) }
 
 	/*
 	Backup versions for temporarily disabling

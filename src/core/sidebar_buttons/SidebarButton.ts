@@ -129,50 +129,12 @@ export class SidebarButton extends Circle {
 		})
 		this.updateLabel()
 	}
-	
-
-	onTouchDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onPenDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onMouseDown(e: ScreenEvent) {
-		this.onPointerDown(e)
-	}
-
-	onTouchMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onPenMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onMouseMove(e: ScreenEvent) {
-		this.onPointerMove(e)
-	}
-
-	onTouchUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onPenUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onMouseUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
 
 	onPointerDown(e: ScreenEvent) {
 		this.commonButtonDown()
 		this.touchStart = eventVertex(e)
 	}
-	
+
 	onPointerMove(e: ScreenEvent) {
 	
 		let t: MouseEvent | Touch = null

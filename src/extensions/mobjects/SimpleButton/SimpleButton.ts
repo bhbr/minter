@@ -23,19 +23,6 @@ export class SimpleButton extends TextLabel {
 	onPointerUp(e: ScreenEvent) {
 		this.action()
 	}
-	
-	onTouchUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onPenUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
-	onMouseUp(e: ScreenEvent) {
-		this.onPointerUp(e)
-	}
-
 
 }
 
