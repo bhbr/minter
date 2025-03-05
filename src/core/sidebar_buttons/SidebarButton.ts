@@ -158,6 +158,10 @@ export class SidebarButton extends Circle {
 	onPointerUp(e: ScreenEvent) {
 		this.commonButtonUp()
 	}
+
+	onPointerCancel(e: ScreenEvent) {
+		this.commonButtonUp()
+	}
 	
 	buttonUpByKey(key) {
 		if (!this.activeKeyboard) { return }

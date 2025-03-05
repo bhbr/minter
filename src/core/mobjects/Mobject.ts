@@ -3,7 +3,7 @@ import { remove } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { copy, deepCopy } from 'core/functions/copying'
 import { getPaper } from 'core/functions/getters'
-import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, ScreenEvent, screenEventType, ScreenEventType, screenEventTypeAsString, screenEventDeviceAsString, screenEventDescription, isTouchDevice } from './screen_events'
+import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, addPointerCancel, removePointerCancel, ScreenEvent, screenEventType, ScreenEventType, screenEventTypeAsString, screenEventDeviceAsString, screenEventDescription, isTouchDevice } from './screen_events'
 import { vertex, vertexArray, isVertex, isVertexArray, vertexOrigin, vertexInterpolate, vertexArrayInterpolate, vertexCloseTo, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
@@ -132,6 +132,7 @@ and logic for drawing and user interaction.
 		addPointerDown(this.view, this.capturedOnPointerDown.bind(this))
 		addPointerMove(this.view, this.capturedOnPointerMove.bind(this))
 		addPointerUp(this.view, this.capturedOnPointerUp.bind(this))
+		addPointerCancel(this.view, this.capturedOnPointerCancel.bind(this))
 	}
 
 
@@ -815,10 +816,7 @@ and logic for drawing and user interaction.
 
 	onTouchDown(e: ScreenEvent) { this.onPointerDown(e) }
 	onTouchMove(e: ScreenEvent) { this.onPointerMove(e) }
-	onTouchUp(e: ScreenEvent) {
-		log('on touch up')
-		this.onPointerUp(e)
-	}
+	onTouchUp(e: ScreenEvent) { this.onPointerUp(e) }
 	onTouchTap(e: ScreenEvent) { this.onTap(e) }
 	onMereTouchTap(e: ScreenEvent) { this.onMereTap(e) }
 	onDoubleTouchTap(e: ScreenEvent) { this.onDoubleTap(e) }
@@ -837,6 +835,11 @@ and logic for drawing and user interaction.
 	onMereMouseClick(e: ScreenEvent) { this.onMereTap(e) }
 	onDoubleMouseClick(e: ScreenEvent) { this.onDoubleTap(e) }
 	onLongMouseDown(e: ScreenEvent) { this.onLongPress(e) }
+
+	onPointerCancel(e: ScreenEvent) {
+		log(this.eventTarget)
+		log("cancel")
+	}
 
 	/*
 	Backup versions for temporarily disabling
@@ -1018,8 +1021,6 @@ and logic for drawing and user interaction.
 		default:
 			throw `Unknown pointer device ${target.screenEventDevice}`
 		}
-
-		//this.resetTimeout()
 	}
 
 	capturedOnPointerUp(e: ScreenEvent) {
@@ -1033,6 +1034,17 @@ and logic for drawing and user interaction.
 		if (this.deleteHistoryTimeoutID != null) { return }
 		this.deleteHistoryTimeoutID = window.setTimeout(this.deleteScreenEventHistory.bind(this), 1000
 		)
+	}
+
+	capturedOnPointerCancel(e: ScreenEvent) {
+		
+		let target = this.eventTarget
+		if (target == null || this.screenEventDevice == null) { return }
+		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
+		e.stopPropagation()
+
+		target.onPointerCancel(e)
+		this.deleteScreenEventHistory()
 	}
 
 	decideEventAction(e: ScreenEvent) {
