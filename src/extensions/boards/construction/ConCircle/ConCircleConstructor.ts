@@ -4,6 +4,7 @@ import { ConCircle } from './ConCircle'
 import { Constructor } from '../Constructor'
 import { FreePoint } from '../FreePoint'
 import { Construction } from '../Construction'
+import { log } from 'core/functions/logging'
 
 export class ConCircleConstructor extends Constructor {
 

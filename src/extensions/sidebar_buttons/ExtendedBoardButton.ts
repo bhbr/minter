@@ -5,7 +5,7 @@ export class ExtendedBoardButton extends CreativeButton {
 
 	ownDefaults(): object {
 		return {
-			creations: ['board', 'cons']
+			creations: ['board', 'geo']
 		}
 	}
 

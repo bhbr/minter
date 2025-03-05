@@ -24,6 +24,7 @@ import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, 
 import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
+import { log } from 'core/functions/logging'
 
 export type ConMobject = ConStrait | ConCircle
 
@@ -72,12 +73,7 @@ export class Construction extends Board {
 	}
 
 	addPoint(p: ConPoint): boolean {
-		// for (let q of this.points) {
-		// 	if (this.snapped(p.midpoint, q.midpoint)) {
-		// 		return false
-		// 	}
-		// }
-		this.add(p)
+		this.addToContent(p)
 		this.points.push(p)
 		return true
 	}
@@ -136,7 +132,7 @@ export class Construction extends Board {
 		}
 		this.creationStroke.push(v)
 		this.creator = this.createCreator(this.creationMode) as Constructor
-		this.add(this.creator)
+		this.addToContent(this.creator)
 	}
 
 	creating(e: ScreenEvent) {
@@ -192,7 +188,7 @@ export class Construction extends Board {
 		} else {
 			return
 		}
-		this.add(cm)
+		this.addToContent(cm)
 		this.intersectWithRest(cm)
 		this.constructedMobjects.push(cm)
 		p1.update({ strokeColor: mob.penStrokeColor, fillColor: mob.penFillColor })

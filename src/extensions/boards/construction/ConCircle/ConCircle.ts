@@ -1,6 +1,6 @@
 
 import { Circle } from 'core/shapes/Circle'
-import { vertex, vertexOrigin } from 'core/functions/vertex'
+import { vertex, vertexOrigin, vertexSubtract, vertexNorm } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 
 export class ConCircle extends Circle {
@@ -28,7 +28,7 @@ on its circumference. The radius (and anchor) is updated automatically.
 	update(args: object = {}, redraw: boolean = true) {
 		let p = args['midpoint'] || this.midpoint
 		let q = args['outerPoint'] || this.outerPoint
-		let r = p.subtract(q).norm()
+		let r = vertexNorm(vertexSubtract(p, q))
 		args['radius'] = r
 		super.update(args, redraw)
 	}
