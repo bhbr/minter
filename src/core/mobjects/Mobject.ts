@@ -793,7 +793,11 @@ and logic for drawing and user interaction.
 	screenEventDevice?: ScreenEventDevice
 
 	screenEventHistory: Array<ScreenEvent>
-	timeoutID?: number
+	resetPointerTimeoutID?: number
+	deleteHistoryTimeoutID?: number
+	longPressTimeoutID?: number
+	mereTapTimeoutID?: number
+
 	eventStartTime: number
 
 	/*
@@ -811,7 +815,10 @@ and logic for drawing and user interaction.
 
 	onTouchDown(e: ScreenEvent) { this.onPointerDown(e) }
 	onTouchMove(e: ScreenEvent) { this.onPointerMove(e) }
-	onTouchUp(e: ScreenEvent) { this.onPointerUp(e) }
+	onTouchUp(e: ScreenEvent) {
+		log('on touch up')
+		this.onPointerUp(e)
+	}
 	onTouchTap(e: ScreenEvent) { this.onTap(e) }
 	onMereTouchTap(e: ScreenEvent) { this.onMereTap(e) }
 	onDoubleTouchTap(e: ScreenEvent) { this.onDoubleTap(e) }
@@ -985,6 +992,8 @@ and logic for drawing and user interaction.
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
 
+		this.clearResetPointer()
+		this.clearDeleteHistoryTimeout()
 		this.decideEventAction(e)
 		
 	}
@@ -992,7 +1001,8 @@ and logic for drawing and user interaction.
 	capturedOnPointerMove(e: ScreenEvent) {
 
 		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null || target.screenEventHandler == ScreenEventHandler.Auto) { return }
+		if (target == null || this.screenEventDevice == null) { return }
+		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
 
 		switch (this.screenEventDevice) {
@@ -1009,7 +1019,7 @@ and logic for drawing and user interaction.
 			throw `Unknown pointer device ${target.screenEventDevice}`
 		}
 
-		this.resetTimeout()
+		//this.resetTimeout()
 	}
 
 	capturedOnPointerUp(e: ScreenEvent) {
@@ -1020,16 +1030,9 @@ and logic for drawing and user interaction.
 		e.stopPropagation()
 
 		this.decideEventAction(e)
-		
-		this.resetTimeout()
-		window.setTimeout(
-			function() {
-				this.clearScreenEventHistory()
-				this.eventTarget = null
-			}
-			.bind(this), 1000
+		if (this.deleteHistoryTimeoutID != null) { return }
+		this.deleteHistoryTimeoutID = window.setTimeout(this.deleteScreenEventHistory.bind(this), 1000
 		)
-
 	}
 
 	decideEventAction(e: ScreenEvent) {
@@ -1081,7 +1084,7 @@ and logic for drawing and user interaction.
 					//log('case 8a1')
 					this.eventTarget.rawOnTouchUp(e)
 					this.eventTarget.registerScreenEvent(e)
-					this.resetPointer()
+					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 				} else {
 					//log('case 8a2')
 					// ignore
@@ -1091,7 +1094,7 @@ and logic for drawing and user interaction.
 					//log('case 8b1')
 					this.eventTarget.rawOnPenUp(e)
 					this.eventTarget.registerScreenEvent(e)
-					this.resetPointer()
+					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 				} else {
 					//log('case 8b2')
 					// ignore
@@ -1100,7 +1103,7 @@ and logic for drawing and user interaction.
 				//log('case 8c')
 				this.eventTarget.rawOnMouseUp(e)
 				this.eventTarget.registerScreenEvent(e)
-				this.resetPointer()
+				this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 			}
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
 			// ignore
@@ -1122,9 +1125,13 @@ and logic for drawing and user interaction.
 	}
 
 	resetPointer() {
-		window.setTimeout(function() {
-			this.screenEventDevice = null
-		}.bind(this), 250)
+		this.screenEventDevice = null
+		this.resetPointerTimeoutID = null
+	}
+
+	clearResetPointer() {
+		window.clearTimeout(this.resetPointerTimeoutID)
+		this.resetPointerTimeoutID = null
 	}
 
 	registerScreenEvent(e: ScreenEvent) {
@@ -1132,16 +1139,17 @@ and logic for drawing and user interaction.
 	}
 
 	rawOnTouchDown(e: ScreenEvent) {
-		this.timeoutID = window.setTimeout(this.onLongTouchDown.bind(this), LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongTouchDown.bind(this), LONG_PRESS_DURATION)
 		this.onTouchDown(e)
 	}
 
 	rawOnTouchUp(e: ScreenEvent) {
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
-			this.resetTimeout()
+			this.clearMereTapTimeout()
 			this.onTouchTap(e)
-			window.setTimeout(function() {
+			this.mereTapTimeoutID = window.setTimeout(function() {
+				this.mereTapTimeoutID = null
 				if (this.screenEventHistory.length == 2) {
 					this.onMereTouchTap(e)
 				}
@@ -1158,7 +1166,7 @@ and logic for drawing and user interaction.
 	}
 
 	rawOnPenDown(e: ScreenEvent) {
-		this.timeoutID = window.setTimeout(this.onLongPenDown.bind(this), LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongPenDown.bind(this), LONG_PRESS_DURATION)
 		this.onPenDown(e)
 	}
 
@@ -1166,7 +1174,8 @@ and logic for drawing and user interaction.
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
 			this.onPenTap(e)
-			window.setTimeout(function() {
+			this.mereTapTimeoutID = window.setTimeout(function() {
+				this.mereTapTimeoutID = null
 				if (this.screenEventHistory.length == 2) {
 					this.onMerePenTap(e)
 				}
@@ -1183,7 +1192,7 @@ and logic for drawing and user interaction.
 	}
 
 	rawOnMouseDown(e: ScreenEvent) {
-		this.timeoutID = window.setTimeout(this.onLongMouseDown.bind(this), LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongMouseDown.bind(this), LONG_PRESS_DURATION)
 		this.onMouseDown(e)
 	}
 
@@ -1191,7 +1200,8 @@ and logic for drawing and user interaction.
 		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
 		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
 			this.onMouseClick(e)
-			window.setTimeout(function() {
+			this.mereTapTimeoutID = window.setTimeout(function() {
+				this.mereTapTimeoutID = null
 				if (this.screenEventHistory.length == 2) {
 					this.onMereMouseClick(e)
 				}
@@ -1224,14 +1234,23 @@ and logic for drawing and user interaction.
 
 	// Cleanup methods
 
-	clearScreenEventHistory() {
+	deleteScreenEventHistory() {
 		this.screenEventHistory = []
+		this.eventTarget = null
+		this.deleteHistoryTimeoutID = null
 	}
 
-	resetTimeout() {
-		if (this.timeoutID) {
-			clearTimeout(this.timeoutID)
-			this.timeoutID = null
+	clearDeleteHistoryTimeout() {
+		if (this.deleteHistoryTimeoutID) {
+			clearTimeout(this.deleteHistoryTimeoutID)
+			this.deleteHistoryTimeoutID = null
+		}
+	}
+
+	clearMereTapTimeout() {
+		if (this.mereTapTimeoutID) {
+			window.clearInterval(this.mereTapTimeoutID)
+			this.mereTapTimeoutID = null
 		}
 	}
 
