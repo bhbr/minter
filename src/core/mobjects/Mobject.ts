@@ -836,10 +836,7 @@ and logic for drawing and user interaction.
 	onDoubleMouseClick(e: ScreenEvent) { this.onDoubleTap(e) }
 	onLongMouseDown(e: ScreenEvent) { this.onLongPress(e) }
 
-	onPointerCancel(e: ScreenEvent) {
-		log(this.eventTarget)
-		log("cancel")
-	}
+	onPointerCancel(e: ScreenEvent) { }
 
 	/*
 	Backup versions for temporarily disabling
