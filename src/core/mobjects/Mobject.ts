@@ -1026,6 +1026,7 @@ and logic for drawing and user interaction.
 		if (target == null || this.screenEventDevice == null) { return }
 		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		e.preventDefault()
 
 		this.decideEventAction(e)
 		if (this.deleteHistoryTimeoutID != null) { return }
