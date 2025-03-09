@@ -20,4 +20,11 @@ export class BoardCreator extends SpanningCreator {
 		return cm
 	}
 
+	dissolve() {
+		let w = this.getWidth()
+		let h = this.getHeight()
+		if (w < 25 || h < 25) { return }
+		super.dissolve()
+	}
+
 }

@@ -56,11 +56,13 @@ export class SpanningCreator extends Creator {
 	}
 
 	dissolve() {
+		let w = this.getWidth()
+		let h = this.getHeight()
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.topLeftVertex(),
-			width: this.getWidth(),
-			height: this.getHeight()
+			width: w,
+			height: h
 		})
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
