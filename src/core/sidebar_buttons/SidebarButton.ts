@@ -14,7 +14,7 @@ var paper: Paper = null
 if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper_id')
 	if (paperView !== null) {
-		paper = paperView['mobject'] as Paper
+		paper = paperView['view']['mobject'] as Paper
 	}
 }
 
