@@ -12,7 +12,7 @@ import { Dependency } from './Dependency'
 import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
 import { Frame } from './Frame'
 import { View } from './View'
-
+import { Motor } from './Motor'
 
 export class Mobject extends ExtendedObject {
 
@@ -67,14 +67,7 @@ and logic for drawing and user interaction.
 			children: [], // i. e. submobjects
 			// The meaning of these properties is explained in the sections further below.
 
-			// position
-			/*
-			Note: anchor is a property of transform
-			and exposed to the mobject itself
-			with a getter/setter.
-			*/
-
-			// view
+			motor: new Motor(),
 
 			// hierarchy
 			_parent: null,
@@ -106,6 +99,8 @@ and logic for drawing and user interaction.
 	setup() {
 		this.view.mobject = this
 		this.view.setup()
+		this.motor.mobject = this
+		this.motor.setup()
 
 		addPointerDown(this.view.div, this.capturedOnPointerDown.bind(this))
 		addPointerMove(this.view.div, this.capturedOnPointerMove.bind(this))
@@ -181,6 +176,8 @@ and logic for drawing and user interaction.
 	get drawShadow(): boolean { return this.view.drawShadow }
 	set drawShadow(newValue: boolean) { this.view.drawShadow = newValue }
 
+	hideShadow() { this.view.hideShadow() }
+	showShadow() { this.view.showShadow() }
 
 	showDependents() {
 		for (let depmob of this.allDependents()) {
@@ -200,117 +197,11 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-
-	/*
-	Animation is 'home-grown' (not via CSS).
-	Any numerical property (number, Color, Vertex,
-	number array, vertexArray, Transform) can be animated.
-	For this, we create animationStopArgs (the given
-	animation arguments), and animationStartArgs
-	(the dict of corresponding current values).
-	Then, at regular intervals, we compute
-	a convex combination of each property
-	and update this mobject with those.
-	*/
-
-	animationTimeStart: number
-	animationDuration: number
-	animationInterval: number
-
-	animationStartArgs: object
-	animationStopArgs: object
-
-	static isAnimatable(args: object): boolean {
-		for (let [key, value] of Object.entries(args)) {
-			if ((typeof value ==  'number') 
-				|| isVertex(value)
-				|| isVertexArray(value)
-				|| value instanceof Transform
-				|| value instanceof Color)
-				{ continue }
-			else {
-				console.error(`Property ${key} on ${this.constructor.name} is not animatable`)
-				return false
-			}
-		}
-		return true
-	}
+	motor: Motor
 
 	animate(args: object = {}, seconds: number) {
-	// Calling this method launches an animation
-		if (!Mobject.isAnimatable(args)) {
-			return
-		}
-
-		for (let key of Object.keys(args)) {
-			this.animationStartArgs[key] = copy(this[key])
-		}
-		this.animationStopArgs = args
-
-		// all times in ms bc that is what setInterval and setTimeout expect
-		let dt = 10
-		this.animationTimeStart = Date.now()
-		this.animationDuration = seconds * 1000
-		this.view.disableShadow()
-
-		this.animationInterval = window.setInterval(
-			function() {
-				this.updateAnimation(Object.keys(args))
-			}
-			.bind(this), dt)
-		// this.animationInterval is a reference number
-		// that we need to remember to stop the animation
-		window.setTimeout(
-			this.cleanupAfterAnimation
-		.bind(this), this.animationDuration)
+		this.motor.animate(args, seconds)
 	}
-
-	updateAnimation(keys: Array<string>) {
-	// This method gets called at regular intervals during the animation
-		let weight = (Date.now() - this.animationTimeStart) / this.animationDuration
-		let newArgs = this.interpolatedAnimationArgs(keys, weight)
-		this.update(newArgs, true)
-	}
-
-	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {
-	/*
-	Compute a convex combination between the start and stop values
-	of each key. The custom types (all except number) all have
-	their own interpolation method.
-	*/
-		let returnValues: object = {}
-		for (let key of keys) {
-			let startValue: any = this.animationStartArgs[key]
-			let stopValue: any = this.animationStopArgs[key]
-			if (typeof startValue ==  'number') {
-				returnValues[key] = (1 - weight) * startValue + weight * stopValue
-			} else if (isVertex(startValue)) {
-				returnValues[key] = vertexInterpolate(startValue, stopValue as vertex, weight)
-			} else if (isVertexArray(startValue)) {
-				returnValues[key] = vertexArrayInterpolate(startValue, stopValue as vertexArray, weight)
-			} else if (startValue instanceof Transform) {
-				returnValues[key] = startValue.interpolate(stopValue as Transform, weight)
-			} else if (startValue instanceof Color) {
-				returnValues[key] = startValue.interpolate(stopValue as Color, weight)
-			}
-		}
-		return returnValues
-	}
-
-	cleanupAfterAnimation() {
-	// This method gets called at the end of the animation
-		window.clearInterval(this.animationInterval)
-		this.animationInterval = null
-		this.animationStartArgs = {}
-		this.animationStopArgs = {}
-		this.view.enableShadow()
-	}
-
-
-
-
-
-
 
 
 	//////////////////////////////////////////////////////////
@@ -740,7 +631,6 @@ and logic for drawing and user interaction.
 			t = t.parentElement
 			targetDivChain.push(t)
 		}
-		console.log(targetDivChain)
 		return targetDivChain.reverse()
 	}
 
@@ -1157,10 +1047,11 @@ and logic for drawing and user interaction.
 
 	startDragging(e: ScreenEvent) {
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
-		this.view.disableShadow()
+		this.hideShadow()
 	}
 
 	dragging(e: ScreenEvent) {
+		if (this.dragAnchorStart == null) { return }
 		this.update({
 			anchor: vertexAdd(eventVertex(e), this.dragAnchorStart)
 		})
@@ -1168,7 +1059,7 @@ and logic for drawing and user interaction.
 
 	endDragging(e: ScreenEvent) {
 		this.dragAnchorStart = null
-		this.view.enableShadow()
+		this.showShadow()
 	}
 
 }
