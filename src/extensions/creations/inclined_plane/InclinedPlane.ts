@@ -1,27 +1,26 @@
 
 import { Polygon } from 'core/vmobjects/Polygon'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexCopyFrom, vertexTranslatedBy } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 
 export class InclinedPlane extends Polygon {
 	
 	length: number
 	inclination: number
-	midpoint: Vertex
+	midpoint: vertex
 
 	ownDefaults(): object {
 		return {
 			length: undefined,
-			midpoint: Vertex.origin(),
+			midpoint: [0, 0],
 			inclination: 0,
 			fillColor: Color.white(),
 			fillOpacity: 0.5,
-			vertices: new VertexArray([
-				Vertex.origin(),
-				Vertex.origin(),
-				Vertex.origin()
-			])
+			vertices: [
+				[0, 0],
+				[0, 0],
+				[0, 0]
+			]
 		}
 	}
 
@@ -43,10 +42,10 @@ export class InclinedPlane extends Polygon {
 		super.update(args, false)
 		let w = this.getWidth()
 		let h = this.getHeight()
-		this.vertices[0].copyFrom(this.midpoint.translatedBy(-w/2, h/2))
-		this.vertices[1].copyFrom(this.midpoint.translatedBy(w/2, h/2))
-		this.vertices[2].copyFrom(this.midpoint.translatedBy(w/2, -h/2))
-		if (redraw) { this.redraw() }
+		vertexCopyFrom(this.vertices[0], vertexTranslatedBy(this.midpoint, [-w/2, h/2]))
+		vertexCopyFrom(this.vertices[1], vertexTranslatedBy(this.midpoint, [w/2, h/2]))
+		vertexCopyFrom(this.vertices[2], vertexTranslatedBy(this.midpoint, [w/2, -h/2]))
+		if (redraw) { this.view.redraw() }
 	}
 
 }

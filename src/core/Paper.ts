@@ -6,12 +6,14 @@ import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
 import { PAPER_WIDTH, PAGE_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
 import { StartPaper } from 'startPaper'
 
 export class Paper extends Board {
 
+	declare view: PaperView
 	currentColor: Color
 	expandedMobject: Board
 	pressedKeys: Array<string>
@@ -19,15 +21,15 @@ export class Paper extends Board {
 
 	ownDefaults(): object {
 		return {
-			view: document.querySelector('#paper_id') as HTMLDivElement,
+			view: new PaperView(),
 			expandedPadding: 0,
 			expanded: true,
 			screenEventHandler: ScreenEventHandler.Self,
 			expandedMobject: this,
 			pressedKeys: [],
 			activeKeyboard: true,
-			viewWidth: PAPER_WIDTH,
-			viewHeight: PAGE_HEIGHT,
+			frameWidth: PAPER_WIDTH,
+			frameHeight: PAGE_HEIGHT,
 			currentColor: Color.white(),
 			drawShadow: false
 		}
@@ -41,12 +43,12 @@ export class Paper extends Board {
 			drawShadow: 'never'
 		}
 	}
-
+	
 	setup() {
 		super.setup()
 		this.expandedMobject = this
-		this.expandButton.hide()
-		this.expandedInputList.hide()
+		this.expandButton.view.hide()
+		this.expandedInputList.view.hide()
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
@@ -56,13 +58,13 @@ export class Paper extends Board {
 			strokeColor: Color.clear(),
 			strokeWidth: 0.0
 		})
-		this.background.disableShadow()
+		this.background.view.disableShadow()
 
 		let width = window.innerWidth - (isTouchDevice ? 0 : SIDEBAR_WIDTH)
 		let height = window.innerHeight
 		this.update({
-			viewWidth: width,
-			viewHeight: height 
+			frameWidth: width,
+			frameHeight: height 
 		})
 		this.background.update({
 			width: width,

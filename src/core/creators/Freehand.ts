@@ -17,8 +17,7 @@ export class Freehand extends Creator {
 		return {
 			screenEventHandler: ScreenEventHandler.Below,
 			line: new PolygonalLine({
-				closed: false,
-				opacity: 1.0
+				closed: false
 			}),
 			penStrokeColor: Color.white(),
 			penStrokeWidth: 1.0,
@@ -45,21 +44,21 @@ export class Freehand extends Creator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		if (redraw) {
-			this.line.redraw()
-			this.redraw()
+			this.line.view.redraw()
+			this.view.redraw()
 		}
 	}
 
 	dissolve() {
 		this.update({
-			viewWidth: this.line.getWidth(),
-			viewHeight: this.line.getHeight()
+			frameWidth: this.line.getWidth(),
+			frameHeight: this.line.getHeight()
 		})
 
 		let par = this.parent
 		par.creator = null
 		par.remove(this)
-		if (this.visible) {
+		if (this.view.visible) {
 			par.addToContent(this)
 		}
 	}

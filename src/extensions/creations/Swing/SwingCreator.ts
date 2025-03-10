@@ -35,7 +35,7 @@ export class SwingCreator extends Creator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		var dr: vertex = vertexSubtract(q, this.getStartPoint())
-		dr = vertexSubtract(dr, [this.viewWidth/2, this.swing.fixtureHeight])
+		dr = vertexSubtract(dr, [this.view.frame.width/2, this.swing.fixtureHeight])
 		let length: number = vertexNorm(dr)
 		let angle: number = -Math.atan2(dr[0], dr[1])
 		this.swing.update({

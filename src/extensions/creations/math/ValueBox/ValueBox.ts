@@ -17,8 +17,8 @@ export class ValueBox extends Linkable {
 				fillColor: Color.black()
 			}),
 			valueLabel: new TextLabel(),
-			viewWidth: 80,
-			viewHeight: 40,
+			frameWidth: 80,
+			frameHeight: 40,
 			inputNames: ['value'],
 			outputNames: ['value'],
 			strokeWidth: 0.0,
@@ -36,15 +36,15 @@ export class ValueBox extends Linkable {
 	setup() {
 		super.setup()
 		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height
 		})
 		this.valueLabel.update({
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height,
 			text: `${this.value}`
 		})
-		this.valueLabel.view.style.fontSize = '20px'
+		this.valueLabel.view.div.style.fontSize = '20px'
 		this.add(this.background)
 		this.add(this.valueLabel)
 	}
@@ -52,8 +52,8 @@ export class ValueBox extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height
 		}, redraw)
 
 		var labelText = `${this.value.toPrecision(3)}`
@@ -62,12 +62,12 @@ export class ValueBox extends Linkable {
 		}
 
 		this.valueLabel.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
+			width: this.view.frame.width,
+			height: this.view.frame.height,
 			text: labelText
 		}, redraw)
 
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 

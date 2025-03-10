@@ -32,9 +32,12 @@ import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSE
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
+import { VView } from 'core/vmobjects/VView'
 
 declare var paper: Paper
 declare interface Window { webkit?: any }
+
+export class BoardContent extends MGroup { }
 
 export class Board extends Linkable {
 /*
@@ -51,17 +54,17 @@ The content children can also be dragged and panned.
 	ownDefaults(): object {
 		return {
 			contentChildren: [],
-			content: new MGroup(),
+			content: new BoardContent(),
 			expandButton: new ExpandButton(),
 			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
 				cornerRadius: 25,
+				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
-				screenEventHandler: ScreenEventHandler.Parent,
 				drawShadow: true
 			}),
 			expandedPadding: 20,
@@ -135,15 +138,15 @@ The content children can also be dragged and panned.
 		super.setup()
 		
 		this.update({
-			viewWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
-			viewHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
+			frameWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
+			frameHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
 			anchor: this.expanded ? this.expandedAnchor() : vertexCopy(this.compactAnchor)
 		})
 
-		this.addDependency('viewWidth', this.background, 'width')
-		this.addDependency('viewHeight', this.background, 'height')
+		this.addDependency('frameWidth', this.background, 'width')
+		this.addDependency('frameHeight', this.background, 'height')
 
-		this.content.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+		this.content.view.div.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 		this.add(this.content)
@@ -153,32 +156,32 @@ The content children can also be dragged and panned.
 
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
+			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
 			mobject: this
 		})
 		this.add(this.expandedInputList)
 
 		this.expandedOutputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
+			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
 			mobject: this
 		})
 		this.add(this.expandedOutputList)
 
 		if (this.contracted) {
 			this.contractStateChange()
-			this.inputList.show()
-			this.outputList.show()
-			this.expandedInputList.hide()
-			this.expandedOutputList.hide()
+			this.inputList.view.show()
+			this.outputList.view.show()
+			this.expandedInputList.view.hide()
+			this.expandedOutputList.view.hide()
 		} else {
 			this.expandStateChange()
-			this.inputList.hide()
-			this.outputList.hide()
-			this.expandedInputList.show()
-			this.expandedOutputList.show()
+			this.inputList.view.hide()
+			this.outputList.view.hide()
+			this.expandedInputList.view.show()
+			this.expandedOutputList.view.show()
 		}
 		this.hideLinksOfContent()
 	}
@@ -186,18 +189,18 @@ The content children can also be dragged and panned.
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height
 		})
 		this.content.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height
 		})
-		if  (redraw) { this.redraw() }
+		if  (redraw) { this.view.redraw() }
 	}
 
 	//////////////////////////////////////////////////////////
@@ -218,11 +221,11 @@ The content children can also be dragged and panned.
 	}
 
 	expandedWidth(): number {
-		return getPaper().viewWidth - 2 * this.expandedPadding
+		return getPaper().view.frame.width - 2 * this.expandedPadding
 	}
 
 	expandedHeight(): number {
-		return getPaper().viewHeight - 2 * this.expandedPadding
+		return getPaper().view.frame.height - 2 * this.expandedPadding
 	}
 
 	getCompactWidth(): number {
@@ -266,8 +269,8 @@ The content children can also be dragged and panned.
 
 	expand() {
 		 this.animate({
-		 	viewWidth: this.expandedWidth(),
-		 	viewHeight: this.expandedHeight(),
+		 	frameWidth: this.expandedWidth(),
+		 	frameHeight: this.expandedHeight(),
 		 	anchor: this.expandedAnchor()
 		}, 0.5)
 		this.expandStateChange()
@@ -287,14 +290,14 @@ The content children can also be dragged and panned.
 		this.expandButton.label.update({
 			text: '+'
 		})
-		this.expandedInputList.hide()
-		this.expandedOutputList.hide()
+		this.expandedInputList.view.hide()
+		this.expandedOutputList.view.hide()
 
 		this.inputList.update({
-			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), -IO_LIST_OFFSET - this.inputList.viewHeight]
+			anchor: [0.5 * (this.compactWidth - this.inputList.view.frame.width), -IO_LIST_OFFSET - this.inputList.view.frame.height]
 		}, true)
 		this.outputList.update({
-			anchor: [0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET]
+			anchor: [0.5 * (this.compactWidth - this.outputList.view.frame.width), IO_LIST_OFFSET]
 		}, true)
 
 		if (this.board !== null) {
@@ -305,8 +308,8 @@ The content children can also be dragged and panned.
 
 	contract() {
 		this.animate({
-			viewWidth: this.compactWidth,
-			viewHeight: this.compactHeight,
+			frameWidth: this.compactWidth,
+			frameHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
 		this.contractStateChange()
@@ -338,12 +341,12 @@ The content children can also be dragged and panned.
 
 
 	enableShadow() {
-		this.background.enableShadow()
+		this.background.view.enableShadow()
 		this.board.update()
 	}
 
 	disableShadow() {
-		this.background.disableShadow()
+		this.background.view.disableShadow()
 		this.board.update()
 	}
 
@@ -374,7 +377,7 @@ The content children can also be dragged and panned.
 		if (this.contracted) {
 			mob.disable()
 		}
-		if (this.expandButton.visible) {
+		if (this.expandButton.view.visible) {
 			// exception: Paper
 			this.moveToTop(this.expandButton)
 		}
@@ -384,7 +387,7 @@ The content children can also be dragged and panned.
 		if (mob instanceof Board) {
 			if (mob.constructor.name == 'Construction') { return }
 			mob.background.update({
-				fillColor: this.background.fillColor.brighten(1.1)
+				fillColor: this.background.view.fillColor.brighten(1.1)
 			})
 		}
 	}
@@ -499,8 +502,8 @@ The content children can also be dragged and panned.
 	startPanning(e: ScreenEvent) {
 		this.panPointStart = this.localEventVertex(e)
 		for (let mob of this.contentChildren) {
-			mob.dragAnchorStart = vertexCopy(mob.anchor)
-			mob.disableShadow()
+			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
+			mob.view.disableShadow()
 		}
 	}
 
@@ -511,8 +514,8 @@ The content children can also be dragged and panned.
 		for (let mob of this.contentChildren) {
 			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
 			mob.update({ anchor: newAnchor })
-			mob.view.style.left = `${newAnchor[0]}px`
-			mob.view.style.top = `${newAnchor[1]}px`
+			mob.view.div.style.left = `${newAnchor[0]}px`
+			mob.view.div.style.top = `${newAnchor[1]}px`
 		}
 		this.updateLinks()
 	}
@@ -625,7 +628,7 @@ The content children can also be dragged and panned.
 
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = null
-			mob.enableShadow()
+			mob.view.enableShadow()
 		}
 	}
 
@@ -667,8 +670,8 @@ The content children can also be dragged and panned.
 			submob.showLinks()
 		}
 
-		this.expandedInputList.show()
-		this.expandedOutputList.show()
+		this.expandedInputList.view.show()
+		this.expandedOutputList.view.show()
 	}
 	
 	hideLinksOfContent() {
@@ -681,8 +684,8 @@ The content children can also be dragged and panned.
 			submob.hideLinks()
 		}
 
-		this.expandedInputList.hide()
-		this.expandedOutputList.hide()
+		this.expandedInputList.view.hide()
+		this.expandedOutputList.view.hide()
 	}
 
 	setLinking(flag: boolean) {
@@ -801,7 +804,7 @@ The content children can also be dragged and panned.
 		var p = this.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
 		if (this.openHook === null) { return }
-		p = this.openHook.parent.transformLocalPoint(this.openHook.midpoint, this)
+		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
 		let sb = new LinkBullet({ midpoint: p })
 		let eb = new LinkBullet({ midpoint: p })
 		this.openLink = new DependencyLink({

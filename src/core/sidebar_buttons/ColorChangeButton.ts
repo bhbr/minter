@@ -26,7 +26,7 @@ export class ColorChangeButton extends SidebarButton {
 
 	setup() {
 		super.setup()
-		this.label.view.setAttribute('fill', 'black')
+		this.label.view.div.setAttribute('fill', 'black')
 
 		for (let name of this.colorNames) {
 			this.messages.push({color: name, target: 'paper'})
@@ -49,7 +49,7 @@ export class ColorChangeButton extends SidebarButton {
 		this.radius = BUTTON_RADIUS
 		this.update({}, false)
 		this.active = false
-		this.fillColor = this.colorForIndex(this.currentModeIndex)
+		this.view.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
 		this.label.update({text: ''})
 		this.messagePaper(this.outgoingMessage)

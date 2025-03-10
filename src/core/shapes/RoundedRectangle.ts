@@ -66,15 +66,15 @@ export class RoundedRectangle extends CurvedShape {
 		super.update(args, false)
 
 		//// internal dependencies
-		this.viewWidth = this.width
-		this.viewHeight = this.height
+		this.view.frame.width = this.width
+		this.view.frame.height = this.height
 
 		this.p2[0] = this.width
 		this.p3[0] = this.width
 		this.p3[1] = this.height
 		this.p4[1] = this.height
 
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 }

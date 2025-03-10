@@ -16,7 +16,7 @@ export class BoardCreator extends SpanningCreator {
 			compactHeight: this.getHeight()
 		})
 		cm.contractStateChange()
-		cm.expandButton.show()
+		cm.expandButton.view.show()
 		return cm
 	}
 

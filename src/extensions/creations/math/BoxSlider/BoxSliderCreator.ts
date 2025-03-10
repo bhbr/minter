@@ -34,19 +34,19 @@ export class BoxSliderCreator extends Creator {
 			fillColor: Color.gray(0.5)
 		}, redraw)
 		this.creation.hideLinks()
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	dissolve() {
 		super.dissolve()
 		if (this.creation === null) { return }
 		this.creation.update({
-			anchor: this.anchor,
-			viewHeight: this.creation.height
+			anchor: this.view.frame.anchor,
+			frameHeight: this.creation.height
 		})
 		this.creation.outerBar.update({ anchor: vertexOrigin() }) // necessary?
 		this.creation.label.update({
-			anchor: [this.creation.width/2 - this.creation.label.viewWidth/2, this.creation.height/2 - this.creation.label.viewHeight/2]
+			anchor: [this.creation.width/2 - this.creation.label.view.frame.width/2, this.creation.height/2 - this.creation.label.view.frame.height/2]
 		})
 		this.creation.outputList.positionSelf()
 

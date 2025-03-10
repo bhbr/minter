@@ -7,6 +7,8 @@ import { Transform } from 'core/classes/Transform/Transform'
 import { remove } from 'core/functions/arrays'
 import { deepCopy } from 'core/functions/copying'
 import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'core/mobjects/screen_events'
+import { VView } from './VView'
+import { Frame } from 'core/mobjects/Frame'
 
 export class VMobject extends Mobject {
 /*
@@ -36,65 +38,43 @@ TODO: support mutiple paths e. g. for shapes with holes
 
 	vertices: vertexArray
 
-	fillColor: Color
-	fillOpacity: number // 0 to 1
-	strokeColor: Color
-	strokeWidth: number
-
-	svg?: SVGSVGElement // child of view
-	path?: SVGElement // child of svg
+	declare view: VView
 
 	ownDefaults(): object {
 		return {
-			svg: document.createElementNS('http://www.w3.org/2000/svg', 'svg'),
-			path: document.createElementNS('http://www.w3.org/2000/svg', 'path'),
-			fillColor: Color.white(),
-			fillOpacity: 0,
-			strokeColor: Color.white(),
-			strokeWidth: 1,
+			view: new VView(),
 			vertices: []
 		}
 	}
 
-	ownMutabilities(): object {
-		return {
-			svg: 'never',
-			path: 'never'
-		}
-	}
+	get fillColor(): Color { return this.view.fillColor }
+	set fillColor(newValue: Color) { this.view.fillColor = newValue }
+
+	get fillOpacity(): number { return this.view.fillOpacity }
+	set fillOpacity(newValue: number) { this.view.fillOpacity = newValue }
+
+	get strokeColor(): Color { return this.view.strokeColor }
+	set strokeColor(newValue: Color) { this.view.strokeColor = newValue }
+
+	get strokeWidth(): number { return this.view.strokeWidth }
+	set strokeWidth(newValue: number) { this.view.strokeWidth = newValue }
 
 	setup() {
-		if (!this.svg || !this.path || !this.view) { return }
 		// setup the svg
-		this.svg['mobject'] = this
-		this.svg.setAttribute('class', 'mobject-svg')
-		this.svg.style.overflow = 'visible'
-		// and its path
-		this.path['mobject'] = this
-		this.svg.appendChild(this.path)
-
-		this.setupView()
-		this.view.appendChild(this.svg)
-		this.view.setAttribute('class', this.constructor.name + ' mobject-div')
+		super.setup()
+		if (!this.view.svg || !this.view.path || !this.view) { return }
+		this.view.svg['mobject'] = this
+		this.view.setup()
 		// screen events are detected on the path
 		// so the active area is clipped to its shape
-		addPointerDown(this.path, this.capturedOnPointerDown.bind(this))
-		addPointerMove(this.path, this.capturedOnPointerMove.bind(this))
-		addPointerUp(this.path, this.capturedOnPointerUp.bind(this))
+		removePointerDown(this.view.div, this.capturedOnPointerDown.bind(this))
+		removePointerMove(this.view.div, this.capturedOnPointerMove.bind(this))
+		removePointerUp(this.view.div, this.capturedOnPointerUp.bind(this))
+		addPointerDown(this.view.path, this.capturedOnPointerDown.bind(this))
+		addPointerMove(this.view.path, this.capturedOnPointerMove.bind(this))
+		addPointerUp(this.view.path, this.capturedOnPointerUp.bind(this))
 	}
 
-	redraw() {
-		super.redraw()
-		if (!this.svg || !this.path || !this.view) { return }
-		let pathString: string = this.pathString()
-		if (pathString.includes('NaN')) { return }
-		this.path.setAttribute('d', pathString)
-
-		this.path.style['fill'] = this.fillColor.toHex()
-		this.path.style['fill-opacity'] = this.fillOpacity.toString()
-		this.path.style['stroke'] = this.strokeColor.toHex()
-		this.path.style['stroke-width'] = this.strokeWidth.toString()
-	}
 
 	static stringFromPoint(point: Array<number>): string {
 		// a string representation for CSS
@@ -109,9 +89,9 @@ TODO: support mutiple paths e. g. for shapes with holes
 		return ''
 	}
 
-	relativeVertices(frame?: Mobject): vertexArray {
+	relativeVertices(frame?: Frame): vertexArray {
 	// the vertices are in local coordinates, convert them to the given frame of an ancestor mobject
-		let returnValue: vertexArray = this.relativeTransform(frame).appliedToVertices(this.vertices)
+		let returnValue: vertexArray = this.view.frame.relativeTransform(frame).appliedToVertices(this.vertices)
 		if (returnValue == undefined) { return [] }
 		else { return returnValue }
 	}
@@ -142,7 +122,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				xMin = Math.min(xMin, mob.localXMin() + mob.anchor[0])
+				xMin = Math.min(xMin, mob.view.frame.localXMin() + mob.view.frame.anchor[0])
 			}
 		}
 		return xMin
@@ -155,7 +135,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				xMax = Math.max(xMax, mob.localXMax() + mob.anchor[0])
+				xMax = Math.max(xMax, mob.view.frame.localXMax() + mob.view.frame.anchor[0])
 			}
 		}
 		return xMax
@@ -168,7 +148,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				yMin = Math.min(yMin, mob.localYMin() + mob.anchor[1])
+				yMin = Math.min(yMin, mob.view.frame.localYMin() + mob.view.frame.anchor[1])
 			}
 		}
 		return yMin
@@ -184,7 +164,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 		}
 		if (this.children != undefined) {
 			for (let mob of this.children) {
-				yMax = Math.max(yMax, mob.localYMax() + mob.anchor[1])
+				yMax = Math.max(yMax, mob.view.frame.localYMax() + mob.view.frame.anchor[1])
 			}
 		}
 		return yMax
@@ -204,25 +184,25 @@ TODO: support mutiple paths e. g. for shapes with holes
 	localTopCenter(): vertex { return [this.localMidX(), this.localYMin()] }
 	localBottomCenter(): vertex { return [this.localMidX(), this.localYMax()] }
 
-	ulCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localULCorner(), frame) }
-	urCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localURCorner(), frame) }
-	llCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLLCorner(), frame) }
-	lrCorner(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLRCorner(), frame) }
+	ulCorner(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localULCorner(), frame) }
+	urCorner(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localURCorner(), frame) }
+	llCorner(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localLLCorner(), frame) }
+	lrCorner(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localLRCorner(), frame) }
 
-	center(frame?: Mobject): vertex { return this.transformLocalPoint(this.localCenter(), frame) }
+	center(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localCenter(), frame) }
 
-	xMin(frame?: Mobject): number { return this.ulCorner(frame)[0] }
-	xMax(frame?: Mobject): number { return this.lrCorner(frame)[0] }
-	yMin(frame?: Mobject): number { return this.ulCorner(frame)[1] }
-	yMax(frame?: Mobject): number { return this.lrCorner(frame)[1] }
+	xMin(frame?: Frame): number { return this.ulCorner(frame)[0] }
+	xMax(frame?: Frame): number { return this.lrCorner(frame)[0] }
+	yMin(frame?: Frame): number { return this.ulCorner(frame)[1] }
+	yMax(frame?: Frame): number { return this.lrCorner(frame)[1] }
 
-	midX(frame?: Mobject): number { return this.center(frame)[0] }
-	midY(frame?: Mobject): number { return this.center(frame)[1] }
+	midX(frame?: Frame): number { return this.center(frame)[0] }
+	midY(frame?: Frame): number { return this.center(frame)[1] }
 
-	leftCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localLeftCenter(), frame) }
-	rightCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localRightCenter(), frame) }
-	topCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localTopCenter(), frame) }
-	bottomCenter(frame?: Mobject): vertex { return this.transformLocalPoint(this.localBottomCenter(), frame) }
+	leftCenter(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localLeftCenter(), frame) }
+	rightCenter(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localRightCenter(), frame) }
+	topCenter(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localTopCenter(), frame) }
+	bottomCenter(frame?: Frame): vertex { return this.view.frame.transformLocalPoint(this.localBottomCenter(), frame) }
 
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }

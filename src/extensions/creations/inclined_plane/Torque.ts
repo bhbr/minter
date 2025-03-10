@@ -1,6 +1,5 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexAdd, vertexSubtract, vertexOuterProduct } from 'core/functions/vertex'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { ForceVector } from 'ForceVector'
 import { Color } from 'core/classes/Color'
@@ -9,12 +8,12 @@ export class Torque extends Polygon {
 	
 	force: ForceVector
 
-	get origin(): Vertex {
-		return this.anchor
+	get origin(): vertex {
+		return this.view.frame.anchor
 	}
 
-	set origin(newValue: Vertex) {
-		this.anchor = newValue
+	set origin(newValue: vertex) {
+		this.view.frame.anchor = newValue
 	}
 
 	ownDefaults(): object {
@@ -32,12 +31,12 @@ export class Torque extends Polygon {
 		}
 	}
 
-	lever(): Vertex {
-		return this.force.startPoint.subtract(this.origin)
+	lever(): vertex {
+		return vertexSubtract(this.force.startPoint, this.origin)
 	}
 
 	size(): number {
-		return Vertex.outerProduct(this.lever(), this.force.mereVector())
+		return vertexOuterProduct(this.lever(), this.force.mereVector())
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -45,16 +44,16 @@ export class Torque extends Polygon {
 		let r = this.lever()
 		let F = this.force.asVectorOnScreen()
 		if (Math.abs(this.size() * this.force.scale) < 5) { // in square pixels
-			this.vertices = new VertexArray()
+			this.vertices = []
 		} else {
-			this.vertices = new VertexArray([
-				Vertex.origin(),
+			this.vertices = [
+				[0, 0],
 				r,
-				r.add(F),
+				vertexAdd(r, F),
 				F
-			])
+			]
 		}
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 }

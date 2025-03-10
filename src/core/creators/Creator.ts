@@ -25,11 +25,11 @@ export class Creator extends Mobject {
 	}
 
 	getStartPoint(): vertex {
-		return this.creationStroke[0] ?? this.anchor
+		return this.creationStroke[0] ?? this.view.frame.anchor
 	}
 
 	getEndPoint(): vertex {
-		return this.creationStroke[this.creationStroke.length - 1] ?? this.anchor
+		return this.creationStroke[this.creationStroke.length - 1] ?? this.view.frame.anchor
 	}
 
 	dissolve() {
@@ -48,7 +48,7 @@ export class Creator extends Mobject {
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		this.creationStroke.push(q)
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 }

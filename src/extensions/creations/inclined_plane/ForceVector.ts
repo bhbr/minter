@@ -2,8 +2,7 @@ import { Line } from 'core/shapes/Line'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { Circle } from 'core/shapes/Circle'
 import { DEGREES } from 'core/constants'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
+import { vertex, vertexSubtract, vertexTranslatedBy, vertexScaledBy, vertexRotatedBy } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ConStrait } from 'extensions/boards/construction/straits/ConStrait'
 
@@ -64,43 +63,43 @@ export class ForceVector extends ConStrait {
 	update(args: object = {}, redraw: boolean = true) {
 		let newStartPoint = args['startPoint'] ?? this.startPoint
 		let newDirection = args['direction'] ?? this.direction
-		let unitVector = new Vertex(Math.cos(newDirection), -Math.sin(newDirection))
+		let unitVector: vertex = [Math.cos(newDirection), -Math.sin(newDirection)]
 		let length = this.size * this.scale - this.tipSize
-		args['endPoint'] = newStartPoint.translatedBy(unitVector.scaledBy(length))
+		args['endPoint'] = vertexTranslatedBy(newStartPoint, vertexScaledBy(unitVector, length, [0, 0]))
 		super.update(args, false)
 
-		this.strokeColor = this.color
+		this.view.strokeColor = this.color
 		if (this.size * this.scale < 5) {
-			this.hide()
+			this.view.hide()
 		} else {
-			this.show()
+			this.view.show()
 		}
 
 		let tipWingSize = this.tipSize / Math.cos(this.tipOpeningAngle / 2)
-		let tipVector1 = unitVector.scaledBy(-tipWingSize).rotatedBy(this.tipOpeningAngle / 2)
-		let tipVector2 = unitVector.scaledBy(-tipWingSize).rotatedBy(-this.tipOpeningAngle / 2)
-		let tipPoint1 = this.endPoint.translatedBy(tipVector1)
-		let tipPoint2 = this.endPoint.translatedBy(tipVector2)
-		this.tip.vertices = new VertexArray([
+		let tipVector1 = vertexRotatedBy(vertexScaledBy(unitVector, -tipWingSize, [0, 0]), this.tipOpeningAngle / 2, [0, 0])
+		let tipVector2 = vertexRotatedBy(vertexScaledBy(unitVector, -tipWingSize, [0, 0]), -this.tipOpeningAngle / 2, [0, 0])
+		let tipPoint1 = vertexTranslatedBy(this.endPoint, tipVector1)
+		let tipPoint2 = vertexTranslatedBy(this.endPoint, tipVector2)
+		this.tip.vertices = [
 			this.endPoint,
 			tipPoint1,
 			tipPoint2
-		])
+		]
 
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
-	drawingEndPoint(): Vertex {
-		let unitVector = new Vertex(Math.cos(this.direction), -Math.sin(this.direction))
-		return this.endPoint.translatedBy(unitVector.scaledBy(-this.tipSize))
+	drawingEndPoint(): vertex {
+		let unitVector = [Math.cos(this.direction), -Math.sin(this.direction)]
+		return vertexTranslatedBy(this.endPoint, vertexScaledBy(unitVector, -this.tipSize, [0, 0]))
 	}
 
-	mereVector(): Vertex {
-		return this.asVectorOnScreen().scaledBy(1 / this.scale)
+	mereVector(): vertex {
+		return vertexScaledBy(this.asVectorOnScreen(), 1 / this.scale, [0, 0])
 	}
 
-	asVectorOnScreen(): Vertex {
-		return this.endPoint.subtract(this.startPoint)
+	asVectorOnScreen(): vertex {
+		return vertexSubtract(this.endPoint, this.startPoint)
 	}
 
 }

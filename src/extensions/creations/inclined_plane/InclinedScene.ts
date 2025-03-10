@@ -3,8 +3,8 @@ import { InclinedBox } from './InclinedBox'
 import { InclinedPlane } from './InclinedPlane'
 import { Linkable } from 'core/linkables/Linkable'
 import { DEGREES, TAU } from 'core/constants'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { Transform } from 'core/classes/vertex/Transform'
+import { vertex, vertexAdd, vertexSubtract, vertexScaledBy, vertexRotatedBy, vertexTranslatedBy } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform/Transform'
 import { log } from 'core/functions/logging'
 import { ForceVector } from './ForceVector'
 import { Torque } from './Torque'
@@ -31,13 +31,13 @@ export class InclinedScene extends Linkable implements Playable {
 	normalTorque: Torque
 	staticFrictionTorque: Torque
 	torques: MGroup
-	torqueOrigin: Vertex
+	torqueOrigin: vertex
 	forceScale: number
 	staticFrictionNumber: number
 	running: boolean
 	simulationStartTime?: number
 	simulationInterval?: number
-	boxStartCOM: Vertex
+	boxStartCOM: vertex
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 	glidingStarted?: boolean
@@ -60,11 +60,11 @@ export class InclinedScene extends Linkable implements Playable {
 				showTorquesToggle: new Toggle({
 					propertyName: 'showTorques',
 					labelText: 'show torques',
-					anchor: new Vertex(10, 50)
+					anchor: [10, 50]
 				}),
 
-				viewWidth: 500,
-				viewHeight: 300,
+				frameWidth: 500,
+				frameHeight: 300,
 				inclination: 20 * DEGREES,
 				staticFrictionNumber: 0.5,
 				running: false,
@@ -72,7 +72,7 @@ export class InclinedScene extends Linkable implements Playable {
 				simulationInterval: null,
 				glidingStarted: null,
 				showTorques: false,
-				torqueOrigin: Vertex.origin(),
+				torqueOrigin: [0, 0],
 				inputNames: [
 					'inclination'
 				],
@@ -120,10 +120,9 @@ export class InclinedScene extends Linkable implements Playable {
 		this.add(this.showTorquesToggle)
 
 		this.plane.update({
-			midpoint: this.localCenter(),
+			midpoint: this.view.frame.localCenter(),
 			inclination: this.inclination
 		})
-		this.adjustFrame()
 
 		this.box.addDependency('centerOfMass', this.gravityForce, 'startPoint')
 
@@ -180,9 +179,9 @@ export class InclinedScene extends Linkable implements Playable {
 	set showTorques(newValue: boolean) {
 		this._showTorques = newValue
 		if (newValue) {
-			this.torques.show()
+			this.torques.view.show()
 		} else {
-			this.torques.hide()
+			this.torques.view.hide()
 		}
 	}
 
@@ -202,21 +201,21 @@ export class InclinedScene extends Linkable implements Playable {
 		return (this.hasStaticFriction() ? this.gravityForceParallelComponent() : 0)
 	}
 
-	vertexAlongPlane(relativePosition: number): Vertex {
+	vertexAlongPlane(relativePosition: number): vertex {
 		let bottomLeft = this.plane.llCorner()
 		let topRight = this.plane.urCorner()
-		return bottomLeft.add(topRight.subtract(bottomLeft).scaledBy(relativePosition))
+		return vertexAdd(bottomLeft, vertexScaledBy(vertexSubtract(topRight, bottomLeft), relativePosition, [0, 0]))
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
 		args['torqueOrigin'] = this.box.llCorner()
 		super.update(args, false)
-		let v = new Vertex(0, -this.box.height / 2).rotatedBy(this.inclination)
-		let newCOM = this.vertexAlongPlane(this.initialBoxPositionAlongPlane).translatedBy(v)
+		let v = vertexRotatedBy([0, -this.box.height / 2], this.inclination, [0, 0])
+		let newCOM = vertexTranslatedBy(this.vertexAlongPlane(this.initialBoxPositionAlongPlane), v)
 		this.box.update({
 			centerOfMass: newCOM
 		})
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	play() {
@@ -240,8 +239,8 @@ export class InclinedScene extends Linkable implements Playable {
 		let t = (Date.now() - this.simulationStartTime) / 1000
 		let boxPositionAlongPlane = this.initialBoxPositionAlongPlane - FtotSize * 0.5 * t ** 2
 		let newBoxBottomCenter = this.vertexAlongPlane(boxPositionAlongPlane)
-		let v = new Vertex(0, -this.box.height / 2).rotatedBy(this.inclination)
-		let newBoxCOM = newBoxBottomCenter.translatedBy(v)
+		let v = vertexRotatedBy([0, -this.box.height / 2], this.inclination, [0, 0])
+		let newBoxCOM = vertexTranslatedBy(newBoxBottomCenter, v)
 		this.box.update({
 			centerOfMass: newBoxCOM
 		})

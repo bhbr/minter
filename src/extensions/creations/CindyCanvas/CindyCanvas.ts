@@ -61,28 +61,30 @@ export class CindyCanvas extends Linkable implements Playable {
 	setup() {
 		super.setup()
 
+		this.innerCanvas.view.frame.update({
+			width: this.view.frame.width,
+			height: this.view.frame.height
+		})
 		this.innerCanvas.update({
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
 			screenEventHandler: ScreenEventHandler.Auto
 		})
 		this.add(this.innerCanvas)
 
 		this.outerFrame.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
+			width: this.view.frame.width,
+			height: this.view.frame.height,
 			screenEventHandler: ScreenEventHandler.Parent
 		})
 		this.add(this.outerFrame)
 
-		this.innerCanvas.view.style['pointer-events'] = 'auto'
+		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
 
-		this.innerCanvas.view.id = this.id
+		this.innerCanvas.view.div.id = this.id
 
 		Object.assign(this.port, {
 			id: this.id,
-			width: this.viewWidth,
-			height: this.viewHeight,
+			width: this.view.frame.width,
+			height: this.view.frame.height,
 			started: false
 		})
 		this.add(this.playButton)

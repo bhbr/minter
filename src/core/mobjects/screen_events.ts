@@ -134,14 +134,16 @@ export function removePointerUp(element: HTMLElement | SVGElement, method: (Even
 	element.removeEventListener('pointerup', method, { capture: true })
 }
 
-export function addPointerCancel(element: HTMLElement | SVGElement, method: (Event) => void) {
-	element.addEventListener('touchcancel', method, { capture: true })
-	element.addEventListener('mouseout', method, { capture: true })
+export function addPointerOut(element: HTMLElement | SVGElement, method: (Event) => void) {
+//	element.addEventListener('touchcancel', method, { capture: true })
+//	element.addEventListener('mouseout', method, { capture: true })
+	element.addEventListener('pointercancel', method, { capture: true })
 }
 
-export function removePointerCancel(element: HTMLElement | SVGElement, method: (Event) => void) {
-	element.removeEventListener('touchcancel', method, { capture: true })
-	element.removeEventListener('mouseout', method, { capture: true })
+export function removePointerOut(element: HTMLElement | SVGElement, method: (Event) => void) {
+//	element.removeEventListener('touchcancel', method, { capture: true })
+//	element.removeEventListener('mouseout', method, { capture: true })
+	element.removeEventListener('pointercancel', method, { capture: true })
 }
 
 

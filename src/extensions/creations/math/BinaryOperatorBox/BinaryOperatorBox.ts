@@ -42,14 +42,14 @@ export class BinaryOperatorBox extends ValueBox {
 	setup() {
 		super.setup()
 		this.operatorSign.update({
-			midpoint: [this.viewWidth / 2, 0]
+			midpoint: [this.view.frame.width / 2, 0]
 		})
 		this.operatorLabel.update({
 			text: this.operatorDict[this.operator],
-			viewWidth: 2 * this.operatorSign.radius,
-			viewHeight: 2 * this.operatorSign.radius
+			frameWidth: 2 * this.operatorSign.radius,
+			frameHeight: 2 * this.operatorSign.radius
 		})
-		this.operatorLabel.view.style.fontSize = '14px'
+		this.operatorLabel.view.div.style.fontSize = '14px'
 		this.operatorSign.add(this.operatorLabel)
 		this.add(this.operatorSign)
 	}

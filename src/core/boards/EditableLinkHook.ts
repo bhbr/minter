@@ -8,12 +8,13 @@ import { vertex } from 'core/functions/vertex'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Line } from 'core/shapes/Line'
 import { Board } from './Board'
+import { EditableLinkHookView } from './EditableLinkHookView'
 
 export class EditableLinkHook extends LinkHook {
 	
-	inputBox: HTMLInputElement
 	declare _parent: ExpandedBoardIOList
 	declare mobject: Board
+	declare view: EditableLinkHookView
 	previousValue: string
 	index: number
 	empty: boolean
@@ -31,7 +32,6 @@ export class EditableLinkHook extends LinkHook {
 
 	ownDefaults(): object {
 		return {
-			inputBox: document.createElement('input'),
 			screenEventHandler: ScreenEventHandler.Parent,
 			previousValue: '',
 			index: 0,
@@ -44,7 +44,6 @@ export class EditableLinkHook extends LinkHook {
 
 	ownMutabilities(): object {
 		return {
-			inputBox: 'never',
 			signStrokeWidth: 'never',
 			signScale: 'never',
 			plusSign: 'never'
@@ -53,22 +52,6 @@ export class EditableLinkHook extends LinkHook {
 
 	setup() {
 		super.setup()
-		this.inputBox.setAttribute('type', 'text')
-		this.inputBox.style.width = '90%'
-		this.inputBox.style.padding = '3px 3px'
-		this.inputBox.style.color = 'white'
-		this.inputBox.style.backgroundColor = Color.gray(0.2).toCSS()
-		this.inputBox.style.textAlign = 'left'
-		this.inputBox.style.verticalAlign = 'center'
-		this.inputBox.style.fontSize = '20px'
-		this.inputBox.style.position = 'absolute'
-		this.inputBox.style.top = '-7px'
-		this.inputBox.style.left = '30px'
-		this.inputBox.style.width = '150px'
-		this.view.appendChild(this.inputBox)
-		if (this.empty) {
-			this.inputBox.style.visibility = 'hidden'
-		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.boundActivateKeyboard = this.activateKeyboard.bind(this)
 		this.setupPlusSign()
@@ -92,15 +75,10 @@ export class EditableLinkHook extends LinkHook {
 		}
 	}
 
-	setViewVisibility(visibility: boolean) {
-		super.setViewVisibility(visibility)
-		this.inputBox.style.visibility = (visibility && !this.empty) ? 'visible' : 'hidden'
-	}
-
 	editName() {
-		this.inputBox.style.visibility = 'visible'
-		this.inputBox.focus()
-		this.inputBox.style.backgroundColor = Color.black().toCSS()
+		this.view.inputBox.style.visibility = 'visible'
+		this.view.inputBox.focus()
+		this.view.inputBox.style.backgroundColor = Color.black().toCSS()
 		this.parent.parent.editingLinkName = true
 		document.addEventListener('keyup', this.boundActivateKeyboard)
 	}
@@ -129,11 +107,11 @@ export class EditableLinkHook extends LinkHook {
 	keyPressed(e: KeyboardEvent) {
 		if (e.which != 13) { return }
 		this.empty = false
-		if (this.inputBox.value == '') {
-			this.inputBox.value = this.previousValue
+		if (this.view.inputBox.value == '') {
+			this.view.inputBox.value = this.previousValue
 			return
 		}
-		this.inputBox.blur()
+		this.view.inputBox.blur()
 		this.parent.parent.editingLinkName = false
 		this.remove(this.plusSign)
 		this.parent.parent.hideLinksOfContent()
@@ -143,14 +121,14 @@ export class EditableLinkHook extends LinkHook {
 				button.activeKeyboard = true
 			}
 		}
-		if (this.inputBox.value == this.previousValue) { return }
+		if (this.view.inputBox.value == this.previousValue) { return }
 		if (this.previousValue == '') {
 			this.parent.createNewHook(true)
 		}
-		this.previousValue = this.inputBox.value
+		this.previousValue = this.view.inputBox.value
 		
 		this.update({
-			name: this.inputBox.value
+			name: this.view.inputBox.value
 		})
 		this.parent.updateLinkNames()
 		this.mobject.setLinking(false)
@@ -168,7 +146,7 @@ export class EditableLinkHook extends LinkHook {
 
 	positionInLinkMap(): vertex {
 	// used e. g. for snapping
-		let p = this.parent.transformLocalPoint(this.midpoint, this.parent.parent)
+		let p = this.parent.view.frame.transformLocalPoint(this.midpoint, this.parent.parent.view.frame)
 		return p
 	}
 

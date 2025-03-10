@@ -1,7 +1,6 @@
 
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { VertexArray } from 'core/classes/vertex/VertexArray'
-import { Transform } from 'core/classes/vertex/Transform'
+import { vertex } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform/Transform'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
@@ -19,11 +18,11 @@ export class InclinedBox extends Polygon {
 	}
 
 	get centerOfMass(): Vertex {
-		return this.anchor
+		return this.view.frame.anchor
 	}
 
 	set centerOfMass(newValue: Vertex) {
-		this.anchor = newValue
+		this.view.frame.anchor = newValue
 	}
 
 	get rotationAngle(): number {
@@ -44,10 +43,10 @@ export class InclinedBox extends Polygon {
 		super.update(args, false)
 		let w2 = this.width / 2
 		let h2 = this.height / 2
-		this.vertices = new VertexArray([
+		this.vertices = [
 			[-w2, -h2], [-w2, h2], [w2, h2], [w2 ,-h2]
-		])
-		if (redraw) { this.redraw() }
+		]
+		if (redraw) { this.view.redraw() }
 	}
 
 	topDirection(): number {

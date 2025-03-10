@@ -22,7 +22,7 @@ on its circumference. The radius (and anchor) is updated automatically.
 
 	setup() {
 		super.setup()
-		this.view.style['pointer-events'] = 'none'
+		this.view.div.style['pointer-events'] = 'none'
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

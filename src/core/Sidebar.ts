@@ -16,14 +16,16 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { log } from 'core/functions/logging'
+import { SidebarView } from './SidebarView'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
-import { StartSidebar } from 'startSidebar'
+import { StartSidebar } from 'StartSidebar'
 
 interface Window { webkit?: any }
 
 export class Sidebar extends Mobject {
 
+	declare view: SidebarView
 	background: Rectangle
 	availableButtonClasses: Array<any>
 	buttons: Array<SidebarButton>
@@ -31,7 +33,7 @@ export class Sidebar extends Mobject {
 
 	ownDefaults(): object {
 		return {
-			view: document.querySelector('#sidebar_id') as HTMLElement,
+			view: new SidebarView(),
 			background: new Rectangle({
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
@@ -49,8 +51,8 @@ export class Sidebar extends Mobject {
 				new DragButton(),
 				new LinkButton()
 			],
-			viewWidth: SIDEBAR_WIDTH,
-			viewHeight: PAGE_HEIGHT,
+			frameWidth: SIDEBAR_WIDTH,
+			frameHeight: PAGE_HEIGHT,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -64,13 +66,13 @@ export class Sidebar extends Mobject {
 
 	setup() { 
 		this.add(this.background)
-		this.view['mobject'] = this
+		this.view.mobject = this
 		let maybePaper = getPaper()
 		if (maybePaper != undefined) {
 			let paper = maybePaper as Paper
 			paper.sidebar = this
 			this.background.update({
-				fillColor: paper.background.fillColor
+				fillColor: paper.background.view.fillColor
 			})
 		}
 		// initialize with the buttons it needs itself
@@ -82,7 +84,7 @@ export class Sidebar extends Mobject {
 
 		let height = window.innerHeight
 		this.update({
-			viewHeight: height
+			frameHeight: height
 		})
 		this.background.update({
 			height: height

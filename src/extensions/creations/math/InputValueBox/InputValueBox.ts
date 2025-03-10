@@ -20,8 +20,8 @@ export class InputValueBox extends Linkable {
 				fillColor: Color.black()
 			}),
 			inputBox: document.createElement('input'),
-			viewWidth: 80,
-			viewHeight: 40,
+			frameWidth: 80,
+			frameHeight: 40,
 			inputNames: [],
 			outputNames: ['value'],
 			strokeWidth: 0.0,
@@ -56,15 +56,15 @@ export class InputValueBox extends Linkable {
 		this.inputBox.style.textAlign = 'center'
 		this.inputBox.style.verticalAlign = 'center'
 		this.inputBox.style.fontSize = '20px'
-		this.view.appendChild(this.inputBox)
+		this.view.div.appendChild(this.inputBox)
 		this.boundKeyPressed = this.keyPressed.bind(this)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height
 		}, redraw)
 
 	}
