@@ -420,7 +420,9 @@ The content children can also be dragged and panned.
 				} else if (!this.editingLinkName) {
 					this.hideLinksOfContent()
 					//this.endLinking()
-					this.remove(this.openLink)
+					if (this.openLink) {
+						this.remove(this.openLink)
+					}
 				}
 				this.setLinking(value)
 		}
