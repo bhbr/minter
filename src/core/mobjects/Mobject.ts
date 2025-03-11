@@ -482,155 +482,26 @@ and logic for drawing and user interaction.
 
 	onPointerOut(e: ScreenEvent) { }
 
-	/*
-	Backup versions for temporarily disabling
-	interactivity on a mobject (e. g. while dragging)
-	*/
 
-	savedOnTouchDown(e: ScreenEvent) { }
-	savedOnTouchMove(e: ScreenEvent) { }
-	savedOnTouchUp(e: ScreenEvent) { }
-	savedOnTouchTap(e: ScreenEvent) { }
-	savedOnMereTouchTap(e: ScreenEvent) { }
-	savedOnDoubleTouchTap(e: ScreenEvent) { }
-	savedOnLongTouchDown(e: ScreenEvent) { }
 
-	savedOnPenDown(e: ScreenEvent) { }
-	savedOnPenMove(e: ScreenEvent) { }
-	savedOnPenUp(e: ScreenEvent) { }
-	savedOnPenTap(e: ScreenEvent) { }
-	savedOnMerePenTap(e: ScreenEvent) { }
-	savedOnDoublePenTap(e: ScreenEvent) { }
-	savedOnLongPenDown(e: ScreenEvent) { }
-
-	savedOnMouseDown(e: ScreenEvent) { }
-	savedOnMouseMove(e: ScreenEvent) { }
-	savedOnMouseUp(e: ScreenEvent) { }
-	savedOnMouseClick(e: ScreenEvent) { }
-	savedOnMereMouseClick(e: ScreenEvent) { }
-	savedOnDoubleMouseClick(e: ScreenEvent) { }
-	savedOnLongMouseDown(e: ScreenEvent) { }
-
-	// Dragging methods
-
-	/*
-	Mobjects drag themselves, not via their parent.
-	This is possible since the event target is fixed by hand
-	as long as the gesture occurs, even if individual events
-	(pointer moves) may trigger outside it because of lag.
-	*/
-	
-
-	setDragging(flag: boolean) {
-
-		if (flag) {
-
-			if (this.draggingEnabled()) { return }
-
-			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnTouchUp = this.onTouchUp
-			this.savedOnTouchTap = this.onTouchTap
-			this.savedOnMereTouchTap = this.onMereTouchTap
-			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
-			this.savedOnLongTouchDown = this.onLongTouchDown
-
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnPenUp = this.onPenUp
-			this.savedOnPenTap = this.onPenTap
-			this.savedOnMerePenTap = this.onMerePenTap
-			this.savedOnDoublePenTap = this.onDoublePenTap
-			this.savedOnLongPenDown = this.onLongPenDown
-
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnMouseUp = this.onMouseUp
-			this.savedOnMouseClick = this.onMouseClick
-			this.savedOnMereMouseClick = this.onMereMouseClick
-			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
-			this.savedOnLongMouseDown = this.onLongMouseDown
-
-			this.onTouchDown = this.startDragging
-			this.onTouchMove = this.dragging
-			this.onTouchUp = this.endDragging
-			this.onTouchTap = (e: ScreenEvent) => { }
-			this.onMereTouchTap = (e: ScreenEvent) => { }
-			this.onDoubleTouchTap = (e: ScreenEvent) => { }
-			this.onLongTouchDown = (e: ScreenEvent) => { }
-
-			this.onPenDown = this.startDragging
-			this.onPenMove = this.dragging
-			this.onPenUp = this.endDragging
-			this.onPenTap = (e: ScreenEvent) => { }
-			this.onMerePenTap = (e: ScreenEvent) => { }
-			this.onDoublePenTap = (e: ScreenEvent) => { }
-			this.onLongPenDown = (e: ScreenEvent) => { }
-
-			this.onMouseDown = this.startDragging
-			this.onMouseMove = this.dragging
-			this.onMouseUp = this.endDragging
-			this.onMouseClick = (e: ScreenEvent) => { }
-			this.onMereMouseClick = (e: ScreenEvent) => { }
-			this.onDoubleMouseClick = (e: ScreenEvent) => { }
-			this.onLongMouseDown = (e: ScreenEvent) => { }
-
-		} else {
-
-			if (!this.draggingEnabled()) { return }
-
-			this.onTouchDown = this.savedOnTouchDown
-			this.onTouchMove = this.savedOnTouchMove
-			this.onTouchUp = this.savedOnTouchUp
-			this.onTouchTap = this.savedOnTouchTap
-			this.onMereTouchTap = this.savedOnMereTouchTap
-			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
-			this.onLongTouchDown = this.savedOnLongTouchDown
-
-			this.onPenDown = this.savedOnPenDown
-			this.onPenMove = this.savedOnPenMove
-			this.onPenUp = this.savedOnPenUp
-			this.onPenTap = this.savedOnPenTap
-			this.onMerePenTap = this.savedOnMerePenTap
-			this.onDoublePenTap = this.savedOnDoublePenTap
-			this.onLongPenDown = this.savedOnLongPenDown
-
-			this.onMouseDown = this.savedOnMouseDown
-			this.onMouseMove = this.savedOnMouseMove
-			this.onMouseUp = this.savedOnMouseUp
-			this.onMouseClick = this.savedOnMouseClick
-			this.onMereMouseClick = this.savedOnMereMouseClick
-			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
-			this.onLongMouseDown = this.savedOnLongMouseDown
-
-			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnTouchUp = (e: ScreenEvent) => { }
-			this.savedOnTouchTap = (e: ScreenEvent) => { }
-			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
-			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
-			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
-
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnPenUp = (e: ScreenEvent) => { }
-			this.savedOnPenTap = (e: ScreenEvent) => { }
-			this.savedOnMerePenTap = (e: ScreenEvent) => { }
-			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
-			this.savedOnLongPenDown = (e: ScreenEvent) => { }
-
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnMouseUp = (e: ScreenEvent) => { }
-			this.savedOnMouseClick = (e: ScreenEvent) => { }
-			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
-			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
-			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
-		}
-	}
 
 	draggingEnabled(): boolean {
-		return (this.onTouchDown == this.startDragging)
+		return (this.sensor.onTouchDown == this.startDragging)
+	}
+
+
+	setDragging(flag: boolean) {
+		if (flag) {
+			if (this.draggingEnabled()) { return }
+			this.sensor.setTouchMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
+			this.sensor.setPenMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
+			this.sensor.setMouseMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
+		} else {
+			if (!this.draggingEnabled()) { return }
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
+		}
 	}
 
 	startDragging(e: ScreenEvent) {
