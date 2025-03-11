@@ -325,7 +325,7 @@ The content children can also be dragged and panned.
 
 	disableContent() {
 		for (let mob of this.contentChildren) {
-			if (mob.screenEventHandler == ScreenEventHandler.Self) {
+			if (mob.sensor.screenEventHandler == ScreenEventHandler.Self) {
 				mob.disable()
 			}
 		}
@@ -333,21 +333,21 @@ The content children can also be dragged and panned.
 
 	enableContent() {
 		for (let mob of this.contentChildren) {
-			if (mob.savedScreenEventHandler == ScreenEventHandler.Self) {
+			if (mob.sensor.savedScreenEventHandler == ScreenEventHandler.Self) {
 				mob.enable()
 			}
 		}
 	}
 
 
-	enableShadow() {
-		this.background.view.enableShadow()
-		this.board.update()
+	showShadow() {
+		super.showShadow()
+		this.background.showShadow()
 	}
 
-	disableShadow() {
-		this.background.view.disableShadow()
-		this.board.update()
+	hideShadow() {
+		super.hideShadow()
+		this.background.hideShadow()
 	}
 
 	//////////////////////////////////////////////////////////
@@ -458,7 +458,7 @@ The content children can also be dragged and panned.
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
 			return
 		}
-		this.creationStroke.push(this.localEventVertex(e))
+		this.creationStroke.push(this.sensor.localEventVertex(e))
 		this.creator = this.createCreator(this.creationMode)
 		this.add(this.creator)
 	}
@@ -473,7 +473,7 @@ The content children can also be dragged and panned.
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
 			return
 		}
-		let v: vertex = this.localEventVertex(e)
+		let v: vertex = this.sensor.localEventVertex(e)
 		this.creationStroke.push(v)
 		this.creator.updateFromTip(v)
 	}
@@ -500,18 +500,19 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
-		this.panPointStart = this.localEventVertex(e)
+		this.panPointStart = this.sensor.localEventVertex(e)
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
-			mob.view.disableShadow()
+			mob.hideShadow()
 		}
 	}
 
 	panning(e: ScreenEvent) {
-		let panPoint = this.localEventVertex(e)
+		let panPoint = this.sensor.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
 
 		for (let mob of this.contentChildren) {
+			if (mob.dragAnchorStart == null) { return }
 			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
 			mob.update({ anchor: newAnchor })
 			mob.view.div.style.left = `${newAnchor[0]}px`
@@ -520,7 +521,12 @@ The content children can also be dragged and panned.
 		this.updateLinks()
 	}
 
-	endPanning(e: ScreenEvent) { }
+	endPanning(e: ScreenEvent) {
+		for (let mob of this.contentChildren) {
+			mob.dragAnchorStart = null
+			mob.showShadow()
+		}
+	}
 
 	setPanning(flag: boolean) {
 
@@ -626,10 +632,10 @@ The content children can also be dragged and panned.
 
 		}
 
-		for (let mob of this.contentChildren) {
-			mob.dragAnchorStart = null
-			mob.view.enableShadow()
-		}
+		// for (let mob of this.contentChildren) {
+		// 	mob.dragAnchorStart = null
+		// 	mob.view.showShadow()
+		// }
 	}
 
 
@@ -801,7 +807,7 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		var p = this.localEventVertex(e)
+		var p = this.sensor.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
 		if (this.openHook === null) { return }
 		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
@@ -818,7 +824,7 @@ The content children can also be dragged and panned.
 
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
-		let p = this.localEventVertex(e)
+		let p = this.sensor.localEventVertex(e)
 		for (let hook of this.compatibleHooks) {
 			let m = hook.positionInLinkMap()
 			if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
@@ -834,7 +840,7 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
-		let h = this.hookAtLocation(this.localEventVertex(e))
+		let h = this.hookAtLocation(this.sensor.localEventVertex(e))
 		if (this.openLink !== null) {
 			this.remove(this.openLink)
 		}

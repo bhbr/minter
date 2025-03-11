@@ -9,10 +9,10 @@ import { Transform } from 'core/classes/Transform/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
 import { Dependency } from './Dependency'
-import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
 import { Frame } from './Frame'
 import { View } from './View'
 import { Motor } from './Motor'
+import { Sensor } from './Sensor'
 
 export class Mobject extends ExtendedObject {
 
@@ -68,24 +68,13 @@ and logic for drawing and user interaction.
 			// The meaning of these properties is explained in the sections further below.
 
 			motor: new Motor(),
+			sensor: new Sensor(),
 
 			// hierarchy
 			_parent: null,
 
 			// dependencies
 			dependencies: [],
-
-			// interactivity
-			screenEventHandler: ScreenEventHandler.Parent,
-			savedScreenEventHandler: null,
-			eventTarget: null,
-			screenEventHistory: [],
-			screenEventDevice: null,
-			eventStartTime: 0,
-
-			// animation
-			animationStartArgs: {},
-			animationStopArgs: {}
 		}
 	}
 
@@ -100,12 +89,12 @@ and logic for drawing and user interaction.
 		this.view.mobject = this
 		this.view.setup()
 		this.motor.mobject = this
-		this.motor.setup()
+		this.sensor.mobject = this
 
-		addPointerDown(this.view.div, this.capturedOnPointerDown.bind(this))
-		addPointerMove(this.view.div, this.capturedOnPointerMove.bind(this))
-		addPointerUp(this.view.div, this.capturedOnPointerUp.bind(this))
-		addPointerOut(this.view.div, this.capturedOnPointerOut.bind(this))
+		addPointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this.sensor))
+		addPointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this.sensor))
+		addPointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this.sensor))
+		addPointerOut(this.view.div, this.sensor.capturedOnPointerOut.bind(this.sensor))
 	}
 
 	// this.anchor is a synonym for this.frame.anchor
@@ -390,8 +379,8 @@ and logic for drawing and user interaction.
 		super.update(args)
 
 		if (this.view != null) {
-			this.view.div.setAttribute('screen-event-handler', ScreenEventHandler[this.screenEventHandler])
-			if (this.screenEventHandler == ScreenEventHandler.Below) {
+			this.view.div.setAttribute('screen-event-handler', ScreenEventHandler[this.sensor.screenEventHandler])
+			if (this.sensor.screenEventHandler == ScreenEventHandler.Below) {
 				this.view.div.style['pointer-events'] = 'none'
 			} else {
 				this.view.div.style['pointer-events'] = 'auto'
@@ -446,20 +435,15 @@ and logic for drawing and user interaction.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-
-	eventTarget?: Mobject
-	screenEventHandler: ScreenEventHandler
-	savedScreenEventHandler?: ScreenEventHandler
+	sensor: Sensor
 	dragAnchorStart?: vertex
-	screenEventDevice?: ScreenEventDevice
 
-	screenEventHistory: Array<ScreenEvent>
-	resetPointerTimeoutID?: number
-	deleteHistoryTimeoutID?: number
-	longPressTimeoutID?: number
-	mereTapTimeoutID?: number
+	disable() { this.sensor.disable() }
+	enable() { this.sensor.enable() }
 
-	eventStartTime: number
+	get screenEventHandler(): ScreenEventHandler { return this.sensor.screenEventHandler }
+	set screenEventHandler(newValue: ScreenEventHandler) { this.sensor.screenEventHandler = newValue }
+
 
 	/*
 	The following empty methods need to be declared here
@@ -496,7 +480,7 @@ and logic for drawing and user interaction.
 	onDoubleMouseClick(e: ScreenEvent) { this.onDoubleTap(e) }
 	onLongMouseDown(e: ScreenEvent) { this.onLongPress(e) }
 
-	onPointerOut(e: ScreenEvent) { log('out') }
+	onPointerOut(e: ScreenEvent) { }
 
 	/*
 	Backup versions for temporarily disabling
@@ -527,403 +511,6 @@ and logic for drawing and user interaction.
 	savedOnDoubleMouseClick(e: ScreenEvent) { }
 	savedOnLongMouseDown(e: ScreenEvent) { }
 
-	/*
-	Methods for temporarily disabling interactivity on a mobject
-	(e. g. when dragging a CindyCanvas)
-	*/
-	disable() {
-		if (this.isDisabled()) { return }
-		this.savedScreenEventHandler = this.screenEventHandler
-		this.screenEventHandler = ScreenEventHandler.Parent // .Below?
-	}
-
-	enable() {
-		if (this.isEnabled()) { return }
-		this.screenEventHandler = this.savedScreenEventHandler
-		this.savedScreenEventHandler = null
-	}
-
-	isEnabled(): boolean {
-		return (this.savedScreenEventHandler === null)
-	}
-
-	isDisabled(): boolean {
-		return !this.isEnabled()
-	}
-
-
-	/*
-	Finding the event target
-
-	Depending on the screenEventHandler:
-
-	- .Below: mobject is transparent (via CSS), the sibling mobject
-	          underneath or the parent should handle the event
-	          Example: TwoPointCircle in a Construction
-	- .Auto:  don't interfere with event propagation at all
-	          Example: CindyCanvas
-
-	Otherwise the event is captured by the topmost view (paper or sidebar),
-	the automatic propagation is stopped and the event is passed onto the
-	eventTarget as determined by the declared screenEventHandlers in the
-	chain of possible event targets.
-	The event target is the lowest mobject willing to handle it and that
-	is not underneath a mobject that wants its parent to handle it.
-
-	- .Parent: the parent should handle it
-	- .Self:   handle it if no child wants to handle it and if no parent wants
-	           its parent to handle it
-	*/
-
-	eventTargetMobject(e: ScreenEvent): Mobject | null {
-	/*
-	Find the lowest Mobject willing and allowed to handle the event
-	General rule: the event is handled by the lowest submob that can handle it
-	and that is not underneath a mobject that wants its parent to handle it.
-	If the event policies end in a loop, no one handles it.
-	*/
-		var t: Element = e.target as Element
-		if (t == this.view.div) {
-			return this
-		}
-		let targetMobChain = this.eventTargetMobjectChain(e) // defined below
-		var m: any
-		while (targetMobChain.length > 0) {
-			m = targetMobChain.pop()
-			if (m === undefined) { return this }
-			if (m.screenEventHandler == ScreenEventHandler.Parent) {
-				continue
-			}
-			if ((m.screenEventHandler == ScreenEventHandler.Self || m.screenEventHandler == ScreenEventHandler.Auto)) {
-				return m
-			}
-		}
-		// if all of this fails, this mob must handle the event itself
-		return this
-	}
-
-	eventTargetMobjectChain(e: ScreenEvent): Array<Mobject> {
-	// Collect the chain of corresponding target mobjects (highest to lowest)
-		let targetDivChain = this.eventTargetDivChain(e) // defined below
-		let targetMobChain: Array<Mobject> = []
-		for (var div of targetDivChain.values()) {
-			let m: any = div['view'].mobject
-			if (m == undefined) { continue }
-			let mob: Mobject = m as Mobject
-			// only consider targets above the first mobject
-			// with ScreenEventHandler.Parent
-			targetMobChain.push(mob)
-		}
-		return targetMobChain
-	}
-
-	eventTargetDivChain(e: ScreenEvent): Array<Element> {
-	// Collect the chain of target views (highest to lowest)
-		var t: Element = e.target as Element
-		if (t.tagName == 'path') { t = t.parentElement.parentElement }
-		// the mob whose view contains the svg element containing the path
-		if (t.tagName == 'svg') { t = t.parentElement } //.parentElement }
-		// we hit an svg outside its path (but inside its bounding box),
-		// so ignore the corresponding mob and pass the event on to its parent
-
-		let targetDivChain: Array<Element> = [t]
-		while (t != undefined && t != this.view.div) {
-			t = t.parentElement
-			targetDivChain.push(t)
-		}
-		return targetDivChain.reverse()
-	}
-
-
-	/*
-	Captured event methods
-	*/
-
-	capturedOnPointerDown(e: ScreenEvent) {
-
-		if (this.eventStartTime == 0) {
-			this.eventStartTime = e.timeStamp
-		}
-
-		let target = this.eventTargetMobject(e)
-		this.eventTarget = target
-		if (target == null) { return }
-		
-		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
-		e.stopPropagation()
-
-		this.clearResetPointer()
-		this.clearDeleteHistoryTimeout()
-		this.decideEventAction(e)
-		
-	}
-
-	capturedOnPointerMove(e: ScreenEvent) {
-
-		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null) { return }
-		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
-		e.stopPropagation()
-
-		switch (this.screenEventDevice) {
-		case ScreenEventDevice.Finger:
-			target.onTouchMove(e)
-			break
-		case ScreenEventDevice.Pen:
-			target.onPenMove(e)
-			break
-		case ScreenEventDevice.Mouse:
-			target.onMouseMove(e)
-			break
-		default:
-			throw `Unknown pointer device ${target.screenEventDevice}`
-		}
-	}
-
-	capturedOnPointerUp(e: ScreenEvent) {
-		
-		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null) { return }
-		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
-		e.stopPropagation()
-
-		this.decideEventAction(e)
-		if (this.deleteHistoryTimeoutID != null) { return }
-		this.deleteHistoryTimeoutID = window.setTimeout(this.deleteScreenEventHistory.bind(this), 1000
-		)
-	}
-
-	capturedOnPointerOut(e: ScreenEvent) {
-		
-		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null) { return }
-		if (target.screenEventHandler == ScreenEventHandler.Auto) { return }
-		e.stopPropagation()
-
-		target.onPointerOut(e)
-		this.deleteScreenEventHistory()
-	}
-
-	decideEventAction(e: ScreenEvent) {
-		let device = screenEventDevice(e)
-		let type = screenEventType(e)
-
-		if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
-			//log('case 1')
-			this.eventTarget.rawOnPenDown(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.screenEventDevice = ScreenEventDevice.Pen
-		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
-			//log('case 2')
-			this.eventTarget.rawOnPenUp(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.resetPointer()
-		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
-			//log('case 3')
-			// ignore
-		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
-			//log('case 4')
-			this.eventTarget.rawOnTouchDown(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.screenEventDevice = ScreenEventDevice.Finger
-		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
-			//log('case 5')
-			this.eventTarget.rawOnTouchUp(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.resetPointer()
-		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
-			//log('case 6')
-			// ignore
-		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Down) {
-			if (this.screenEventDevice == ScreenEventDevice.Finger) {
-				//log('case 7a')
-				// ignore
-			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
-				//log('case 7b')
-				// ignore
-			} else {
-				//log('case 7c')
-				this.eventTarget.rawOnMouseDown(e)
-				this.eventTarget.registerScreenEvent(e)
-				this.screenEventDevice = ScreenEventDevice.Mouse
-			}
-		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
-			if (this.screenEventDevice == ScreenEventDevice.Finger) {
-				if (isTouchDevice) {
-					//log('case 8a1')
-					this.eventTarget.rawOnTouchUp(e)
-					this.eventTarget.registerScreenEvent(e)
-					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
-				} else {
-					//log('case 8a2')
-					// ignore
-				}
-			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
-				if (isTouchDevice) {
-					//log('case 8b1')
-					this.eventTarget.rawOnPenUp(e)
-					this.eventTarget.registerScreenEvent(e)
-					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
-				} else {
-					//log('case 8b2')
-					// ignore
-				}
-			} else {
-				//log('case 8c')
-				this.eventTarget.rawOnMouseUp(e)
-				this.eventTarget.registerScreenEvent(e)
-				this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
-			}
-		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
-			// ignore
-			//log('case 9')
-		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
-			//log('case 10')
-			this.eventTarget.rawOnTouchDown(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.screenEventDevice = ScreenEventDevice.Finger
-		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
-			//log('case 11')
-			this.eventTarget.rawOnPenDown(e)
-			this.eventTarget.registerScreenEvent(e)
-			this.screenEventDevice = ScreenEventDevice.Pen
-		} else {
-			//log('case 12')
-			// ignore
-		}
-	}
-
-	resetPointer() {
-		this.screenEventDevice = null
-		this.resetPointerTimeoutID = null
-	}
-
-	clearResetPointer() {
-		window.clearTimeout(this.resetPointerTimeoutID)
-		this.resetPointerTimeoutID = null
-	}
-
-	registerScreenEvent(e: ScreenEvent) {
-		this.screenEventHistory.push(e)
-	}
-
-	rawOnTouchDown(e: ScreenEvent) {
-		this.longPressTimeoutID = window.setTimeout(this.onLongTouchDown.bind(this), LONG_PRESS_DURATION)
-		this.onTouchDown(e)
-	}
-
-	rawOnTouchUp(e: ScreenEvent) {
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
-			this.clearMereTapTimeout()
-			this.onTouchTap(e)
-			this.mereTapTimeoutID = window.setTimeout(function() {
-				this.mereTapTimeoutID = null
-				if (this.screenEventHistory.length == 2) {
-					this.onMereTouchTap(e)
-				}
-			}.bind(this), MERE_TAP_DELAY)
-			if (this.screenEventHistory.length == 3) {
-				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
-				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
-				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
-					this.onDoubleTouchTap(e)
-				}
-			}
-		}
-		this.onTouchUp(e)
-	}
-
-	rawOnPenDown(e: ScreenEvent) {
-		this.longPressTimeoutID = window.setTimeout(this.onLongPenDown.bind(this), LONG_PRESS_DURATION)
-		this.onPenDown(e)
-	}
-
-	rawOnPenUp(e: ScreenEvent) {
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
-			this.onPenTap(e)
-			this.mereTapTimeoutID = window.setTimeout(function() {
-				this.mereTapTimeoutID = null
-				if (this.screenEventHistory.length == 2) {
-					this.onMerePenTap(e)
-				}
-			}.bind(this), MERE_TAP_DELAY)
-			if (this.screenEventHistory.length == 3) {
-				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
-				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
-				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
-					this.onDoublePenTap(e)
-				}
-			}
-		}
-		this.onPenUp(e)
-	}
-
-	rawOnMouseDown(e: ScreenEvent) {
-		this.longPressTimeoutID = window.setTimeout(this.onLongMouseDown.bind(this), LONG_PRESS_DURATION)
-		this.onMouseDown(e)
-	}
-
-	rawOnMouseUp(e: ScreenEvent) {
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
-			this.onMouseClick(e)
-			this.mereTapTimeoutID = window.setTimeout(function() {
-				this.mereTapTimeoutID = null
-				if (this.screenEventHistory.length == 2) {
-					this.onMereMouseClick(e)
-				}
-			}.bind(this), MERE_TAP_DELAY)
-			if (this.screenEventHistory.length == 3) {
-				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
-				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
-				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
-					this.onDoubleMouseClick(e)
-				}
-			}
-		}
-		this.onMouseUp(e)
-	}
-
-	// Local coordinates for use in custom event methods
-
-	localEventVertex(e: ScreenEvent): vertex {
-	/*
-	eventVertex(e) gives the coordinates in the topmost
-	mobject's frame (paper or sidebar). This method here
-	finds them in the mobject's local frame.
-	*/
-		let p: vertex = eventVertex(e)
-		let rt = this.view.frame.relativeTransform(getPaper().frame)
-		let q = rt.inverse().appliedTo(p)
-		return q
-	}
-
-
-	// Cleanup methods
-
-	deleteScreenEventHistory() {
-		this.screenEventHistory = []
-		this.eventTarget = null
-		this.deleteHistoryTimeoutID = null
-	}
-
-	clearDeleteHistoryTimeout() {
-		if (this.deleteHistoryTimeoutID) {
-			clearTimeout(this.deleteHistoryTimeoutID)
-			this.deleteHistoryTimeoutID = null
-		}
-	}
-
-	clearMereTapTimeout() {
-		if (this.mereTapTimeoutID) {
-			window.clearInterval(this.mereTapTimeoutID)
-			this.mereTapTimeoutID = null
-		}
-	}
-
-
 	// Dragging methods
 
 	/*
@@ -932,6 +519,7 @@ and logic for drawing and user interaction.
 	as long as the gesture occurs, even if individual events
 	(pointer moves) may trigger outside it because of lag.
 	*/
+	
 
 	setDragging(flag: boolean) {
 
@@ -1048,6 +636,7 @@ and logic for drawing and user interaction.
 	startDragging(e: ScreenEvent) {
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
 		this.hideShadow()
+		this.parent.update()
 	}
 
 	dragging(e: ScreenEvent) {

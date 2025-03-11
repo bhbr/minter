@@ -119,13 +119,13 @@ export class Construction extends Board {
 	}
 
 	startCreating(e: ScreenEvent) {
-		let v = this.localEventVertex(e)
+		let v = this.sensor.localEventVertex(e)
 		let p: ConPoint | null = this.snappedPointForVertex(v)
 		if (this.creationMode == 'freehand') {
 			if (p === null) { // starting a freehand drawing
 				super.startCreating(e)
 			} else if (p instanceof FreePoint) { // dragging a free point
-				this.eventTarget = p
+				this.sensor.eventTarget = p
 				p.startDragging(e)
 			} // hitting any other point does nothing if in freehand mode
 			return
@@ -140,7 +140,7 @@ export class Construction extends Board {
 			super.creating(e)
 			return
 		}
-		let p: vertex = this.localEventVertex(e)
+		let p: vertex = this.sensor.localEventVertex(e)
 		for (let fq of this.points) {
 			let q: vertex = fq.midpoint
 			if (this.snapped(p, q)) {
@@ -220,10 +220,10 @@ export class Construction extends Board {
 			return
 		}
 		if (this.contracted) { return }
-		let v = this.localEventVertex(e)
+		let v = this.sensor.localEventVertex(e)
 		let p = this.snappedPointForVertex(v)
 		if (p !== null) {
-			getPaper().eventTarget = p
+			getPaper().sensor.eventTarget = p
 			p.startDragging(e)
 		} else {
 			this.startCreating(e)

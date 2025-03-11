@@ -41,9 +41,6 @@ export class Motor extends ExtendedObject {
 		}
 	}
 
-	setup() {
-		
-	}
 
 	static isAnimatable(args: object): boolean {
 		for (let [key, value] of Object.entries(args)) {

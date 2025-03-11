@@ -71,7 +71,7 @@ export class View extends ExtendedObject {
 		this.frame.view = this
 		this.redraw()
 		if (this.drawShadow) {
-			this.enableShadow()
+			this.showShadow()
 		}
 	}
 
@@ -100,7 +100,7 @@ export class View extends ExtendedObject {
 		}
 	}
 
-	enableShadow() {
+	showShadow() {
 		if (this.savedDrawShadow !== null) {
 			this.drawShadow = this.savedDrawShadow
 		}
@@ -110,11 +110,10 @@ export class View extends ExtendedObject {
 		}
 	}
 
-	disableShadow() {
+	hideShadow() {
 		this.savedDrawShadow = this.drawShadow
 		this.drawShadow = false
 		this.div.style.filter = ''
-		this.mobject?.parent.update()
 	}
 
 	shouldBeDrawn(): boolean {

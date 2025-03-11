@@ -179,9 +179,9 @@ export class CindyCanvas extends Linkable implements Playable {
 	setDragging(flag: boolean) {
 		super.setDragging(flag)
 		if (flag) {
-			this.outerFrame.screenEventHandler = ScreenEventHandler.Parent
+			this.outerFrame.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else {
-			this.outerFrame.screenEventHandler = ScreenEventHandler.Below
+			this.outerFrame.sensor.screenEventHandler = ScreenEventHandler.Below
 		}
 	}
 

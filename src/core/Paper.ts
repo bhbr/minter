@@ -58,7 +58,7 @@ export class Paper extends Board {
 			strokeColor: Color.clear(),
 			strokeWidth: 0.0
 		})
-		this.background.view.disableShadow()
+		this.background.view.hideShadow()
 
 		let width = window.innerWidth - (isTouchDevice ? 0 : SIDEBAR_WIDTH)
 		let height = window.innerHeight
