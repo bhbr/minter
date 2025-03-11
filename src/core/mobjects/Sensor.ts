@@ -500,13 +500,9 @@ export class Sensor extends ExtendedObject {
 
 	// Dragging methods
 
-	/*
-	Mobjects drag themselves, not via their parent.
-	This is possible since the event target is fixed by hand
-	as long as the gesture occurs, even if individual events
-	(pointer moves) may trigger outside it because of lag.
-	*/
-	
+
+
+
 	setTouchMethodsTo(
 		newOnTouchDown: (e: ScreenEvent) => void,
 		newOnTouchMove: (e: ScreenEvent) => void,

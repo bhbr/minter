@@ -533,7 +533,6 @@ The content children can also be dragged and panned.
 	}
 
 	setPanning(flag: boolean) {
-
 		if (flag) {
 			this.sensor.setTouchMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
 			this.sensor.setPenMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
@@ -543,11 +542,6 @@ The content children can also be dragged and panned.
 			this.sensor.restorePenMethods()
 			this.sensor.restoreMouseMethods()
 		}
-
-		// for (let mob of this.contentChildren) {
-		// 	mob.dragAnchorStart = null
-		// 	mob.view.showShadow()
-		// }
 	}
 
 
