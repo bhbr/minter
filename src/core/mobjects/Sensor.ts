@@ -383,7 +383,7 @@ export class Sensor extends ExtendedObject {
 			this.mereTapTimeoutID = window.setTimeout(function() {
 				this.mereTapTimeoutID = null
 				if (this.screenEventHistory.length == 2) {
-					this.mobject.onMereMouseClick(e)
+					this.onMereMouseClick(e)
 				}
 			}.bind(this), MERE_TAP_DELAY)
 			if (this.screenEventHistory.length == 3) {
@@ -394,7 +394,7 @@ export class Sensor extends ExtendedObject {
 				}
 			}
 		}
-		this.mobject.onMouseUp(e)
+		this.onMouseUp(e)
 	}
 
 	// Local coordinates for use in custom event methods

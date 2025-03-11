@@ -11,5 +11,5 @@ export function getPaper(): Paper {
 export function getSidebar(): Sidebar {
 	let sidebarDiv = document.querySelector('#sidebar_id')
 	if (sidebarDiv == null) { return undefined }
-	return sidebarDiv['mobject']
+	return sidebarDiv['view'].mobject
 }

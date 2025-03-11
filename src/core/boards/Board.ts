@@ -419,6 +419,8 @@ The content children can also be dragged and panned.
 					this.showLinksOfContent()
 				} else if (!this.editingLinkName) {
 					this.hideLinksOfContent()
+					//this.endLinking()
+					this.remove(this.openLink)
 				}
 				this.setLinking(value)
 		}
@@ -449,7 +451,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		log('old board onPointerDown')
 		if (this.contracted) { return }
 		this.startCreating(e)
 	}
@@ -501,7 +502,6 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
-		console.log(this)
 		this.panPointStart = this.sensor.localEventVertex(e)
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
@@ -593,7 +593,6 @@ The content children can also be dragged and panned.
 	hideLinksOfContent() {
 	// toggled by 'link' button in sidebar
 		for (let link of this.links) {
-			link.abortLinkCreation()
 			this.remove(link)
 		}
 		for (let submob of this.linkableChildren()) {
@@ -661,8 +660,13 @@ The content children can also be dragged and panned.
 			this.remove(this.openLink)
 		}
 		if (h === null) {
+			this.openLink = null
+			this.openHook = null
+			this.openBullet = null
+			this.compatibleHooks = []
 			return
-		} else if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+		}
+		if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
 			// click on a plus button to create a new hook
 			let ed = h as EditableLinkHook
 			ed.editName()
