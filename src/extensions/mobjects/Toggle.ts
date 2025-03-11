@@ -5,7 +5,7 @@ import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler, eventVertex } from 'core/mobjects/screen_events'
 import { getPaper } from 'core/functions/getters'
-import { Vertex } from 'core/classes/vertex/Vertex'
+import { vertex, vertexNorm, vertexTranslatedBy } from 'core/functions/vertex'
 
 export class Toggle extends Mobject {
 
@@ -28,7 +28,7 @@ export class Toggle extends Mobject {
 				strokeWidth: 0
 			}),
 			label: new TextLabel({
-				viewHeight: 20
+				frameHeight: 20
 			}),
 			mobject: undefined,
 			propertyName: undefined,
@@ -83,7 +83,7 @@ export class Toggle extends Mobject {
 
 	onPointerUp(e: ScreenEvent) {
 		let p = this.localEventVertex(e)
-		if (p.norm() <= this.circle.radius) {
+		if (vertexNorm(p) <= this.circle.radius) {
 			this.setState(!this.value())
 		} else {
 			this.setState(this.value())
@@ -94,7 +94,7 @@ export class Toggle extends Mobject {
 		super.update(args, redraw)
 		this.label.update({
 			text: this.labelText,
-			anchor: this.circle.urCorner().translatedBy(5, 0)
+			anchor: vertexTranslatedBy (this.circle.urCorner(), [5, 0])
 		}, redraw)
 	}
 

@@ -32,6 +32,6 @@ export class Line extends Polygon {
 		let p: vertex = this.drawingStartPoint()
 		let q: vertex = this.drawingEndPoint()
 		this.vertices = [p, q]
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 }

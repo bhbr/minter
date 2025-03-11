@@ -16,6 +16,7 @@
 import { remove } from 'core/functions/arrays'
 import { copy, equalObjects } from 'core/functions/copying'
 import { log } from 'core/functions/logging'
+import { isVertex, isVertexArray, vertexEquals, vertexArrayEquals } from 'core/functions/vertex'
 
 
 class BaseExtendedObject {
@@ -34,6 +35,7 @@ export class ExtendedObject extends BaseExtendedObject {
 	_defaults: object
 	_initComplete: boolean
 	_checkPermissions: boolean
+	passedByValue: boolean
 	static mutabilityOrder = {
 		'always': 0,
 		'on_init': 1,
@@ -248,8 +250,16 @@ export class ExtendedObject extends BaseExtendedObject {
 				if (this[prop] === value) {
 					delete args[prop]
 				}
-			} else if (value.constructor.name == 'Vertex' || value.constructor.name == 'Transform') {
+			} else if (value.constructor.name == 'Transform') {
 				if (this[prop].equals(value)) {
+					delete args[prop]
+				}
+			} else if (isVertex(value)) {
+				if (vertexEquals(this[prop], value)) {
+					delete args[prop]
+				}
+			} else if (isVertexArray(value)) {
+				if (vertexArrayEquals(this[prop], value)) {
 					delete args[prop]
 				}
 			} else {

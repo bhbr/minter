@@ -48,7 +48,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				fillOpacity: 0.5
 			}),
 			label: new TextLabel({
-				viewHeight: 25,
+				frameHeight: 25,
 				horizontalAlign: 'center',
 				verticalAlign: 'center',
 				fontSize: 20
@@ -84,8 +84,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.addDependency('width', this.outerBar, 'width')
 		this.addDependency('height', this.outerBar, 'height')
 		this.update({
-			viewWidth: this.width,
-			viewHeight: this.height
+			frameWidth: this.width,
+			frameHeight: this.height
 		})
 		this.outputList.update()
 	}
@@ -99,10 +99,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		super.update(args, false)
 
 		if (args['width'] !== undefined) {
-			this.viewWidth = this.width
+			this.view.frame.width = this.width
 		}
 		if (args['height'] !== undefined) {
-			this.viewHeight = this.height
+			this.view.frame.height = this.height
 		}
 
 		//// updating submobs
@@ -117,14 +117,14 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 		this.updateLabel(redraw)
 
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	updateLabel(redraw: boolean = true) {
 		this.label.update({
 			text: this.value.toString(),
 			anchor: [this.width/2 - this.width/2, this.height/2 - 25/2],
-			viewWidth: this.width
+			frameWidth: this.width
 		}, redraw)
 	}
 

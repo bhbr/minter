@@ -46,7 +46,7 @@ export class CurvedLine extends VMobject {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.updateBezierPoints()
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	static makePathString(bezierPoints: vertexArray, closed: boolean = false): string {

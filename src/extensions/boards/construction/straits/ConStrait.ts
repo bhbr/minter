@@ -11,7 +11,7 @@ export class ConStrait extends Line {
 		super.update(args, false)
 		this.vertices[0] = this.drawingStartPoint()
 		this.vertices[1] = this.drawingEndPoint()
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 }

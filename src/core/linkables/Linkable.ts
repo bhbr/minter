@@ -56,24 +56,24 @@ which can be linked to such-exposed variables of other mobjects.
 			linkNames: this.inputNames
 		})
 		this.add(this.inputList)
-		this.inputList.hide()
+		this.inputList.view.hide()
 		this.outputList.update({
 			mobject: this,
 			linkNames: this.outputNames
 		})
 		this.add(this.outputList)
-		this.outputList.hide()
+		this.outputList.view.hide()
 	}
 
 	showLinks() {
-		this.inputList.show()
-		this.outputList.show()
+		this.inputList.view.show()
+		this.outputList.view.show()
 		this.disable()
 	}
 
 	hideLinks() {
-		this.inputList.hide()
-		this.outputList.hide()
+		this.inputList.view.hide()
+		this.outputList.view.hide()
 		this.enable()
 	}
 
@@ -98,11 +98,11 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	getCompactWidth(): number {
-		return this.viewWidth
+		return this.view.frame.width
 	}
 
 	getCompactHeight(): number {
-		return this.viewHeight
+		return this.view.frame.height
 	}
 
 	dragging(e: ScreenEvent) {

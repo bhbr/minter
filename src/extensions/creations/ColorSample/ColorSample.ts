@@ -20,8 +20,8 @@ export class ColorSample extends Linkable {
 				fillOpacity: 1
 			}),
 			color: Color.white(),
-			viewWidth: 2 * RADIUS,
-			viewHeight: 2 * RADIUS,
+			frameWidth: 2 * RADIUS,
+			frameHeight: 2 * RADIUS,
 			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
 			screenEventHandler: ScreenEventHandler.Self

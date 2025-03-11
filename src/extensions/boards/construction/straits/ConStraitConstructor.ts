@@ -46,7 +46,7 @@ export class ConStraitConstructor extends Constructor {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		this.update()
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 }

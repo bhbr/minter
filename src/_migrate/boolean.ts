@@ -165,8 +165,8 @@
 
 // 	notLabel = new TextLabel({
 // 		text: 'NOT',
-// 		viewWidth: this.width,
-// 		viewHeight: this.height,
+// 		frameWidth: this.width,
+// 		frameHeight: this.height,
 // 		anchor: new Vertex(0, -this.height)
 // 	})
 

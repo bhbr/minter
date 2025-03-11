@@ -7,6 +7,7 @@ import { Board } from 'core/boards/Board'
 import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
 import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
+import { remove } from 'core/functions/arrays'
 
 export class DependencyLink extends Mobject {
 /*
@@ -61,10 +62,6 @@ linkable mobjects
 		this.add(this.linkLine)
 	}
 
-
-	abortLinkCreation() {
-		// todo
-	}
 
 
 

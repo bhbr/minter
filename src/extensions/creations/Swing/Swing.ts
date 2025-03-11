@@ -64,15 +64,15 @@ export class Swing extends Linkable {
 		this.fixture.update({
 			width: this.fixtureWidth,
 			height: this.fixtureHeight,
-			anchor: [(this.viewWidth - this.fixtureWidth) / 2, 0]
+			anchor: [(this.view.frame.width - this.fixtureWidth) / 2, 0]
 		}, true)
 		this.string.update({
-			startPoint: [this.viewWidth / 2, this.fixtureHeight]
+			startPoint: [this.view.frame.width / 2, this.fixtureHeight]
 		})
 		this.weight.update({
 			radius: this.weightRadius()
 		})
-		this.viewHeight = this.fixtureHeight + this.pixelLength() + this.weightRadius()
+		this.view.frame.height = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 		this.outputList.update()
 	}
 
@@ -96,9 +96,9 @@ export class Swing extends Linkable {
 
 	update(args: object = {}, redraw: boolean = true) {
 
-		args['viewHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
+		args['frameHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 		args = this.removeUnchangedProperties(args)
-		if (args['viewHeight'] !== undefined) {
+		if (args['frameHeight'] !== undefined) {
 			this.outputList.update()
 		}
 
@@ -115,7 +115,7 @@ export class Swing extends Linkable {
 			midpoint: newEndPoint
 		}, redraw)
 
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	run() {

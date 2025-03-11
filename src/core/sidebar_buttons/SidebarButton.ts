@@ -14,7 +14,7 @@ var paper: Paper = null
 if (isTouchDevice === false) {
 	const paperView = document.querySelector('#paper_id')
 	if (paperView !== null) {
-		paper = paperView['mobject'] as Paper
+		paper = paperView['view']['mobject'] as Paper
 	}
 }
 
@@ -64,8 +64,8 @@ export class SidebarButton extends Circle {
 			showLabel: true,
 			text: 'text',
 			radius: BUTTON_RADIUS,
-			viewWidth: 2 * BUTTON_RADIUS,
-			viewHeight: 2 * BUTTON_RADIUS,
+			frameWidth: 2 * BUTTON_RADIUS,
+			frameHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 0.5,
 			activeKeyboard: true
 		}
@@ -87,16 +87,16 @@ export class SidebarButton extends Circle {
 		this.add(this.label)
 		this.addDependency('midpoint', this.label, 'midpoint')
 		this.updateModeIndex(0)
-		this.update({
+		this.view.update({
 			fillColor: this.baseColor
 		})
 		this.label.update({
-			viewWidth: 2 * this.baseRadius,
-			viewHeight: 2 * this.baseRadius,
+			frameWidth: 2 * this.baseRadius,
+			frameHeight: 2 * this.baseRadius,
 			text: this.text
 		}, false)
-		this.label.view.style['font-size'] = `${this.baseFontSize}px`
-		this.label.view.style['color'] = Color.white().toHex()
+		this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
+		this.label.view.div.style['color'] = Color.white().toHex()
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -124,10 +124,10 @@ export class SidebarButton extends Circle {
 			radius: this.baseRadius * this.activeScalingFactor,
 			previousIndex: this.currentModeIndex
 		})
-		this.label.view.style.setProperty('font-size', `${this.baseFontSize * this.activeScalingFactor}px`)
+		this.label.view.div.style.setProperty('font-size', `${this.baseFontSize * this.activeScalingFactor}px`)
 		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius			
+			frameWidth: 2 * this.radius,
+			frameHeight: 2 * this.radius			
 		})
 		this.updateLabel()
 	}
@@ -161,7 +161,7 @@ export class SidebarButton extends Circle {
 		this.commonButtonUp()
 	}
 
-	onPointerCancel(e: ScreenEvent) {
+	onPointerOut(e: ScreenEvent) {
 		this.commonButtonUp()
 	}
 	
@@ -184,10 +184,10 @@ export class SidebarButton extends Circle {
 			radius: this.baseRadius,
 			fontSize: this.baseFontSize
 		})
-		this.label.view.style.setProperty('font-size', `${this.baseFontSize}px`)
+		this.label.view.div.style.setProperty('font-size', `${this.baseFontSize}px`)
 		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius			
+			frameWidth: 2 * this.radius,
+			frameHeight: 2 * this.radius			
 		})
 		this.updateLabel()
 		this.messagePaper(this.outgoingMessage)
@@ -204,13 +204,13 @@ export class SidebarButton extends Circle {
 	updateLabel() {
 		if (this.label == undefined) { return }
 		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius
+			frameWidth: 2 * this.radius,
+			frameHeight: 2 * this.radius
 		})
 
 		let f = this.active ? BUTTON_SCALE_FACTOR : 1
 		let fs = f * (this.baseFontSize ?? 12)
-		this.label.view?.setAttribute('font-size', fs.toString())
+		this.label.view?.div.style.setProperty('font-size', fs.toString())
 		if (this.showLabel) {
 			try {
 				let msg = this.messages[this.currentModeIndex]
@@ -227,7 +227,7 @@ export class SidebarButton extends Circle {
 		//args['midpoint'] = buttonCenter(this.locationIndex)
 		super.update(args, false)
 		this.updateLabel()
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 	
 	updateModeIndex(newIndex: number, withMessage: any = {}) {

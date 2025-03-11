@@ -24,8 +24,8 @@ export class WavyCreator extends SpanningCreator {
 		let p = this.getStartPoint()
 		return new Wavy({
 			anchor: p,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height,
 			nbSources: this.nbSources
 		})
 	}

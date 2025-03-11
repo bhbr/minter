@@ -15,8 +15,8 @@
 // 	defaultValues(): object {
 // 		return {
 // 			radius: RADIUS,
-// 			viewWidth: 2 * RADIUS,
-// 			viewHeight: 2 * RADIUS,
+// 			frameWidth: 2 * RADIUS,
+// 			frameHeight: 2 * RADIUS,
 // 			inputNames: ['red', 'green', 'blue', 'alpha'],
 // 			outputNames: ['color'],
 // 			screenEventHandler: ScreenEventHandler.Self

@@ -47,6 +47,14 @@ export function vertexEquals(v: vertex, w: vertex): boolean {
 	return vertexCloseTo(v, w, 1e-6)
 }
 
+export function vertexArrayEquals(va: vertexArray, wa: vertexArray): boolean {
+	if (va.length != wa.length) { return false }
+	for (let i = 0; i < va.length; i++) {
+		if (!vertexEquals(va[i], wa[i])) { return false }
+	}
+	return true
+}
+
 export function vertexCopyFrom(v: vertex, w: vertex) {
 	v[0] = w[0]
 	v[1] = w[1]

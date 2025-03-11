@@ -8,8 +8,8 @@ export class SimpleButton extends TextLabel {
 
 	ownDefaults(): object {
 		return {
-			viewWidth: 40,
-			viewHeight: 20,
+			frameWidth: 40,
+			frameHeight: 20,
 			backgroundColor: Color.black(),
 			color: Color.white(),
 			borderColor: Color.white(),

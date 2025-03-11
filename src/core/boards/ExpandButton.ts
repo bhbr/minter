@@ -6,6 +6,7 @@ import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
+import { VView } from 'core/vmobjects/VView'
 
 export class ExpandButton extends Circle {
 
@@ -15,8 +16,8 @@ export class ExpandButton extends Circle {
 		return {
 			transform: Transform.identity(),
 			midpoint: [15, 15],
-			radius: 12,
 			screenEventHandler: ScreenEventHandler.Self,
+			radius: 12,
 			backgroundColor: Color.clear(),
 			fillColor: Color.gray(0.25),
 			fillOpacity: 1,
@@ -64,9 +65,9 @@ export class ExpandButton extends Circle {
 	setup() {
 		super.setup()
 		this.add(this.label)
-		this.label.update({
-			viewWidth: 2 * this.radius,
-			viewHeight: 2 * this.radius
+		this.label.view.frame.update({
+			width: 2 * this.radius,
+			height: 2 * this.radius
 		})
 	}
 

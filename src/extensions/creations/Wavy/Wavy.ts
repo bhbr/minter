@@ -95,7 +95,7 @@ export class Wavy extends CindyCanvas {
 		}
 		let code = `drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););`
 		this.core.evokeCS(code)
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 

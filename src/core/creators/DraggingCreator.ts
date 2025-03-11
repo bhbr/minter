@@ -5,6 +5,7 @@ import { Color } from 'core/classes/Color'
 import { vertex } from 'core/functions/vertex'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Linkable } from 'core/linkables/Linkable'
+import { VView } from 'core/vmobjects/VView'
 
 export class DraggingCreator extends Creator {
 
@@ -18,9 +19,11 @@ export class DraggingCreator extends Creator {
 		return new Rectangle({
 			width: 50,
 			height: 50,
-			fillColor: Color.red(),
-			fillOpacity: 1.0,
-			anchor: this.creationStroke[0]
+			view: new VView({
+				fillColor: Color.red(),
+				fillOpacity: 1.0,
+				anchor: this.creationStroke[0]
+			})
 		})
 	}
 
@@ -29,7 +32,7 @@ export class DraggingCreator extends Creator {
 		this.creation.update({
 			anchor: q
 		}, redraw)
-		if (redraw) { this.redraw() }
+		if (redraw) { this.view.redraw() }
 	}
 
 	dissolve() {

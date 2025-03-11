@@ -46,7 +46,7 @@ export class ExpandedBoardIOList extends IOList {
 	}
 
 	getHeight(): number {
-		return this.viewHeight
+		return this.view.frame.height
 	}
 
 	setup() {

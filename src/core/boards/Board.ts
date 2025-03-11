@@ -32,9 +32,12 @@ import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSE
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
+import { VView } from 'core/vmobjects/VView'
 
 declare var paper: Paper
 declare interface Window { webkit?: any }
+
+export class BoardContent extends MGroup { }
 
 export class Board extends Linkable {
 /*
@@ -51,17 +54,17 @@ The content children can also be dragged and panned.
 	ownDefaults(): object {
 		return {
 			contentChildren: [],
-			content: new MGroup(),
+			content: new BoardContent(),
 			expandButton: new ExpandButton(),
 			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
 				cornerRadius: 25,
+				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
-				screenEventHandler: ScreenEventHandler.Parent,
 				drawShadow: true
 			}),
 			expandedPadding: 20,
@@ -135,15 +138,15 @@ The content children can also be dragged and panned.
 		super.setup()
 		
 		this.update({
-			viewWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
-			viewHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
+			frameWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
+			frameHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
 			anchor: this.expanded ? this.expandedAnchor() : vertexCopy(this.compactAnchor)
 		})
 
-		this.addDependency('viewWidth', this.background, 'width')
-		this.addDependency('viewHeight', this.background, 'height')
+		this.addDependency('frameWidth', this.background, 'width')
+		this.addDependency('frameHeight', this.background, 'height')
 
-		this.content.view.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+		this.content.view.div.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		// TODO: clip at rounded corners as well
 		this.add(this.background)
 		this.add(this.content)
@@ -153,32 +156,32 @@ The content children can also be dragged and panned.
 
 		this.expandedInputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
+			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
 			mobject: this
 		})
 		this.add(this.expandedInputList)
 
 		this.expandedOutputList.update({
 			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.viewWidth - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.viewWidth + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
+			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
 			mobject: this
 		})
 		this.add(this.expandedOutputList)
 
 		if (this.contracted) {
 			this.contractStateChange()
-			this.inputList.show()
-			this.outputList.show()
-			this.expandedInputList.hide()
-			this.expandedOutputList.hide()
+			this.inputList.view.show()
+			this.outputList.view.show()
+			this.expandedInputList.view.hide()
+			this.expandedOutputList.view.hide()
 		} else {
 			this.expandStateChange()
-			this.inputList.hide()
-			this.outputList.hide()
-			this.expandedInputList.show()
-			this.expandedOutputList.show()
+			this.inputList.view.hide()
+			this.outputList.view.hide()
+			this.expandedInputList.view.show()
+			this.expandedOutputList.view.show()
 		}
 		this.hideLinksOfContent()
 	}
@@ -186,18 +189,18 @@ The content children can also be dragged and panned.
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.background.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height
 		})
 		this.content.update({
-			width: this.viewWidth,
-			height: this.viewHeight,
-			viewWidth: this.viewWidth,
-			viewHeight: this.viewHeight
+			width: this.view.frame.width,
+			height: this.view.frame.height,
+			frameWidth: this.view.frame.width,
+			frameHeight: this.view.frame.height
 		})
-		if  (redraw) { this.redraw() }
+		if  (redraw) { this.view.redraw() }
 	}
 
 	//////////////////////////////////////////////////////////
@@ -218,11 +221,11 @@ The content children can also be dragged and panned.
 	}
 
 	expandedWidth(): number {
-		return getPaper().viewWidth - 2 * this.expandedPadding
+		return getPaper().view.frame.width - 2 * this.expandedPadding
 	}
 
 	expandedHeight(): number {
-		return getPaper().viewHeight - 2 * this.expandedPadding
+		return getPaper().view.frame.height - 2 * this.expandedPadding
 	}
 
 	getCompactWidth(): number {
@@ -266,8 +269,8 @@ The content children can also be dragged and panned.
 
 	expand() {
 		 this.animate({
-		 	viewWidth: this.expandedWidth(),
-		 	viewHeight: this.expandedHeight(),
+		 	frameWidth: this.expandedWidth(),
+		 	frameHeight: this.expandedHeight(),
 		 	anchor: this.expandedAnchor()
 		}, 0.5)
 		this.expandStateChange()
@@ -287,14 +290,14 @@ The content children can also be dragged and panned.
 		this.expandButton.label.update({
 			text: '+'
 		})
-		this.expandedInputList.hide()
-		this.expandedOutputList.hide()
+		this.expandedInputList.view.hide()
+		this.expandedOutputList.view.hide()
 
 		this.inputList.update({
-			anchor: [0.5 * (this.compactWidth - this.inputList.viewWidth), -IO_LIST_OFFSET - this.inputList.viewHeight]
+			anchor: [0.5 * (this.compactWidth - this.inputList.view.frame.width), -IO_LIST_OFFSET - this.inputList.view.frame.height]
 		}, true)
 		this.outputList.update({
-			anchor: [0.5 * (this.compactWidth - this.outputList.viewWidth), IO_LIST_OFFSET]
+			anchor: [0.5 * (this.compactWidth - this.outputList.view.frame.width), IO_LIST_OFFSET]
 		}, true)
 
 		if (this.board !== null) {
@@ -305,8 +308,8 @@ The content children can also be dragged and panned.
 
 	contract() {
 		this.animate({
-			viewWidth: this.compactWidth,
-			viewHeight: this.compactHeight,
+			frameWidth: this.compactWidth,
+			frameHeight: this.compactHeight,
 			anchor: this.compactAnchor
 		}, 0.5)
 		this.contractStateChange()
@@ -322,7 +325,7 @@ The content children can also be dragged and panned.
 
 	disableContent() {
 		for (let mob of this.contentChildren) {
-			if (mob.screenEventHandler == ScreenEventHandler.Self) {
+			if (mob.sensor.screenEventHandler == ScreenEventHandler.Self) {
 				mob.disable()
 			}
 		}
@@ -330,21 +333,21 @@ The content children can also be dragged and panned.
 
 	enableContent() {
 		for (let mob of this.contentChildren) {
-			if (mob.savedScreenEventHandler == ScreenEventHandler.Self) {
+			if (mob.sensor.savedScreenEventHandler == ScreenEventHandler.Self) {
 				mob.enable()
 			}
 		}
 	}
 
 
-	enableShadow() {
-		this.background.enableShadow()
-		this.board.update()
+	showShadow() {
+		super.showShadow()
+		this.background.showShadow()
 	}
 
-	disableShadow() {
-		this.background.disableShadow()
-		this.board.update()
+	hideShadow() {
+		super.hideShadow()
+		this.background.hideShadow()
 	}
 
 	//////////////////////////////////////////////////////////
@@ -374,7 +377,7 @@ The content children can also be dragged and panned.
 		if (this.contracted) {
 			mob.disable()
 		}
-		if (this.expandButton.visible) {
+		if (this.expandButton.view.visible) {
 			// exception: Paper
 			this.moveToTop(this.expandButton)
 		}
@@ -384,7 +387,7 @@ The content children can also be dragged and panned.
 		if (mob instanceof Board) {
 			if (mob.constructor.name == 'Construction') { return }
 			mob.background.update({
-				fillColor: this.background.fillColor.brighten(1.1)
+				fillColor: this.background.view.fillColor.brighten(1.1)
 			})
 		}
 	}
@@ -416,6 +419,10 @@ The content children can also be dragged and panned.
 					this.showLinksOfContent()
 				} else if (!this.editingLinkName) {
 					this.hideLinksOfContent()
+					//this.endLinking()
+					if (this.openLink) {
+						this.remove(this.openLink)
+					}
 				}
 				this.setLinking(value)
 		}
@@ -455,7 +462,7 @@ The content children can also be dragged and panned.
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
 			return
 		}
-		this.creationStroke.push(this.localEventVertex(e))
+		this.creationStroke.push(this.sensor.localEventVertex(e))
 		this.creator = this.createCreator(this.creationMode)
 		this.add(this.creator)
 	}
@@ -470,7 +477,7 @@ The content children can also be dragged and panned.
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
 			return
 		}
-		let v: vertex = this.localEventVertex(e)
+		let v: vertex = this.sensor.localEventVertex(e)
 		this.creationStroke.push(v)
 		this.creator.updateFromTip(v)
 	}
@@ -497,136 +504,50 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
-		this.panPointStart = this.localEventVertex(e)
+		this.panPointStart = this.sensor.localEventVertex(e)
 		for (let mob of this.contentChildren) {
-			mob.dragAnchorStart = vertexCopy(mob.anchor)
-			mob.disableShadow()
+			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
+			mob.hideShadow()
 		}
 	}
 
 	panning(e: ScreenEvent) {
-		let panPoint = this.localEventVertex(e)
+		let panPoint = this.sensor.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
 
 		for (let mob of this.contentChildren) {
+			if (mob.dragAnchorStart == null) { return }
 			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
 			mob.update({ anchor: newAnchor })
-			mob.view.style.left = `${newAnchor[0]}px`
-			mob.view.style.top = `${newAnchor[1]}px`
+			mob.view.div.style.left = `${newAnchor[0]}px`
+			mob.view.div.style.top = `${newAnchor[1]}px`
 		}
 		this.updateLinks()
 	}
 
-	endPanning(e: ScreenEvent) { }
+	endPanning(e: ScreenEvent) {
+		for (let mob of this.contentChildren) {
+			mob.dragAnchorStart = null
+			mob.showShadow()
+		}
+	}
 
 	setPanning(flag: boolean) {
 
 		if (flag) {
-
-			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnTouchUp = this.onTouchUp
-			this.savedOnTouchTap = this.onTouchTap
-			this.savedOnMereTouchTap = this.onMereTouchTap
-			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
-			this.savedOnLongTouchDown = this.onLongTouchDown
-
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnPenUp = this.onPenUp
-			this.savedOnPenTap = this.onPenTap
-			this.savedOnMerePenTap = this.onMerePenTap
-			this.savedOnDoublePenTap = this.onDoublePenTap
-			this.savedOnLongPenDown = this.onLongPenDown
-
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnMouseUp = this.onMouseUp
-			this.savedOnMouseClick = this.onMouseClick
-			this.savedOnMereMouseClick = this.onMereMouseClick
-			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
-			this.savedOnLongMouseDown = this.onLongMouseDown
-
-			this.onTouchDown = this.startPanning
-			this.onTouchMove = this.panning
-			this.onTouchUp = this.endPanning
-			this.onTouchTap = (e: ScreenEvent) => { }
-			this.onMereTouchTap = (e: ScreenEvent) => { }
-			this.onDoubleTouchTap = (e: ScreenEvent) => { }
-			this.onLongTouchDown = (e: ScreenEvent) => { }
-
-			this.onPenDown = this.startPanning
-			this.onPenMove = this.panning
-			this.onPenUp = this.endPanning
-			this.onPenTap = (e: ScreenEvent) => { }
-			this.onMerePenTap = (e: ScreenEvent) => { }
-			this.onDoublePenTap = (e: ScreenEvent) => { }
-			this.onLongPenDown = (e: ScreenEvent) => { }
-
-			this.onMouseDown = this.startPanning
-			this.onMouseMove = this.panning
-			this.onMouseUp = this.endPanning
-			this.onMouseClick = (e: ScreenEvent) => { }
-			this.onMereMouseClick = (e: ScreenEvent) => { }
-			this.onDoubleMouseClick = (e: ScreenEvent) => { }
-			this.onLongMouseDown = (e: ScreenEvent) => { }
-
+			this.sensor.setTouchMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
+			this.sensor.setPenMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
+			this.sensor.setMouseMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
 		} else {
-
-			this.onTouchDown = this.savedOnTouchDown
-			this.onTouchMove = this.savedOnTouchMove
-			this.onTouchUp = this.savedOnTouchUp
-			this.onTouchTap = this.savedOnTouchTap
-			this.onMereTouchTap = this.savedOnMereTouchTap
-			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
-			this.onLongTouchDown = this.savedOnLongTouchDown
-
-			this.onPenDown = this.savedOnPenDown
-			this.onPenMove = this.savedOnPenMove
-			this.onPenUp = this.savedOnPenUp
-			this.onPenTap = this.savedOnPenTap
-			this.onMerePenTap = this.savedOnMerePenTap
-			this.onDoublePenTap = this.savedOnDoublePenTap
-			this.onLongPenDown = this.savedOnLongPenDown
-
-			this.onMouseDown = this.savedOnMouseDown
-			this.onMouseMove = this.savedOnMouseMove
-			this.onMouseUp = this.savedOnMouseUp
-			this.onMouseClick = this.savedOnMouseClick
-			this.onMereMouseClick = this.savedOnMereMouseClick
-			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
-			this.onLongMouseDown = this.savedOnLongMouseDown
-
-			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnTouchUp = (e: ScreenEvent) => { }
-			this.savedOnTouchTap = (e: ScreenEvent) => { }
-			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
-			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
-			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
-
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnPenUp = (e: ScreenEvent) => { }
-			this.savedOnPenTap = (e: ScreenEvent) => { }
-			this.savedOnMerePenTap = (e: ScreenEvent) => { }
-			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
-			this.savedOnLongPenDown = (e: ScreenEvent) => { }
-
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnMouseUp = (e: ScreenEvent) => { }
-			this.savedOnMouseClick = (e: ScreenEvent) => { }
-			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
-			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
-			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
-
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 
-		for (let mob of this.contentChildren) {
-			mob.dragAnchorStart = null
-			mob.enableShadow()
-		}
+		// for (let mob of this.contentChildren) {
+		// 	mob.dragAnchorStart = null
+		// 	mob.view.showShadow()
+		// }
 	}
 
 
@@ -667,129 +588,34 @@ The content children can also be dragged and panned.
 			submob.showLinks()
 		}
 
-		this.expandedInputList.show()
-		this.expandedOutputList.show()
+		this.expandedInputList.view.show()
+		this.expandedOutputList.view.show()
 	}
 	
 	hideLinksOfContent() {
 	// toggled by 'link' button in sidebar
 		for (let link of this.links) {
-			link.abortLinkCreation()
 			this.remove(link)
 		}
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()
 		}
 
-		this.expandedInputList.hide()
-		this.expandedOutputList.hide()
+		this.expandedInputList.view.hide()
+		this.expandedOutputList.view.hide()
 	}
 
 	setLinking(flag: boolean) {
-
 		if (flag) {
-
 			this.showLinksOfContent()
-
-			this.savedOnTouchDown = this.onTouchDown
-			this.savedOnTouchMove = this.onTouchMove
-			this.savedOnTouchUp = this.onTouchUp
-			this.savedOnTouchTap = this.onTouchTap
-			this.savedOnMereTouchTap = this.onMereTouchTap
-			this.savedOnDoubleTouchTap = this.onDoubleTouchTap
-			this.savedOnLongTouchDown = this.onLongTouchDown
-
-			this.savedOnPenDown = this.onPenDown
-			this.savedOnPenMove = this.onPenMove
-			this.savedOnPenUp = this.onPenUp
-			this.savedOnPenTap = this.onPenTap
-			this.savedOnMerePenTap = this.onMerePenTap
-			this.savedOnDoublePenTap = this.onDoublePenTap
-			this.savedOnLongPenDown = this.onLongPenDown
-
-			this.savedOnMouseDown = this.onMouseDown
-			this.savedOnMouseMove = this.onMouseMove
-			this.savedOnMouseUp = this.onMouseUp
-			this.savedOnMouseClick = this.onMouseClick
-			this.savedOnMereMouseClick = this.onMereMouseClick
-			this.savedOnDoubleMouseClick = this.onDoubleMouseClick
-			this.savedOnLongMouseDown = this.onLongMouseDown
-
-			this.onTouchDown = this.startLinking
-			this.onTouchMove = this.linking
-			this.onTouchUp = this.endLinking
-			this.onTouchTap = (e: ScreenEvent) => { }
-			this.onMereTouchTap = (e: ScreenEvent) => { }
-			this.onDoubleTouchTap = (e: ScreenEvent) => { }
-			this.onLongTouchDown = (e: ScreenEvent) => { }
-
-			this.onPenDown = this.startLinking
-			this.onPenMove = this.linking
-			this.onPenUp = this.endLinking
-			this.onPenTap = (e: ScreenEvent) => { }
-			this.onMerePenTap = (e: ScreenEvent) => { }
-			this.onDoublePenTap = (e: ScreenEvent) => { }
-			this.onLongPenDown = (e: ScreenEvent) => { }
-
-			this.onMouseDown = this.startLinking
-			this.onMouseMove = this.linking
-			this.onMouseUp = this.endLinking
-			this.onMouseClick = (e: ScreenEvent) => { }
-			this.onMereMouseClick = (e: ScreenEvent) => { }
-			this.onDoubleMouseClick = (e: ScreenEvent) => { }
-			this.onLongMouseDown = (e: ScreenEvent) => { }
-
+			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else if (!this.editingLinkName) {
-
 			this.hideLinksOfContent()
-
-			this.onTouchDown = this.savedOnTouchDown
-			this.onTouchMove = this.savedOnTouchMove
-			this.onTouchUp = this.savedOnTouchUp
-			this.onTouchTap = this.savedOnTouchTap
-			this.onMereTouchTap = this.savedOnMereTouchTap
-			this.onDoubleTouchTap = this.savedOnDoubleTouchTap
-			this.onLongTouchDown = this.savedOnLongTouchDown
-
-			this.onPenDown = this.savedOnPenDown
-			this.onPenMove = this.savedOnPenMove
-			this.onPenUp = this.savedOnPenUp
-			this.onPenTap = this.savedOnPenTap
-			this.onMerePenTap = this.savedOnMerePenTap
-			this.onDoublePenTap = this.savedOnDoublePenTap
-			this.onLongPenDown = this.savedOnLongPenDown
-
-			this.onMouseDown = this.savedOnMouseDown
-			this.onMouseMove = this.savedOnMouseMove
-			this.onMouseUp = this.savedOnMouseUp
-			this.onMouseClick = this.savedOnMouseClick
-			this.onMereMouseClick = this.savedOnMereMouseClick
-			this.onDoubleMouseClick = this.savedOnDoubleMouseClick
-			this.onLongMouseDown = this.savedOnLongMouseDown
-
-			this.savedOnTouchDown = (e: ScreenEvent) => { }
-			this.savedOnTouchMove = (e: ScreenEvent) => { }
-			this.savedOnTouchUp = (e: ScreenEvent) => { }
-			this.savedOnTouchTap = (e: ScreenEvent) => { }
-			this.savedOnMereTouchTap = (e: ScreenEvent) => { }
-			this.savedOnDoubleTouchTap = (e: ScreenEvent) => { }
-			this.savedOnLongTouchDown = (e: ScreenEvent) => { }
-
-			this.savedOnPenDown = (e: ScreenEvent) => { }
-			this.savedOnPenMove = (e: ScreenEvent) => { }
-			this.savedOnPenUp = (e: ScreenEvent) => { }
-			this.savedOnPenTap = (e: ScreenEvent) => { }
-			this.savedOnMerePenTap = (e: ScreenEvent) => { }
-			this.savedOnDoublePenTap = (e: ScreenEvent) => { }
-			this.savedOnLongPenDown = (e: ScreenEvent) => { }
-
-			this.savedOnMouseDown = (e: ScreenEvent) => { }
-			this.savedOnMouseMove = (e: ScreenEvent) => { }
-			this.savedOnMouseUp = (e: ScreenEvent) => { }
-			this.savedOnMouseClick = (e: ScreenEvent) => { }
-			this.savedOnMereMouseClick = (e: ScreenEvent) => { }
-			this.savedOnDoubleMouseClick = (e: ScreenEvent) => { }
-			this.savedOnLongMouseDown = (e: ScreenEvent) => { }
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 	}
 
@@ -798,10 +624,10 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		var p = this.localEventVertex(e)
+		var p = this.sensor.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
 		if (this.openHook === null) { return }
-		p = this.openHook.parent.transformLocalPoint(this.openHook.midpoint, this)
+		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
 		let sb = new LinkBullet({ midpoint: p })
 		let eb = new LinkBullet({ midpoint: p })
 		this.openLink = new DependencyLink({
@@ -815,7 +641,7 @@ The content children can also be dragged and panned.
 
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
-		let p = this.localEventVertex(e)
+		let p = this.sensor.localEventVertex(e)
 		for (let hook of this.compatibleHooks) {
 			let m = hook.positionInLinkMap()
 			if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
@@ -831,13 +657,18 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
-		let h = this.hookAtLocation(this.localEventVertex(e))
+		let h = this.hookAtLocation(this.sensor.localEventVertex(e))
 		if (this.openLink !== null) {
 			this.remove(this.openLink)
 		}
 		if (h === null) {
+			this.openLink = null
+			this.openHook = null
+			this.openBullet = null
+			this.compatibleHooks = []
 			return
-		} else if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+		}
+		if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
 			// click on a plus button to create a new hook
 			let ed = h as EditableLinkHook
 			ed.editName()

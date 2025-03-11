@@ -6,6 +6,7 @@ import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, IO_LIST_OFFSET, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
+import { VView } from 'core/vmobjects/VView'
 
 export class IOList extends RoundedRectangle {
 /*
@@ -24,10 +25,10 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			mobject: null,
 			linkNames: [],
 			cornerRadius: 20,
+			width: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1.0,
-			strokeWidth: 0,
-			width: IO_LIST_WIDTH
+			strokeWidth: 0
 		}
 	}
 
@@ -84,8 +85,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			text: name,
 			horizontalAlign: 'left',
 			verticalAlign: 'center',
-			viewHeight: HOOK_VERTICAL_SPACING,
-			viewWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
+			frameHeight: HOOK_VERTICAL_SPACING,
+			frameWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
 		})
 		this.add(hook)
 		this.add(label)
