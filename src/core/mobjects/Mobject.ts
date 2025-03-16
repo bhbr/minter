@@ -182,6 +182,8 @@ and logic for drawing and user interaction.
 		}
 	}
 
+	redraw() { this.view.redraw() }
+
 	//////////////////////////////////////////////////////////
 	//                                                      //
 	//                       ANIMATION                      //
