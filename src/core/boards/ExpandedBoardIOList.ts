@@ -14,13 +14,13 @@ export class ExpandedBoardIOList extends IOList {
 	emptyLinkHook: EditableLinkHook
 	declare _parent: Board
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			emptyLinkHook: new EditableLinkHook({ showBox: false })
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			emptyLinkHook: 'always'
 		}

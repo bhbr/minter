@@ -11,7 +11,7 @@ on its circumference. The radius (and anchor) is updated automatically.
 
 	outerPoint: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			strokeColor: Color.white(),
 			fillColor: Color.white(),

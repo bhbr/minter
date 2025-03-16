@@ -51,7 +51,7 @@ are linkable) together.
 The content children can also be dragged and panned.
 */
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			contentChildren: [],
 			content: new BoardContent(),
@@ -102,7 +102,7 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			contentChildren: 'never',
 			content: 'never',

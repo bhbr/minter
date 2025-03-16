@@ -9,14 +9,14 @@ export class PolygonalLine extends VMobject {
 
 	closed: boolean
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			closed: true,
 			fillOpacity: 0
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			closed: 'on_init'
 		}

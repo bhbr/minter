@@ -10,7 +10,7 @@ export class Transform extends ExtendedObject {
 	scale: number
 	shift: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			passedByValue: true,
 			anchor: vertexOrigin(),
@@ -20,7 +20,7 @@ export class Transform extends ExtendedObject {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			passedByValue: 'never'
 		}

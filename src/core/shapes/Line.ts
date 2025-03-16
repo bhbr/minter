@@ -7,7 +7,7 @@ export class Line extends Polygon {
 	startPoint: vertex
 	endPoint: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			startPoint: vertexOrigin(),
 			endPoint: vertexOrigin()

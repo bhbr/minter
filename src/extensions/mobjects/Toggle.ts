@@ -16,7 +16,7 @@ export class Toggle extends Mobject {
 	label: TextLabel
 	labelText: string
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			circle: new Circle({
 				radius: 10,
@@ -38,7 +38,7 @@ export class Toggle extends Mobject {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			circle: 'never',
 			bullet: 'never',

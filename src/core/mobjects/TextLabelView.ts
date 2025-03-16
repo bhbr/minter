@@ -14,7 +14,7 @@ export class TextLabelView extends View {
 	borderWidth: number
 	fontSize: number
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			horizontalAlign: 'center',
 			verticalAlign: 'center',

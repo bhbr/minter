@@ -17,7 +17,7 @@ export class PhysicsPaper extends Paper {
 
 	scene: InclinedScene
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			scene: new InclinedScene({
 				anchor: new Vertex(100, 100)
@@ -36,7 +36,7 @@ export class PhysicsPaper extends Paper {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			scene: 'never',
 			creationConstructors: 'never',

@@ -5,7 +5,7 @@ import { Color } from 'core/classes/Color'
 
 export class ConPoint extends Circle {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			radius: 7.0,
 			fillOpacity: 1.0,
@@ -13,7 +13,7 @@ export class ConPoint extends Circle {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			radius: 'never',
 			fillOpacity: 'in_subclass'

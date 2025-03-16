@@ -11,7 +11,7 @@ export class CircularArc extends CurvedLine {
 	angle: number
 	nbPoints: number // vertex resolution along the arc
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			closed: false,
 			anchor: undefined,

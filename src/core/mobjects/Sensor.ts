@@ -24,7 +24,7 @@ export class Sensor extends ExtendedObject {
 	eventStartTime: number
 
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			mobject: null,
 			screenEventHandler: ScreenEventHandler.Parent,
@@ -36,7 +36,7 @@ export class Sensor extends ExtendedObject {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return { }
 	}
 
@@ -147,7 +147,6 @@ export class Sensor extends ExtendedObject {
 		}
 		return targetDivChain.reverse()
 	}
-
 
 	/*
 	Captured event methods

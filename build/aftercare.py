@@ -52,14 +52,14 @@ def add_empty_methods(file, nb_levels_up=0):
 		hasMutabilities = False
 		for line in class_lines:
 			stripped_line = line.lstrip().rstrip()
-			if not hasDefaults and stripped_line.startswith('ownDefaults() {'):
+			if not hasDefaults and stripped_line.startswith('defaults() {'):
 				hasDefaults = True
-			if not hasMutabilities and stripped_line.startswith('ownMutabilities() {'):
+			if not hasMutabilities and stripped_line.startswith('mutabilities() {'):
 				hasMutabilities = True
 		if not hasDefaults:
-			class_lines.insert(-1, indentation + 'ownDefaults() { return {}; }\n')
+			class_lines.insert(-1, indentation + 'defaults() { return {}; }\n')
 		if not hasMutabilities:
-			class_lines.insert(-1, indentation + 'ownMutabilities() { return {}; }\n')
+			class_lines.insert(-1, indentation + 'mutabilities() { return {}; }\n')
 		new_code_lines.extend(class_lines)
 	new_code_lines.extend(code_lines[class_ranges[-1][1]:])
 	with open(file, 'w') as fh:

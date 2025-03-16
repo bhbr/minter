@@ -12,7 +12,7 @@ export class LinkHook extends Circle {
 	name: string
 	type: 'input' | 'output'
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			name: '',
 			type: 'input',
@@ -23,7 +23,7 @@ export class LinkHook extends Circle {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			radius: 'never',
 			fillOpacity: 'never',

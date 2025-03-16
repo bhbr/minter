@@ -11,7 +11,7 @@ export class ValueBox extends Linkable {
 	valueLabel: TextLabel
 	background: Rectangle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			background: new Rectangle({
 				fillColor: Color.black()
@@ -26,7 +26,7 @@ export class ValueBox extends Linkable {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			background: 'never',
 			valueLabel: 'never'

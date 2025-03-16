@@ -19,7 +19,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	mobject?: Linkable
 	type: 'input' | 'output'
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			linkHooks: [],
 			mobject: null,
@@ -32,7 +32,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			cornerRadius: 'never',
 			fillColor: 'never',

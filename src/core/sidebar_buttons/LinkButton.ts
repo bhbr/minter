@@ -3,7 +3,7 @@ import { ToggleButton } from './ToggleButton'
 
 export class LinkButton extends ToggleButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			messages: [{ link: true }],
 			outgoingMessage: { link: false },
@@ -11,7 +11,7 @@ export class LinkButton extends ToggleButton {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			messages: 'never',
 			outgoingMessage: 'never',

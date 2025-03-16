@@ -3,7 +3,7 @@ import { ToggleButton } from './ToggleButton'
 
 export class DragButton extends ToggleButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			messages: [{ drag: true }],
 			outgoingMessage: { drag: false },
@@ -11,7 +11,7 @@ export class DragButton extends ToggleButton {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			messages: 'never',
 			outgoingMessage: 'never',

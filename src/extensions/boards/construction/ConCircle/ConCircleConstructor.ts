@@ -12,7 +12,7 @@ export class ConCircleConstructor extends Constructor {
 	freeOuterPoint: FreePoint
 	circle: ConCircle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			freeMidpoint : new FreePoint(),
 			freeOuterPoint: new FreePoint(),
@@ -22,7 +22,7 @@ export class ConCircleConstructor extends Constructor {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			freeMidpoint: 'never',
 			freeOuterPoint: 'never',

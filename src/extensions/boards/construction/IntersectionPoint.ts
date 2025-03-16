@@ -14,7 +14,7 @@ export class IntersectionPoint extends ConPoint {
 	lambda: number = NaN
 	mu: number = NaN
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			fillOpacity: 0,
 			conMob1: undefined,
@@ -24,7 +24,7 @@ export class IntersectionPoint extends ConPoint {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			fillOpacity: 'never',
 			conMob1: 'on_init',

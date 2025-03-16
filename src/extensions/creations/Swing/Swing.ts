@@ -22,7 +22,7 @@ export class Swing extends Linkable {
 	string: Line
 	weight: Circle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			fixtureWidth: 50,
 			fixtureHeight: 20,
@@ -46,7 +46,7 @@ export class Swing extends Linkable {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			fixtureWidth: 'never',
 			fixtureHeight: 'never',

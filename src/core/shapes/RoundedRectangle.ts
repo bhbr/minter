@@ -13,7 +13,7 @@ export class RoundedRectangle extends CurvedShape {
 	p4: vertex
 	cornerRadius: number
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			width: 200,
 			height: 100,

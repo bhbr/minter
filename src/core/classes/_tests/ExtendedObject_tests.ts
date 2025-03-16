@@ -17,7 +17,7 @@ class FirstClass extends ExtendedObject {
 		this._accessor = newValue
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			mutableProperty: 1,
 			initializableProperty: 2,
@@ -27,7 +27,7 @@ class FirstClass extends ExtendedObject {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			//mutableProperty: 'always',
 			initializableProperty: 'on_init',
@@ -189,7 +189,7 @@ export function An_immutable_property_cannot_be_changed_on_object_creation(): bo
 export function A_mutable_property_can_be_changed_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
@@ -205,7 +205,7 @@ export function A_mutable_property_can_be_changed_in_subclass(): boolean {
 export function A_mutable_property_will_be_changed_properly_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
@@ -222,7 +222,7 @@ export function A_mutable_property_will_be_changed_properly_in_subclass(): boole
 export function An_initializable_property_can_be_changed_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					initializableProperty: 20
 				}
@@ -238,7 +238,7 @@ export function An_initializable_property_can_be_changed_in_subclass(): boolean 
 export function An_initializable_property_will_be_changed_properly_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					initializableProperty: 20
 				}
@@ -254,7 +254,7 @@ export function An_initializable_property_will_be_changed_properly_in_subclass()
 export function A_subclassable_property_can_be_changed_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					subclassableProperty: 20
 				}
@@ -270,7 +270,7 @@ export function A_subclassable_property_can_be_changed_in_subclass(): boolean {
 export function A_subclassable_property_will_be_changed_properly_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					subclassableProperty: 20
 				}
@@ -286,7 +286,7 @@ export function A_subclassable_property_will_be_changed_properly_in_subclass(): 
 export function An_immutable_property_cannot_be_changed_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					immutableProperty: 40
 				}
@@ -335,7 +335,7 @@ export function A_property_s_mutability_cannot_be_changed_on_an_object(): boolea
 export function An_immutable_property_cannot_become_subclassable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					immutableProperty: 'in_subclass'
 				}
@@ -351,7 +351,7 @@ export function An_immutable_property_cannot_become_subclassable_in_subclass(): 
 export function An_immutable_property_cannot_become_initializable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					immutableProperty: 'on_init'
 				}
@@ -367,7 +367,7 @@ export function An_immutable_property_cannot_become_initializable_in_subclass():
 export function An_immutable_property_cannot_become_mutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					immutableProperty: 'always'
 				}
@@ -383,7 +383,7 @@ export function An_immutable_property_cannot_become_mutable_in_subclass(): boole
 export function A_subclassable_property_can_become_immutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					subclassableProperty: 'never'
 				}
@@ -400,12 +400,12 @@ export function A_subclassable_property_can_become_immutable_in_subclass(): bool
 export function A_subclassable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					subclassableProperty: 30
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					subclassableProperty: 'never'
 				}
@@ -421,7 +421,7 @@ export function A_subclassable_property_can_become_immutable_and_have_a_new_defa
 export function A_subclassable_property_cannot_become_initializable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					subclassableProperty: 'on_init'
 				}
@@ -437,7 +437,7 @@ export function A_subclassable_property_cannot_become_initializable_in_subclass(
 export function A_subclassable_property_cannot_become_mutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					subclassableProperty: 'always'
 				}
@@ -454,7 +454,7 @@ export function A_subclassable_property_cannot_become_mutable_in_subclass(): boo
 export function An_initializable_property_can_become_immutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					initializableProperty: 'never'
 				}
@@ -471,12 +471,12 @@ export function An_initializable_property_can_become_immutable_in_subclass(): bo
 export function An_initializable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					initializableProperty: 20
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					initializableProperty: 'never'
 				}
@@ -492,7 +492,7 @@ export function An_initializable_property_can_become_immutable_and_have_a_new_de
 export function An_initializable_property_can_become_subclassable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					initializableProperty: 'in_subclass'
 				}
@@ -508,12 +508,12 @@ export function An_initializable_property_can_become_subclassable_in_subclass():
 export function An_initializable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					initializableProperty: 20
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					initializableProperty: 'in_subclass'
 				}
@@ -529,7 +529,7 @@ export function An_initializable_property_can_become_subclassable_and_have_a_new
 export function An_initializable_property_cannot_become_mutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					initializableProperty: 'always'
 				}
@@ -545,7 +545,7 @@ export function An_initializable_property_cannot_become_mutable_in_subclass(): b
 export function A_mutable_property_can_become_immutable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'never'
 				}
@@ -561,12 +561,12 @@ export function A_mutable_property_can_become_immutable_in_subclass(): boolean {
 export function A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'never'
 				}
@@ -583,12 +583,12 @@ export function A_mutable_property_can_become_immutable_and_have_a_new_default_v
 	try {
 		class SecondClass extends FirstClass { }
 		class ThirdClass extends SecondClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'never'
 				}
@@ -604,12 +604,12 @@ export function A_mutable_property_can_become_immutable_and_have_a_new_default_v
 export function A_mutable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_2(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'never'
 				}
@@ -627,7 +627,7 @@ export function A_mutable_property_can_become_immutable_and_have_a_new_default_v
 export function A_mutable_property_can_become_subclassable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'in_subclass'
 				}
@@ -643,12 +643,12 @@ export function A_mutable_property_can_become_subclassable_in_subclass(): boolea
 export function A_mutable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'in_subclass'
 				}
@@ -664,7 +664,7 @@ export function A_mutable_property_can_become_subclassable_and_have_a_new_defaul
 export function A_mutable_property_can_become_initializable_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'on_init'
 				}
@@ -680,12 +680,12 @@ export function A_mutable_property_can_become_initializable_in_subclass(): boole
 export function A_mutable_property_can_become_initializable_and_have_a_new_default_value_in_subclass(): boolean {
 	try {
 		class SecondClass extends FirstClass {
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					mutableProperty: 10
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					mutableProperty: 'on_init'
 				}
@@ -759,12 +759,12 @@ export function An_immutable_property_can_be_added_in_a_subclass(): boolean {
 
 			immutableProperty2: number
 
-			ownDefaults(): object {
+			defaults(): object {
 				return {
 					immutableProperty2: 6
 				}
 			}
-			ownMutabilities(): object {
+			mutabilities(): object {
 				return {
 					immutableProperty2: 'never'
 				}

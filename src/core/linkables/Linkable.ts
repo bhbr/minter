@@ -17,7 +17,7 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList 
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
@@ -27,7 +27,7 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			inputList: 'never',
 			outputList: 'never'

@@ -6,13 +6,13 @@ export class ConRayConstructor extends ConStraitConstructor {
 
 	ray: ConRay
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			ray: new ConRay()
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			ray: 'never'
 		}

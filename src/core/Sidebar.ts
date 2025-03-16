@@ -31,7 +31,7 @@ export class Sidebar extends Mobject {
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			view: new SidebarView(),
 			background: new Rectangle({
@@ -57,7 +57,7 @@ export class Sidebar extends Mobject {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			view: 'never',
 			background: 'never'

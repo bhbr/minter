@@ -40,7 +40,7 @@ TODO: support mutiple paths e. g. for shapes with holes
 
 	declare view: VView
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			view: new VView(),
 			vertices: []

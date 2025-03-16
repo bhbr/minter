@@ -30,7 +30,7 @@ export class EditableLinkHook extends LinkHook {
 		this._parent = newValue
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			screenEventHandler: ScreenEventHandler.Parent,
 			previousValue: '',
@@ -42,7 +42,7 @@ export class EditableLinkHook extends LinkHook {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			signStrokeWidth: 'never',
 			signScale: 'never',

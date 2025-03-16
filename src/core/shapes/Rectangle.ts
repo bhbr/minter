@@ -11,7 +11,7 @@ export class Rectangle extends Polygon {
 	p3: vertex // = (width, height)
 	p4: vertex // = (0, height)
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			width: 200,
 			height: 100,

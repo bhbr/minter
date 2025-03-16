@@ -8,13 +8,13 @@ export class EditableLinkHookView extends VView {
 	declare mobject: EditableLinkHook
 	inputBox: HTMLInputElement
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			inputBox: document.createElement('input')
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			inputBox: 'never'
 		}

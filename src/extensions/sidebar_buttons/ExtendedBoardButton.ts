@@ -3,13 +3,13 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class ExtendedBoardButton extends CreativeButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			creations: ['board', 'geo']
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			creations: 'never'
 		}

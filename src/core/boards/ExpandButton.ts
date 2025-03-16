@@ -12,7 +12,7 @@ export class ExpandButton extends Circle {
 
 	label: TextLabel
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			transform: Transform.identity(),
 			midpoint: [15, 15],
@@ -28,7 +28,7 @@ export class ExpandButton extends Circle {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			transform: 'never',
 			midpoint: 'never',

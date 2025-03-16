@@ -44,7 +44,7 @@ export class InclinedScene extends Linkable implements Playable {
 	_showTorques: boolean
 	showTorquesToggle: Toggle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 				plane: new InclinedPlane({
 					length: 500
@@ -95,7 +95,7 @@ export class InclinedScene extends Linkable implements Playable {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			plane: 'never',
 			box: 'never',

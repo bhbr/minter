@@ -6,7 +6,7 @@ import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class SimpleButton extends TextLabel {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			frameWidth: 40,
 			frameHeight: 20,

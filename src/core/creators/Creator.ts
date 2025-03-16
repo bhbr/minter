@@ -9,7 +9,7 @@ export class Creator extends Mobject {
 	creation?: Mobject
 	creationStroke: vertexArray
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			creationStroke: [],
 			creation: null,

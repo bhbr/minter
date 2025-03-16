@@ -9,7 +9,7 @@ export class ColorChangeButton extends SidebarButton {
 
 	colorNames: Array<string>
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			colorNames: Object.keys(COLOR_PALETTE),
 			outgoingMessage: {},
@@ -18,7 +18,7 @@ export class ColorChangeButton extends SidebarButton {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			colorNames: 'in_subclass'
 		}

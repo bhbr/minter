@@ -21,7 +21,7 @@ linkable mobjects
 	endBullet: LinkBullet
 	linkLine: Line
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			dependency: new Dependency(),
 			startBullet: new LinkBullet(),
@@ -31,7 +31,7 @@ linkable mobjects
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			dependency: 'never',
 			startBullet: 'on_init',

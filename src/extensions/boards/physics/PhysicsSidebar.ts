@@ -9,7 +9,7 @@ import { buttonDict } from 'core/sidebar_buttons/SidebarButton'
 
 export class PhysicsSidebar extends Sidebar {
 	
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			availableButtonClasses: [
 				DragButton,
@@ -26,7 +26,7 @@ export class PhysicsSidebar extends Sidebar {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			availableButtonClasses: 'never'
 		}

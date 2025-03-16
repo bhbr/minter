@@ -3,13 +3,13 @@ import { CreativeButton } from './CreativeButton'
 
 export class BoardButton extends CreativeButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			creations: ['board']
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			creations: 'never'
 		}

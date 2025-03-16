@@ -13,7 +13,7 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorLabel: TextLabel
 	operatorDict: object
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
 			operatorSign: new Circle({
@@ -30,7 +30,7 @@ export class BinaryOperatorBox extends ValueBox {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			operatorDict: 'in_subclass',
 			operatorSign: 'never',
@@ -78,12 +78,12 @@ export class BinaryOperatorBox extends ValueBox {
 }
 
 export class AddBox extends BinaryOperatorBox {
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			operator: '+'
 		}
 	}
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			operator: 'never'
 		}
@@ -91,12 +91,12 @@ export class AddBox extends BinaryOperatorBox {
 }
 
 export class SubtractBox extends BinaryOperatorBox {
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			operator: '–'
 		}
 	}
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			operator: 'never'
 		}
@@ -104,12 +104,12 @@ export class SubtractBox extends BinaryOperatorBox {
 }
 
 export class MultiplyBox extends BinaryOperatorBox {
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			operator: '&times;'
 		}
 	}
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			operator: 'never'
 		}
@@ -117,12 +117,12 @@ export class MultiplyBox extends BinaryOperatorBox {
 }
 
 export class DivideBox extends BinaryOperatorBox {
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			operator: '/'
 		}
 	}
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			operator: 'never'
 		}

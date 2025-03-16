@@ -30,7 +30,7 @@ export class Motor extends ExtendedObject {
 	mobject?: Mobject
 	showShadow?: boolean
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			animationTimeStart: null,
 			animationDuration: null,

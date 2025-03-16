@@ -4,7 +4,7 @@ import { ExpandedBoardIOList } from './ExpandedBoardIOList'
 
 export class ExpandedBoardOutputList extends ExpandedBoardIOList {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			type: 'output'
 		}

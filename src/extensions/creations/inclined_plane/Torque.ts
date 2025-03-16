@@ -16,7 +16,7 @@ export class Torque extends Polygon {
 		this.view.frame.anchor = newValue
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			force: undefined,
 			strokeWidth: 0,
@@ -25,7 +25,7 @@ export class Torque extends Polygon {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			force: 'on_init'
 		}

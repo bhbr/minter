@@ -21,7 +21,7 @@ export class View extends ExtendedObject {
 	savedDrawShadow: boolean | null
 	drawBorder: boolean
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			div: document.createElement('div'),
 			frame: new Frame(),

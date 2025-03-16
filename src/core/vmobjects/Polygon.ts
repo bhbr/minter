@@ -6,7 +6,7 @@ export class Polygon extends PolygonalLine {
 	A Polygon is a closed PolygonalLine
 	*/
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			closed: 'never'
 		}

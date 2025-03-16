@@ -6,7 +6,7 @@ export class Ellipse extends CurvedShape {
 	majorAxis: number
 	minorAxis: number
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			majorAxis: 200,
 			minorAxis: 100

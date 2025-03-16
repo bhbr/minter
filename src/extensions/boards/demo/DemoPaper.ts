@@ -32,7 +32,7 @@ import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 
 export class DemoPaper extends Paper {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
@@ -66,7 +66,7 @@ export class DemoPaper extends Paper {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			creationConstructors: 'never',
 			buttonNames: 'never'

@@ -34,7 +34,7 @@ export class Construction extends Board {
 	constructedMobjects: Array<ConMobject>
 	declare creator: Constructor
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			points: [],
 			constructedMobjects: [],
@@ -46,7 +46,7 @@ export class Construction extends Board {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			points: 'never',
 			constructedMobjects: 'never',

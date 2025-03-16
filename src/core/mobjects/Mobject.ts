@@ -29,7 +29,7 @@ and logic for drawing and user interaction.
 
 	/*
 	Subclasses dot NOT get their own explicit constructor.
-	The state is completely set by defaults().
+	The state is completely set by fullDefaults().
 	Any additional actions are performed afterwards in setup().
 	
 	Subclasses may also have quite a different setup
@@ -55,7 +55,7 @@ and logic for drawing and user interaction.
 		this.view.redraw()
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 	/*
 	Default values of properties (declared
 	in the sections that follow).
@@ -80,7 +80,7 @@ and logic for drawing and user interaction.
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			view: 'on_init',
 			children: 'never'

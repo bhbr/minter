@@ -5,7 +5,7 @@ import { IO_LIST_OFFSET } from './constants'
 
 export class OutputList extends IOList {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			type: 'output'
 		}

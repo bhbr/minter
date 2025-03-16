@@ -9,7 +9,7 @@ export class PlayButton extends SimpleButton {
 
 	mobject: Playable
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			screenEventHandler: ScreenEventHandler.Self,
 			mobject: undefined,
@@ -23,7 +23,7 @@ export class PlayButton extends SimpleButton {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			screenEventHandler: 'never'
 		}

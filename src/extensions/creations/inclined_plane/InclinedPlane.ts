@@ -9,7 +9,7 @@ export class InclinedPlane extends Polygon {
 	inclination: number
 	midpoint: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			length: undefined,
 			midpoint: [0, 0],
@@ -24,7 +24,7 @@ export class InclinedPlane extends Polygon {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			length: 'on_init'
 		}

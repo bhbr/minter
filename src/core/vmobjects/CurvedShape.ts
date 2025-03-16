@@ -6,7 +6,7 @@ export class CurvedShape extends CurvedLine {
 	A closed CurvedLine is a CurvedShape
 	*/
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			closed: 'never'
 		}

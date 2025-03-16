@@ -9,13 +9,13 @@ export class SpanningCreator extends Creator {
 	
 	rectangle: Rectangle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			rectangle: new Rectangle()
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			rectangle: 'never'
 		}

@@ -3,7 +3,7 @@ import { Construction } from './Construction'
 
 export class ConPaper extends Construction {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			buttonNames: [
 				'DragButton',
@@ -13,7 +13,7 @@ export class ConPaper extends Construction {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			buttonNames: 'never'
 		}

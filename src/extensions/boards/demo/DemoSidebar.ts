@@ -15,7 +15,7 @@ import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleB
 
 export class DemoSidebar extends Sidebar {
 	
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			availableButtonClasses: [
 				DragButton,
@@ -43,7 +43,7 @@ export class DemoSidebar extends Sidebar {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			availableButtonClasses: 'never'
 		}

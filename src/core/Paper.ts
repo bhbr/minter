@@ -19,7 +19,7 @@ export class Paper extends Board {
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			view: new PaperView(),
 			expandedPadding: 0,
@@ -35,7 +35,7 @@ export class Paper extends Board {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			view: 'never',
 			expandedPadding: 'never',

@@ -43,7 +43,7 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
@@ -71,7 +71,7 @@ export class SidebarButton extends Circle {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			baseColor: 'in_subclass',
 			optionSpacing: 'never',

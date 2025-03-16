@@ -22,7 +22,7 @@ export class Frame extends ExtendedObject {
 
 	view?: View
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			// position
 			transform: Transform.identity(),

@@ -11,7 +11,7 @@ A link bullet gets dragged onto a link hook to create
 a dependency between two linkable mobjects.
 */
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			radius: BULLET_RADIUS,
 			fillOpacity: 1,
@@ -19,7 +19,7 @@ a dependency between two linkable mobjects.
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			radius: 'never',
 			fillOpacity: 'never',

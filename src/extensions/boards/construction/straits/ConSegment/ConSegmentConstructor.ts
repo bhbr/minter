@@ -6,13 +6,13 @@ export class ConSegmentConstructor extends ConStraitConstructor {
 
 	segment: ConSegment
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			segment: new ConSegment()
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			segment: 'never'
 		}

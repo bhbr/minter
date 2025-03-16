@@ -4,7 +4,7 @@ import { ScreenEvent, eventVertex } from 'core/mobjects/screen_events'
 
 export class BoxStepper extends BoxSlider {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			min: 0,
 			max: 10,
@@ -13,7 +13,7 @@ export class BoxStepper extends BoxSlider {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			precision: 'never'
 		}

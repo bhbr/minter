@@ -21,8 +21,8 @@ import { isVertex, isVertexArray, vertexEquals, vertexArrayEquals } from 'core/f
 
 class BaseExtendedObject {
 
-	ownDefaults(): object { return {} }
-	ownMutabilities(): object { return {} }
+	defaults(): object { return {} }
+	mutabilities(): object { return {} }
 	mutability(prop: string): string { return 'always' }
 }
 
@@ -67,14 +67,14 @@ export class ExtendedObject extends BaseExtendedObject {
 		this._classHierarchy.reverse()
 
 		for (let obj of prototypes) {
-			let newMutabilities = obj.ownMutabilities()
+			let newMutabilities = obj.mutabilities()
 			if (!equalObjects(previousMutabilities, newMutabilities)) {
 				this._hierarchicalMutabilities[obj.constructor.name] = newMutabilities
 				previousMutabilities = newMutabilities
 			} else {
 				this._hierarchicalMutabilities[obj.constructor.name] = {}
 			}
-			let newDefaults = obj.ownDefaults()
+			let newDefaults = obj.defaults()
 			if (!equalObjects(previousDefaults, newDefaults)) {
 				this._hierarchicalDefaults[obj.constructor.name] = newDefaults
 				previousDefaults = newDefaults
@@ -139,7 +139,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		this._initComplete = true
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			passedByValue: 'in_subclass'
 		}
@@ -161,7 +161,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		return this._mutabilities[prop] ?? 'always'
 	}
 
-	mutabilities(): object {
+	fullMutabilities(): object {
 		let ret = {}
 		for (let prop of this.properties()) {
 			ret[prop] = this.mutability(prop)
@@ -169,7 +169,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		return ret
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			passedByValue: false
 		}

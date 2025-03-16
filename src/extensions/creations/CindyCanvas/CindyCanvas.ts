@@ -19,7 +19,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	playButton: PlayButton
 	playState: 'play' | 'pause' | 'stop'
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			port: {
 				transform: [{
@@ -48,7 +48,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	}
 
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			port: 'never',
 			innerCanvas: 'never',

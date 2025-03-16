@@ -7,13 +7,13 @@ export class SwingCreator extends Creator {
 
 	swing: Swing
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			swing: new Swing()
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			swing: 'never'
 		}

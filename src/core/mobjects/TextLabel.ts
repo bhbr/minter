@@ -9,7 +9,7 @@ export class TextLabel extends Mobject {
 	text: string
 	declare view: TextLabelView
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			text: 'text',
 			view: new TextLabelView()

@@ -35,7 +35,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			inputNames: [],
 			outputNames: ['value'],
@@ -66,7 +66,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			inputNames: 'never',
 			outputNames: 'never',

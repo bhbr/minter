@@ -4,7 +4,7 @@ import { BUTTON_SCALE_FACTOR } from './button_geometry'
 
 export class ToggleButton extends SidebarButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {}
 	}
 

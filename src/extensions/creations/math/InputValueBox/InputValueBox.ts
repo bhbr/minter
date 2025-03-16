@@ -14,7 +14,7 @@ export class InputValueBox extends Linkable {
 	inputBox: HTMLInputElement
 	background: Rectangle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			background: new Rectangle({
 				fillColor: Color.black()
@@ -29,7 +29,7 @@ export class InputValueBox extends Linkable {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			background: 'never',
 			inputBox: 'never'

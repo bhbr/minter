@@ -11,13 +11,13 @@ export class CurvedLine extends VMobject {
 	The array is wrapped in an accessor that keeps this.vertices in sync with it
 	*/
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			closed: true
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			closed: 'on_init'
 		}

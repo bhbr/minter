@@ -12,7 +12,7 @@ export class ColorSample extends Linkable {
 	color: Color
 	circle: Circle
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			circle : new Circle({
 				radius: RADIUS,
@@ -28,7 +28,7 @@ export class ColorSample extends Linkable {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			circle: 'never'
 		}

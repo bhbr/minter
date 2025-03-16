@@ -14,7 +14,7 @@ export class Constructor extends Creator {
 	startPoint: vertex
 	endPoint: vertex
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			construction: undefined, // defined in constructor arguments
 			penStrokeColor: Color.white(),
@@ -24,7 +24,7 @@ export class Constructor extends Creator {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			construction: 'on_init'
 		}

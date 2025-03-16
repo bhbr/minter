@@ -13,7 +13,7 @@ export class Freehand extends Creator {
 	penStrokeWidth: number
 	penStrokeLength: number
 	
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			screenEventHandler: ScreenEventHandler.Below,
 			line: new PolygonalLine({
@@ -25,7 +25,7 @@ export class Freehand extends Creator {
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			screenEventHandler: 'never',
 			line: 'never'

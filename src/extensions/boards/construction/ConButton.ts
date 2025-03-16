@@ -3,13 +3,13 @@ import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
 export class ConButton extends CreativeButton {
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			creations: ['geo']
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			creations: 'never'
 		}

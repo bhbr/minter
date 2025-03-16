@@ -10,13 +10,13 @@ export class ConLineConstructor extends ConStraitConstructor {
 		super(args)
 	}
 
-	ownDefaults(): object {
+	defaults(): object {
 		return {
 			line: new ConLine()
 		}
 	}
 
-	ownMutabilities(): object {
+	mutabilities(): object {
 		return {
 			line: 'never'
 		}
