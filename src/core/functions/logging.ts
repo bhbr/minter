@@ -62,7 +62,7 @@ function htmlLog(msg: any) {
 	logInto(logString(msg), 'htmlConsole')
 }
 function jsLog(msg: any) {
-	console.log(logString(msg))
+	console.log(msg)
 }
 
 export function stackSize(): number {
