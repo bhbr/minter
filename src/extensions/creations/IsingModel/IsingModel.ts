@@ -14,7 +14,11 @@ export class IsingModel extends CellularAutomaton {
 			colorPalette: {
 				"1": Color.red(),
 				"-1": Color.blue()
-			}
+			},
+			inputNames: [
+				'temperature',
+				'couplingStrength'
+			]
 		}
 	}
 
@@ -34,9 +38,10 @@ export class IsingModel extends CellularAutomaton {
 		return initialState
 	}
 
-	evolve() {
+	singleStep() {
 		let i = Math.floor(Math.random() * this.grid.width)
 		let j = Math.floor(Math.random() * this.grid.height)
+		let cell = this.grid.cells[i][j]
 		let oldSpin = this.state[i][j]
 		var nnSum = 0
 		if (i > 1) { nnSum += this.state[i - 1][j] }
@@ -44,17 +49,43 @@ export class IsingModel extends CellularAutomaton {
 		if (j > 1) { nnSum += this.state[i][j - 1] }
 		if (j < this.grid.height - 1) { nnSum += this.state[i][j + 1] }
 		if (oldSpin * nnSum < 0) {
-			this.newState[i][j] = -oldSpin
+			this.state[i][j] = -oldSpin
+			cell.update({
+				fillColor: this.colorPalette[(-oldSpin).toString()]
+			})
 		} else {
 			let dE = this.couplingStrength * oldSpin * nnSum
 			let p = Math.exp(-dE/this.temperature)
 			if (Math.random() < p) {
-				this.newState[i][j] = -oldSpin
+				this.state[i][j] = -oldSpin
+				cell.update({
+					fillColor: this.colorPalette[(-oldSpin).toString()]
+				})
 			}
 		}
-		this.update({
-			state: this.newState
-		})
 	}
+
+	evolve(nbSteps: number = 10) {
+		for (let i = 0; i < nbSteps; i++) {
+			this.singleStep()
+		}
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		if (args['temperature'] || args['couplingStrenngth']) {
+			args['state'] = this.createInitialState()
+		}
+		super.update(args, redraw)
+	}
+
+
+
+
+
+
+
+
+
+
 	
 }

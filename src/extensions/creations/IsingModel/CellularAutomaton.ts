@@ -45,7 +45,7 @@ export class CellularAutomaton extends Linkable {
 	}
 
 
-	evolve() {
+	evolve(nbSteps: number = 1) {
 		this.update({
 			state: this.newState
 		})
@@ -67,6 +67,5 @@ export class CellularAutomaton extends Linkable {
 				})
 			}
 		}
-
 	}
 }

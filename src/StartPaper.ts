@@ -16,7 +16,8 @@ let ising = new IsingModel({
 		height: 20,
 		cellSize: 20
 	}),
-	temperature: 0.01
+	temperature: 0.5,
+	couplingStrength: 0.14
 })
 
 paper.addToContent(ising)
