@@ -1,7 +1,6 @@
 
 import { Grid } from './Grid'
 import { Linkable } from 'core/linkables/Linkable'
-import { copy } from 'core/functions/copying'
 
 export type CAState = Array<Array<number>>
 
@@ -9,14 +8,12 @@ export class CellularAutomaton extends Linkable {
 
 	grid: Grid
 	state: CAState
-	newState: CAState
 	colorPalette: object
 
 	defaults(): object {
 		return {
 			grid: new Grid(),
 			state: [],
-			newState: [],
 			colorPalette: { }
 		}
 	}
@@ -28,15 +25,14 @@ export class CellularAutomaton extends Linkable {
 		if (this.state.length == 0) {
 			this.state = this.createInitialState()
 		}
-		this.newState = copy(this.state)
-		this.updateCells()
+		this.redrawCells()
 	}
 
 	createInitialState(): CAState {
 		let initialState: CAState = []
-		for (let i = 0; i < this.grid.width; i++) {
+		for (var i = 0; i < this.grid.height; i++) {
 			let stateLine: Array<number> = []
-			for (let j = 0; j < this.grid.height; j++) {
+			for (var j = 0; j < this.grid.width; j++) {
 				stateLine.push(0)
 			}
 			initialState.push(stateLine)
@@ -44,23 +40,30 @@ export class CellularAutomaton extends Linkable {
 		return initialState
 	}
 
-
 	evolve(nbSteps: number = 1) {
-		this.update({
-			state: this.newState
-		})
+		for (var i = 0; i < nbSteps; i++) {
+			this.singleStep()
+		}
+		// this.update({
+		// 	state: this.newState
+		// })
+		this.redrawCells()
+	}
+
+	singleStep() {
+		// dynamics implemented in subclass
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		if (args['state'] !== undefined) {
-			this.updateCells()
+		if (args['state'] !== undefined && redraw) {
+			this.redrawCells()
 		}
 		super.update(args, redraw)
 	}
 
-	updateCells() {
-		for (let i = 0; i < this.grid.width; i++) {
-			for (let j = 0; j < this.grid.height; j++) {
+	redrawCells() {
+		for (let i = 0; i < this.grid.height; i++) {
+			for (let j = 0; j < this.grid.width; j++) {
 				let cell = this.grid.cells[i][j]
 				cell.update({
 					fillColor: this.colorPalette[this.state[i][j].toString()]

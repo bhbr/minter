@@ -12,6 +12,7 @@ export class Grid extends MGroup {
 	horizontalGridLines: MGroup
 	verticalGridLines: MGroup
 	cells: Array<Array<GridCell>>
+	drawGridLines: boolean
 
 	defaults(): object {
 		return {
@@ -20,7 +21,8 @@ export class Grid extends MGroup {
 			height: 2,
 			horizontalGridLines: new MGroup(),
 			verticalGridLines: new MGroup(),
-			cells: []
+			cells: [],
+			drawGridLines: true
 		}
 	}
 
@@ -37,15 +39,17 @@ export class Grid extends MGroup {
 
 	setup() {
 		super.setup()
-		this.drawNewGridLines()
-		this.add(this.horizontalGridLines)
-		this.add(this.verticalGridLines)
+		if (this.drawGridLines) {
+			this.drawNewGridLines()
+			this.add(this.horizontalGridLines)
+			this.add(this.verticalGridLines)
+		}
 
-		for (let i = 0; i < this.width; i++) {
+		for (var i = 0; i < this.height; i++) {
 			let cellLine: Array<GridCell> = []
-			for (let j = 0; j < this.height; j++) {
+			for (var j = 0; j < this.width; j++) {
 				let cell = new GridCell({
-					anchor: [i * this.cellSize, j * this.cellSize],
+					anchor: [j * this.cellSize, i * this.cellSize],
 					sidelength: this.cellSize
 				})
 				this.add(cell)
@@ -65,7 +69,7 @@ export class Grid extends MGroup {
 		for (let line of this.horizontalGridLines.submobs) {
 			this.horizontalGridLines.remove(line)
 		}
-		for (let i = 0; i < this.height + 1; i++) {
+		for (var i = 0; i < this.height + 1; i++) {
 			let line = new Line({
 				startPoint: [0, i * this.cellSize],
 				endPoint: [this.width, i * this.cellSize]
@@ -79,10 +83,10 @@ export class Grid extends MGroup {
 		for (let line of this.verticalGridLines.submobs) {
 			this.verticalGridLines.remove(line)
 		}
-		for (let i = 0; i < this.width + 1; i++) {
+		for (var j = 0; j < this.width + 1; j++) {
 			let line = new Line({
-				startPoint: [i * this.cellSize, 0],
-				endPoint: [i * this.cellSize, this.height]
+				startPoint: [j * this.cellSize, 0],
+				endPoint: [j * this.cellSize, this.height]
 			})
 			this.verticalGridLines.add(line)
 		}
@@ -92,7 +96,7 @@ export class Grid extends MGroup {
 	
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		if (args['cellSize'] || args['width'] || args['height']) {
+		if (this.drawGridLines && (args['cellSize'] || args['width'] || args['height'])) {
 			this.drawNewGridLines()
 		}
 	}

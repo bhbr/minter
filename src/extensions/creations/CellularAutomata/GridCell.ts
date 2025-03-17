@@ -7,7 +7,8 @@ export class GridCell extends Square {
 
 	defaults(): object {
 		return {
-			fillOpacity: 1
+			fillOpacity: 1,
+			strokeWidth: 0
 		}
 	}
 

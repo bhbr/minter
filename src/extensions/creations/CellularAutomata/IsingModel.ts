@@ -24,9 +24,9 @@ export class IsingModel extends CellularAutomaton {
 
 	createInitialState(): CAState {
 		let initialState: CAState = []
-		for (let i = 0; i < this.grid.width; i++) {
+		for (var i = 0; i < this.grid.width; i++) {
 			let stateLine: Array<number> = []
-			for (let j = 0; j < this.grid.height; j++) {
+			for (var j = 0; j < this.grid.height; j++) {
 				if (Math.random() < 0.5) {
 					stateLine.push(1)
 				} else {
@@ -62,12 +62,6 @@ export class IsingModel extends CellularAutomaton {
 					fillColor: this.colorPalette[(-oldSpin).toString()]
 				})
 			}
-		}
-	}
-
-	evolve(nbSteps: number = 10) {
-		for (let i = 0; i < nbSteps; i++) {
-			this.singleStep()
 		}
 	}
 
