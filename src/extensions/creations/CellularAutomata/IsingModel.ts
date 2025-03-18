@@ -50,23 +50,17 @@ export class IsingModel extends CellularAutomaton {
 		if (j < this.grid.height - 1) { nnSum += this.state[i][j + 1] }
 		if (oldSpin * nnSum < 0) {
 			this.state[i][j] = -oldSpin
-			cell.update({
-				fillColor: this.colorPalette[(-oldSpin).toString()]
-			})
 		} else {
 			let dE = this.couplingStrength * oldSpin * nnSum
 			let p = Math.exp(-dE/this.temperature)
 			if (Math.random() < p) {
 				this.state[i][j] = -oldSpin
-				cell.update({
-					fillColor: this.colorPalette[(-oldSpin).toString()]
-				})
 			}
 		}
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		if (args['temperature'] || args['couplingStrenngth']) {
+		if (args['temperature'] || args['couplingStrength']) {
 			args['state'] = this.createInitialState()
 		}
 		super.update(args, redraw)
