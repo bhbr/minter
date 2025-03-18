@@ -10,7 +10,7 @@ export function Anchors_of_nested_mobjects_transform_properly(): boolean {
 	})
 	parent.add(child)
 	let v = [42, 96]
-	let transformedAnchor = child.transformLocalPoint(v, parent)
+	let transformedAnchor = child.frame.transformLocalPoint(v, parent.frame)
 	let addedAnchors = vertexAdd(v, child.anchor)
 	return vertexEquals(transformedAnchor, addedAnchors)
 }
