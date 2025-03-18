@@ -2,17 +2,26 @@
 import { Linkable } from 'core/linkables/Linkable'
 import { getPaper } from 'core/functions/getters'
 import { View } from 'core/mobjects/View'
+import { Mobject } from 'core/mobjects/Mobject'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Rectangle } from 'core/shapes/Rectangle'
 
 declare var Desmos: any
 
 export class DesmosCalculator extends Linkable {
 
+	calculator: any
+	innerCanvas: Mobject
+	outerFrame: Rectangle
 
 	defaults(): object {
 		return {
 			view: new View({
 				div: document.createElement('div')
-			})
+			}),
+			calculator: null,
+			innerCanvas: new Mobject(),
+			outerFrame: new Rectangle()
 		}
 	}
 
@@ -21,8 +30,30 @@ export class DesmosCalculator extends Linkable {
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
 		}
-		this.view.div.id = 'desmos-calc'
-		window.setTimeout(this.createCalculator.bind(this), 5000)
+
+
+		this.innerCanvas.view.frame.update({
+			width: this.view.frame.width,
+			height: this.view.frame.height
+		})
+		this.innerCanvas.update({
+			screenEventHandler: ScreenEventHandler.Auto
+		})
+		this.add(this.innerCanvas)
+
+
+		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
+
+		this.innerCanvas.view.div.id = 'desmos-calc'
+
+		this.outerFrame.update({
+			width: this.view.frame.width,
+			height: this.view.frame.height,
+			screenEventHandler: ScreenEventHandler.Below
+		})
+		this.add(this.outerFrame)
+
+		window.setTimeout(this.createCalculator.bind(this), 1000)
 
 	}
 
@@ -38,7 +69,23 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	createCalculator() {
-		let calculator = Desmos.GraphingCalculator(this.view.div)
+		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, {
+			expressions: false
+		})
+		this.calculator.setExpression({id:'graph1', latex:'y=x^2'})
+	}
+
+	setDragging(flag: boolean) {
+		super.setDragging(flag)
+		if (flag) {
+			this.outerFrame.update({
+				screenEventHandler: ScreenEventHandler.Parent
+			})
+		} else {
+			this.outerFrame.update({
+				screenEventHandler: ScreenEventHandler.Below
+			})
+		}
 	}
 
 
