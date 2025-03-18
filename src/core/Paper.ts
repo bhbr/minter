@@ -18,6 +18,7 @@ export class Paper extends Board {
 	expandedMobject: Board
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
+	loadedAPIs: Array<string>
 
 	defaults(): object {
 		return {
@@ -31,7 +32,8 @@ export class Paper extends Board {
 			frameWidth: PAPER_WIDTH,
 			frameHeight: PAGE_HEIGHT,
 			currentColor: Color.white(),
-			drawShadow: false
+			drawShadow: false,
+			loadedAPIs: []
 		}
 	}
 

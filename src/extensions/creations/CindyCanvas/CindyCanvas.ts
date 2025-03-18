@@ -6,6 +6,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
 import { Rectangle } from 'core/shapes/Rectangle'
+import { getPaper } from 'core/functions/getters'
 
 declare var CindyJS: any
 
@@ -61,6 +62,10 @@ export class CindyCanvas extends Linkable implements Playable {
 	setup() {
 		super.setup()
 
+		if (!getPaper().loadedAPIs.includes('cindy')) {
+			this.loadCindyAPI()
+		}
+
 		this.innerCanvas.view.frame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height
@@ -92,7 +97,24 @@ export class CindyCanvas extends Linkable implements Playable {
 			mobject: this
 		})
 		this.createScripts()
-		this.startCore()
+
+		window.setTimeout(this.startCore.bind(this), 2000)
+		// todo: async/await
+	}
+
+	loadCindyAPI() {
+		let paper = getPaper()
+
+		let scriptTag1 = document.createElement('script')
+		scriptTag1.type = 'text/javascript'
+		scriptTag1.src = '../../../CindyJS/build/js/Cindy.js'
+		let scriptTag2 = document.createElement('script')
+		scriptTag2.type = 'text/javascript'
+		scriptTag2.src = '../../../CindyJS/build/js/CindyGL.js'
+		document.head.append(scriptTag1)
+		document.head.append(scriptTag2)
+
+		paper.loadedAPIs.push('cindy')
 	}
 
 	createScripts() {
