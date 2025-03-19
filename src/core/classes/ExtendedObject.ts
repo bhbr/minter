@@ -1,17 +1,6 @@
 
-// Problem: When updating a Mobject with setAttributes(args),
-// some attributes should only be copied (passed by value),
-// not linked (passed by reference). This mainly concerns Vertex.
-// E. g. if one Mobject's anchor is set to another's by reference,
-// these two attributes now point to the same object. Changing one
-// Mobject's anchor now changes the other's as well.
-// The issue stems from the fact that a Vertex is an object
-// even though it should just be a "dumb" list of numbers (a struct)
-// without a persistent identity.
+// An ExtendedObject 
 
-// Solution: An ExtendedObject has a flag passedByValue, which
-// is taken into account when updating a Mobject's attribute with
-// such an ExtendedObject as argument.
 
 import { remove } from 'core/functions/arrays'
 import { copy, equalObjects } from 'core/functions/copying'
@@ -28,22 +17,21 @@ class BaseExtendedObject {
 
 export class ExtendedObject extends BaseExtendedObject {
 
-	_classHierarchy: Array<string>
-	_mutabilities: object
-	_hierarchicalMutabilities: object
-	_hierarchicalDefaults: object
-	_defaults: object
-	_initComplete: boolean
-	_checkPermissions: boolean
-	passedByValue: boolean
-	static mutabilityOrder = {
+	private _classHierarchy: Array<string>
+	private _mutabilities: object
+	private _hierarchicalMutabilities: object
+	private _hierarchicalDefaults: object
+	private _defaults: object
+	private _initComplete: boolean
+	private _checkPermissions: boolean
+	private static mutabilityOrder = {
 		'always': 0,
 		'on_init': 1,
 		'in_subclass': 2,
 		'never': 3
 	}
 
-	static compatibleMutabilities(oldMut, newMut): boolean {
+	private static compatibleMutabilities(oldMut, newMut): boolean {
 		return (ExtendedObject.mutabilityOrder[newMut] >= ExtendedObject.mutabilityOrder[oldMut])
 	}
 
@@ -139,12 +127,6 @@ export class ExtendedObject extends BaseExtendedObject {
 		this._initComplete = true
 	}
 
-	mutabilities(): object {
-		return {
-			passedByValue: 'in_subclass'
-		}
-	}
-
 	properties(): Array<string> {
 		let ret: Array<string> = []
 		for (let [cls, defDict] of Object.entries(this._hierarchicalDefaults)) {
@@ -169,13 +151,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		return ret
 	}
 
-	defaults(): object {
-		return {
-			passedByValue: false
-		}
-	}
-
-	updateInits(oldInits: object, newInits: object): object {
+	private updateInits(oldInits: object, newInits: object): object {
 		let updatedInits = copy(oldInits)
 		for (let [prop, value] of Object.entries(newInits)) {
 			let mutability = this._mutabilities[prop] ?? 'always'
@@ -188,7 +164,7 @@ export class ExtendedObject extends BaseExtendedObject {
 	 	return updatedInits
 	}
 
-	checkPermissionsOnUpdateDict(args): boolean {
+	private checkPermissionsOnUpdateDict(args): boolean {
 		for (let prop of Object.keys(args)) {
 			let mutability = this._mutabilities[prop]
 			if (mutability === 'never' || mutability === 'in_subclass') {
@@ -206,14 +182,14 @@ export class ExtendedObject extends BaseExtendedObject {
 		return args
 	}
 
-	isSetter(prop: string): boolean {
+	private isSetter(prop: string): boolean {
 		let pd = this.propertyDescriptor(prop)
 		if (pd === undefined) { return false }
 		let s = pd['set']
 		return s !== undefined
 	}
 
-	propertyDescriptors(): object {
+	private propertyDescriptors(): object {
 		let pds = {}
 		var obj = this
 		while (obj) {
@@ -223,12 +199,12 @@ export class ExtendedObject extends BaseExtendedObject {
 		return pds
 	}
 
-	propertyDescriptor(prop: string): PropertyDescriptor | undefined {
+	private propertyDescriptor(prop: string): PropertyDescriptor | undefined {
 		let pds = this.propertyDescriptors()
 		return pds[prop]
 	}
 
-	setter(prop: string): any {
+	private setter(prop: string): any {
 		let pd = this.propertyDescriptor(prop)
 		return (pd === undefined) ? undefined : pd.set
 	}
@@ -243,7 +219,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		}
 	}
 
-	removeUnchangedProperties(args: object): object {
+	private removeUnchangedProperties(args: object): object {
 		for (let [prop, value] of Object.entries(args)) {
 			if (this[prop] === undefined) { continue }
 			if (typeof value != 'object' || value === null) {
@@ -271,7 +247,7 @@ export class ExtendedObject extends BaseExtendedObject {
 		return args
 	}
 
-	setProperties(args: object = {}) {
+	private setProperties(args: object = {}) {
 
 	 	let syncedArgs = this.synchronizeUpdateArguments(args)
 
@@ -295,7 +271,7 @@ export class ExtendedObject extends BaseExtendedObject {
 	 	}
 	}
 
-	setProperty(prop: string, value: any) {
+	private setProperty(prop: string, value: any) {
 		let desc = this.propertyDescriptor(prop)
 		if (desc === undefined) {
 			Object.defineProperty(this, prop, {
@@ -329,6 +305,15 @@ export class ExtendedObject extends BaseExtendedObject {
 
 	isMutable(prop: string) {
 		return (this.mutability(prop) === 'always')
+	}
+
+	classHierarchy(): string {
+		// for debugging
+		var ret: string = ''
+		for (let className of this._classHierarchy) {
+			ret += className + ' > '
+		}
+		return ret.substring(0, ret.length - 3)
 	}
 
 }

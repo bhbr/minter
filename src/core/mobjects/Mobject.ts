@@ -17,8 +17,8 @@ import { Sensor } from './Sensor'
 export class Mobject extends ExtendedObject {
 
 /*
-A mobject (math object) has a view with an underlying state
-and logic for drawing and user interaction.
+A mobject (math object) has a view with an underlying state and logic
+for drawing (View), animation (Motor) and user interaction (Sensor).
  */
 
 	//////////////////////////////////////////////////////////

@@ -97,7 +97,6 @@ export class Swing extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 
 		args['frameHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
-		args = this.removeUnchangedProperties(args)
 		if (args['frameHeight'] !== undefined) {
 			this.outputList.update()
 		}

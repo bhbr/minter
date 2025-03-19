@@ -12,20 +12,13 @@ export class Transform extends ExtendedObject {
 
 	defaults(): object {
 		return {
-			passedByValue: true,
 			anchor: vertexOrigin(),
 			angle: 0,
 			scale: 1,
 			shift: vertexOrigin()
 		}
 	}
-
-	mutabilities(): object {
-		return {
-			passedByValue: 'never'
-		}
-	}
-
+	
 	static identity(): Transform { return new Transform() }
 
 	det(): number { return this.scale ** 2 }
