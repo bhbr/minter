@@ -15,6 +15,11 @@ export class DesmosCalculator extends Linkable {
 	innerCanvas: Mobject
 	outerFrame: Rectangle
 	a: number
+	aExpression: any
+	b: number
+	X: number
+	Y: number
+	YExpression: any
 
 	defaults(): object {
 		return {
@@ -26,7 +31,13 @@ export class DesmosCalculator extends Linkable {
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			a: 1,
-			outputNames: ['a']
+			aExpression: null,
+			YExpression: null,
+			b: 1,
+			X: 1,
+			Y: 1,
+			inputNames: ['X', 'b'],
+			outputNames: ['a', 'Y']
 		}
 	}
 
@@ -75,21 +86,25 @@ export class DesmosCalculator extends Linkable {
 
 	createCalculator() {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, {
-			expressions: false
+			expressions: true
 		})
-		this.calculator.setExpression({id:'graph1', latex:'f(x)=x^2'})
+		this.calculator.setExpression({id:'graph1', latex:`f(x)=ax^2+${this.b}`})
 
 		this.calculator.setExpressions([
-			{ id: 'xValue', latex: `a=${this.a}` },
-			{ id: 'point', latex: '(a,f(a))' }
+			{ id: 'a', latex: `a=1` },
+			{ id: 'Y', latex: `Y=f(${this.X})` },
+			{ id: 'point', latex: `(${this.X},Y)` }
 		]);
 
-		var a = this.calculator.HelperExpression({ latex: 'a' });
+		this.aExpression = this.calculator.HelperExpression({ latex: 'a' });
+		this.YExpression = this.calculator.HelperExpression({ latex: 'Y' });
 
-		a.observe('numericValue.change', function() {
-			this.update({ a: a.numericValue })
-			
-		}.bind(this));
+		this.aExpression.observe('numericValue.change', function() {
+			this.update({ a: this.aExpression.numericValue })
+		}.bind(this))
+		this.YExpression.observe('numericValue.change', function() {
+			this.update({ Y: this.YExpression.numericValue })
+		}.bind(this))
 	}
 
 	setDragging(flag: boolean) {
@@ -104,6 +119,38 @@ export class DesmosCalculator extends Linkable {
 			})
 		}
 	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		if (args['b'] !== undefined) {
+			this.calculator.setExpression({id:'graph1', latex:`f(x)=ax^2+ ${this.b}`})
+		}
+		if (args['X'] !== undefined) {
+			this.calculator.setExpressions([
+				{ id: 'Y', latex: `Y=f(${this.X})` },
+				{ id: 'point', latex: `(${this.X},Y)` }
+			])
+		}
+		super.update(args, redraw)
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
