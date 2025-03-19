@@ -5,6 +5,7 @@ import { View } from 'core/mobjects/View'
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
+import { log } from 'core/functions/logging'
 
 declare var Desmos: any
 
@@ -13,15 +14,19 @@ export class DesmosCalculator extends Linkable {
 	calculator: any
 	innerCanvas: Mobject
 	outerFrame: Rectangle
+	a: number
 
 	defaults(): object {
 		return {
 			view: new View({
 				div: document.createElement('div')
 			}),
+			screenEventHandler: ScreenEventHandler.Self,
 			calculator: null,
 			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle()
+			outerFrame: new Rectangle(),
+			a: 1,
+			outputNames: ['a']
 		}
 	}
 
@@ -72,7 +77,19 @@ export class DesmosCalculator extends Linkable {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, {
 			expressions: false
 		})
-		this.calculator.setExpression({id:'graph1', latex:'y=x^2'})
+		this.calculator.setExpression({id:'graph1', latex:'f(x)=x^2'})
+
+		this.calculator.setExpressions([
+			{ id: 'xValue', latex: `a=${this.a}` },
+			{ id: 'point', latex: '(a,f(a))' }
+		]);
+
+		var a = this.calculator.HelperExpression({ latex: 'a' });
+
+		a.observe('numericValue.change', function() {
+			this.update({ a: a.numericValue })
+			
+		}.bind(this));
 	}
 
 	setDragging(flag: boolean) {

@@ -73,6 +73,8 @@ export class CindyCanvas extends Linkable implements Playable {
 		this.innerCanvas.update({
 			screenEventHandler: ScreenEventHandler.Auto
 		})
+		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
+		this.innerCanvas.view.div.id = this.id
 		this.add(this.innerCanvas)
 
 		this.outerFrame.update({
@@ -82,16 +84,13 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 		this.add(this.outerFrame)
 
-		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
-
-		this.innerCanvas.view.div.id = this.id
-
 		Object.assign(this.port, {
 			id: this.id,
 			width: this.view.frame.width,
 			height: this.view.frame.height,
 			started: false
 		})
+
 		this.add(this.playButton)
 		this.playButton.update({
 			mobject: this

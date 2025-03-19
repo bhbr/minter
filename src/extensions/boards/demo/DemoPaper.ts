@@ -1,6 +1,7 @@
 
 import { Paper } from 'core/Paper'
 import { WavyCreator } from 'extensions/creations/Wavy/WavyCreator'
+import { DesmosCalculatorCreator } from 'extensions/creations/DesmosCalculator/DesmosCalculatorCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { ValueBoxCreator } from 'extensions/creations/math/ValueBox/ValueBoxCreator'
@@ -36,6 +37,7 @@ export class DemoPaper extends Paper {
 		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
+				'desmos': DesmosCalculatorCreator,
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
 				'value': ValueBoxCreator,

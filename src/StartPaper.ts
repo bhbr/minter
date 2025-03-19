@@ -9,11 +9,3 @@ import { DesmosCalculator } from './extensions/creations/DesmosCalculator/Desmos
 export const TESTING: boolean = false
 export class StartPaper extends DemoPaper { }
 export const paper = new StartPaper()
-
-let desmos = new DesmosCalculator({
-	anchor: [100, 100],
-	frameWidth: 400,
-	frameHeight: 300
-})
-
-paper.addToContent(desmos)
