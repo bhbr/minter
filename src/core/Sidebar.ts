@@ -1,7 +1,7 @@
 
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { rgb, gray } from 'core/functions/colors'
-import { TAU, SIDEBAR_WIDTH, PAGE_HEIGHT } from 'core/constants'
+import { TAU, SIDEBAR_WIDTH, PAPER_HEIGHT } from 'core/constants'
 import { vertex } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { convertStringToArray } from 'core/functions/arrays'
@@ -40,7 +40,7 @@ export class Sidebar extends Mobject {
 				strokeWidth: 0,
 				screenEventHandler: ScreenEventHandler.Parent,
 				width: SIDEBAR_WIDTH,
-				height: PAGE_HEIGHT
+				height: PAPER_HEIGHT
 			}),
 
 			availableButtonClasses: [
@@ -52,7 +52,7 @@ export class Sidebar extends Mobject {
 				new LinkButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
-			frameHeight: PAGE_HEIGHT,
+			frameHeight: PAPER_HEIGHT,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}

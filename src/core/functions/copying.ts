@@ -1,4 +1,6 @@
 
+import { log } from './logging'
+
 export function copy(obj: any): any {
 	// shallow copy
 
@@ -76,9 +78,9 @@ export function deepCopy(obj: any, withHTML: boolean = true, memo: Array<Array<o
 	let newObj: object
 	if (obj.constructor.name == 'HTMLDivElement') {
 		newObj = withHTML ? document.createElement('div') : null
-	} else if (obj.constructor.name == 'HTMLSVGElement') {
+	} else if (obj.constructor.name == 'SVGSVGElement') {
 		newObj = withHTML ? document.createElementNS('http://www.w3.org/2000/svg', 'svg') : null
-	} else if (obj.constructor.name == 'HTMLPathElement') {
+	} else if (obj.constructor.name == 'SVGPathElement') {
 		newObj = withHTML ? document.createElementNS('http://www.w3.org/2000/svg', 'path') : null
 	} else {
 		newObj = Object.create(obj.constructor.prototype)
@@ -89,7 +91,7 @@ export function deepCopy(obj: any, withHTML: boolean = true, memo: Array<Array<o
 	if (newObj === null) {
 		return newObj
 	}
-	
+
 	for (let [key, value] of Object.entries(obj)) {
 
 			var copiedValue: any
@@ -109,10 +111,14 @@ export function deepCopy(obj: any, withHTML: boolean = true, memo: Array<Array<o
 			}
 	}
 
-	if (withHTML && isInstance(obj, 'VMobject')) {
+	if (withHTML && isInstance(obj, 'View')) {
+		newObj['div'] = obj.div.cloneNode()
+		obj.div['view'] = newObj
+	}
+	if (withHTML && isInstance(obj, 'VView')) {
 		newObj['svg'] = obj.svg.cloneNode()
 		newObj['path'] = obj.path.cloneNode()
-		newObj['view'].appendChild(newObj['svg'])
+		newObj['div'].appendChild(newObj['svg'])
 		newObj['svg'].appendChild(newObj['path'])
 	}
 	return newObj
@@ -138,6 +144,7 @@ export function equalObjects(obj1: object, obj2: object) {
 	}
 	for (let prop of a) {
 		if (obj1[prop] != obj2[prop]) { return false }
+		// shouldn't this also check recursively for unequal objects?
 	}
 	return true
 }

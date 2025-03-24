@@ -27,7 +27,10 @@ export class TextLabelView extends View {
 
 	setup() {
 		super.setup()
-		this.div.setAttribute('class', this.constructor.name + ' unselectable mobject-div')
+		if (this.constructor.name == 'TextLabelView') {
+			//debugger
+		}
+		this.div.setAttribute('class', this.mobject.constructor.name + ' unselectable mobject-div')
 		this.div.style.display = 'flex'
 		this.div.style.fontFamily = 'Helvetica'
 		this.div.style.fontSize = `${this.fontSize}px`

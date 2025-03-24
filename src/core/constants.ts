@@ -3,7 +3,7 @@ import { Color } from 'core/classes/Color'
 
 export const SIDEBAR_WIDTH = 150
 export const PAPER_WIDTH = 1000 //1216
-export const PAGE_HEIGHT = 800 //1024
+export const PAPER_HEIGHT = 800 //1024
 
 export const DRAW_BORDERS: boolean = false
 

@@ -1,6 +1,7 @@
 import { View } from 'core/mobjects/View'
 import { VMobject } from './VMobject'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class VView extends View {
 	
@@ -44,15 +45,18 @@ export class VView extends View {
 		if (!this.svg || !this.path) { return }
 		let pathString: string = this.mobject.pathString()
 		if (pathString.includes('NaN')) { return }
-		this.path.setAttribute('d', pathString)
+		this.updatePath(pathString)
+	}
 
+	updatePath(pathString: string) {
+		this.path.setAttribute('d', pathString)
 		this.path.style['fill'] = this.fillColor.toHex()
 		this.path.style['fill-opacity'] = this.fillOpacity.toString()
 		this.path.style['stroke'] = this.strokeColor.toHex()
 		this.path.style['stroke-width'] = this.strokeWidth.toString()
 	}
-
 }
+
 
 
 

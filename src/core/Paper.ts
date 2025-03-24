@@ -5,7 +5,7 @@ import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, r
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { PAPER_WIDTH, PAGE_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { PAPER_WIDTH, PAPER_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
 import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
@@ -30,7 +30,7 @@ export class Paper extends Board {
 			pressedKeys: [],
 			activeKeyboard: true,
 			frameWidth: PAPER_WIDTH,
-			frameHeight: PAGE_HEIGHT,
+			frameHeight: PAPER_HEIGHT,
 			currentColor: Color.white(),
 			drawShadow: false,
 			loadedAPIs: []
