@@ -121,12 +121,15 @@ export class Sensor extends ExtendedObject {
 		let targetDivChain = this.eventTargetDivChain(e) // defined below
 		let targetMobChain: Array<Mobject> = []
 		for (var div of targetDivChain.values()) {
-			let m: any = div['view'].mobject
-			if (m == undefined) { continue }
-			let mob: Mobject = m as Mobject
-			// only consider targets above the first mobject
-			// with ScreenEventHandler.Parent
-			targetMobChain.push(mob)
+			try {
+				let m: any = div['view'].mobject
+				let mob: Mobject = m as Mobject
+				// only consider targets above the first mobject
+				// with ScreenEventHandler.Parent
+				targetMobChain.push(mob)
+			} catch {
+				continue
+			}
 		}
 		return targetMobChain
 	}
