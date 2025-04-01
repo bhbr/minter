@@ -9,6 +9,7 @@ export class ConStrait extends Line {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
+		
 		this.vertices[0] = this.drawingStartPoint()
 		this.vertices[1] = this.drawingEndPoint()
 		if (redraw) { this.view.redraw() }

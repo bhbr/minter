@@ -13,7 +13,7 @@ export class Torque extends Polygon {
 	}
 
 	set origin(newValue: vertex) {
-		this.view.frame.anchor = newValue
+		this.view.frame.update({ anchor: newValue })
 	}
 
 	defaults(): object {
@@ -44,14 +44,14 @@ export class Torque extends Polygon {
 		let r = this.lever()
 		let F = this.force.asVectorOnScreen()
 		if (Math.abs(this.size() * this.force.scale) < 5) { // in square pixels
-			this.vertices = []
+			super.update({ vertices: [] })
 		} else {
-			this.vertices = [
+			super.update({ vertices: [
 				[0, 0],
 				r,
 				vertexAdd(r, F),
 				F
-			]
+			] })
 		}
 		if (redraw) { this.view.redraw() }
 	}

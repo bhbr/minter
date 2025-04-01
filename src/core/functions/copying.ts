@@ -143,8 +143,17 @@ export function equalObjects(obj1: object, obj2: object) {
 		if (!a.includes(key)) { return false }
 	}
 	for (let prop of a) {
-		if (obj1[prop] != obj2[prop]) { return false }
-		// shouldn't this also check recursively for unequal objects?
+		let value1 = obj1[prop]
+		let value2 = obj2[prop]
+		if (typeof value1 == 'object' && typeof value2 == 'object') {
+			if (!equalObjects(value1, value2)) {
+				return false
+			}
+		} else {
+			if (value1 !== value2) {
+				return false
+			}
+		}
 	}
 	return true
 }

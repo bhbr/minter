@@ -12,9 +12,9 @@ import { log } from 'core/functions/logging'
 var paper: Paper = null
 
 if (isTouchDevice === false) {
-	const paperView = document.querySelector('#paper_id')
-	if (paperView !== null) {
-		paper = paperView['view']['mobject'] as Paper
+	const paperDiv = document.querySelector('#paper_id')
+	if (paperDiv !== null) {
+		paper = paperDiv['view']['mobject'] as Paper
 	}
 }
 

@@ -7,5 +7,7 @@ import { ExtendedObject } from './core/classes/ExtendedObject'
 import { deepCopy } from './core/functions/copying'
 
 export const TESTING: boolean = false
+
 export class StartPaper extends DemoPaper { }
 export const paper = new StartPaper()
+

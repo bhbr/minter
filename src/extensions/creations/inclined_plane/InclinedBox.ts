@@ -17,12 +17,12 @@ export class InclinedBox extends Polygon {
 		}
 	}
 
-	get centerOfMass(): Vertex {
+	get centerOfMass(): vertex {
 		return this.view.frame.anchor
 	}
 
-	set centerOfMass(newValue: Vertex) {
-		this.view.frame.anchor = newValue
+	set centerOfMass(newValue: vertex) {
+		this.view.frame.update({ anchor: newValue })
 	}
 
 	get rotationAngle(): number {
@@ -43,9 +43,9 @@ export class InclinedBox extends Polygon {
 		super.update(args, false)
 		let w2 = this.width / 2
 		let h2 = this.height / 2
-		this.vertices = [
+		super.update({ vertices: [
 			[-w2, -h2], [-w2, h2], [w2, h2], [w2 ,-h2]
-		]
+		] })
 		if (redraw) { this.view.redraw() }
 	}
 
