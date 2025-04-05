@@ -47,10 +47,10 @@ i. e. if running in the browser (minter.html)
 instead of in the app (paper.html)
 */
 	var sidebarWidth: number = 0
-	let sidebarView = document.querySelector('#sidebar_id') as HTMLDivElement
-	if (sidebarView !== null) {
+	let sidebarDiv = document.querySelector('#sidebar_id') as HTMLDivElement
+	if (sidebarDiv !== null) {
 		// we are in the browser
-		sidebarWidth = sidebarView.clientWidth
+		sidebarWidth = sidebarDiv.clientWidth
 	}
 	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }

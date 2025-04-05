@@ -7,8 +7,8 @@ import { GridCell } from './GridCell'
 export class Grid extends MGroup {
 	
 	cellSize: number
-	width: number
-	height: number
+	nbCellsHorizontal: number
+	nbCellsVertical: number
 	horizontalGridLines: MGroup
 	verticalGridLines: MGroup
 	cells: Array<Array<GridCell>>
@@ -17,8 +17,8 @@ export class Grid extends MGroup {
 	defaults(): object {
 		return {
 			cellSize: 50,
-			width: 3,
-			height: 2,
+			nbCellsHorizontal: 3,
+			nbCellsVertical: 2,
 			horizontalGridLines: new MGroup(),
 			verticalGridLines: new MGroup(),
 			cells: [],
@@ -29,8 +29,8 @@ export class Grid extends MGroup {
 	mutabilities(): object {
 		return {
 			cellSize: 'on_init',
-			width: 'on_init',
-			height: 'on_init',
+			nbCellsHorizontal: 'on_init',
+			nbCellsVertical: 'on_init',
 			horizontalGridLines: 'never',
 			verticalGridLines: 'never',
 			cells: 'never'
@@ -45,9 +45,9 @@ export class Grid extends MGroup {
 			this.add(this.verticalGridLines)
 		}
 
-		for (var i = 0; i < this.height; i++) {
+		for (var i = 0; i < this.nbCellsVertical; i++) {
 			let cellLine: Array<GridCell> = []
-			for (var j = 0; j < this.width; j++) {
+			for (var j = 0; j < this.nbCellsHorizontal; j++) {
 				let cell = new GridCell({
 					anchor: [j * this.cellSize, i * this.cellSize],
 					sidelength: this.cellSize
@@ -69,10 +69,10 @@ export class Grid extends MGroup {
 		for (let line of this.horizontalGridLines.submobs) {
 			this.horizontalGridLines.remove(line)
 		}
-		for (var i = 0; i < this.height + 1; i++) {
+		for (var i = 0; i < this.nbCellsVertical + 1; i++) {
 			let line = new Line({
 				startPoint: [0, i * this.cellSize],
-				endPoint: [this.width, i * this.cellSize]
+				endPoint: [this.nbCellsHorizontal, i * this.cellSize]
 			})
 			this.horizontalGridLines.add(line)
 		}
@@ -83,10 +83,10 @@ export class Grid extends MGroup {
 		for (let line of this.verticalGridLines.submobs) {
 			this.verticalGridLines.remove(line)
 		}
-		for (var j = 0; j < this.width + 1; j++) {
+		for (var j = 0; j < this.nbCellsHorizontal + 1; j++) {
 			let line = new Line({
 				startPoint: [j * this.cellSize, 0],
-				endPoint: [j * this.cellSize, this.height]
+				endPoint: [j * this.cellSize, this.nbCellsVertical]
 			})
 			this.verticalGridLines.add(line)
 		}
@@ -94,6 +94,19 @@ export class Grid extends MGroup {
 
 	}
 	
+	synchronizeUpdateArguments(args: object = {}) {
+		let w = args['nbCellsHorizontal']
+		let c = args['cellSize'] ?? this.cellSize
+		if (w) {
+			args['width'] =  c * w
+		}
+		let h = args['nbCellsVertical']
+		if (h) {
+			args['height'] = c * h
+		}
+		return args
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (this.drawGridLines && (args['cellSize'] || args['width'] || args['height'])) {

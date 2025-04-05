@@ -132,7 +132,8 @@ export class Sidebar extends Mobject {
 	requestInit() {
 		let message = { init: 'sidebar' }
 		try {
-			(window as Window).webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
+			let w = window as Window
+			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
 			let maybePaper = getPaper()
 			if (maybePaper != undefined) {

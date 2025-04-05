@@ -22,9 +22,9 @@ export class GameOfLife extends CellularAutomaton {
 	setup() {
 		super.setup()
 
-		for (var i = 0; i < this.grid.height; i++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
 			let stateLine: Array<number> = []
-			for (var j = 0; j < this.grid.width; j++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				stateLine.push(0)
 			}
 			this.newState.push(stateLine)
@@ -34,15 +34,14 @@ export class GameOfLife extends CellularAutomaton {
 
 	createInitialState(): CAState {
 		let initialState: CAState = []
-		for (var i = 0; i < this.grid.height; i++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
 			let stateLine: Array<number> = []
-			for (var j = 0; j < this.grid.width; j++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				if (Math.random() < 0.5) {
 					stateLine.push(1)
 				} else {
 					stateLine.push(0)
 				}
-				stateLine.push(0)
 			}
 			initialState.push(stateLine)
 		}
@@ -52,20 +51,21 @@ export class GameOfLife extends CellularAutomaton {
 
 	
 	singleStep() {
-		for (var i = 0; i < this.grid.height; i++) {
-			for (var j = 0; j < this.grid.width; j++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				var nbNeighbours = 0
 
 				if (i > 1 && j > 1)                                      { nbNeighbours += this.state[i - 1][j - 1] }
 				if (i > 1)                                               { nbNeighbours += this.state[i - 1][j] }
-				if (i > 1 && j < this.grid.width - 1)                    { nbNeighbours += this.state[i - 1][j + 1] }
+				if (i > 1 && j < this.grid.nbCellsHorizontal - 1)                    { nbNeighbours += this.state[i - 1][j + 1] }
 
 				if (j > 1)                                               { nbNeighbours += this.state[i][j - 1] }
-				if (j < this.grid.width - 1)                             { nbNeighbours += this.state[i][j + 1] }
+				if (j < this.grid.nbCellsHorizontal - 1)                 { nbNeighbours += this.state[i][j + 1] }
 
-				if (i < this.grid.height - 1 && j > 1)                   { nbNeighbours += this.state[i + 1][j - 1] }
-				if (i < this.grid.height - 1)                            { nbNeighbours += this.state[i + 1][j] }
-				if (i < this.grid.height - 1 && j < this.grid.width - 1) { nbNeighbours += this.state[i + 1][j + 1] }
+				if (i < this.grid.nbCellsVertical - 1 && j > 1)          { nbNeighbours += this.state[i + 1][j - 1] }
+				if (i < this.grid.nbCellsVertical - 1)                   { nbNeighbours += this.state[i + 1][j] }
+				if (i < this.grid.nbCellsVertical - 1 && j < this.grid.nbCellsHorizontal - 1)
+					                                                     { nbNeighbours += this.state[i + 1][j + 1] }
 
 				if (this.state[i][j] == 0 && nbNeighbours == 3) {
 					this.newState[i][j] = 1
@@ -77,8 +77,8 @@ export class GameOfLife extends CellularAutomaton {
 			}
 		}
 
-		for (var i = 0; i < this.grid.height; i++) {
-			for (var j = 0; j < this.grid.width; j++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				this.state[i][j] = this.newState[i][j]
 			}
 		}

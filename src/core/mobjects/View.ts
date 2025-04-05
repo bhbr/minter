@@ -53,6 +53,23 @@ export class View extends ExtendedObject {
 		this.frame.transform = newValue
 	}
 
+	get frameWidth(): number {
+		return this.frame.width
+	}
+
+	set frameWidth(newValue: number) {
+		this.frame.width = newValue
+	}
+	
+	get frameHeight(): number {
+		return this.frame.height ?? 0
+	}
+
+	set frameHeight(newValue: number) {
+		this.frame.height = newValue
+	}
+
+
 	// parent view = view of the mobject's parent
 	// (not settable because that is the mobject's responsibility)
 	get parent(): View {

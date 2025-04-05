@@ -30,9 +30,9 @@ export class CellularAutomaton extends Linkable {
 
 	createInitialState(): CAState {
 		let initialState: CAState = []
-		for (var i = 0; i < this.grid.height; i++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
 			let stateLine: Array<number> = []
-			for (var j = 0; j < this.grid.width; j++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				stateLine.push(0)
 			}
 			initialState.push(stateLine)
@@ -44,9 +44,6 @@ export class CellularAutomaton extends Linkable {
 		for (var i = 0; i < nbSteps; i++) {
 			this.singleStep()
 		}
-		// this.update({
-		// 	state: this.newState
-		// })
 		this.redrawCells()
 	}
 
@@ -62,8 +59,8 @@ export class CellularAutomaton extends Linkable {
 	}
 
 	redrawCells() {
-		for (let i = 0; i < this.grid.height; i++) {
-			for (let j = 0; j < this.grid.width; j++) {
+		for (var i = 0; i < this.grid.nbCellsVertical; i++) {
+			for (var j = 0; j < this.grid.nbCellsHorizontal; j++) {
 				let cell = this.grid.cells[i][j]
 				cell.update({
 					fillColor: this.colorPalette[this.state[i][j].toString()]

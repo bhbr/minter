@@ -34,9 +34,10 @@ import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
 import { VView } from 'core/vmobjects/VView'
+import { View } from 'core/mobjects/View'
 
 declare var paper: Paper
-declare interface Window { webkit?: any }
+export declare interface Window { webkit?: any }
 
 export class BoardContent extends MGroup { }
 
@@ -137,6 +138,7 @@ The content children can also be dragged and panned.
 
 	setup() {
 		super.setup()
+		let w = window as Window
 		
 		this.update({
 			frameWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
@@ -260,9 +262,12 @@ The content children can also be dragged and panned.
 		}
 		this.sidebar = getPaper().sidebar
 		if (this.sidebar === null || this.sidebar === undefined) {
-			let sidebarView = document.querySelector('#sidebar_id')
-			if (sidebarView !== null) {
-				this.sidebar = (sidebarView as any)['mobject']
+			let sidebarDiv = document.querySelector('#sidebar_id')
+			if (sidebarDiv != null) {
+				let sidebarView = (sidebarDiv as any)['view']
+				if (sidebarView != null) {
+					this.sidebar = (sidebarView as View).mobject
+				}
 				getPaper().sidebar = this.sidebar
 			}
 		}
@@ -771,7 +776,8 @@ The content children can also be dragged and panned.
 
 	messageSidebar(message: object) {
 		if (isTouchDevice) {
-			(window as Window).webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
+			let w = window as Window
+			w.webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
 		} else {
 			if (this.sidebar !== null && this.sidebar !== undefined) {
 				this.sidebar.getMessage(message)

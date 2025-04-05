@@ -1,6 +1,6 @@
 
 export function remove(arr: Array<any>, value: any, all: boolean = false) {
-	// remove an objector value from an Array
+	// remove an object or value from an Array
 	// either the first encountered matching entry (if all = false)
 	// or every matching entry (if all = true)
    for (let i = 0; i < arr.length; i++) {

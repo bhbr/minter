@@ -7,8 +7,8 @@ export class Square extends Rectangle {
 	defaults(): object {
 		return {
 			sidelength: 100,
-			width: undefined,
-			height: undefined
+			width: 100,
+			height: 100
 		}
 	}
 

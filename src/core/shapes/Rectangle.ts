@@ -4,8 +4,8 @@ import { Polygon } from 'core/vmobjects/Polygon'
 
 export class Rectangle extends Polygon {
 
-	readonly width: number
-	readonly height: number
+	width: number
+	height: number
 	p1: vertex // top left is always (0, 0) (in its own frame)
 	p2: vertex // = (width, 0)
 	p3: vertex // = (width, height)

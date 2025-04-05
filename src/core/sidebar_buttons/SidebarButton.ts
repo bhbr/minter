@@ -195,7 +195,8 @@ export class SidebarButton extends Circle {
 	
 	messagePaper(message: object) {
 		try {
-			(window as Window).webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
+			let w = window as Window
+			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
 			paper.getMessage(message)
 		}
