@@ -5,14 +5,14 @@
         "allowJs": true,
         "target": "es2021",
         "sourceMap": true,
-         "lib": [
+        "lib": [
             "dom",
             "dom.iterable",
             "es2021",
         ],
         "paths": {
-            "core/*": ["../../src/core/*"],
-            "extensions/*": ["../../src/extensions/*"]
+            "core/*": ["./core/*"],
+            "extensions/*": ["./extensions/*"]
         }
     },
     "include": [
