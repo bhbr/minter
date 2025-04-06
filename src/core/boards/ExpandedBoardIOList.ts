@@ -1,7 +1,5 @@
 
 import { IOList } from 'core/linkables/IOList'
-import { LinkHook } from 'core/linkables/LinkHook'
-import { TextLabel } from 'core/mobjects/TextLabel'
 import { vertex } from 'core/functions/vertex'
 import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'core/linkables/constants'
 import { HOOK_HORIZONTAL_SPACING } from './constants'

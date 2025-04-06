@@ -1,6 +1,4 @@
 
-import { View } from './View'
-import { Color } from 'core/classes/Color'
 import { Mobject } from './Mobject'
 import { TextLabelView } from './TextLabelView'
 

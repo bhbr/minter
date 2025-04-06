@@ -1,7 +1,7 @@
 
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
-import { ScreenEventDevice, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, isTouchDevice, ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, isTouchDevice, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'

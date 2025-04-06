@@ -3,9 +3,6 @@ import { Mobject } from 'core/mobjects/Mobject'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
 import { vertex, vertexArray } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
-import { remove } from 'core/functions/arrays'
-import { deepCopy } from 'core/functions/copying'
 import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'core/mobjects/screen_events'
 import { VView } from './VView'
 import { Frame } from 'core/mobjects/Frame'
@@ -67,6 +64,8 @@ TODO: support mutiple paths e. g. for shapes with holes
 		this.view.setup()
 		// screen events are detected on the path
 		// so the active area is clipped to its shape
+
+		// move to sensor setup?
 		removePointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this))
 		removePointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this))
 		removePointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this))

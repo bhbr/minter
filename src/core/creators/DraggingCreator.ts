@@ -4,7 +4,6 @@ import { Creator } from './Creator'
 import { Color } from 'core/classes/Color'
 import { vertex } from 'core/functions/vertex'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { Linkable } from 'core/linkables/Linkable'
 import { VView } from 'core/vmobjects/VView'
 
 export class DraggingCreator extends Creator {

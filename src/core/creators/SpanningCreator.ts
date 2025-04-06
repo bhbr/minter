@@ -1,9 +1,7 @@
 
 import { Creator } from './Creator'
-import { Color } from 'core/classes/Color'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { vertex } from 'core/functions/vertex'
-import { Mobject } from 'core/mobjects/Mobject'
 
 export class SpanningCreator extends Creator {
 	

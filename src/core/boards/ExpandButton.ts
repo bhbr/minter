@@ -6,7 +6,6 @@ import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
-import { VView } from 'core/vmobjects/VView'
 
 export class ExpandButton extends Circle {
 

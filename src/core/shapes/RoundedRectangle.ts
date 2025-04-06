@@ -1,7 +1,6 @@
 
-import { vertex, vertexArray, vertexOrigin, vertexTranslatedBy, vertexAdd, vertexDivide } from 'core/functions/vertex'
+import { vertex, vertexOrigin, vertexTranslatedBy, vertexAdd, vertexDivide } from 'core/functions/vertex'
 import { CurvedShape } from 'core/vmobjects/CurvedShape'
-import { remove } from 'core/functions/arrays'
 
 export class RoundedRectangle extends CurvedShape {
 

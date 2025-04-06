@@ -1,13 +1,11 @@
 
-import { vertex } from 'core/functions/vertex'
 import { Dependency } from 'core/mobjects/Dependency'
 import { Line } from 'core/shapes/Line'
 import { Mobject } from 'core/mobjects/Mobject'
 import { Board } from 'core/boards/Board'
 import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
-import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
-import { remove } from 'core/functions/arrays'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class DependencyLink extends Mobject {
 /*

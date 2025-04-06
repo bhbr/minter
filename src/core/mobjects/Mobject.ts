@@ -1,10 +1,9 @@
 
 import { remove } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
-import { copy, deepCopy } from 'core/functions/copying'
-import { getPaper } from 'core/functions/getters'
-import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, eventVertex, addPointerDown, removePointerDown, addPointerMove, removePointerMove, addPointerUp, removePointerUp, addPointerOut, removePointerOut, ScreenEvent, screenEventType, ScreenEventType, screenEventTypeAsString, screenEventDeviceAsString, screenEventDescription, isTouchDevice } from './screen_events'
-import { vertex, vertexArray, isVertex, isVertexArray, vertexOrigin, vertexInterpolate, vertexArrayInterpolate, vertexCloseTo, vertexAdd, vertexSubtract } from 'core/functions/vertex'
+import { copy } from 'core/functions/copying'
+import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events'
+import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Color } from 'core/classes/Color'
@@ -93,6 +92,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.motor.mobject = this
 		this.sensor.mobject = this
 
+		// put into sensor setup?
 		addPointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this.sensor))
 		addPointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this.sensor))
 		addPointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this.sensor))

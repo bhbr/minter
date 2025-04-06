@@ -1,5 +1,5 @@
 import { Mobject } from '../Mobject'
-import { vertex, vertexAdd, vertexEquals } from 'core/functions/vertex'
+import { vertexAdd, vertexEquals } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 

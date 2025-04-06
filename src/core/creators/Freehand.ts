@@ -1,7 +1,6 @@
 
 import { Creator } from 'core/creators/Creator'
 import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
-import { Circle } from 'core/shapes/Circle'
 import { vertex } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'

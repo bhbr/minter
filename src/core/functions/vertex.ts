@@ -184,8 +184,6 @@ export function vertexOuterProduct(v: vertex, w: vertex): number {
 	return v[0] * w[1] - v[1] * w[0]
 }
 
-
-
 export function vertexArrayInterpolate(vtxArray1: vertexArray, vtxArray2: vertexArray, weight): vertexArray {
 	let interpolatedVertexArray: vertexArray = []
 	for (let i = 0; i < vtxArray1.length; i++) {

@@ -1,10 +1,9 @@
 
 import { vertex } from 'core/functions/vertex'
-import { Mobject } from 'core/mobjects/Mobject'
 import { Linkable } from './Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
-import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_RADIUS, BULLET_RADIUS } from './constants'
+import { HOOK_RADIUS } from './constants'
 
 export class LinkHook extends Circle {
 

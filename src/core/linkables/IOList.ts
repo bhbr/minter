@@ -5,8 +5,7 @@ import { Linkable } from './Linkable'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
 import { TextLabel } from 'core/mobjects/TextLabel'
-import { IO_LIST_WIDTH, IO_LIST_OFFSET, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
-import { VView } from 'core/vmobjects/VView'
+import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 
 export class IOList extends RoundedRectangle {
 /*

@@ -1,6 +1,4 @@
 
-import { Color } from 'core/classes/Color'
-
 // replicate RGB(A) notation from CSS
 export function rgba(r: number, g: number, b: number, a: number): string {
 	return `rgb(${255 * r}, ${255 * g}, ${255 * b}, ${a})`

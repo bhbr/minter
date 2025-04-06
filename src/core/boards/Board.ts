@@ -7,33 +7,23 @@ import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtrac
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { Freehand } from 'core/creators/Freehand'
 import { ExpandButton } from './ExpandButton'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
-import { BoardButton } from 'core/sidebar_buttons/BoardButton'
-import { Sidebar } from 'core/Sidebar'
 import { LinkHook } from 'core/linkables/LinkHook'
 import { EditableLinkHook } from './EditableLinkHook'
-import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
-import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
-import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
 import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
-import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
-import { HOOK_HORIZONTAL_SPACING, EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
+import { EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
 import { PAPER_WIDTH, PAPER_HEIGHT } from 'core/constants'
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
-import { VView } from 'core/vmobjects/VView'
 import { View } from 'core/mobjects/View'
 
 declare var paper: Paper
@@ -76,18 +66,12 @@ The content children can also be dragged and panned.
 			compactHeight: 300, // idem
 			compactAnchor: vertexOrigin(),
 			creationConstructors: {
-				'board': BoardCreator,
-				'input': InputValueBoxCreator,
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
-				'color': ColorSampleCreator
+				'board': BoardCreator
 			},
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
-				'BoardButton',
-				'NumberButton',
-				'ColorSampleButton'
+				'BoardButton'
 			],
 			creationStroke: [],
 			creationMode: 'freehand',

@@ -1,5 +1,5 @@
 
-import { vertex, vertexArray, vertexOrigin } from 'core/functions/vertex'
+import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Polygon } from 'core/vmobjects/Polygon'
 
 export class Rectangle extends Polygon {

@@ -1,7 +1,7 @@
 
 import { CurvedLine } from 'core/vmobjects/CurvedLine'
 import { vertex, vertexArray, vertexTranslatedBy, vertexCentrallyScaledBy } from 'core/functions/vertex'
-import { DEGREES, TAU } from 'core/constants'
+import { TAU } from 'core/constants'
 
 const DEFAULT_RADIUS = 10
 
