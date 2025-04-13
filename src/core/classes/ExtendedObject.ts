@@ -79,6 +79,7 @@ A property can have one of five mutability levels:
 		// If yes, complement them with the default values and set them
 		let initialArgs = this.fullDefaults()
 		Object.assign(initialArgs, args)
+		initialArgs = this.synchronizeUpdateArguments(initialArgs)
 		this.setProperties(initialArgs)
 	}
 
