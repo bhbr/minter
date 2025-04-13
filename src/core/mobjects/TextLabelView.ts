@@ -27,9 +27,6 @@ export class TextLabelView extends View {
 
 	setup() {
 		super.setup()
-		if (this.constructor.name == 'TextLabelView') {
-			//debugger
-		}
 		this.div.setAttribute('class', this.mobject.constructor.name + ' unselectable mobject-div')
 		this.div.style.display = 'flex'
 		this.div.style.fontFamily = 'Helvetica'
@@ -39,6 +36,7 @@ export class TextLabelView extends View {
 	redraw() {
 		super.redraw()
 		//// internal dependencies
+		this.color = this.mobject.textColor
 		this.div.innerHTML = this.mobject.text
 		this.div.style.color = (this.color ?? Color.white()).toHex()
 		this.div.style.borderColor = (this.borderColor ?? Color.white()).toHex()
