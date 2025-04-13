@@ -99,6 +99,8 @@ export class CindyCanvas extends Linkable implements Playable {
 
 		window.setTimeout(this.startCore.bind(this), 2000)
 		// todo: async/await
+
+		
 	}
 
 	loadCindyAPI() {

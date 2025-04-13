@@ -3,10 +3,8 @@ import { Mobject } from './Mobject'
 
 export class Dependency {
 /*
-A dependency sets a property of one mobject (target) as the property of another (source).
-So target.inputName will always be synced to source.outputName.
-This class here is almost entirely representational, the actual updating is done in the
-updating code in Mobject.
+A dependency sets a property of one mobject (target) as the property of another (source). So target.inputName will always be synced to source.outputName. The output property can also be the result of a method (provided it requires no arguments).
+This class here is almost entirely representational, the actual updating is done in the updating code in Mobject.
 */
 	source: Mobject
 	outputName: string | null

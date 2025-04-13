@@ -83,6 +83,8 @@ import {
 	A_transform_s_determinant_is_computed_properly
 } from 'core/classes/Transform/_tests/Transform_tests'
 
+import { Colors_properly_export_to_hex } from 'core/_tests/Color_tests'
+
 import {
 	Anchors_of_nested_mobjects_transform_properly,
 	A_mobject_has_a_fill_color
@@ -191,18 +193,20 @@ let tests = [
 	A_transform_s_inverse_s_inverse_is_the_original_transform,
 	A_transform_s_determinant_is_computed_properly,
 
+	// Color tests
+	Colors_properly_export_to_hex,
+
 	// Mobject tests
 	//Anchors_of_nested_mobjects_transform_properly,
 	A_mobject_has_a_fill_color
+
 ]
 
-
-
-for (let test of tests) {
-	runTest(test)
+export function runAllTests() {
+	for (let test of tests) {
+		runTest(test)
+	}
 }
-
-
 
 
 

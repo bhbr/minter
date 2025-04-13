@@ -7,14 +7,44 @@ import { AssignmentError } from './Errors'
 
 export class ExtendedObject {
 /*
-An ExtendedObject 
+An ExtendedObject has concise functionality for:
+ - settingting initial values for its properties,
+ - set default values for them in subclasses,
+ - updating these values while maintaining a consistent state,
+ - and defining permissions to change them ('mutability').
+
+A property can have one of five mutability levels:
+
+ - 'always':
+ 		Can always be changed directly, i. e. in the form mobject.property = ... This bears the risk of creating a state inconsistent with itself of e. g. the view.
+ - 'on_update':
+ 		Can only be changed via calling the update() method, i. e. mobject.update({ property: ... }). It is update()'s responsibility to keep everything in sync internally and externally (via Dependencies)
+ - 'on_init':
+ 		Can only be set to a value different from the default on object creation (as part of the constructor argument object), so as mob = new Mobject({ property: ... }). The property is immutable afterwards. Example: the grid dimensions for a cellular automaton.
+ - 'in_subclass':
+ 		Can only be assigned a new, immutable value by subclassing:
+			//	export class Submobject extends Mobject {
+			//		defaults(): object {
+			//			return {
+			//				property: ...
+			//			}
+			//		}
+			//	}
+			//  (This code example is doubly commented out because otherwise TS won't compile properly)
+ 		A good example are UI elements.
+ - 'never':
+ 		The class has spoken, this value is fixed forever and in every subclass
 */
 	private static classDeclarations: object // format: { className: classDeclaration }
 	properties: Array<string>
-	unsettableProperties: object
+	private indirectlyWritableProperties: object // i. e. with mutability 'on_update'
+	// These properties need to be treated separately so we can modify them without declaring a public writable property. They are hidden inside this private dictionary, and modified by calling the update method, which internally accesses this dictionary.
 
 	mutabilities(): object { return {} }
 	defaults(): object { return {} }
+	// Empty base implementations that ground the recursive buildup of the fullMutabilities and fullDefaults
+
+
 
 	constructor(args: object = {}) {
 
@@ -39,7 +69,7 @@ An ExtendedObject
 			writable: false,
 			enumerable: true
 		})
-		Object.defineProperty(this, 'unsettableProperties', {
+		Object.defineProperty(this, 'indirectlyWritableProperties', {
 			value: {},
 			writable: false,
 			enumerable: true
@@ -83,7 +113,7 @@ An ExtendedObject
 
 	private static initializeClassDeclarations() {
 		ExtendedObject.classDeclarations = {
-			// the first entry is for the base class
+			// The first entry is for the base class
 			ExtendedObject: new ClassDeclaration({
 				name: 'ExtendedObject',
 				parent: null,
@@ -101,7 +131,7 @@ An ExtendedObject
 			ret.push(obj)
 			obj = Object.getPrototypeOf(obj)
 		}
-		ret.pop() // superfluous Object
+		ret.pop() // superfluous entry of type Object
 		return ret.reverse()
 	}
 
@@ -111,7 +141,7 @@ An ExtendedObject
 	}
 
 	private checkConstructorArgs(args: object) {
-	// Only properties with mutability 'always' or 'on_init' can be set in the constructor call
+	// Only properties with mutability 'always', 'on_update' or 'on_init' can be set in the constructor call
 		for (let [prop, value] of Object.entries(args)) {
 			if (this.mutability(prop) === 'never' || this.mutability(prop) === 'in_subclass') {
 				throw new AssignmentError(`Property ${prop} in class ${this.constructor.name} cannot be assigned new value ${value} in constructor`)
@@ -121,44 +151,59 @@ An ExtendedObject
 
 	private setProperties(args: object = {}) {
 
-	 	let syncedArgs = this.synchronizeUpdateArguments(args)
-
 	 	// Accessors (abstract properties that are just setters, e. g. a Circle's midpoint) are set only after all non-accessors have been set. So we split the args along that separation.
-		let accessorArgs: object = {}
-		let otherPropertyArgs: object = {}
-		for (let [prop, value] of Object.entries(syncedArgs)) {
-			if (this.isAccessor(prop)) {
-	 			accessorArgs[prop] = value
-	 		} else {
-	 			otherPropertyArgs[prop] = value
-	 		}
-		}
-
+		
 		// Set the non-accessors (properties that have their own state)
-		for (let [prop, value] of Object.entries(otherPropertyArgs)) {
+		let nonAccessorArgs = this.nonAccessorArgs(args)
+		for (let [prop, value] of Object.entries(nonAccessorArgs)) {
 			this.setProperty(prop, value)
 		}
+
 		// Set the accessors (abstract properties)
+		let accessorArgs = this.accessorArgs(args)
 		for (let [prop, value] of Object.entries(accessorArgs)) {
 			this.setProperty(prop, value)
 	 	}
+	}
+
+	private accessorArgs(args: object): object {
+		let accessorArgs: object = {}
+		for (let [prop, value] of Object.entries(args)) {
+			if (this.isAccessor(prop)) {
+	 			accessorArgs[prop] = value
+	 		}
+		}
+		return accessorArgs
+	}
+
+	private nonAccessorArgs(args: object): object {
+		let nonAccessorArgs: object = {}
+		for (let [prop, value] of Object.entries(args)) {
+			if (!this.isAccessor(prop)) {
+	 			nonAccessorArgs[prop] = value
+	 		}
+		}
+		return nonAccessorArgs
 	}
 
 	private setProperty(prop: string, value: any) {
 		if (!this.properties.includes(prop) && !this.isAccessor(prop)) {
 			this.createProperty(prop, value)
 		} else {
-			if (this.isAccessor(prop)) {
-				let accessor = this.getAccessor(prop)
-				accessor.call(this, value)
-				return
-			}
-			if (this.isSettable(prop)) {
-				this[prop] = value
-			} else {
-				this.unsettableProperties[prop] = value
-			}
+			this.setExistingProperty(prop, value)
+		}
+	}
 
+	private setExistingProperty(prop: string, value: any) {
+		if (this.isAccessor(prop)) {
+			let accessor = this.getAccessor(prop)
+			accessor.call(this, value)
+			return
+		}
+		if (this.isWritable(prop)) {
+			this[prop] = value
+		} else {
+			this.indirectlyWritableProperties[prop] = value
 		}
 	}
 
@@ -172,10 +217,10 @@ An ExtendedObject
 				enumerable: true
 			})
 		} else {
-			this.unsettableProperties[prop] = value
+			this.indirectlyWritableProperties[prop] = value
 			Object.defineProperty(this, prop, {
 				get() {
-					return this.unsettableProperties[prop]
+					return this.indirectlyWritableProperties[prop]
 				},
 				set(newValue) {
 					throw new AssignmentError(`Use the update method to change the value of property ${prop} in class ${this.constructor.name}`)
@@ -187,7 +232,7 @@ An ExtendedObject
 	}
 
 	isAccessor(prop: string): boolean {
-		if (Object.keys(this.unsettableProperties).includes(prop)) { return false }
+		if (Object.keys(this.indirectlyWritableProperties).includes(prop)) { return false }
 		let pd = this.propertyDescriptor(prop)
 		if (pd === undefined) { return false }
 		if (!pd.enumerable) { return true }
@@ -221,15 +266,20 @@ An ExtendedObject
 		return ExtendedObject.classDeclarations[this.constructor.name].mutability(prop)
 	}
 
-	isSettable(prop: string) {
+	isWritable(prop: string) {
 		return (this.mutability(prop) === 'always')
 	}
 
 	synchronizeUpdateArguments(args: object): object {
+	/*
+	Override this method to resolve possible conflicts in update arguments.
+	Example: Should Circle({ midpoint: ..., anchor: ... }) silently fit the radius or raise an error?
+	*/
 		return args
 	}
 
 	private checkUpdateArgs(args: object) {
+	// Check whether any properites are not updatable
 		for (let [prop, value] of Object.entries(args)) {
 			if (this.mutability(prop) !== 'always' && this.mutability(prop) !== 'on_update') {
 				throw new AssignmentError(`Property ${prop} in class ${this.constructor.name} is not updatable, cannot be assigned new value ${value} after initialization`)
@@ -237,11 +287,13 @@ An ExtendedObject
 		}
 	}
 
-
 	update(args: object = {}) {
+	/*
+	Override this method in subclasses. It MUST at some point call super.update(args).
+	*/
 		this.checkUpdateArgs(args)
 		args = this.synchronizeUpdateArguments(args)
-		args = this.removeUnchangedProperties(args)
+		args = this.removeUnchangedProperties(args) // for performance
 		this.setProperties(args)
 	}
 	
@@ -264,7 +316,7 @@ An ExtendedObject
 				if (vertexArrayEquals(this[prop], value)) {
 					delete args[prop]
 				}
-			} else {
+			} else { // any other kind of object
 				if (this[prop] == value) {
 					delete args[prop]
 				}
@@ -290,6 +342,7 @@ An ExtendedObject
 	}
 
 	static clearClassDeclarations() {
+	// for testing
 		ExtendedObject.classDeclarations = undefined
 	}
 

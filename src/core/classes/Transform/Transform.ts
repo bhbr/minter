@@ -4,11 +4,14 @@ import { TAU, PI, DEGREES } from 'core/constants'
 import { vertex, vertexOrigin, vertexIsZero, vertexX, vertexY, vertexOpposite, vertexAdd, vertexSubtract, vertexCentrallyRotatedBy, vertexCentrallyScaledBy, vertexTranslatedBy, vertexInterpolate } from 'core/functions/vertex'
 
 export class Transform extends ExtendedObject {
+/*
+A Transform describes the positioning of a Mobject relative to its parent. Transforms compose as mobjects are nested into each other.
+*/
 
-	anchor: vertex
+	anchor: vertex // the point around which the Transform scales and rotates
 	angle: number
 	scale: number
-	shift: vertex
+	shift: vertex // translations are mainly realized by mobject anchors, but we offer the option. (Note that Transform({ anchor: p, angle: 0, scale: 1 }) is the identity, not a translation).
 
 	defaults(): object {
 		return {
@@ -33,7 +36,16 @@ export class Transform extends ExtendedObject {
 		return (str1 + str2 + str3 + str4 + str5).replace(`  `, ` `).trim()
 	}
 
+	toString(): string {
+	// for debugging
+		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
+	}
+
+
+	// Matrix representation just in case anyone wants to do something fancy
+
 	toMatrix(): string {
+	// for debugging
 		return `[[${this.a()} ${this.b()}] [${this.c()} ${this.d()}]]; [${this.e()} ${this.f()}]`
 	}
 
@@ -114,10 +126,6 @@ export class Transform extends ExtendedObject {
 		let t = this.copy()
 		t.anchor = vertexOrigin()
 		return t
-	}
-
-	toString(): string {
-		return `Transform(anchor: ${this.anchor}, angle: ${this.angle/DEGREES}°, scale: ${this.scale}, shift: ${this.shift})`
 	}
 
 	equals(t: Transform): boolean {

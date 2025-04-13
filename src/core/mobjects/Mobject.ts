@@ -40,7 +40,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	
 	It also allows to control the setting of default
 	state variables.
-
 	*/
 
 	constructor(args: object = {}) {
@@ -55,27 +54,19 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	defaults(): object {
-	/*
-	Default values of properties (declared
-	in the sections that follow).
-	This list is complemented in subclasses
-	by overriding the method.
-	*/
 		return {
-			view: new View(),
+			// hierarchy
+			_parent: null,
 			children: [], // i. e. submobjects
-			// The meaning of these properties is explained in the sections further below.
 
+			view: new View(),
 			motor: new Motor(),
 			sensor: new Sensor(),
 
-			// hierarchy
-			_parent: null,
+			draggingEnabled: false,
 
 			// dependencies
-			dependencies: [],
-
-			draggingEnabled: false
+			dependencies: []
 		}
 	}
 
@@ -99,49 +90,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		addPointerOut(this.view.div, this.sensor.capturedOnPointerOut.bind(this.sensor))
 	}
 
-	// this.anchor is a synonym for this.frame.anchor
-	get anchor(): vertex {
-		return this.view?.anchor ?? [0, 0]
-	}
-
-	set anchor(newValue: vertex) {
-		if (!this.view) { return }
-		this.view.anchor = newValue
-	}
-
-	get transform(): Transform {
-		return this.view?.transform ?? Transform.identity()
-	}
-
-	set transform(newValue: Transform) {
-		if (!this.view) { return }
-		this.view.transform = newValue
-	}
-
-	get frame(): Frame {
-		return this.view.frame
-	}
-
-	set frame(newValue: Frame) {
-		this.view.frame = newValue
-	}
-
-	get frameWidth(): number {
-		return this.frame.width
-	}
-
-	set frameWidth(newValue: number) {
-		this.frame.width = newValue
-	}
-
-	get frameHeight(): number {
-		return this.frame.height ?? 0
-	}
-
-	set frameHeight(newValue: number) {
-		this.frame.height = newValue
-	}
-
 
 
 	//////////////////////////////////////////////////////////
@@ -152,20 +100,41 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	view: View
 
+	//////////// Aliases ////////////
+
+	get anchor(): vertex { return this.view?.anchor ?? [0, 0] }
+	set anchor(newValue: vertex) {
+		if (!this.view) { return }
+		this.view.anchor = newValue
+	}
+
+	get transform(): Transform { return this.view?.transform ?? Transform.identity() }
+	set transform(newValue: Transform) {
+		if (!this.view) { return }
+		this.view.transform = newValue
+	}
+
+	get frame(): Frame { return this.view.frame }
+	set frame(newValue: Frame) { this.view.frame = newValue }
+	get frameWidth(): number { return this.frame.width }
+	set frameWidth(newValue: number) { this.frame.width = newValue }
+	get frameHeight(): number { return this.frame.height ?? 0 }
+	set frameHeight(newValue: number) { this.frame.height = newValue }
+
 	get visible(): boolean { return this.view.visible }
 	set visible(newValue: boolean) { this.view.visible = newValue }
-
 	get opacity(): number { return this.view.opacity }
 	set opacity(newValue: number) { this.view.opacity = newValue }
-
 	get backgroundColor(): Color { return this.view.backgroundColor }
 	set backgroundColor(newValue: Color) { this.view.backgroundColor = newValue }
-
 	get drawBorder(): boolean { return this.view.drawBorder }
 	set drawBorder(newValue: boolean) { this.view.drawBorder = newValue }
-
 	get drawShadow(): boolean { return this.view.drawShadow }
 	set drawShadow(newValue: boolean) { this.view.drawShadow = newValue }
+
+	redraw() { this.view.redraw() }
+
+	//////////// Showing and hiding ////////////
 
 	hideShadow() { this.view.hideShadow() }
 	showShadow() { this.view.showShadow() }
@@ -181,8 +150,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			depmob.view.hide()
 		}
 	}
-
-	redraw() { this.view.redraw() }
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -204,12 +171,12 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	//////////////////////////////////////////////////////////
 
 
-	_parent?: Mobject // == superMobject
+	protected _parent?: Mobject // == superMobject
 	children: Array<Mobject> // ==  submobjects == submobs
 
 	/*
-	Actually we want to hide behind setting this.parent
-	some more housekeeping code bc parent and child
+	Actually we want to hide some more housekeeping code
+	behind setting this.parent bc parent and child
 	reference each other, and probably the views need
 	to be updated.
 	*/
@@ -239,19 +206,13 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return ret
 	}
 
-	// Alias for parent
+	//////////// Aliases ////////////
 	get superMobject(): this { return this.parent as this }
 	set superMobject(newValue: this) { this.parent = newValue }
-
-	// Aliases for children
 	get submobjects(): Array<Mobject> { return this.children }
-	set submobjects(newValue: Array<Mobject>) {
-		this.children = newValue
-	}
+	set submobjects(newValue: Array<Mobject>) { this.children = newValue }
 	get submobs(): Array<Mobject> { return this.submobjects }
-	set submobs(newValue: Array<Mobject>) {
-		this.submobs = newValue
-	}
+	set submobs(newValue: Array<Mobject>) { this.submobs = newValue }
 
 	add(submob: Mobject) {
 		// Set this as the submob's parent
@@ -274,8 +235,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	remove(submob: Mobject) {
-		// Remove from the array of children
-		// (with an imported helper method)
+	// Remove from the array of children (with an imported helper method)
 		remove(this.children, submob)
 		submob.parent = null
 		submob.view.div.remove()
@@ -299,13 +259,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
-	/*
-	A dependency describes how one mobject's property1
-	equals another's property2, i. e. changing the first ('output')
-	triggers an update on the second ('input').
-	The output property can also be the result of a method
-	(provided it requires no arguments).
-	*/
 	dependencies: Array<Dependency>
 
 	dependents(): Array<Mobject> {
@@ -358,13 +311,13 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	addDependent(target: Mobject) {
 	/*
-	No properties given. Simply if this mobject updates,
+	No properties given. Simply, if this mobject updates,
 	update the target mobject as well.
 	*/
 		this.addDependency(null, target, null)
 	}
 
-	// Update methods //
+	//////////// Update methods ////////////
 
 	synchronizeUpdateArguments(args: object = {}): object {
 		let syncedArgs: object = copy(args)
@@ -382,6 +335,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 		super.update(args)
 
+		// TODO: move to CindyCanvas
 		if (this.view != null) {
 			this.view.div.setAttribute('screen-event-handler', ScreenEventHandler[this.sensor.screenEventHandler])
 			if (this.sensor.screenEventHandler == ScreenEventHandler.Below) {
@@ -393,6 +347,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 		let targetsAndUpdateDicts: Array<[Mobject, object]> = []
 
+		// TODO: refactor
 		for (let dep of this.dependencies || []) {
 
 			let output: any = this[dep.outputName] // value or function, may be undefined
@@ -485,8 +440,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	onLongMouseDown(e: ScreenEvent) { this.onLongPress(e) }
 
 	onPointerOut(e: ScreenEvent) { }
-
-
 
 	draggingEnabled: boolean
 

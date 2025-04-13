@@ -3,7 +3,7 @@ import { MutabilityError, AssignmentError } from './Errors'
 
 export class ClassDeclaration {
 /*
-A ClassDeclaration is an abstracted version of the default values and associated mutabilities defined in the subclasses of Mobjects (or ExtendedObjects in general). Its purpose is to check the validity of the overridden defaults() and mutabilities() methods.
+A ClassDeclaration is an abstracted version of the default values and associated mutabilities defined in the subclasses of Mobjects (actually, ExtendedObjects in general). Its purpose is to check the validity of the overridden defaults() and mutabilities() methods.
 */
 	name: string // of the class
 	parent: ClassDeclaration | null // null for the base class ExtendedObject
@@ -15,15 +15,13 @@ A ClassDeclaration is an abstracted version of the default values and associated
 
 	/*
 	Comparing mutabilities: from laxest ('always') to strictest ('never'). A subclass can change a property's mutability only to a stricter level.
-	 - 'always': can always be updated
-	 - 'on_init': can only be set to a value different from the default on object creation (as part of the constructor argument object), immutable afterwards
-	 - 'in_subclass': can only be assigned a new, immutable value by subclassing
-	 - 'never': the class has spoken, this value is fixed forever and in every subclass
+	See ExtendedObject for a description of the mutability levels.
 	*/
 	private static mutabilityOrder = {
 		'always': 0, 'on_update': 1, 'on_init': 2, 'in_subclass': 3, 'never': 4
 	}
 	private static compatibleMutabilities(oldMut, newMut): boolean {
+	// Is the dictionary of newMutabilities a valid extension of the oldMutabilities? It is only valid if mutabilities of existing properties get restricted, they can never be expanded again.
 		return (ClassDeclaration.mutabilityOrder[oldMut] <= ClassDeclaration.mutabilityOrder[newMut])
 	}
 
@@ -31,17 +29,19 @@ A ClassDeclaration is an abstracted version of the default values and associated
 		this.name = args['name']
 		this.parent = args['parent']
 		this.mutabilities = Object.assign({}, args['mutabilities']) // a fresh copy (so it can be altered without propagating back into the parent classes)
-		this.defaults = args['defaults'] // a function that will create a fresh default object for each new object instance (including e. g. new DOM elements)
+		this.defaults = args['defaults'] // a *function* object that will create a fresh default object for each new object instance (including e. g. new DOM elements)
 
-		this.initializeFullMutabilities()
-		this.initializeFullDefaults()
+		this.initializeFullMutabilities() // collect and merge the mutabilities objects of all ancestor classes
+		this.initializeFullDefaults() // collect and merge the defaults objects (return values of the defaults functions) of all parent classes
 	}
 
 	mutability(prop: string): string {
+	// If the class doesn't specify a mutability, look into the ancestor classes. If they don't either, the default mutability is 'always'.
 		return this.mutabilities[prop] ?? this.fullMutabilities[prop] ?? 'always'
 	}
 
 	private initializeFullMutabilities() {
+	// Collect and merge the mutabilities objects of all ancestor classes into a single object
 		this.fullMutabilities = {}
 		// Collect the entire mutabilities from all ancestor classes
 		if (this.parent) { Object.assign(this.fullMutabilities, this.parent.fullMutabilities) }
@@ -57,6 +57,7 @@ A ClassDeclaration is an abstracted version of the default values and associated
 	}
 
 	private initializeFullDefaults() {
+	// Collect and merge the defaults of all ancestor classes, as a function
 		this.checkDefaults()
 		this.fullDefaults = function() {
 			let parentDefaults = this.parent ? this.parent.fullDefaults() : {}

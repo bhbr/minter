@@ -1,10 +1,11 @@
 
 export class Color {
+// Color objects handle conversion to HTML and CSS formats and have a few other convenient methods
 
-	red: number
-	green: number
-	blue: number
-	alpha: number
+	red: number // from 0 to 1
+	green: number // from 0 to 1
+	blue: number // from 0 to 1
+	alpha: number // from 0 to 1
 
 	constructor(r, g, b, a = 1) {
 		this.red = r
@@ -17,7 +18,10 @@ export class Color {
 		return new Color(factor * this.red, factor * this.green, factor * this.blue, this.alpha)
 	}
 
+	// Conversion methods
+
 	toHex(): string {
+	// e. g. Color(1, 1, 1, 1).toHex() == '#ff0000'
 		let hex_r: string = (Math.round(this.red * 255)).toString(16).padStart(2, '0')
 		let hex_g: string = (Math.round(this.green * 255)).toString(16).padStart(2, '0')
 		let hex_b: string = (Math.round(this.blue * 255)).toString(16).padStart(2, '0')
@@ -29,6 +33,8 @@ export class Color {
 	}
 
 	toCSS(): string {
+	// e. g. Color(1, 1, 1, 1).toCSS() == 'rgba(255, 255, 255, 1)'
+	// CSS rgb values go from 0 to 255, the alpha value from 0 to 1
 		return `rgba(${255 * this.red}, ${255 * this.green}, ${255 * this.blue}, ${this.alpha})`
 	}
 
@@ -51,18 +57,10 @@ export class Color {
 		return new Color(r, g, b, a)
 	}
 
-	interpolate(newColor: Color, weight: number) {
-		return new Color(
-			(1 - weight) * this.red + weight * newColor.red,
-			(1 - weight) * this.green + weight * newColor.green,
-			(1 - weight) * this.blue + weight * newColor.blue,
-			(1 - weight) * this.alpha + weight * newColor.alpha
-		)
-	}
+	// Color palette
 
 	static clear(): Color { return new Color(0, 0, 0, 0) }
 
-	static gray(x): Color { return new Color(x, x, x) }
 	static black(): Color { return Color.gray(0) }
 	static white(): Color { return Color.gray(1) }
 
@@ -74,8 +72,22 @@ export class Color {
 	static indigo(): Color { return new Color(0.5, 0, 1) }
 	static purple(): Color { return new Color(1, 0, 1) }
 
+	// Methods for creating new colors
+
+	static gray(x): Color { return new Color(x, x, x) }
+
 	static random(): Color { return new Color(Math.random(), Math.random(), Math.random(), 1) }
 	static randomGray(): Color { return Color.gray(Math.random()) }
+	
+	interpolate(newColor: Color, weight: number) {
+		return new Color(
+			(1 - weight) * this.red + weight * newColor.red,
+			(1 - weight) * this.green + weight * newColor.green,
+			(1 - weight) * this.blue + weight * newColor.blue,
+			(1 - weight) * this.alpha + weight * newColor.alpha
+		)
+	}
+
 }
 
 
