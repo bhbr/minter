@@ -24,3 +24,6 @@ let plotter = new RunningAveragePlotter({
 	anchor: [200, 100]
 })
 paper.addToContent(plotter)
+
+plotter.focus()
+paper.activeKeyboard = true

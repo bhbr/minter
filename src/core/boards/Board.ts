@@ -46,6 +46,7 @@ The content children can also be dragged and panned.
 	defaults(): object {
 		return {
 			contentChildren: [],
+			focusedChild: null,
 			content: new BoardContent(),
 			expandButton: new ExpandButton(),
 			links: [],
@@ -112,6 +113,7 @@ The content children can also be dragged and panned.
 
 	// the submobs that will pan along (not e. g. the window chrome)
 	contentChildren: Array<Mobject>
+	focusedChild?: Mobject
 	content: MGroup
 
 	/*
@@ -443,8 +445,29 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		if (this.focusedChild) {
+			this.focusedChild.blur()
+		}
 		if (this.contracted) { return }
 		this.startCreating(e)
+	}
+
+	focusOn(child: Mobject) {
+		this.focusedChild = child
+		getPaper().activeKeyboard = false
+		if (!this.sidebar) { return }
+		for (let button of this.sidebar.buttons) {
+			button.activeKeyboard = false
+		}
+	}
+
+	blurFocusedChild() {
+		this.focusedChild = null
+		getPaper().activeKeyboard = true
+		if (!this.sidebar) { return }
+		for (let button of this.sidebar.buttons) {
+			button.activeKeyboard = true
+		}
 	}
 
 	startCreating(e: ScreenEvent) {

@@ -37,12 +37,9 @@ export class InputValueBox extends Linkable {
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		super.focus()
 		this.inputBox.focus()
 		document.addEventListener('keydown', this.boundKeyPressed)
-		getPaper().activeKeyboard = false
-		for (let button of getSidebar().buttons) {
-			button.activeKeyboard = false
-		}
 	}
 
 	setup() {

@@ -12,6 +12,7 @@ import { Frame } from './Frame'
 import { View } from './View'
 import { Motor } from './Motor'
 import { Sensor } from './Sensor'
+import { getPaper } from 'core/functions/getters'
 
 export class Mobject extends ExtendedObject {
 
@@ -475,6 +476,14 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	endDragging(e: ScreenEvent) {
 		this.dragAnchorStart = null
 		this.showShadow()
+	}
+
+	focus() {
+		getPaper().focusOn(this)
+	}
+
+	blur() {
+		getPaper().blurFocusedChild()
 	}
 
 }

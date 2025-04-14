@@ -3,7 +3,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { getPaper } from 'core/functions/getters'
 import { View } from 'core/mobjects/View'
 import { Mobject } from 'core/mobjects/Mobject'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { log } from 'core/functions/logging'
 
@@ -35,7 +35,6 @@ export class DesmosCalculator extends Linkable {
 			this.loadDesmosAPI()
 		}
 
-
 		this.innerCanvas.view.frame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height
@@ -45,16 +44,17 @@ export class DesmosCalculator extends Linkable {
 		})
 		this.add(this.innerCanvas)
 
-
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
-
 		this.innerCanvas.view.div.id = 'desmos-calc'
 
 		this.outerFrame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height,
-			screenEventHandler: ScreenEventHandler.Below
+			screenEventHandler: ScreenEventHandler.Self
 		})
+		this.outerFrame.onPointerDown = (e) => {
+			this.focus()
+		}
 		this.add(this.outerFrame)
 
 		window.setTimeout(this.createCalculator.bind(this), 1000)
@@ -72,9 +72,24 @@ export class DesmosCalculator extends Linkable {
 		paper.loadedAPIs.push('desmos-calc')
 	}
 
+
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
-		
+		getPaper().activeKeyboard = false
+	}
+
+	focus() {
+		super.focus()
+		this.outerFrame.update({
+			screenEventHandler: ScreenEventHandler.Below
+		})
+	}
+
+	blur() {
+		super.blur()
+		this.outerFrame.update({
+			screenEventHandler: ScreenEventHandler.Self
+		})
 	}
 
 	setDragging(flag: boolean) {
@@ -85,7 +100,7 @@ export class DesmosCalculator extends Linkable {
 			})
 		} else {
 			this.outerFrame.update({
-				screenEventHandler: ScreenEventHandler.Below
+				screenEventHandler: ScreenEventHandler.Self
 			})
 		}
 	}
