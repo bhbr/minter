@@ -18,12 +18,14 @@ export class DesmosCalculator extends Linkable {
 	defaults(): object {
 		return {
 			view: new View({
-				div: document.createElement('div')
+				div: document.createElement('div'),
+				frameWidth: 800,
+				frameHeight: 500
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
 			calculator: null,
 			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle(),
+			outerFrame: new Rectangle()
 		}
 	}
 
@@ -70,10 +72,8 @@ export class DesmosCalculator extends Linkable {
 		paper.loadedAPIs.push('desmos-calc')
 	}
 
-	createCalculator() {
-		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, {
-			expressions: true
-		})
+	createCalculator(options: object = {}) {
+		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 		
 	}
 

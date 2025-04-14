@@ -14,9 +14,12 @@ export class Coin extends Circle {
 			state: 'heads',
 			radius: 25,
 			headsColor: Color.black(),
-			tailsColor: Color.white()
+			tailsColor: Color.white(),
 		}
 	}
+
+	get value(): number { return (this.state == 'tails') ? 1 : 0 }
+	set value(newValue: number) { this.state = (newValue == 0) ? 'heads' : 'tails' }
 
 	synchronizeUpdateArguments(args: object = {}): object {
 		args = super.synchronizeUpdateArguments(args)
@@ -33,5 +36,19 @@ export class Coin extends Circle {
 		let newState = (x > tailsProbability) ? 'heads' : 'tails'
 		this.update({ state: newState })
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

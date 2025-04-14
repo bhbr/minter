@@ -5,18 +5,20 @@ import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 
-export class CoinFlipper extends Linkable {
+export class CoinFlipper extends Linkable implements Playable {
 	
 	nbCoins: number
 	tailsProbability: number
 	coins: Array<Coin>
 	flipButton: SimpleButton
 	tailsCounts: Array<number>
-	tailsHistory: Array<number>
 	tailsCountLabels: Array<TextLabel>
 	headsColor: Color
 	tailsColor: Color
+	playState: 'play' | 'pause' | 'stop'
+	playIntervalID?: number
 
 	defaults(): object {
 		return {
@@ -27,10 +29,10 @@ export class CoinFlipper extends Linkable {
 			coins: [],
 			tailsCounts: [],
 			tailsCountLabels: [],
-			tailsHistory: [],
 			flipButton: new SimpleButton({ text: 'flip' }),
 			inputNames: ['tailsProbability'],
-			outputNames: ['tailsHistory']
+			outputNames: ['tailsCounts'],
+			playState: 'stop'
 		}
 	}
 
@@ -46,6 +48,7 @@ export class CoinFlipper extends Linkable {
 	setup() {
 		super.setup()
 		this.flipButton.action = function() { this.flipCoins() }.bind(this)
+		this.flipButton.onLongPress = function() { this.togglePlayState() }.bind(this)
 		this.add(this.flipButton)
 		for (var i = 0; i < this.nbCoins; i++) {
 			let coin = new Coin({
@@ -63,13 +66,13 @@ export class CoinFlipper extends Linkable {
 				frameWidth: 20,
 				frameHeight: 20,
 				text: '0',
+				fontSize: 16,
 				textColor: this.headsColor.interpolate(this.tailsColor, i / this.nbCoins),
 				anchor: [30 + 20 * i, 85]
 			})
 			this.tailsCountLabels.push(countLabel)
 			this.add(countLabel)
 		}
-
 
 	}
 
@@ -79,11 +82,32 @@ export class CoinFlipper extends Linkable {
 		}
 		let nbTails = this.count('tails')
 		this.tailsCounts[nbTails] += 1
-		this.tailsHistory.push(nbTails)
 		this.tailsCountLabels[nbTails].update({
 			text: `${this.tailsCounts[nbTails]}`
 		})
 		this.update() // to trigger the histogram to update
+	}
+
+	play() {
+		this.playIntervalID = window.setInterval(
+			function() { this.flipCoins() }.bind(this),
+			100
+		)
+		this.playState = 'play'
+	}
+
+	pause() {
+		window.clearInterval(this.playIntervalID)
+		this.playIntervalID = null
+		this.playState = 'pause'
+	}
+
+	togglePlayState() {
+		if (this.playState == 'play') {
+			this.pause()
+		} else {
+			this.play()
+		}
 	}
 
 	count(state: 'heads' | 'tails'): number {

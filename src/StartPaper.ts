@@ -4,25 +4,23 @@ import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { runAllTests } from './core/_tests/all-tests'
 import { CoinFlipper } from './extensions/creations/CoinFlipper/CoinFlipper'
-import { Histogram } from './extensions/creations/CoinFlipper/Histogram'
+import { PlayableCoin } from './extensions/creations/CoinFlipper/PlayableCoin'
+import { RunningAveragePlotter } from './extensions/creations/CoinFlipper/RunningAveragePlotter'
 
 export class StartPaper extends DemoPaper { }
 
-let TESTING = true
+let TESTING = false
 
 if (TESTING) { runAllTests() }
 
 export const paper = new StartPaper()
 
-let flipper = new CoinFlipper({
-	anchor: [100, 100],
-	nbCoins: 6
+let coin = new PlayableCoin({
+	anchor: [100, 100]
 })
-paper.addToContent(flipper)
+paper.addToContent(coin)
 
-let histogram = new Histogram({
-	anchor: [400, 100],
-	frameWidth: 800,
-	frameHeight: 500
+let plotter = new RunningAveragePlotter({
+	anchor: [200, 100]
 })
-paper.addToContent(histogram)
+paper.addToContent(plotter)

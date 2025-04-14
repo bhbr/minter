@@ -33,8 +33,9 @@ export class TestDesmosCalculator extends DesmosCalculator {
 	}
 
 
-	createCalculator() {
-		super.createCalculator()
+	createCalculator(options: object = {}) {
+		options['expressions'] = true
+		super.createCalculator(options)
 		this.calculator.setExpression({id:'graph1', latex:`f(x)=ax^2+${this.b}`})
 
 		this.calculator.setExpressions([
