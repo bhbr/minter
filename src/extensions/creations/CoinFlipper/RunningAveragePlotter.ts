@@ -15,17 +15,18 @@ export class RunningAveragePlotter extends DesmosCalculator {
 	}
 
 	createCalculator(options: object = {}) {
-		options['expressions'] = true
+		options['expressions'] = false
 		super.createCalculator(options)
 		this.calculator.setExpression({ id: 'L', latex: `L = [${this.valueList}]` })
-		this.calculator.setExpression({ id: 'k', latex: `k = [1, 2, ..., \\length(L)]` })
+		this.calculator.setExpression({ id: 'k', latex: `k = [1, ..., ${this.valueList.length}]` })
 		this.calculator.setExpression({ id: 'a', latex: `a = \\frac 1 k \\sum_{n=1}^k L[n]` })
+		this.calculator.setExpression({ id: 'a-vs-k-lines', latex: `\\{k<x<k+1:(1-x+k) a[k]+(x-k) a[k+1]\\}`})
 		this.calculator.setExpression({ id: 'a-vs-k', latex: `(k, a)` })
 		this.calculator.setMathBounds({
-			left: -5,
-			right: 5,
-			bottom:  -5,
-			top: 5
+			left: -0.5,
+			right: 10,
+			bottom: -0.1,
+			top: 1.1
 		})
 	}
 
@@ -37,6 +38,7 @@ export class RunningAveragePlotter extends DesmosCalculator {
 		super.update(args, redraw)
 		if (args['valueList'] !== undefined) {
 			this.calculator.setExpression({ id:'L', latex: `L=[${this.valueList}]` })
+			this.calculator.setExpression({ id: 'k', latex: `k = [1, ..., ${this.valueList.length}]` })
 			this.createLine()
 		}
 

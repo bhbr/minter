@@ -3,6 +3,7 @@ import { Coin } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
+import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
 
 export class PlayableCoin extends Linkable implements Playable {
 
@@ -10,6 +11,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
+	resetButton: SimpleButton
 	valueHistory: Array<number>
 
 	defaults(): object {
@@ -18,10 +20,16 @@ export class PlayableCoin extends Linkable implements Playable {
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
-				anchor: [7, -23]
+				anchor: [-25, 50]
+			}),
+			resetButton: new SimpleButton({
+				anchor: [10, 50],
+				text: 'reset'
 			}),
 			valueHistory: [],
-			outputNames: ['value', 'valueHistory']
+			outputNames: ['value', 'valueHistory'],
+			frameWidth: 50,
+			frameHeight: 80
 		}
 	}
 
@@ -29,7 +37,9 @@ export class PlayableCoin extends Linkable implements Playable {
 		super.setup()
 		this.add(this.coin)
 		this.add(this.playButton)
+		this.add(this.resetButton)
 		this.playButton.mobject = this
+		this.resetButton.action = this.reset.bind(this)
 	}
 
 	flip() {
@@ -56,7 +66,9 @@ export class PlayableCoin extends Linkable implements Playable {
 		}
 	}
 
-	clear() {
+	reset() {
+		this.pause()
+		this.playButton.toggleLabel()
 		this.valueHistory = []
 		this.update()
 	}

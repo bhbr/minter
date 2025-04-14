@@ -75,7 +75,6 @@ export class DesmosCalculator extends Linkable {
 
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
-		getPaper().activeKeyboard = false
 	}
 
 	focus() {
