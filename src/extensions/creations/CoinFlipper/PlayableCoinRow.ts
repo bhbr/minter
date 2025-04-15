@@ -45,7 +45,7 @@ export class PlayableCoinRow extends Linkable implements Playable {
 			nbTailsLabel: new TextLabel(),
 			nbHeadsHistory: [],
 			nbTailsHistory: [],
-			inputNames: ['tailsProbability'],
+			inputNames: ['tailsProbability', 'headsColor', 'tailsColor'],
 			outputNames: ['nbHeads', 'nbTails', 'nbFlips', 'nbHeadsHistory', 'nbTailsHistory'],
 			frameWidth: 300,
 			frameHeight: 100
