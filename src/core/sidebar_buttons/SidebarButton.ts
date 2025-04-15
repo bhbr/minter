@@ -9,14 +9,6 @@ import { Paper } from 'core/Paper'
 import { eventVertex, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 
-var paper: Paper = null
-
-if (isTouchDevice === false) {
-	const paperDiv = document.querySelector('#paper_id')
-	if (paperDiv !== null) {
-		paper = paperDiv['view']['mobject'] as Paper
-	}
-}
 
 interface Window { webkit?: any }
 
@@ -42,6 +34,7 @@ export class SidebarButton extends Circle {
 	outgoingMessage: object
 	key: string
 	activeKeyboard: boolean
+	paper?: Paper
 
 	defaults(): object {
 		return {
@@ -67,7 +60,9 @@ export class SidebarButton extends Circle {
 			frameWidth: 2 * BUTTON_RADIUS,
 			frameHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 0.5,
-			activeKeyboard: true
+			activeKeyboard: true,
+
+			paper: null
 		}
 	}
 
@@ -97,6 +92,16 @@ export class SidebarButton extends Circle {
 		}, false)
 		this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 		this.label.view.div.style['color'] = Color.white().toHex()
+
+		if (isTouchDevice === false) {
+			const paperDiv = document.querySelector('#paper_id')
+			if (paperDiv !== null) {
+				let paperView = paperDiv['view']
+				if (paperView !== null) {
+					this.paper = paperView['mobject'] as Paper
+				}
+			}
+		}
 	}
 
 	numberOfIndices(): number { return this.messages.length }
@@ -198,7 +203,7 @@ export class SidebarButton extends Circle {
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
-			paper.getMessage(message)
+			this.paper.getMessage(message)
 		}
 	}
 

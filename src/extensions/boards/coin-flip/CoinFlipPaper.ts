@@ -6,11 +6,6 @@ import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderC
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/BinaryOperatorBox/BinaryOperatorBoxCreator'
 import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
-import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
-import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
-import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -27,20 +22,13 @@ export class CoinFlipPaper extends Paper {
 				'/': DivideBoxCreator,
 				'color': ColorSampleCreator,
 			},
-			availableButtonClasses: [
-				DragButton,
-				LinkButton,
-				NumberButton,
-				ArithmeticButton,
-				ColorSampleButton
-			],
-			buttons: [
-				new DragButton(),
-				new LinkButton(),
-				new NumberButton(),
-				new ArithmeticButton(),
-				new ColorSampleButton()
-			],
+			buttonNames: [
+				'DragButton',
+				'LinkButton',
+				'NumberButton',
+				'ArithmeticButton',
+				'ColorSampleButton'
+			]
 		}
 	}
 

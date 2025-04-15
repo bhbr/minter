@@ -56,8 +56,10 @@ export class ValueBox extends Linkable {
 			height: this.view.frame.height
 		}, redraw)
 
-		let precision = Number.isInteger(this.value) ? 1 : 3
-		var labelText = `${this.value.toPrecision(precision)}`
+		var labelText = this.value.toString()
+		if (!Number.isInteger(this.value)) {
+			var labelText = `${this.value.toPrecision(3)}`
+		}
 		if (isNaN(this.value) || !isFinite(this.value)) {
 			labelText = ''
 		}

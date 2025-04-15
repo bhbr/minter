@@ -45,6 +45,7 @@ export class PlayableCoinRow extends Linkable implements Playable {
 			nbTailsLabel: new TextLabel(),
 			nbHeadsHistory: [],
 			nbTailsHistory: [],
+			inputNames: ['tailsProbability'],
 			outputNames: ['nbHeads', 'nbTails', 'nbFlips', 'nbHeadsHistory', 'nbTailsHistory'],
 			frameWidth: 300,
 			frameHeight: 100
@@ -107,7 +108,7 @@ export class PlayableCoinRow extends Linkable implements Playable {
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 250)
+		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 100)
 		this.playState = 'play'
 	}
 	

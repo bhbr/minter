@@ -5,72 +5,48 @@ import { log } from 'core/functions/logging'
 
 export class Histogram extends DesmosCalculator {
 
-	tailsList: Array<number>
-	nbCoins: number
-	barsCreates: boolean
+	data: Array<number>
+	nbBins: number
 
 	defaults(): object {
 		return {
-			tailsList: [],
-			inputNames: ['tailsList', 'nbCoins']
+			nbBins: 0,
+			data: [],
+			inputNames: ['data']
 		}
 	}
 
 	createCalculator(options: object = {}) {
 		options['expressions'] = false
 		super.createCalculator(options)
-		this.createTailsList()
-		this.createNormalDistribution()
-		this.calculator.setExpression({ id:'L', latex: `L=[${this.tailsList}]` })
+		this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]` })
 		this.calculator.setMathBounds({
 			left: -1,
-			right: this.nbCoins + 1,
-			bottom:  - 2 / this.nbCoins ** 0.5 * 0.1,
-			top: 2 / this.nbCoins ** 0.5 * 1.1
+			right: this.nbBins + 1,
+			bottom:  - 1,
+			top: 10
 		})
 	}
 
-	nbFlips() {
-		var sum = 0
-		for (var i = 0; i < this.tailsList.length; i++) {
-			sum += this.tailsList[i]
-		}
-		return sum
+	sampleSize() {
+		return this.data.length
 	}
 
-	createTailsList() {
-		this.tailsList = []
-		for (var i = 0; i <= this.nbCoins; i++) {
-			this.tailsList.push(0)
+	bins() {
+		let bins = []
+		for (var i = 0; i < this.nbBins; i++) {
+			bins.push(0)
 		}
-	}
-
-	createBinomialDistribution() {
-		for (var i = 0; i <= this.nbCoins; i++) {
-			let latex = `y = \\{ ${i}\\leq x < ${i + 1}:  \\nCr(${this.nbCoins}, ${i}) / (2^${this.nbCoins})\\}`
-			this.calculator.setExpression({
-				id: `dist-${i}`,
-				latex: latex,
-				color: Color.black().toHex()
-			})
+		for (var n of this.data) {
+			bins[n]++
 		}
-	}
-
-	createNormalDistribution() {
-		let mean = this.nbCoins / 2
-		let variance = 0.25 * this.nbCoins
-		let latex = `y=\\frac{1}{(2\\pi ${variance})^{0.5}}\\exp(-\\frac{(x-${mean})^2}{2 * ${variance}})`
-		this.calculator.setExpression({
-				id: `dist-normal`,
-				latex: latex,
-				color: Color.black().toHex()
-			})
+		return bins
 	}
 
 	createBars() {
-		for (var i = 0; i <= this.nbCoins; i++) {
-			let color = Color.red().interpolate(Color.blue(), i / this.nbCoins)
-			let latex = `0\\leq y\\leq \\{ ${i}\\leq x < ${i + 1}: L[${i + 1}] / ${this.nbFlips()}\\}`
+		for (var i = 0; i < this.nbBins; i++) {
+			let color = Color.red().interpolate(Color.blue(), i / this.nbBins)
+			let latex = `0\\leq y\\leq \\{ ${i}\\leq x < ${i + 1}: B[${i + 1}]\\}`
 			this.calculator.setExpression({
 				id: `bar-${i}`,
 				latex: latex,
@@ -81,8 +57,8 @@ export class Histogram extends DesmosCalculator {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		if (args['tailsList'] !== undefined) {
-			this.calculator.setExpression({ id:'L', latex: `L=[${this.tailsList}]` })
+		if (args['data'] !== undefined) {
+			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]` })
 			this.createBars()
 		}
 
