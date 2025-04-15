@@ -6,6 +6,7 @@ import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderC
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/BinaryOperatorBox/BinaryOperatorBoxCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
+import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -20,7 +21,8 @@ export class CoinFlipPaper extends Paper {
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
-				'color': RGBAColorSampleCreator,
+				'rgb': RGBAColorSampleCreator,
+				'wheel': WheelColorSampleCreator,
 			},
 			buttonNames: [
 				'DragButton',

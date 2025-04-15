@@ -5,7 +5,7 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 import { TAU, DEGREES } from 'core/constants'
 import { Color } from 'core/classes/Color'
 
-export class TouchColorSample extends ColorSample {
+export class WheelColorSample extends ColorSample {
 
 	touchStartLocation?: vertex
 	saturationShiftTime?: number

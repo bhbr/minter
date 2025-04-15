@@ -5,7 +5,7 @@ export class ColorSampleButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['color']
+			creations: ['rgb', 'wheel']
 		}
 	}
 
