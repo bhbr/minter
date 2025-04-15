@@ -22,7 +22,6 @@ export class ColorSample extends Linkable {
 			color: Color.white(),
 			frameWidth: 2 * RADIUS,
 			frameHeight: 2 * RADIUS,
-			inputNames: ['red', 'green', 'blue', 'alpha'],
 			outputNames: ['color'],
 			screenEventHandler: ScreenEventHandler.Self
 		}

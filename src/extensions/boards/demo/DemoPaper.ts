@@ -10,7 +10,7 @@ import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator
 import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
-import { ColorSampleCreator } from 'extensions/creations/ColorSample/ColorSampleCreator'
+import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { BoxStepper } from 'extensions/creations/math/BoxStepper/BoxStepper'
 import { Swing } from 'extensions/creations/Swing/Swing'
 import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
@@ -48,7 +48,7 @@ export class DemoPaper extends Paper {
 				'/': DivideBoxCreator,
 				'board': BoardCreator,
 				'swing': SwingCreator,
-				'color': ColorSampleCreator,
+				'color': RGBAColorSampleCreator,
 				'geo': ConstructionCreator,
 				'line': ConLineConstructor,
 				'ray': ConRayConstructor,

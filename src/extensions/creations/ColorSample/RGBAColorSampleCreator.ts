@@ -1,14 +1,14 @@
 
-import { ColorSample } from 'extensions/creations/ColorSample/ColorSample'
+import { RGBAColorSample } from './RGBAColorSample'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex, vertexTranslatedBy } from 'core/functions/vertex'
 
-export class ColorSampleCreator extends DraggingCreator {
+export class RGBAColorSampleCreator extends DraggingCreator {
 	
-	declare creation: ColorSample
+	declare creation: RGBAColorSample
 
 	createMobject() {
-		return new ColorSample({
+		return new RGBAColorSample({
 			midpoint: this.getStartPoint()
 		})
 	}

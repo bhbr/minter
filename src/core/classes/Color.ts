@@ -1,3 +1,4 @@
+import { TAU } from 'core/constants'
 
 export class Color {
 // Color objects handle conversion to HTML and CSS formats and have a few other convenient methods
@@ -78,7 +79,7 @@ export class Color {
 
 	static random(): Color { return new Color(Math.random(), Math.random(), Math.random(), 1) }
 	static randomGray(): Color { return Color.gray(Math.random()) }
-	
+
 	interpolate(newColor: Color, weight: number) {
 		return new Color(
 			(1 - weight) * this.red + weight * newColor.red,
@@ -86,6 +87,43 @@ export class Color {
 			(1 - weight) * this.blue + weight * newColor.blue,
 			(1 - weight) * this.alpha + weight * newColor.alpha
 		)
+	}
+
+	static hsv_to_rgb(hue: number, saturation: number, value: number): Array<number> {
+
+		let deg60 = TAU / 6
+		let C = saturation * value
+		let X = C * (1 - Math.abs((hue / deg60) % 2 - 1))
+		let m = value - C
+		var rPrime = 0
+		var gPrime = 0
+		var bPrime = 0
+
+		if (hue < deg60) {
+			rPrime = C
+			gPrime = X
+		} else if (hue < 2 * deg60) {
+			rPrime = X
+			gPrime = C
+		} else if (hue < 3 * deg60) {
+			gPrime = C
+			bPrime = X
+		} else if (hue < 4 * deg60) {
+			gPrime = X
+			bPrime = C
+		} else if (hue < 5 * deg60) {
+			rPrime = X
+			bPrime = C
+		} else {
+			rPrime = C
+			bPrime = X
+		}
+
+		let red = Math.min(rPrime + m, 1)
+		let green = Math.min(gPrime + m, 1)
+		let blue = Math.min(bPrime + m, 1)
+		return [red, green, blue]
+
 	}
 
 }
