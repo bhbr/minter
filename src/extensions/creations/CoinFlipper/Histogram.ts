@@ -16,7 +16,8 @@ export class Histogram extends DesmosCalculator {
 			data: [],
 			leftColor: Color.green(),
 			rightColor: Color.purple(),
-			inputNames: ['data', 'nbBins', 'leftColor', 'rightColor']
+			inputNames: ['data', 'nbBins', 'leftColor', 'rightColor'],
+			outputNames: ['bins']
 		}
 	}
 
