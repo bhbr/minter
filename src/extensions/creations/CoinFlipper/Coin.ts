@@ -8,6 +8,7 @@ export class Coin extends Circle {
 	state: 'heads' | 'tails'
 	headsColor: Color
 	tailsColor: Color
+	tailsProbability: number
 
 	defaults(): object {
 		return {
@@ -31,9 +32,9 @@ export class Coin extends Circle {
 		return args
 	}
 
-	flip(tailsProbability: number = 0.5) {
+	flip() {
 		let x = Math.random()
-		let newState = (x > tailsProbability) ? 'heads' : 'tails'
+		let newState = (x > this.tailsProbability) ? 'heads' : 'tails'
 		this.update({ state: newState })
 	}
 

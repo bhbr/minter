@@ -8,6 +8,7 @@ import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
 export class PlayableCoin extends Linkable implements Playable {
 
 	coin: Coin
+	tailsProbability: number
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
@@ -27,7 +28,7 @@ export class PlayableCoin extends Linkable implements Playable {
 				text: 'reset'
 			}),
 			valueHistory: [],
-			outputNames: ['value', 'valueHistory'],
+			outputNames: ['value', 'valueHistory', 'nbFlips', 'nbHeads', 'nbTails'],
 			frameWidth: 50,
 			frameHeight: 80
 		}
@@ -35,6 +36,9 @@ export class PlayableCoin extends Linkable implements Playable {
 
 	setup() {
 		super.setup()
+		this.coin.update({
+			tailsProbability: this.tailsProbability
+		}, false)
 		this.add(this.coin)
 		this.add(this.playButton)
 		this.add(this.resetButton)
@@ -76,7 +80,17 @@ export class PlayableCoin extends Linkable implements Playable {
 	get value(): number { return this.coin.value }
 	set value(newValue: number) { this.coin.value = newValue }
 
+	nbFlips(): number { return this.valueHistory.length }
 
+	nbHeads(): number {
+		var sum = 0
+		for (let value of this.valueHistory) {
+			sum += value
+		}
+		return sum
+	}
+
+	nbTails(): number { return this.nbFlips() - this.nbHeads() }
 
 
 

@@ -5,7 +5,7 @@ export class NumberButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['input', 'slider', 'stepper']
+			creations: ['value', 'input', 'slider', 'stepper']
 		}
 	}
 
