@@ -49,7 +49,6 @@ export class Histogram extends DesmosCalculator {
 	}
 
 	createBars() {
-		console.log(this.leftColor)
 		for (var i = 0; i < this.nbBins; i++) {
 			let color = this.leftColor.interpolate(this.rightColor, i / this.nbBins)
 			let latex = `0\\leq y\\leq \\{ ${i}\\leq x < ${i + 1}: B[${i + 1}]\\}`

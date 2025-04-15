@@ -665,9 +665,6 @@ The content children can also be dragged and panned.
 
 	endLinking(e: ScreenEvent) {
 		let h = this.hookAtLocation(this.sensor.localEventVertex(e))
-		if (this.openLink !== null) {
-			this.remove(this.openLink)
-		}
 		if (h === null) {
 			this.openLink = null
 			this.openHook = null
@@ -706,11 +703,14 @@ The content children can also be dragged and panned.
 			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
 			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
 			this.createNewDependencyBetweenHooks(startHook, endHook)
-
 		} else if (this.openBullet == this.openLink.endBullet) {
-			let startHook = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
-			let endHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
-			this.createNewDependencyBetweenHooks(startHook, endHook)
+			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
+			let hook2 = this.hookAtLocation(this.openBullet.positionInLinkMap())
+			if (hook1.type == 'output' && hook2.type == 'input') {
+				this.createNewDependencyBetweenHooks(hook1, hook2)
+			} else if (hook1.type == 'input' && hook2.type == 'output') {
+				this.createNewDependencyBetweenHooks(hook2, hook1)
+			}
 		}
 	}
 
