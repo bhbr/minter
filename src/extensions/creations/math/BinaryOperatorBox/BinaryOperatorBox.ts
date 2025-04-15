@@ -71,8 +71,8 @@ export class BinaryOperatorBox extends ValueBox {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		args['value'] = this.result()
-		super.update(args, redraw)
+		super.update(args, false)
+		super.update({ value: this.result() }, redraw)
 	}
 
 }

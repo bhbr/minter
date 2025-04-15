@@ -15,17 +15,4 @@ if (TESTING) { runAllTests() }
 
 export const paper = new StartPaper()
 
-let nbCoins = 10
 
-let row = new PlayableCoinRow({
-	anchor: [100, 100],
-	nbCoins: nbCoins
-})
-
-let hist = new Histogram({
-	anchor: [300, 100],
-	nbBins: nbCoins + 1
-})
-
-paper.addToContent(row)
-paper.addToContent(hist)
