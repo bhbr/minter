@@ -13,6 +13,7 @@ export class TextLabelView extends View {
 	borderColor: Color
 	borderWidth: number
 	fontSize: number
+	fontFamily: string
 
 	defaults(): object {
 		return {
@@ -21,7 +22,8 @@ export class TextLabelView extends View {
 			color: Color.white(),
 			borderColor: Color.white(),
 			borderWidth: 1,
-			fontSize: 12
+			fontSize: 16,
+			fontFamily: 'Helvetica'
 		}
 	}
 
@@ -29,7 +31,7 @@ export class TextLabelView extends View {
 		super.setup()
 		this.div.setAttribute('class', this.mobject.constructor.name + ' unselectable mobject-div')
 		this.div.style.display = 'flex'
-		this.div.style.fontFamily = 'Helvetica'
+		this.div.style.fontFamily = this.fontFamily
 		this.div.style.fontSize = `${this.fontSize}px`
 	}
 
@@ -40,7 +42,7 @@ export class TextLabelView extends View {
 		this.div.style.color = (this.color ?? Color.white()).toHex()
 		this.div.style.borderColor = (this.borderColor ?? Color.white()).toHex()
 		this.div.style.borderWidth = `${this.borderWidth}px`
-		
+
 		this.div.style.fontSize = `${this.fontSize}px`
 		switch (this.verticalAlign) {
 		case 'top':

@@ -57,7 +57,7 @@ export class DesmosCalculator extends Linkable {
 		}
 		this.add(this.outerFrame)
 
-		window.setTimeout(this.createCalculator.bind(this), 3000)
+		window.setTimeout(this.createCalculator.bind(this), 10000)
 
 	}
 

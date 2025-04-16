@@ -8,6 +8,8 @@ import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderC
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/BinaryOperatorBox/BinaryOperatorBoxCreator'
 import { SumBoxCreator, AverageBoxCreator, CumSumBoxCreator, CumAverageBoxCreator } from 'extensions/creations/math/FunctionBox/ListOperationBoxCreators'
+import { SequencePlotCreator } from 'extensions/creations/DesmosCalculator/SequencePlotCreator'
+import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 
@@ -30,6 +32,8 @@ export class CoinFlipPaper extends Paper {
 				'avg': AverageBoxCreator,
 				'cumsum': CumSumBoxCreator,
 				'cumavg': CumAverageBoxCreator,
+				'plot': SequencePlotCreator,
+				'hist': HistogramCreator,
 				'rgb': RGBAColorSampleCreator,
 				'wheel': WheelColorSampleCreator,
 			},
@@ -40,6 +44,7 @@ export class CoinFlipPaper extends Paper {
 				'NumberButton',
 				'ArithmeticButton',
 				'ListOperationsButton',
+				'PlotButton',
 				'ColorSampleButton'
 			]
 		}

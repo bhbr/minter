@@ -5,6 +5,7 @@ import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { CoinButton } from './CoinButton'
 import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
 import { ListOperationsButton } from 'extensions/sidebar_buttons/ListOperationsButton'
+import { PlotButton } from 'extensions/sidebar_buttons/PlotButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
 
@@ -19,6 +20,7 @@ export class CoinFlipSidebar extends Sidebar {
 				NumberButton,
 				ArithmeticButton,
 				ListOperationsButton,
+				PlotButton,
 				ColorSampleButton
 			],
 			buttons: [
@@ -28,6 +30,7 @@ export class CoinFlipSidebar extends Sidebar {
 				new NumberButton(),
 				new ArithmeticButton(),
 				new ListOperationsButton(),
+				new PlotButton(),
 				new ColorSampleButton()
 			],
 		}

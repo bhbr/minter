@@ -43,10 +43,10 @@ export class FunctionBox extends ValueBox {
 		})
 		this.functionLabel.update({
 			text: this.functionName,
+			fontSize: 12,
 			frameWidth: this.functionSign.width,
 			frameHeight: this.functionSign.height
 		})
-		this.functionLabel.view.div.style.fontSize = '14px'
 		this.functionSign.add(this.functionLabel)
 		this.add(this.functionSign)
 	}
