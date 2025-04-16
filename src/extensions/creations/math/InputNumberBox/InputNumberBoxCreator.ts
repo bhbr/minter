@@ -1,14 +1,14 @@
 
-import { InputValueBox } from 'extensions/creations/math/InputValueBox/InputValueBox'
+import { InputNumberBox } from 'extensions/creations/math/InputNumberBox/InputNumberBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 
-export class InputValueBoxCreator extends DraggingCreator {
+export class InputNumberBoxCreator extends DraggingCreator {
 	
-	declare creation: InputValueBox
+	declare creation: InputNumberBox
 
 	createMobject() {
-		return new InputValueBox({
+		return new InputNumberBox({
 			anchor: this.getStartPoint()
 		})
 	}

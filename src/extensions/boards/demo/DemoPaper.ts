@@ -4,8 +4,8 @@ import { WavyCreator } from 'extensions/creations/Wavy/WavyCreator'
 import { DesmosCalculatorCreator } from 'extensions/creations/DesmosCalculator/DesmosCalculatorCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
-import { ValueBoxCreator } from 'extensions/creations/math/ValueBox/ValueBoxCreator'
-import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
+import { NumberBoxCreator } from 'extensions/creations/math/ValueBox/NumberBoxCreator'
+import { InputNumberBoxCreator } from 'extensions/creations/math/InputNumberBox/InputNumberBoxCreator'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/BinaryOperatorBox/BinaryOperatorBoxCreator'
 import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
@@ -40,8 +40,8 @@ export class DemoPaper extends Paper {
 				'desmos': DesmosCalculatorCreator,
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
-				'value': ValueBoxCreator,
-				'input': InputValueBoxCreator,
+				'number': NumberBoxCreator,
+				'input': InputNumberBoxCreator,
 				'+': AddBoxCreator,
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,

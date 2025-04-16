@@ -1,14 +1,14 @@
 
-import { ValueBox } from './ValueBox'
+import { NumberBox } from './NumberBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 
-export class ValueBoxCreator extends DraggingCreator {
+export class NumberBoxCreator extends DraggingCreator {
 	
-	declare creation: ValueBox
+	declare creation: NumberBox
 
 	createMobject() {
-		return new ValueBox({
+		return new NumberBox({
 			anchor: this.getStartPoint()
 		})
 	}

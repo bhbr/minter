@@ -8,7 +8,7 @@ import { getPaper, getSidebar } from 'core/functions/getters'
 import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 
-export class InputValueBox extends Linkable {
+export class InputNumberBox extends Linkable {
 
 	value: number
 	inputBox: HTMLInputElement
