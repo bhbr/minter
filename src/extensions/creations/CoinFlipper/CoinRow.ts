@@ -6,12 +6,14 @@ import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
 import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
 import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
+import { vertex } from 'core/functions/vertex'
 
-export class PlayableCoinRow extends Linkable implements Playable {
+export class CoinRow extends Linkable implements Playable {
 
 	coins: Array<Coin>
 	coinRadius: number
 	nbCoins: number
+	coinSpacing: number
 	headsColor: Color
 	tailsColor: Color
 	tailsProbability: number
@@ -21,6 +23,7 @@ export class PlayableCoinRow extends Linkable implements Playable {
 	resetButton: SimpleButton
 	nbHeadsLabel: TextLabel
 	nbTailsLabel: TextLabel
+	labelWidth: number
 	nbHeadsHistory: Array<number>
 	nbTailsHistory: Array<number>
 
@@ -29,23 +32,27 @@ export class PlayableCoinRow extends Linkable implements Playable {
 			coins: [],
 			coinRadius: 25,
 			nbCoins: 12,
-			headsColor: Color.blue(),
+			coinSpacing: 20,
+			headsColor: new Color(0, 0.3, 1),
 			tailsColor: Color.red(),
 			tailsProbability: 0.5,
 			playState: 'stop',
 			playIntervalID: null,
-			playButton: new PlayButton({
-				anchor: [-25, 50]
-			}),
+			playButton: new PlayButton(),
 			resetButton: new SimpleButton({
-				anchor: [10, 50],
 				text: 'reset'
 			}),
-			nbHeadsLabel: new TextLabel(),
-			nbTailsLabel: new TextLabel(),
+			nbHeadsLabel: new TextLabel({
+				frameWidth: 50,
+				frameHeight: 25
+			}),
+			nbTailsLabel: new TextLabel({
+				frameWidth: 50,
+				frameHeight: 25
+			}),
 			nbHeadsHistory: [],
 			nbTailsHistory: [],
-			inputNames: ['tailsProbability', 'headsColor', 'tailsColor'],
+			inputNames: ['tailsProbability', 'nbCoins', 'headsColor', 'tailsColor'],
 			outputNames: ['nbHeads', 'nbTails', 'nbFlips', 'nbHeadsHistory', 'nbTailsHistory'],
 			frameWidth: 300,
 			frameHeight: 100
@@ -57,20 +64,11 @@ export class PlayableCoinRow extends Linkable implements Playable {
 		this.createCoins()
 		this.setupLabels()
 		this.setupButtons()
-}
+	}
 
 	createCoins() {
-		let spacing = (this.frameWidth - this.coinRadius) / (this.nbCoins - 1)
 		for (var i = 0; i < this.nbCoins; i++) {
-			let coin = new Coin({
-				midpoint: [50 + spacing * i, 0],
-				radius: this.coinRadius
-			})
-			this.addDependency('headsColor', coin, 'headsColor')
-			this.addDependency('tailsColor', coin, 'tailsColor')
-			this.addDependency('tailsProbability', coin, 'tailsProbability')
-			this.coins.push(coin)
-			this.add(coin)
+			this.addCoin()
 		}
 	}
 
@@ -78,24 +76,87 @@ export class PlayableCoinRow extends Linkable implements Playable {
 		this.nbHeadsLabel.update({
 			textColor: this.headsColor,
 			fontSize: 24,
-			anchor: [-70, -50]
+			anchor: [0, this.coinRadius - this.nbHeadsLabel.frameHeight / 2]
 		})
 		this.addDependency('nbHeadsAsString', this.nbHeadsLabel, 'text')
 		this.add(this.nbHeadsLabel)
 		this.nbTailsLabel.update({
 			textColor: this.tailsColor,
-			fontSize: 24,
-			anchor: [this.frameWidth + 20, -50]
+			fontSize: 24
 		})
 		this.addDependency('nbTailsAsString', this.nbTailsLabel, 'text')
 		this.add(this.nbTailsLabel)
+		this.positionTailsLabel()
 	}
 
 	setupButtons() {
 		this.add(this.playButton)
 		this.add(this.resetButton)
-		this.playButton.mobject = this
+		this.positionButtons()
+		this.playButton.update({
+			mobject: this
+		})
 		this.resetButton.action = this.reset.bind(this)
+	}
+
+
+	addCoin() {
+		let coin = new Coin({
+			midpoint: [
+				this.nbHeadsLabel.frameWidth + this.coinSpacing * this.coins.length + this.coinRadius,
+				this.coinRadius
+			],
+			radius: this.coinRadius,
+			headsColor: this.headsColor,
+			tailsColor: this.tailsColor,
+			tailsProbability: this.tailsProbability
+		})
+		this.addDependency('headsColor', coin, 'headsColor')
+		this.addDependency('tailsColor', coin, 'tailsColor')
+		this.addDependency('tailsProbability', coin, 'tailsProbability')
+		this.coins.push(coin)
+		this.add(coin)
+		this.adjustFrameWidth()
+		this.positionTailsLabel()
+		this.positionButtons()
+	}
+
+	removeCoin() {
+		let coin = this.coins.pop()
+		this.remove(coin)
+		this.adjustFrameWidth()
+		this.positionTailsLabel()
+		this.positionButtons()
+	}
+
+	adjustFrameWidth() {
+		this.update({
+			frameWidth: 2 * this.nbHeadsLabel.frameWidth + 2 * this.coinRadius + (this.coins.length - 1) * this.coinSpacing
+		})
+	}
+
+	positionTailsLabel() {
+		this.nbTailsLabel.update({
+			anchor: [
+				this.nbTailsLabel.frameWidth + (this.coins.length - 1) * this.coinSpacing + 2 * this.coinRadius,
+				this.coinRadius - this.nbHeadsLabel.frameHeight / 2
+			]
+		})
+	}
+
+	positionButtons() {
+		this.playButton.update({
+			anchor: [
+				this.frameWidth / 2 - this.playButton.frameWidth - 5,
+				2 * this.coinRadius + 5
+			]
+		})
+		this.resetButton.update({
+			anchor: [
+				this.frameWidth / 2 + 5,
+				2 * this.coinRadius + 5
+			]
+		})
 	}
 
 	flipCoins() {
@@ -147,7 +208,25 @@ export class PlayableCoinRow extends Linkable implements Playable {
 	nbHeads(): number { return this.nbCoins - this.nbTails() }
 	nbHeadsAsString(): string { return this.nbHeads().toString() }
 
+	update(args: object = {}, redraw: boolean = false) {
+		let newNbCoins = args['nbCoins']
+		if (newNbCoins !== undefined && newNbCoins != this.nbCoins) {
+			this.updateNbCoins(newNbCoins)
+		}
+		super.update(args, redraw)
+	}
 
+	updateNbCoins(newNbCoins: number) {
+		if (newNbCoins < this.nbCoins) {
+			for (var i = this.nbCoins - 1; i >= newNbCoins; i--) {
+				this.removeCoin()
+			}
+		} else {
+			for (var i = this.nbCoins; i < newNbCoins; i++) {
+				this.addCoin()
+			}
+		}
+	}
 
 
 

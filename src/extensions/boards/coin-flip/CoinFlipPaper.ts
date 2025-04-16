@@ -1,5 +1,7 @@
 
 import { Paper } from 'core/Paper'
+import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCoinCreator'
+import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
 import { ValueBoxCreator } from 'extensions/creations/math/ValueBox/ValueBoxCreator'
 import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
@@ -17,6 +19,8 @@ export class CoinFlipPaper extends Paper {
 				'input': InputValueBoxCreator,
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
+				'coin': PlayableCoinCreator,
+				'coin row': CoinRowCreator,
 				'+': AddBoxCreator,
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,
@@ -27,6 +31,7 @@ export class CoinFlipPaper extends Paper {
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
+				'CoinButton',
 				'NumberButton',
 				'ArithmeticButton',
 				'ColorSampleButton'

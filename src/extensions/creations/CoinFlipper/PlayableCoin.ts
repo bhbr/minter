@@ -30,7 +30,8 @@ export class PlayableCoin extends Linkable implements Playable {
 			valueHistory: [],
 			outputNames: ['value', 'valueHistory', 'nbFlips', 'nbHeads', 'nbTails'],
 			frameWidth: 50,
-			frameHeight: 80
+			frameHeight: 80,
+			tailsProbability: 0.5
 		}
 	}
 
