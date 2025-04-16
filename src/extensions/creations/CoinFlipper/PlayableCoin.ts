@@ -4,6 +4,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
 import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
+import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class PlayableCoin extends Linkable implements Playable {
 
@@ -45,6 +46,10 @@ export class PlayableCoin extends Linkable implements Playable {
 		this.add(this.resetButton)
 		this.playButton.mobject = this
 		this.resetButton.action = this.reset.bind(this)
+	}
+
+	onTap(e: ScreenEvent) {
+		this.flip()
 	}
 
 	flip() {
