@@ -1,24 +1,27 @@
 
 
 import { ValueBox } from '../ValueBox/ValueBox'
-import { Circle } from 'core/shapes/Circle'
+import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 
 export class FunctionBox extends ValueBox {
 
 	argument: number | Array<number>
-	functionSign: Circle
+	functionSign: Rectangle
 	functionLabel: TextLabel
+	functionName: string
 
 	defaults(): object {
 		return {
-			functionSign: new Circle({
-				radius: 10,
+			functionSign: new Rectangle({
+				width: 50,
+				height: 20,
 				fillColor: Color.black(),
 				fillOpacity: 1.0
 			}),
 			functionLabel: new TextLabel(),
+			functionName: '',
 			argument: 0,
 			inputNames: ['argument'],
 			outputNames: ['result']
@@ -28,19 +31,20 @@ export class FunctionBox extends ValueBox {
 	mutabilities(): object {
 		return {
 			functionSign: 'never',
-			functionLabel: 'never'
+			functionLabel: 'never',
+			functionName: 'on_init'
 		}
 	}
 
 	setup() {
 		super.setup()
 		this.functionSign.update({
-			midpoint: [this.frameWidth / 2, 0]
+			anchor: [this.frameWidth / 2 - this.functionSign.frameWidth / 2, -this.functionSign.frameHeight]
 		})
 		this.functionLabel.update({
-			text: '',
-			frameWidth: 2 * this.functionSign.radius,
-			frameHeight: 2 * this.functionSign.radius
+			text: this.functionName,
+			frameWidth: this.functionSign.width,
+			frameHeight: this.functionSign.height
 		})
 		this.functionLabel.view.div.style.fontSize = '14px'
 		this.functionSign.add(this.functionLabel)

@@ -7,7 +7,7 @@ import { InputNumberBoxCreator } from 'extensions/creations/math/InputNumberBox/
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/BinaryOperatorBox/BinaryOperatorBoxCreator'
-import { AverageBoxCreator } from 'extensions/creations/math/FunctionBox/AverageBoxCreator'
+import { SumBoxCreator, AverageBoxCreator, CumSumBoxCreator, CumAverageBoxCreator } from 'extensions/creations/math/FunctionBox/ListOperationBoxCreators'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 
@@ -26,7 +26,10 @@ export class CoinFlipPaper extends Paper {
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
-				'mean': AverageBoxCreator,
+				'sum': SumBoxCreator,
+				'avg': AverageBoxCreator,
+				'cumsum': CumSumBoxCreator,
+				'cumavg': CumAverageBoxCreator,
 				'rgb': RGBAColorSampleCreator,
 				'wheel': WheelColorSampleCreator,
 			},

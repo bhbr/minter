@@ -5,7 +5,7 @@ export class ListOperationsButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['mean']
+			creations: ['sum', 'avg', 'cumsum', 'cumavg']
 		}
 	}
 
