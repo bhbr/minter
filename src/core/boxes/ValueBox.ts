@@ -1,42 +1,46 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
+import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { Linkable } from 'core/linkables/Linkable'
 import { log } from 'core/functions/logging'
-import { Scroll } from './Scroll'
 
-export class ListBox extends Linkable {
+export class ValueBox extends Linkable {
 
-	list: Array<any>
-	scroll: Scroll
+	value: any
 	background: Rectangle
 
 	defaults(): object {
 		return {
-			scroll: new Scroll(),
 			background: new Rectangle({
 				fillColor: Color.black()
 			}),
 			frameWidth: 80,
-			frameHeight: 200,
-			inputNames: ['list'],
-			outputNames: ['list'],
+			frameHeight: 40,
+			inputNames: ['value'],
+			outputNames: ['value'],
 			strokeWidth: 0.0,
-			list: []
+			value: 1
+		}
+	}
+
+	mutabilities(): object {
+		return {
+			background: 'never',
 		}
 	}
 
 	setup() {
 		super.setup()
-		this.add(this.background)
-		this.add(this.scroll)
-		this.scroll.update({
-			frameWidth: this.view.frame.width,
-			frameHeight: this.view.frame.height,
-			list: this.list
+		this.background.update({
+			width: this.view.frame.width,
+			height: this.view.frame.height
 		})
-		this.scroll.view.div.style.fontSize = '20px'
-		this.scroll.view.div.style.color = Color.white().toCSS()
+		this.add(this.background)
+	}
+
+	valueAsString(): string {
+		return this.value.toString()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -44,12 +48,6 @@ export class ListBox extends Linkable {
 		this.background.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height
-		}, redraw)
-
-		this.scroll.update({
-			width: this.view.frame.width,
-			height: this.view.frame.height,
-			list: this.list
 		}, redraw)
 
 		if (redraw) { this.view.redraw() }

@@ -1,15 +1,28 @@
 
-import { FunctionBox } from './FunctionBox'
+import { FunctionBox } from '../FunctionBox'
+import { NumberBox } from '../NumberBox/NumberBox'
+import { NumberListBox } from '../lists/NumberListBox'
 import { numberArraySum, numberArrayAverage, numberArrayCumSum, numberArrayCumAverage } from 'core/functions/numberArray'
 
+export class ListFunctionBox extends FunctionBox {
 
-export class SumBox extends FunctionBox {
-	
 	declare argument: Array<number>
 
 	defaults(): object {
 		return {
-			functionName: 'sum'
+			argument: []
+		}
+	}
+}
+
+export class SumBox extends ListFunctionBox {
+
+	declare valueBox: NumberBox
+	
+	defaults(): object {
+		return {
+			functionName: 'sum',
+			valueBox: new NumberBox()
 		}
 	}
 
@@ -24,13 +37,14 @@ export class SumBox extends FunctionBox {
 	}
 }
 
-export class AverageBox extends FunctionBox {
-	
-	declare argument: Array<number>
+export class AverageBox extends ListFunctionBox {
+
+	declare valueBox: NumberBox
 
 	defaults(): object {
 		return {
-			functionName: 'avg'
+			functionName: 'avg',
+			valueBox: new NumberBox()
 		}
 	}
 
@@ -45,13 +59,14 @@ export class AverageBox extends FunctionBox {
 	}
 }
 
-export class CumSumBox extends FunctionBox {
-	
-	declare argument: Array<number>
+export class CumSumBox extends ListFunctionBox {
+
+	declare valueBox: NumberListBox
 
 	defaults(): object {
 		return {
-			functionName: 'cumsum'
+			functionName: 'cumsum',
+			valueBox: new NumberListBox()
 		}
 	}
 
@@ -66,13 +81,14 @@ export class CumSumBox extends FunctionBox {
 	}
 }
 
-export class CumAverageBox extends FunctionBox {
-	
-	declare argument: Array<number>
+export class CumAverageBox extends ListFunctionBox {
+
+	declare valueBox: NumberListBox
 
 	defaults(): object {
 		return {
-			functionName: 'cumavg'
+			functionName: 'cumavg',
+			valueBox: new NumberListBox()
 		}
 	}
 

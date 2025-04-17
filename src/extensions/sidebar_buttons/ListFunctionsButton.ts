@@ -1,7 +1,7 @@
 
 import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
-export class ListOperationsButton extends CreativeButton {
+export class ListFunctionsButton extends CreativeButton {
 
 	defaults(): object {
 		return {

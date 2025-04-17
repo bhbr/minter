@@ -1,5 +1,5 @@
 
-import { ValueBox } from '../ValueBox/ValueBox'
+import { ValueBox } from '../ValueBox'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
