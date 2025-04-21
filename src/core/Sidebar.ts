@@ -13,6 +13,7 @@ import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
+import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'StartSidebar'
@@ -41,11 +42,13 @@ export class Sidebar extends Mobject {
 
 			availableButtonClasses: [
 				DragButton,
-				LinkButton
+				LinkButton,
+				NumberButton
 			],
 			buttons: [
 				new DragButton(),
-				new LinkButton()
+				new LinkButton(),
+				new NumberButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: PAPER_HEIGHT,
