@@ -1,12 +1,15 @@
 
 import { ValueBox } from '../ValueBox'
+import { NumberBox } from '../NumberBox/NumberBox'
+import { NumberListBox } from '../lists/NumberListBox'
+import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 
 type operatorString = "+" | "–" | "&times;" | "/"
 
-export class BinaryOperatorBox extends ValueBox {
+export class BinaryOperatorBox extends Linkable {
 
 	operand1: number | Array<number>
 	operand2: number | Array<number>
@@ -14,6 +17,8 @@ export class BinaryOperatorBox extends ValueBox {
 	operatorSign: Circle
 	operatorLabel: TextLabel
 	operatorDict: object
+	valueType: 'number' | 'Array<number>'
+	valueBox: ValueBox
 
 	defaults(): object {
 		return {
@@ -27,6 +32,8 @@ export class BinaryOperatorBox extends ValueBox {
 			operator: undefined,
 			operand1: 0,
 			operand2: 0,
+			valueType: 'number',
+			valueBox: new NumberBox(),
 			inputNames: ['operand1', 'operand2'],
 			outputNames: ['result']
 		}
@@ -43,6 +50,7 @@ export class BinaryOperatorBox extends ValueBox {
 
 	setup() {
 		super.setup()
+		this.add(this.valueBox)
 		this.operatorSign.update({
 			midpoint: [this.view.frame.width / 2, 0]
 		})
@@ -54,6 +62,24 @@ export class BinaryOperatorBox extends ValueBox {
 		this.operatorLabel.view.div.style.fontSize = '14px'
 		this.operatorSign.add(this.operatorLabel)
 		this.add(this.operatorSign)
+	}
+
+	setValueTypeTo(newType: 'number' | 'Array<number>') {
+		if (this.valueType == 'number' && newType == 'Array<number>') {
+			this.remove(this.valueBox)
+			this.valueBox = new NumberListBox({
+				value: this.result()
+			})
+		} else if (this.valueType == 'Array<number>' && newType == 'number') {
+			this.remove(this.valueBox)
+			this.valueBox = new NumberBox({
+				value: this.result()
+			})
+		} else {
+			return
+		}
+		this.add(this.valueBox)
+		this.moveToTop(this.operatorSign)
 	}
 
 	result(): number | Array<number> {
@@ -105,8 +131,17 @@ export class BinaryOperatorBox extends ValueBox {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+		let oldOp1Type = typeof this.operand1
+		let oldOp2Type = typeof this.operand2
 		super.update(args, false)
-		super.update({ value: this.result() }, redraw)
+		if (typeof this.operand1 != oldOp1Type || typeof this.operand2 != oldOp2Type) {
+			if (typeof this.operand1 == 'number' && typeof this.operand2 == 'number') {
+				this.setValueTypeTo('number')
+			} else {
+				this.setValueTypeTo('Array<number>')
+			}
+		}
+		this.valueBox.update({ value: this.result() }, redraw)
 	}
 
 }
