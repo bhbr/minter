@@ -10,7 +10,7 @@ import { BoardCreator } from './BoardCreator'
 import { Freehand } from 'core/creators/Freehand'
 import { ExpandButton } from './ExpandButton'
 import { LinkHook } from 'core/linkables/LinkHook'
-import { EditableLinkHook } from './EditableLinkHook'
+//import { EditableLinkHook } from './EditableLinkHook'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
 import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
@@ -80,6 +80,7 @@ The content children can also be dragged and panned.
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
 			expandedOutputList: new ExpandedBoardOutputList(),
+			linksEditable: true,
 			editingLinkName: false,
 			openLink: null,
 			openHook: null,
@@ -409,12 +410,12 @@ The content children can also be dragged and panned.
 			case 'link':
 				if (value) {
 					this.showLinksOfContent()
-				} else if (!this.editingLinkName) {
+				} else { // if (!this.editingLinkName) {
 					this.hideLinksOfContent()
-					//this.endLinking()
-					if (this.openLink) {
-						this.remove(this.openLink)
-					}
+					// //this.endLinking()
+					// if (this.openLink) {
+					// 	this.remove(this.openLink)
+					// }
 				}
 				this.setLinking(value)
 		}
@@ -566,11 +567,11 @@ The content children can also be dragged and panned.
 
 	expandedInputList: ExpandedBoardInputList
 	expandedOutputList: ExpandedBoardOutputList
-	editingLinkName: boolean
-	openLink?: DependencyLink
-	openHook?: LinkHook
-	openBullet?: LinkBullet
-	compatibleHooks: Array<LinkHook>
+	// editingLinkName: boolean
+	// openLink?: DependencyLink
+	// openHook?: LinkHook
+	// openBullet?: LinkBullet
+	// compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 
@@ -618,7 +619,7 @@ The content children can also be dragged and panned.
 			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-		} else if (!this.editingLinkName) {
+		} else { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
 			this.sensor.restoreTouchMethods()
 			this.sensor.restorePenMethods()
@@ -631,146 +632,146 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		var p = this.sensor.localEventVertex(e)
-		this.openHook = this.hookAtLocation(p)
-		if (this.openHook === null) { return }
-		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
-		let sb = new LinkBullet({ midpoint: p })
-		let eb = new LinkBullet({ midpoint: p })
-		this.openLink = new DependencyLink({
-			startBullet: sb,
-			endBullet: eb
-		})
-		this.add(this.openLink)
-		this.openBullet = eb
-		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+		// var p = this.sensor.localEventVertex(e)
+		// this.openHook = this.hookAtLocation(p)
+		// if (this.openHook === null) { return }
+		// p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
+		// let sb = new LinkBullet({ midpoint: p })
+		// let eb = new LinkBullet({ midpoint: p })
+		// this.openLink = new DependencyLink({
+		// 	startBullet: sb,
+		// 	endBullet: eb
+		// })
+		// this.add(this.openLink)
+		// this.openBullet = eb
+		// this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
-		if (this.openLink === null) { return }
-		let p = this.sensor.localEventVertex(e)
-		for (let hook of this.compatibleHooks) {
-			let m = hook.positionInLinkMap()
-			if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
-				this.openBullet.update({
-					midpoint: m
-				})
-				return
-			}
-		}
-		this.openBullet.update({
-			midpoint: p
-		})
+		// if (this.openLink === null) { return }
+		// let p = this.sensor.localEventVertex(e)
+		// for (let hook of this.compatibleHooks) {
+		// 	let m = hook.positionInLinkMap()
+		// 	if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
+		// 		this.openBullet.update({
+		// 			midpoint: m
+		// 		})
+		// 		return
+		// 	}
+		// }
+		// this.openBullet.update({
+		// 	midpoint: p
+		// })
 	}
 
 	endLinking(e: ScreenEvent) {
-		let h = this.hookAtLocation(this.sensor.localEventVertex(e))
-		if (h === null) {
-			this.openLink = null
-			this.openHook = null
-			this.openBullet = null
-			this.compatibleHooks = []
-			return
-		}
-		if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
-			// click on a plus button to create a new hook
-			let ed = h as EditableLinkHook
-			ed.editName()
-		} else if (h.constructor.name === 'EditableLinkHook') {
-			// drag a link onto a plus button
-			this.createNewDependency()
-			this.links.push(this.openLink)
-			let ed = h as EditableLinkHook
-			ed.editName()
-		} else {
-			this.createNewDependency()
-			this.links.push(this.openLink)
-		}
-		this.openLink = null
-		this.openHook = null
-		this.openBullet = null
-		this.compatibleHooks = []
+		// let h = this.hookAtLocation(this.sensor.localEventVertex(e))
+		// if (h === null) {
+		// 	this.openLink = null
+		// 	this.openHook = null
+		// 	this.openBullet = null
+		// 	this.compatibleHooks = []
+		// 	return
+		// }
+		// if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+		// 	// click on a plus button to create a new hook
+		// 	let ed = h as EditableLinkHook
+		// 	ed.editName()
+		// } else if (h.constructor.name === 'EditableLinkHook') {
+		// 	// drag a link onto a plus button
+		// 	this.createNewDependency()
+		// 	this.links.push(this.openLink)
+		// 	let ed = h as EditableLinkHook
+		// 	ed.editName()
+		// } else {
+		// 	this.createNewDependency()
+		// 	this.links.push(this.openLink)
+		// }
+		// this.openLink = null
+		// this.openHook = null
+		// this.openBullet = null
+		// this.compatibleHooks = []
 	}
 
 	updateLinks() {
-		for (let hook of this.allHooks()) {
-			hook.update() // updates start and end points of links
-		}
+	// 	for (let hook of this.allHooks()) {
+	// 		hook.update() // updates start and end points of links
+	// 	}
 	}
 
-	createNewDependency() {
-		if (this.openBullet == this.openLink.startBullet) {
-			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
-			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
-			this.createNewDependencyBetweenHooks(startHook, endHook)
-		} else if (this.openBullet == this.openLink.endBullet) {
-			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
-			let hook2 = this.hookAtLocation(this.openBullet.positionInLinkMap())
-			if (hook1.type == 'output' && hook2.type == 'input') {
-				this.createNewDependencyBetweenHooks(hook1, hook2)
-			} else if (hook1.type == 'input' && hook2.type == 'output') {
-				this.createNewDependencyBetweenHooks(hook2, hook1)
-			}
-		}
-	}
+	// createNewDependency() {
+	// 	if (this.openBullet == this.openLink.startBullet) {
+	// 		let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
+	// 		let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
+	// 		this.createNewDependencyBetweenHooks(startHook, endHook)
+	// 	} else if (this.openBullet == this.openLink.endBullet) {
+	// 		let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
+	// 		let hook2 = this.hookAtLocation(this.openBullet.positionInLinkMap())
+	// 		if (hook1.type == 'output' && hook2.type == 'input') {
+	// 			this.createNewDependencyBetweenHooks(hook1, hook2)
+	// 		} else if (hook1.type == 'input' && hook2.type == 'output') {
+	// 			this.createNewDependencyBetweenHooks(hook2, hook1)
+	// 		}
+	// 	}
+	// }
 
-	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
-		startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
-		startHook.addDependency('positionInLinkMap', this.openLink.startBullet, 'midpoint')
-		endHook.addDependency('positionInLinkMap', this.openLink.endBullet, 'midpoint')
-		startHook.mobject.update()
-	}
+	// createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
+	// 	startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
+	// 	startHook.addDependency('positionInLinkMap', this.openLink.startBullet, 'midpoint')
+	// 	endHook.addDependency('positionInLinkMap', this.openLink.endBullet, 'midpoint')
+	// 	startHook.mobject.update()
+	// }
 
-	getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
-		if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
-			return this.innerInputHooks().concat(this.outerOutputHooks())
-		} else {
-			return this.innerOutputHooks().concat(this.outerInputHooks())
-		}
-	}
+	// getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
+	// 	if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
+	// 		return this.innerInputHooks().concat(this.outerOutputHooks())
+	// 	} else {
+	// 		return this.innerOutputHooks().concat(this.outerInputHooks())
+	// 	}
+	// }
 
-	innerInputHooks(): Array<LinkHook> {
-		let arr: Array<LinkHook>  = []
-		for (let submob of this.linkableChildren()) {
-			for (let inputName of submob.inputNames) {
-				arr.push(submob.inputList.hookNamed(inputName))
-			}
-		}
-		return arr
-	}
+	// innerInputHooks(): Array<LinkHook> {
+	// 	let arr: Array<LinkHook>  = []
+	// 	for (let submob of this.linkableChildren()) {
+	// 		for (let inputName of submob.inputNames) {
+	// 			arr.push(submob.inputList.hookNamed(inputName))
+	// 		}
+	// 	}
+	// 	return arr
+	// }
 
-	innerOutputHooks(): Array<LinkHook> {
-		let arr: Array<LinkHook>  = []
-		for (let submob of this.linkableChildren()) {
-			for (let outputName of submob.outputNames) {
-				arr.push(submob.outputList.hookNamed(outputName))
-			}
-		}
-		return arr
-	}
+	// innerOutputHooks(): Array<LinkHook> {
+	// 	let arr: Array<LinkHook>  = []
+	// 	for (let submob of this.linkableChildren()) {
+	// 		for (let outputName of submob.outputNames) {
+	// 			arr.push(submob.outputList.hookNamed(outputName))
+	// 		}
+	// 	}
+	// 	return arr
+	// }
 
-	outerInputHooks(): Array<LinkHook> {
-		return this.expandedInputList.linkHooks
-	}
+	// outerInputHooks(): Array<LinkHook> {
+	// 	return this.expandedInputList.linkHooks
+	// }
 
-	outerOutputHooks(): Array<LinkHook> {
-		return this.expandedOutputList.linkHooks
-	}
+	// outerOutputHooks(): Array<LinkHook> {
+	// 	return this.expandedOutputList.linkHooks
+	// }
 
-	allHooks(): Array<LinkHook> {
-		return this.innerInputHooks()
-			.concat(this.innerOutputHooks())
-			.concat(this.outerInputHooks())
-			.concat(this.outerOutputHooks())
-	}
+	// allHooks(): Array<LinkHook> {
+	// 	return this.innerInputHooks()
+	// 		.concat(this.innerOutputHooks())
+	// 		.concat(this.outerInputHooks())
+	// 		.concat(this.outerOutputHooks())
+	// }
 
 	hookAtLocation(p: vertex): LinkHook | null {
-		for (let h of this.allHooks()) {
-			let q = h.positionInLinkMap()
-			if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
-				return h
-			}
-		}
+		// for (let h of this.allHooks()) {
+		// 	let q = h.positionInLinkMap()
+		// 	if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
+		// 		return h
+		// 	}
+		// }
 		return null
 	}
 

@@ -15,14 +15,16 @@ which can be linked to such-exposed variables of other mobjects.
 	inputNames: Array<string>
 	outputNames: Array<string>
 	inputList: InputList
-	outputList: OutputList 
+	outputList: OutputList
+	linksEditable: boolean
 
 	defaults(): object {
 		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
 			inputNames: [],
-			outputNames: [],			
+			outputNames: [],
+			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -30,7 +32,8 @@ which can be linked to such-exposed variables of other mobjects.
 	mutabilities(): object {
 		return {
 			inputList: 'never',
-			outputList: 'never'
+			outputList: 'never',
+			linksEditable: 'in_subclass'
 		}
 	}
 
@@ -53,13 +56,15 @@ which can be linked to such-exposed variables of other mobjects.
 		super.setup()
 		this.inputList.update({
 			mobject: this,
-			linkNames: this.inputNames
+			linkNames: this.inputNames,
+			editable: this.linksEditable
 		})
 		this.add(this.inputList)
 		this.inputList.view.hide()
 		this.outputList.update({
 			mobject: this,
-			linkNames: this.outputNames
+			linkNames: this.outputNames,
+			editable: this.linksEditable
 		})
 		this.add(this.outputList)
 		this.outputList.view.hide()

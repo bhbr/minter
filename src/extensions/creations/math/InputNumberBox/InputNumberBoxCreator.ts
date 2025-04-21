@@ -1,14 +1,14 @@
 
-import { InputNumberBox } from 'extensions/creations/math/InputNumberBox/InputNumberBox'
+import { LinkableInputNumberBox } from 'extensions/creations/math/InputNumberBox/LinkableInputNumberBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 
 export class InputNumberBoxCreator extends DraggingCreator {
 	
-	declare creation: InputNumberBox
+	declare creation: LinkableInputNumberBox
 
 	createMobject() {
-		return new InputNumberBox({
+		return new LinkableInputNumberBox({
 			anchor: this.getStartPoint()
 		})
 	}

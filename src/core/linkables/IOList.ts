@@ -4,6 +4,7 @@ import { Color } from 'core/classes/Color'
 import { Linkable } from './Linkable'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
+import { LinkOutlet } from './LinkOutlet'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 
@@ -14,20 +15,22 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 */
 
 	linkNames: Array<string>
-	linkHooks: Array<LinkHook>
+	linkOutlets: Array<LinkOutlet>
 	mobject?: Linkable
 	type: 'input' | 'output'
+	editable: boolean
 
 	defaults(): object {
 		return {
-			linkHooks: [],
+			linkOutlets: [],
 			mobject: null,
 			linkNames: [],
 			cornerRadius: 20,
 			width: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1.0,
-			strokeWidth: 0
+			strokeWidth: 0,
+			editable: false
 		}
 	}
 
@@ -37,7 +40,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			fillColor: 'never',
 			fillOpacity: 'never',
 			strokeWidth: 'never',
-			type: 'in_subclass'
+			type: 'in_subclass',
+			editable: 'on_update'
 		}
 	}
 
@@ -51,7 +55,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 	setup() {
 		super.setup()
-		this.createHookList()
+		this.createOutlets()
 		this.update({ height: this.getHeight() }, false)
 	}
 
@@ -62,48 +66,38 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * (this.linkNames.length - 1) }
 	}
 
-	createHookList() {
+	createOutlets() {
 	// create the hooks (empty circles) and their labels
-		this.linkHooks = []
+		this.linkOutlets = []
 		for (let submob of this.submobs) {
 			this.remove(submob)
 		}
 		for (let i = 0; i < this.linkNames.length; i++) {
 			let name = this.linkNames[i]
-			this.createHookAndLabel(name)
+			this.createOutlet(name)
 		}
 	}
 
-	createHookAndLabel(name: string) {
-		let hook = new LinkHook({
-			mobject: this.mobject,
+	createOutlet(name: string) {
+		let outlet = new LinkOutlet({
 			name: name,
-			type: this.type
+			editable: this.editable
 		})
-		let label = new TextLabel({
-			text: name,
-			horizontalAlign: 'left',
-			verticalAlign: 'center',
-			frameHeight: HOOK_VERTICAL_SPACING,
-			frameWidth: IO_LIST_WIDTH - HOOK_LABEL_INSET
-		})
-		this.add(hook)
-		this.add(label)
-		this.linkHooks.push(hook)
-		this.positionHookAndLabel(hook, label, this.linkHooks.length - 1)
+		this.add(outlet)
+		this.linkOutlets.push(outlet)
+		this.positionOutlet(outlet, this.linkOutlets.length - 1)
 	}
 
-	positionHookAndLabel(hook: LinkHook, label: TextLabel, index: number) {
-		let m: vertex = [HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index]
-		hook.update({ midpoint: m })
-		let a = vertexTranslatedBy(hook.midpoint, [HOOK_LABEL_INSET, -HOOK_VERTICAL_SPACING / 2])
-		label.update({ anchor: a })
+	positionOutlet(outlet: LinkOutlet, index: number) {
+		outlet.update({
+			anchor: [HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index]
+		})
 	}
 
-	hookNamed(name): LinkHook | null {
-		for (let h of this.linkHooks) {
-			if (h.name == name) {
-				return h
+	hookNamed(name, index: number = 0): LinkHook | null {
+		for (let outlet of this.linkOutlets) {
+			if (outlet.name == name) {
+				return outlet.linkHooks[index]
 			}
 		}
 		return null
@@ -116,7 +110,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 		if (args['linkNames'] === undefined) { return }
 
-		this.createHookList()
+		this.createOutlets()
 		this.height = this.getHeight()
 		if (this.mobject == null) { return }
 		this.positionSelf()
