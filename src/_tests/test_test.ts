@@ -1,15 +1,16 @@
 
 import { log } from 'core/functions/logging'
 
-const CATCH_EXCEPTIONS: boolean = true
+const CATCH_EXCEPTIONS: boolean = false
+var indentationLevel: number = 0
 
 function functionThatShouldRun() {
 	//throw 'Exception'
 }
 
 function functionThatShouldReturnTrue(): boolean {
-	//throw 'Exception'
-	return true
+	throw 'Exception'
+	//return true
 	//return false
 }
 
@@ -92,12 +93,12 @@ function exceptionTest(f: () => void, errorName: string | null = null, name: str
 
 
 function runTest(test: Test, verbose: boolean = true): boolean {
-	if (verbose) console.log(`Running test named: ${test['displayName']}...`)
+	if (verbose) console.log(' '.repeat(4 * indentationLevel) + `Running test named: ${test['displayName']}...`)
 	let result = test()
 	if (result) {
-		if (verbose) console.log(`%c PASSED: ${test['displayName']}`, 'background-color: #070')
+		if (verbose) console.log(' '.repeat(4 * indentationLevel) + `%c PASSED: ${test['displayName']}`, 'background-color: #070')
 	} else {
-		if (verbose) console.log(`%c FAILED: ${test['displayName']}`, 'background-color: #700')
+		if (verbose) console.log(' '.repeat(4 * indentationLevel) + `%c FAILED: ${test['displayName']}`, 'background-color: #700')
 	}
 	return result
 }
@@ -105,9 +106,11 @@ function runTest(test: Test, verbose: boolean = true): boolean {
 export function testBundle(name: string, tests: Array<Test>, verbose: boolean = false): Test {
 	let bundledTest = function() {
 		var result: boolean = true
+		indentationLevel++
 		for (let test of tests) {
 			result = result && runTest(test, verbose)
 		}
+		indentationLevel--
 		return result
 	}
 	Object.defineProperty(bundledTest, 'displayName', { value: name })
@@ -122,12 +125,12 @@ let testBundle1 = testBundle('testBundle1', [
 let testBundle2 = testBundle('testBundle2', [
 	exceptionTest(functionThatShouldThrow, null, 'testing whether functionThatShouldThrow throws an error'),
 	exceptionTest(functionThatShouldThrow, 'CustomError', 'testing whether functionThatShouldThrow throws a CustomError')
-])
+], true)
 
 let testBundle3 = testBundle('testBundle3', [
 	assertionTest(testBundle1),
 	assertionTest(testBundle2)
-])
+], true)
 
 export function run_all_tests() {
 	runTest(testBundle3)
