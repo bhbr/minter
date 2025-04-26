@@ -1,9 +1,14 @@
 
+import { log } from 'core/functions/logging'
+
+const CATCH_EXCEPTIONS: boolean = true
+
 function functionThatShouldRun() {
 	//throw 'Exception'
 }
 
 function functionThatShouldReturnTrue() {
+	//throw 'Exception'
 	return true
 	//return false
 }
@@ -13,31 +18,53 @@ class CustomError extends Error {
 }
 
 function functionThatShouldThrow() {
-	//throw new Error()
+	//throw 'Exception'
 	throw new CustomError()
 }
 
 
-type Test = () => void
+type Test = () => boolean
 
 function executionTest(f: () => void): Test {
-	return f
+	if (CATCH_EXCEPTIONS) {
+		let test = function() {
+			try {
+				f()
+				return true
+			} catch {
+				return false
+			}
+		}
+		Object.defineProperty(test, 'name', { value: f.name })
+		return test
+	} else {
+		let test = function() {
+			f()
+			return true
+		}
+		Object.defineProperty(test, 'name', { value: f.name })
+		return test
+	}
 }
 
 function assertionTest(f: () => boolean): Test {
-	let test = function() {
-		let a = f()
-		if (a !== true) {
-			throw 'Assertion test failed'
+	if (CATCH_EXCEPTIONS) {
+		let test = function() {
+			try {
+				return f()
+			} catch {
+				return false
+			}
 		}
+		Object.defineProperty(test, 'name', { value: f.name })
+		return test
+	} else {
+		let test = function() {
+			return f()
+		}
+		Object.defineProperty(test, 'name', { value: f.name })
+		return test
 	}
-	Object.defineProperty(test, 'name', { value: f.name })
-	return test
-}
-
-
-class ErrorTestFailedError extends Error {
-	name = 'ErrorTestFailedError'
 }
 
 function exceptionTest(f: () => void, errorName: string = null): Test {
@@ -45,14 +72,12 @@ function exceptionTest(f: () => void, errorName: string = null): Test {
 		try {
 			f()
 		} catch (error) {
-			if (errorName === null ) { return }
-			if (error.name == errorName) { return }
+			if (errorName === null ) { return true }
+			if (error.name == errorName) { return true }
+			if (CATCH_EXCEPTIONS) { return false }
+			throw error
 		}
-		if (errorName === null) {
-			throw new ErrorTestFailedError(`The function ${f.name} should have thrown an error, but didn't`)
-		} else {
-			throw new ErrorTestFailedError(`The function ${f.name} should have thrown a ${errorName}, but didn't`)
-		}
+		return false
 	}
 	Object.defineProperty(test, 'name', { value: f.name })
 	return test
@@ -60,12 +85,16 @@ function exceptionTest(f: () => void, errorName: string = null): Test {
 
 let test_functionThatShouldRunShouldRun = executionTest(functionThatShouldRun)
 let test_functionThatShouldReturnTrueReturnsTrue = assertionTest(functionThatShouldReturnTrue)
-let test_functionThatShouldThrowThrows = exceptionTest(functionThatShouldThrow)
+let test_functionThatShouldThrowThrows = exceptionTest(functionThatShouldThrow, 'CustomError')
 
 function runTest(test: Test) {
 	console.log(`Running test ${test.name}...`)
-	test()
-	console.log(`%c PASSED: ${test.name}`, 'background-color: #070')
+	let result = test()
+	if (result) {
+		console.log(`%c PASSED: ${test.name}`, 'background-color: #070')
+	} else {
+		console.log(`%c FAILED: ${test.name}`, 'background-color: #700')
+	}
 }
 
 let tests_to_run = [
