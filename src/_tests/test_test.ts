@@ -7,7 +7,7 @@ function functionThatShouldRun() {
 	//throw 'Exception'
 }
 
-function functionThatShouldReturnTrue() {
+function functionThatShouldReturnTrue(): boolean {
 	//throw 'Exception'
 	return true
 	//return false
@@ -25,7 +25,7 @@ function functionThatShouldThrow() {
 
 type Test = () => boolean
 
-function executionTest(f: () => void): Test {
+function executionTest(f: () => void, name: string | null = null): Test {
 	if (CATCH_EXCEPTIONS) {
 		let test = function() {
 			try {
@@ -35,39 +35,45 @@ function executionTest(f: () => void): Test {
 				return false
 			}
 		}
-		Object.defineProperty(test, 'name', { value: f.name })
+		let testName = name ?? `testing ${f['displayName']}`
+		Object.defineProperty(test, 'displayName', { value: testName })
 		return test
 	} else {
 		let test = function() {
 			f()
 			return true
 		}
-		Object.defineProperty(test, 'name', { value: f.name })
+		let testName = name ?? `testing ${f['displayName']}`
+		Object.defineProperty(test, 'displayName', { value: testName })
 		return test
 	}
 }
 
-function assertionTest(f: () => boolean): Test {
+function assertionTest(f: () => boolean, name: string | null = null): Test {
 	if (CATCH_EXCEPTIONS) {
 		let test = function() {
 			try {
-				return f()
+				let result = f()
+				return result
 			} catch {
 				return false
 			}
 		}
-		Object.defineProperty(test, 'name', { value: f.name })
+		let testName = name ?? `testing ${f['displayName']}`
+		Object.defineProperty(test, 'displayName', { value: testName })
 		return test
 	} else {
 		let test = function() {
-			return f()
+			let result = f()
+			return result
 		}
-		Object.defineProperty(test, 'name', { value: f.name })
+		let testName = name ?? `testing ${f['displayName']}`
+		Object.defineProperty(test, 'displayName', { value: testName })
 		return test
 	}
 }
 
-function exceptionTest(f: () => void, errorName: string = null): Test {
+function exceptionTest(f: () => void, errorName: string | null = null, name: string | null = null): Test {
 	let test = function() {
 		try {
 			f()
@@ -79,37 +85,53 @@ function exceptionTest(f: () => void, errorName: string = null): Test {
 		}
 		return false
 	}
-	Object.defineProperty(test, 'name', { value: f.name })
+	let testName = name ?? `testing ${f['displayName']}`
+	Object.defineProperty(test, 'displayName', { value: testName })
 	return test
 }
 
-let test_functionThatShouldRunShouldRun = executionTest(functionThatShouldRun)
-let test_functionThatShouldReturnTrueReturnsTrue = assertionTest(functionThatShouldReturnTrue)
-let test_functionThatShouldThrowThrows = exceptionTest(functionThatShouldThrow, 'CustomError')
 
-function runTest(test: Test) {
-	console.log(`Running test ${test.name}...`)
+function runTest(test: Test, verbose: boolean = true): boolean {
+	if (verbose) console.log(`Running test named: ${test['displayName']}...`)
 	let result = test()
 	if (result) {
-		console.log(`%c PASSED: ${test.name}`, 'background-color: #070')
+		if (verbose) console.log(`%c PASSED: ${test['displayName']}`, 'background-color: #070')
 	} else {
-		console.log(`%c FAILED: ${test.name}`, 'background-color: #700')
+		if (verbose) console.log(`%c FAILED: ${test['displayName']}`, 'background-color: #700')
 	}
+	return result
 }
 
-let tests_to_run = [
-	test_functionThatShouldRunShouldRun,
-	test_functionThatShouldReturnTrueReturnsTrue,
-	test_functionThatShouldThrowThrows
-]
-
-export function run_test_collection(tests_to_run: Array<Test>) {
-	for (let test of tests_to_run) {
-		runTest(test)
+export function testBundle(name: string, tests: Array<Test>, verbose: boolean = false): Test {
+	let bundledTest = function() {
+		var result: boolean = true
+		for (let test of tests) {
+			result = result && runTest(test, verbose)
+		}
+		return result
 	}
+	Object.defineProperty(bundledTest, 'displayName', { value: name })
+	return bundledTest
 }
+
+let testBundle1 = testBundle('testBundle1', [
+	executionTest(functionThatShouldRun, 'testing whether functionThatShouldRun runs'),
+	assertionTest(functionThatShouldReturnTrue, 'testing whether functionThatShouldReturnTrue returns true')
+], true)
+
+let testBundle2 = testBundle('testBundle2', [
+	exceptionTest(functionThatShouldThrow, null, 'testing whether functionThatShouldThrow throws an error'),
+	exceptionTest(functionThatShouldThrow, 'CustomError', 'testing whether functionThatShouldThrow throws a CustomError')
+])
+
+let testBundle3 = testBundle('testBundle3', [
+	assertionTest(testBundle1),
+	assertionTest(testBundle2)
+])
 
 export function run_all_tests() {
-	run_test_collection(tests_to_run)
+	runTest(testBundle3)
 }
+
+
 
