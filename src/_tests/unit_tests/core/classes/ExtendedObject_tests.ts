@@ -2,6 +2,7 @@
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { MutabilityError, AssignmentError } from 'core/classes/Errors'
 import { log } from 'core/functions/logging'
+import { ExecutionTest, ConditionTest, ValueTest, AssertionTest, ErrorTest, BundledTest } from '_tests/Tests'
 
 class FirstClass extends ExtendedObject {
 
@@ -35,10 +36,9 @@ class FirstClass extends ExtendedObject {
 
 }
 
-
-export const ExtendedObject_tests = [
-
-	function Every_property_has_a_mutability(): boolean {
+export const Every_property_has_a_mutability = new AssertionTest({
+	name: 'Every_property_has_a_mutability',
+	function: function(): boolean {
 		ExtendedObject.clearClassDeclarations()
 		let A = new FirstClass()
 		for (let prop of A.properties) {
@@ -49,7 +49,11 @@ export const ExtendedObject_tests = [
 			}
 		}
 		return true
-	},
+	}
+})
+
+export const ExtendedObject_tests = [
+
 
 	function A_property_is_by_default_settable(): boolean {
 		ExtendedObject.clearClassDeclarations()
