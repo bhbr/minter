@@ -5,7 +5,7 @@ const CATCH_EXCEPTIONS: boolean = false
 var indentationLevel: number = 0
 
 function functionThatShouldRun() {
-	//throw 'Exception'
+	throw 'Exception'
 }
 
 function functionThatShouldReturnTrue(): boolean {
@@ -21,6 +21,53 @@ class CustomError extends Error {
 function functionThatShouldThrow() {
 	//throw 'Exception'
 	throw new CustomError()
+}
+
+class TestAsClass {
+
+	name: string
+	functionToTest: () => any
+	catchErrors: boolean
+	verbose: boolean
+
+	constructor(args) {
+		this.functionToTest = args['func']
+		this.name = args['name'] ?? 'test_' + this.functionToTest.name
+		Object.defineProperty(this.functionToTest, 'displayName', { value: this.name })
+		this.verbose = args['verbose'] ?? true
+		this.catchErrors = args['catchErrors'] ?? false
+	}
+
+	run(indentationLevel: number = 0) {
+		if (this.verbose) console.log(`Running ${this.name}`)
+		let result = this.silentRun()
+		if (result) {
+			if (this.verbose) console.log(' '.repeat(4 * indentationLevel) + `%c PASSED: ${this.name}`, 'background-color: #070')
+		} else {
+			if (this.verbose) console.log(' '.repeat(4 * indentationLevel) + `%c FAILED: ${this.name}`, 'background-color: #700')
+		}
+	}
+
+	silentRun(): boolean {
+		this.functionToTest()
+		return true
+	}
+}
+
+class ExecutionTest extends TestAsClass {
+	silentRun() {
+		if (this.catchErrors) {
+			try {
+				this.functionToTest()
+				return true
+			} catch {
+				return false
+			}
+		} else {
+			this.functionToTest()
+			return true
+		}
+	}
 }
 
 
@@ -132,8 +179,16 @@ let testBundle3 = testBundle('testBundle3', [
 	assertionTest(testBundle2)
 ], true)
 
+let test1 = new ExecutionTest({
+	name: 'testing whether functionThatShouldRun runs',
+	func: functionThatShouldRun,
+	catchErrors: true,
+	verbose: true
+})
+
 export function run_all_tests() {
-	runTest(testBundle3)
+	//runTest(testBundle3)
+	test1.run()
 }
 
 
