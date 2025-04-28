@@ -1,5 +1,5 @@
 
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 
 export type vertex = Array<number>
 export type vertexArray = Array<vertex>

@@ -1,11 +1,20 @@
 
 import { BundledTest } from './Tests'
-import { ExtendedObject_tests } from './unit_tests/core/classes/ExtendedObject_tests'
+import { ColorTest } from './unit_tests/core/classes/ColorTest'
+import { CopyingTest } from './unit_tests/core/functions/CopyingTest'
+import { ExtendedObjectTest } from './unit_tests/core/classes/ExtendedObjectTest'
+import { MobjectTest } from './unit_tests/core/mobjects/MobjectTest'
+import { TransformTest } from './unit_tests/core/classes/TransformTest'
+import { VertexTest } from './unit_tests/core/functions/VertexTest'
 
-export const allTests = new BundledTest({
+export const AllTests = new BundledTest({
 	name: 'all tests',
 	tests: [
-		ExtendedObject_tests
-	],
-	silenceSubtests: true
+		ColorTest,
+		CopyingTest,
+		ExtendedObjectTest,
+		MobjectTest,
+		TransformTest,
+		VertexTest
+	]
 })

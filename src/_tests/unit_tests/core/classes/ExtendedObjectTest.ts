@@ -44,7 +44,7 @@ class FirstClass extends ExtendedObject {
 
 let Basic_defaults_and_mutability_tests = new BundledTest({
 	name: 'Basic defaults and mutability tests',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new AssertionTest({
@@ -100,7 +100,7 @@ let Basic_defaults_and_mutability_tests = new BundledTest({
 
 let Setting_property_values_after_object_creation = new BundledTest({
 	name: 'Setting property values after object creation',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new ExecutionTest({
@@ -174,7 +174,7 @@ let Setting_property_values_after_object_creation = new BundledTest({
 
 let Updating_property_values_after_object_creation = new BundledTest({
 	name: 'Updating property values after object creation tests',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new ExecutionTest({
@@ -263,7 +263,7 @@ let Updating_property_values_after_object_creation = new BundledTest({
 
 let Changing_property_values_on_object_creation = new BundledTest({
 	name: 'Changing property values on object creation',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new ExecutionTest({
@@ -351,7 +351,7 @@ let Changing_property_values_on_object_creation = new BundledTest({
 
 let Changing_property_values_in_a_subclass = new BundledTest({
 	name: 'Changing property values in a subclass',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new ExecutionTest({
@@ -480,7 +480,7 @@ let Changing_property_values_in_a_subclass = new BundledTest({
 
 let Changing_mutability_and_default_values_in_subclass = new BundledTest({
 	name: 'Changing mutability and default values in subclass',
-	silenceSubtests: true,
+	silenceSubtests: false,
 	tests: [
 
 		new ErrorTest({
@@ -971,8 +971,8 @@ export const An_immutable_property_can_be_added_in_a_subclass = new AssertionTes
 
 
 
-export const ExtendedObject_tests = new BundledTest({
-	name: 'ExtendedObject tests',
+export const ExtendedObjectTest = new BundledTest({
+	name: 'ExtendedObject test',
 	tests: [
 		Basic_defaults_and_mutability_tests,
 		Setting_property_values_after_object_creation,
@@ -982,7 +982,7 @@ export const ExtendedObject_tests = new BundledTest({
 		Changing_mutability_and_default_values_in_subclass,
 		An_immutable_property_can_be_added_in_a_subclass
 	],
-	silenceSubtests: true
+	silenceSubtests: false
 })
 
 

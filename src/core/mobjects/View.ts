@@ -2,7 +2,7 @@
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Frame } from './Frame'
 import { vertex } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { DRAW_BORDERS } from 'core/constants'
 import { Mobject } from 'core/mobjects/Mobject'

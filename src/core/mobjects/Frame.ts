@@ -1,7 +1,7 @@
 
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 import { View } from './View'
 
 export class Frame extends ExtendedObject {

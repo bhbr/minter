@@ -1,6 +1,6 @@
 
 import { vertex } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'

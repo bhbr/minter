@@ -3,7 +3,7 @@ import { Board } from './Board'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
 
