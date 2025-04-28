@@ -72,6 +72,9 @@ export class Color {
 	static blue(): Color { return new Color(0, 0, 1) }
 	static indigo(): Color { return new Color(0.5, 0, 1) }
 	static purple(): Color { return new Color(1, 0, 1) }
+	static space(): Color {
+		throw 'No color out of space'
+	}
 
 	// Methods for creating new colors
 

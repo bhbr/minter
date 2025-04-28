@@ -1,7 +1,7 @@
 
 import { Mobject } from './Mobject'
 import { vertex, vertexArray, isVertex, isVertexArray, vertexInterpolate, vertexArrayInterpolate } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform/Transform'
+import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { copy } from 'core/functions/copying'
 import { ExtendedObject } from 'core/classes/ExtendedObject'

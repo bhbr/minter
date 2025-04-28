@@ -12,11 +12,13 @@
         ],
         "paths": {
             "core/*": ["./core/*"],
-            "extensions/*": ["./extensions/*"]
+            "extensions/*": ["./extensions/*"],
+            "_tests/*": ["./_tests/*"]
         }
     },
     "include": [
         "../../src/core/*",
-        "../../src/extensions/*"
+        "../../src/extensions/*",
+        "../../src/_tests/*",
     ]
 }

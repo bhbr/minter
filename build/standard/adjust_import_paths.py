@@ -8,7 +8,7 @@ def single_line_adder(line, nb_levels_up=0):
 		ret = line[:-3] + ".js';\n"
 	if (line.endswith("'\n") and not line.endswith(".js'\n")):
 		ret = line[:-2] + ".js'\n"
-	for directory in ['core', 'extensions']:
+	for directory in ['core', 'extensions', '_tests']:
 		original_string = f"'{directory}/"
 		if original_string not in ret:
 			continue
