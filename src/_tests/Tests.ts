@@ -131,7 +131,7 @@ export class BundledTest extends AssertionTest {
 	constructor(args) {
 		super(args)
 		this.tests = args['tests']
-		this.silenceSubtests = args['silenceSubtests'] ?? true
+		this.silenceSubtests = args['silenceSubtests'] ?? false
 		this.functionToTest = function(): boolean {
 			var result: boolean = true
 			for (let test of this.tests) {

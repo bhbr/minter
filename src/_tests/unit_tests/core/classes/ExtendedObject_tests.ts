@@ -36,6 +36,11 @@ class FirstClass extends ExtendedObject {
 
 }
 
+
+/////////////////////////////////////////
+// BASIC DEFAULTS AND MUTABILITY TESTS //
+/////////////////////////////////////////
+
 export const Every_property_has_a_mutability = new AssertionTest({
 	name: 'Every_property_has_a_mutability',
 	function: function(): boolean {
@@ -52,16 +57,20 @@ export const Every_property_has_a_mutability = new AssertionTest({
 	}
 })
 
-export const ExtendedObject_tests = [
 
-
-	function A_property_is_by_default_settable(): boolean {
+export const A_property_is_by_default_settable = new ValueTest({
+	name: 'A_property_is_by_default_settable',
+	function: function(): string {
 		ExtendedObject.clearClassDeclarations()
 		let A = new FirstClass()
-		return A.mutability('genericallySettableProperty') === 'always'
+		return A.mutability('genericallySettableProperty')
 	},
+	value: 'always'
+})
 
-	function Every_property_has_a_default_value(): boolean {
+export const Every_property_has_a_default_value = new AssertionTest({
+	name: 'Every_property_has_a_default_value',
+	function: function(): boolean {
 		ExtendedObject.clearClassDeclarations()
 		let A = new FirstClass() // default values: see above
 		return (
@@ -73,100 +82,154 @@ export const ExtendedObject_tests = [
 			&& A.immutableProperty == 60
 		)
 	}
+})
 
-]
+
+export const Basic_defaults_and_mutability_tests = new BundledTest({
+	name: 'Basic_defaults_and_mutability_tests',
+	tests: [
+		Every_property_has_a_mutability,
+		A_property_is_by_default_settable,
+		Every_property_has_a_default_value
+	]
+})
+
 
 ///////////////////////////////////////////////////
 // SETTING PROPERTY VALUES AFTER OBJECT CREATION //
 ///////////////////////////////////////////////////
 
-export function A_settable_property_can_be_set_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+export const A_settable_property_can_be_set_after_object_creation = new ExecutionTest({
+	name: 'A_settable_property_can_be_set_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.settableProperty = 21
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
 	}
-}
-
-export function A_settable_property_will_be_set_properly_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	A.settableProperty = 21
-	return A.settableProperty === 21
-}
+})
 
 
-export function An_updatable_property_cannot_be_set_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+
+export const A_settable_property_will_be_set_properly_after_object_creation = new ValueTest({
+	name: 'A_settable_property_will_be_set_properly_after_object_creation',
+	function: function(): number {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
+		A.settableProperty = 21
+		return A.settableProperty
+	},
+	value: 21
+})
+
+
+
+export const An_updatable_property_cannot_be_set_after_object_creation = new ErrorTest({
+	name: 'An_updatable_property_cannot_be_set_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.updatableProperty = 31
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+	},
+	errorName: 'AssignmentError'
+})
 
-export function An_initializable_property_cannot_be_set_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+
+export const An_initializable_property_cannot_be_set_after_object_creation = new ErrorTest({
+	name: 'An_initializable_property_cannot_be_set_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.initializableProperty = 41
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+	},
+	errorName: 'AssignmentError'
+})
 
-export function A_subclassable_property_cannot_be_set_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+
+export const A_subclassable_property_cannot_be_set_after_object_creation = new ErrorTest({
+	name: 'A_subclassable_property_cannot_be_set_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.subclassableProperty = 51
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+	},
+	errorName: 'AssignmentError'	
+})
 
-export function An_immutable_property_cannot_be_set_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+
+
+export const An_immutable_property_cannot_be_set_after_object_creation = new ErrorTest({
+	name: 'An_immutable_property_cannot_be_set_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.immutableProperty = 61
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+	},
+	errorName: 'AssignmentError'
+})
+
+
+export const Setting_property_values_after_object_creation = new BundledTest({
+	name: 'Setting_property_values_after_object_creation',
+	tests: [
+		A_settable_property_can_be_set_after_object_creation,
+		A_settable_property_will_be_set_properly_after_object_creation,
+		An_updatable_property_cannot_be_set_after_object_creation,
+		An_initializable_property_cannot_be_set_after_object_creation,
+		A_subclassable_property_cannot_be_set_after_object_creation,
+		An_immutable_property_cannot_be_set_after_object_creation
+	]
+})
 
 
 ////////////////////////////////////////////////////
 // UPDATING PROPERTY VALUES AFTER OBJECT CREATION //
 ////////////////////////////////////////////////////
 
-export function A_settable_property_can_be_updated_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
+export const A_settable_property_can_be_updated_after_object_creation = new ExecutionTest({
+	name: 'A_settable_property_can_be_updated_after_object_creation',
+	function: function() {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
 		A.update({ settableProperty: 21 })
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
 	}
-}
+})
 
-export function A_settable_property_will_be_updated_properly_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	A.update({ settableProperty: 21 })
-	return A.settableProperty === 21
-}
+export const A_settable_property_will_be_updated_properly_after_object_creation = new ValueTest({
+	name: 'A_settable_property_will_be_updated_properly_after_object_creation',
+	function: function(): number {
+		ExtendedObject.clearClassDeclarations()
+		let A = new FirstClass()
+		A.update({ settableProperty: 21 })
+		return A.settableProperty
+	},
+	value: 21
+})
+
+
+export const Updating_property_values_after_object_creation = new BundledTest({
+	name: 'Updating_property_values_after_object_creation tests',
+	tests: [
+		A_settable_property_can_be_updated_after_object_creation,
+		A_settable_property_will_be_updated_properly_after_object_creation
+	]
+})
+
+
+
+export const ExtendedObject_tests = new BundledTest({
+	name: 'ExtendedObject tests',
+	tests: [
+		Basic_defaults_and_mutability_tests,
+		Setting_property_values_after_object_creation,
+		Updating_property_values_after_object_creation
+	]
+})
+
+
+
+
+
+
 
 export function An_updatable_property_can_be_updated_after_object_creation(): boolean {
 	ExtendedObject.clearClassDeclarations()
