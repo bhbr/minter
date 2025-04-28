@@ -26,9 +26,9 @@ class Test {
 		console.log(indentation + `Running ${this.name}...`)
 		let result = this.mereRun()
 		if (result) {
-			console.log(indentation + `%c PASSED: ${this.name}`, 'background-color: #070')
+			console.log(indentation + `%c PASSED: ${this.name} `, 'background-color: #070')
 		} else {
-			console.log(indentation + `%c FAILED: ${this.name}`, 'background-color: #700')
+			console.log(indentation + `%c FAILED: ${this.name} `, 'background-color: #700')
 		}
 		return result
 	}

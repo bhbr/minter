@@ -7,5 +7,5 @@ export const allTests = new BundledTest({
 	tests: [
 		ExtendedObject_tests
 	],
-	silenceSubtests: false
+	silenceSubtests: true
 })

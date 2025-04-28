@@ -41,435 +41,435 @@ class FirstClass extends ExtendedObject {
 // BASIC DEFAULTS AND MUTABILITY TESTS //
 /////////////////////////////////////////
 
-export const Every_property_has_a_mutability = new AssertionTest({
-	name: 'Every_property_has_a_mutability',
-	function: function(): boolean {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		for (let prop of A.properties) {
-			let mut = A.mutability(prop)
-			if (mut === null || mut === undefined) {
-				console.error(`Mutability of ${prop} on class FirstClass is ${mut}`)
-				return false
-			}
-		}
-		return true
-	}
-})
 
-
-export const A_property_is_by_default_settable = new ValueTest({
-	name: 'A_property_is_by_default_settable',
-	function: function(): string {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		return A.mutability('genericallySettableProperty')
-	},
-	value: 'always'
-})
-
-export const Every_property_has_a_default_value = new AssertionTest({
-	name: 'Every_property_has_a_default_value',
-	function: function(): boolean {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass() // default values: see above
-		return (
-			A.genericallySettableProperty == 10
-			&& A.settableProperty == 20
-			&& A.updatableProperty == 30
-			&& A.initializableProperty == 40
-			&& A.subclassableProperty == 50
-			&& A.immutableProperty == 60
-		)
-	}
-})
-
-
-export const Basic_defaults_and_mutability_tests = new BundledTest({
-	name: 'Basic_defaults_and_mutability_tests',
+let Basic_defaults_and_mutability_tests = new BundledTest({
+	name: 'Basic defaults and mutability tests',
+	silenceSubtests: true,
 	tests: [
-		Every_property_has_a_mutability,
-		A_property_is_by_default_settable,
-		Every_property_has_a_default_value
+
+		new AssertionTest({
+			name: 'Every property has a mutability',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				for (let prop of A.properties) {
+					let mut = A.mutability(prop)
+					if (mut === null || mut === undefined) {
+						console.error(`Mutability of ${prop} on class FirstClass is ${mut}`)
+						return false
+					}
+				}
+				return true
+			}
+		}),
+
+		new ValueTest({
+			name: 'A property is by_default settable',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				return A.mutability('genericallySettableProperty')
+			},
+			value: 'always'
+		}),
+
+		new AssertionTest({
+			name: 'Every property has a default value',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass() // default values: see above
+				return (
+					A.genericallySettableProperty == 10
+					&& A.settableProperty == 20
+					&& A.updatableProperty == 30
+					&& A.initializableProperty == 40
+					&& A.subclassableProperty == 50
+					&& A.immutableProperty == 60
+				)
+			}
+		})
 	]
 })
+
 
 
 ///////////////////////////////////////////////////
 // SETTING PROPERTY VALUES AFTER OBJECT CREATION //
 ///////////////////////////////////////////////////
 
-export const A_settable_property_can_be_set_after_object_creation = new ExecutionTest({
-	name: 'A_settable_property_can_be_set_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.settableProperty = 21
-	}
-})
 
-
-
-export const A_settable_property_will_be_set_properly_after_object_creation = new ValueTest({
-	name: 'A_settable_property_will_be_set_properly_after_object_creation',
-	function: function(): number {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.settableProperty = 21
-		return A.settableProperty
-	},
-	value: 21
-})
-
-
-
-export const An_updatable_property_cannot_be_set_after_object_creation = new ErrorTest({
-	name: 'An_updatable_property_cannot_be_set_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.updatableProperty = 31
-	},
-	errorName: 'AssignmentError'
-})
-
-
-export const An_initializable_property_cannot_be_set_after_object_creation = new ErrorTest({
-	name: 'An_initializable_property_cannot_be_set_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.initializableProperty = 41
-	},
-	errorName: 'AssignmentError'
-})
-
-
-export const A_subclassable_property_cannot_be_set_after_object_creation = new ErrorTest({
-	name: 'A_subclassable_property_cannot_be_set_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.subclassableProperty = 51
-	},
-	errorName: 'AssignmentError'	
-})
-
-
-
-export const An_immutable_property_cannot_be_set_after_object_creation = new ErrorTest({
-	name: 'An_immutable_property_cannot_be_set_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.immutableProperty = 61
-	},
-	errorName: 'AssignmentError'
-})
-
-
-export const Setting_property_values_after_object_creation = new BundledTest({
-	name: 'Setting_property_values_after_object_creation',
+let Setting_property_values_after_object_creation = new BundledTest({
+	name: 'Setting property values after object creation',
+	silenceSubtests: true,
 	tests: [
-		A_settable_property_can_be_set_after_object_creation,
-		A_settable_property_will_be_set_properly_after_object_creation,
-		An_updatable_property_cannot_be_set_after_object_creation,
-		An_initializable_property_cannot_be_set_after_object_creation,
-		A_subclassable_property_cannot_be_set_after_object_creation,
-		An_immutable_property_cannot_be_set_after_object_creation
+
+		new ExecutionTest({
+			name: 'A settable property can be set after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.settableProperty = 21
+			}
+		}),
+
+		new ValueTest({
+			name: 'A settable property will be set properly after object creation',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.settableProperty = 21
+				return A.settableProperty
+			},
+			value: 21
+		}),
+
+		new ErrorTest({
+			name: 'An updatable property cannot be set after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.updatableProperty = 31
+			},
+			errorName: 'AssignmentError'
+		}),
+
+		new ErrorTest({
+			name: 'An initializable property cannot_be set after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.initializableProperty = 41
+			},
+			errorName: 'AssignmentError'
+		}),
+
+		new ErrorTest({
+			name: 'A subclassable property cannot be set after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.subclassableProperty = 51
+			},
+			errorName: 'AssignmentError'	
+		}),
+
+		new ErrorTest({
+			name: 'An immutable property cannot be set after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.immutableProperty = 61
+			},
+			errorName: 'AssignmentError'
+		})
 	]
 })
+
 
 
 ////////////////////////////////////////////////////
 // UPDATING PROPERTY VALUES AFTER OBJECT CREATION //
 ////////////////////////////////////////////////////
 
-export const A_settable_property_can_be_updated_after_object_creation = new ExecutionTest({
-	name: 'A_settable_property_can_be_updated_after_object_creation',
-	function: function() {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.update({ settableProperty: 21 })
-	}
-})
 
-export const A_settable_property_will_be_updated_properly_after_object_creation = new ValueTest({
-	name: 'A_settable_property_will_be_updated_properly_after_object_creation',
-	function: function(): number {
-		ExtendedObject.clearClassDeclarations()
-		let A = new FirstClass()
-		A.update({ settableProperty: 21 })
-		return A.settableProperty
-	},
-	value: 21
-})
-
-
-export const Updating_property_values_after_object_creation = new BundledTest({
-	name: 'Updating_property_values_after_object_creation tests',
+let Updating_property_values_after_object_creation = new BundledTest({
+	name: 'Updating property values after object creation tests',
+	silenceSubtests: true,
 	tests: [
-		A_settable_property_can_be_updated_after_object_creation,
-		A_settable_property_will_be_updated_properly_after_object_creation
+
+		new ExecutionTest({
+			name: 'A settable property can be updated after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ settableProperty: 21 })
+			}
+		}),
+
+		new ValueTest({
+			name: 'A settable property will be updated properly after object creation',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ settableProperty: 21 })
+				return A.settableProperty
+			},
+			value: 21
+		}),
+
+		new ExecutionTest({
+			name: 'An updatable property can be updated after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ updatableProperty: 31 })
+			}
+		}),
+
+		new ValueTest({
+			name: 'An updatable property will be updated properly after object creation',
+			function : function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ updatableProperty: 31 })
+				return A.updatableProperty
+			},
+			value: 31
+		}),
+
+		new ErrorTest({
+			name: 'An initializable property cannot be update after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ initializableProperty: 41 })
+			},
+			errorName: 'AssignmentError'
+		}),
+
+		new ErrorTest({
+			name: 'A subclassable property cannot be update after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ subclassableProperty: 51 })
+			},
+			errorName: 'AssignmentError'
+		}),
+
+		new ErrorTest({
+			name: 'An immutable property cannot be updated after object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass()
+				A.update({ immutableProperty: 61 })
+			},
+			errorName: 'AssignmentError'
+		})
 	]
 })
 
 
 
-export const ExtendedObject_tests = new BundledTest({
-	name: 'ExtendedObject tests',
-	tests: [
-		Basic_defaults_and_mutability_tests,
-		Setting_property_values_after_object_creation,
-		Updating_property_values_after_object_creation
-	]
-})
 
 
 
 
-
-
-
-export function An_updatable_property_can_be_updated_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
-		A.update({ updatableProperty: 31 })
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
-
-export function An_updatable_property_will_be_updated_properly_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	A.update({ updatableProperty: 31 })
-	return A.updatableProperty === 31
-}
-
-export function An_initializable_property_cannot_be_update_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
-		A.update({ initializableProperty: 41 })
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
-
-export function A_subclassable_property_cannot_be_update_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
-		A.update({ subclassableProperty: 51 })
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
-
-export function An_immutable_property_cannot_be_updated_after_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass()
-	try {
-		A.update({ immutableProperty: 61 })
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
 
 
 /////////////////////////////////////////////////
 // CHANGING PROPERTY VALUES ON OBJECT CREATION //
 /////////////////////////////////////////////////
 
-export function A_settable_property_can_be_changed_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		let A = new FirstClass({ settableProperty: 21 })
-		return true
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+let Changing_property_values_on_object_creation = new BundledTest({
+	name: 'Changing property values on object creation',
+	silenceSubtests: true,
+	tests: [
 
-export function A_settable_property_will_be_changed_properly_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass({ settableProperty: 21 })
-	return A.settableProperty === 21
-}
+		new ExecutionTest({
+			name: 'A settable property can be changed on object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ settableProperty: 21 })
+			}
+		}),
 
-export function An_updatable_property_can_be_changed_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		let A = new FirstClass({ updatableProperty: 31 })
-		return true
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+		new ValueTest({
+			name: 'A settable property will be changed properly on object creation',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ settableProperty: 21 })
+				return A.settableProperty
+			},
+			value: 21
+		}),
 
-export function An_updatable_property_will_be_changed_properly_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass({ updatableProperty: 31 })
-	return A.updatableProperty === 31
-}
+		new ExecutionTest({
+			name: 'An updatable property can be changed on object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ updatableProperty: 31 })
+			}
+		}),
 
-export function An_initializable_property_can_be_changed_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		let A = new FirstClass({ initializableProperty: 41 })
-		return true
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+		new ValueTest({
+			name: 'An updatable property will be changed properly on object creation',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ updatableProperty: 31 })
+				return A.updatableProperty
+			},
+			value: 31
+		}),
 
-export function An_initializable_property_will_be_changed_properly_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	let A = new FirstClass({ initializableProperty: 41 })
-	return A.initializableProperty === 41
-}
+		new ExecutionTest({
+			name: 'An initializable property can be changed on object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ initializableProperty: 41 })
+			}
+		}),
 
-export function A_subclassable_property_cannot_be_changed_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		let A = new FirstClass({ subclassableProperty: 51 })
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+		new ValueTest({
+			name: 'An initializable property will be changed properly on object creation',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ initializableProperty: 41 })
+				return A.initializableProperty
+			},
+			value: 41
+		}),
 
-export function An_immutable_property_cannot_be_changed_on_object_creation(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		let A = new FirstClass({ immutableProperty: 61 })
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+		new ErrorTest({
+			name: 'A subclassable property cannot be changed on object creation',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ subclassableProperty: 51 })
+			},
+			errorName: 'AssignmentError'
+		}),
+
+		new ErrorTest({
+			name: 'An immutable property cannot be changed on object creation',
+			function() {
+				ExtendedObject.clearClassDeclarations()
+				let A = new FirstClass({ immutableProperty: 61 })
+			},
+			errorName: 'AssignmentError'
+		})
+	]
+})
+
+
+
+
 
 
 ////////////////////////////////////////////
 // CHANGING PROPERTY VALUES IN A SUBCLASS //
 ////////////////////////////////////////////
 
-export function A_settable_property_can_be_changed_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 10
+let Changing_property_values_in_a_subclass = new BundledTest({
+	name: 'Changing property values in a subclass',
+	silenceSubtests: true,
+	tests: [
+
+		new ExecutionTest({
+			name: 'A settable property can be changed in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 10
+						}
+					}
 				}
+				let A = new SecondClass()
 			}
-		}
-		let A = new SecondClass()
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_mutable_property_will_be_changed_properly_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	class SecondClass extends FirstClass {
-		defaults(): object {
-			return {
-				settableProperty: 10
-			}
-		}
-	}
-	let A = new SecondClass()
-	return A.settableProperty === 10
-}
-
-export function An_initializable_property_can_be_changed_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					initializableProperty: 20
+		new ValueTest({
+			name: 'A mutable property will be changed properly in subclass',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 10
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.settableProperty
+			},
+			value: 10
+		}),
 
-export function An_initializable_property_will_be_changed_properly_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	class SecondClass extends FirstClass {
-		defaults(): object {
-			return {
-				initializableProperty: 20
-			}
-		}
-	}
-	let A = new SecondClass()
-	return A.initializableProperty === 20
-}
-
-export function A_subclassable_property_can_be_changed_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					subclassableProperty: 20
+		new ExecutionTest({
+			name: 'An initializable property can be changed in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							initializableProperty: 20
+						}
+					}
 				}
+				let A = new SecondClass()
 			}
-		}
-		let A = new SecondClass()
-		return true
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_subclassable_property_will_be_changed_properly_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	class SecondClass extends FirstClass {
-		defaults(): object {
-			return {
-				subclassableProperty: 20
-			}
-		}
-	}
-	let A = new SecondClass()
-	return (A.subclassableProperty === 20)
-}
-
-export function An_immutable_property_cannot_be_changed_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					immutableProperty: 40
+		new ValueTest({
+			name: 'An initializable property will be changed properly in subclass',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							initializableProperty: 20
+						}
+					}
 				}
+				let A = new SecondClass()
+				return A.initializableProperty
+			},
+			value: 20
+		}),
+
+		new ExecutionTest({
+			name: 'A subclassable property can be changed in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							subclassableProperty: 20
+						}
+					}
+				}
+				let A = new SecondClass()
 			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof AssignmentError
-	}
-}
+		}),
+
+		new ValueTest({
+			name: 'A subclassable property will be changed properly in subclass',
+			function: function(): number {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							subclassableProperty: 20
+						}
+					}
+				}
+				let A = new SecondClass()
+				return A.subclassableProperty
+			},
+			value: 20
+		}),
+
+		new ErrorTest({
+			name: 'An immutable property cannot be changed in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							immutableProperty: 40
+						}
+					}
+				}
+				let A = new SecondClass()
+			},
+			errorName: 'AssignmentError'
+		})
+	]
+})
+
+
+
 
 
 
@@ -478,507 +478,479 @@ export function An_immutable_property_cannot_be_changed_in_subclass(): boolean {
 // CHANGING MUTABILITY AND DEFAULT VALUES IN SUBCLASS //
 ////////////////////////////////////////////////////////
 
-export function An_immutable_property_cannot_become_subclassable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					immutableProperty: 'in_subclass'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+let Changing_mutability_and_default_values_in_subclass = new BundledTest({
+	name: 'Changing mutability and default values in subclass',
+	silenceSubtests: true,
+	tests: [
 
-export function An_immutable_property_cannot_become_initializable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					immutableProperty: 'on_init'
+		new ErrorTest({
+			name: 'An immutable property cannot become subclassable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							immutableProperty: 'in_subclass'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function An_immutable_property_cannot_become_updatable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					immutableProperty: 'on_update'
+		new ErrorTest({
+			name: 'An immutable property cannot become initializable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							immutableProperty: 'on_init'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function An_immutable_property_cannot_become_settable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					immutableProperty: 'always'
+		new ErrorTest({
+			name: 'An immutable property cannot become updatable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							immutableProperty: 'on_update'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function A_subclassable_property_can_become_immutable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					subclassableProperty: 'never'
+		new ErrorTest({
+			name: 'An immutable property cannot become settable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							immutableProperty: 'always'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('subclassableProperty') === 'never')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function A_subclassable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					subclassableProperty: 51
+		new ValueTest({
+			name: 'A subclassable property can become immutable in subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							subclassableProperty: 'never'
+						}
+					}
 				}
-			}
-			mutabilities(): object {
-				return {
-					subclassableProperty: 'never'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('subclassableProperty') === 'never' && A.subclassableProperty === 51)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('subclassableProperty')
+			},
+			value: 'never'
+		}),
 
-export function A_subclassable_property_cannot_become_initializable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					subclassableProperty: 'on_init'
+		new AssertionTest({
+			name: 'A subclassable property can become immutable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							subclassableProperty: 51
+						}
+					}
+					mutabilities(): object {
+						return {
+							subclassableProperty: 'never'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('subclassableProperty') === 'never' && A.subclassableProperty === 51)
 			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+		}),
 
-export function A_subclassable_property_cannot_become_updatable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					subclassableProperty: 'on_update'
+		new ErrorTest({
+			name: 'A subclassable property cannot become initializable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							subclassableProperty: 'on_init'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function A_subclassable_property_cannot_become_settable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					subclassableProperty: 'always'
+		new ErrorTest({
+			name: 'A subclassable property cannot become updatable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							subclassableProperty: 'on_update'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
+		new ErrorTest({
+			name: 'A subclassable property cannot become settable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							subclassableProperty: 'always'
+						}
+					}
+				}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function An_initializable_property_can_become_immutable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					initializableProperty: 'never'
+		new ValueTest({
+			name: 'An initializable property can become immutable in subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							initializableProperty: 'never'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('initializableProperty') === 'never')
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('initializableProperty')
+			},
+			value: 'never'
+		}),
 
-export function An_initializable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					initializableProperty: 41
+		new AssertionTest({
+			name: 'An initializable property can become immutable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							initializableProperty: 41
+						}
+					}
+					mutabilities(): object {
+						return {
+							initializableProperty: 'never'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('initializableProperty') === 'never' && A.initializableProperty === 41)
 			}
-			mutabilities(): object {
-				return {
-					initializableProperty: 'never'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('initializableProperty') === 'never' && A.initializableProperty === 41)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function An_initializable_property_can_become_subclassable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					initializableProperty: 'in_subclass'
+		new ValueTest({
+			name: 'An initializable property can become subclassable in subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							initializableProperty: 'in_subclass'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('initializableProperty') === 'in_subclass')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('initializableProperty')
+			},
+			value: 'in_subclass'
+		}),
 
-export function An_initializable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					initializableProperty: 41
+		new AssertionTest({
+			name: 'An initializable property can become subclassable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							initializableProperty: 41
+						}
+					}
+					mutabilities(): object {
+						return {
+							initializableProperty: 'in_subclass'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('initializableProperty') === 'in_subclass' && A.initializableProperty === 41)
 			}
-			mutabilities(): object {
-				return {
-					initializableProperty: 'in_subclass'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('initializableProperty') === 'in_subclass' && A.initializableProperty === 41)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function An_initializable_property_cannot_become_updatable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					initializableProperty: 'on_update'
+		new ErrorTest({
+			name: 'An initializable property cannot become updatable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							initializableProperty: 'on_update'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function An_initializable_property_cannot_become_settable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					initializableProperty: 'always'
+		new ErrorTest({
+			name: 'An initializable property cannot become settable in subclass',
+			function: function() {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							initializableProperty: 'always'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return false
-	} catch (e) {
-		return e instanceof MutabilityError
-	}
-}
+				let A = new SecondClass()
+			},
+			errorName: 'MutabilityError'
+		}),
 
-export function A_settable_property_can_become_immutable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					settableProperty: 'never'
+		new ValueTest({
+			name: 'A settable property can become immutable in subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							settableProperty: 'never'
+						}
+					}
 				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'never')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('settableProperty')
+			},
+			value: 'never'
+		}),
 
-export function A_settable_property_can_become_immutable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 21
+		new AssertionTest({
+			name: 'A settable property can become immutable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 21
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'never'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
 			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'never'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_settable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_1(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass { }
-		class ThirdClass extends SecondClass {
-			defaults(): object {
-				return {
-					settableProperty: 21
+		new AssertionTest({
+			name: 'A settable property can become immutable and have a new default value in subsubclass 1',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass { }
+				class ThirdClass extends SecondClass {
+					defaults(): object {
+						return {
+							settableProperty: 21
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'never'
+						}
+					}
 				}
+				let A = new ThirdClass()
+				return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
 			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'never'
-				}
-			}
-		}
-		let A = new ThirdClass()
-		return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_settable_property_can_become_immutable_and_have_a_new_default_value_in_subsubclass_2(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 21
+		new AssertionTest({
+			name: 'A settable property can become immutable and have a new default value in subsubclass 2',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 21
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'never'
+						}
+					}
 				}
+				class ThirdClass extends SecondClass { }
+				let A = new ThirdClass()
+				return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
 			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'never'
-				}
-			}
-		}
-		class ThirdClass extends SecondClass { }
-		let A = new ThirdClass()
-		return (A.mutability('settableProperty') === 'never' && A.settableProperty == 21)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
+		new ValueTest({
+			name: 'A_settable_property_can_become_subclassable_in_subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							settableProperty: 'in_subclass'
+						}
+					}
+				}
+				let A = new SecondClass()
+				return A.mutability('settableProperty')
+			},
+			value: 'in_subclass'
+		}),
 
-export function A_settable_property_can_become_subclassable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					settableProperty: 'in_subclass'
+		new AssertionTest({
+			name: 'A settable property can become subclassable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 10
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'in_subclass'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('settableProperty') === 'in_subclass' && A.settableProperty === 10)
 			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'in_subclass')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_settable_property_can_become_subclassable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 10
+		new ValueTest({
+			name: 'A settable property can become initializable_in_subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							settableProperty: 'on_init'
+						}
+					}
 				}
-			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'in_subclass'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'in_subclass' && A.settableProperty === 10)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('settableProperty')
+			},
+			value: 'on_init'
+		}),
 
-export function A_settable_property_can_become_initializable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					settableProperty: 'on_init'
+		new AssertionTest({
+			name: 'A settable property can become initializable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 10
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'on_init'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('settableProperty') === 'on_init' && A.settableProperty == 10)
 			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'on_init')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		}),
 
-export function A_settable_property_can_become_initializable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 10
+		new ValueTest({
+			name: 'A settable property can become updatable in subclass',
+			function: function(): string {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					mutabilities(): object {
+						return {
+							settableProperty: 'on_update'
+						}
+					}
 				}
-			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'on_init'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'on_init' && A.settableProperty == 10)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+				let A = new SecondClass()
+				return A.mutability('settableProperty')
+			},
+			value: 'on_update'
+		}),
 
-export function A_settable_property_can_become_updatable_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			mutabilities(): object {
-				return {
-					settableProperty: 'on_update'
+		new AssertionTest({
+			name: 'A settable property can become updatable and have a new default value in subclass',
+			function: function(): boolean {
+				ExtendedObject.clearClassDeclarations()
+				class SecondClass extends FirstClass {
+					defaults(): object {
+						return {
+							settableProperty: 21
+						}
+					}
+					mutabilities(): object {
+						return {
+							settableProperty: 'on_update'
+						}
+					}
 				}
+				let A = new SecondClass()
+				return (A.mutability('settableProperty') === 'on_update' && A.settableProperty == 21)
 			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'on_update')
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
+		})
+	]
+})
 
-export function A_settable_property_can_become_updatable_and_have_a_new_default_value_in_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
-		class SecondClass extends FirstClass {
-			defaults(): object {
-				return {
-					settableProperty: 21
-				}
-			}
-			mutabilities(): object {
-				return {
-					settableProperty: 'on_update'
-				}
-			}
-		}
-		let A = new SecondClass()
-		return (A.mutability('settableProperty') === 'on_update' && A.settableProperty == 21)
-	} catch (e) {
-		console.error(e)
-		return false
-	}
-}
 
 
 ///////////////////////////////////
 // ADDING PROPERTIES IN SUBCLASS //
 ///////////////////////////////////
 
-export function An_immutable_property_can_be_added_in_a_subclass(): boolean {
-	ExtendedObject.clearClassDeclarations()
-	try {
+export const An_immutable_property_can_be_added_in_a_subclass = new AssertionTest({
+	name: 'An immutable property can be added in a subclass',
+	function: function(): boolean {
+		ExtendedObject.clearClassDeclarations()
 		class SecondClass extends FirstClass {
-
 			immutableProperty2: number
-
 			defaults(): object {
 				return {
 					immutableProperty2: 7
@@ -992,15 +964,26 @@ export function An_immutable_property_can_be_added_in_a_subclass(): boolean {
 		}
 		let A = new SecondClass()
 		return (A.mutability('immutableProperty2') == 'never' && A.immutableProperty2 == 7)
-	} catch (e) {
-		console.error(e)
-		return false
 	}
-}
+})
 
 
 
 
+
+export const ExtendedObject_tests = new BundledTest({
+	name: 'ExtendedObject tests',
+	tests: [
+		Basic_defaults_and_mutability_tests,
+		Setting_property_values_after_object_creation,
+		Updating_property_values_after_object_creation,
+		Changing_property_values_on_object_creation,
+		Changing_property_values_in_a_subclass,
+		Changing_mutability_and_default_values_in_subclass,
+		An_immutable_property_can_be_added_in_a_subclass
+	],
+	silenceSubtests: true
+})
 
 
 
