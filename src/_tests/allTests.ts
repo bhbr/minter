@@ -16,5 +16,6 @@ export const AllTests = new BundledTest({
 		MobjectTest,
 		TransformTest,
 		VertexTest
-	]
+	],
+	silenceSubtests: true
 })
