@@ -19,7 +19,7 @@ class Test {
 	}
 
 	run(silent: boolean = null): boolean {
-		silent = silent ?? this.silent
+		silent = (silent ?? this.silent) || this.silent
 		if (silent) return this.mereRun()
 		
 		let indentation = ' '.repeat(4 * this.indentationLevel)
@@ -48,7 +48,8 @@ class Test {
 	}
 
 	unsafeRun(): boolean {
-		throw 'Please subclass Test'
+		console.error('Please subclass Test')
+		return false
 	}
 
 }
@@ -136,10 +137,13 @@ export class BundledTest extends AssertionTest {
 			var result: boolean = true
 			for (let test of this.tests) {
 				let previousIndentationLevel = test.indentationLevel
+				let previousSilentFlag = test.silent
 				test.indentationLevel = this.indentationLevel + 1
-				let subtestResult = test.run(this.silenceSubtests || this.silent || test.silent)
+				test.silent = this.silenceSubtests || this.silent || test.silent
+				let subtestResult = test.run()
 				result = result && subtestResult
 				test.indentationLevel = previousIndentationLevel
+				test.silent = previousSilentFlag
 			}
 			return result
 		}
