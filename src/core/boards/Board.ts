@@ -148,7 +148,8 @@ The content children can also be dragged and panned.
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
-			mobject: this
+			mobject: this,
+			linkNames: this.inputNames
 		})
 		this.add(this.expandedInputList)
 
@@ -156,7 +157,8 @@ The content children can also be dragged and panned.
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
-			mobject: this
+			mobject: this,
+			linkNames: this.outputNames
 		})
 		this.add(this.expandedOutputList)
 
@@ -168,12 +170,12 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.view.hide()
 		} else {
 			this.expandStateChange()
-			this.inputList.view.hide()
+			//this.inputList.view.hide()
 			this.outputList.view.hide()
 			this.expandedInputList.view.show()
 			this.expandedOutputList.view.show()
 		}
-		this.hideLinksOfContent()
+//		this.hideLinksOfContent()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -611,6 +613,12 @@ The content children can also be dragged and panned.
 
 		this.expandedInputList.view.hide()
 		this.expandedOutputList.view.hide()
+	}
+
+	renameLinkableProperty(type: 'input' | 'output', oldName: string, newName: string) {
+		super.renameLinkableProperty(type, oldName, newName)
+		let expandedList = (type == 'input') ? this.expandedInputList : this.expandedOutputList
+		expandedList.renameProperty(oldName, newName)	
 	}
 
 	setLinking(flag: boolean) {

@@ -95,7 +95,7 @@ export class LinkOutlet extends MGroup {
 		})
 	}
 
-	update(args: object = {}, redraw: boolean = false) {
+	update(args: object = {}, redraw: boolean = true) {
 		let newName = args['name']
 		if (newName == '') {
 			throw `Name of property ${this.name} cannot be changed to an empty string`;

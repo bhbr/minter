@@ -7,6 +7,8 @@ import { LinkHook } from './LinkHook'
 import { LinkOutlet } from './LinkOutlet'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
+import { log } from 'core/functions/logging'
+import { clear } from 'core/functions/arrays'
 
 export class IOList extends RoundedRectangle {
 /*
@@ -63,16 +65,16 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	// calculate the height from the number of outputs
 		if (this.linkNames == undefined) { return 0 }
 		if (this.linkNames.length == 0) { return 0 }
-		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * (this.linkNames.length - 1) }
+		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * this.linkNames.length }
 	}
 
 	createOutlets() {
 	// create the hooks (empty circles) and their labels
-		this.linkOutlets = []
-		for (let submob of this.submobs) {
-			this.remove(submob)
+		for (let outlet of this.linkOutlets) {
+			this.remove(outlet)
 		}
-		for (let i = 0; i < this.linkNames.length; i++) {
+		clear(this.linkOutlets)
+		for (var i = 0; i < this.linkNames.length; i++) {
 			let name = this.linkNames[i]
 			this.createOutlet(name)
 		}
@@ -86,6 +88,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		this.add(outlet)
 		this.linkOutlets.push(outlet)
 		this.positionOutlet(outlet, this.linkOutlets.length - 1)
+
 	}
 
 	positionOutlet(outlet: LinkOutlet, index: number) {
@@ -114,6 +117,9 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		this.height = this.getHeight()
 		if (this.mobject == null) { return }
 		this.positionSelf()
+		if (redraw) {
+			this.redraw()
+		}
 	}
 
 	positionSelf() {
@@ -125,6 +131,14 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	getAnchor(): vertex {
 		// placeholder, subclassed in InputList and OutputList
 		return vertexOrigin()
+	}
+
+	renameProperty(oldName: string, newName: string) {
+		let index = this.linkNames.indexOf(oldName)
+		this.linkNames[index] = newName
+		this.linkOutlets[index].update({
+			name: newName
+		})
 	}
 
 }

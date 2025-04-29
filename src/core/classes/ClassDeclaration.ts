@@ -6,9 +6,9 @@ export class ClassDeclaration {
 A ClassDeclaration is an abstracted version of the default values and associated mutabilities defined in the subclasses of Mobjects (actually, ExtendedObjects in general). Its purpose is to check the validity of the overridden defaults() and mutabilities() methods.
 */
 	name: string // of the class
-	parent: ClassDeclaration | null // null for the base class ExtendedObject
-	mutabilities: object // format:  { propertyName : mutability }
-	defaults: Function // must be a function that creates new copies of the defaults object to instantiate new objects, so they won't share references (e. g. pointing to the same <div>)
+	parent: ClassDeclaration | null // null only for the base class ExtendedObject
+	mutabilities: object // format: { propertyName : mutability }
+	defaults: () => object // must be a function that creates new copies of the defaults object to instantiate new objects, so they won't share references (e. g. pointing to the same <div>)
 
 	fullMutabilities: object // as collected from all the parent classes
 	fullDefaults: object // as collected from all the parent classes
@@ -45,15 +45,9 @@ A ClassDeclaration is an abstracted version of the default values and associated
 		this.fullMutabilities = {}
 		// Collect the entire mutabilities from all ancestor classes
 		if (this.parent) { Object.assign(this.fullMutabilities, this.parent.fullMutabilities) }
-		// Check the own mutabilities are compatible with them, then update
+		// Check whether the own mutabilities are compatible with them, then update
 		this.checkMutabilities()
 		Object.assign(this.fullMutabilities, this.mutabilities)
-		// Properties with no mentioned mutability are set to the default mutability 'always'
-		for (let prop of Object.keys(this.defaults())) {
-			if (this.fullMutabilities[prop] === undefined) {
-				this.fullMutabilities[prop] = 'always'
-			}
-		}
 	}
 
 	private initializeFullDefaults() {

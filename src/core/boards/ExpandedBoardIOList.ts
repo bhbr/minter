@@ -1,16 +1,16 @@
 
 import { IOList } from 'core/linkables/IOList'
 // import { vertex } from 'core/functions/vertex'
-// import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'core/linkables/constants'
-// import { HOOK_HORIZONTAL_SPACING } from './constants'
+import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'core/linkables/constants'
+import { OUTLET_HORIZONTAL_SPACING } from './constants'
 // import { EditableLinkHook } from './EditableLinkHook'
-// import { Board } from 'core/boards/Board'
-
+ import { Board } from 'core/boards/Board'
+import { LinkOutlet } from 'core/linkables/LinkOutlet'
 
 export class ExpandedBoardIOList extends IOList {
 
 // 	emptyLinkHook: EditableLinkHook
-// 	declare _parent: Board
+ 	declare _parent: Board
 
 // 	defaults(): object {
 // 		return {
@@ -24,6 +24,20 @@ export class ExpandedBoardIOList extends IOList {
 // 		}
 // 	}
 
+	get parent(): Board {
+		return super.parent as Board
+	}
+
+	set parent(newValue: Board) {
+		super.parent = newValue
+	}
+
+	positionOutlet(outlet: LinkOutlet, index: number) {
+		outlet.update({
+			anchor: [HOOK_INSET_X + OUTLET_HORIZONTAL_SPACING * index, HOOK_INSET_Y]
+		})
+	}
+
 // 	positionHook(hook: EditableLinkHook, index: number) {
 // 		let m: vertex = [
 // 			HOOK_INSET_X + hook.radius + HOOK_HORIZONTAL_SPACING * index,
@@ -35,13 +49,6 @@ export class ExpandedBoardIOList extends IOList {
 // 		})
 // 	}
 
-// 	get parent(): Board {
-// 		return super.parent as Board
-// 	}
-
-// 	set parent(newValue: Board) {
-// 		super.parent = newValue
-// 	}
 
 // 	getHeight(): number {
 // 		return this.view.frame.height
@@ -72,14 +79,9 @@ export class ExpandedBoardIOList extends IOList {
 // 		// implemented in subclasses
 // 	}
 
-// 	update(args: object = {}, redraw: boolean = true) {
-// 		super.update(args, redraw)
-// 		let newMob = args['mobject']
-// 		if (newMob !== undefined) {
-// 			this.linkHooks.forEach((hook) => hook.update({
-// 				mobject: newMob
-// 			}, false))
-// 		}
-// 	}
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		
+	}
 
 }

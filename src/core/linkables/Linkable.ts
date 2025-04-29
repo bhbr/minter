@@ -2,9 +2,11 @@
 import { Board } from 'core/boards/Board'
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { IOList } from './IOList'
 import { InputList } from './InputList'
 import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
+import { log } from 'core/functions/logging'
 
 export class Linkable extends Mobject {
 /*
@@ -60,7 +62,7 @@ which can be linked to such-exposed variables of other mobjects.
 			editable: this.linksEditable
 		})
 		this.add(this.inputList)
-		this.inputList.view.hide()
+		//this.inputList.view.hide()
 		this.outputList.update({
 			mobject: this,
 			linkNames: this.outputNames,
@@ -101,6 +103,15 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 		return arr
 	}
+
+	renameLinkableProperty(type: 'input' | 'output', oldName: string, newName: string) {
+		let propertyNames = (type == 'input') ? this.inputNames : this.outputNames
+		let list: IOList = (type == 'input') ? this.inputList : this.outputList
+		list.renameProperty(oldName, newName)
+		// TODO: update dependencies
+	}
+
+	// The following two methods are used only for positioning IOLists, rework/rename this
 
 	getCompactWidth(): number {
 		return this.view.frame.width
