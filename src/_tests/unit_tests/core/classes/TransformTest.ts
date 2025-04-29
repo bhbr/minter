@@ -6,7 +6,7 @@ import { AssertionTest, BundledTest } from '_tests/Tests'
 
 export const TransformTest = new BundledTest({
 	name: 'Transform test',
-	tests: [
+	subtests: [
 
 		new AssertionTest({
 			name: 'A transform transforms a vertex as expected',

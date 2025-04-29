@@ -15,7 +15,7 @@ class Test {
 		this.catchErrors = args['catchErrors'] ?? false
 		this.indentationLevel = args['indentationLevel'] ?? 0
 		if (!this.functionToTest) { return } // might be a bundled test, where this function is only defined later
-		this.name = args['name'] ?? 'test_' + this.functionToTest.name
+		this.name = args['name'] ?? 'Test_' + this.functionToTest.name
 	}
 
 	run(silent: boolean = null): boolean {
@@ -126,16 +126,16 @@ export class ErrorTest extends Test {
 
 export class BundledTest extends AssertionTest {
 
-	tests: Array<Test>
+	subtests: Array<Test>
 	silenceSubtests: boolean
 
 	constructor(args) {
 		super(args)
-		this.tests = args['tests']
+		this.subtests = args['subtests'] || []
 		this.silenceSubtests = args['silenceSubtests'] ?? false
 		this.functionToTest = function(): boolean {
 			var result: boolean = true
-			for (let test of this.tests) {
+			for (let test of this.subtests) {
 				let previousIndentationLevel = test.indentationLevel
 				let previousSilentFlag = test.silent
 				test.indentationLevel = this.indentationLevel + 1
@@ -147,7 +147,14 @@ export class BundledTest extends AssertionTest {
 			}
 			return result
 		}
-		this.name = args['name'] ?? 'test_' + this.functionToTest.name
+		if (args['name']) {
+			this.name = args['name']
+		} else {
+			this.name = 'BundledTest'
+			for (let test of this.subtests) {
+				this.name += '_' + test.name
+			}
+		}
 	}
 
 }

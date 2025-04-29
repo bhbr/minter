@@ -6,7 +6,7 @@ import { AssertionTest, ValueTest, BundledTest } from '_tests/Tests'
 
 export const MobjectTest = new BundledTest({
 	name: 'Mobject test',
-	tests: [
+	subtests: [
 
 		new AssertionTest({
 			name: 'Anchors of nested mobjects transform properly',

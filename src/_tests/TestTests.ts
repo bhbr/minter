@@ -78,7 +78,7 @@ export function run_all_tests() {
 
 	let testBundle1 = new BundledTest({
 		name: 'testing 1-3',
-		tests: [
+		subtests: [
 			test1,
 			test2,
 			test3
@@ -91,7 +91,7 @@ export function run_all_tests() {
 
 	let testBundle2 = new BundledTest({
 		name: 'testing 4-6',
-		tests: [
+		subtests: [
 			test4,
 			test5,
 			test6
@@ -104,7 +104,7 @@ export function run_all_tests() {
 
 	let fullTestBundle = new BundledTest({
 		name: 'testing 1-6',
-		tests: [
+		subtests: [
 			testBundle1,
 			testBundle2
 		],

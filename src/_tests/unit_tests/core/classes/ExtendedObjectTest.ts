@@ -45,7 +45,7 @@ class FirstClass extends ExtendedObject {
 let Basic_defaults_and_mutability_tests = new BundledTest({
 	name: 'Basic defaults and mutability tests',
 	silenceSubtests: false,
-	tests: [
+	subtests: [
 
 		new AssertionTest({
 			name: 'Every property has a mutability',
@@ -175,7 +175,7 @@ let Setting_property_values_after_object_creation = new BundledTest({
 let Updating_property_values_after_object_creation = new BundledTest({
 	name: 'Updating property values after object creation tests',
 	silenceSubtests: false,
-	tests: [
+	subtests: [
 
 		new ExecutionTest({
 			name: 'A settable property can be updated after object creation',
@@ -264,7 +264,7 @@ let Updating_property_values_after_object_creation = new BundledTest({
 let Changing_property_values_on_object_creation = new BundledTest({
 	name: 'Changing property values on object creation',
 	silenceSubtests: false,
-	tests: [
+	subtests: [
 
 		new ExecutionTest({
 			name: 'A settable property can be changed on object creation',
@@ -352,7 +352,7 @@ let Changing_property_values_on_object_creation = new BundledTest({
 let Changing_property_values_in_a_subclass = new BundledTest({
 	name: 'Changing property values in a subclass',
 	silenceSubtests: false,
-	tests: [
+	subtests: [
 
 		new ExecutionTest({
 			name: 'A settable property can be changed in subclass',
@@ -481,7 +481,7 @@ let Changing_property_values_in_a_subclass = new BundledTest({
 let Changing_mutability_and_default_values_in_subclass = new BundledTest({
 	name: 'Changing mutability and default values in subclass',
 	silenceSubtests: false,
-	tests: [
+	subtests: [
 
 		new ErrorTest({
 			name: 'An immutable property cannot become subclassable in subclass',
@@ -973,7 +973,7 @@ export const An_immutable_property_can_be_added_in_a_subclass = new AssertionTes
 
 export const ExtendedObjectTest = new BundledTest({
 	name: 'ExtendedObject test',
-	tests: [
+	subtests: [
 		Basic_defaults_and_mutability_tests,
 		Setting_property_values_after_object_creation,
 		Updating_property_values_after_object_creation,

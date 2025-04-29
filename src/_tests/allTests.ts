@@ -9,7 +9,7 @@ import { VertexTest } from './unit_tests/core/functions/VertexTest'
 
 export const AllTests = new BundledTest({
 	name: 'all tests',
-	tests: [
+	subtests: [
 		ColorTest,
 		CopyingTest,
 		ExtendedObjectTest,

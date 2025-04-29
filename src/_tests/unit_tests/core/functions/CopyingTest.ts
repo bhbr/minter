@@ -3,7 +3,7 @@ import { AssertionTest, BundledTest } from '_tests/Tests'
 
 export const CopyingTest = new BundledTest({
 	name: 'Copying test',
-	tests: [
+	subtests: [
 		new AssertionTest({
 			name: 'Equal objects are equal',
 			function: function(): boolean {

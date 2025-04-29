@@ -4,7 +4,7 @@ import { AssertionTest, BundledTest } from '_tests/Tests'
 
 export const VertexTest = new BundledTest({
 	name: 'Vertex test',
-	tests: [
+	subtests: [
 		new AssertionTest({
 			name: 'A vertex is close to itself',
 			function: function(): boolean {
