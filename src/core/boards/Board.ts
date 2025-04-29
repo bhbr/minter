@@ -624,23 +624,24 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag) {
 			this.showLinksOfContent()
-			// this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			// this.sensor.restoreTouchMethods()
-			// this.sensor.restorePenMethods()
-			// this.sensor.restoreMouseMethods()
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 	}
 
 
-	startLinking(startHook: LinkHook) {
-		this.openHook = startHook
-		log(this.openHook)
-		let p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
-		log(p)
+	startLinking(e: ScreenEvent) {
+//		let p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
+		var p = this.sensor.localEventVertex(e)
+		this.openHook = this.hookAtLocation(p)
+		if (this.openHook == null) { return }
+		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
 		let sb = new LinkBullet({ midpoint: p })
 		let eb = new LinkBullet({ midpoint: p })
 		this.openLink = new DependencyLink({
@@ -755,10 +756,10 @@ The content children can also be dragged and panned.
 	// }
 
 	allHooks(): Array<LinkHook> {
-		let ret: Array<LinkHook> = []
 		if (this.contracted) {
-			ret = ret.concat(super.allHooks())
+			return super.allHooks()
 		}
+		let ret: Array<LinkHook> = []
 		for (let linkable of this.contentChildren) {
 			if (linkable instanceof Linkable) {
 				ret = ret.concat(linkable.allHooks())
@@ -769,10 +770,10 @@ The content children can also be dragged and panned.
 
 	hookAtLocation(p: vertex): LinkHook | null {
 		for (let h of this.allHooks()) {
-			let q = this.view.frame.transformLocalPoint(h.midpoint)
-			log(q)
+			let boardFrame = this.view.frame
+			let outletFrame = h.parent.view.frame
+			let q = outletFrame.transformLocalPoint(h.midpoint, boardFrame)
 			if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
-				log(h)
 				return h
 			}
 		}

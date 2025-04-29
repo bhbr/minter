@@ -23,8 +23,7 @@ export class LinkHook extends Circle {
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			mobject: null,
-			outlet: null,
-			screenEventHandler: ScreenEventHandler.Self
+			outlet: null
 		}
 	}
 
@@ -37,14 +36,6 @@ export class LinkHook extends Circle {
 			type: 'on_init',
 			outlet: 'on_init'
 		}
-	}
-
-	onPointerDown(e: ScreenEvent) {
-		this.outlet.ioList.mobject.board.startLinking(this)
-	}
-
-	onPointerMove(e: ScreenEvent) {
-		this.outlet.ioList.mobject.board.linking(e)
 	}
 
 	
