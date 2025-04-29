@@ -573,7 +573,7 @@ The content children can also be dragged and panned.
 	openLink?: DependencyLink
 	openHook?: LinkHook
 	openBullet?: LinkBullet
-	// compatibleHooks: Array<LinkHook>
+	compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 
@@ -635,9 +635,7 @@ The content children can also be dragged and panned.
 		}
 	}
 
-
 	startLinking(e: ScreenEvent) {
-//		let p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
 		var p = this.sensor.localEventVertex(e)
 		this.openHook = this.hookAtLocation(p)
 		if (this.openHook == null) { return }
@@ -650,26 +648,32 @@ The content children can also be dragged and panned.
 		})
 		this.add(this.openLink)
 		this.openBullet = eb
-		// this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
-		let p = this.sensor.localEventVertex(e)
+		var p = this.sensor.localEventVertex(e)
+		let endHook = this.hookAtLocation(p)
+		if (endHook !== null) {
+			p = endHook.parent.view.frame.transformLocalPoint(endHook.midpoint, this.view.frame)
+		}
 		this.openBullet.update({
 			midpoint: p
 		})
 	}
 
 	endLinking(e: ScreenEvent) {
-		// let h = this.hookAtLocation(this.sensor.localEventVertex(e))
-		// if (h === null) {
-		// 	this.openLink = null
-		// 	this.openHook = null
-		// 	this.openBullet = null
-		// 	this.compatibleHooks = []
-		// 	return
-		// }
+		let h = this.compatibleHookAtLocation(this.sensor.localEventVertex(e))
+		log(h)
+		if (h === null) {
+			this.remove(this.openLink)
+			this.openLink = null
+			this.openHook = null
+			this.openBullet = null
+			this.compatibleHooks = []
+			return
+		}
 		// if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
 		// 	// click on a plus button to create a new hook
 		// 	let ed = h as EditableLinkHook
@@ -688,6 +692,10 @@ The content children can also be dragged and panned.
 		// this.openHook = null
 		// this.openBullet = null
 		// this.compatibleHooks = []
+	}
+
+	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {
+		return this.allHooks() // for now
 	}
 
 	updateLinks() {
@@ -768,8 +776,8 @@ The content children can also be dragged and panned.
 		return ret
 	}
 
-	hookAtLocation(p: vertex): LinkHook | null {
-		for (let h of this.allHooks()) {
+	hookAtLocationFromList(p: vertex, hookList: Array<LinkHook>): LinkHook | null {
+		for (let h of hookList) {
 			let boardFrame = this.view.frame
 			let outletFrame = h.parent.view.frame
 			let q = outletFrame.transformLocalPoint(h.midpoint, boardFrame)
@@ -780,6 +788,13 @@ The content children can also be dragged and panned.
 		return null
 	}
 
+	hookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.allHooks())
+	}
+
+	compatibleHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.compatibleHooks)
+	}
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
