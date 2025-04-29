@@ -570,9 +570,9 @@ The content children can also be dragged and panned.
 	expandedInputList: ExpandedBoardInputList
 	expandedOutputList: ExpandedBoardOutputList
 	// editingLinkName: boolean
-	// openLink?: DependencyLink
+	openLink?: DependencyLink
 	openHook?: LinkHook
-	// openBullet?: LinkBullet
+	openBullet?: LinkBullet
 	// compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
@@ -635,42 +635,29 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	linkingEnabled(): boolean {
-		return (this.onPointerDown == this.startLinking)
-	}
 
-	startLinking(e: ScreenEvent) {
-		var p = this.sensor.localEventVertex(e)
-		this.openHook = this.hookAtLocation(p)
+	startLinking(startHook: LinkHook) {
+		this.openHook = startHook
 		log(this.openHook)
-		// if (this.openHook === null) { return }
-		// p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
-		// let sb = new LinkBullet({ midpoint: p })
-		// let eb = new LinkBullet({ midpoint: p })
-		// this.openLink = new DependencyLink({
-		// 	startBullet: sb,
-		// 	endBullet: eb
-		// })
-		// this.add(this.openLink)
-		// this.openBullet = eb
+		let p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
+		log(p)
+		let sb = new LinkBullet({ midpoint: p })
+		let eb = new LinkBullet({ midpoint: p })
+		this.openLink = new DependencyLink({
+			startBullet: sb,
+			endBullet: eb
+		})
+		this.add(this.openLink)
+		this.openBullet = eb
 		// this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
-		// if (this.openLink === null) { return }
-		// let p = this.sensor.localEventVertex(e)
-		// for (let hook of this.compatibleHooks) {
-		// 	let m = hook.positionInBoard()
-		// 	if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
-		// 		this.openBullet.update({
-		// 			midpoint: m
-		// 		})
-		// 		return
-		// 	}
-		// }
-		// this.openBullet.update({
-		// 	midpoint: p
-		// })
+		if (this.openLink === null) { return }
+		let p = this.sensor.localEventVertex(e)
+		this.openBullet.update({
+			midpoint: p
+		})
 	}
 
 	endLinking(e: ScreenEvent) {

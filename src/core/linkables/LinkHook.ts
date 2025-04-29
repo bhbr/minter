@@ -40,8 +40,15 @@ export class LinkHook extends Circle {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		log('pointer down')
+		this.outlet.ioList.mobject.board.startLinking(this)
 	}
+
+	onPointerMove(e: ScreenEvent) {
+		this.outlet.ioList.mobject.board.linking(e)
+	}
+
+	
+
 
 
 
