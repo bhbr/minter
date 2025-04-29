@@ -571,7 +571,7 @@ The content children can also be dragged and panned.
 	expandedOutputList: ExpandedBoardOutputList
 	// editingLinkName: boolean
 	// openLink?: DependencyLink
-	// openHook?: LinkHook
+	openHook?: LinkHook
 	// openBullet?: LinkBullet
 	// compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
@@ -624,14 +624,14 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag) {
 			this.showLinksOfContent()
-			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			// this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			// this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			// this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
+			// this.sensor.restoreTouchMethods()
+			// this.sensor.restorePenMethods()
+			// this.sensor.restoreMouseMethods()
 		}
 	}
 
@@ -640,8 +640,9 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
-		// var p = this.sensor.localEventVertex(e)
-		// this.openHook = this.hookAtLocation(p)
+		var p = this.sensor.localEventVertex(e)
+		this.openHook = this.hookAtLocation(p)
+		log(this.openHook)
 		// if (this.openHook === null) { return }
 		// p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
 		// let sb = new LinkBullet({ midpoint: p })
@@ -659,7 +660,7 @@ The content children can also be dragged and panned.
 		// if (this.openLink === null) { return }
 		// let p = this.sensor.localEventVertex(e)
 		// for (let hook of this.compatibleHooks) {
-		// 	let m = hook.positionInLinkMap()
+		// 	let m = hook.positionInBoard()
 		// 	if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
 		// 		this.openBullet.update({
 		// 			midpoint: m
@@ -709,12 +710,12 @@ The content children can also be dragged and panned.
 
 	// createNewDependency() {
 	// 	if (this.openBullet == this.openLink.startBullet) {
-	// 		let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
-	// 		let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
+	// 		let startHook = this.hookAtLocation(this.openBullet.positionInBoard())
+	// 		let endHook = this.hookAtLocation(this.openLink.endBullet.positionInBoard())
 	// 		this.createNewDependencyBetweenHooks(startHook, endHook)
 	// 	} else if (this.openBullet == this.openLink.endBullet) {
-	// 		let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
-	// 		let hook2 = this.hookAtLocation(this.openBullet.positionInLinkMap())
+	// 		let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInBoard())
+	// 		let hook2 = this.hookAtLocation(this.openBullet.positionInBoard())
 	// 		if (hook1.type == 'output' && hook2.type == 'input') {
 	// 			this.createNewDependencyBetweenHooks(hook1, hook2)
 	// 		} else if (hook1.type == 'input' && hook2.type == 'output') {
@@ -725,8 +726,8 @@ The content children can also be dragged and panned.
 
 	// createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
 	// 	startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
-	// 	startHook.addDependency('positionInLinkMap', this.openLink.startBullet, 'midpoint')
-	// 	endHook.addDependency('positionInLinkMap', this.openLink.endBullet, 'midpoint')
+	// 	startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
+	// 	endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
 	// 	startHook.mobject.update()
 	// }
 
@@ -766,20 +767,28 @@ The content children can also be dragged and panned.
 	// 	return this.expandedOutputList.linkHooks
 	// }
 
-	// allHooks(): Array<LinkHook> {
-	// 	return this.innerInputHooks()
-	// 		.concat(this.innerOutputHooks())
-	// 		.concat(this.outerInputHooks())
-	// 		.concat(this.outerOutputHooks())
-	// }
+	allHooks(): Array<LinkHook> {
+		let ret: Array<LinkHook> = []
+		if (this.contracted) {
+			ret = ret.concat(super.allHooks())
+		}
+		for (let linkable of this.contentChildren) {
+			if (linkable instanceof Linkable) {
+				ret = ret.concat(linkable.allHooks())
+			}
+		}
+		return ret
+	}
 
 	hookAtLocation(p: vertex): LinkHook | null {
-		// for (let h of this.allHooks()) {
-		// 	let q = h.positionInLinkMap()
-		// 	if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
-		// 		return h
-		// 	}
-		// }
+		for (let h of this.allHooks()) {
+			let q = this.view.frame.transformLocalPoint(h.midpoint)
+			log(q)
+			if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
+				log(h)
+				return h
+			}
+		}
 		return null
 	}
 

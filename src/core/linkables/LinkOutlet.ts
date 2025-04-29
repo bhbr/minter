@@ -6,6 +6,8 @@ import { MGroup } from 'core/mobjects/MGroup'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
+import { IOList } from './IOList'
+import { log } from 'core/functions/logging'
 
 export class LinkOutlet extends MGroup {
 
@@ -14,6 +16,7 @@ export class LinkOutlet extends MGroup {
 	inputBox?: InputTextBox
 	linkHooks: Array<LinkHook>
 	editable: boolean
+	ioList?: IOList
 
 	defaults(): object {
 		return {
@@ -24,7 +27,8 @@ export class LinkOutlet extends MGroup {
 			}),
 			inputBox: null,
 			linkHooks: [],
-			editable: false
+			editable: false,
+			ioList: null
 		}
 	}
 
@@ -33,7 +37,8 @@ export class LinkOutlet extends MGroup {
 			label: 'never',
 			inputBox: 'on_update',
 			linkHooks: 'never',
-			editable: 'on_init'
+			editable: 'on_init',
+			ioList: 'on_init'
 		}
 	}
 
@@ -70,11 +75,17 @@ export class LinkOutlet extends MGroup {
 	addHook() {
 		let index = this.linkHooks.length
 		let newHook = new LinkHook({
-			midpoint: [this.label.frameWidth + 15 + HOOK_HORIZONTAL_SPACING * index, this.label.frameHeight / 2]
+			midpoint: [
+				this.label.frameWidth + 15 + HOOK_HORIZONTAL_SPACING * index,
+				this.label.frameHeight / 2
+			],
+			outlet: this
 		})
 		this.add(newHook)
 		this.linkHooks.push(newHook)
 	}
+
+
 
 	removeHook() {
 		let lastHook = this.linkHooks.pop()

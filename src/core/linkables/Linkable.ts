@@ -128,6 +128,10 @@ which can be linked to such-exposed variables of other mobjects.
 		this.board.updateLinks()
 	}
 
+	allHooks(): Array<LinkHook> {
+		return this.inputList.allHooks().concat(this.outputList.allHooks())
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (args['inputNames'] !== undefined) {

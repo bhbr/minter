@@ -149,7 +149,7 @@
 // 		this.deactivateKeyboard()
 // 	}
 
-// 	positionInLinkMap(): vertex {
+// 	positionInBoard(): vertex {
 // 	// used e. g. for snapping
 // 		let p = this.parent.view.frame.transformLocalPoint(this.midpoint, this.parent.parent.view.frame)
 // 		return p

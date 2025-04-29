@@ -34,7 +34,7 @@ a dependency between two linkable mobjects.
 		super.parent = newValue
 	}
 
-	positionInLinkMap(): vertex {
+	positionInBoard(): vertex {
 	// used e. g. for snapping
 		return this.midpoint
 	}

@@ -16,9 +16,8 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let board = new Board({
-	compactAnchor: [200, 200],
-	outputNames: ['a'],
-	inputNames: ['oihof', 'b', 'c', 'd', 'e']
+let box = new NumberListBox({
+	anchor: [200, 200],
 })
-paper.addToContent(board)
+paper.addToContent(box)
+

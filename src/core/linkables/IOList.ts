@@ -83,7 +83,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	createOutlet(name: string) {
 		let outlet = new LinkOutlet({
 			name: name,
-			editable: this.editable
+			editable: this.editable,
+			ioList: this
 		})
 		this.add(outlet)
 		this.linkOutlets.push(outlet)
@@ -139,6 +140,14 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		this.linkOutlets[index].update({
 			name: newName
 		})
+	}
+
+	allHooks(): Array<LinkHook> {
+		let ret: Array<LinkHook> = []
+		for (let outlet of this.linkOutlets) {
+			ret = ret.concat(outlet.linkHooks)
+		}
+		return ret
 	}
 
 }
