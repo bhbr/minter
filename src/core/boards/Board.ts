@@ -597,7 +597,6 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
-
 		this.expandedInputList.view.show()
 		this.expandedOutputList.view.show()
 	}
@@ -679,8 +678,8 @@ The content children can also be dragged and panned.
 		// 	ed.editName()
 		// } else if (h.constructor.name === 'EditableLinkHook') {
 		// 	// drag a link onto a plus button
+		this.links.push(this.openLink)
 		this.createNewDependency()
-		// 	this.links.push(this.openLink)
 		// 	let ed = h as EditableLinkHook
 		// 	ed.editName()
 		// } else {
@@ -720,8 +719,6 @@ The content children can also be dragged and panned.
 	if (this.openBullet == this.openLink.endBullet) {
 			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInBoard())
 			let hook2 = this.hookAtLocation(this.openBullet.positionInBoard())
-			log(hook1)
-			log(hook2)
 			if (hook1.outlet.kind == 'output' && hook2.outlet.kind == 'input') {
 				this.createNewDependencyBetweenHooks(hook1, hook2)
 			} else if (hook1.outlet.kind == 'input' && hook2.outlet.kind == 'output') {

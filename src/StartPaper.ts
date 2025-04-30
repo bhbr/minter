@@ -34,8 +34,5 @@ let sum = new AddBox({
 })
 paper.addToContent(sum)
 
-
-log(box.inputList.linkOutlets[0].ioList)
-
 box.onTap = (e) => { box.update({ value: [1, 2, 3] }) }
 
