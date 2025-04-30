@@ -6,6 +6,8 @@ import { OUTLET_HORIZONTAL_SPACING } from './constants'
 // import { EditableLinkHook } from './EditableLinkHook'
  import { Board } from 'core/boards/Board'
 import { LinkOutlet } from 'core/linkables/LinkOutlet'
+import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class ExpandedBoardIOList extends IOList {
 
@@ -32,6 +34,13 @@ export class ExpandedBoardIOList extends IOList {
 		super.parent = newValue
 	}
 
+	createOutlet(name: string) {
+		super.createOutlet(name)
+		this.linkOutlets[this.linkOutlets.length - 1].label.update({
+			backgroundColor: Color.gray(0.5)
+		})
+	}
+
 	positionOutlet(outlet: LinkOutlet, index: number) {
 		outlet.update({
 			anchor: [HOOK_INSET_X + OUTLET_HORIZONTAL_SPACING * index, HOOK_INSET_Y]
@@ -54,10 +63,6 @@ export class ExpandedBoardIOList extends IOList {
 // 		return this.view.frame.height
 // 	}
 
-// 	setup() {
-// 		super.setup()
-// 		this.createNewHook(true)
-// 	}
 
 // 	createNewHook(empty: boolean = false) {
 // 		let hook = new EditableLinkHook({
