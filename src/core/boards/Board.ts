@@ -680,16 +680,10 @@ The content children can also be dragged and panned.
 		// 	// drag a link onto a plus button
 		this.links.push(this.openLink)
 		this.createNewDependency()
-		// 	let ed = h as EditableLinkHook
-		// 	ed.editName()
-		// } else {
-		// 	this.createNewDependency()
-		// 	this.links.push(this.openLink)
-		// }
-		// this.openLink = null
-		// this.openHook = null
-		// this.openBullet = null
-		// this.compatibleHooks = []
+		this.openLink = null
+		this.openHook = null
+		this.openBullet = null
+		this.compatibleHooks = []
 	}
 
 	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {
@@ -735,6 +729,7 @@ The content children can also be dragged and panned.
 		)
 		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.outlet.addHook()
 		startHook.outlet.ioList.mobject.update()
 	}
 
