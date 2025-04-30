@@ -665,7 +665,9 @@ The content children can also be dragged and panned.
 	endLinking(e: ScreenEvent) {
 		let h = this.compatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null) {
-			this.remove(this.openLink)
+			if (this.openLink) {
+				this.remove(this.openLink)
+			}
 			this.openLink = null
 			this.openHook = null
 			this.openBullet = null
