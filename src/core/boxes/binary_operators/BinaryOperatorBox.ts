@@ -34,8 +34,13 @@ export class BinaryOperatorBox extends Linkable {
 			operand2: 0,
 			valueType: 'number',
 			valueBox: new NumberBox(),
-			inputNames: ['operand1', 'operand2'],
-			outputNames: ['result']
+			inputProperties: [
+				{ name: 'operand1', type: 'number' },
+				{ name: 'operand2', type: 'number' }
+			],
+			outputProperties: [
+				{ name: 'result', type: 'number' }
+			]
 		}
 	}
 

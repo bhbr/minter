@@ -17,8 +17,12 @@ export class ValueBox extends Linkable {
 			}),
 			frameWidth: 80,
 			frameHeight: 40,
-			inputNames: ['value'],
-			outputNames: ['value'],
+			inputProperties: [
+				{ name: 'value', type: 'any' }
+			],
+			outputProperties: [
+				{ name: 'value', type: 'any' }
+			],
 			strokeWidth: 0.0,
 			value: 1
 		}

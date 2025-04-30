@@ -52,8 +52,19 @@ export class CoinRow extends Linkable implements Playable {
 			}),
 			nbHeadsHistory: [],
 			nbTailsHistory: [],
-			inputNames: ['tailsProbability', 'nbCoins', 'headsColor', 'tailsColor'],
-			outputNames: ['nbHeads', 'nbTails', 'nbFlips', 'nbHeadsHistory', 'nbTailsHistory'],
+			inputProperties: [
+				{ name: 'tailsProbability', type: 'number' },
+				{ name: 'nbCoins', type: 'number' },
+				{ name: 'headsColor', type: 'Color' },
+				{ name: 'tailsColor', type: 'Color' }
+			],
+			outputProperties: [
+				{ name: 'nbHeads', type: 'number' },
+				{ name: 'nbTails', type: 'number' },
+				{ name: 'nbFlips', type: 'number' },
+				{ name: 'nbHeadsHistory', type: 'Array<number>' },
+				{ name: 'nbTailsHistory', type: 'Array<number>' }
+			],
 			frameWidth: 300,
 			frameHeight: 100
 		}

@@ -18,9 +18,21 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let board = new Board({
-	compactAnchor: [200, 200],
-	inputNames: ['a', 'b'],
-	outputNames: ['c', 'd'],
+let box = new NumberListBox({
+	anchor: [200, 200],
+	value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 })
-paper.addToContent(board)
+paper.addToContent(box)
+
+let avg = new AverageBox({
+	anchor: [400, 200]
+})
+paper.addToContent(avg)
+
+let sum = new AddBox({
+	anchor: [400, 400]
+})
+paper.addToContent(sum)
+
+box.onTap = (e) => { box.update({ value: [1, 2, 3] }) }
+

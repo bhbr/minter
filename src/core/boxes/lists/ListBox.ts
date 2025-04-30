@@ -18,7 +18,13 @@ export class ListBox extends ValueBox {
 			scroll: new Scroll(),
 			frameHeight: 200,
 			strokeWidth: 0.0,
-			value: []
+			value: [],
+			inputProperties: [
+				{ name: 'value', type: 'Array<any>' }
+			],
+			outputProperties: [
+				{ name: 'value', type: 'Array<any>' }
+			]
 		}
 	}
 

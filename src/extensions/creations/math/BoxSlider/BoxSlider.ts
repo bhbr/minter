@@ -37,8 +37,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	defaults(): object {
 		return {
-			inputNames: [],
-			outputNames: ['value'],
+			inputProperties: [],
+			outputProperties: [
+				{ name: 'value', type: 'number' }
+			],
 			outerBar: new Rectangle({
 				fillColor: Color.black(),
 				fillOpacity: 1,
@@ -68,7 +70,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	mutabilities(): object {
 		return {
-			inputNames: 'never',
+			inputProperties: 'never',
 			outputNames: 'never',
 			outerBar: 'never',
 			filledBar: 'never',

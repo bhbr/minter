@@ -17,7 +17,13 @@ export class NumberBox extends ValueBox {
 	defaults(): object {
 		return {
 			value: 1,
-			valueLabel: new TextLabel()
+			valueLabel: new TextLabel(),
+			inputProperties: [
+				{ name: 'value', type: 'number' }
+			],
+			outputProperties: [
+				{ name: 'value', type: 'number' }
+			]
 		}
 	}
 

@@ -13,8 +13,13 @@ export class Wavy extends CindyCanvas {
 	defaults(): object {
 		return {
 			sourceYPosition: 0.2,
-			inputNames: ['wavelength', 'frequency', 'nbSources', 'color'],
-			outputNames: [],
+			inputProperties: [
+				{ name: 'wavelength', type: 'number' },
+				{ name: 'frequency', type: 'number' },
+				{ name: 'nbSources', type: 'number' },
+				{ name: 'color', type: 'Color' }
+			],
+			outputProperties: [],
 			wavelength: 0.25,
 			frequency: 0,
 			nbSources: 1,
@@ -25,8 +30,8 @@ export class Wavy extends CindyCanvas {
 	mutabilities(): object {
 		return {
 			sourceYPosition: 'on_init',
-			inputNames: 'in_subclass',
-			outputNames: 'in_subclass'
+			inputProperties: 'in_subclass',
+			outputProperties: 'in_subclass'
 		}
 	}
 

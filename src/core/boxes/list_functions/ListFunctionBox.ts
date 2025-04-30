@@ -10,7 +10,10 @@ export class ListFunctionBox extends FunctionBox {
 
 	defaults(): object {
 		return {
-			argument: []
+			argument: [],
+			inputProperties: [
+				{ name: 'argument', type: 'Array<number>' }
+			]
 		}
 	}
 }
@@ -22,7 +25,10 @@ export class SumBox extends ListFunctionBox {
 	defaults(): object {
 		return {
 			functionName: 'sum',
-			valueBox: new NumberBox()
+			valueBox: new NumberBox(),
+			outputProperties: [
+				{ name: 'value', type: 'number' }
+			]
 		}
 	}
 
@@ -44,7 +50,10 @@ export class AverageBox extends ListFunctionBox {
 	defaults(): object {
 		return {
 			functionName: 'avg',
-			valueBox: new NumberBox()
+			valueBox: new NumberBox(),
+			outputProperties: [
+				{ name: 'value', type: 'number' }
+			]
 		}
 	}
 
@@ -66,7 +75,10 @@ export class CumSumBox extends ListFunctionBox {
 	defaults(): object {
 		return {
 			functionName: 'cumsum',
-			valueBox: new NumberListBox()
+			valueBox: new NumberListBox(),
+			outputProperties: [
+				{ name: 'value', type: 'Array<number>' }
+			]
 		}
 	}
 
@@ -88,7 +100,10 @@ export class CumAverageBox extends ListFunctionBox {
 	defaults(): object {
 		return {
 			functionName: 'cumavg',
-			valueBox: new NumberListBox()
+			valueBox: new NumberListBox(),
+			outputProperties: [
+				{ name: 'value', type: 'Array<number>' }
+			]
 		}
 	}
 

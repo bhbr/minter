@@ -18,7 +18,12 @@ export class WheelColorSample extends ColorSample {
 	defaults(): object {
 		return {
 			alpha: 1,
-			outputNames: ['color', 'red', 'green', 'blue'],
+			outputProperties: [
+				{ name: 'color', type: 'Color' },
+				{ name: 'red', type: 'number' },
+				{ name: 'green', type: 'number' },
+				{ name: 'blue', type: 'number' }
+			],
 			touchStartLocation: null,
 			saturationShiftTime: null,
 			timeoutID: null,

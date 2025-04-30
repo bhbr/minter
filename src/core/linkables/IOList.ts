@@ -9,6 +9,7 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 import { log } from 'core/functions/logging'
 import { clear } from 'core/functions/arrays'
+import { IOProperty } from './Linkable'
 
 export class IOList extends RoundedRectangle {
 /*
@@ -16,7 +17,7 @@ A visual list of available input or output variables of a linkable mobject.
 It is displayed on top of or below the mobject when the 'link' toggle button is held down.
 */
 
-	linkNames: Array<string>
+	outletProperties: Array<IOProperty>
 	linkOutlets: Array<LinkOutlet>
 	mobject?: Linkable
 	kind: 'input' | 'output'
@@ -26,7 +27,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		return {
 			linkOutlets: [],
 			mobject: null,
-			linkNames: [],
+			outletProperties: [],
 			cornerRadius: 20,
 			width: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
@@ -63,9 +64,9 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 	getHeight(): number {
 	// calculate the height from the number of outputs
-		if (this.linkNames == undefined) { return 0 }
-		if (this.linkNames.length == 0) { return 0 }
-		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * this.linkNames.length }
+		if (this.outletProperties == undefined) { return 0 }
+		if (this.outletProperties.length == 0) { return 0 }
+		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * this.outletProperties.length }
 	}
 
 	createOutlets() {
@@ -74,18 +75,19 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			this.remove(outlet)
 		}
 		clear(this.linkOutlets)
-		for (var i = 0; i < this.linkNames.length; i++) {
-			let name = this.linkNames[i]
-			this.createOutlet(name)
+		for (var i = 0; i < this.outletProperties.length; i++) {
+			let prop = this.outletProperties[i]
+			this.createOutlet(prop)
 		}
 	}
 
-	createOutlet(name: string) {
+
+	createOutlet(prop: IOProperty) {
 		let outlet = new LinkOutlet({
-			name: name,
+			name: prop.name,
 			editable: this.editable,
 			ioList: this,
-			type: typeof this.mobject[name]
+			type: prop.type
 		})
 		this.add(outlet)
 		this.linkOutlets.push(outlet)
@@ -112,7 +114,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		if (this.mobject == null) { return }
 		if (this.constructor.name == 'ExpandedBoardInputList') { return }
 
-		if (args['linkNames'] === undefined) { return }
+		if (args['outletProperties'] === undefined) { return }
 
 		this.createOutlets()
 		this.height = this.getHeight()
@@ -134,9 +136,13 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		return vertexOrigin()
 	}
 
+	outletNames(): Array<string> {
+		return this.outletProperties.map((prop) => prop.name)
+	}
+
 	renameProperty(oldName: string, newName: string) {
-		let index = this.linkNames.indexOf(oldName)
-		this.linkNames[index] = newName
+		let index = this.outletNames().indexOf(oldName)
+		this.outletProperties[index].name = newName
 		this.linkOutlets[index].update({
 			name: newName
 		})

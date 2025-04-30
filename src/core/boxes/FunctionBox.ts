@@ -25,8 +25,12 @@ export class FunctionBox extends Linkable {
 			functionLabel: new TextLabel(),
 			functionName: '',
 			argument: 0,
-			inputNames: ['argument'],
-			outputNames: ['result']
+			inputProperties: [
+				{ name: 'argument', type: 'any' }
+			],
+			outputProperties: [
+				{ name: 'result', type: 'any' }
+			]
 		}
 	}
 

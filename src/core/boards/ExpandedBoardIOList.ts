@@ -8,6 +8,7 @@ import { OUTLET_HORIZONTAL_SPACING } from './constants'
 import { LinkOutlet } from 'core/linkables/LinkOutlet'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { IOProperty } from 'core/linkables/Linkable'
 
 export class ExpandedBoardIOList extends IOList {
 
@@ -34,8 +35,8 @@ export class ExpandedBoardIOList extends IOList {
 		super.parent = newValue
 	}
 
-	createOutlet(name: string) {
-		super.createOutlet(name)
+	createOutlet(prop: IOProperty) {
+		super.createOutlet(prop)
 		this.linkOutlets[this.linkOutlets.length - 1].label.update({
 			backgroundColor: Color.gray(0.5)
 		})

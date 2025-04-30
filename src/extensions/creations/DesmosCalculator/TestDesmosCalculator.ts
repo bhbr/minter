@@ -27,8 +27,14 @@ export class TestDesmosCalculator extends DesmosCalculator {
 			b: 1,
 			X: 1,
 			Y: 1,
-			inputNames: ['X', 'b'],
-			outputNames: ['a', 'Y']
+			inputProperties: [
+				{ name: 'X', type: 'number' },
+				{ name: 'b', type: 'number' }
+			],
+			outputProperties: [
+				{ name: 'a', type: 'number' },
+				{ name: 'Y', type: 'number' }
+			]
 		}
 	}
 

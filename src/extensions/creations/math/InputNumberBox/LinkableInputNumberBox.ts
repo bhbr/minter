@@ -6,6 +6,14 @@ export class LinkableInputNumberBox extends LinkableInputBox {
 
 	declare inputBox: InputNumberBox
 
+	defaults(): object {
+		return {
+			outputProperties: [
+				{ name: 'value', type: 'number' }
+			],
+		}
+	}
+
 	get value(): number {
 		return this.inputBox.value
 	}

@@ -149,7 +149,7 @@ The content children can also be dragged and panned.
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
 			mobject: this,
-			linkNames: this.inputNames
+			outletProperties: this.inputProperties
 		})
 		this.add(this.expandedInputList)
 
@@ -158,7 +158,7 @@ The content children can also be dragged and panned.
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
 			mobject: this,
-			linkNames: this.outputNames
+			outletProperties: this.outputProperties
 		})
 		this.add(this.expandedOutputList)
 
@@ -170,12 +170,12 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.view.hide()
 		} else {
 			this.expandStateChange()
-			//this.inputList.view.hide()
+			this.inputList.view.hide()
 			this.outputList.view.hide()
 			this.expandedInputList.view.show()
 			this.expandedOutputList.view.show()
 		}
-//		this.hideLinksOfContent()
+		this.hideLinksOfContent()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -414,7 +414,7 @@ The content children can also be dragged and panned.
 					this.showLinksOfContent()
 				} else { // if (!this.editingLinkName) {
 					this.hideLinksOfContent()
-					// //this.endLinking()
+					//this.endLinking()
 					// if (this.openLink) {
 					// 	this.remove(this.openLink)
 					// }
@@ -695,7 +695,9 @@ The content children can also be dragged and panned.
 
 	areCompatibleHooks(startHook: LinkHook, endHook: LinkHook): boolean {
 		let flag1 = (startHook.outlet.kind !== endHook.outlet.kind)
-		let flag2 = (startHook.outlet.type === endHook.outlet.type)
+		let flag2 = (startHook.outlet.type === endHook.outlet.type
+					|| startHook.outlet.type === 'any'
+					|| endHook.outlet.type === 'any')
 		let flag3 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
 		let flag4 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
 		return flag1 && flag2 && flag3 && flag4

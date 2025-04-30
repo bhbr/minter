@@ -30,8 +30,12 @@ export class CoinFlipper extends Linkable implements Playable {
 			tailsCounts: [],
 			tailsCountLabels: [],
 			flipButton: new SimpleButton({ text: 'flip' }),
-			inputNames: ['tailsProbability'],
-			outputNames: ['tailsCounts'],
+			inputProperties: [
+				{ name: 'tailsProbability', type: 'number' }
+			],
+			outputProperties: [
+				{ name: 'tailsCounts', type: 'Array<number>' }
+			],
 			playState: 'stop'
 		}
 	}

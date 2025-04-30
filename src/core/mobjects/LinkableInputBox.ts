@@ -22,8 +22,10 @@ export class LinkableInputBox extends Linkable {
 			inputBox: new InputBox(),
 			frameWidth: 80,
 			frameHeight: 40,
-			inputNames: [],
-			outputNames: ['value'],
+			inputProperties: [],
+			outputProperties: [
+				{ name: 'value', type: 'any' }
+			],
 			strokeWidth: 0.0,
 			screenEventHandler: ScreenEventHandler.Self
 		}

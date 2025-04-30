@@ -6,6 +6,14 @@ export class LinkableInputTextBox extends LinkableInputBox {
 
 	declare inputBox: InputTextBox
 
+	defaults(): object {
+		return {
+			outputProperties: [
+				{ name: 'value', type: 'string' }
+			],
+		}
+	}
+
 	get value(): string {
 		return this.inputBox.value
 	}

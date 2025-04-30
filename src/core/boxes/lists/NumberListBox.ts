@@ -6,4 +6,12 @@ export class NumberListBox extends ListBox {
 
 	declare value: Array<number>
 
+	defaults(): object {
+		return {
+			outputProperties: [
+				{ name: 'value', type: 'Array<number>' }
+			]
+		}
+	}
+
 }
