@@ -12,7 +12,7 @@ export class LinkHook extends Circle {
 
 	mobject?: Linkable
 	name: string
-	outlet?: LinkOutlet
+	outlet?: LinkOutlet // TODO: redirect to parent
 
 	defaults(): object {
 		return {

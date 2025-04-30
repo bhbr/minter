@@ -665,7 +665,6 @@ The content children can also be dragged and panned.
 
 	endLinking(e: ScreenEvent) {
 		let h = this.compatibleHookAtLocation(this.sensor.localEventVertex(e))
-		log(h)
 		if (h === null) {
 			this.remove(this.openLink)
 			this.openLink = null
@@ -680,7 +679,7 @@ The content children can also be dragged and panned.
 		// 	ed.editName()
 		// } else if (h.constructor.name === 'EditableLinkHook') {
 		// 	// drag a link onto a plus button
-		// 	this.createNewDependency()
+		this.createNewDependency()
 		// 	this.links.push(this.openLink)
 		// 	let ed = h as EditableLinkHook
 		// 	ed.editName()
@@ -713,28 +712,34 @@ The content children can also be dragged and panned.
 	// 	}
 	}
 
-	// createNewDependency() {
+	createNewDependency() {
 	// 	if (this.openBullet == this.openLink.startBullet) {
 	// 		let startHook = this.hookAtLocation(this.openBullet.positionInBoard())
 	// 		let endHook = this.hookAtLocation(this.openLink.endBullet.positionInBoard())
 	// 		this.createNewDependencyBetweenHooks(startHook, endHook)
-	// 	} else if (this.openBullet == this.openLink.endBullet) {
-	// 		let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInBoard())
-	// 		let hook2 = this.hookAtLocation(this.openBullet.positionInBoard())
-	// 		if (hook1.type == 'output' && hook2.type == 'input') {
-	// 			this.createNewDependencyBetweenHooks(hook1, hook2)
-	// 		} else if (hook1.type == 'input' && hook2.type == 'output') {
-	// 			this.createNewDependencyBetweenHooks(hook2, hook1)
-	// 		}
-	// 	}
-	// }
+	if (this.openBullet == this.openLink.endBullet) {
+			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInBoard())
+			let hook2 = this.hookAtLocation(this.openBullet.positionInBoard())
+			log(hook1)
+			log(hook2)
+			if (hook1.outlet.kind == 'output' && hook2.outlet.kind == 'input') {
+				this.createNewDependencyBetweenHooks(hook1, hook2)
+			} else if (hook1.outlet.kind == 'input' && hook2.outlet.kind == 'output') {
+				this.createNewDependencyBetweenHooks(hook2, hook1)
+			}
+	 	}
+	}
 
-	// createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
-	// 	startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
-	// 	startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
-	// 	endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
-	// 	startHook.mobject.update()
-	// }
+	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
+		startHook.outlet.ioList.mobject.addDependency(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
+		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.outlet.ioList.mobject.update()
+	}
 
 	// getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
 	// 	if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {

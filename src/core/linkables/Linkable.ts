@@ -62,7 +62,7 @@ which can be linked to such-exposed variables of other mobjects.
 			editable: this.linksEditable
 		})
 		this.add(this.inputList)
-		//this.inputList.view.hide()
+		this.inputList.view.hide()
 		this.outputList.update({
 			mobject: this,
 			linkNames: this.outputNames,
@@ -86,7 +86,6 @@ which can be linked to such-exposed variables of other mobjects.
 
 	inputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available input variables
-	// TODO: filter by kind
 		let arr: Array<LinkHook> = []
 		for (let inputName of this.inputNames) {
 			arr.push(this.inputList.hookNamed(inputName))
@@ -96,7 +95,6 @@ which can be linked to such-exposed variables of other mobjects.
 
 	outputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available output variables
-	// TODO: filter by kind
 		let arr: Array<LinkHook> = []
 		for (let outputName of this.outputNames) {
 			arr.push(this.outputList.hookNamed(outputName))

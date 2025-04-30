@@ -20,7 +20,7 @@ export const paper = new StartPaper()
 
 let box = new NumberListBox({
 	anchor: [200, 200],
-	value: [1, 2, 3, 4]
+	value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 })
 paper.addToContent(box)
 
@@ -33,3 +33,9 @@ let sum = new AddBox({
 	anchor: [400, 400]
 })
 paper.addToContent(sum)
+
+
+log(box.inputList.linkOutlets[0].ioList)
+
+box.onTap = (e) => { box.update({ value: [1, 2, 3] }) }
+
