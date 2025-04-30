@@ -86,7 +86,7 @@ which can be linked to such-exposed variables of other mobjects.
 
 	inputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available input variables
-	// TODO: filter by type
+	// TODO: filter by kind
 		let arr: Array<LinkHook> = []
 		for (let inputName of this.inputNames) {
 			arr.push(this.inputList.hookNamed(inputName))
@@ -96,7 +96,7 @@ which can be linked to such-exposed variables of other mobjects.
 
 	outputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available output variables
-	// TODO: filter by type
+	// TODO: filter by kind
 		let arr: Array<LinkHook> = []
 		for (let outputName of this.outputNames) {
 			arr.push(this.outputList.hookNamed(outputName))
@@ -104,9 +104,9 @@ which can be linked to such-exposed variables of other mobjects.
 		return arr
 	}
 
-	renameLinkableProperty(type: 'input' | 'output', oldName: string, newName: string) {
-		let propertyNames = (type == 'input') ? this.inputNames : this.outputNames
-		let list: IOList = (type == 'input') ? this.inputList : this.outputList
+	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
+		let propertyNames = (kind == 'input') ? this.inputNames : this.outputNames
+		let list: IOList = (kind == 'input') ? this.inputList : this.outputList
 		list.renameProperty(oldName, newName)
 		// TODO: update dependencies
 	}

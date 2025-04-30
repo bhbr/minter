@@ -615,9 +615,9 @@ The content children can also be dragged and panned.
 		this.expandedOutputList.view.hide()
 	}
 
-	renameLinkableProperty(type: 'input' | 'output', oldName: string, newName: string) {
-		super.renameLinkableProperty(type, oldName, newName)
-		let expandedList = (type == 'input') ? this.expandedInputList : this.expandedOutputList
+	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
+		super.renameLinkableProperty(kind, oldName, newName)
+		let expandedList = (kind == 'input') ? this.expandedInputList : this.expandedOutputList
 		expandedList.renameProperty(oldName, newName)	
 	}
 
@@ -654,7 +654,7 @@ The content children can also be dragged and panned.
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
 		var p = this.sensor.localEventVertex(e)
-		let endHook = this.hookAtLocation(p)
+		let endHook = this.compatibleHookAtLocation(p)
 		if (endHook !== null) {
 			p = endHook.parent.view.frame.transformLocalPoint(endHook.midpoint, this.view.frame)
 		}
@@ -695,7 +695,16 @@ The content children can also be dragged and panned.
 	}
 
 	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {
-		return this.allHooks() // for now
+		return this.allHooks().filter((endHook) => this.areCompatibleHooks(startHook, endHook))
+		// TODO: and endHook is not yet occupied!
+	}
+
+	areCompatibleHooks(startHook: LinkHook, endHook: LinkHook): boolean {
+		let flag1 = (startHook.outlet.kind !== endHook.outlet.kind)
+		let flag2 = (startHook.outlet.type === endHook.outlet.type)
+		let flag3 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
+		let flag4 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
+		return flag1 && flag2 && flag3 && flag4
 	}
 
 	updateLinks() {

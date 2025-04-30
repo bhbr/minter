@@ -19,7 +19,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	linkNames: Array<string>
 	linkOutlets: Array<LinkOutlet>
 	mobject?: Linkable
-	type: 'input' | 'output'
+	kind: 'input' | 'output'
 	editable: boolean
 
 	defaults(): object {
@@ -42,7 +42,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			fillColor: 'never',
 			fillOpacity: 'never',
 			strokeWidth: 'never',
-			type: 'in_subclass',
+			kind: 'in_subclass',
 			editable: 'on_update'
 		}
 	}
@@ -84,12 +84,12 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		let outlet = new LinkOutlet({
 			name: name,
 			editable: this.editable,
-			ioList: this
+			ioList: this,
+			type: typeof this.mobject[name]
 		})
 		this.add(outlet)
 		this.linkOutlets.push(outlet)
 		this.positionOutlet(outlet, this.linkOutlets.length - 1)
-
 	}
 
 	positionOutlet(outlet: LinkOutlet, index: number) {

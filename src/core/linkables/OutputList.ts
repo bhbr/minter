@@ -7,7 +7,7 @@ export class OutputList extends IOList {
 
 	defaults(): object {
 		return {
-			type: 'output'
+			kind: 'output'
 		}
 	}
 

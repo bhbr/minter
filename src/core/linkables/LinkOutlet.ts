@@ -7,11 +7,13 @@ import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { IOList } from './IOList'
+import { InputList } from './InputList'
 import { log } from 'core/functions/logging'
 
 export class LinkOutlet extends MGroup {
 
 	name: string
+	type: string
 	label: TextLabel
 	inputBox?: InputTextBox
 	linkHooks: Array<LinkHook>
@@ -21,6 +23,7 @@ export class LinkOutlet extends MGroup {
 	defaults(): object {
 		return {
 			name: '',
+			type: 'number',
 			label: new TextLabel({
 				frameWidth: 100,
 				frameHeight: 25
@@ -38,7 +41,8 @@ export class LinkOutlet extends MGroup {
 			inputBox: 'on_update',
 			linkHooks: 'never',
 			editable: 'on_init',
-			ioList: 'on_init'
+			ioList: 'on_init',
+			type: 'on_init'
 		}
 	}
 
@@ -85,7 +89,9 @@ export class LinkOutlet extends MGroup {
 		this.linkHooks.push(newHook)
 	}
 
-
+	get kind(): 'input' | 'output' {
+		return this.ioList.kind
+	}
 
 	removeHook() {
 		let lastHook = this.linkHooks.pop()

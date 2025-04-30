@@ -12,13 +12,12 @@ export class LinkHook extends Circle {
 
 	mobject?: Linkable
 	name: string
-	type: 'input' | 'output'
 	outlet?: LinkOutlet
 
 	defaults(): object {
 		return {
 			name: '',
-			type: 'input',
+			kind: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white(),
@@ -33,7 +32,7 @@ export class LinkHook extends Circle {
 			fillOpacity: 'never',
 			strokeColor: 'never',
 			name: 'always',
-			type: 'on_init',
+			kind: 'on_init',
 			outlet: 'on_init'
 		}
 	}
