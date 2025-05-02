@@ -11,38 +11,37 @@ import { AverageBox } from './core/boxes_new/AverageBox'
 import { CumSumBox } from './core/boxes_new/CumSumBox'
 import { CumAverageBox } from './core/boxes_new/CumAverageBox'
 
-export class StartPaper extends DemoPaper { }
+export class StartPaper extends CoinFlipPaper { }
 
 let TESTING = true
 
 if (TESTING) { AllTests.run() }
 
-export const paper = new StartPaper()
+export const paper = new CoinFlipPaper()
 
 let lnb = new LinkableNumberListBox({
-	anchor: [100, 100],
-	value: [4, 5, 6]
+	anchor: [100, 100]
 })
 paper.addToContent(lnb)
 
-let sb = new SumBox({
-	anchor: [200, 100]
-})
-paper.addToContent(sb)
+// let sb = new SumBox({
+// 	anchor: [200, 100]
+// })
+// paper.addToContent(sb)
 
-let ab = new AverageBox({
-	anchor: [400, 100]
-})
-paper.addToContent(ab)
+// let ab = new AverageBox({
+// 	anchor: [400, 100]
+// })
+// paper.addToContent(ab)
 
-let csb = new CumSumBox({
-	anchor: [600, 100]
-})
-paper.addToContent(csb)
+// let csb = new CumSumBox({
+// 	anchor: [600, 100]
+// })
+// paper.addToContent(csb)
 
-let cab = new CumAverageBox({
-	anchor: [800, 100]
-})
-paper.addToContent(cab)
+// let cab = new CumAverageBox({
+// 	anchor: [800, 100]
+// })
+// paper.addToContent(cab)
 
 

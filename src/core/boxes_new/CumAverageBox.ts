@@ -1,6 +1,7 @@
 
 import { NumberListValuedFunctionBox } from './NumberListValuedFunctionBox'
 import { numberArrayCumAverage } from 'core/functions/numberArray'
+import { DraggingCreator } from 'core/creators/DraggingCreator'
 
 export class CumAverageBox extends NumberListValuedFunctionBox {
 	
@@ -20,4 +21,12 @@ export class CumAverageBox extends NumberListValuedFunctionBox {
 		return numberArrayCumAverage(this.argument) 
 	}
 
+}
+
+
+export class CumAverageBoxCreator extends DraggingCreator {
+	declare creation: CumAverageBox
+	createMobject(): CumAverageBox {
+		return new CumAverageBox()
+	}
 }

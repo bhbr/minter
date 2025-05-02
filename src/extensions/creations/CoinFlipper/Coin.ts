@@ -42,15 +42,4 @@ export class Coin extends Circle {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 }

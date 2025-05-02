@@ -113,6 +113,7 @@ export class Sidebar extends Mobject {
 				return new buttonClass()
 			}
 		}
+		throw `Button class ${buttonName} not available!`
 		return null
 	}
 

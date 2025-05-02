@@ -3,6 +3,8 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Scroll } from './Scroll'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
+import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { vertex } from 'core/functions/vertex'
 
 export class NumberListBox extends Linkable {
 	
@@ -13,7 +15,8 @@ export class NumberListBox extends Linkable {
 	defaults(): object {
 		return {
 			background: new Rectangle({
-				fillColor: Color.black()
+				fillColor: Color.black(),
+				fillOpacity: 1
 			}),
 			scroll: new Scroll(),
 			frameWidth: 80,
@@ -60,12 +63,32 @@ export class LinkableNumberListBox extends NumberListBox {
 				{ name: 'value', type: 'Array<number>' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'Array<number>' }
+				{ name: 'value', type: 'Array<number>' },
+				{ name: 'length', type: 'number' },
 			]
 		}
+
 	}
 
+	length(): number {
+		return this.list.length
+	}
+
+}
 
 
+export class NumberListBoxCreator extends DraggingCreator {
+	
+	declare creation: LinkableNumberListBox
 
+	createMobject() {
+		return new LinkableNumberListBox({
+			anchor: this.getStartPoint()
+		})
+	}
+
+	updateFromTip(q: vertex, redraw: boolean = true) {
+		super.updateFromTip(q, redraw)
+		this.creation.hideLinks()
+	}
 }

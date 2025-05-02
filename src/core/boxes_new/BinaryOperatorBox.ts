@@ -1,7 +1,6 @@
 
-import { ValueBox } from '../ValueBox'
-import { NumberBox } from '../NumberBox/NumberBox'
-import { NumberListBox } from '../lists/NumberListBox'
+import { NumberBox } from './NumberBox'
+import { NumberListBox } from './NumberListBox'
 import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
@@ -18,7 +17,7 @@ export class BinaryOperatorBox extends Linkable {
 	operatorLabel: TextLabel
 	operatorDict: object
 	valueType: 'number' | 'Array<number>'
-	valueBox: ValueBox
+	valueBox: NumberBox | NumberListBox
 
 	defaults(): object {
 		return {

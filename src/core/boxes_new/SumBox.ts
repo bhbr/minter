@@ -1,6 +1,7 @@
 
 import { NumberValuedFunctionBox } from './NumberValuedFunctionBox'
 import { numberArraySum } from 'core/functions/numberArray'
+import { DraggingCreator } from 'core/creators/DraggingCreator'
 
 export class SumBox extends NumberValuedFunctionBox {
 	
@@ -20,4 +21,12 @@ export class SumBox extends NumberValuedFunctionBox {
 		return numberArraySum(this.argument) 
 	}
 
+}
+
+
+export class SumBoxCreator extends DraggingCreator {
+	declare creation: SumBox
+	createMobject(): SumBox {
+		return new SumBox()
+	}
 }

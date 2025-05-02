@@ -29,7 +29,7 @@ export class PlayableCoin extends Linkable implements Playable {
 				text: 'reset'
 			}),
 			valueHistory: [],
-			outputNames: [
+			outputProperties: [
 				{ name: 'value', type: 'number' },
 				{ name: 'valueHistory', type: 'Array<number>' },
 				{ name: 'nbFlips', type: 'number' },

@@ -3,6 +3,8 @@ import { Linkable } from 'core/linkables/Linkable'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
+import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { vertex } from 'core/functions/vertex'
 
 export class NumberBox extends Linkable {
 	
@@ -77,8 +79,20 @@ export class LinkableNumberBox extends NumberBox {
 			]
 		}
 	}
+}
 
+export class NumberBoxCreator extends DraggingCreator {
+	
+	declare creation: LinkableNumberBox
 
+	createMobject() {
+		return new LinkableNumberBox({
+			anchor: this.getStartPoint()
+		})
+	}
 
-
+	updateFromTip(q: vertex, redraw: boolean = true) {
+		super.updateFromTip(q, redraw)
+		this.creation.hideLinks()
+	}
 }
