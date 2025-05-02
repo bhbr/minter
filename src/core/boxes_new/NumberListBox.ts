@@ -50,7 +50,7 @@ export class NumberListBox extends Linkable {
 			height: this.view.frame.height,
 			list: this.list
 		}, redraw)}
-
+		if (redraw) { this.view.redraw() }
 }
 
 export class LinkableNumberListBox extends NumberListBox {

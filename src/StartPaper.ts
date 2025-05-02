@@ -6,6 +6,7 @@ import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
 import { NumberListBox, LinkableNumberListBox } from './core/boxes_new/NumberListBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
+import { SumBox } from './core/boxes_new/SumBox'
 
 export class StartPaper extends DemoPaper { }
 
@@ -15,24 +16,16 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let nb = new NumberListBox({
-	anchor: [100, 100],
-	value: [1, 2, 3]
-})
-
-paper.addToContent(nb)
-
-nb.update({
-	anchor: [100, 300]
-})
-
 let lnb = new LinkableNumberListBox({
-	anchor: [300, 100],
+	anchor: [100, 100],
 	value: [4, 5, 6]
 })
 paper.addToContent(lnb)
 
-
+let sb = new SumBox({
+	anchor: [300, 100]
+})
+paper.addToContent(sb)
 
 
 
