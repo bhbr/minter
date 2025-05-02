@@ -121,11 +121,11 @@ export class LinkOutlet extends MGroup {
 		if (newName !== undefined) {
 			this.label.update({
 				text: newName
-			})
+			}, redraw)
 			if (this.editable) {
 				this.inputBox.update({
 					value: newName
-				})
+				}, redraw)
 			}
 		}
 	}

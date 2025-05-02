@@ -29,8 +29,9 @@ export class FunctionBox extends Linkable {
 				{ name: 'argument', type: 'any' }
 			],
 			outputProperties: [
-				{ name: 'result', type: 'any' }
-			]
+				{ name: 'value', type: 'any' }
+			],
+			drawBorder: true
 		}
 	}
 
@@ -63,8 +64,9 @@ export class FunctionBox extends Linkable {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, false)
+		super.update(args, redraw)
 		this.valueBox.update({ value: this.result() }, redraw)
+		if (redraw) { this.view.redraw() }
 	}
 
 }

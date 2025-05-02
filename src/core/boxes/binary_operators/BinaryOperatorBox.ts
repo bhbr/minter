@@ -138,7 +138,7 @@ export class BinaryOperatorBox extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 		let oldOp1Type = typeof this.operand1
 		let oldOp2Type = typeof this.operand2
-		super.update(args, false)
+		super.update(args, redraw)
 		if (typeof this.operand1 != oldOp1Type || typeof this.operand2 != oldOp2Type) {
 			if (typeof this.operand1 == 'number' && typeof this.operand2 == 'number') {
 				this.setValueTypeTo('number')

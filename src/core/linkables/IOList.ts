@@ -59,7 +59,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	setup() {
 		super.setup()
 		this.createOutlets()
-		this.update({ height: this.getHeight() }, false)
+		this.update({ height: this.getHeight() })
 	}
 
 	getHeight(): number {

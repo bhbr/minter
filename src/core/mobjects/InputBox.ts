@@ -21,7 +21,8 @@ export class InputBox extends Mobject {
 			frameHeight: 40,
 			strokeWidth: 0.0,
 			screenEventHandler: ScreenEventHandler.Self,
-			value: 0
+			value: 0,
+			backgroundColor: Color.black()
 		}
 	}
 
@@ -50,11 +51,11 @@ export class InputBox extends Mobject {
 	setup() {
 		super.setup()
 		this.inputElement.setAttribute('type', 'text')
-		this.inputElement.style.width = '90%'
+		this.inputElement.style.width = '80%'
 		this.inputElement.style.padding = '3px 3px'
 		this.inputElement.style.color = 'white'
 		this.inputElement.style.backgroundColor = 'black'
-		this.inputElement.style.textAlign = 'left'
+		this.inputElement.style.textAlign = 'center'
 		this.inputElement.style.verticalAlign = 'center'
 		this.inputElement.style.fontSize = '16px'
 		this.inputElement.value = this.value

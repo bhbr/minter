@@ -85,9 +85,5 @@ export class ExpandedBoardIOList extends IOList {
 // 		// implemented in subclasses
 // 	}
 
-	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, redraw)
-		
-	}
 
 }

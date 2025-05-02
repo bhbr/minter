@@ -444,7 +444,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	draggingEnabled: boolean
 
-
 	setDragging(flag: boolean) {
 		if (flag) {
 			if (this.draggingEnabled) { return }

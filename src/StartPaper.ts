@@ -4,11 +4,8 @@ import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper'
 import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
-import { NumberListBox } from './core/boxes/lists/NumberListBox'
-import { ListBox } from './core/boxes/lists/ListBox'
-import { Board } from './core/boards/Board'
-import { AverageBox } from './core/boxes/list_functions/ListFunctionBox'
-import { AddBox } from './core/boxes/binary_operators/BinaryOperatorBox'
+import { NumberBox, LinkableNumberBox } from './core/boxes_new/NumberBox'
+import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 
 export class StartPaper extends DemoPaper { }
 
@@ -18,21 +15,26 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let box = new NumberListBox({
-	anchor: [200, 200],
-	value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let nb = new NumberBox({
+	anchor: [100, 100],
+	value: 2
 })
-paper.addToContent(box)
 
-let avg = new AverageBox({
-	anchor: [400, 200]
+paper.addToContent(nb)
+
+nb.update({
+	anchor: [100, 300]
 })
-paper.addToContent(avg)
 
-let sum = new AddBox({
-	anchor: [400, 400]
+let lnb = new LinkableNumberBox({
+	value: 3,
+	anchor: [300, 100]
 })
-paper.addToContent(sum)
+paper.addToContent(lnb)
 
-box.onTap = (e) => { box.update({ value: [1, 2, 3] }) }
+let slider = new BoxSlider({
+	anchor: [500, 100]
+})
+paper.addToContent(slider)
+
 
