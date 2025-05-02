@@ -2,7 +2,7 @@
 import { NumberValuedFunctionBox } from './NumberValuedFunctionBox'
 import { numberArraySum } from 'core/functions/numberArray'
 
-export class SumBox extends NumberValuedFunctionBox {
+export class AverageBox extends NumberValuedFunctionBox {
 	
 	declare argument: Array<number>
 
@@ -15,7 +15,7 @@ export class SumBox extends NumberValuedFunctionBox {
 		}
 	}
 	result(): number {
-		return numberArraySum(this.argument) 
+		return numberArraySum(this.argument) / this.argument.length
 	}
 
 }
