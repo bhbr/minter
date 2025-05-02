@@ -694,19 +694,24 @@ The content children can also be dragged and panned.
 	}
 
 	areCompatibleHooks(startHook: LinkHook, endHook: LinkHook): boolean {
-		let flag1 = (startHook.outlet.kind !== endHook.outlet.kind)
-		let flag2 = (startHook.outlet.type === endHook.outlet.type
-					|| startHook.outlet.type === 'any'
-					|| endHook.outlet.type === 'any')
-		let flag3 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
-		let flag4 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
-		return flag1 && flag2 && flag3 && flag4
+		if (startHook.outlet.kind == 'output' && endHook.outlet.kind == 'input') {
+			let flag1 = (startHook.outlet.type == endHook.outlet.type)
+				|| ((startHook.outlet.type == 'number' || startHook.outlet.type == 'Array<number>')
+					&& endHook.outlet.type == 'number|Array<number>')
+			let flag2 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
+			let flag3 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
+			return flag1 && flag2 && flag3
+		} else if (startHook.outlet.kind == 'input' && endHook.outlet.kind == 'output'){
+			return this.areCompatibleHooks(endHook, startHook)
+		} else {
+			return false
+		}
 	}
 
 	updateLinks() {
-	// 	for (let hook of this.allHooks()) {
-	// 		hook.update() // updates start and end points of links
-	// 	}
+		for (let hook of this.allHooks()) {
+			hook.update() // updates start and end points of links
+		}
 	}
 
 	createNewDependency() {

@@ -4,6 +4,7 @@ import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper'
 import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
+import { LinkableNumberBox } from './core/boxes_new/NumberBox'
 import { NumberListBox, LinkableNumberListBox } from './core/boxes_new/NumberListBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 import { SumBox } from './core/boxes_new/SumBox'
@@ -20,9 +21,16 @@ if (TESTING) { AllTests.run() }
 export const paper = new CoinFlipPaper()
 
 let lnb = new LinkableNumberListBox({
-	anchor: [100, 100]
+	anchor: [100, 100],
+	value: [1, 2, 3, 4]
 })
 paper.addToContent(lnb)
+
+let nb = new LinkableNumberBox({
+	anchor: [300, 100],
+	value: 5
+})
+paper.addToContent(nb)
 
 // let sb = new SumBox({
 // 	anchor: [200, 100]

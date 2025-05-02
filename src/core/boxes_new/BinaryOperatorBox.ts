@@ -5,6 +5,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 type operatorString = "+" | "–" | "&times;" | "/"
 
@@ -34,11 +35,11 @@ export class BinaryOperatorBox extends Linkable {
 			valueType: 'number',
 			valueBox: new NumberBox(),
 			inputProperties: [
-				{ name: 'operand1', type: 'number' },
-				{ name: 'operand2', type: 'number' }
+				{ name: 'operand1', type: 'number|Array<number>' },
+				{ name: 'operand2', type: 'number|Array<number>' }
 			],
 			outputProperties: [
-				{ name: 'result', type: 'number' }
+				{ name: 'result', type: 'number|Array<number>' }
 			]
 		}
 	}
@@ -93,6 +94,9 @@ export class BinaryOperatorBox extends Linkable {
 	}
 
 	compute(a: number | Array<number>, b: number | Array<number>, op: operatorString): number | Array<number> {
+		log('computing')
+		log(a)
+		log(b)
 		if (typeof a == 'number' && typeof b == 'number') {
 			return this.computeNumberAndNumber(a, b, op)
 		} else if (a instanceof Array && typeof b == 'number') {
