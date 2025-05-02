@@ -3,7 +3,6 @@ import { Linkable } from 'core/linkables/Linkable'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class NumberBox extends Linkable {
 	
