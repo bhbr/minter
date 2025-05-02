@@ -3,7 +3,7 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { InputTextBox } from 'core/mobjects/InputTextBox'
 import { LinkHook } from './LinkHook'
 import { MGroup } from 'core/mobjects/MGroup'
-import { HOOK_HORIZONTAL_SPACING } from './constants'
+import { HOOK_HORIZONTAL_SPACING, IO_LIST_WIDTH } from './constants'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { IOList } from './IOList'
@@ -25,7 +25,7 @@ export class LinkOutlet extends MGroup {
 			name: '',
 			type: 'number',
 			label: new TextLabel({
-				frameWidth: 100,
+				frameWidth: IO_LIST_WIDTH / 2,
 				frameHeight: 25
 			}),
 			inputBox: null,
@@ -52,7 +52,7 @@ export class LinkOutlet extends MGroup {
 			text: this.name
 		})
 		this.label.view.update({
-			horizontalAlign: 'left'
+			horizontalAlign: 'right'
 		})
 		this.add(this.label)
 		if (this.editable) {
@@ -80,7 +80,7 @@ export class LinkOutlet extends MGroup {
 		let index = this.linkHooks.length
 		let newHook = new LinkHook({
 			midpoint: [
-				this.label.frameWidth + 15 + HOOK_HORIZONTAL_SPACING * index,
+				this.ioList.frameWidth / 2 + 15 + HOOK_HORIZONTAL_SPACING * index,
 				this.label.frameHeight / 2
 			],
 			outlet: this

@@ -653,7 +653,7 @@ The content children can also be dragged and panned.
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
 		var p = this.sensor.localEventVertex(e)
-		let endHook = this.compatibleHookAtLocation(p)
+		let endHook = this.freeCompatibleHookAtLocation(p)
 		if (endHook !== null) {
 			p = endHook.parent.view.frame.transformLocalPoint(endHook.midpoint, this.view.frame)
 		}
@@ -663,7 +663,7 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
-		let h = this.compatibleHookAtLocation(this.sensor.localEventVertex(e))
+		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null) {
 			if (this.openLink) {
 				this.remove(this.openLink)
@@ -740,6 +740,8 @@ The content children can also be dragged and panned.
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
 		startHook.outlet.addHook()
 		startHook.outlet.ioList.mobject.update()
+		startHook.update({ free: false })
+		endHook.update({ free: false })
 	}
 
 	// getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
@@ -791,6 +793,10 @@ The content children can also be dragged and panned.
 		return ret
 	}
 
+	freeHooks(): Array<LinkHook> {
+		return this.allHooks().filter((h: LinkHook) => h.free)
+	}
+
 	hookAtLocationFromList(p: vertex, hookList: Array<LinkHook>): LinkHook | null {
 		for (let h of hookList) {
 			let boardFrame = this.view.frame
@@ -803,12 +809,24 @@ The content children can also be dragged and panned.
 		return null
 	}
 
+	freeCompatibleHooks(): Array<LinkHook> {
+		return this.compatibleHooks.filter((h: LinkHook) => h.free)
+	}
+
 	hookAtLocation(p: vertex): LinkHook | null {
 		return this.hookAtLocationFromList(p, this.allHooks())
 	}
 
+	freeHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.freeHooks())
+	}
+
 	compatibleHookAtLocation(p: vertex): LinkHook | null {
 		return this.hookAtLocationFromList(p, this.compatibleHooks)
+	}
+
+	freeCompatibleHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.freeCompatibleHooks())
 	}
 
 	//////////////////////////////////////////////////////////
