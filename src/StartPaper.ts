@@ -6,7 +6,10 @@ import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
 import { NumberListBox, LinkableNumberListBox } from './core/boxes_new/NumberListBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
+import { SumBox } from './core/boxes_new/SumBox'
 import { AverageBox } from './core/boxes_new/AverageBox'
+import { CumSumBox } from './core/boxes_new/CumSumBox'
+import { CumAverageBox } from './core/boxes_new/CumAverageBox'
 
 export class StartPaper extends DemoPaper { }
 
@@ -22,10 +25,24 @@ let lnb = new LinkableNumberListBox({
 })
 paper.addToContent(lnb)
 
+let sb = new SumBox({
+	anchor: [200, 100]
+})
+paper.addToContent(sb)
+
 let ab = new AverageBox({
-	anchor: [300, 100]
+	anchor: [400, 100]
 })
 paper.addToContent(ab)
 
+let csb = new CumSumBox({
+	anchor: [600, 100]
+})
+paper.addToContent(csb)
+
+let cab = new CumAverageBox({
+	anchor: [800, 100]
+})
+paper.addToContent(cab)
 
 

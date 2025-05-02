@@ -8,6 +8,7 @@ export class AverageBox extends NumberValuedFunctionBox {
 
 	defaults(): object {
 		return {
+			name: 'avg',
 			argument: [],
 			inputProperties: [
 				{ name: 'argument', type: 'Array<number>' }

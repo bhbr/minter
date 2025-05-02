@@ -1,11 +1,11 @@
 
-import { NumberBox } from './NumberBox'
+import { NumberListBox } from './NumberListBox'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { numberArraySum } from 'core/functions/numberArray'
 
-export class NumberValuedFunctionBox extends NumberBox {
+export class NumberListValuedFunctionBox extends NumberListBox {
 	
 	argument: any
 	functionSign: Rectangle
@@ -27,7 +27,7 @@ export class NumberValuedFunctionBox extends NumberBox {
 				{ name: 'argument', type: 'any' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'number' }
+				{ name: 'value', type: 'Array<number>' }
 			]
 		}
 	}
@@ -47,8 +47,8 @@ export class NumberValuedFunctionBox extends NumberBox {
 		this.add(this.functionSign)
 	}
 
-	result(): number {
-		return NaN
+	result(): Array<number> {
+		return []
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

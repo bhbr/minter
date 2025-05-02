@@ -8,12 +8,14 @@ export class SumBox extends NumberValuedFunctionBox {
 
 	defaults(): object {
 		return {
+			name: 'sum',
 			argument: [],
 			inputProperties: [
 				{ name: 'argument', type: 'Array<number>' }
 			]
 		}
 	}
+
 	result(): number {
 		return numberArraySum(this.argument) 
 	}

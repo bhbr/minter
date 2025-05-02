@@ -44,13 +44,12 @@ export class NumberListBox extends Linkable {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, false)
+		super.update(args, redraw)
 		this.scroll.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height,
 			list: this.list
 		}, redraw)}
-		if (redraw) { this.view.redraw() }
 }
 
 export class LinkableNumberListBox extends NumberListBox {
