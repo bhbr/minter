@@ -7,6 +7,8 @@ import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
 import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { vertex } from 'core/functions/vertex'
+import { log } from 'core/functions/logging'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -120,7 +122,8 @@ export class CoinRow extends Linkable implements Playable {
 			radius: this.coinRadius,
 			headsColor: this.headsColor,
 			tailsColor: this.tailsColor,
-			tailsProbability: this.tailsProbability
+			tailsProbability: this.tailsProbability,
+			screenEventHandler: ScreenEventHandler.Parent
 		})
 		this.addDependency('headsColor', coin, 'headsColor')
 		this.addDependency('tailsColor', coin, 'tailsColor')
@@ -180,6 +183,7 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	play() {
+		log('play')
 		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 100)
 		this.playState = 'play'
 	}

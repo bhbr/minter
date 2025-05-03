@@ -20,7 +20,6 @@ export class Coin extends Circle {
 			tailsColor: Color.red(),
 			tailsProbability: 0.5,
 			label: new TextLabel({
-				anchor: [-25, -25],
 				fontSize: 24,
 				text: 'H'
 			})
@@ -29,6 +28,11 @@ export class Coin extends Circle {
 
 	setup() {
 		super.setup()
+		this.label.update({
+			//anchor: [0, 0],
+			frameWidth: 2 * this.radius,
+			frameHeight: 2 * this.radius
+		})
 		this.add(this.label)
 	}
 
