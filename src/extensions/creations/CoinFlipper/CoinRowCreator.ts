@@ -21,8 +21,8 @@ export class CoinRowCreator extends Creator {
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
-		let width = q[0] - this.getStartPoint()[0]
-		let nbCoins = Math.floor(width / this.creation.coinSpacing)
+		let width = q[0] - this.getStartPoint()[0] - 100
+		let nbCoins = Math.max(Math.floor(width / this.creation.coinSpacing), 1)
 		this.creation.update({
 			nbCoins: nbCoins
 		})
