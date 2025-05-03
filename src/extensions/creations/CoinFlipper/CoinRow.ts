@@ -32,7 +32,7 @@ export class CoinRow extends Linkable implements Playable {
 			coins: [],
 			coinRadius: 25,
 			nbCoins: 12,
-			coinSpacing: 20,
+			coinSpacing: 16,
 			headsColor: new Color(0, 0.3, 1),
 			tailsColor: Color.red(),
 			tailsProbability: 0.5,

@@ -2,6 +2,7 @@
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { TextLabel } from 'core/mobjects/TextLabel'
 
 export class Coin extends Circle {
 	
@@ -9,6 +10,7 @@ export class Coin extends Circle {
 	headsColor: Color
 	tailsColor: Color
 	tailsProbability: number
+	label: TextLabel
 
 	defaults(): object {
 		return {
@@ -16,8 +18,18 @@ export class Coin extends Circle {
 			radius: 25,
 			headsColor: new Color(0, 0.3, 1),
 			tailsColor: Color.red(),
-			tailsProbability: 0.5
+			tailsProbability: 0.5,
+			label: new TextLabel({
+				anchor: [-25, -25],
+				fontSize: 24,
+				text: 'H'
+			})
 		}
+	}
+
+	setup() {
+		super.setup()
+		this.add(this.label)
 	}
 
 	get value(): number { return (this.state == 'tails') ? 1 : 0 }
@@ -30,6 +42,7 @@ export class Coin extends Circle {
 		let hc = args['headsColor'] ?? this.headsColor
 		let tc = args['tailsColor'] ?? this.tailsColor
 		args['fillColor'] = (newState === 'heads') ? hc : tc
+		args['labelText'] = (newState === 'heads') ? 'H' : 'T'
 		return args
 	}
 
@@ -37,6 +50,14 @@ export class Coin extends Circle {
 		let x = Math.random()
 		let newState = (x < this.tailsProbability) ? 'tails' : 'heads'
 		this.update({ state: newState })
+	}
+
+	get labelText(): string {
+		return this.label.text
+	}
+
+	set labelText(newValue: string) {
+		this.label.text = newValue
 	}
 
 

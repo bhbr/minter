@@ -5,7 +5,7 @@ import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
 
-export class StartPaper extends DemoPaper { }
+export class StartPaper extends CoinFlipPaper { }
 
 let TESTING = true
 
