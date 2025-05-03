@@ -1,7 +1,6 @@
 
 import { Sidebar } from 'core/Sidebar'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
+import { CommandButton } from 'core/sidebar_buttons/CommandButton'
 import { ExtendedBoardButton } from 'extensions/sidebar_buttons/ExtendedBoardButton'
 import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { ConButton } from 'extensions/boards/construction/ConButton'
@@ -18,8 +17,7 @@ export class DemoSidebar extends Sidebar {
 	defaults(): object {
 		return {
 			availableButtonClasses: [
-				DragButton,
-				LinkButton,
+				CommandButton,
 				BoardButton,
 				ExtendedBoardButton,
 				ConCircleButton,
@@ -31,8 +29,7 @@ export class DemoSidebar extends Sidebar {
 				ColorSampleButton
 			],
 			buttons: [
-				new DragButton(),
-				new LinkButton(),
+				new CommandButton(),
 				new ExtendedBoardButton(),
 				new NumberButton(),
 				new ArithmeticButton(),

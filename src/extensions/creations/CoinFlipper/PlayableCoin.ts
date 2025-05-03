@@ -3,7 +3,7 @@ import { Coin } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class PlayableCoin extends Linkable implements Playable {

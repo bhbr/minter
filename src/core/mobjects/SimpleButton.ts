@@ -14,7 +14,8 @@ export class SimpleButton extends TextLabel {
 			color: Color.white(),
 			borderColor: Color.white(),
 			borderWidth: 1,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			visible: false
 		}
 	}
 

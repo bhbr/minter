@@ -221,12 +221,16 @@ export class SidebarButton extends Circle {
 			try {
 				let msg = this.messages[this.currentModeIndex]
 				this.label.update({
-					text: Object.values(msg)[0]
+					text: this.labelFromMessage(msg)
 				})
 			} catch { }
 		} else {
 			this.label.text = ''
 		}
+	}
+
+	labelFromMessage(msg: object): string {
+		return Object.keys(msg)[0]
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -237,7 +241,9 @@ export class SidebarButton extends Circle {
 	}
 	
 	updateModeIndex(newIndex: number, withMessage: any = {}) {
-		if (newIndex == this.currentModeIndex || newIndex == -1) { return }
+		if (newIndex == this.currentModeIndex || newIndex == -1) {
+			return
+		}
 		this.currentModeIndex = newIndex
 		let message: object = this.messages[this.currentModeIndex]
 		this.update({
@@ -245,7 +251,7 @@ export class SidebarButton extends Circle {
 		})
 		if (withMessage as boolean) { this.messagePaper(message) }
  
-		//this.update()
+		this.updateLabel()
 	}
 	
 	selectNextOption() {

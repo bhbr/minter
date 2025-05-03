@@ -56,8 +56,7 @@ export class DemoPaper extends Paper {
 				'circle': ConCircleConstructor
 			},
 			buttonNames: [
-				'DragButton',
-				'LinkButton',
+				'CommandButton',
 				'ExtendedBoardButton',
 				'NumberButton',
 				'ArithmeticButton',

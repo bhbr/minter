@@ -7,6 +7,7 @@ import { InputList } from './InputList'
 import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
 import { log } from 'core/functions/logging'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 
 export interface IOProperty {
 	name: string
@@ -128,6 +129,16 @@ which can be linked to such-exposed variables of other mobjects.
 	// (doesn't work at present)
 		super.dragging(e)
 		this.board.updateLinks()
+	}
+
+	setButtonVisibility(visible: boolean) {
+		for (let mob of this.submobs) {
+			if (mob instanceof SimpleButton) {
+				mob.update({
+					visible: visible
+				})
+			}
+		}
 	}
 
 	allHooks(): Array<LinkHook> {

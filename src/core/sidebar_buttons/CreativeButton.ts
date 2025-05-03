@@ -25,4 +25,8 @@ export class CreativeButton extends SidebarButton {
 		}
 	}
 
+	labelFromMessage(msg: object): string {
+		return Object.values(msg)[0]
+	}
+
 }

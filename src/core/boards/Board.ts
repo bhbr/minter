@@ -176,6 +176,7 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.view.show()
 		}
 		this.hideLinksOfContent()
+		this.setButtonVisibility(false)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -392,15 +393,35 @@ The content children can also be dragged and panned.
 		this.content.remove(mob)
 	}
 
+	setInternalDragging(value: boolean) {
+		this.setPanning(value)
+			for (let mob of this.contentChildren) {
+				mob.setDragging(value)
+			}
+	}
 
 	handleMessage(key: string, value: any) {
 		this.enableContent()
 		switch (key) {
 			case 'drag':
-				this.setPanning(value as boolean)
-				for (let mob of this.contentChildren) {
-					mob.setDragging(value as boolean)
-				}
+				this.setInternalDragging(value as boolean)
+				this.setLinkVisibility(false)
+				this.setButtonVisibility(false)
+				break
+			case 'link':
+				this.setInternalDragging(false)
+				this.setLinkVisibility(value as boolean)
+				this.setButtonVisibility(false)
+				break
+			case 'com':
+				this.setInternalDragging(false)
+				this.setLinkVisibility(false)
+				this.setButtonVisibility(value as boolean)
+				break
+			case 'all':
+				this.setInternalDragging(false)
+				this.setLinkVisibility(false)
+				this.setButtonVisibility(false)
 				break
 			case 'create':
 				this.creationMode = value
@@ -409,17 +430,22 @@ The content children can also be dragged and panned.
 				this.creator = this.createCreator(this.creationMode)
 				this.add(this.creator)
 				break
-			case 'link':
-				if (value) {
-					this.showLinksOfContent()
-				} else { // if (!this.editingLinkName) {
-					this.hideLinksOfContent()
-					//this.endLinking()
-					// if (this.openLink) {
-					// 	this.remove(this.openLink)
-					// }
-				}
-				this.setLinking(value)
+		}
+	}
+
+	setLinkVisibility(visible: boolean) {
+		if (visible) {
+			this.showLinksOfContent()
+		} else {
+			this.hideLinksOfContent()
+		}
+	}
+
+	setButtonVisibility(visible: boolean) {
+		for (let mob of this.contentChildren) {
+			if (mob instanceof Linkable) {
+				mob.setButtonVisibility(visible)
+			}
 		}
 	}
 

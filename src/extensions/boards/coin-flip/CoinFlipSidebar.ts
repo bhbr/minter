@@ -1,7 +1,6 @@
 
 import { Sidebar } from 'core/Sidebar'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
+import { CommandButton } from 'core/sidebar_buttons/CommandButton'
 import { CoinButton } from './CoinButton'
 import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
 import { ListFunctionsButton } from 'extensions/sidebar_buttons/ListFunctionsButton'
@@ -14,8 +13,7 @@ export class CoinFlipSidebar extends Sidebar {
 	defaults(): object {
 		return {
 			availableButtonClasses: [
-				DragButton,
-				LinkButton,
+				CommandButton,
 				CoinButton,
 				NumberButton,
 				ArithmeticButton,
@@ -24,8 +22,7 @@ export class CoinFlipSidebar extends Sidebar {
 				ColorSampleButton
 			],
 			buttons: [
-				new DragButton(),
-				new LinkButton(),
+				new CommandButton(),
 				new CoinButton(),
 				new NumberButton(),
 				new ArithmeticButton(),

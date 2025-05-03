@@ -1,5 +1,5 @@
 
-import { SimpleButton } from 'extensions/mobjects/SimpleButton/SimpleButton'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { Playable } from './Playable'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'

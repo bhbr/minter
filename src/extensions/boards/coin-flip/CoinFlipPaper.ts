@@ -43,8 +43,7 @@ export class CoinFlipPaper extends Paper {
 				'wheel': WheelColorSampleCreator,
 			},
 			buttonNames: [
-				'DragButton',
-				'LinkButton',
+				'CommandButton',
 				'CoinButton',
 				'NumberButton',
 				'ArithmeticButton',
