@@ -1,5 +1,5 @@
 
-import { LinkableInputNumberBox } from 'extensions/creations/math/InputNumberBox/LinkableInputNumberBox'
+import { LinkableInputNumberBox } from './InputNumberBox'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 
