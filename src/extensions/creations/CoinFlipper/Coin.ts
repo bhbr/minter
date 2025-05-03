@@ -57,7 +57,7 @@ export class Coin extends Circle {
 	}
 
 	set labelText(newValue: string) {
-		this.label.text = newValue
+		this.label.update({ text: newValue })
 	}
 
 
