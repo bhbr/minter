@@ -1,11 +1,11 @@
 
-import { ValueBox } from '../ValueBox'
-import { NumberBox } from '../NumberBox/NumberBox'
-import { NumberListBox } from '../lists/NumberListBox'
+import { NumberBox } from './NumberBox'
+import { NumberListBox } from './NumberListBox'
 import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 type operatorString = "+" | "–" | "&times;" | "/"
 
@@ -18,7 +18,7 @@ export class BinaryOperatorBox extends Linkable {
 	operatorLabel: TextLabel
 	operatorDict: object
 	valueType: 'number' | 'Array<number>'
-	valueBox: ValueBox
+	valueBox: NumberBox | NumberListBox
 
 	defaults(): object {
 		return {
@@ -34,8 +34,13 @@ export class BinaryOperatorBox extends Linkable {
 			operand2: 0,
 			valueType: 'number',
 			valueBox: new NumberBox(),
-			inputNames: ['operand1', 'operand2'],
-			outputNames: ['result']
+			inputProperties: [
+				{ name: 'operand1', type: 'number|Array<number>' },
+				{ name: 'operand2', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', type: 'number|Array<number>' }
+			]
 		}
 	}
 
@@ -89,6 +94,9 @@ export class BinaryOperatorBox extends Linkable {
 	}
 
 	compute(a: number | Array<number>, b: number | Array<number>, op: operatorString): number | Array<number> {
+		log('computing')
+		log(a)
+		log(b)
 		if (typeof a == 'number' && typeof b == 'number') {
 			return this.computeNumberAndNumber(a, b, op)
 		} else if (a instanceof Array && typeof b == 'number') {
@@ -133,7 +141,7 @@ export class BinaryOperatorBox extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 		let oldOp1Type = typeof this.operand1
 		let oldOp2Type = typeof this.operand2
-		super.update(args, false)
+		super.update(args, redraw)
 		if (typeof this.operand1 != oldOp1Type || typeof this.operand2 != oldOp2Type) {
 			if (typeof this.operand1 == 'number' && typeof this.operand2 == 'number') {
 				this.setValueTypeTo('number')

@@ -5,7 +5,12 @@ export class RGBAColorSample extends ColorSample {
 
 	defaults(): object {
 		return {
-			inputNames: ['red', 'green', 'blue', 'alpha'],
+			inputProperties: [
+				{ name: 'red', type: 'number' },
+				{ name: 'green', type: 'number' },
+				{ name: 'blue', type: 'number' },
+				{ name: 'alpha', type: 'number' }
+			]
 		}
 	}
 

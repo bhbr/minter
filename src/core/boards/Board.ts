@@ -3,14 +3,14 @@ import { Linkable } from 'core/linkables/Linkable'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { LinkBullet } from 'core/linkables/LinkBullet'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtract, vertexCloseTo } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexEquals, vertexAdd, vertexSubtract, vertexCloseTo } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
 import { Freehand } from 'core/creators/Freehand'
 import { ExpandButton } from './ExpandButton'
 import { LinkHook } from 'core/linkables/LinkHook'
-import { EditableLinkHook } from './EditableLinkHook'
+//import { EditableLinkHook } from './EditableLinkHook'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
 import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
@@ -80,6 +80,7 @@ The content children can also be dragged and panned.
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
 			expandedOutputList: new ExpandedBoardOutputList(),
+			linksEditable: true,
 			editingLinkName: false,
 			openLink: null,
 			openHook: null,
@@ -147,7 +148,8 @@ The content children can also be dragged and panned.
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
-			mobject: this
+			mobject: this,
+			outletProperties: this.inputProperties
 		})
 		this.add(this.expandedInputList)
 
@@ -155,7 +157,8 @@ The content children can also be dragged and panned.
 			height: EXPANDED_IO_LIST_HEIGHT,
 			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
 			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
-			mobject: this
+			mobject: this,
+			outletProperties: this.outputProperties
 		})
 		this.add(this.expandedOutputList)
 
@@ -409,12 +412,12 @@ The content children can also be dragged and panned.
 			case 'link':
 				if (value) {
 					this.showLinksOfContent()
-				} else if (!this.editingLinkName) {
+				} else { // if (!this.editingLinkName) {
 					this.hideLinksOfContent()
 					//this.endLinking()
-					if (this.openLink) {
-						this.remove(this.openLink)
-					}
+					// if (this.openLink) {
+					// 	this.remove(this.openLink)
+					// }
 				}
 				this.setLinking(value)
 		}
@@ -566,7 +569,7 @@ The content children can also be dragged and panned.
 
 	expandedInputList: ExpandedBoardInputList
 	expandedOutputList: ExpandedBoardOutputList
-	editingLinkName: boolean
+	// editingLinkName: boolean
 	openLink?: DependencyLink
 	openHook?: LinkHook
 	openBullet?: LinkBullet
@@ -594,7 +597,6 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
-
 		this.expandedInputList.view.show()
 		this.expandedOutputList.view.show()
 	}
@@ -612,13 +614,19 @@ The content children can also be dragged and panned.
 		this.expandedOutputList.view.hide()
 	}
 
+	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
+		super.renameLinkableProperty(kind, oldName, newName)
+		let expandedList = (kind == 'input') ? this.expandedInputList : this.expandedOutputList
+		expandedList.renameProperty(oldName, newName)	
+	}
+
 	setLinking(flag: boolean) {
 		if (flag) {
 			this.showLinksOfContent()
 			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-		} else if (!this.editingLinkName) {
+		} else { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
 			this.sensor.restoreTouchMethods()
 			this.sensor.restorePenMethods()
@@ -626,37 +634,74 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	linkingEnabled(): boolean {
-		return (this.onPointerDown == this.startLinking)
-	}
-
 	startLinking(e: ScreenEvent) {
 		var p = this.sensor.localEventVertex(e)
-		this.openHook = this.hookAtLocation(p)
-		if (this.openHook === null) { return }
-		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
+		let clickedHook = this.hookAtLocation(p)
+		if (clickedHook == null) { return }
+		p = this.locationOfHook(clickedHook)
+		if (this.isFree(clickedHook)) {
+			this.createNewOpenLink(clickedHook)
+		} else {
+			let link = this.linkForHook(clickedHook)
+			link.dependency.source.removeDependency(link.dependency)
+			remove(this.links, link)
+			this.remove(link)
+			clickedHook.outlet.removeHook()
+			if (clickedHook.outlet.kind == 'output') {
+				this.createNewOpenLink(link.endHook)
+			} else {
+				this.createNewOpenLink(link.startHook)
+			}
+		}
+		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+	}
+
+	locationOfHook(hook: LinkHook): vertex {
+		return hook.parent.view.frame.transformLocalPoint(hook.midpoint, this.view.frame)
+	}
+
+	linkForHook(hook: LinkHook): DependencyLink | null {
+		for (let link of this.links) {
+			if (link.startHook == hook || link.endHook == hook) {
+				return link
+			}
+		}
+		return null
+	}
+
+	isFree(hook: LinkHook): boolean {
+		return this.linkForHook(hook) == null
+	}
+
+	createNewOpenLink(hook: LinkHook) {
+		this.openHook = hook
+		let p = this.locationOfHook(hook)
 		let sb = new LinkBullet({ midpoint: p })
 		let eb = new LinkBullet({ midpoint: p })
-		this.openLink = new DependencyLink({
-			startBullet: sb,
-			endBullet: eb
-		})
+		if (this.openHook.outlet.kind == 'output') {
+			this.openLink = new DependencyLink({
+				startBullet: sb,
+				endBullet: eb,
+				startHook: hook
+			})
+			this.openBullet = eb
+		} else {
+			this.openLink = new DependencyLink({
+				startBullet: sb,
+				endBullet: eb,
+				endHook: hook
+			})
+			this.openBullet = sb
+		}
 		this.add(this.openLink)
-		this.openBullet = eb
-		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
 		if (this.openLink === null) { return }
-		let p = this.sensor.localEventVertex(e)
-		for (let hook of this.compatibleHooks) {
-			let m = hook.positionInLinkMap()
-			if (vertexCloseTo(p, m, SNAPPING_DISTANCE)) {
-				this.openBullet.update({
-					midpoint: m
-				})
-				return
-			}
+		var p = this.sensor.localEventVertex(e)
+		let endHook = this.freeCompatibleHookAtLocation(p)
+		if (endHook !== null) {
+			p = this.locationOfHook(endHook)
 		}
 		this.openBullet.update({
 			midpoint: p
@@ -664,109 +709,151 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
-		let h = this.hookAtLocation(this.sensor.localEventVertex(e))
+		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null) {
+			if (this.openLink) {
+				this.remove(this.openLink)
+			}
 			this.openLink = null
 			this.openHook = null
 			this.openBullet = null
 			this.compatibleHooks = []
 			return
 		}
-		if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
-			// click on a plus button to create a new hook
-			let ed = h as EditableLinkHook
-			ed.editName()
-		} else if (h.constructor.name === 'EditableLinkHook') {
-			// drag a link onto a plus button
-			this.createNewDependency()
-			this.links.push(this.openLink)
-			let ed = h as EditableLinkHook
-			ed.editName()
+		// if (h.constructor.name === 'EditableLinkHook' && h === this.openHook) {
+		// 	// click on a plus button to create a new hook
+		// 	let ed = h as EditableLinkHook
+		// 	ed.editName()
+		// } else if (h.constructor.name === 'EditableLinkHook') {
+		// 	// drag a link onto a plus button
+		if (this.openLink.startHook == null) {
+			this.openLink.update({
+				startHook: h
+			})
 		} else {
-			this.createNewDependency()
-			this.links.push(this.openLink)
+			this.openLink.update({
+				endHook: h
+			})
 		}
+		this.links.push(this.openLink)
+		this.createNewDependency()
 		this.openLink = null
 		this.openHook = null
 		this.openBullet = null
 		this.compatibleHooks = []
+
+	}
+
+	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {
+		return this.allHooks().filter((endHook) => this.areCompatibleHooks(startHook, endHook))
+		// TODO: and endHook is not yet occupied!
+	}
+
+	areCompatibleHooks(startHook: LinkHook, endHook: LinkHook): boolean {
+		if (startHook.outlet.kind == 'output' && endHook.outlet.kind == 'input') {
+			let flag1 = (startHook.outlet.type == endHook.outlet.type)
+				|| ((startHook.outlet.type == 'number' || startHook.outlet.type == 'Array<number>')
+					&& endHook.outlet.type == 'number|Array<number>')
+			let flag2 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
+			let flag3 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
+			return flag1 && flag2 && flag3
+		} else if (startHook.outlet.kind == 'input' && endHook.outlet.kind == 'output'){
+			return this.areCompatibleHooks(endHook, startHook)
+		} else {
+			return false
+		}
 	}
 
 	updateLinks() {
 		for (let hook of this.allHooks()) {
-			hook.update() // updates start and end points of links
+			hook.update() // this is supposed to update start and end points of links
 		}
 	}
 
 	createNewDependency() {
-		if (this.openBullet == this.openLink.startBullet) {
-			let startHook = this.hookAtLocation(this.openBullet.positionInLinkMap())
-			let endHook = this.hookAtLocation(this.openLink.endBullet.positionInLinkMap())
-			this.createNewDependencyBetweenHooks(startHook, endHook)
-		} else if (this.openBullet == this.openLink.endBullet) {
-			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInLinkMap())
-			let hook2 = this.hookAtLocation(this.openBullet.positionInLinkMap())
-			if (hook1.type == 'output' && hook2.type == 'input') {
-				this.createNewDependencyBetweenHooks(hook1, hook2)
-			} else if (hook1.type == 'input' && hook2.type == 'output') {
-				this.createNewDependencyBetweenHooks(hook2, hook1)
-			}
-		}
+			this.createNewDependencyBetweenHooks(this.openLink.startHook, this.openLink.endHook)
 	}
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
-		startHook.mobject.addDependency(startHook.name, endHook.mobject, endHook.name)
-		startHook.addDependency('positionInLinkMap', this.openLink.startBullet, 'midpoint')
-		endHook.addDependency('positionInLinkMap', this.openLink.endBullet, 'midpoint')
-		startHook.mobject.update()
+		startHook.outlet.ioList.mobject.addDependency(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		this.openLink.update({
+			startHook: startHook,
+			endHook: endHook,
+			dependency: startHook.outlet.ioList.mobject.dependencies[startHook.outlet.ioList.mobject.dependencies.length - 1]
+		})
+		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
+		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.outlet.addHook()
+		startHook.outlet.ioList.mobject.update()
 	}
 
-	getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
-		if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
-			return this.innerInputHooks().concat(this.outerOutputHooks())
-		} else {
-			return this.innerOutputHooks().concat(this.outerInputHooks())
-		}
+	removeDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
+		startHook.outlet.ioList.mobject.removeDependencyBetween(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		startHook.removeDependencyBetween('positionInBoard', this.openLink.startBullet, 'midpoint')
+		endHook.removeDependencyBetween('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.outlet.removeHook()
+		startHook.outlet.ioList.mobject.update()
 	}
 
-	innerInputHooks(): Array<LinkHook> {
-		let arr: Array<LinkHook>  = []
-		for (let submob of this.linkableChildren()) {
-			for (let inputName of submob.inputNames) {
-				arr.push(submob.inputList.hookNamed(inputName))
-			}
-		}
-		return arr
-	}
 
-	innerOutputHooks(): Array<LinkHook> {
-		let arr: Array<LinkHook>  = []
-		for (let submob of this.linkableChildren()) {
-			for (let outputName of submob.outputNames) {
-				arr.push(submob.outputList.hookNamed(outputName))
-			}
-		}
-		return arr
-	}
+	// innerInputHooks(): Array<LinkHook> {
+	// 	let arr: Array<LinkHook>  = []
+	// 	for (let submob of this.linkableChildren()) {
+	// 		for (let inputName of submob.inputNames) {
+	// 			arr.push(submob.inputList.hookNamed(inputName))
+	// 		}
+	// 	}
+	// 	return arr
+	// }
 
-	outerInputHooks(): Array<LinkHook> {
-		return this.expandedInputList.linkHooks
-	}
+	// innerOutputHooks(): Array<LinkHook> {
+	// 	let arr: Array<LinkHook>  = []
+	// 	for (let submob of this.linkableChildren()) {
+	// 		for (let outputName of submob.outputNames) {
+	// 			arr.push(submob.outputList.hookNamed(outputName))
+	// 		}
+	// 	}
+	// 	return arr
+	// }
 
-	outerOutputHooks(): Array<LinkHook> {
-		return this.expandedOutputList.linkHooks
-	}
+	// outerInputHooks(): Array<LinkHook> {
+	// 	return this.expandedInputList.linkHooks
+	// }
+
+	// outerOutputHooks(): Array<LinkHook> {
+	// 	return this.expandedOutputList.linkHooks
+	// }
 
 	allHooks(): Array<LinkHook> {
-		return this.innerInputHooks()
-			.concat(this.innerOutputHooks())
-			.concat(this.outerInputHooks())
-			.concat(this.outerOutputHooks())
+		if (this.contracted) {
+			return super.allHooks()
+		}
+		let ret: Array<LinkHook> = []
+		for (let linkable of this.contentChildren) {
+			if (linkable instanceof Linkable) {
+				ret = ret.concat(linkable.allHooks())
+			}
+		}
+		return ret
 	}
 
-	hookAtLocation(p: vertex): LinkHook | null {
-		for (let h of this.allHooks()) {
-			let q = h.positionInLinkMap()
+	freeHooks(): Array<LinkHook> {
+		return this.allHooks().filter((h: LinkHook) => this.isFree(h))
+	}
+
+	hookAtLocationFromList(p: vertex, hookList: Array<LinkHook>): LinkHook | null {
+		for (let h of hookList) {
+			let boardFrame = this.view.frame
+			let outletFrame = h.parent.view.frame
+			let q = outletFrame.transformLocalPoint(h.midpoint, boardFrame)
 			if (vertexCloseTo(p, q, SNAPPING_DISTANCE)) {
 				return h
 			}
@@ -774,6 +861,25 @@ The content children can also be dragged and panned.
 		return null
 	}
 
+	freeCompatibleHooks(): Array<LinkHook> {
+		return this.compatibleHooks.filter((h: LinkHook) => this.isFree(h))
+	}
+
+	hookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.allHooks())
+	}
+
+	freeHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.freeHooks())
+	}
+
+	compatibleHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.compatibleHooks)
+	}
+
+	freeCompatibleHookAtLocation(p: vertex): LinkHook | null {
+		return this.hookAtLocationFromList(p, this.freeCompatibleHooks())
+	}
 
 	//////////////////////////////////////////////////////////
 	//                                                      //

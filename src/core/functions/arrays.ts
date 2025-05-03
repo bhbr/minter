@@ -11,6 +11,13 @@ export function remove(arr: Array<any>, value: any, all: boolean = false) {
 	}
 }
 
+export function clear(arr: Array<any>) {
+	let l = arr.length
+	for (var i = 0; i < l; i++) {
+		arr.pop()
+	}
+}
+
 export function concat(arr1: Array<any>, arr2: Array<any>): Array<any> {
 	let ret: Array<any> = []
 	for (let x of arr1) { ret.push(x) }

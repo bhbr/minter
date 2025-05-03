@@ -6,6 +6,7 @@ import { Board } from 'core/boards/Board'
 import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { LinkHook } from './LinkHook'
 
 export class DependencyLink extends Mobject {
 /*
@@ -16,7 +17,9 @@ linkable mobjects
 
 	dependency: Dependency
 	startBullet: LinkBullet
+	startHook: LinkHook | null
 	endBullet: LinkBullet
+	endHook: LinkHook | null
 	linkLine: Line
 
 	defaults(): object {
@@ -24,14 +27,15 @@ linkable mobjects
 			dependency: new Dependency(),
 			startBullet: new LinkBullet(),
 			endBullet: new LinkBullet(),
+			startHook: null,
+			endHook: null,
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH }),
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Parent
 		}
 	}
 
 	mutabilities(): object {
 		return {
-			dependency: 'never',
 			startBullet: 'on_init',
 			endBullet: 'on_init',
 			linkLine: 'never'

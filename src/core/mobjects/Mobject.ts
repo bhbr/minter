@@ -307,7 +307,24 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	removeDependency(dep: Dependency) {
+		if (!this.dependencies.includes(dep)) {
+			log('hm')
+		}
 		remove(this.dependencies, dep)
+	}
+
+	getDependency(outputName: string | null, target: Mobject, inputName: string | null): Dependency | null {
+		for (let dep of this.dependencies) {
+			if (dep.outputName == outputName && dep.target == target && dep.inputName == inputName) {
+				return dep
+			}
+		}
+		return null
+	}
+
+	removeDependencyBetween(outputName: string | null, target: Mobject, inputName: string | null) {
+		let dep = this.getDependency(outputName, target, inputName)
+		if (dep) { this.removeDependency(dep) }
 	}
 
 	addDependent(target: Mobject) {
@@ -443,7 +460,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	onPointerOut(e: ScreenEvent) { }
 
 	draggingEnabled: boolean
-
 
 	setDragging(flag: boolean) {
 		if (flag) {

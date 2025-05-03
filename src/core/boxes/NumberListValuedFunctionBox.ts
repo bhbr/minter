@@ -1,51 +1,44 @@
 
-import { Linkable } from 'core/linkables/Linkable'
-import { ValueBox } from './ValueBox'
+import { NumberListBox } from './NumberListBox'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
+import { numberArraySum } from 'core/functions/numberArray'
 
-export class FunctionBox extends Linkable {
-
+export class NumberListValuedFunctionBox extends NumberListBox {
+	
 	argument: any
-	valueBox: ValueBox
 	functionSign: Rectangle
 	functionLabel: TextLabel
-	functionName: string
+	name: string
 
 	defaults(): object {
 		return {
+			name: 'f',
+			argument: null,
 			functionSign: new Rectangle({
 				width: 50,
 				height: 20,
 				fillColor: Color.black(),
 				fillOpacity: 1.0
 			}),
-			valueBox: new ValueBox(),
 			functionLabel: new TextLabel(),
-			functionName: '',
-			argument: 0,
-			inputNames: ['argument'],
-			outputNames: ['result']
-		}
-	}
-
-	mutabilities(): object {
-		return {
-			functionSign: 'never',
-			functionLabel: 'never',
-			functionName: 'on_init'
+			inputProperties: [
+				{ name: 'argument', type: 'any' }
+			],
+			outputProperties: [
+				{ name: 'value', type: 'Array<number>' }
+			]
 		}
 	}
 
 	setup() {
 		super.setup()
-		this.add(this.valueBox)
 		this.functionSign.update({
 			anchor: [this.frameWidth / 2 - this.functionSign.frameWidth / 2, -this.functionSign.frameHeight]
 		})
 		this.functionLabel.update({
-			text: this.functionName,
+			text: this.name,
 			fontSize: 12,
 			frameWidth: this.functionSign.width,
 			frameHeight: this.functionSign.height
@@ -54,24 +47,16 @@ export class FunctionBox extends Linkable {
 		this.add(this.functionSign)
 	}
 
-	result(): any {
-		return NaN
+	result(): Array<number> {
+		return []
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, false)
-		this.valueBox.update({ value: this.result() }, redraw)
+		args['value'] = this.result()
+		super.update(args, redraw)
 	}
 
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
-

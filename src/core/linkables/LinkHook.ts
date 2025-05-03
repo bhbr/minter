@@ -4,21 +4,25 @@ import { Linkable } from './Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
 import { HOOK_RADIUS } from './constants'
+import { LinkOutlet } from './LinkOutlet'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { log } from 'core/functions/logging'
 
 export class LinkHook extends Circle {
 
 	mobject?: Linkable
 	name: string
-	type: 'input' | 'output'
+	outlet?: LinkOutlet // TODO: redirect to parent
 
 	defaults(): object {
 		return {
 			name: '',
-			type: 'input',
+			kind: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white(),
-			mobject: null
+			mobject: null,
+			outlet: null
 		}
 	}
 
@@ -28,14 +32,14 @@ export class LinkHook extends Circle {
 			fillOpacity: 'never',
 			strokeColor: 'never',
 			name: 'always',
-			type: 'on_init'
+			kind: 'on_init',
+			outlet: 'on_init'
 		}
 	}
 
-	positionInLinkMap(): vertex {
-	// used e. g. for snapping
-		let p = this.parent.view.frame.transformLocalPoint(this.midpoint, this.mobject.parent.view.frame)
-		return p
-	}
+	
+
+
+
 
 }

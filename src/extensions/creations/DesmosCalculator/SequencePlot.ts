@@ -9,7 +9,9 @@ export class SequencePlot extends DesmosCalculator {
 
 	defaults(): object {
 		return {
-			inputNames: ['data'],
+			inputProperties: [
+			{ name: 'data', type: 'Array<number>' }
+		],
 			valueList: [0]
 		}
 	}

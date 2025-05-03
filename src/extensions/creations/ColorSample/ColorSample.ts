@@ -22,7 +22,9 @@ export class ColorSample extends Linkable {
 			color: Color.white(),
 			frameWidth: 2 * RADIUS,
 			frameHeight: 2 * RADIUS,
-			outputNames: ['color'],
+			outputProperties: [
+				{ name: 'color', type: 'Color' }
+			],
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}

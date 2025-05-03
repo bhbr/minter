@@ -15,9 +15,9 @@ export class IsingModel extends CellularAutomaton {
 				"1": Color.red(),
 				"-1": Color.blue()
 			},
-			inputNames: [
-				'temperature',
-				'couplingStrength'
+			inputProperties: [
+				{ name: 'temperature', type: 'number' },
+				{ name: 'couplingStrength', type: 'number' }
 			]
 		}
 	}

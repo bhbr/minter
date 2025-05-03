@@ -2,9 +2,16 @@
 import { Board } from 'core/boards/Board'
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { IOList } from './IOList'
 import { InputList } from './InputList'
 import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
+import { log } from 'core/functions/logging'
+
+export interface IOProperty {
+	name: string
+	type: string
+}
 
 export class Linkable extends Mobject {
 /*
@@ -12,17 +19,19 @@ A mobject with input and output variables exposed to the UI,
 which can be linked to such-exposed variables of other mobjects.
 */
 
-	inputNames: Array<string>
-	outputNames: Array<string>
+	inputProperties: Array<IOProperty>
+	outputProperties: Array<IOProperty>
 	inputList: InputList
-	outputList: OutputList 
+	outputList: OutputList
+	linksEditable: boolean
 
 	defaults(): object {
 		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
-			inputNames: [],
-			outputNames: [],			
+			inputs: [],
+			outputs: [],
+			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -30,7 +39,8 @@ which can be linked to such-exposed variables of other mobjects.
 	mutabilities(): object {
 		return {
 			inputList: 'never',
-			outputList: 'never'
+			outputList: 'never',
+			linksEditable: 'in_subclass'
 		}
 	}
 
@@ -53,13 +63,15 @@ which can be linked to such-exposed variables of other mobjects.
 		super.setup()
 		this.inputList.update({
 			mobject: this,
-			linkNames: this.inputNames
+			outletProperties: this.inputProperties,
+			editable: this.linksEditable
 		})
 		this.add(this.inputList)
 		this.inputList.view.hide()
 		this.outputList.update({
 			mobject: this,
-			linkNames: this.outputNames
+			outletProperties: this.outputProperties,
+			editable: this.linksEditable
 		})
 		this.add(this.outputList)
 		this.outputList.view.hide()
@@ -79,23 +91,29 @@ which can be linked to such-exposed variables of other mobjects.
 
 	inputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available input variables
-	// TODO: filter by type
 		let arr: Array<LinkHook> = []
-		for (let inputName of this.inputNames) {
-			arr.push(this.inputList.hookNamed(inputName))
+		for (let ip of this.inputProperties) {
+			arr.push(this.inputList.hookNamed(ip.name))
 		}
 		return arr
 	}
 
 	outputHooks(): Array<LinkHook> {
 	// the hooks (with name and position) of available output variables
-	// TODO: filter by type
 		let arr: Array<LinkHook> = []
-		for (let outputName of this.outputNames) {
-			arr.push(this.outputList.hookNamed(outputName))
+		for (let op of this.outputProperties) {
+			arr.push(this.outputList.hookNamed(op.name))
 		}
 		return arr
 	}
+
+	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
+		let list: IOList = (kind == 'input') ? this.inputList : this.outputList
+		list.renameProperty(oldName, newName)
+		// TODO: update dependencies
+	}
+
+	// The following two methods are used only for positioning IOLists, rework/rename this
 
 	getCompactWidth(): number {
 		return this.view.frame.width
@@ -112,16 +130,20 @@ which can be linked to such-exposed variables of other mobjects.
 		this.board.updateLinks()
 	}
 
+	allHooks(): Array<LinkHook> {
+		return this.inputList.allHooks().concat(this.outputList.allHooks())
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		if (args['inputNames'] !== undefined) {
+		if (args['inputProperties'] !== undefined) {
 			this.inputList.update({
-				linkNames: args['inputNames']
+				outletProperties: args['inputProperties']
 			}, true)
 		}
-		if (args['outputNames'] !== undefined) {
+		if (args['outputProperties'] !== undefined) {
 			this.outputList.update({
-				linkNames: args['outputNames']
+				outletProperties: args['outputProperties']
 			}, true)
 		}
 	}

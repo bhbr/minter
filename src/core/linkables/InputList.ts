@@ -7,7 +7,7 @@ export class InputList extends IOList {
 
 	defaults(): object {
 		return {
-			type: 'input'
+			kind: 'input'
 		}
 	}
 

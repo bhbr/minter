@@ -41,8 +41,14 @@ export class Swing extends Linkable {
 			initialAngle: 0,
 			initialSpeed: 0,
 			initialTime: Date.now(),
-			inputNames: ['length', 'mass'],
-			outputNames: ['angle', 'period']
+			inputProperties: [
+				{ name: 'length', type: 'number' },
+				{ name: 'mass', type: 'number' }
+			],
+			outputProperties: [
+				{ name: 'angle', type: 'number' },
+				{ name: 'period', type: 'number' }
+			],
 		}
 	}
 
