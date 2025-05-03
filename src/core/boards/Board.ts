@@ -3,7 +3,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { LinkBullet } from 'core/linkables/LinkBullet'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexAdd, vertexSubtract, vertexCloseTo } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexEquals, vertexAdd, vertexSubtract, vertexCloseTo } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
@@ -636,18 +636,64 @@ The content children can also be dragged and panned.
 
 	startLinking(e: ScreenEvent) {
 		var p = this.sensor.localEventVertex(e)
-		this.openHook = this.hookAtLocation(p)
-		if (this.openHook == null) { return }
-		p = this.openHook.parent.view.frame.transformLocalPoint(this.openHook.midpoint, this.view.frame)
+		let clickedHook = this.hookAtLocation(p)
+		if (clickedHook == null) { return }
+		p = this.locationOfHook(clickedHook)
+		if (this.isFree(clickedHook)) {
+			this.createNewOpenLink(clickedHook)
+		} else {
+			let link = this.linkForHook(clickedHook)
+			link.dependency.source.removeDependency(link.dependency)
+			remove(this.links, link)
+			this.remove(link)
+			clickedHook.outlet.removeHook()
+			if (clickedHook.outlet.kind == 'output') {
+				this.createNewOpenLink(link.endHook)
+			} else {
+				this.createNewOpenLink(link.startHook)
+			}
+		}
+		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+	}
+
+	locationOfHook(hook: LinkHook): vertex {
+		return hook.parent.view.frame.transformLocalPoint(hook.midpoint, this.view.frame)
+	}
+
+	linkForHook(hook: LinkHook): DependencyLink | null {
+		for (let link of this.links) {
+			if (link.startHook == hook || link.endHook == hook) {
+				return link
+			}
+		}
+		return null
+	}
+
+	isFree(hook: LinkHook): boolean {
+		return this.linkForHook(hook) == null
+	}
+
+	createNewOpenLink(hook: LinkHook) {
+		this.openHook = hook
+		let p = this.locationOfHook(hook)
 		let sb = new LinkBullet({ midpoint: p })
 		let eb = new LinkBullet({ midpoint: p })
-		this.openLink = new DependencyLink({
-			startBullet: sb,
-			endBullet: eb
-		})
+		if (this.openHook.outlet.kind == 'output') {
+			this.openLink = new DependencyLink({
+				startBullet: sb,
+				endBullet: eb,
+				startHook: hook
+			})
+			this.openBullet = eb
+		} else {
+			this.openLink = new DependencyLink({
+				startBullet: sb,
+				endBullet: eb,
+				endHook: hook
+			})
+			this.openBullet = sb
+		}
 		this.add(this.openLink)
-		this.openBullet = eb
-		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
 	}
 
 	linking(e: ScreenEvent) {
@@ -655,7 +701,7 @@ The content children can also be dragged and panned.
 		var p = this.sensor.localEventVertex(e)
 		let endHook = this.freeCompatibleHookAtLocation(p)
 		if (endHook !== null) {
-			p = endHook.parent.view.frame.transformLocalPoint(endHook.midpoint, this.view.frame)
+			p = this.locationOfHook(endHook)
 		}
 		this.openBullet.update({
 			midpoint: p
@@ -680,12 +726,22 @@ The content children can also be dragged and panned.
 		// 	ed.editName()
 		// } else if (h.constructor.name === 'EditableLinkHook') {
 		// 	// drag a link onto a plus button
+		if (this.openLink.startHook == null) {
+			this.openLink.update({
+				startHook: h
+			})
+		} else {
+			this.openLink.update({
+				endHook: h
+			})
+		}
 		this.links.push(this.openLink)
 		this.createNewDependency()
 		this.openLink = null
 		this.openHook = null
 		this.openBullet = null
 		this.compatibleHooks = []
+
 	}
 
 	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {
@@ -710,24 +766,12 @@ The content children can also be dragged and panned.
 
 	updateLinks() {
 		for (let hook of this.allHooks()) {
-			hook.update() // updates start and end points of links
+			hook.update() // this is supposed to update start and end points of links
 		}
 	}
 
 	createNewDependency() {
-	// 	if (this.openBullet == this.openLink.startBullet) {
-	// 		let startHook = this.hookAtLocation(this.openBullet.positionInBoard())
-	// 		let endHook = this.hookAtLocation(this.openLink.endBullet.positionInBoard())
-	// 		this.createNewDependencyBetweenHooks(startHook, endHook)
-	if (this.openBullet == this.openLink.endBullet) {
-			let hook1 = this.hookAtLocation(this.openLink.startBullet.positionInBoard())
-			let hook2 = this.hookAtLocation(this.openBullet.positionInBoard())
-			if (hook1.outlet.kind == 'output' && hook2.outlet.kind == 'input') {
-				this.createNewDependencyBetweenHooks(hook1, hook2)
-			} else if (hook1.outlet.kind == 'input' && hook2.outlet.kind == 'output') {
-				this.createNewDependencyBetweenHooks(hook2, hook1)
-			}
-	 	}
+			this.createNewDependencyBetweenHooks(this.openLink.startHook, this.openLink.endHook)
 	}
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
@@ -736,21 +780,29 @@ The content children can also be dragged and panned.
 			endHook.outlet.ioList.mobject,
 			endHook.outlet.name
 		)
+		this.openLink.update({
+			startHook: startHook,
+			endHook: endHook,
+			dependency: startHook.outlet.ioList.mobject.dependencies[startHook.outlet.ioList.mobject.dependencies.length - 1]
+		})
 		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
 		startHook.outlet.addHook()
 		startHook.outlet.ioList.mobject.update()
-		startHook.update({ free: false })
-		endHook.update({ free: false })
 	}
 
-	// getCompatibleHooks(hook: LinkHook): Array<LinkHook> {
-	// 	if ((hook.type == 'output' && hook.constructor.name === 'LinkHook') || (hook.type == 'input' && hook.constructor.name === 'EditableLinkHook')) {
-	// 		return this.innerInputHooks().concat(this.outerOutputHooks())
-	// 	} else {
-	// 		return this.innerOutputHooks().concat(this.outerInputHooks())
-	// 	}
-	// }
+	removeDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
+		startHook.outlet.ioList.mobject.removeDependencyBetween(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		startHook.removeDependencyBetween('positionInBoard', this.openLink.startBullet, 'midpoint')
+		endHook.removeDependencyBetween('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.outlet.removeHook()
+		startHook.outlet.ioList.mobject.update()
+	}
+
 
 	// innerInputHooks(): Array<LinkHook> {
 	// 	let arr: Array<LinkHook>  = []
@@ -794,7 +846,7 @@ The content children can also be dragged and panned.
 	}
 
 	freeHooks(): Array<LinkHook> {
-		return this.allHooks().filter((h: LinkHook) => h.free)
+		return this.allHooks().filter((h: LinkHook) => this.isFree(h))
 	}
 
 	hookAtLocationFromList(p: vertex, hookList: Array<LinkHook>): LinkHook | null {
@@ -810,7 +862,7 @@ The content children can also be dragged and panned.
 	}
 
 	freeCompatibleHooks(): Array<LinkHook> {
-		return this.compatibleHooks.filter((h: LinkHook) => h.free)
+		return this.compatibleHooks.filter((h: LinkHook) => this.isFree(h))
 	}
 
 	hookAtLocation(p: vertex): LinkHook | null {

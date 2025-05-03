@@ -16,5 +16,9 @@ export class InputNumberBox extends InputBox {
 		return Number(valueString)
 	}
 
-
+	onReturn() {
+		this.update({
+			value: this.valueFromString(this.inputElement.value)
+		})
+	}
 }

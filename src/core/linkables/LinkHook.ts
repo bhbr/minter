@@ -13,7 +13,6 @@ export class LinkHook extends Circle {
 	mobject?: Linkable
 	name: string
 	outlet?: LinkOutlet // TODO: redirect to parent
-	free: boolean
 
 	defaults(): object {
 		return {
@@ -23,8 +22,7 @@ export class LinkHook extends Circle {
 			fillOpacity: 0,
 			strokeColor: Color.white(),
 			mobject: null,
-			outlet: null,
-			free: true
+			outlet: null
 		}
 	}
 
