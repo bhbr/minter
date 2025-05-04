@@ -408,12 +408,15 @@ The content children can also be dragged and panned.
 		this.enableContent()
 		switch (key) {
 			case 'drag':
+				if (isTouchDevice) { value = (value === "1") }
 				this.setInternalDragging(value as boolean)
 				break
 			case 'link':
+				if (isTouchDevice) { value = (value === "1") }
 				this.setLinking(value as boolean)
 				break
 			case 'ctrl':
+				if (isTouchDevice) { value = (value === "1") }
 				this.setButtonVisibility(value as boolean)
 				break
 			case 'create':
@@ -638,22 +641,22 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			if (isTouchDevice) {
+			//if (isTouchDevice) {
 				this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 				this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 				this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			} else {
-				this.sensor.setPointerMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			}
+			// } else {
+			// 	this.sensor.setPointerMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			// }
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			if (isTouchDevice) {
+			//if (isTouchDevice) {
 				this.sensor.restoreTouchMethods()
 				this.sensor.restorePenMethods()
 				this.sensor.restoreMouseMethods()
-			} else {
-				this.sensor.restorePointerMethods()
-			}
+			// } else {
+			// 	this.sensor.restorePointerMethods()
+			// }
 		}
 		this.isShowingLinks = flag
 	}
