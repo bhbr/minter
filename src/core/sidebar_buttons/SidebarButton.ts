@@ -125,6 +125,7 @@ export class SidebarButton extends Circle {
 
 	commonButtonDown() {
 		if (this.active) { return }
+		//log(this.messages[0])
 		this.messagePaper(this.messages[0])
 		this.update({
 			active: true,
@@ -197,6 +198,7 @@ export class SidebarButton extends Circle {
 			frameHeight: 2 * this.radius			
 		})
 		this.updateLabel()
+		//log(this.outgoingMessage)
 		this.messagePaper(this.outgoingMessage)
 	}
 	
@@ -251,7 +253,10 @@ export class SidebarButton extends Circle {
 		this.update({
 			fillColor: this.colorForIndex(this.currentModeIndex)
 		})
-		if (withMessage as boolean) { this.messagePaper(message) }
+		if (withMessage as boolean) {
+			//log(message)
+			this.messagePaper(message)
+		}
  
 		this.updateLabel()
 	}

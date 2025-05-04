@@ -3,13 +3,17 @@ import { SidebarButton } from './SidebarButton'
 import { BUTTON_SCALE_FACTOR } from './button_geometry'
 import { log } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
+import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class ToggleButton extends SidebarButton {
+
+	locked: boolean
 
 	defaults(): object {
 		return {
 			messageKey: 'key',
-			baseColor: Color.gray(0.8)
+			baseColor: Color.gray(0.8),
+			locked: false
 		}
 	}
 
@@ -26,8 +30,14 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	commonButtonUp() {
-		this.currentModeIndex = 0
-		super.commonButtonUp()
+		if (this.currentModeIndex == 1) {
+			if (this.locked) {
+				super.commonButtonUp()
+			}
+			this.locked = !this.locked
+		} else {
+			super.commonButtonUp()
+		}
 	}
 
 	updateLabel() {

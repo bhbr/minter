@@ -87,7 +87,8 @@ The content children can also be dragged and panned.
 			openBullet: null,
 			compatibleHooks: [],
 			creationTool: null,
-			isShowingLinks: false
+			isShowingLinks: false,
+			allowingDrag: false
 		}
 	}
 
@@ -395,6 +396,8 @@ The content children can also be dragged and panned.
 	}
 
 	setInternalDragging(value: boolean) {
+		if (value == this.allowingDrag) { return }
+		this.allowingDrag = value
 		this.setPanning(value)
 		for (let mob of this.contentChildren) {
 			mob.setDragging(value)
@@ -457,7 +460,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		log('pointer down')
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
@@ -527,6 +529,7 @@ The content children can also be dragged and panned.
 	//                                                      //
 	//////////////////////////////////////////////////////////
 
+	allowingDrag: boolean
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
@@ -552,6 +555,7 @@ The content children can also be dragged and panned.
 	}
 
 	endPanning(e: ScreenEvent) {
+		this.panPointStart = null
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = null
 			mob.showShadow()
