@@ -6,7 +6,7 @@ import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from './button_geometry'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Paper } from 'core/Paper'
-import { eventVertex, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
+import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 
 
@@ -95,7 +95,7 @@ export class SidebarButton extends Circle {
 		this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 		this.label.view.div.style['color'] = Color.white().toHex()
 
-		if (isTouchDevice === false) {
+		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
 				let paperView = paperDiv['view']
@@ -125,7 +125,6 @@ export class SidebarButton extends Circle {
 
 	commonButtonDown() {
 		if (this.active) { return }
-		//log(this.messages[0])
 		this.messagePaper(this.messages[0])
 		this.update({
 			active: true,
@@ -198,7 +197,6 @@ export class SidebarButton extends Circle {
 			frameHeight: 2 * this.radius			
 		})
 		this.updateLabel()
-		//log(this.outgoingMessage)
 		this.messagePaper(this.outgoingMessage)
 	}
 	
@@ -254,7 +252,6 @@ export class SidebarButton extends Circle {
 			fillColor: this.colorForIndex(this.currentModeIndex)
 		})
 		if (withMessage as boolean) {
-			//log(message)
 			this.messagePaper(message)
 		}
  

@@ -1,7 +1,7 @@
 
 import { SidebarButton } from './SidebarButton'
 import { BUTTON_SCALE_FACTOR } from './button_geometry'
-import { log } from 'core/functions/logging'
+import { log, htmlLog } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 

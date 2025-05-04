@@ -2,7 +2,8 @@
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 
-export const isTouchDevice: boolean = (document.body.className == 'ipad')
+export const isTouchDevice: boolean = (window.navigator.maxTouchPoints > 0)
+export const separateSidebar: boolean = (document.querySelector('#paper_id') === null || document.querySelector('#sidebar_id') === null)
 
 /*
 Screen input can come from a mouse, finger(s) or a pen/stylus.

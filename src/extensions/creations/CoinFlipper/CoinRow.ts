@@ -183,7 +183,6 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	play() {
-		log('play')
 		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 100)
 		this.playState = 'play'
 	}

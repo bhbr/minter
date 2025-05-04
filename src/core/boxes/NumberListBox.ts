@@ -79,7 +79,6 @@ export class LinkableNumberListBox extends NumberListBox {
 		return undefined // this.list[this.list.length - 1]
 	}
 	set nextEntry(newValue: number) {
-		log(newValue)
 		this.list.push(newValue)
 		this.update()
 	}

@@ -94,9 +94,6 @@ export class BinaryOperatorBox extends Linkable {
 	}
 
 	compute(a: number | Array<number>, b: number | Array<number>, op: operatorString): number | Array<number> {
-		log('computing')
-		log(a)
-		log(b)
 		if (typeof a == 'number' && typeof b == 'number') {
 			return this.computeNumberAndNumber(a, b, op)
 		} else if (a instanceof Array && typeof b == 'number') {

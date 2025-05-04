@@ -307,9 +307,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	removeDependency(dep: Dependency) {
-		if (!this.dependencies.includes(dep)) {
-			log('hm')
-		}
 		remove(this.dependencies, dep)
 	}
 

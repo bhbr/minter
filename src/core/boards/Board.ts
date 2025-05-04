@@ -405,18 +405,17 @@ The content children can also be dragged and panned.
 	}
 
 	handleMessage(key: string, value: any) {
+		if (value === "0") { value = false }
+		if (value === "1") { value = true }
 		this.enableContent()
 		switch (key) {
 			case 'drag':
-				if (isTouchDevice) { value = (value === "1") }
 				this.setInternalDragging(value as boolean)
 				break
 			case 'link':
-				if (isTouchDevice) { value = (value === "1") }
 				this.setLinking(value as boolean)
 				break
 			case 'ctrl':
-				if (isTouchDevice) { value = (value === "1") }
 				this.setButtonVisibility(value as boolean)
 				break
 			case 'create':
