@@ -4,9 +4,10 @@ import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper'
 import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
-import { WheelColorSample } from './extensions/creations/ColorSample/WheelColorSample'
+import { PascalsBrickWall } from './extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
+import { factorial, binomial } from './core/functions/math'
 
-export class StartPaper extends CoinFlipPaper { }
+export class StartPaper extends DemoPaper { }
 
 let TESTING = true
 
@@ -14,7 +15,5 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let s = new WheelColorSample({
-	anchor: [300, 300]
-})
-paper.addToContent(s)
+let p = new PascalsBrickWall()
+paper.add(p)
