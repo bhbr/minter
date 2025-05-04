@@ -500,6 +500,13 @@ export class Sensor extends ExtendedObject {
 	savedOnDoubleMouseClick(e: ScreenEvent) { }
 	savedOnLongMouseDown(e: ScreenEvent) { }
 
+	savedOnPointerDown(e: ScreenEvent) { }
+	savedOnPointerMove(e: ScreenEvent) { }
+	savedOnPointerUp(e: ScreenEvent) { }
+	savedOnTap(e: ScreenEvent) { }
+	savedOnMereTap(e: ScreenEvent) { }
+	savedOnDoubleTap(e: ScreenEvent) { }
+	savedOnLongPress(e: ScreenEvent) { }
 	// Dragging methods
 
 
@@ -571,6 +578,29 @@ export class Sensor extends ExtendedObject {
 		this.onLongMouseDown = (e: ScreenEvent) => { }
 	}
 
+
+	setPointerMethodsTo(
+		newOnPointerDown: (e: ScreenEvent) => void,
+		newOnPointerMove: (e: ScreenEvent) => void,
+		newOnPointerUp: (e: ScreenEvent) => void
+	) {
+		this.savedOnPointerDown = this.onPointerDown
+		this.savedOnPointerMove = this.onPointerMove
+		this.savedOnPointerUp = this.onPointerUp
+		this.savedOnTap = this.onTap
+		this.savedOnMereTap = this.onMereTap
+		this.savedOnDoubleTap = this.onDoubleTap
+		this.savedOnLongPress = this.onLongPress
+
+		this.onPointerDown = newOnPointerDown
+		this.onPointerMove = newOnPointerMove
+		this.onPointerUp = newOnPointerUp
+		this.onTap = (e: ScreenEvent) => { }
+		this.onMereTap = (e: ScreenEvent) => { }
+		this.onDoubleTap = (e: ScreenEvent) => { }
+		this.onLongPress = (e: ScreenEvent) => { }
+	}
+
 	restoreTouchMethods() {
 		this.onTouchDown = this.savedOnTouchDown
 		this.onTouchMove = this.savedOnTouchMove
@@ -625,6 +655,23 @@ export class Sensor extends ExtendedObject {
 		this.savedOnLongMouseDown = (e: ScreenEvent) => { }
 	}
 
+	restorePointerMethods() {
+		this.onPointerDown = this.savedOnPointerDown
+		this.onPointerMove = this.savedOnPointerMove
+		this.onPointerUp = this.savedOnPointerUp
+		this.onTap = this.savedOnTap
+		this.onMereTap = this.savedOnMereTap
+		this.onDoubleTap = this.savedOnDoubleTap
+		this.onLongPress = this.savedOnLongPress
+
+		this.savedOnPointerDown = (e: ScreenEvent) => { }
+		this.savedOnPointerMove = (e: ScreenEvent) => { }
+		this.savedOnPointerUp = (e: ScreenEvent) => { }
+		this.savedOnTap = (e: ScreenEvent) => { }
+		this.savedOnMereTap = (e: ScreenEvent) => { }
+		this.savedOnDoubleTap = (e: ScreenEvent) => { }
+		this.savedOnLongPress = (e: ScreenEvent) => { }
+	}
 
 
 }

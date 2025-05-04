@@ -28,7 +28,7 @@ export class SidebarButton extends Circle {
 	touchStart: vertex
 	active: boolean
 	showLabel: boolean
-	text: string
+	messageKey: string
 	label: TextLabel
 	messages: Array<object>
 	outgoingMessage: object
@@ -55,7 +55,7 @@ export class SidebarButton extends Circle {
 			locationIndex: 0,
 			active: false,
 			showLabel: true,
-			text: 'text',
+			messageKey: 'key',
 			radius: BUTTON_RADIUS,
 			frameWidth: 2 * BUTTON_RADIUS,
 			frameHeight: 2 * BUTTON_RADIUS,
@@ -72,7 +72,9 @@ export class SidebarButton extends Circle {
 			optionSpacing: 'never',
 			label: 'never',
 			activeScalingFactor: 'never',
-			messages: 'on_init'
+			messages: 'on_update',
+			outgoingMessage: 'on_update',
+			messageKey: 'on_init'
 		}
 	}
 
@@ -88,7 +90,7 @@ export class SidebarButton extends Circle {
 		this.label.update({
 			frameWidth: 2 * this.baseRadius,
 			frameHeight: 2 * this.baseRadius,
-			text: this.text
+			text: this.messageKey
 		}, false)
 		this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 		this.label.view.div.style['color'] = Color.white().toHex()

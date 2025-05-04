@@ -9,7 +9,7 @@ import { buttonCenter } from 'core/sidebar_buttons/button_geometry'
 import { Paper } from 'core/Paper'
 import { Mobject } from 'core/mobjects/Mobject'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
-import { CommandButton } from 'core/sidebar_buttons/CommandButton'
+import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
 
@@ -39,10 +39,10 @@ export class Sidebar extends Mobject {
 			}),
 
 			availableButtonClasses: [
-				CommandButton
+				DragButton
 			],
 			buttons: [
-				new CommandButton()
+				new DragButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: PAPER_HEIGHT,

@@ -12,4 +12,3 @@ let TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-

@@ -86,7 +86,8 @@ The content children can also be dragged and panned.
 			openHook: null,
 			openBullet: null,
 			compatibleHooks: [],
-			creationTool: null
+			creationTool: null,
+			isShowingLinks: false
 		}
 	}
 
@@ -395,9 +396,9 @@ The content children can also be dragged and panned.
 
 	setInternalDragging(value: boolean) {
 		this.setPanning(value)
-			for (let mob of this.contentChildren) {
-				mob.setDragging(value)
-			}
+		for (let mob of this.contentChildren) {
+			mob.setDragging(value)
+		}
 	}
 
 	handleMessage(key: string, value: any) {
@@ -405,23 +406,12 @@ The content children can also be dragged and panned.
 		switch (key) {
 			case 'drag':
 				this.setInternalDragging(value as boolean)
-				this.setLinkVisibility(false)
-				this.setButtonVisibility(false)
 				break
 			case 'link':
-				this.setInternalDragging(false)
-				this.setLinkVisibility(value as boolean)
-				this.setButtonVisibility(false)
+				this.setLinking(value as boolean)
 				break
-			case 'com':
-				this.setInternalDragging(false)
-				this.setLinkVisibility(false)
+			case 'ctrl':
 				this.setButtonVisibility(value as boolean)
-				break
-			case 'all':
-				this.setInternalDragging(false)
-				this.setLinkVisibility(false)
-				this.setButtonVisibility(false)
 				break
 			case 'create':
 				this.creationMode = value
@@ -433,13 +423,6 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	setLinkVisibility(visible: boolean) {
-		if (visible) {
-			this.showLinksOfContent()
-		} else {
-			this.hideLinksOfContent()
-		}
-	}
 
 	setButtonVisibility(visible: boolean) {
 		for (let mob of this.contentChildren) {
@@ -474,6 +457,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		log('pointer down')
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
@@ -602,6 +586,7 @@ The content children can also be dragged and panned.
 	compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
+	isShowingLinks: boolean
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -647,17 +632,26 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
-		if (flag) {
+		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-		} else { // if (!this.editingLinkName) {
+			if (isTouchDevice) {
+				this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+				this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+				this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			} else {
+				this.sensor.setPointerMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			}
+		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
+			if (isTouchDevice) {
+				this.sensor.restoreTouchMethods()
+				this.sensor.restorePenMethods()
+				this.sensor.restoreMouseMethods()
+			} else {
+				this.sensor.restorePointerMethods()
+			}
 		}
+		this.isShowingLinks = flag
 	}
 
 	startLinking(e: ScreenEvent) {

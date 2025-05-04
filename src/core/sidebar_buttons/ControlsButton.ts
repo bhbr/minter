@@ -1,11 +1,11 @@
 
 import { ToggleButton } from './ToggleButton'
 
-export class LinkButton extends ToggleButton {
+export class ControlsButton extends ToggleButton {
 
 	defaults(): object {
 		return {
-			messageKey: 'link'
+			messageKey: 'ctrl'
 		}
 	}
 

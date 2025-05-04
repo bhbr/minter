@@ -5,6 +5,7 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
+import { log } from 'core/functions/logging'
 
 export class NumberListBox extends Linkable {
 	
@@ -27,7 +28,6 @@ export class NumberListBox extends Linkable {
 
 	get list(): Array<number> { return this.value }
 	set list(newValue: Array<number>) { this.value = newValue }
-
 
 	setup() {
 		super.setup()
@@ -60,7 +60,8 @@ export class LinkableNumberListBox extends NumberListBox {
 	defaults(): object {
 		return {
 			inputProperties: [
-				{ name: 'value', type: 'Array<number>' }
+				{ name: 'value', type: 'Array<number>' },
+				{ name: 'nextEntry', type: 'number' },
 			],
 			outputProperties: [
 				{ name: 'value', type: 'Array<number>' },
@@ -73,6 +74,16 @@ export class LinkableNumberListBox extends NumberListBox {
 	length(): number {
 		return this.list.length
 	}
+
+	get nextEntry(): number {
+		return undefined // this.list[this.list.length - 1]
+	}
+	set nextEntry(newValue: number) {
+		log(newValue)
+		this.list.push(newValue)
+		this.update()
+	}
+
 
 }
 
