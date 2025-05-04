@@ -5,7 +5,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { vertex } from 'core/functions/vertex'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
-let RADIUS = 30
+export const COLOR_SAMPLE_RADIUS = 30
 
 export class ColorSample extends Linkable {
 
@@ -15,13 +15,13 @@ export class ColorSample extends Linkable {
 	defaults(): object {
 		return {
 			circle : new Circle({
-				radius: RADIUS,
-				midpoint: [RADIUS, RADIUS],
+				radius: COLOR_SAMPLE_RADIUS,
+				midpoint: [COLOR_SAMPLE_RADIUS, COLOR_SAMPLE_RADIUS],
 				fillOpacity: 1
 			}),
 			color: Color.white(),
-			frameWidth: 2 * RADIUS,
-			frameHeight: 2 * RADIUS,
+			frameWidth: 2 * COLOR_SAMPLE_RADIUS,
+			frameHeight: 2 * COLOR_SAMPLE_RADIUS,
 			outputProperties: [
 				{ name: 'color', type: 'Color' }
 			],

@@ -4,16 +4,17 @@ import { vertex, vertexSubtract, vertexNorm } from 'core/functions/vertex'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { TAU, DEGREES } from 'core/constants'
 import { Color } from 'core/classes/Color'
+import { Circle } from 'core/shapes/Circle'
+import { COLOR_SAMPLE_RADIUS } from './ColorSample'
 
 export class WheelColorSample extends ColorSample {
 
 	touchStartLocation?: vertex
 	saturationShiftTime?: number
-	timeoutID?: number
-	intervalID?: number
 	hue: number
 	saturation: number
 	value: number
+	marker: Circle
 
 	defaults(): object {
 		return {
@@ -30,7 +31,14 @@ export class WheelColorSample extends ColorSample {
 			intervalID: null,
 			hue: 0,
 			saturation: 1,
-			value: 0.5
+			value: 1,
+			marker: new Circle({
+				midpoint: [COLOR_SAMPLE_RADIUS, 0.2 * COLOR_SAMPLE_RADIUS],
+				radius: 3,
+				fillColor: Color.white(),
+				fillOpacity: 1,
+				strokeWidth: 0
+			})
 		}
 	}
 
@@ -40,47 +48,30 @@ export class WheelColorSample extends ColorSample {
 		}
 	}
 
-	onPointerDown(e: ScreenEvent) {
-		this.touchStartLocation = this.sensor.localEventVertex(e)
-		this.timeoutID = window.setTimeout(this.startSaturationShift.bind(this), 1000)
+	setup() {
+		super.setup()
+		this.add(this.marker)
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		if (this.touchStartLocation == null) { return }
 		let p = this.sensor.localEventVertex(e)
 		let t = Date.now()
-		let dp = vertexSubtract(p, this.touchStartLocation)
+		let dp = vertexSubtract(p, this.circle.midpoint)
 		let angle = Math.atan2(dp[1], dp[0])
-		let distance = vertexNorm(dp) / 100
 		this.hue = angle + TAU / 2
-		this.value = Math.min(distance, 1)
 		let rgb = Color.hsv_to_rgb(this.hue, this.saturation, this.value)
 		this.update({
 			red: rgb[0], green: rgb[1], blue: rgb[2]
 		})
-	}
-
-	onPointerUp(e: ScreenEvent) {
-		window.clearTimeout(this.timeoutID)
-		this.timeoutID = null
-		window.clearInterval(this.intervalID)
-		this.intervalID = null
-	}
-
-	startSaturationShift() {
-		this.intervalID = window.setInterval(this.shiftSaturation.bind(this), 100)
-		this.saturationShiftTime = 0.001 * Date.now()
-	}
-
-	shiftSaturation() {
-		let t = 0.001 * Date.now()
-		let dt = t - this.saturationShiftTime
-		this.saturation = 0.5 * (1 + Math.sin(dt))
-		let rgb = Color.hsv_to_rgb(this.hue, this.saturation, this.value)
-		this.update({
-			red: rgb[0], green: rgb[1], blue: rgb[2]
+		this.marker.update({
+			midpoint: [
+				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.cos(this.hue)),
+				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.sin(this.hue))
+			]
 		})
 	}
+
+
 
 }
 
