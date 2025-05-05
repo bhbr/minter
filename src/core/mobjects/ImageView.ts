@@ -25,4 +25,12 @@ export class ImageView extends View {
 		this.imageElement.height = this.frameHeight
 	}
 
+	update(args: object = {}) {
+		super.update(args)
+		let newImageLocation = args['imageLocation']
+		if (newImageLocation) {
+			this.imageElement.src = newImageLocation
+		}
+	}
+
 }

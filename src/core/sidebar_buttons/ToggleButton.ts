@@ -46,4 +46,9 @@ export class ToggleButton extends SidebarButton {
 		this.label.view.div.setAttribute('font-size', (f * this.baseFontSize).toString())
 	}
 
+
+	imageNameForIndex(index: number): string {
+		return Object.keys(this.messages[index])[0]
+	}
+
 }

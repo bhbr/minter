@@ -29,4 +29,10 @@ export class CreativeButton extends SidebarButton {
 		return Object.values(msg)[0]
 	}
 
+
+
+	imageNameForIndex(index: number): string {
+		return Object.values(this.messages[index])[0]
+	}
+
 }

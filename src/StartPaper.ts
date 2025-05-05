@@ -18,13 +18,12 @@ if (TESTING) { AllTests.run() }
 export const paper = new StartPaper()
 
 let imageView = new ImageView({
+	frameWidth: 200,
+	frameHeight: 200,
 	imageLocation: '../../assets/drag.png'
 })
 
-let image = new Mobject({
-	view: imageView
-})
 
-paper.add(image)
+
+paper.view.add(imageView)
 log(imageView)
-log(image)

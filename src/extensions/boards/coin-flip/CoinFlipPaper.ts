@@ -28,7 +28,7 @@ export class CoinFlipPaper extends Paper {
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
 				'coin': PlayableCoinCreator,
-				'coin row': CoinRowCreator,
+				'coinrow': CoinRowCreator,
 				'+': AddBoxCreator,
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,
