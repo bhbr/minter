@@ -12,6 +12,7 @@ import { SimpleButton } from 'core/mobjects/SimpleButton'
 export interface IOProperty {
 	name: string
 	type: string
+	displayName: string | undefined
 }
 
 export class Linkable extends Mobject {
