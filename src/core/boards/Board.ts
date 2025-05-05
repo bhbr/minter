@@ -20,7 +20,6 @@ import { getPaper } from 'core/functions/getters'
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
-import { PAPER_WIDTH, PAPER_HEIGHT } from 'core/constants'
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
@@ -216,11 +215,11 @@ The content children can also be dragged and panned.
 	}
 
 	expandedWidth(): number {
-		return PAPER_WIDTH - 2 * this.expandedPadding
+		return window.innerWidth - 2 * this.expandedPadding
 	}
 
 	expandedHeight(): number {
-		return PAPER_HEIGHT - 2 * this.expandedPadding
+		return window.innerHeight - 2 * this.expandedPadding
 	}
 
 	getCompactWidth(): number {

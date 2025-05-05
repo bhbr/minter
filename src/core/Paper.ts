@@ -5,7 +5,7 @@ import { ScreenEventDevice, separateSidebar, ScreenEventHandler } from 'core/mob
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { PAPER_WIDTH, PAPER_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
 import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
@@ -29,8 +29,6 @@ export class Paper extends Board {
 			expandedMobject: this,
 			pressedKeys: [],
 			activeKeyboard: true,
-			frameWidth: PAPER_WIDTH,
-			frameHeight: PAPER_HEIGHT,
 			currentColor: Color.white(),
 			drawShadow: false,
 			loadedAPIs: []
@@ -71,6 +69,18 @@ export class Paper extends Board {
 		this.background.update({
 			width: width,
 			height: height
+		})
+		window.addEventListener('resize', this.resize.bind(this))
+	}
+
+	resize() {
+		log('resizing')
+		this.update({
+			frameWidth: window.innerWidth - this.sidebar.frameWidth,
+			frameHeight: window.innerHeight + 500
+		})
+		this.sidebar.update({
+			frameHeight: window.innerHeight + 500
 		})
 	}
 
