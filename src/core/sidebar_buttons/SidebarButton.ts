@@ -35,7 +35,7 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 	paper?: Paper
-
+	
 	defaults(): object {
 		return {
 			baseColor: Color.gray(0.4),

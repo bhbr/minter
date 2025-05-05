@@ -6,6 +6,8 @@ import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
 import { TextLabel } from './core/mobjects/TextLabel'
 import { isTouchDevice } from './core/mobjects/screen_events'
+import { ImageView } from './core/mobjects/ImageView'
+import { Mobject } from './core/mobjects/Mobject'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -15,3 +17,14 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
+let imageView = new ImageView({
+	imageLocation: '../../assets/drag.png'
+})
+
+let image = new Mobject({
+	view: imageView
+})
+
+paper.add(image)
+log(imageView)
+log(image)
