@@ -17,7 +17,7 @@ export class IsingModel extends CellularAutomaton {
 			},
 			inputProperties: [
 				{ name: 'temperature', type: 'number' },
-				{ name: 'couplingStrength', type: 'number' }
+				{ name: 'couplingStrength', displayName: 'coupling strength', type: 'number' }
 			]
 		}
 	}
