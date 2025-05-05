@@ -70,17 +70,20 @@ export class Paper extends Board {
 			width: width,
 			height: height
 		})
-		window.addEventListener('resize', this.resize.bind(this))
+		//window.addEventListener('resize', this.resize.bind(this))
+		this.resize()
 	}
 
 	resize() {
-		log('resizing')
+		let size = Math.max(window.screen.width, window.screen.height)
+		let buffer = 500
+		log(size)
 		this.update({
-			frameWidth: window.innerWidth - this.sidebar.frameWidth,
-			frameHeight: window.innerHeight + 500
+			frameWidth: size + buffer,
+			frameHeight: size + buffer
 		})
-		this.sidebar.update({
-			frameHeight: window.innerHeight + 500
+		this.sidebar?.update({
+			frameHeight: size + buffer
 		})
 	}
 

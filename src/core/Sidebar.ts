@@ -35,7 +35,7 @@ export class Sidebar extends Mobject {
 				strokeWidth: 0,
 				screenEventHandler: ScreenEventHandler.Parent,
 				width: SIDEBAR_WIDTH,
-				height: window.innerHeight
+				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
 
 			availableButtonClasses: [
@@ -45,7 +45,7 @@ export class Sidebar extends Mobject {
 				new DragButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
-			frameHeight: window.innerHeight,
+			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -78,14 +78,7 @@ export class Sidebar extends Mobject {
 
 		this.addDependency('frameWidth', this.background, 'width')
 		this.addDependency('frameHeight', this.background, 'height')
-		
-		let height = window.innerHeight
-		this.update({
-			frameHeight: height
-		})
-		// this.background.update({
-		// 	height: height
-		// })
+
 	}
 
 
