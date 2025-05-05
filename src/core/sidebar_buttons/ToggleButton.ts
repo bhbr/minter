@@ -48,7 +48,7 @@ export class ToggleButton extends SidebarButton {
 
 
 	imageNameForIndex(index: number): string {
-		return Object.keys(this.messages[index])[0]
+		return this.messageKey
 	}
 
 }
