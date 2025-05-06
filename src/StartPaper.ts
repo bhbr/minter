@@ -8,6 +8,7 @@ import { TextLabel } from './core/mobjects/TextLabel'
 import { isTouchDevice } from './core/mobjects/screen_events'
 import { ImageView } from './core/mobjects/ImageView'
 import { Mobject } from './core/mobjects/Mobject'
+import { Coin } from './extensions/creations/CoinFlipper/Coin'
 
 export class StartPaper extends CoinFlipPaper { }
 
