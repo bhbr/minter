@@ -157,8 +157,6 @@ export class Sensor extends ExtendedObject {
 
 	capturedOnPointerDown(e: ScreenEvent) {
 
-		log('down')
-
 		if (this.eventStartTime == 0) {
 			this.eventStartTime = e.timeStamp
 		}

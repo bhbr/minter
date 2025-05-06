@@ -639,24 +639,21 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			//if (isTouchDevice) {
-				this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-				this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-				this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// } else {
-			// 	this.sensor.setPointerMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// }
+			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			//if (isTouchDevice) {
-				this.sensor.restoreTouchMethods()
-				this.sensor.restorePenMethods()
-				this.sensor.restoreMouseMethods()
-			// } else {
-			// 	this.sensor.restorePointerMethods()
-			// }
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 		this.isShowingLinks = flag
+		if (flag) {
+			this.disableContent()
+		} else {
+			this.enableContent()
+		}
 	}
 
 	startLinking(e: ScreenEvent) {
