@@ -28,12 +28,12 @@ export class TestDesmosCalculator extends DesmosCalculator {
 			X: 1,
 			Y: 1,
 			inputProperties: [
-				{ name: 'X', type: 'number' },
-				{ name: 'b', type: 'number' }
+				{ name: 'X', displayName: null, type: 'number' },
+				{ name: 'b', displayName: null, type: 'number' }
 			],
 			outputProperties: [
-				{ name: 'a', type: 'number' },
-				{ name: 'Y', type: 'number' }
+				{ name: 'a', displayName: null, type: 'number' },
+				{ name: 'Y', displayName: null, type: 'number' }
 			]
 		}
 	}

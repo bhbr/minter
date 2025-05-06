@@ -13,7 +13,7 @@ import { log } from 'core/functions/logging'
 export class LinkOutlet extends MGroup {
 
 	name: string
-	displayName: string
+	displayName?: string
 	type: string
 	label: TextLabel
 	inputBox?: InputTextBox
@@ -50,6 +50,7 @@ export class LinkOutlet extends MGroup {
 
 	setup() {
 		super.setup()
+		this.displayName = this.displayName ?? this.name
 		this.label.update({
 			text: this.displayName
 		})
@@ -66,7 +67,7 @@ export class LinkOutlet extends MGroup {
 			}.bind(this)
 			this.update({
 				inputBox: new InputTextBox({
-					value: this.name,
+					value: this.displayName,
 					frameWidth: this.label.frameWidth,
 					frameHeight: this.label.frameHeight
 				})
@@ -110,7 +111,7 @@ export class LinkOutlet extends MGroup {
 		this.remove(this.inputBox)
 		this.add(this.label)
 		this.update({
-			name: this.inputBox.value
+			displayName: this.inputBox.value
 		})
 	}
 

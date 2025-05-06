@@ -24,10 +24,10 @@ export class NumberValuedFunctionBox extends NumberBox {
 			}),
 			functionLabel: new TextLabel(),
 			inputProperties: [
-				{ name: 'argument', type: 'any' }
+				{ name: 'argument', displayName: null, type: 'any' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'number' }
+				{ name: 'value', displayName: null, type: 'number' }
 			]
 		}
 	}

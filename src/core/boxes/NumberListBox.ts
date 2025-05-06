@@ -60,12 +60,12 @@ export class LinkableNumberListBox extends NumberListBox {
 	defaults(): object {
 		return {
 			inputProperties: [
-				{ name: 'value', type: 'Array<number>' },
-				{ name: 'nextEntry', type: 'number' },
+				{ name: 'value', displayName: null, type: 'Array<number>' },
+				{ name: 'nextEntry', displayName: 'next entry', type: 'number' },
 			],
 			outputProperties: [
-				{ name: 'value', type: 'Array<number>' },
-				{ name: 'length', type: 'number' },
+				{ name: 'value', displayName: null, type: 'Array<number>' },
+				{ name: 'length', displayName: null, type: 'number' },
 			]
 		}
 

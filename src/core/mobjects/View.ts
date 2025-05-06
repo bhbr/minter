@@ -98,8 +98,8 @@ export class View extends ExtendedObject {
 
 	// called by mobject.add
 	add(subView: View) {
-		subView.setup()
 		this.div.appendChild(subView.div)
+		subView.setup()
 	}
 
 	redraw() {

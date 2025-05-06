@@ -17,10 +17,10 @@ export class Histogram extends DesmosCalculator {
 			leftColor: Color.green(),
 			rightColor: Color.purple(),
 			inputProperties: [
-				{ name: 'data', type: 'Array<number>' },
-				{ name: 'nbBins', type: 'number' },
-				{ name: 'leftColor', type: 'Color' },
-				{ name: 'rightColor', type: 'Color' }
+				{ name: 'data', displayName: null, type: 'Array<number>' },
+				{ name: 'nbBins', displayName: '# bins', type: 'number' },
+				{ name: 'leftColor', displayName: 'left color', type: 'Color' },
+				{ name: 'rightColor', displayName: 'right color', type: 'Color' }
 			],
 			outputProperties: [
 				{ name: 'bins', type: 'Array<number>' }

@@ -12,7 +12,7 @@ export class SumBox extends NumberValuedFunctionBox {
 			name: 'sum',
 			argument: [],
 			inputProperties: [
-				{ name: 'list', type: 'Array<number>' }
+				{ name: 'list', displayName: null, type: 'Array<number>' }
 			]
 		}
 	}
