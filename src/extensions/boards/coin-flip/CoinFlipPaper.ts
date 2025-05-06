@@ -22,8 +22,8 @@ export class CoinFlipPaper extends Paper {
 	defaults(): object {
 		return {
 			creationConstructors: {
-				'num': NumberBoxCreator,
-				'numlist': NumberListBoxCreator,
+				'number': NumberBoxCreator,
+				'list': NumberListBoxCreator,
 				'input': InputNumberBoxCreator,
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
@@ -34,9 +34,7 @@ export class CoinFlipPaper extends Paper {
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
 				'sum': SumBoxCreator,
-				'avg': AverageBoxCreator,
-				'cumsum': CumSumBoxCreator,
-				'cumavg': CumAverageBoxCreator,
+				'mean': AverageBoxCreator,
 				'plot': SequencePlotCreator,
 				'hist': HistogramCreator,
 				'rgb': RGBAColorSampleCreator,

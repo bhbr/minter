@@ -16,14 +16,3 @@ let TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let imageView = new ImageView({
-	frameWidth: 200,
-	frameHeight: 200,
-	imageLocation: '../../assets/drag.png'
-})
-
-
-
-paper.view.add(imageView)
-log(imageView)
