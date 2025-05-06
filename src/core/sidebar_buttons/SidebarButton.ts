@@ -105,6 +105,7 @@ export class SidebarButton extends Circle {
 			this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 			this.label.view.div.style['color'] = Color.white().toHex()
 		}
+		this.updateLabel()
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -239,9 +240,6 @@ export class SidebarButton extends Circle {
 			frameHeight: 2 * this.radius
 		})
 
-		let f = this.active ? BUTTON_SCALE_FACTOR : 1
-		let fs = f * (this.baseFontSize) // ?? 12)
-		this.label.view?.div.style.setProperty('font-size', fs.toString().concat('px'))
 		if (this.label) {
 			try {
 				let msg = this.messages[this.currentModeIndex]
@@ -252,6 +250,9 @@ export class SidebarButton extends Circle {
 		} else {
 			this.label.text = ''
 		}
+		let f = this.active ? BUTTON_SCALE_FACTOR : 1
+		let fs = f * (this.baseFontSize) // ?? 12)
+		this.label.view?.div.style.setProperty('font-size', '30px') //fs.toString().concat('px'))
 	}
 
 	updateIcon() {
