@@ -20,7 +20,7 @@ export class CreativeButton extends SidebarButton {
 
 	setup() {
 		for (let c of this.creations) {
-			this.messages.push({create: c})
+			this.messages.push({ create: c })
 		}
 		super.setup()
 	}

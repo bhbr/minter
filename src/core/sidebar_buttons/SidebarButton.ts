@@ -82,6 +82,7 @@ export class SidebarButton extends Circle {
 	}
 
 	setup() {
+		log('SidebarButton.setup')
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
 		if (this.label && !this.icon) {
@@ -105,7 +106,7 @@ export class SidebarButton extends Circle {
 			this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 			this.label.view.div.style['color'] = Color.white().toHex()
 		}
-
+		log(this.label.view.div.style['font-size'])
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -147,7 +148,7 @@ export class SidebarButton extends Circle {
 			scale: this.activeScalingFactor
 		})
 		this.redraw()
-		this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize * this.activeScalingFactor}px`)
+		//this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize * this.activeScalingFactor}px`)
 		this.label?.update({
 			frameWidth: 2 * this.radius,
 			frameHeight: 2 * this.radius			
@@ -214,7 +215,7 @@ export class SidebarButton extends Circle {
 			scale: 1
 		})
 		this.redraw()
-		this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize}px`)
+		//this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize}px`)
 		this.label?.update({
 			frameWidth: 2 * this.radius,
 			frameHeight: 2 * this.radius			
@@ -241,8 +242,8 @@ export class SidebarButton extends Circle {
 		})
 
 		let f = this.active ? BUTTON_SCALE_FACTOR : 1
-		let fs = f * (this.baseFontSize ?? 12)
-		this.label.view?.div.style.setProperty('font-size', fs.toString())
+		let fs = f * (this.baseFontSize) // ?? 12)
+		this.label.view?.div.style.setProperty('font-size', fs.toString().concat('px'))
 		if (this.label) {
 			try {
 				let msg = this.messages[this.currentModeIndex]
