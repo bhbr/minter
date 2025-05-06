@@ -7,6 +7,7 @@ import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 
 export class NumberListBox extends Linkable {
 	
@@ -70,10 +71,18 @@ export class NumberListBox extends Linkable {
 		this.scroll.preventDefault = false
 	}
 
+	clear() {
+		this.update({
+			value: []
+		})
+	}
+
 
 }
 
 export class LinkableNumberListBox extends NumberListBox {
+
+	clearButton: SimpleButton
 
 	defaults(): object {
 		return {
@@ -84,7 +93,10 @@ export class LinkableNumberListBox extends NumberListBox {
 			outputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
 				{ name: 'length', displayName: null, type: 'number' },
-			]
+			],
+			clearButton: new SimpleButton({
+				text: 'clear'
+			})
 		}
 
 	}
@@ -99,6 +111,15 @@ export class LinkableNumberListBox extends NumberListBox {
 	set newestEntry(newValue: number) {
 		this.list.push(newValue)
 		this.update()
+	}
+
+	setup() {
+		super.setup()
+		this.clearButton.update({
+			anchor: [10, this.frameHeight + 10]
+		})
+		this.clearButton.action = this.clear.bind(this)
+		this.add(this.clearButton)
 	}
 
 }
