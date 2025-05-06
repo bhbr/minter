@@ -1,5 +1,7 @@
 
-let isTouchDevice: boolean = (window.navigator.maxTouchPoints > 0)
+import { isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
+
+let debugging = true
 
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
@@ -69,7 +71,7 @@ function jsLog(msg: any) {
 export function log(msg: any) {
 	// device-agnostic log function
 	// this should be used for logging
-	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
+	if (isTouchDevice && debugging) { htmlLog(msg) } else { jsLog(msg) }
 }
 
 

@@ -6,6 +6,7 @@ import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
+import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class NumberListBox extends Linkable {
 	
@@ -23,6 +24,7 @@ export class NumberListBox extends Linkable {
 			frameWidth: 80,
 			frameHeight: 200,
 			value: [],
+			preventDefault: false
 		}
 	}
 
@@ -56,6 +58,19 @@ export class NumberListBox extends Linkable {
 		this.scroll.view.div.style['overflow-y'] = 'auto'
 	}
 
+	startDragging(e: ScreenEvent) {
+		super.startDragging(e)
+		this.preventDefault = true
+		this.scroll.preventDefault = true
+	}
+
+	endDragging(e: ScreenEvent) {
+		super.endDragging(e)
+		this.preventDefault = false
+		this.scroll.preventDefault = false
+	}
+
+
 }
 
 export class LinkableNumberListBox extends NumberListBox {
@@ -64,7 +79,7 @@ export class LinkableNumberListBox extends NumberListBox {
 		return {
 			inputProperties: [
 				{ name: 'value', displayName: null, type: 'Array<number>' },
-				{ name: 'nextEntry', displayName: 'next entry', type: 'number' },
+				{ name: 'newestEntry', displayName: 'newest entry', type: 'number' },
 			],
 			outputProperties: [
 				{ name: 'value', displayName: null, type: 'Array<number>' },
@@ -78,14 +93,13 @@ export class LinkableNumberListBox extends NumberListBox {
 		return this.list.length
 	}
 
-	get nextEntry(): number {
+	get newestEntry(): number {
 		return undefined // this.list[this.list.length - 1]
 	}
-	set nextEntry(newValue: number) {
+	set newestEntry(newValue: number) {
 		this.list.push(newValue)
 		this.update()
 	}
-
 
 }
 
