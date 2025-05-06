@@ -30,11 +30,7 @@ export class PlayableCoin extends Linkable implements Playable {
 			}),
 			valueHistory: [],
 			outputProperties: [
-				{ name: 'value', type: 'number' },
-				{ name: 'valueHistory', type: 'Array<number>' },
-				{ name: 'nbFlips', type: 'number', displayName: "# flips" },
-				{ name: 'nbHeads', type: 'number', displayName: "# heads" },
-				{ name: 'nbTails', type: 'number', displayName: "# tails" }
+				{ name: 'value', type: 'number' }
 			],
 			frameWidth: 50,
 			frameHeight: 80,
