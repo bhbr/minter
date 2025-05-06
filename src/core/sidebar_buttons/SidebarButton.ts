@@ -82,7 +82,6 @@ export class SidebarButton extends Circle {
 	}
 
 	setup() {
-		log('SidebarButton.setup')
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
 		if (this.label && !this.icon) {
@@ -106,7 +105,6 @@ export class SidebarButton extends Circle {
 			this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
 			this.label.view.div.style['color'] = Color.white().toHex()
 		}
-		log(this.label.view.div.style['font-size'])
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {

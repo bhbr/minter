@@ -52,7 +52,10 @@ export class NumberListBox extends Linkable {
 			width: this.view.frame.width,
 			height: this.view.frame.height,
 			list: this.list
-		}, redraw)}
+		}, redraw)
+		this.scroll.view.div.style['overflow-y'] = 'auto'
+	}
+
 }
 
 export class LinkableNumberListBox extends NumberListBox {
