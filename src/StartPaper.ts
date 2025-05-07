@@ -10,6 +10,7 @@ import { ImageView } from './core/mobjects/ImageView'
 import { Mobject } from './core/mobjects/Mobject'
 import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
+import { Checkbox } from './core/mobjects/Checkbox'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -19,8 +20,12 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let box = new LinkableNumberListBox({
-	value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+let cb = new Checkbox({
 	anchor: [100, 100]
 })
-paper.addToContent(box)
+
+cb.onToggle = function() {
+	log(cb.state)
+}
+
+paper.add(cb)
