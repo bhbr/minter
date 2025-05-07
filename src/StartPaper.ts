@@ -10,7 +10,7 @@ import { ImageView } from './core/mobjects/ImageView'
 import { Mobject } from './core/mobjects/Mobject'
 import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
-import { Checkbox } from './core/mobjects/Checkbox'
+import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -20,12 +20,11 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let cb = new Checkbox({
-	anchor: [100, 100]
+let plot = new SequencePlot({
+	anchor: [100, 100],
+	frameWidth: 500,
+	frameHeight: 300,
+	data: [1, 4, 3, 2, 6, 5, 3, 2, 1]
 })
+paper.add(plot)
 
-cb.onToggle = function() {
-	log(cb.state)
-}
-
-paper.add(cb)

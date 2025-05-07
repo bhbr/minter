@@ -33,12 +33,27 @@ export class Checkbox extends MGroup {
 		}
 	}
 
+	get text(): string {
+		return this.label.text
+	}
+
+	set text(newValue: string) {
+		this.label.update({
+			text: newValue
+		})
+	}
+
 	setup() {
 		super.setup()
 		this.add(this.boxBorder)
 		this.add(this.box)
 		this.add(this.label)
 		this.label.view.div.style.justifyContent = 'left'
+		if (this.state) {
+			this.box.view.show()
+		} else {
+			this.box.view.hide()
+		}
 
 	}
 
@@ -55,10 +70,10 @@ export class Checkbox extends MGroup {
 	toggle() {
 		if (this.state) { this.uncheck() }
 		else { this.check() }
-		this.onToggle()
+		this.onToggle(this.state)
 	}
 
-	onToggle() { }
+	onToggle(flag: boolean) { }
 
 	onTap() {
 		this.toggle()
