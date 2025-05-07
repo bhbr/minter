@@ -26,5 +26,5 @@ let plot = new SequencePlot({
 	frameHeight: 300,
 	data: [1, 4, 3, 2, 6, 5, 3, 2, 1]
 })
-paper.add(plot)
+paper.addToContent(plot)
 

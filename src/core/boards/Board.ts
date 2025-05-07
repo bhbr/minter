@@ -177,7 +177,7 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.view.show()
 		}
 		this.hideLinksOfContent()
-		this.setButtonVisibility(false)
+		this.setControlsVisibility(false)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -415,7 +415,7 @@ The content children can also be dragged and panned.
 				this.setLinking(value as boolean)
 				break
 			case 'ctrl':
-				this.setButtonVisibility(value as boolean)
+				this.setControlsVisibility(value as boolean)
 				break
 			case 'create':
 				this.creationMode = value
@@ -428,10 +428,10 @@ The content children can also be dragged and panned.
 	}
 
 
-	setButtonVisibility(visible: boolean) {
+	setControlsVisibility(visible: boolean) {
 		for (let mob of this.contentChildren) {
 			if (mob instanceof Linkable) {
-				mob.setButtonVisibility(visible)
+				mob.setControlsVisibility(visible)
 			}
 		}
 	}

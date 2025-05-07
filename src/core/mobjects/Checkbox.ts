@@ -2,7 +2,7 @@
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Square } from 'core/shapes/Square'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
 
 export class Checkbox extends MGroup {
 
@@ -17,6 +17,7 @@ export class Checkbox extends MGroup {
 			screenEventHandler: ScreenEventHandler.Self,
 			frameWidth: 100,
 			frameHeight: 20,
+			visible: false,
 			boxBorder: new Square({
 				sidelength: 18
 			}),
@@ -75,7 +76,7 @@ export class Checkbox extends MGroup {
 
 	onToggle(flag: boolean) { }
 
-	onTap() {
+	onTap(e: ScreenEvent) {
 		this.toggle()
 	}
 
