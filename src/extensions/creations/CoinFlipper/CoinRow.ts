@@ -62,8 +62,7 @@ export class CoinRow extends Linkable implements Playable {
 			],
 			outputProperties: [
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
-				{ name: 'nbTails', displayName: '# tails', type: 'number' },
-				{ name: 'nbFlips', displayName: '# flips', type: 'number' }
+				{ name: 'nbTails', displayName: '# tails', type: 'number' }
 			],
 			frameWidth: 300,
 			frameHeight: 100

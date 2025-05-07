@@ -116,7 +116,7 @@ export class LinkableNumberListBox extends NumberListBox {
 	setup() {
 		super.setup()
 		this.clearButton.update({
-			anchor: [10, this.frameHeight + 10]
+			anchor: [20, this.frameHeight + 10]
 		})
 		this.clearButton.action = this.clear.bind(this)
 		this.add(this.clearButton)

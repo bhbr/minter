@@ -56,6 +56,10 @@ export class BinaryOperatorBox extends Linkable {
 	setup() {
 		super.setup()
 		this.add(this.valueBox)
+		this.update({
+			frameWidth: this.valueBox.frameWidth,
+			frameHeight: this.valueBox.frameHeight,
+		})
 		this.operatorSign.update({
 			midpoint: [this.view.frame.width / 2, 0]
 		})

@@ -28,6 +28,10 @@ export class Coin extends Circle {
 
 	setup() {
 		super.setup()
+		this.update({
+			frameWidth: 2 * this.radius,
+			frameHeight: 2 * this.radius
+		})
 		this.label.update({
 			//anchor: [0, 0],
 			frameWidth: 2 * this.radius,
