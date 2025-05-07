@@ -34,12 +34,12 @@ export class BinaryOperatorBox extends Linkable {
 			operand2: 0,
 			valueType: 'number',
 			valueBox: new NumberBox(),
-			inputProperties: [
-				{ name: 'operand1', type: 'number|Array<number>' },
-				{ name: 'operand2', type: 'number|Array<number>' }
+ 			inputProperties: [
+				{ name: 'operand1', displayName: null, type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: null, type: 'number|Array<number>' }
 			],
 			outputProperties: [
-				{ name: 'result', type: 'number|Array<number>' }
+				{ name: 'result', displayName: null, type: 'number|Array<number>' }
 			]
 		}
 	}
@@ -56,6 +56,10 @@ export class BinaryOperatorBox extends Linkable {
 	setup() {
 		super.setup()
 		this.add(this.valueBox)
+		this.update({
+			frameWidth: this.valueBox.frameWidth,
+			frameHeight: this.valueBox.frameHeight,
+		})
 		this.operatorSign.update({
 			midpoint: [this.view.frame.width / 2, 0]
 		})
@@ -94,9 +98,6 @@ export class BinaryOperatorBox extends Linkable {
 	}
 
 	compute(a: number | Array<number>, b: number | Array<number>, op: operatorString): number | Array<number> {
-		log('computing')
-		log(a)
-		log(b)
 		if (typeof a == 'number' && typeof b == 'number') {
 			return this.computeNumberAndNumber(a, b, op)
 		} else if (a instanceof Array && typeof b == 'number') {
@@ -157,7 +158,14 @@ export class BinaryOperatorBox extends Linkable {
 export class AddBox extends BinaryOperatorBox {
 	defaults(): object {
 		return {
-			operator: '+'
+			operator: '+',
+ 			inputProperties: [
+				{ name: 'operand1', displayName: 'term', type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: 'term', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', displayName: 'sum', type: 'number|Array<number>' }
+			]
 		}
 	}
 	mutabilities(): object {
@@ -170,7 +178,14 @@ export class AddBox extends BinaryOperatorBox {
 export class SubtractBox extends BinaryOperatorBox {
 	defaults(): object {
 		return {
-			operator: '–'
+			operator: '–',
+ 			inputProperties: [
+				{ name: 'operand1', displayName: 'minuend', type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: 'subtrahend', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', displayName: 'difference', type: 'number|Array<number>' }
+			]
 		}
 	}
 	mutabilities(): object {
@@ -183,7 +198,14 @@ export class SubtractBox extends BinaryOperatorBox {
 export class MultiplyBox extends BinaryOperatorBox {
 	defaults(): object {
 		return {
-			operator: '&times;'
+			operator: '&times;',
+ 			inputProperties: [
+				{ name: 'operand1', displayName: 'factor', type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: 'factor', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', displayName: 'product', type: 'number|Array<number>' }
+			]
 		}
 	}
 	mutabilities(): object {
@@ -196,7 +218,14 @@ export class MultiplyBox extends BinaryOperatorBox {
 export class DivideBox extends BinaryOperatorBox {
 	defaults(): object {
 		return {
-			operator: '/'
+			operator: '/',
+ 			inputProperties: [
+				{ name: 'operand1', displayName: 'dividend', type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: 'divisor', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', displayName: 'quotient', type: 'number|Array<number>' }
+			]
 		}
 	}
 	mutabilities(): object {

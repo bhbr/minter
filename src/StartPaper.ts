@@ -9,7 +9,7 @@ import { factorial, binomial } from './core/functions/math'
 
 export class StartPaper extends DemoPaper { }
 
-let TESTING = true
+export const TESTING = true
 
 if (TESTING) { AllTests.run() }
 

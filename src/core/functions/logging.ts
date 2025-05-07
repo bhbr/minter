@@ -1,6 +1,7 @@
 
-export const LOG_STACK_RESOLUTION = Infinity
-let isTouchDevice: boolean = (document.body.className == 'ipad')
+import { isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
+
+let debugging = true
 
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
@@ -47,37 +48,30 @@ export function logString(msg: any) {
 	} else {
 		let keys = Object.keys(msg)
 		if (keys.length <= 5) {
-			let ret = '{ '
+			var ret = '{ '
 			for (let i = 0; i < keys.length - 1; i++) {
 				ret += keys[i] + ' : ' + logString(msg[keys[i]]) + ', '
 			}
 			ret += keys[keys.length - 1] + ' : ' + logString(msg[keys[keys.length - 1]]) + ' }'
+			return ret
 		} else {
 			return msg.constructor.name
 		}
 	}
 }
 
-function htmlLog(msg: any) {
+export function htmlLog(msg: any) {
 	logInto(logString(msg), 'htmlConsole')
 }
 function jsLog(msg: any) {
 	console.log(msg)
 }
 
-export function stackSize(): number {
-	// how many levels of function calls deep are we?
-	let s = (new Error()).stack
-	let a = s.split('\n')
-	return a.length
-}
 
 export function log(msg: any) {
 	// device-agnostic log function
-	// with variable resolution,
 	// this should be used for logging
-	if (stackSize() > LOG_STACK_RESOLUTION) { return }
-	if (isTouchDevice) { htmlLog(msg) } else { jsLog(msg) }
+	if (isTouchDevice && debugging) { htmlLog(msg) } else { jsLog(msg) }
 }
 
 

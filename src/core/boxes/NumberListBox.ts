@@ -6,6 +6,8 @@ import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
+import { ScreenEvent } from 'core/mobjects/screen_events'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 
 export class NumberListBox extends Linkable {
 	
@@ -23,6 +25,7 @@ export class NumberListBox extends Linkable {
 			frameWidth: 80,
 			frameHeight: 200,
 			value: [],
+			preventDefault: false
 		}
 	}
 
@@ -52,21 +55,48 @@ export class NumberListBox extends Linkable {
 			width: this.view.frame.width,
 			height: this.view.frame.height,
 			list: this.list
-		}, redraw)}
+		}, redraw)
+		this.scroll.view.div.style['overflow-y'] = 'auto'
+	}
+
+	startDragging(e: ScreenEvent) {
+		super.startDragging(e)
+		this.preventDefault = true
+		this.scroll.preventDefault = true
+	}
+
+	endDragging(e: ScreenEvent) {
+		super.endDragging(e)
+		this.preventDefault = false
+		this.scroll.preventDefault = false
+	}
+
+	clear() {
+		this.update({
+			value: []
+		})
+	}
+
+
 }
 
 export class LinkableNumberListBox extends NumberListBox {
 
+	clearButton: SimpleButton
+
 	defaults(): object {
 		return {
 			inputProperties: [
-				{ name: 'value', type: 'Array<number>' },
-				{ name: 'nextEntry', type: 'number' },
+				{ name: 'value', displayName: 'list', type: 'Array<number>' },
+				{ name: 'newestEntry', displayName: 'newest', type: 'number' },
 			],
 			outputProperties: [
-				{ name: 'value', type: 'Array<number>' },
-				{ name: 'length', type: 'number' },
-			]
+				{ name: 'value', displayName: 'list', type: 'Array<number>' },
+				{ name: 'length', displayName: null, type: 'number' },
+			],
+			clearButton: new SimpleButton({
+				text: 'clear'
+			})
 		}
 
 	}
@@ -75,15 +105,22 @@ export class LinkableNumberListBox extends NumberListBox {
 		return this.list.length
 	}
 
-	get nextEntry(): number {
+	get newestEntry(): number {
 		return undefined // this.list[this.list.length - 1]
 	}
-	set nextEntry(newValue: number) {
-		log(newValue)
+	set newestEntry(newValue: number) {
 		this.list.push(newValue)
 		this.update()
 	}
 
+	setup() {
+		super.setup()
+		this.clearButton.update({
+			anchor: [20, this.frameHeight + 10]
+		})
+		this.clearButton.action = this.clear.bind(this)
+		this.add(this.clearButton)
+	}
 
 }
 

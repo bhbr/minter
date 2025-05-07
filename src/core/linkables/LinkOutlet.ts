@@ -13,6 +13,7 @@ import { log } from 'core/functions/logging'
 export class LinkOutlet extends MGroup {
 
 	name: string
+	displayName?: string
 	type: string
 	label: TextLabel
 	inputBox?: InputTextBox
@@ -23,6 +24,7 @@ export class LinkOutlet extends MGroup {
 	defaults(): object {
 		return {
 			name: '',
+			displayName: '',
 			type: 'number',
 			label: new TextLabel({
 				frameWidth: IO_LIST_WIDTH / 2,
@@ -48,8 +50,9 @@ export class LinkOutlet extends MGroup {
 
 	setup() {
 		super.setup()
+		this.displayName = this.displayName ?? this.name
 		this.label.update({
-			text: this.name
+			text: this.displayName
 		})
 		this.label.view.update({
 			horizontalAlign: 'right'
@@ -64,7 +67,7 @@ export class LinkOutlet extends MGroup {
 			}.bind(this)
 			this.update({
 				inputBox: new InputTextBox({
-					value: this.name,
+					value: this.displayName,
 					frameWidth: this.label.frameWidth,
 					frameHeight: this.label.frameHeight
 				})
@@ -108,14 +111,14 @@ export class LinkOutlet extends MGroup {
 		this.remove(this.inputBox)
 		this.add(this.label)
 		this.update({
-			name: this.inputBox.value
+			displayName: this.inputBox.value
 		})
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		let newName = args['name']
+		let newName = args['displayName']
 		if (newName == '') {
-			throw `Name of property ${this.name} cannot be changed to an empty string`;
+			throw `Name of property ${this.displayName} cannot be changed to an empty string`;
 		}
 		super.update(args, redraw)
 		if (newName !== undefined) {

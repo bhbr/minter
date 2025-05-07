@@ -94,7 +94,7 @@ export class Toggle extends Mobject {
 		super.update(args, redraw)
 		this.label.update({
 			text: this.labelText,
-			anchor: vertexTranslatedBy (this.circle.urCorner(), [5, 0])
+			anchor: vertexTranslatedBy(this.circle.urCorner(), [5, 0])
 		}, redraw)
 	}
 

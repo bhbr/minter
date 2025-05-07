@@ -19,14 +19,18 @@ export class CreativeButton extends SidebarButton {
 	}
 
 	setup() {
-		super.setup()
 		for (let c of this.creations) {
-			this.messages.push({create: c})
+			this.messages.push({ create: c })
 		}
+		super.setup()
 	}
 
 	labelFromMessage(msg: object): string {
 		return Object.values(msg)[0]
+	}
+
+	imageNameForIndex(index: number): string {
+		return (Object.values(this.messages[index] ?? {}) ?? ['key'])[0]
 	}
 
 }

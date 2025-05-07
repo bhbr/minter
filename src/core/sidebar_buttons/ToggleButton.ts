@@ -1,7 +1,7 @@
 
 import { SidebarButton } from './SidebarButton'
 import { BUTTON_SCALE_FACTOR } from './button_geometry'
-import { log } from 'core/functions/logging'
+import { log, htmlLog } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 
@@ -44,6 +44,11 @@ export class ToggleButton extends SidebarButton {
 		if (this.label == undefined) { return }
 		let f: number = this.active ? BUTTON_SCALE_FACTOR : 1
 		this.label.view.div.setAttribute('font-size', (f * this.baseFontSize).toString())
+	}
+
+
+	imageNameForIndex(index: number): string {
+		return this.messageKey
 	}
 
 }

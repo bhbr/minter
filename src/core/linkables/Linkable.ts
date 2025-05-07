@@ -8,10 +8,12 @@ import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
 import { log } from 'core/functions/logging'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { Checkbox } from 'core/mobjects/Checkbox'
 
 export interface IOProperty {
 	name: string
 	type: string
+	displayName: string | null
 }
 
 export class Linkable extends Mobject {
@@ -131,9 +133,10 @@ which can be linked to such-exposed variables of other mobjects.
 		this.board.updateLinks()
 	}
 
-	setButtonVisibility(visible: boolean) {
+	setControlsVisibility(visible: boolean) {
 		for (let mob of this.submobs) {
-			if (mob instanceof SimpleButton) {
+			log(mob)
+			if (mob instanceof SimpleButton || mob instanceof Checkbox) {
 				mob.update({
 					visible: visible
 				})

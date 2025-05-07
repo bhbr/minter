@@ -1,11 +1,11 @@
 
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
-import { ScreenEventDevice, isTouchDevice, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, separateSidebar, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { PAPER_WIDTH, PAPER_HEIGHT, SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
 import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
@@ -29,8 +29,6 @@ export class Paper extends Board {
 			expandedMobject: this,
 			pressedKeys: [],
 			activeKeyboard: true,
-			frameWidth: PAPER_WIDTH,
-			frameHeight: PAPER_HEIGHT,
 			currentColor: Color.white(),
 			drawShadow: false,
 			loadedAPIs: []
@@ -62,7 +60,7 @@ export class Paper extends Board {
 		})
 		this.background.view.hideShadow()
 
-		let width = window.innerWidth - (isTouchDevice ? 0 : SIDEBAR_WIDTH)
+		let width = window.innerWidth - (separateSidebar ? 0 : SIDEBAR_WIDTH)
 		let height = window.innerHeight
 		this.update({
 			frameWidth: width,
@@ -71,6 +69,20 @@ export class Paper extends Board {
 		this.background.update({
 			width: width,
 			height: height
+		})
+		//window.addEventListener('resize', this.resize.bind(this))
+		this.resize()
+	}
+
+	resize() {
+		let size = Math.max(window.screen.width, window.screen.height)
+		let buffer = 500
+		this.update({
+			frameWidth: size + buffer,
+			frameHeight: size + buffer
+		})
+		this.sidebar?.update({
+			frameHeight: size + buffer
 		})
 	}
 
@@ -138,7 +150,7 @@ export class Paper extends Board {
 	}
 
 	expandedAnchor(): vertex {
-		return isTouchDevice ? vertexOrigin() : [150, 0]
+		return separateSidebar ? vertexOrigin() : [SIDEBAR_WIDTH, 0]
 	}
 
 	expand() { }

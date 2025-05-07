@@ -9,10 +9,10 @@ export class AverageBox extends NumberValuedFunctionBox {
 
 	defaults(): object {
 		return {
-			name: 'avg',
+			name: 'mean',
 			argument: [],
-			inputProperties: [
-				{ name: 'argument', type: 'Array<number>' }
+			outputProperties: [
+				{ name: 'value', displayName: 'mean', type: 'number' }
 			]
 		}
 	}

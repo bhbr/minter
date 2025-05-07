@@ -20,7 +20,6 @@ import { getPaper } from 'core/functions/getters'
 import { ExpandedBoardInputList } from './ExpandedBoardInputList'
 import { ExpandedBoardOutputList } from './ExpandedBoardOutputList'
 import { EXPANDED_IO_LIST_HEIGHT, EXPANDED_IO_LIST_INSET } from './constants'
-import { PAPER_WIDTH, PAPER_HEIGHT } from 'core/constants'
 import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
@@ -178,7 +177,7 @@ The content children can also be dragged and panned.
 			this.expandedOutputList.view.show()
 		}
 		this.hideLinksOfContent()
-		this.setButtonVisibility(false)
+		this.setControlsVisibility(false)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -216,11 +215,11 @@ The content children can also be dragged and panned.
 	}
 
 	expandedWidth(): number {
-		return PAPER_WIDTH - 2 * this.expandedPadding
+		return window.innerWidth - 2 * this.expandedPadding
 	}
 
 	expandedHeight(): number {
-		return PAPER_HEIGHT - 2 * this.expandedPadding
+		return window.innerHeight - 2 * this.expandedPadding
 	}
 
 	getCompactWidth(): number {
@@ -405,19 +404,18 @@ The content children can also be dragged and panned.
 	}
 
 	handleMessage(key: string, value: any) {
+		if (value === "0") { value = false }
+		if (value === "1") { value = true }
 		this.enableContent()
 		switch (key) {
 			case 'drag':
-				if (isTouchDevice) { value = (value === "1") }
 				this.setInternalDragging(value as boolean)
 				break
 			case 'link':
-				if (isTouchDevice) { value = (value === "1") }
 				this.setLinking(value as boolean)
 				break
 			case 'ctrl':
-				if (isTouchDevice) { value = (value === "1") }
-				this.setButtonVisibility(value as boolean)
+				this.setControlsVisibility(value as boolean)
 				break
 			case 'create':
 				this.creationMode = value
@@ -430,10 +428,10 @@ The content children can also be dragged and panned.
 	}
 
 
-	setButtonVisibility(visible: boolean) {
+	setControlsVisibility(visible: boolean) {
 		for (let mob of this.contentChildren) {
 			if (mob instanceof Linkable) {
-				mob.setButtonVisibility(visible)
+				mob.setControlsVisibility(visible)
 			}
 		}
 	}
@@ -641,24 +639,21 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			//if (isTouchDevice) {
-				this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-				this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-				this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// } else {
-			// 	this.sensor.setPointerMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			// }
+			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			//if (isTouchDevice) {
-				this.sensor.restoreTouchMethods()
-				this.sensor.restorePenMethods()
-				this.sensor.restoreMouseMethods()
-			// } else {
-			// 	this.sensor.restorePointerMethods()
-			// }
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 		this.isShowingLinks = flag
+		if (flag) {
+			this.disableContent()
+		} else {
+			this.enableContent()
+		}
 	}
 
 	startLinking(e: ScreenEvent) {

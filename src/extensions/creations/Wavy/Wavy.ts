@@ -14,10 +14,10 @@ export class Wavy extends CindyCanvas {
 		return {
 			sourceYPosition: 0.2,
 			inputProperties: [
-				{ name: 'wavelength', type: 'number' },
-				{ name: 'frequency', type: 'number' },
-				{ name: 'nbSources', type: 'number' },
-				{ name: 'color', type: 'Color' }
+				{ name: 'wavelength', displayName: null, type: 'number' },
+				{ name: 'frequency', displayName: null, type: 'number' },
+				{ name: 'nbSources', displayName: '# sources', type: 'number' },
+				{ name: 'color', displayName: null, type: 'Color' }
 			],
 			outputProperties: [],
 			wavelength: 0.25,

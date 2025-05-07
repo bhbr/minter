@@ -11,8 +11,8 @@ export class SumBox extends NumberValuedFunctionBox {
 		return {
 			name: 'sum',
 			argument: [],
-			inputProperties: [
-				{ name: 'argument', type: 'Array<number>' }
+			outputProperties: [
+				{ name: 'value', displayName: 'sum', type: 'number' }
 			]
 		}
 	}

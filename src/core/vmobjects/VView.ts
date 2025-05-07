@@ -36,8 +36,12 @@ export class VView extends View {
 		super.setup()
 		this.svg.setAttribute('class', 'mobject-svg')
 		this.svg.style.overflow = 'visible'
-		this.div.appendChild(this.svg)
-		this.svg.appendChild(this.path)
+		if (!this.div.contains(this.svg)) {
+			this.div.appendChild(this.svg)
+		}
+		if (!this.svg.contains(this.path)) {
+			this.svg.appendChild(this.path)
+		}
 	}
 
 	redraw() {

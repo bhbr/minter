@@ -1,5 +1,6 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
+import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class Scroll extends Mobject {
 
@@ -11,7 +12,8 @@ export class Scroll extends Mobject {
 		return {
 			list: [],
 			fontSize: 16,
-			fontFamily: 'Helvetica'
+			fontFamily: 'Helvetica',
+			preventDefault: false
 		}
 	}
 

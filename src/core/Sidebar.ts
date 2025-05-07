@@ -1,6 +1,6 @@
 
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { SIDEBAR_WIDTH, PAPER_HEIGHT } from 'core/constants'
+import { SIDEBAR_WIDTH } from 'core/constants'
 import { convertStringToArray } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 import { Color } from 'core/classes/Color'
@@ -35,7 +35,7 @@ export class Sidebar extends Mobject {
 				strokeWidth: 0,
 				screenEventHandler: ScreenEventHandler.Parent,
 				width: SIDEBAR_WIDTH,
-				height: PAPER_HEIGHT
+				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
 
 			availableButtonClasses: [
@@ -45,7 +45,7 @@ export class Sidebar extends Mobject {
 				new DragButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
-			frameHeight: PAPER_HEIGHT,
+			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -75,14 +75,12 @@ export class Sidebar extends Mobject {
 		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
 
-		let height = window.innerHeight
-		this.update({
-			frameHeight: height
-		})
-		this.background.update({
-			height: height
-		})
+
+		this.addDependency('frameWidth', this.background, 'width')
+		this.addDependency('frameHeight', this.background, 'height')
+
 	}
+
 
 	addButton(button: SidebarButton) {
 		let i = this.buttons.length

@@ -22,19 +22,15 @@ export class PlayableCoin extends Linkable implements Playable {
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
-				anchor: [-25, 50]
+				anchor: [-35, 50]
 			}),
 			resetButton: new SimpleButton({
-				anchor: [10, 50],
+				anchor: [15, 50],
 				text: 'reset'
 			}),
 			valueHistory: [],
 			outputProperties: [
-				{ name: 'value', type: 'number' },
-				{ name: 'valueHistory', type: 'Array<number>' },
-				{ name: 'nbFlips', type: 'number' },
-				{ name: 'nbHeads', type: 'number' },
-				{ name: 'nbTails', type: 'number' }
+				{ name: 'value', type: 'number' }
 			],
 			frameWidth: 50,
 			frameHeight: 80,
@@ -44,6 +40,10 @@ export class PlayableCoin extends Linkable implements Playable {
 
 	setup() {
 		super.setup()
+		this.update({
+			frameWidth: 2 * this.coin.radius,
+			frameHeight: 2 * this.coin.radius
+		})
 		this.coin.update({
 			tailsProbability: this.tailsProbability
 		}, false)

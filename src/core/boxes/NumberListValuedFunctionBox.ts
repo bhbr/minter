@@ -24,10 +24,10 @@ export class NumberListValuedFunctionBox extends NumberListBox {
 			}),
 			functionLabel: new TextLabel(),
 			inputProperties: [
-				{ name: 'argument', type: 'any' }
+				{ name: 'argument', displayName: null, type: 'any' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'Array<number>' }
+				{ name: 'value', displayName: null, type: 'Array<number>' }
 			]
 		}
 	}

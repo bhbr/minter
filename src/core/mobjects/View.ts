@@ -72,12 +72,16 @@ export class View extends ExtendedObject {
 
 	// parent view = view of the mobject's parent
 	// (not settable because that is the mobject's responsibility)
-	get parent(): View {
-		return this.mobject.parent.view
+	get parent(): View | null {
+		return this.mobject?.parent?.view
 	}
 
 	setup() {
-		this.div.setAttribute('class', 'mobject-div ' + this.mobject.constructor.name)
+		if (this.mobject) {
+			this.div.setAttribute('class', 'mobject-div ' + this.mobject.constructor.name)
+		} else {
+			this.div.setAttribute('class', 'mobject-div ' + this.constructor.name)
+		}
 		this.div.style.transformOrigin = 'top left'
 		this.div.style.position = 'absolute'
 		// 'absolute' positions this mobject relative (sic) to its parent
@@ -94,7 +98,8 @@ export class View extends ExtendedObject {
 
 	// called by mobject.add
 	add(subView: View) {
-		this.div.appendChild(subView.div)	
+		subView.setup()
+		this.div.appendChild(subView.div)
 	}
 
 	redraw() {
@@ -141,7 +146,7 @@ export class View extends ExtendedObject {
 		return true
 	}
 
-	superViews(): Array<View> {
+	superViews(): Array<View> | null {
 		return this.mobject?.ancestors().map((mob) => mob.view) ?? []
 }
 

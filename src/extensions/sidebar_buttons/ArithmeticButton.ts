@@ -5,7 +5,8 @@ export class ArithmeticButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['+', '–', '&times;', '/']
+			creations: ['+', '–', '&times;', '/'],
+			baseFontSize: 30
 		}
 	}
 
@@ -14,4 +15,5 @@ export class ArithmeticButton extends CreativeButton {
 			creations: 'never'
 		}
 	}
+
 }

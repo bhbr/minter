@@ -63,6 +63,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			view: new View(),
 			motor: new Motor(),
 			sensor: new Sensor(),
+			preventDefault: true,
 
 			draggingEnabled: false,
 
@@ -307,9 +308,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	removeDependency(dep: Dependency) {
-		if (!this.dependencies.includes(dep)) {
-			log('hm')
-		}
 		remove(this.dependencies, dep)
 	}
 
@@ -413,6 +411,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	//////////////////////////////////////////////////////////
 
 	sensor: Sensor
+	preventDefault: boolean
 	dragAnchorStart?: vertex
 
 	disable() { this.sensor.disable() }

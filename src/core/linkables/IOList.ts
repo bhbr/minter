@@ -85,6 +85,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	createOutlet(prop: IOProperty) {
 		let outlet = new LinkOutlet({
 			name: prop.name,
+			displayName: prop.displayName ?? prop.name,
 			editable: this.editable,
 			ioList: this,
 			type: prop.type

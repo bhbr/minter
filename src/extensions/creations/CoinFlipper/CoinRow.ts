@@ -55,17 +55,14 @@ export class CoinRow extends Linkable implements Playable {
 			nbHeadsHistory: [],
 			nbTailsHistory: [],
 			inputProperties: [
-				{ name: 'tailsProbability', type: 'number' },
-				{ name: 'nbCoins', type: 'number' },
-				{ name: 'headsColor', type: 'Color' },
-				{ name: 'tailsColor', type: 'Color' }
+				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
+				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
+				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
 			],
 			outputProperties: [
-				{ name: 'nbHeads', type: 'number' },
-				{ name: 'nbTails', type: 'number' },
-				{ name: 'nbFlips', type: 'number' },
-				{ name: 'nbHeadsHistory', type: 'Array<number>' },
-				{ name: 'nbTailsHistory', type: 'Array<number>' }
+				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
+				{ name: 'nbTails', displayName: '# tails', type: 'number' }
 			],
 			frameWidth: 300,
 			frameHeight: 100
@@ -183,7 +180,6 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	play() {
-		log('play')
 		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 100)
 		this.playState = 'play'
 	}

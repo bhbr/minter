@@ -74,7 +74,7 @@ export class InclinedScene extends Linkable implements Playable {
 				showTorques: false,
 				torqueOrigin: [0, 0],
 				inputProperties: [
-					{ name: 'inclination', type: 'number' }
+					{ name: 'inclination', displayName: null, type: 'number' }
 				],
 				forceScale: ForceVector,
 				screenEventHandler: ScreenEventHandler.Self,

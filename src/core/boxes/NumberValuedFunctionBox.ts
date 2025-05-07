@@ -7,7 +7,7 @@ import { numberArraySum } from 'core/functions/numberArray'
 
 export class NumberValuedFunctionBox extends NumberBox {
 	
-	argument: any
+	argument: Array<number>
 	functionSign: Rectangle
 	functionLabel: TextLabel
 	name: string
@@ -24,10 +24,10 @@ export class NumberValuedFunctionBox extends NumberBox {
 			}),
 			functionLabel: new TextLabel(),
 			inputProperties: [
-				{ name: 'argument', type: 'any' }
+				{ name: 'argument', displayName: 'list', type: 'Array<number>' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'number' }
+				{ name: 'value', displayName: null, type: 'number' }
 			]
 		}
 	}

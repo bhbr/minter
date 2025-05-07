@@ -167,6 +167,9 @@ export class Sensor extends ExtendedObject {
 		
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		if (this.eventTarget.preventDefault) {
+			e.preventDefault()
+		}
 
 		this.clearResetPointer()
 		this.clearDeleteHistoryTimeout()
@@ -179,6 +182,9 @@ export class Sensor extends ExtendedObject {
 		if (target == null || this.screenEventDevice == null) { return }
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		if (this.eventTarget.preventDefault) {
+			e.preventDefault()
+		}
 
 		switch (this.screenEventDevice) {
 		case ScreenEventDevice.Finger:
@@ -200,6 +206,9 @@ export class Sensor extends ExtendedObject {
 		if (target == null || this.screenEventDevice == null) { return }
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		if (this.eventTarget.preventDefault) {
+			e.preventDefault()
+		}
 
 		this.decideEventAction(e)
 		if (this.deleteHistoryTimeoutID != null) { return }
@@ -212,6 +221,9 @@ export class Sensor extends ExtendedObject {
 		if (target == null || this.screenEventDevice == null) { return }
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
+		if (this.eventTarget.preventDefault) {
+			e.preventDefault()
+		}
 
 		target.sensor.onPointerOut(e)
 		this.deleteScreenEventHistory()
