@@ -35,7 +35,7 @@ export class WheelColorSample extends ColorSample {
 			marker: new Circle({
 				midpoint: [COLOR_SAMPLE_RADIUS, 0.2 * COLOR_SAMPLE_RADIUS],
 				radius: 3,
-				fillColor: Color.white(),
+				fillColor: Color.black(),
 				fillOpacity: 1,
 				strokeWidth: 0
 			})

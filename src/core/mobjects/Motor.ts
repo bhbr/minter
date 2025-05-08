@@ -65,7 +65,9 @@ export class Motor extends ExtendedObject {
 		}
 
 		for (let key of Object.keys(args)) {
-			this.animationStartArgs[key] = copy(this.mobject[key])
+			let a = this.mobject[key]
+			let b = copy(a)
+			this.animationStartArgs[key] = b
 		}
 		this.animationStopArgs = args
 
@@ -123,6 +125,7 @@ export class Motor extends ExtendedObject {
 	cleanupAfterAnimation() {
 	// This method gets called at the end of the animation
 		window.clearInterval(this.animationInterval)
+		this.mobject.update(this.animationStopArgs)
 		if (!this.showShadow) { this.mobject.showShadow() }
 		this.animationInterval = null
 		this.animationStartArgs = {}
