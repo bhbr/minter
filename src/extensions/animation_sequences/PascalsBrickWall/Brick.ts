@@ -4,23 +4,30 @@ import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH } from './constants'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
+import { vertex } from 'core/functions/vertex'
 
 export class Brick extends Rectangle {
 	
 	nbFlips: number
 	nbTails: number
+	tailsProbability: number
+	headsColor: Color
+	tailsColor: Color
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			nbTails: 0,
+			tailsProbability: 0.5,
 			height: BRICK_HEIGHT,
-			fillOpacity: 1
+			fillOpacity: 1,
+			headsColor: HEADS_COLOR,
+			tailsColor: TAILS_COLOR
 		}
 	}
 
 	getFillColor(): Color {
-		return HEADS_COLOR.interpolate(TAILS_COLOR, 1 - this.nbTails / this.nbFlips)
+		return this.headsColor.interpolate(this.tailsColor, this.nbTails / this.nbFlips)
 	}
 
 	combinations(): number {
@@ -28,7 +35,7 @@ export class Brick extends Rectangle {
 	}
 
 	getWidth(): number {
-		return this.combinations() / (2 ** this.nbFlips) * ROW_WIDTH
+		return this.combinations() * this.tailsProbability ** this.nbTails * (1 - this.tailsProbability) ** (this.nbFlips - this.nbTails) * ROW_WIDTH
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -38,5 +45,11 @@ export class Brick extends Rectangle {
 			width: this.getWidth()
 		})
 	}
+
+
+
+
+
+
 
 }
