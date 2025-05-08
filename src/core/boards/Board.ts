@@ -544,7 +544,6 @@ The content children can also be dragged and panned.
 	panning(e: ScreenEvent) {
 		let panPoint = this.sensor.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
-
 		for (let mob of this.contentChildren) {
 			if (mob.dragAnchorStart == null) { return }
 			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
