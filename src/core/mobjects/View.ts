@@ -82,7 +82,7 @@ export class View extends ExtendedObject {
 		} else {
 			this.div.setAttribute('class', 'mobject-div ' + this.constructor.name)
 		}
-		//this.div.style.transformOrigin = 'top left'
+		this.div.style.transformOrigin = 'top left'
 		this.div.style.position = 'absolute'
 		// 'absolute' positions this mobject relative (sic) to its parent
 		this.div.style.overflow = 'visible'

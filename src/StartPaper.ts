@@ -20,9 +20,11 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let c = new Coin({
-	midpoint: [100, 100]
+let plot = new SequencePlot({
+	anchor: [100, 100],
+	frameWidth: 500,
+	frameHeight: 300,
+	data: [1, 4, 3, 2, 6, 5, 3, 2, 1]
 })
-paper.add(c)
-c.transform.update({ scale: 2 })
-c.redraw()
+paper.addToContent(plot)
+

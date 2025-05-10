@@ -9,6 +9,4 @@ export class SidebarView extends View {
 		}
 	}
 
-	
-
 }
