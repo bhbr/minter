@@ -10,6 +10,7 @@ import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_
 import { log } from 'core/functions/logging'
 import { ImageView } from 'core/mobjects/ImageView'
 import { Transform } from 'core/classes/Transform'
+import { SidebarButtonView } from './SidebarButtonView'
 
 interface Window { webkit?: any }
 
@@ -17,6 +18,7 @@ export const buttonDict: object = {}
 
 export class SidebarButton extends Circle {
 	
+	declare view: SidebarButtonView
 	currentModeIndex: number
 	previousIndex: number
 	baseColor: Color
@@ -43,7 +45,7 @@ export class SidebarButton extends Circle {
 			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
 			baseFontSize: 12,
-			activeScalingFactor: 1.2,
+			activeScalingFactor: BUTTON_SCALE_FACTOR,
 			optionSpacing: 25,
 
 			label: new TextLabel(),
@@ -64,7 +66,8 @@ export class SidebarButton extends Circle {
 			fillOpacity: 0.5,
 			activeKeyboard: true,
 
-			paper: null
+			paper: null,
+			view: new SidebarButtonView({ radius: BUTTON_RADIUS })
 		}
 	}
 
@@ -106,6 +109,7 @@ export class SidebarButton extends Circle {
 			this.label.view.div.style['color'] = Color.white().toHex()
 		}
 		this.updateLabel()
+
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -143,7 +147,7 @@ export class SidebarButton extends Circle {
 			previousIndex: this.currentModeIndex,
 		})
 		this.frame.transform.update({
-			anchor: vertexSubtract(this.midpoint, vertexMultiply([BUTTON_RADIUS, BUTTON_RADIUS], this.activeScalingFactor)),
+			//anchor: vertexSubtract(this.midpoint, vertexMultiply([BUTTON_RADIUS, BUTTON_RADIUS], this.activeScalingFactor)),
 			scale: this.activeScalingFactor
 		})
 		this.redraw()
@@ -157,6 +161,8 @@ export class SidebarButton extends Circle {
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		log('on pointer down:')
+		log(this.view.div.style.transformOrigin)
 		this.commonButtonDown()
 		this.touchStart = eventVertex(e)
 	}

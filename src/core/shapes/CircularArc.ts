@@ -28,13 +28,15 @@ export class CircularArc extends CurvedLine {
 		if (this.radius === undefined) {
 			throw 'No radius yet!'
 		}
-		return vertexTranslatedBy(this.view.frame.anchor, [this.radius, this.radius])
+		let r = this.radius * this.transform.scale
+		return vertexTranslatedBy(this.view.frame.anchor, [r, r])
 	}
 	set midpoint(newValue: vertex) {
 		if (this.radius === undefined) {
 			throw 'No radius yet!'
 		}
-		this.view.frame.anchor = vertexTranslatedBy(newValue, [-this.radius, -this.radius])
+		let r = this.radius * this.transform.scale
+		this.view.frame.anchor = vertexTranslatedBy(newValue, [-r, -r])
 	}
 
 	synchronizeUpdateArguments(args: object = {}): object {
