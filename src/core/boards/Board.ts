@@ -542,6 +542,10 @@ The content children can also be dragged and panned.
 	}
 
 	panning(e: ScreenEvent) {
+		if (this.panPointStart == null) {
+			this.startPanning(e)
+			return
+		}
 		let panPoint = this.sensor.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
 		for (let mob of this.contentChildren) {
