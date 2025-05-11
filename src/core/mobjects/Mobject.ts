@@ -486,6 +486,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.update({
 			anchor: vertexAdd(eventVertex(e), this.dragAnchorStart)
 		})
+		this.redraw() // fixes dragging bug
 	}
 
 	endDragging(e: ScreenEvent) {

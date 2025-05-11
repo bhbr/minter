@@ -9,6 +9,7 @@ import { isTouchDevice } from './core/mobjects/screen_events'
 import { ImageView } from './core/mobjects/ImageView'
 import { Mobject } from './core/mobjects/Mobject'
 import { Coin } from './extensions/creations/CoinFlipper/Coin'
+import { CoinRow} from './extensions/creations/CoinFlipper/CoinRow'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 
@@ -20,11 +21,7 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let plot = new SequencePlot({
-	anchor: [100, 100],
-	frameWidth: 500,
-	frameHeight: 300,
-	data: [1, 4, 3, 2, 6, 5, 3, 2, 1]
+let row = new CoinRow({
+	anchor: [100, 100]
 })
-paper.addToContent(plot)
-
+paper.addToContent(row)
