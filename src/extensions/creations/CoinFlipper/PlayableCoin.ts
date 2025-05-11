@@ -55,6 +55,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	flip() {
 		this.coin.flip()
 		this.update()
+		this.updateDependents()
 	}
 
 	play() {

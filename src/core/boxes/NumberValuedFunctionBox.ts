@@ -4,6 +4,7 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { numberArraySum } from 'core/functions/numberArray'
+import { log } from 'core/functions/logging'
 
 export class NumberValuedFunctionBox extends NumberBox {
 	
@@ -52,6 +53,7 @@ export class NumberValuedFunctionBox extends NumberBox {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+		log('updating NumberValuedFunctionBox')
 		args['value'] = this.result()
 		super.update(args, redraw)
 	}

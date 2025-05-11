@@ -20,8 +20,3 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let row = new CoinRow({
-	anchor: [100, 100]
-})
-paper.addToContent(row)
