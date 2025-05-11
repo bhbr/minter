@@ -389,7 +389,7 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	removeFromContent(mob: Linkable) {
+	removeFromContent(mob: Mobject) {
 		remove(this.contentChildren, mob)
 		this.content.remove(mob)
 	}
@@ -424,9 +424,19 @@ The content children can also be dragged and panned.
 				this.creator = this.createCreator(this.creationMode)
 				this.add(this.creator)
 				break
+			case 'restart':
+				this.restart()
+				break
 		}
 	}
 
+	restart() {
+		var child = this.contentChildren.pop()
+		while (child !== undefined) {
+			this.content.remove(child)
+			child = this.contentChildren.pop()
+		}
+	}
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.contentChildren) {

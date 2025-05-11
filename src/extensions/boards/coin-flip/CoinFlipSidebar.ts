@@ -9,6 +9,7 @@ import { ListFunctionsButton } from 'extensions/sidebar_buttons/ListFunctionsBut
 import { PlotButton } from 'extensions/sidebar_buttons/PlotButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
+import { RestartButton } from 'core/sidebar_buttons/RestartButton'
 
 export class CoinFlipSidebar extends Sidebar {
 	
@@ -23,7 +24,8 @@ export class CoinFlipSidebar extends Sidebar {
 				ArithmeticButton,
 				ListFunctionsButton,
 				PlotButton,
-				ColorSampleButton
+				ColorSampleButton,
+				RestartButton
 			],
 			buttons: [
 				new DragButton(),
@@ -34,7 +36,8 @@ export class CoinFlipSidebar extends Sidebar {
 				new ArithmeticButton(),
 				new ListFunctionsButton(),
 				new PlotButton(),
-				new ColorSampleButton()
+				new ColorSampleButton(),
+				new RestartButton()
 			],
 		}
 	}

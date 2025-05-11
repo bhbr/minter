@@ -141,7 +141,6 @@ export class SidebarButton extends Circle {
 
 	commonButtonDown() {
 		if (this.active) { return }
-		this.messagePaper(this.messages[0])
 		this.update({
 			active: true,
 			//radius: this.baseRadius * this.activeScalingFactor,
@@ -159,6 +158,8 @@ export class SidebarButton extends Circle {
 		})
 		this.updateLabel()
 		this.updateIcon()
+		if (this.messages.length ==0) { return }
+		this.messagePaper(this.messages[0])
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -257,7 +258,7 @@ export class SidebarButton extends Circle {
 		}
 		let f = this.active ? BUTTON_SCALE_FACTOR : 1
 		let fs = f * (this.baseFontSize) // ?? 12)
-		this.label.view?.div.style.setProperty('font-size', '30px') //fs.toString().concat('px'))
+		this.label.view?.div.style.setProperty('font-size', this.baseFontSize.toString().concat('px'))
 	}
 
 	updateIcon() {

@@ -163,7 +163,6 @@ export class Sensor extends ExtendedObject {
 
 		let target = this.eventTargetMobject(e)
 		this.eventTarget = target
-		log(target)
 		if (target == null) { return }
 		
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
