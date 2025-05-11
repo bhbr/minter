@@ -5,15 +5,15 @@ import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
+import { log } from 'core/functions/logging'
 
 export class PlayableCoin extends Linkable implements Playable {
 
 	coin: Coin
 	tailsProbability: number
-	playState: 'play' | 'pause' | 'stop'
+	playState: 'play' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
-	resetButton: SimpleButton
 	valueHistory: Array<number>
 
 	defaults(): object {
@@ -22,11 +22,7 @@ export class PlayableCoin extends Linkable implements Playable {
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
-				anchor: [-35, 50]
-			}),
-			resetButton: new SimpleButton({
-				anchor: [15, 50],
-				text: 'reset'
+				anchor: [-12.5, 50]
 			}),
 			valueHistory: [],
 			outputProperties: [
@@ -49,9 +45,7 @@ export class PlayableCoin extends Linkable implements Playable {
 		}, false)
 		this.add(this.coin)
 		this.add(this.playButton)
-		this.add(this.resetButton)
 		this.playButton.mobject = this
-		this.resetButton.action = this.reset.bind(this)
 	}
 
 	onTap(e: ScreenEvent) {
@@ -60,7 +54,6 @@ export class PlayableCoin extends Linkable implements Playable {
 
 	flip() {
 		this.coin.flip()
-		this.valueHistory.push(this.value)
 		this.update()
 	}
 
@@ -71,7 +64,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	
 	pause() {
 		window.clearInterval(this.playIntervalID)
-		this.playState = 'pause'
+		this.playState = 'stop'
 	}
 
 	togglePlayState() {
@@ -82,28 +75,8 @@ export class PlayableCoin extends Linkable implements Playable {
 		}
 	}
 
-	reset() {
-		this.pause()
-		this.playButton.toggleLabel()
-		this.valueHistory = []
-		this.update()
-	}
-
 	get value(): number { return this.coin.value }
 	set value(newValue: number) { this.coin.value = newValue }
-
-	nbFlips(): number { return this.valueHistory.length }
-
-	nbHeads(): number {
-		var sum = 0
-		for (let value of this.valueHistory) {
-			sum += value
-		}
-		return sum
-	}
-
-	nbTails(): number { return this.nbFlips() - this.nbHeads() }
-
 
 
 

@@ -135,7 +135,6 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.submobs) {
-			log(mob)
 			if (mob instanceof SimpleButton || mob instanceof Checkbox) {
 				mob.update({
 					visible: visible
