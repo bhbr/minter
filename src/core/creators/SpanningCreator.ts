@@ -23,7 +23,7 @@ export class SpanningCreator extends Creator {
 	setup() {
 		super.setup()
 		this.add(this.rectangle)
-		this.addDependency('topLeftVertex', this.rectangle, 'anchor')
+		//this.addDependency('topLeftVertex', this.rectangle, 'anchor')
 		this.addDependency('getWidth', this.rectangle, 'width')
 		this.addDependency('getHeight', this.rectangle, 'height')
 
@@ -56,6 +56,7 @@ export class SpanningCreator extends Creator {
 	dissolve() {
 		let w = this.getWidth()
 		let h = this.getHeight()
+		this.remove(this.creation)
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.topLeftVertex(),

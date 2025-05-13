@@ -24,6 +24,13 @@ export class Creator extends Mobject {
 		super.parent = newValue
 	}
 
+	setup() {
+		super.setup()
+		this.update({
+			anchor: this.getStartPoint()
+		})
+	}
+
 	getStartPoint(): vertex {
 		return this.creationStroke[0] ?? this.view.frame.anchor
 	}
@@ -33,6 +40,7 @@ export class Creator extends Mobject {
 	}
 
 	dissolve() {
+		this.remove(this.creation)
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.getStartPoint()
