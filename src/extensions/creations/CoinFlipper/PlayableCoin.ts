@@ -41,8 +41,9 @@ export class PlayableCoin extends Linkable implements Playable {
 			frameHeight: 2 * this.coin.radius
 		})
 		this.coin.update({
+			midpoint: [this.coin.radius, this.coin.radius],
 			tailsProbability: this.tailsProbability
-		}, false)
+		})
 		this.add(this.coin)
 		this.add(this.playButton)
 		this.playButton.mobject = this

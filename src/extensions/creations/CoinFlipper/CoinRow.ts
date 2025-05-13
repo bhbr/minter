@@ -59,7 +59,7 @@ export class CoinRow extends Linkable implements Playable {
 				{ name: 'nbTails', displayName: '# tails', type: 'number' }
 			],
 			frameWidth: 300,
-			frameHeight: 100
+			frameHeight: 50
 		}
 	}
 

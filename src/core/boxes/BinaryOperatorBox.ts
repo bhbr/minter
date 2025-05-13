@@ -58,8 +58,9 @@ export class BinaryOperatorBox extends Linkable {
 		this.add(this.valueBox)
 		this.update({
 			frameWidth: this.valueBox.frameWidth,
-			frameHeight: this.valueBox.frameHeight,
+			frameHeight: this.valueBox.frameHeight
 		})
+		this.outputList.positionSelf()
 		this.operatorSign.update({
 			midpoint: [this.view.frame.width / 2, 0]
 		})
@@ -87,6 +88,9 @@ export class BinaryOperatorBox extends Linkable {
 		} else {
 			return
 		}
+		this.update({
+			frameHeight: this.valueBox.frameHeight
+		})
 		this.add(this.valueBox)
 		this.moveToTop(this.operatorSign)
 	}
