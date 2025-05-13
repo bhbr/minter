@@ -48,6 +48,7 @@ export class Creator extends Mobject {
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		this.creationStroke.push(q)
+		this.updateDependents()
 		if (redraw) { this.view.redraw() }
 	}
 

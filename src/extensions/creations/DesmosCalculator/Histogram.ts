@@ -29,7 +29,7 @@ export class Histogram extends DesmosCalculator {
 	}
 
 	createCalculator(options: object = {}) {
-		options['expressions'] = true
+		options['expressions'] = false
 		super.createCalculator(options)
 		this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]` })
 		this.calculator.setMathBounds({

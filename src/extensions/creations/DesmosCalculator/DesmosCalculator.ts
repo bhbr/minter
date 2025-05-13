@@ -36,13 +36,8 @@ export class DesmosCalculator extends Linkable {
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
 		}
-
 		this.setupCanvas()
 		this.setupOuterFrame()
-
-		//window.setTimeout(this.createCalculator.bind(this), 1000)
-
-
 	}
 
 	loadDesmosAPI() {

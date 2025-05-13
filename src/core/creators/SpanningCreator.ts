@@ -2,6 +2,7 @@
 import { Creator } from './Creator'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { vertex } from 'core/functions/vertex'
+import { Color } from 'core/classes/Color'
 
 export class SpanningCreator extends Creator {
 	
@@ -42,7 +43,6 @@ export class SpanningCreator extends Creator {
 	getHeight(): number {
 		return Math.abs(this.getStartPoint()[1] - this.getEndPoint()[1])
 	}
-
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
