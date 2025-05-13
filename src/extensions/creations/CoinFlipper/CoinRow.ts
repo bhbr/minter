@@ -8,7 +8,7 @@ import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -160,7 +160,12 @@ export class CoinRow extends Linkable implements Playable {
 		for (let coin of this.coins) {
 			coin.flip()
 		}
-		this.update() // to trigger the histogram to update
+		this.update()
+		this.updateDependents()
+	}
+
+	onTap(e: ScreenEvent) {
+		this.flipCoins()
 	}
 
 	play() {
@@ -179,12 +184,6 @@ export class CoinRow extends Linkable implements Playable {
 		} else {
 			this.play()
 		}
-	}
-
-	reset() {
-		this.pause()
-		this.playButton.toggleLabel()
-		this.update()
 	}
 
 	nbTails(): number {

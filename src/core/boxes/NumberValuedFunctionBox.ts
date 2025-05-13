@@ -53,7 +53,6 @@ export class NumberValuedFunctionBox extends NumberBox {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		log('updating NumberValuedFunctionBox')
 		args['value'] = this.result()
 		super.update(args, redraw)
 	}
