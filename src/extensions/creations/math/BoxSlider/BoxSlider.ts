@@ -89,6 +89,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			frameWidth: this.width,
 			frameHeight: this.height
 		})
+		this.updateDependents()
 		this.outputList.update()
 	}
 

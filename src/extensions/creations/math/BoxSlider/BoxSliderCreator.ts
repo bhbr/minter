@@ -26,10 +26,19 @@ export class BoxSliderCreator extends Creator {
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
+		let p = this.getStartPoint()
+		let topY = Math.min(p[1], q[1])
+		let dY = q[1] - p[1]
 		if (this.creation === null) { return }
 		this.creation.update({
-			height: q[1] - this.getStartPoint()[1],
+			height: Math.abs(dY),
 		}, redraw)
+		if (dY < 0) {
+			this.update({
+				anchor: [this.anchor[0], topY]
+			})
+		}
+		this.creation.updateDependents() // outerBar
 		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)
 		}, redraw)
