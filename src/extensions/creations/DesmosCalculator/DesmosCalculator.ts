@@ -35,6 +35,8 @@ export class DesmosCalculator extends Linkable {
 		super.setup()
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
+		} else {
+			this.createCalculator(this.options)
 		}
 		this.setupCanvas()
 		this.setupOuterFrame()
