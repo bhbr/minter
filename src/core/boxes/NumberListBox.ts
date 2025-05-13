@@ -89,7 +89,7 @@ export class LinkableNumberListBox extends NumberListBox {
 		return {
 			inputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
-				{ name: 'newestEntry', displayName: 'newest', type: 'number' },
+				{ name: 'newestEntry', displayName: 'add entry', type: 'number' },
 			],
 			outputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
