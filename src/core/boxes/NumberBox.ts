@@ -39,10 +39,13 @@ export class NumberBox extends Linkable {
 		})
 		this.valueLabel.view.div.style.fontSize = '20px'
 		this.add(this.valueLabel)
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
+
 	}
 
 	valueAsString(): string {
-		if (!this.value) { return '' }
+		if (!this.value && this.value !== 0) { return '' }
 		var text = this.value.toString()
 		if (!Number.isInteger(this.value)) {
 			text = `${this.value.toPrecision(3)}`

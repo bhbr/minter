@@ -650,23 +650,39 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
-		if (flag && !this.isShowingLinks) {
-			this.showLinksOfContent()
-			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
-			this.hideLinksOfContent()
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
-		}
-		this.isShowingLinks = flag
 		if (flag) {
-			this.disableContent()
+			this.setLinkingToTrue()
 		} else {
-			this.enableContent()
+			this.setLinkingToFalse()
 		}
+	}
+
+	setLinkingToTrue() {
+		this.disableContent()
+		this.onTap = this.selectLinkStartMobject.bind(this)
+	}
+
+	setLinkingToFalse() {
+		this.enableContent()
+		this.hideLinksOfContent()
+		this.onTap = (e: ScreenEvent) => { }
+	}
+
+	selectLinkStartMobject(e: ScreenEvent) {
+
+		let p = this.sensor.localEventVertex(e)
+		for (let mob of this.linkableChildren()) {
+			if (mob.frame.contains(p)) {
+				mob.inputList.view.show()
+				mob.outputList.view.show()
+				this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+				this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+				this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			} else {
+				mob.inputList.view.hide()
+				mob.outputList.view.hide()
+			}
+		}		
 	}
 
 	startLinking(e: ScreenEvent) {
@@ -742,7 +758,43 @@ The content children can also be dragged and panned.
 			midpoint: p
 		})
 		this.openBullet.updateDependents()
+
+		let hook = this.openLink.startHook ?? this.openLink.endHook
+		if (hook.outlet.ioList.kind == 'input') {
+			for (var mob of this.linkableChildren()) {
+
+				log(`checking ${mob.constructor.name} output list`)
+
+				if (mob.outputList.frame.contains(vertexSubtract(p, mob.anchor))
+					|| mob.frame.contains(p)) {
+					log(`${mob.constructor.name} output list contains vertex`)
+					mob.outputList.view.show()
+				} else {
+					log(`${mob.constructor.name} output list contains neither, hiding it`)
+					mob.outputList.view.hide()
+				}
+
+			}
+		}
+
+		if (hook.outlet.ioList.kind == 'output') {
+			for (var mob of this.linkableChildren()) {
+
+				log(`checking ${mob.constructor.name} input list`)
+
+				if (mob.inputList.frame.contains(vertexSubtract(p, mob.anchor))
+					|| mob.frame.contains(p)) {
+					log(`${mob.constructor.name} input list contains vertex`)
+					mob.inputList.view.show()
+				} else {
+					log(`${mob.constructor.name} input list contains neither, hiding it`)
+					mob.inputList.view.hide()
+				}
+			}
+		}
 	}
+
+
 
 	endLinking(e: ScreenEvent) {
 		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
@@ -777,7 +829,8 @@ The content children can also be dragged and panned.
 		this.openHook = null
 		this.openBullet = null
 		this.compatibleHooks = []
-
+		this.setLinking(false)
+		this.setLinking(true)
 	}
 
 	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {

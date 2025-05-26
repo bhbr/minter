@@ -71,12 +71,20 @@ export class Frame extends ExtendedObject {
 
 	transformLocalPoint(point: vertex, frame?: Frame): vertex {
 	/*
-	Given a point (Vertex) in local coordinates,
+	Given a point (vertex) in local coordinates,
 	compute its coordinates in the given ancestor
 	Frame's frame.
 	*/
 		let t = this.relativeTransform(frame)
 		return t.appliedTo(point)
+	}
+
+	contains(point: vertex): boolean {
+		// point in parent frame
+		return point[0] > this.anchor[0] + this.xMin()
+			&& point[0] < this.anchor[0] + this.xMax()
+			&& point[1] > this.anchor[1] + this.yMin()
+			&& point[1] < this.anchor[1] + this.yMax()
 	}
 
 	/*

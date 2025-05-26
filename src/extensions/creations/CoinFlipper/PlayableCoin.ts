@@ -22,14 +22,14 @@ export class PlayableCoin extends Linkable implements Playable {
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
-				anchor: [-12.5, 50]
+				anchor: [0, 60]
 			}),
 			valueHistory: [],
 			outputProperties: [
 				{ name: 'value', type: 'number' }
 			],
 			frameWidth: 50,
-			frameHeight: 80,
+			frameHeight: 50,
 			tailsProbability: 0.5
 		}
 	}
@@ -46,6 +46,8 @@ export class PlayableCoin extends Linkable implements Playable {
 		})
 		this.add(this.coin)
 		this.add(this.playButton)
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
 		this.playButton.mobject = this
 	}
 
