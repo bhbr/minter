@@ -108,8 +108,7 @@ export class Sensor extends ExtendedObject {
 			if (m.sensor.screenEventHandler == ScreenEventHandler.Parent) {
 				continue
 			}
-			if (m.sensor.screenEventHandler == ScreenEventHandler.Self 
-				|| m.sensor.screenEventHandler == ScreenEventHandler.Auto) {
+			if ((m.sensor.screenEventHandler == ScreenEventHandler.Self || m.sensor.screenEventHandler == ScreenEventHandler.Auto)) {
 				return m
 			}
 		}

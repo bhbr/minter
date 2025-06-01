@@ -31,8 +31,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			cornerRadius: 20,
 			width: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
-			strokeWidth: 1,
-			strokeColor: Color.gray(0.4),
+			fillOpacity: 1.0,
+			strokeWidth: 0,
 			editable: false
 		}
 	}
