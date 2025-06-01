@@ -86,7 +86,7 @@ The content children can also be dragged and panned.
 			openBullet: null,
 			compatibleHooks: [],
 			creationTool: null,
-			isShowingLinks: false,
+			isInLinkMode: false,
 			allowingDrag: false
 		}
 	}
@@ -474,7 +474,7 @@ The content children can also be dragged and panned.
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
-		if (this.contracted) { return }
+		if (this.contracted || this.isInLinkMode) { return }
 		this.startCreating(e)
 	}
 
@@ -604,7 +604,7 @@ The content children can also be dragged and panned.
 	compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
-	isShowingLinks: boolean
+	isInLinkMode: boolean
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -650,6 +650,7 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
+		this.isInLinkMode = flag
 		if (flag) {
 			this.setLinkingToTrue()
 		} else {
@@ -663,6 +664,9 @@ The content children can also be dragged and panned.
 	}
 
 	setLinkingToFalse() {
+		this.sensor.restoreTouchMethods()
+		this.sensor.restorePenMethods()
+		this.sensor.restoreMouseMethods()
 		this.enableContent()
 		this.hideLinksOfContent()
 		this.onTap = (e: ScreenEvent) => { }
