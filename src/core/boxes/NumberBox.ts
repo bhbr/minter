@@ -42,7 +42,7 @@ export class NumberBox extends Linkable {
 	}
 
 	valueAsString(): string {
-		if (!this.value) { return '' }
+		if (!this.value && this.value !== 0) { return '' }
 		var text = this.value.toString()
 		if (!Number.isInteger(this.value)) {
 			text = `${this.value.toPrecision(3)}`
