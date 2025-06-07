@@ -71,7 +71,7 @@ export class Frame extends ExtendedObject {
 
 	transformLocalPoint(point: vertex, frame?: Frame): vertex {
 	/*
-	Given a point (Vertex) in local coordinates,
+	Given a point (vertex) in local coordinates,
 	compute its coordinates in the given ancestor
 	Frame's frame.
 	*/
@@ -169,6 +169,5 @@ export class Frame extends ExtendedObject {
 
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }
-
 
 }

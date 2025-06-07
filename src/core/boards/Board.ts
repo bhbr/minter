@@ -24,6 +24,7 @@ import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
 import { View } from 'core/mobjects/View'
+import { IOList } from 'core/linkables/IOList'
 
 declare var paper: Paper
 export declare interface Window { webkit?: any }
@@ -709,6 +710,8 @@ The content children can also be dragged and panned.
 	}
 
 	createNewOpenLink(hook: LinkHook) {
+		this.hideLinksOfContent()
+		hook.outlet.ioList.view.show()
 		this.openHook = hook
 		let p = this.locationOfHook(hook)
 		let sb = new LinkBullet({ midpoint: p })
@@ -742,6 +745,62 @@ The content children can also be dragged and panned.
 			midpoint: p
 		})
 		this.openBullet.updateDependents()
+
+		for (let child of this.linkableChildren()) {
+			child.inputList.view.hide()
+			child.outputList.view.hide()
+		}
+		if (this.openLink.startHook) { this.openLink.startHook.outlet.ioList.view.show() }
+		if (this.openLink.endHook) { this.openLink.endHook.outlet.ioList.view.show() }
+
+		let child = this.hoveredChild(p)
+		let list = this.hoveredIOList(p)
+		if (!child && !list) { return }
+		let compHooks = this.getCompatibleHooks(this.openLink.startHook ?? this.openLink.endHook)
+		if (child) {
+			for (let hook of child.inputList.allHooks()) {
+				if (compHooks.includes(hook)) {
+					child.inputList.view.show()
+					return
+				}
+			}
+			for (let hook of child.outputList.allHooks()) {
+				if (compHooks.includes(hook)) {
+					child.outputList.view.show()
+					return
+				}
+			}
+		}
+		if (list) {
+			for (let hook of list.allHooks()) {
+				if (compHooks.includes(hook)) {
+					list.view.show()
+					return
+				}
+			}
+		}
+	}
+
+	hoveredChild(p: vertex): Linkable | null {
+		for (let child of this.linkableChildren()) {
+			if (child.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.view.frameWidth
+				&& child.anchor[1] <= p[1] && p[1] <= child.anchor[1] + child.view.frameHeight) {
+				return child
+			}
+		}
+		return null
+	}
+
+	hoveredIOList(p: vertex): IOList | null {
+		for (let child of this.linkableChildren()) {
+			for (let list of [child.inputList, child.outputList]) {
+				if (child.anchor[0] + list.anchor[0] <= p[0] && p[0] <= child.anchor[0] + list.anchor[0] + list.view.frameWidth
+					&& child.anchor[1] + list.anchor[1] <= p[1] && p[1] <= child.anchor[1] + list.anchor[1] + list.view.frameHeight) {
+					return list
+				}
+			}
+		}
+		return null
 	}
 
 	endLinking(e: ScreenEvent) {
