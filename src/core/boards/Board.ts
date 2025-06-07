@@ -865,7 +865,7 @@ The content children can also be dragged and panned.
 
 	updateLinks() {
 		for (let hook of this.allHooks()) {
-			hook.update() // this is supposed to update start and end points of links
+			hook.updateDependents() // this is supposed to update start and end points of links
 		}
 	}
 
