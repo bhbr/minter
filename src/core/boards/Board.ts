@@ -682,8 +682,8 @@ The content children can also be dragged and panned.
 			link.dependency.source.removeDependency(link.dependency)
 			remove(this.links, link)
 			this.remove(link)
-			clickedHook.outlet.removeHook()
 			if (clickedHook.outlet.kind == 'output') {
+				clickedHook.outlet.removeHook()
 				this.createNewOpenLink(link.endHook)
 			} else {
 				this.createNewOpenLink(link.startHook)
@@ -886,7 +886,9 @@ The content children can also be dragged and panned.
 		})
 		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
-		startHook.outlet.addHook()
+		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
+			startHook.outlet.addHook()
+		}
 		startHook.outlet.ioList.mobject.update()
 	}
 
