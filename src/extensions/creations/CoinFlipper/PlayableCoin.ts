@@ -22,7 +22,7 @@ export class PlayableCoin extends Linkable implements Playable {
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
-				anchor: [-12.5, 50]
+				anchor: [0, 70]
 			}),
 			valueHistory: [],
 			outputProperties: [

@@ -793,11 +793,13 @@ The content children can also be dragged and panned.
 
 	hoveredIOList(p: vertex): IOList | null {
 		for (let child of this.linkableChildren()) {
-			for (let list of [child.inputList, child.outputList]) {
-				if (child.anchor[0] + list.anchor[0] <= p[0] && p[0] <= child.anchor[0] + list.anchor[0] + list.view.frameWidth
-					&& child.anchor[1] + list.anchor[1] <= p[1] && p[1] <= child.anchor[1] + list.anchor[1] + list.view.frameHeight) {
-					return list
-				}
+			if (child.anchor[0] + child.inputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.inputList.anchor[0] + child.inputList.view.frameWidth
+				&& child.anchor[1] + child.inputList.anchor[1] <= p[1] && p[1] <= child.anchor[1]) {
+				return child.inputList
+			}
+			if (child.anchor[0] + child.outputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.outputList.anchor[0] + child.outputList.view.frameWidth
+				&& child.anchor[1] + child.view.frameHeight <= p[1] && p[1] <= child.anchor[1] + child.outputList.anchor[1] + child.outputList.view.frameHeight) {
+				return child.outputList
 			}
 		}
 		return null
