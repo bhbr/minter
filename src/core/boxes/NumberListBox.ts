@@ -110,6 +110,7 @@ export class LinkableNumberListBox extends NumberListBox {
 		return undefined // this.list[this.list.length - 1]
 	}
 	set newestEntry(newValue: number) {
+		if (isNaN(newValue) || newValue == Infinity || newValue == -Infinity) { return }
 		this.list.push(newValue)
 	}
 
