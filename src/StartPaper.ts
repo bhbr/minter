@@ -26,6 +26,7 @@ if (TESTING) { AllTests.run() }
 export const paper = new StartPaper()
 
 let p = new PascalsBrickWall({
-	nbFlips: 1
+	nbFlips: 1,
+	anchor: [200, 600]
 })
 paper.addToContent(p)

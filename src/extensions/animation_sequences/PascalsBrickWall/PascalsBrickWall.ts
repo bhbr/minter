@@ -36,11 +36,11 @@ export class PascalsBrickWall extends Linkable {
 				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
 			],
 			nextSubstepButton: new SimpleButton({
-				anchor: [0.5 * (ROW_WIDTH - 50), BRICK_HEIGHT + 60],
+				anchor: [0.5 * (ROW_WIDTH - 50), BRICK_HEIGHT + 10],
 				text: ">"
 			}),
 			nextStepButton: new SimpleButton({
-				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 60],
+				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 10],
 				text: ">>"
 			})
 		}
@@ -53,10 +53,10 @@ export class PascalsBrickWall extends Linkable {
 		this.add(this.nextStepButton)
 		this.nextStepButton.action = this.animateNextStep.bind(this)
 
-		for (var i = 1; i <= this.nbFlips; i++) {
+		for (var i = 0; i < this.nbFlips; i++) {
 			let row = new BrickRow({
-				anchor: [0, BRICK_HEIGHT * i],
-				nbFlips: i,
+				anchor: [0, -BRICK_HEIGHT * i],
+				nbFlips: i + 1,
 				tailsProbability: this.tailsProbability,
 				headsColor: this.headsColor,
 				tailsColor: this.tailsColor
@@ -77,7 +77,6 @@ export class PascalsBrickWall extends Linkable {
 		this.duplicatedRow = new BrickRow({
 			nbFlips: this.nbFlips,
 			tailsProbability: this.tailsProbability,
-			anchor: [0, this.nbFlips * BRICK_HEIGHT],
 			visible: false
 		})
 		this.add(this.duplicatedRow)
@@ -86,16 +85,12 @@ export class PascalsBrickWall extends Linkable {
 		})
 		this.moveToTop(this.lastRow())
 		this.duplicatedRow.view.show()
-		this.duplicatedRow.animate({
-			anchor: vertexTranslatedBy(this.duplicatedRow.anchor, [0, BRICK_HEIGHT])
-		}, duration)
+		for (let row of this.rows) {
+			row.animate({
+				anchor: vertexTranslatedBy(row.anchor, [0, -BRICK_HEIGHT])
+			}, duration)
+		}
 		this.animationSubstep += 1
-		this.nextSubstepButton.animate({
-			anchor: [0.5 * (ROW_WIDTH - 50), (this.nbFlips + 1) * BRICK_HEIGHT + 60],
-		}, duration)
-		this.nextStepButton.animate({
-			anchor: [0.5 * (ROW_WIDTH - 50) + 60, (this.nbFlips + 1) * BRICK_HEIGHT + 60],
-		}, duration)
 	}
 
 	splitBricks(duration: number = 1) {
@@ -124,7 +119,6 @@ export class PascalsBrickWall extends Linkable {
 		let nextRow = new BrickRow({
 			nbFlips: this.nbFlips,
 			tailsProbability: this.tailsProbability,
-			anchor: [0, this.nbFlips * BRICK_HEIGHT],
 			opacity: 0
 		})
 		this.rows.push(nextRow)
