@@ -119,6 +119,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		}, redraw)
 
 		this.updateLabel(redraw)
+		this.updateDependents()
 
 		if (redraw) { this.view.redraw() }
 	}
