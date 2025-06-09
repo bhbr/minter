@@ -17,7 +17,7 @@ import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePl
 import { AddBox } from './core/boxes/BinaryOperatorBox'
 
 
-export class StartPaper extends DemoPaper { }
+export class StartPaper extends CoinFlipPaper { }
 
 export const TESTING = true
 
@@ -25,5 +25,7 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let p = new PascalsBrickWall()
-paper.add(p)
+let p = new PascalsBrickWall({
+	nbFlips: 1
+})
+paper.addToContent(p)
