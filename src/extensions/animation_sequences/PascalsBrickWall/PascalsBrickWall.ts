@@ -2,7 +2,7 @@
 import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
 import { BrickRow } from './BrickRow'
 import { Linkable } from 'core/linkables/Linkable'
-import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
 import { vertexTranslatedBy } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { Line } from 'core/shapes/Line'
@@ -19,6 +19,7 @@ export class PascalsBrickWall extends Linkable {
 	headsColor: Color
 	tailsColor: Color
 	nextSubstepButton: SimpleButton
+	nextStepButton: SimpleButton
 
 	defaults(): object {
 		return {
@@ -37,6 +38,10 @@ export class PascalsBrickWall extends Linkable {
 			nextSubstepButton: new SimpleButton({
 				anchor: [0.5 * (ROW_WIDTH - 50), BRICK_HEIGHT + 60],
 				text: ">"
+			}),
+			nextStepButton: new SimpleButton({
+				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 60],
+				text: ">>"
 			})
 		}
 	}
@@ -45,6 +50,8 @@ export class PascalsBrickWall extends Linkable {
 		super.setup()
 		this.add(this.nextSubstepButton)
 		this.nextSubstepButton.action = this.animateNextSubstep.bind(this)
+		this.add(this.nextStepButton)
+		this.nextStepButton.action = this.animateNextStep.bind(this)
 
 		for (var i = 1; i <= this.nbFlips; i++) {
 			let row = new BrickRow({
@@ -66,7 +73,7 @@ export class PascalsBrickWall extends Linkable {
 		return this.rows[this.nbFlips - 1]
 	}
 
-	duplicateLastRow() {
+	duplicateLastRow(duration: number = 1) {
 		this.duplicatedRow = new BrickRow({
 			nbFlips: this.nbFlips,
 			tailsProbability: this.tailsProbability,
@@ -81,14 +88,17 @@ export class PascalsBrickWall extends Linkable {
 		this.duplicatedRow.view.show()
 		this.duplicatedRow.animate({
 			anchor: vertexTranslatedBy(this.duplicatedRow.anchor, [0, BRICK_HEIGHT])
-		}, 1)
+		}, duration)
 		this.animationSubstep += 1
 		this.nextSubstepButton.animate({
 			anchor: [0.5 * (ROW_WIDTH - 50), (this.nbFlips + 1) * BRICK_HEIGHT + 60],
-		}, 1)
+		}, duration)
+		this.nextStepButton.animate({
+			anchor: [0.5 * (ROW_WIDTH - 50) + 60, (this.nbFlips + 1) * BRICK_HEIGHT + 60],
+		}, duration)
 	}
 
-	splitBricks() {
+	splitBricks(duration: number = 1) {
 		let splitLines: Array<Line> = []
 		for (var i = 0; i < this.duplicatedRow.bricks.length; i++) {
 			let x = this.duplicatedRow.bricks[i].anchor[0] + this.duplicatedRow.bricks[i].midX()
@@ -101,15 +111,15 @@ export class PascalsBrickWall extends Linkable {
 			this.duplicatedRow.add(line)
 			line.animate({
 				endPoint: [x, BRICK_HEIGHT]
-			}, 1)
+			}, duration)
 		}
 		this.animationSubstep += 1
 	}
 
-	fadeInNextRow() {
+	fadeInNextRow(duration: number = 1) {
 		this.rows[this.rows.length - 1].animate({
 			opacity: 0.2
-		}, 1)
+		}, duration)
 		this.nbFlips += 1
 		let nextRow = new BrickRow({
 			nbFlips: this.nbFlips,
@@ -121,47 +131,49 @@ export class PascalsBrickWall extends Linkable {
 		this.add(nextRow)
 		nextRow.animate({
 			opacity: 1
-		}, 1)
+		}, duration)
 		window.setTimeout(function() {
 			this.remove(this.duplicatedRow)
 			this.duplicatedRow = null
-		}.bind(this), 1000)
+		}.bind(this), 1000 * duration)
 		this.animationSubstep = 0
-	}
-
-	animateSplitAndMerge() {
-		this.duplicateLastRow()
-		window.setTimeout(this.splitBricks.bind(this), 1000)
-		window.setTimeout(this.fadeInNextRow.bind(this), 2000)
-		this.nbFlips += 1
-	}
-
-	fadeOutAllButLastRow() {
-		for (var i = 0; i < this.nbFlips - 1; i++) {
-			for (let brick of this.rows[i].bricks) {
-				brick.animate({
-					opacity: 0.2
-				}, 1)
-			}
-		}
 	}
 
 	animateNextSubstep() {
 		switch (this.animationSubstep) {
 			case 0:
-				this.duplicateLastRow()
+				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
 				break
 			case 1:
-				this.splitBricks()
+				this.splitBricks(SLOW_ANIMATION_DURATION)
 				break
 			case 2:
-				this.fadeInNextRow()
+				this.fadeInNextRow(SLOW_ANIMATION_DURATION)
 				break
 			default:
 				break
 		}
 	}
 
+	animateNextStep() {
+		switch (this.animationSubstep) {
+			case 0:
+				this.duplicateLastRow(FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.splitBricks(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
+				break
+			case 1:
+				this.splitBricks(FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				break
+			case 2:
+				this.fadeInNextRow(FAST_ANIMATION_DURATION)
+				break
+			default:
+				break
+		}
+
+	}
 
 
 	
