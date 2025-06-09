@@ -12,7 +12,7 @@ export class Histogram extends DesmosCalculator {
 
 	defaults(): object {
 		return {
-			nbBins: 0,
+			nbBins: 10,
 			data: [],
 			leftColor: Color.green(),
 			rightColor: Color.purple(),
@@ -50,7 +50,9 @@ export class Histogram extends DesmosCalculator {
 			bins.push(0)
 		}
 		for (var n of this.data) {
-			bins[n]++
+			if (n < this.nbBins) {
+				bins[n]++
+			}
 		}
 		return bins
 	}

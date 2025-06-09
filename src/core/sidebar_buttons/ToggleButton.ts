@@ -35,6 +35,10 @@ export class ToggleButton extends SidebarButton {
 				super.commonButtonUp()
 			}
 			this.locked = !this.locked
+			this.view.transform.update({
+				scale: 1
+			})
+			this.redraw()
 		} else {
 			super.commonButtonUp()
 		}

@@ -81,8 +81,12 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	showLinks() {
-		this.inputList.view.show()
-		this.outputList.view.show()
+		if (this.inputList.height != 0) {
+			this.inputList.view.show()
+		}
+		if (this.outputList.height != 0) {
+			this.outputList.view.show()
+		}
 		this.disable()
 	}
 
@@ -135,7 +139,6 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.submobs) {
-			log(mob)
 			if (mob instanceof SimpleButton || mob instanceof Checkbox) {
 				mob.update({
 					visible: visible

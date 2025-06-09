@@ -14,6 +14,7 @@ export class DesmosCalculator extends Linkable {
 	calculator: any
 	innerCanvas: Mobject
 	outerFrame: Rectangle
+	options: object
 
 	defaults(): object {
 		return {
@@ -24,6 +25,7 @@ export class DesmosCalculator extends Linkable {
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
 			calculator: null,
+			options: {},
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle()
 		}
@@ -33,7 +35,31 @@ export class DesmosCalculator extends Linkable {
 		super.setup()
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
+		} else {
+			this.createCalculator(this.options)
 		}
+		this.setupCanvas()
+		this.setupOuterFrame()
+	}
+
+	loadDesmosAPI() {
+		let paper = getPaper()
+
+		let scriptTag = document.createElement('script')
+		scriptTag.type = 'text/javascript'
+		scriptTag.src = 'https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6'
+		scriptTag.onload = this.createCalculator.bind(this, this.options)
+		document.head.append(scriptTag)
+
+		paper.loadedAPIs.push('desmos-calc')
+	}
+
+
+	createCalculator(options: object = {}) {
+		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
+	}
+
+	setupCanvas() {
 
 		this.innerCanvas.view.frame.update({
 			width: this.view.frame.width,
@@ -47,6 +73,9 @@ export class DesmosCalculator extends Linkable {
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
 		this.innerCanvas.view.div.id = 'desmos-calc'
 
+	}
+
+	setupOuterFrame() {
 		this.outerFrame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height,
@@ -56,25 +85,6 @@ export class DesmosCalculator extends Linkable {
 			this.focus()
 		}
 		this.add(this.outerFrame)
-
-		window.setTimeout(this.createCalculator.bind(this), 1000)
-
-	}
-
-	loadDesmosAPI() {
-		let paper = getPaper()
-
-		let scriptTag = document.createElement('script')
-		scriptTag.type = 'text/javascript'
-		scriptTag.src = 'https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6'
-		document.head.append(scriptTag)
-
-		paper.loadedAPIs.push('desmos-calc')
-	}
-
-
-	createCalculator(options: object = {}) {
-		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 	}
 
 	focus() {

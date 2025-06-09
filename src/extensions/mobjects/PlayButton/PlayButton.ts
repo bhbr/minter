@@ -4,6 +4,7 @@ import { Playable } from './Playable'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
+import { log } from 'core/functions/logging'
 
 export class PlayButton extends SimpleButton {
 
@@ -36,7 +37,7 @@ export class PlayButton extends SimpleButton {
 
 	toggleLabel() {
 		this.update({
-			text: (this.text == 'play') ? 'pause' : 'play'
+			text: (this.text == 'play') ? 'stop' : 'play'
 		})
 		
 	}

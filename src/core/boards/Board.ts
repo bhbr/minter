@@ -24,6 +24,7 @@ import { IO_LIST_OFFSET, SNAPPING_DISTANCE } from 'core/linkables/constants'
 import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
 import { View } from 'core/mobjects/View'
+import { IOList } from 'core/linkables/IOList'
 
 declare var paper: Paper
 export declare interface Window { webkit?: any }
@@ -87,7 +88,8 @@ The content children can also be dragged and panned.
 			compatibleHooks: [],
 			creationTool: null,
 			isShowingLinks: false,
-			allowingDrag: false
+			allowingDrag: false,
+			lastHoveredChild: null
 		}
 	}
 
@@ -389,7 +391,7 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	removeFromContent(mob: Linkable) {
+	removeFromContent(mob: Mobject) {
 		remove(this.contentChildren, mob)
 		this.content.remove(mob)
 	}
@@ -424,9 +426,19 @@ The content children can also be dragged and panned.
 				this.creator = this.createCreator(this.creationMode)
 				this.add(this.creator)
 				break
+			case 'restart':
+				this.restart()
+				break
 		}
 	}
 
+	restart() {
+		var child = this.contentChildren.pop()
+		while (child !== undefined) {
+			this.content.remove(child)
+			child = this.contentChildren.pop()
+		}
+	}
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.contentChildren) {
@@ -542,6 +554,10 @@ The content children can also be dragged and panned.
 	}
 
 	panning(e: ScreenEvent) {
+		if (this.panPointStart == null) {
+			this.startPanning(e)
+			return
+		}
 		let panPoint = this.sensor.localEventVertex(e)
 		let dr = vertexSubtract(panPoint, this.panPointStart)
 		for (let mob of this.contentChildren) {
@@ -591,6 +607,7 @@ The content children can also be dragged and panned.
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 	isShowingLinks: boolean
+	lastHoveredChild: Linkable | null
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -667,8 +684,8 @@ The content children can also be dragged and panned.
 			link.dependency.source.removeDependency(link.dependency)
 			remove(this.links, link)
 			this.remove(link)
-			clickedHook.outlet.removeHook()
 			if (clickedHook.outlet.kind == 'output') {
+				clickedHook.outlet.removeHook()
 				this.createNewOpenLink(link.endHook)
 			} else {
 				this.createNewOpenLink(link.startHook)
@@ -695,6 +712,8 @@ The content children can also be dragged and panned.
 	}
 
 	createNewOpenLink(hook: LinkHook) {
+		this.hideLinksOfContent()
+		hook.outlet.ioList.view.show()
 		this.openHook = hook
 		let p = this.locationOfHook(hook)
 		let sb = new LinkBullet({ midpoint: p })
@@ -727,6 +746,75 @@ The content children can also be dragged and panned.
 		this.openBullet.update({
 			midpoint: p
 		})
+		this.openBullet.updateDependents()
+
+		for (let child of this.linkableChildren()) {
+			child.inputList.view.hide()
+			child.outputList.view.hide()
+		}
+		if (this.openLink.startHook) { this.openLink.startHook.outlet.ioList.view.show() }
+		if (this.openLink.endHook) { this.openLink.endHook.outlet.ioList.view.show() }
+
+		let child = this.hoveredChild(p)
+		let listOfLists = this.hoveredIOLists(p)
+		if (!child && listOfLists.length == 0) { return }
+		let compHooks = this.getCompatibleHooks(this.openLink.startHook ?? this.openLink.endHook)
+		if (child && listOfLists.length == 0) {
+			for (let hook of child.inputList.allHooks()) {
+				if (compHooks.includes(hook)) {
+					child.inputList.view.show()
+					return
+				}
+			}
+			for (let hook of child.outputList.allHooks()) {
+				if (compHooks.includes(hook)) {
+					child.outputList.view.show()
+					return
+				}
+			}
+		}
+		if (child && listOfLists.length > 1) {
+			for (let list of listOfLists) {
+				if (list.mobject == child) {
+					list.view.show()
+					return
+				}
+			}
+		}
+		let list = listOfLists[0]
+		if (list) {
+			for (let hook of list.allHooks()) {
+				if (compHooks.includes(hook)) {
+					list.view.show()
+					return
+				}
+			}
+		}
+	}
+
+	hoveredChild(p: vertex): Linkable | null {
+		for (let child of this.linkableChildren()) {
+			if (child.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.view.frameWidth
+				&& child.anchor[1] <= p[1] && p[1] <= child.anchor[1] + child.view.frameHeight) {
+				this.lastHoveredChild = child
+			}
+		}
+		return this.lastHoveredChild
+	}
+
+	hoveredIOLists(p: vertex): Array<IOList> {
+		let ret: Array<IOList> = []
+		for (let child of this.linkableChildren()) {
+			if (child.anchor[0] + child.inputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.inputList.anchor[0] + child.inputList.view.frameWidth
+				&& child.anchor[1] + child.inputList.anchor[1] <= p[1] && p[1] <= child.anchor[1]) {
+				ret.push(child.inputList)
+			}
+			if (child.anchor[0] + child.outputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.outputList.anchor[0] + child.outputList.view.frameWidth
+				&& child.anchor[1] + child.view.frameHeight <= p[1] && p[1] <= child.anchor[1] + child.outputList.anchor[1] + child.outputList.view.frameHeight) {
+				ret.push(child.outputList)
+			}
+		}
+		return ret
 	}
 
 	endLinking(e: ScreenEvent) {
@@ -775,6 +863,8 @@ The content children can also be dragged and panned.
 			let flag1 = (startHook.outlet.type == endHook.outlet.type)
 				|| ((startHook.outlet.type == 'number' || startHook.outlet.type == 'Array<number>')
 					&& endHook.outlet.type == 'number|Array<number>')
+				|| (startHook.outlet.type == 'number|Array<number>'
+					&& (endHook.outlet.type == 'number' || endHook.outlet.type == 'Array<number>'))
 			let flag2 = (startHook.outlet.ioList.mobject !== endHook.outlet.ioList.mobject)
 			let flag3 = (!startHook.outlet.ioList.mobject.dependsOn(endHook.outlet.ioList.mobject))
 			return flag1 && flag2 && flag3
@@ -787,12 +877,12 @@ The content children can also be dragged and panned.
 
 	updateLinks() {
 		for (let hook of this.allHooks()) {
-			hook.update() // this is supposed to update start and end points of links
+			hook.updateDependents() // this is supposed to update start and end points of links
 		}
 	}
 
 	createNewDependency() {
-			this.createNewDependencyBetweenHooks(this.openLink.startHook, this.openLink.endHook)
+		this.createNewDependencyBetweenHooks(this.openLink.startHook, this.openLink.endHook)
 	}
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
@@ -808,7 +898,9 @@ The content children can also be dragged and panned.
 		})
 		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
-		startHook.outlet.addHook()
+		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
+			startHook.outlet.addHook()
+		}
 		startHook.outlet.ioList.mobject.update()
 	}
 

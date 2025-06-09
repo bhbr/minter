@@ -75,6 +75,7 @@ export class NumberListBox extends Linkable {
 		this.update({
 			value: []
 		})
+		this.updateDependents()
 	}
 
 
@@ -88,7 +89,7 @@ export class LinkableNumberListBox extends NumberListBox {
 		return {
 			inputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
-				{ name: 'newestEntry', displayName: 'newest', type: 'number' },
+				{ name: 'newestEntry', displayName: 'add entry', type: 'number' },
 			],
 			outputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
@@ -109,8 +110,8 @@ export class LinkableNumberListBox extends NumberListBox {
 		return undefined // this.list[this.list.length - 1]
 	}
 	set newestEntry(newValue: number) {
+		if (isNaN(newValue) || newValue == Infinity || newValue == -Infinity) { return }
 		this.list.push(newValue)
-		this.update()
 	}
 
 	setup() {

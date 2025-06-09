@@ -7,6 +7,7 @@ import { HOOK_RADIUS } from './constants'
 import { LinkOutlet } from './LinkOutlet'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
+import { Mobject } from 'core/mobjects/Mobject'
 
 export class LinkHook extends Circle {
 
@@ -37,7 +38,10 @@ export class LinkHook extends Circle {
 		}
 	}
 
-	
+	positionInBoard(): vertex {
+		let board = this.outlet.ioList.mobject.board
+		return this.parent.frame.transformLocalPoint(this.midpoint, board.frame)
+	}
 
 
 

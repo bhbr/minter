@@ -8,7 +8,7 @@ import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -22,12 +22,9 @@ export class CoinRow extends Linkable implements Playable {
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
-	resetButton: SimpleButton
 	nbHeadsLabel: TextLabel
 	nbTailsLabel: TextLabel
 	labelWidth: number
-	nbHeadsHistory: Array<number>
-	nbTailsHistory: Array<number>
 
 	defaults(): object {
 		return {
@@ -40,9 +37,8 @@ export class CoinRow extends Linkable implements Playable {
 			tailsProbability: 0.5,
 			playState: 'stop',
 			playIntervalID: null,
-			playButton: new PlayButton(),
-			resetButton: new SimpleButton({
-				text: 'reset'
+			playButton: new PlayButton({
+				anchor: [0, 50]
 			}),
 			nbHeadsLabel: new TextLabel({
 				frameWidth: 50,
@@ -52,8 +48,6 @@ export class CoinRow extends Linkable implements Playable {
 				frameWidth: 50,
 				frameHeight: 25
 			}),
-			nbHeadsHistory: [],
-			nbTailsHistory: [],
 			inputProperties: [
 				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
@@ -65,7 +59,7 @@ export class CoinRow extends Linkable implements Playable {
 				{ name: 'nbTails', displayName: '# tails', type: 'number' }
 			],
 			frameWidth: 300,
-			frameHeight: 100
+			frameHeight: 50
 		}
 	}
 
@@ -73,7 +67,7 @@ export class CoinRow extends Linkable implements Playable {
 		super.setup()
 		this.createCoins()
 		this.setupLabels()
-		this.setupButtons()
+		this.setupButton()
 	}
 
 	createCoins() {
@@ -99,14 +93,12 @@ export class CoinRow extends Linkable implements Playable {
 		this.positionTailsLabel()
 	}
 
-	setupButtons() {
+	setupButton() {
 		this.add(this.playButton)
-		this.add(this.resetButton)
-		this.positionButtons()
+		this.positionButton()
 		this.playButton.update({
 			mobject: this
 		})
-		this.resetButton.action = this.reset.bind(this)
 	}
 
 
@@ -129,7 +121,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.add(coin)
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
-		this.positionButtons()
+		this.positionButton()
 	}
 
 	removeCoin() {
@@ -137,7 +129,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.remove(coin)
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
-		this.positionButtons()
+		this.positionButton()
 	}
 
 	adjustFrameWidth() {
@@ -155,17 +147,11 @@ export class CoinRow extends Linkable implements Playable {
 		})
 	}
 
-	positionButtons() {
+	positionButton() {
 		this.playButton.update({
 			anchor: [
-				this.frameWidth / 2 - this.playButton.frameWidth - 5,
-				2 * this.coinRadius + 5
-			]
-		})
-		this.resetButton.update({
-			anchor: [
-				this.frameWidth / 2 + 5,
-				2 * this.coinRadius + 5
+				this.frameWidth / 2 - this.playButton.frameWidth / 2,
+				2 * this.coinRadius + 15
 			]
 		})
 	}
@@ -174,9 +160,12 @@ export class CoinRow extends Linkable implements Playable {
 		for (let coin of this.coins) {
 			coin.flip()
 		}
-		this.nbHeadsHistory.push(this.nbHeads())
-		this.nbTailsHistory.push(this.nbTails())
-		this.update() // to trigger the histogram to update
+		this.update()
+		this.updateDependents()
+	}
+
+	onTap(e: ScreenEvent) {
+		this.flipCoins()
 	}
 
 	play() {
@@ -196,16 +185,6 @@ export class CoinRow extends Linkable implements Playable {
 			this.play()
 		}
 	}
-
-	reset() {
-		this.pause()
-		this.playButton.toggleLabel()
-		this.nbHeadsHistory = []
-		this.nbTailsHistory = []
-		this.update()
-	}
-
-	nbFlips(): number { return this.nbTailsHistory.length }
 
 	nbTails(): number {
 		var t = 0

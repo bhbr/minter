@@ -32,7 +32,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			width: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1.0,
-			strokeWidth: 0,
+			strokeColor: Color.gray(0.4),
+			strokeWidth: 0.75,
 			editable: false
 		}
 	}
@@ -112,13 +113,18 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
+		this.height = this.getHeight()
+		if (this.height == 0) {
+			this.view.hide()
+		} else {
+			this.view.show()
+		}
 		if (this.mobject == null) { return }
 		if (this.constructor.name == 'ExpandedBoardInputList') { return }
 
 		if (args['outletProperties'] === undefined) { return }
 
 		this.createOutlets()
-		this.height = this.getHeight()
 		if (this.mobject == null) { return }
 		this.positionSelf()
 		if (redraw) {

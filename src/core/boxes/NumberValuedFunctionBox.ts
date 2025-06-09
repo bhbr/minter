@@ -4,6 +4,7 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { numberArraySum } from 'core/functions/numberArray'
+import { log } from 'core/functions/logging'
 
 export class NumberValuedFunctionBox extends NumberBox {
 	

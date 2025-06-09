@@ -13,6 +13,7 @@ import { View } from './View'
 import { Motor } from './Motor'
 import { Sensor } from './Sensor'
 import { getPaper } from 'core/functions/getters'
+import { UpdateCall, UpdateCalls } from './UpdateCall'
 
 export class Mobject extends ExtendedObject {
 
@@ -361,46 +362,32 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			}
 		}
 
-		let targetsAndUpdateDicts: Array<[Mobject, object]> = []
-
-		// TODO: refactor
-		for (let dep of this.dependencies || []) {
-
-			let output: any = this[dep.outputName] // value or function, may be undefined
-			var outputValue: any = null
-			if (typeof output === 'function') {
-				outputValue = output.bind(this)()
-			} else if (output !== undefined && output !== null) {
-				outputValue = output
-			}
-			
-			var repeatMobject = false
-			for (let pair of targetsAndUpdateDicts) {
-				let target = pair[0]
-				if (target == dep.target) {
-					let updateDict = pair[1]
-					updateDict[dep.inputName] = outputValue
-					repeatMobject = true
-					break
-				}
-			}
-			if (!repeatMobject) {
-				let newUpdateDict = {}
-				newUpdateDict[dep.inputName] = outputValue
-				targetsAndUpdateDicts.push([dep.target, newUpdateDict])
-			}
-		}
-
-		for (let pair of targetsAndUpdateDicts) {
-			let target = pair[0]
-			let updateDict = pair[1]
-			if (Object.keys(updateDict).includes('null')) {
-				target.update()
-			} else {
-				target.update(updateDict)
-			}
-		}
 		if (redraw) { this.view.redraw() }
+
+	}
+
+	
+
+
+	getUpdateCalls(): UpdateCalls {
+		let ret = new UpdateCalls()
+		for (let dep of this.dependencies) {
+			let dict = {}
+			if (typeof this[dep.outputName] == 'function') {
+				dict[dep.inputName] = this[dep.outputName].bind(this)
+			} else {
+				dict[dep.inputName] = this[dep.outputName]
+			}
+			let updateCall = new UpdateCall(dep.target, dict)
+			ret.includeCall(updateCall)
+			ret.includeCalls(dep.target.getUpdateCalls())
+		}
+		return ret
+	}
+
+	updateDependents() {
+		let calls = this.getUpdateCalls()
+		calls.call()
 	}
 
 
@@ -486,6 +473,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.update({
 			anchor: vertexAdd(eventVertex(e), this.dragAnchorStart)
 		})
+		this.redraw() // fixes dragging bug
 	}
 
 	endDragging(e: ScreenEvent) {

@@ -7,6 +7,7 @@ import { LinkBullet } from './LinkBullet'
 import { LINK_LINE_WIDTH } from './constants'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { LinkHook } from './LinkHook'
+import { Color } from 'core/classes/Color'
 
 export class DependencyLink extends Mobject {
 /*
@@ -21,6 +22,7 @@ linkable mobjects
 	endBullet: LinkBullet
 	endHook: LinkHook | null
 	linkLine: Line
+	borderLinkLine: Line
 
 	defaults(): object {
 		return {
@@ -30,6 +32,10 @@ linkable mobjects
 			startHook: null,
 			endHook: null,
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH }),
+			borderLinkLine: new Line({
+				strokeWidth: LINK_LINE_WIDTH + 4,
+				strokeColor: Color.black()
+			}),
 			screenEventHandler: ScreenEventHandler.Parent
 		}
 	}
@@ -52,13 +58,22 @@ linkable mobjects
 	setup() {
 		super.setup()
 		this.startBullet.addDependency('midpoint', this.linkLine, 'startPoint')
+		this.startBullet.addDependency('midpoint', this.borderLinkLine, 'startPoint')
 		this.linkLine.update({
 			startPoint: this.startBullet.midpoint
 		})
+		this.borderLinkLine.update({
+			startPoint: this.startBullet.midpoint
+		})
 		this.endBullet.addDependency('midpoint', this.linkLine, 'endPoint')
+		this.endBullet.addDependency('midpoint', this.borderLinkLine, 'endPoint')
 		this.linkLine.update({
 			endPoint: this.endBullet.midpoint
 		})
+		this.borderLinkLine.update({
+			endPoint: this.endBullet.midpoint
+		})
+		this.add(this.borderLinkLine)
 		this.add(this.startBullet)
 		this.add(this.endBullet)
 		this.add(this.linkLine)

@@ -14,9 +14,8 @@ export class OutputList extends IOList {
 	getAnchor(): vertex {
 		return [
 			0.5 * (this.mobject.getCompactWidth() - this.view.frame.width),
-			this.mobject.getCompactHeight() + IO_LIST_OFFSET + 15
+			this.mobject.getCompactHeight() + IO_LIST_OFFSET
 		]
-		// TODO: replace the hacky 15px
 	}
 
 }

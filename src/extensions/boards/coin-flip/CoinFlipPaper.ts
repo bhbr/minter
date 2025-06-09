@@ -49,7 +49,8 @@ export class CoinFlipPaper extends Paper {
 				'ArithmeticButton',
 				'ListFunctionsButton',
 				'PlotButton',
-				'ColorSampleButton'
+				'ColorSampleButton',
+				'RestartButton'
 			]
 		}
 	}
