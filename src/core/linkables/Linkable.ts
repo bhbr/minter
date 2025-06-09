@@ -81,8 +81,12 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	showLinks() {
-		this.inputList.view.show()
-		this.outputList.view.show()
+		if (this.inputList.height != 0) {
+			this.inputList.view.show()
+		}
+		if (this.outputList.height != 0) {
+			this.outputList.view.show()
+		}
 		this.disable()
 	}
 
