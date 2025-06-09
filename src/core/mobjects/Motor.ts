@@ -28,6 +28,7 @@ export class Motor extends ExtendedObject {
 	animationStopArgs: object
 
 	mobject?: Mobject
+	animating: boolean
 	showShadow?: boolean
 
 	defaults(): object {
@@ -37,6 +38,7 @@ export class Motor extends ExtendedObject {
 			animationInterval: null,
 			animationStartArgs: {},
 			animationStopArgs: {},
+			animating: false,
 			showShadow: null
 		}
 	}
@@ -63,7 +65,7 @@ export class Motor extends ExtendedObject {
 		if (!Motor.isAnimatable(args)) {
 			return
 		}
-
+		this.animating = true
 		for (let key of Object.keys(args)) {
 			let a = this.mobject[key]
 			let b = copy(a)
@@ -130,6 +132,7 @@ export class Motor extends ExtendedObject {
 		this.animationInterval = null
 		this.animationStartArgs = {}
 		this.animationStopArgs = {}
+		this.animating = false
 		this.showShadow = null
 	}
 

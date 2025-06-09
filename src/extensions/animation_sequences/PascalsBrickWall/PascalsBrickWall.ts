@@ -73,6 +73,15 @@ export class PascalsBrickWall extends Linkable {
 		return this.rows[this.nbFlips - 1]
 	}
 
+	temporarilyDisableButtons(duration: number = 1) {
+		this.nextSubstepButton.disable()
+		this.nextStepButton.disable()
+		window.setTimeout( function() {
+			this.nextSubstepButton.enable()
+			this.nextStepButton.enable()
+		}.bind(this), duration * 1000)
+	}
+
 	duplicateLastRow(duration: number = 1) {
 		this.duplicatedRow = new BrickRow({
 			nbFlips: this.nbFlips,
@@ -85,11 +94,12 @@ export class PascalsBrickWall extends Linkable {
 		})
 		this.moveToTop(this.lastRow())
 		this.duplicatedRow.view.show()
-		for (let row of this.rows) {
-			row.animate({
-				anchor: vertexTranslatedBy(row.anchor, [0, -BRICK_HEIGHT])
+		for (var i = 0; i < this.rows.length; i++) {
+			this.rows[i].animate({
+				anchor: [0, -(this.nbFlips - i) * BRICK_HEIGHT]
 			}, duration)
 		}
+		this.temporarilyDisableButtons()
 		this.animationSubstep += 1
 	}
 
@@ -108,6 +118,7 @@ export class PascalsBrickWall extends Linkable {
 				endPoint: [x, BRICK_HEIGHT]
 			}, duration)
 		}
+		this.temporarilyDisableButtons()
 		this.animationSubstep += 1
 	}
 
@@ -130,6 +141,7 @@ export class PascalsBrickWall extends Linkable {
 			this.remove(this.duplicatedRow)
 			this.duplicatedRow = null
 		}.bind(this), 1000 * duration)
+		this.temporarilyDisableButtons()
 		this.animationSubstep = 0
 	}
 
