@@ -88,7 +88,8 @@ The content children can also be dragged and panned.
 			compatibleHooks: [],
 			creationTool: null,
 			isShowingLinks: false,
-			allowingDrag: false
+			allowingDrag: false,
+			lastHoveredChild: null
 		}
 	}
 
@@ -606,6 +607,7 @@ The content children can also be dragged and panned.
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 	isShowingLinks: boolean
+	lastHoveredChild: Linkable | null
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -754,10 +756,10 @@ The content children can also be dragged and panned.
 		if (this.openLink.endHook) { this.openLink.endHook.outlet.ioList.view.show() }
 
 		let child = this.hoveredChild(p)
-		let list = this.hoveredIOList(p)
-		if (!child && !list) { return }
+		let listOfLists = this.hoveredIOLists(p)
+		if (!child && listOfLists.length == 0) { return }
 		let compHooks = this.getCompatibleHooks(this.openLink.startHook ?? this.openLink.endHook)
-		if (child) {
+		if (child && listOfLists.length == 0) {
 			for (let hook of child.inputList.allHooks()) {
 				if (compHooks.includes(hook)) {
 					child.inputList.view.show()
@@ -771,6 +773,15 @@ The content children can also be dragged and panned.
 				}
 			}
 		}
+		if (child && listOfLists.length > 1) {
+			for (let list of listOfLists) {
+				if (list.mobject == child) {
+					list.view.show()
+					return
+				}
+			}
+		}
+		let list = listOfLists[0]
 		if (list) {
 			for (let hook of list.allHooks()) {
 				if (compHooks.includes(hook)) {
@@ -785,24 +796,25 @@ The content children can also be dragged and panned.
 		for (let child of this.linkableChildren()) {
 			if (child.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.view.frameWidth
 				&& child.anchor[1] <= p[1] && p[1] <= child.anchor[1] + child.view.frameHeight) {
-				return child
+				this.lastHoveredChild = child
 			}
 		}
-		return null
+		return this.lastHoveredChild
 	}
 
-	hoveredIOList(p: vertex): IOList | null {
+	hoveredIOLists(p: vertex): Array<IOList> {
+		let ret: Array<IOList> = []
 		for (let child of this.linkableChildren()) {
 			if (child.anchor[0] + child.inputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.inputList.anchor[0] + child.inputList.view.frameWidth
 				&& child.anchor[1] + child.inputList.anchor[1] <= p[1] && p[1] <= child.anchor[1]) {
-				return child.inputList
+				ret.push(child.inputList)
 			}
 			if (child.anchor[0] + child.outputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.outputList.anchor[0] + child.outputList.view.frameWidth
 				&& child.anchor[1] + child.view.frameHeight <= p[1] && p[1] <= child.anchor[1] + child.outputList.anchor[1] + child.outputList.view.frameHeight) {
-				return child.outputList
+				ret.push(child.outputList)
 			}
 		}
-		return null
+		return ret
 	}
 
 	endLinking(e: ScreenEvent) {
