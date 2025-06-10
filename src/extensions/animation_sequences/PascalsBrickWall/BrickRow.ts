@@ -36,7 +36,7 @@ export class BrickRow extends MGroup {
 				tailsColor: this.tailsColor,
 			})
 			this.bricks.push(brick)
-			this.addDependency('tailsProbability', brick, 'tailsProbability')
+			//this.addDependency('tailsProbability', brick, 'tailsProbability')
 			this.addDependency('headsColor', brick, 'headsColor')
 			this.addDependency('tailsColor', brick, 'tailsColor')
 			this.add(brick)
@@ -45,16 +45,32 @@ export class BrickRow extends MGroup {
 	}
 
 	positionBricks() {
-		var w = 0
+		let anchors = this.brickAnchors()
 		for (var i = 0; i <= this.nbFlips; i++) {
-			this.bricks[i].update({ anchor: [w, 0] })
-			let dw = this.bricks[i].getWidth()
-			w += dw
+			this.bricks[i].update({ anchor: anchors[i] })
 		}
+	}
+
+	brickAnchors(): Array<vertex> {
+		let ret: Array<vertex> = []
+		var w: number = 0
+		for (var i = 0; i <= this.nbFlips; i++) {
+			ret.push([w, 0])
+			w += this.bricks[i].getWidth()
+		}
+		return ret
 	}
 
 	update(args: object = {}, redraw: boolean = false) {
 		super.update(args, redraw)
+		let newP = args['tailsProbability']
+		if (newP !== undefined && newP >= 0 && newP <= 1) {
+			for (let brick of this.bricks) {
+				brick.update({
+					tailsProbability: newP
+				})
+			}
+		}
 		this.positionBricks()
 	}
 

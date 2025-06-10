@@ -20,12 +20,14 @@ export class PascalsBrickWall extends Linkable {
 	tailsColor: Color
 	nextSubstepButton: SimpleButton
 	nextStepButton: SimpleButton
+	presentationForm: 'wall' | 'histogram' | 'centered-histogram'
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			animationSubstep: 0,
 			rows: [],
+			presentationForm: 'wall',
 			duplicatedRow: null,
 			headsColor: HEADS_COLOR,
 			tailsColor: TAILS_COLOR,
@@ -180,6 +182,44 @@ export class PascalsBrickWall extends Linkable {
 		}
 
 	}
+
+	update(args: object = {}, redraw: boolean = false) {
+		super.update(args, redraw)
+		let newP = args['tailsProbability']
+		if (newP === undefined || newP < 0 || newP > 1) { return }
+		for (let row of this.rows) {
+			row.update({
+				tailsProbability: newP
+			})
+		}
+		if (this.duplicatedRow) {
+			this.duplicatedRow.update({
+				tailsProbability: newP
+			})
+		}
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	
