@@ -7,6 +7,7 @@ import { Color } from 'core/classes/Color'
 import { DRAW_BORDERS } from 'core/constants'
 import { Mobject } from 'core/mobjects/Mobject'
 import { log } from 'core/functions/logging'
+import { VIEW_DEBUGGING_OFFSET } from 'core/constants'
 
 export class View extends ExtendedObject {
 	
@@ -104,8 +105,8 @@ export class View extends ExtendedObject {
 
 	redraw() {
 		this.div.style.transform = this.transform.withoutAnchor().toCSSString()
-		this.div.style.left = `${this.anchor[0].toString()}px`
-		this.div.style.top = `${this.anchor[1].toString()}px`
+		this.div.style.left = `${(this.anchor[0] + VIEW_DEBUGGING_OFFSET[0]).toString()}px`
+		this.div.style.top = `${(this.anchor[1] + VIEW_DEBUGGING_OFFSET[1]).toString()}px`
 		this.div.style.width = `${this.frame.width.toString()}px`
 		this.div.style.height = `${this.frame.height.toString()}px`
 		this.div.style.backgroundColor = this.backgroundColor.toCSS()

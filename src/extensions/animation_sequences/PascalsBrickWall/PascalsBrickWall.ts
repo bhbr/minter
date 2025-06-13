@@ -21,6 +21,7 @@ export class PascalsBrickWall extends Linkable {
 	nextSubstepButton: SimpleButton
 	nextStepButton: SimpleButton
 	presentationForm: 'wall' | 'histogram' | 'centered-histogram'
+	nextRow: BrickRow | null
 
 	defaults(): object {
 		return {
@@ -44,7 +45,8 @@ export class PascalsBrickWall extends Linkable {
 			nextStepButton: new SimpleButton({
 				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 10],
 				text: ">>"
-			})
+			}),
+			nextRow: null
 		}
 	}
 
@@ -124,21 +126,34 @@ export class PascalsBrickWall extends Linkable {
 		this.animationSubstep += 1
 	}
 
+	mergeBricks(duration: number = 1) {
+		this.nextRow = new BrickRow({
+			nbFlips: this.nbFlips + 1,
+			tailsProbability: this.tailsProbability,
+			opacity: 0
+		})
+		for (let brick of this.nextRow.bricks) {
+			brick.update({ fillOpacity: 0 })
+		}
+		this.add(this.nextRow)
+		this.nextRow.animate({ opacity: 1 }, duration)
+		for (let brick of this.duplicatedRow.bricks) {
+			brick.animate({ strokeWidth: 0 }, duration)
+		}
+		this.temporarilyDisableButtons()
+		this.animationSubstep += 1
+	}
+
 	fadeInNextRow(duration: number = 1) {
 		this.rows[this.rows.length - 1].animate({
 			opacity: 0.2
 		}, duration)
+		this.moveToTop(this.nextRow)
+		for (let brick of this.nextRow.bricks) {
+			brick.animate({ fillOpacity: 1 }, duration)
+		}
 		this.nbFlips += 1
-		let nextRow = new BrickRow({
-			nbFlips: this.nbFlips,
-			tailsProbability: this.tailsProbability,
-			opacity: 0
-		})
-		this.rows.push(nextRow)
-		this.add(nextRow)
-		nextRow.animate({
-			opacity: 1
-		}, duration)
+		this.rows.push(this.nextRow)
 		window.setTimeout(function() {
 			this.remove(this.duplicatedRow)
 			this.duplicatedRow = null
@@ -156,6 +171,9 @@ export class PascalsBrickWall extends Linkable {
 				this.splitBricks(SLOW_ANIMATION_DURATION)
 				break
 			case 2:
+				this.mergeBricks(SLOW_ANIMATION_DURATION)
+				break
+			case 3:
 				this.fadeInNextRow(SLOW_ANIMATION_DURATION)
 				break
 			default:
@@ -168,13 +186,19 @@ export class PascalsBrickWall extends Linkable {
 			case 0:
 				this.duplicateLastRow(FAST_ANIMATION_DURATION)
 				window.setTimeout(function() { this.splitBricks(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 3000 * FAST_ANIMATION_DURATION)
 				break
 			case 1:
 				this.splitBricks(FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
 				break
 			case 2:
+				this.mergeBricks(FAST_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				break
+			case 3:
 				this.fadeInNextRow(FAST_ANIMATION_DURATION)
 				break
 			default:

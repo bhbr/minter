@@ -27,6 +27,6 @@ export const paper = new StartPaper()
 
 let p = new PascalsBrickWall({
 	nbFlips: 1,
-	anchor: [200, 600]
+	anchor: [200, 400]
 })
 paper.addToContent(p)
