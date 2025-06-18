@@ -1,6 +1,6 @@
 
 import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
-import { BrickRow } from './BrickRow'
+import { Partition } from './Partition'
 import { Linkable } from 'core/linkables/Linkable'
 import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
 import { vertexTranslatedBy } from 'core/functions/vertex'
@@ -13,22 +13,21 @@ export class PascalsBrickWall extends Linkable {
 
 	nbFlips: number
 	animationSubstep: number
-	rows: Array<BrickRow>
-	duplicatedRow?: BrickRow
+	rows: Array<Partition>
+	duplicatedRow?: Partition
 	tailsProbability: number
 	headsColor: Color
 	tailsColor: Color
 	nextSubstepButton: SimpleButton
 	nextStepButton: SimpleButton
-	presentationForm: 'wall' | 'histogram' | 'centered-histogram'
-	nextRow: BrickRow | null
+	histogramButton: SimpleButton
+	nextRow: Partition | null
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			animationSubstep: 0,
 			rows: [],
-			presentationForm: 'wall',
 			duplicatedRow: null,
 			headsColor: HEADS_COLOR,
 			tailsColor: TAILS_COLOR,
@@ -46,6 +45,10 @@ export class PascalsBrickWall extends Linkable {
 				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 10],
 				text: ">>"
 			}),
+			histogramButton: new SimpleButton({
+				anchor: [800, BRICK_HEIGHT + 10],
+				text: "H"
+			}),
 			nextRow: null
 		}
 	}
@@ -56,9 +59,11 @@ export class PascalsBrickWall extends Linkable {
 		this.nextSubstepButton.action = this.animateNextSubstep.bind(this)
 		this.add(this.nextStepButton)
 		this.nextStepButton.action = this.animateNextStep.bind(this)
+		this.add(this.histogramButton)
+		//this.histogramButton.action = this.toHistogram.bind(this)
 
 		for (var i = 0; i < this.nbFlips; i++) {
-			let row = new BrickRow({
+			let row = new Partition({
 				anchor: [0, -BRICK_HEIGHT * i],
 				nbFlips: i + 1,
 				tailsProbability: this.tailsProbability,
@@ -73,21 +78,23 @@ export class PascalsBrickWall extends Linkable {
 		}
 	}
 
-	lastRow(): BrickRow {
+	lastRow(): Partition {
 		return this.rows[this.nbFlips - 1]
 	}
 
 	temporarilyDisableButtons(duration: number = 1) {
 		this.nextSubstepButton.disable()
 		this.nextStepButton.disable()
+		this.histogramButton.disable()
 		window.setTimeout( function() {
 			this.nextSubstepButton.enable()
 			this.nextStepButton.enable()
+			this.histogramButton.enable()
 		}.bind(this), duration * 1000)
 	}
 
 	duplicateLastRow(duration: number = 1) {
-		this.duplicatedRow = new BrickRow({
+		this.duplicatedRow = new Partition({
 			nbFlips: this.nbFlips,
 			tailsProbability: this.tailsProbability,
 			visible: false
@@ -127,7 +134,7 @@ export class PascalsBrickWall extends Linkable {
 	}
 
 	mergeBricks(duration: number = 1) {
-		this.nextRow = new BrickRow({
+		this.nextRow = new Partition({
 			nbFlips: this.nbFlips + 1,
 			tailsProbability: this.tailsProbability,
 			opacity: 0
@@ -204,7 +211,12 @@ export class PascalsBrickWall extends Linkable {
 			default:
 				break
 		}
+	}
 
+	finishStep() {
+		if (this.animationSubstep > 0) {
+			this.animateNextStep()
+		}
 	}
 
 	update(args: object = {}, redraw: boolean = false) {
@@ -224,7 +236,18 @@ export class PascalsBrickWall extends Linkable {
 
 	}
 
+	wallToHistogram() {
+		this.finishStep()
+		for (let row of this.rows) {
+			if (row == this.lastRow()) { break }
+			row.animate({ opacity: 0 }, FAST_ANIMATION_DURATION)
+		}
+		this.lastRow().toHistogram()
+	}
 
+	centeredHistogramToHistogram() {
+		this.lastRow().centeredHistogramToHistogram()
+	}
 
 
 

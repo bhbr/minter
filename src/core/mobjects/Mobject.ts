@@ -117,6 +117,12 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.view.transform = newValue
 	}
 
+	get transformAngle(): number { return this.view?.transform.angle ?? 0 }
+	set transformAngle(newValue: number) {
+		if (!this.view) { return }
+		this.view.transform.angle = newValue
+	}
+
 	get frame(): Frame { return this.view.frame }
 	set frame(newValue: Frame) { this.view.frame = newValue }
 	get frameWidth(): number { return this.frame.width }
