@@ -1,14 +1,14 @@
 
 import { View } from './View'
-import { TextLabel } from './TextLabel'
+import { TextLabel, HorizontalAlignment, VerticalAlignment } from './TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
 export class TextLabelView extends View {
 
 	declare mobject: TextLabel
-	horizontalAlign: 'left' | 'center' | 'right'
-	verticalAlign: 'top' | 'center' | 'bottom'
+	horizontalAlignment: HorizontalAlignment
+	verticalAlignment: VerticalAlignment
 	color?: Color
 	borderColor: Color
 	borderWidth: number
@@ -17,8 +17,8 @@ export class TextLabelView extends View {
 
 	defaults(): object {
 		return {
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
+			horizontalAlignment: 'center',
+			verticalAlignment: 'center',
 			color: Color.white(),
 			borderColor: Color.white(),
 			borderWidth: 1,
@@ -44,7 +44,7 @@ export class TextLabelView extends View {
 		this.div.style.borderWidth = `${this.borderWidth}px`
 
 		this.div.style.fontSize = `${this.fontSize}px`
-		switch (this.verticalAlign) {
+		switch (this.verticalAlignment) {
 		case 'top':
 			this.div.style.alignItems = 'flex-start'
 			break
@@ -55,7 +55,7 @@ export class TextLabelView extends View {
 			this.div.style.alignItems = 'flex-end'
 			break
 		}
-		switch (this.horizontalAlign) {
+		switch (this.horizontalAlignment) {
 		case 'left':
 			this.div.style.justifyContent = 'flex-start'
 			break

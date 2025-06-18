@@ -32,7 +32,6 @@ let p = new Partition({
 })
 paper.addToContent(p)
 
-p.animateToForm('row')
 
 
 

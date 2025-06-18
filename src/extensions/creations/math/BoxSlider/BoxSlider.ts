@@ -51,8 +51,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			}),
 			label: new TextLabel({
 				frameHeight: 25,
-				horizontalAlign: 'center',
-				verticalAlign: 'center',
+				horizontalAlignment: 'center',
+				verticalAlignment: 'center',
 				fontSize: 20
 			}),
 			min: 0,

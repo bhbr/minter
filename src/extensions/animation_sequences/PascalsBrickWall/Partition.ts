@@ -6,6 +6,7 @@ import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
 import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
 import { Color } from 'core/classes/Color'
+import { RadioButtonList } from 'core/mobjects/RadioButtonList'
 
 type PresentationForm = 'row' | 'histogram' | 'centered-histogram'
 
@@ -19,6 +20,7 @@ export class Partition extends MGroup {
 	headsColor: Color
 	tailsColor: Color
 	presentationForm: PresentationForm
+	presentationFormsList: RadioButtonList | null
 	
 	defaults(): object {
 		return {
@@ -29,7 +31,8 @@ export class Partition extends MGroup {
 			bricks: [],
 			leftPartBricks: [],
 			rightPartBricks: [],
-			presentationForm: 'row'
+			presentationForm: 'row',
+			presentationFormsList: null
 		}
 	}
 
@@ -50,6 +53,15 @@ export class Partition extends MGroup {
 			this.add(brick)
 		}
 		this.positionBricks()
+		this.presentationFormsList = new RadioButtonList({
+			anchor: [0, 100],
+			options: {
+				'row': this.animateToRow.bind(this),
+				'histogram': this.animateToHistogram.bind(this),
+				'centered-histogram': this.animateToCenteredHistogram.bind(this),
+			}
+		})
+		this.add(this.presentationFormsList)
 	}
 
 	positionBricks() {
@@ -61,6 +73,18 @@ export class Partition extends MGroup {
 				transformAngle: angle
 			})
 		}
+	}
+
+	animateToRow() {
+		this.animateToForm('row')
+	}
+
+	animateToHistogram() {
+		this.animateToForm('histogram')
+	}
+
+	animateToCenteredHistogram() {
+		this.animateToForm('centered-histogram')
 	}
 
 	animateToForm(newForm: PresentationForm) {
