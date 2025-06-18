@@ -15,7 +15,7 @@ import { CoinRow } from './extensions/creations/CoinFlipper/CoinRow'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
-
+import { binomial } from './core/functions/math'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -26,11 +26,12 @@ if (TESTING) { AllTests.run() }
 export const paper = new StartPaper()
 
 let p = new Partition({
-	nbFlips: 4,
+	nbFlips: 10,
 	anchor: [200, 400],
-	presentationForm: 'centered-histogram'
+	presentationForm: 'row'
 })
 paper.addToContent(p)
+
 
 
 

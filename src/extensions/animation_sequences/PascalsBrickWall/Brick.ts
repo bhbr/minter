@@ -97,11 +97,9 @@ export class Brick extends Rectangle {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+		args['fillColor'] = this.getFillColor()
+		args['width'] = this.getWidth()
 		super.update(args, redraw)
-		super.update({
-			fillColor: this.getFillColor(),
-			width: this.getWidth()
-		})
 		this.updateDependents()
 	}
 

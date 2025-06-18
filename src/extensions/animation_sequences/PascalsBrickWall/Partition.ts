@@ -1,5 +1,5 @@
 
-import { MGroup } from 'core/mobjects/MGroup'
+import { Linkable } from 'core/linkables/Linkable'
 import { Brick } from './Brick'
 import { vertex, vertexAdd } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
@@ -10,7 +10,7 @@ import { RadioButtonList } from 'core/mobjects/RadioButtonList'
 
 type PresentationForm = 'row' | 'histogram' | 'centered-histogram'
 
-export class Partition extends MGroup {
+export class Partition extends Linkable {
 
 	nbFlips: number
 	bricks: Array<Brick>
@@ -32,7 +32,12 @@ export class Partition extends MGroup {
 			leftPartBricks: [],
 			rightPartBricks: [],
 			presentationForm: 'row',
-			presentationFormsList: null
+			presentationFormsList: null,
+			inputProperties: [
+				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
+				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
+			],
 		}
 	}
 
@@ -76,14 +81,17 @@ export class Partition extends MGroup {
 	}
 
 	animateToRow() {
+		this.presentationForm = 'row'
 		this.animateToForm('row')
 	}
 
 	animateToHistogram() {
+		this.presentationForm = 'histogram'
 		this.animateToForm('histogram')
 	}
 
 	animateToCenteredHistogram() {
+		this.presentationForm = 'centered-histogram'
 		this.animateToForm('centered-histogram')
 	}
 
@@ -153,15 +161,7 @@ export class Partition extends MGroup {
 
 	update(args: object = {}, redraw: boolean = false) {
 		super.update(args, redraw)
-		let newP = args['tailsProbability']
-		if (newP !== undefined && newP >= 0 && newP <= 1) {
-			for (let brick of this.bricks) {
-				brick.update({
-					tailsProbability: newP
-				})
-			}
-		}
-		//this.positionBricks()
+		this.positionBricks()
 	}
 
 

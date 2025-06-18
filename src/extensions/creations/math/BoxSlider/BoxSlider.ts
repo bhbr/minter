@@ -142,7 +142,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		var newValue = this.valueBeforeScrubbing - scrubVector[1]/this.height * (this.max - this.min)
 		newValue = Math.max(Math.min(newValue, this.max), this.min)
 		newValue = Math.round(newValue * 10**this.precision) / 10**this.precision
-		this.update({ value: newValue})
+		this.update({ value: newValue })
 	}
 
 }
