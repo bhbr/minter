@@ -31,6 +31,8 @@ export class Motor extends ExtendedObject {
 	animating: boolean
 	showShadow?: boolean
 
+	completionHandler: Function
+
 	defaults(): object {
 		return {
 			animationTimeStart: null,
@@ -39,7 +41,8 @@ export class Motor extends ExtendedObject {
 			animationStartArgs: {},
 			animationStopArgs: {},
 			animating: false,
-			showShadow: null
+			showShadow: null,
+			completionHandler: () => {}
 		}
 	}
 
@@ -60,7 +63,7 @@ export class Motor extends ExtendedObject {
 		return true
 	}
 
-	animate(args: object = {}, seconds: number, showShadow: boolean = false) {
+	animate(args: object = {}, seconds: number, showShadow: boolean = false, completionHandler: Function = () => {}) {
 	// Calling this method launches an animation
 		if (!Motor.isAnimatable(args)) {
 			return
@@ -72,6 +75,7 @@ export class Motor extends ExtendedObject {
 			this.animationStartArgs[key] = b
 		}
 		this.animationStopArgs = args
+		this.completionHandler = completionHandler
 
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
@@ -134,6 +138,7 @@ export class Motor extends ExtendedObject {
 		this.animationStopArgs = {}
 		this.animating = false
 		this.showShadow = null
+		this.completionHandler()
 	}
 
 

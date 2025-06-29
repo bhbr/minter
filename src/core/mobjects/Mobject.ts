@@ -168,8 +168,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	motor: Motor
 
-	animate(args: object = {}, seconds: number, showShadow: boolean = false) {
-		this.motor.animate(args, seconds, showShadow)
+	animate(args: object = {}, seconds: number, showShadow: boolean = false, completionHandler: Function = () => {}) {
+		this.motor.animate(args, seconds, showShadow, completionHandler)
 	}
 
 
