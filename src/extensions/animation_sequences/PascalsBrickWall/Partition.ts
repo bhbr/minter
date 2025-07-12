@@ -11,6 +11,7 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { Line } from 'core/shapes/Line'
 import { MGroup } from 'core/mobjects/MGroup'
 import { binomial } from 'core/functions/math'
+import { SimpleButton } from 'core/mobjects/SimpleButton'
 
 type PresentationForm = 'row' | 'histogram' | 'centered-histogram'
 
@@ -30,6 +31,8 @@ export class Partition extends Linkable {
 	presentationFormsList: RadioButtonList | null
 	animationSubstep: number
 	animationDuration: number
+	nextSubstepButton: SimpleButton
+	nextStepButton: SimpleButton
 	
 	defaults(): object {
 		return {
@@ -51,7 +54,15 @@ export class Partition extends Linkable {
 				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
 			],
 			animationSubstep: 0,
-			animationDuration: SLOW_ANIMATION_DURATION
+			animationDuration: SLOW_ANIMATION_DURATION,
+			nextSubstepButton: new SimpleButton({
+				anchor: [0.5 * (ROW_WIDTH - 50), BRICK_HEIGHT + 10],
+				text: ">"
+			}),
+			nextStepButton: new SimpleButton({
+				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 10],
+				text: ">>"
+			}),
 		}
 	}
 
@@ -94,9 +105,14 @@ export class Partition extends Linkable {
 				'row': this.animateToRow.bind(this),
 				'histogram': this.animateToHistogram.bind(this),
 				'centered-histogram': this.animateToCenteredHistogram.bind(this),
-			}
+			},
+			selection: this.presentationForm
 		})
 		this.add(this.presentationFormsList)
+		this.add(this.nextSubstepButton)
+		this.nextSubstepButton.action = this.nextSubstep.bind(this)
+		this.add(this.nextStepButton)
+		this.nextStepButton.action = this.nextStep.bind(this)
 	}
 
 	positionBricks() {
@@ -218,7 +234,6 @@ export class Partition extends Linkable {
 			}, this.animationDuration, false, (i == this.bricks.length - 1) ? completionHandler : () => {})
 		}
 		//this.temporarilyDisableButtons()
-		this.animationSubstep += 1
 	}
 
 	actuallySplitBricks() {
@@ -341,7 +356,8 @@ export class Partition extends Linkable {
 	}
 
 	resizeBricks(completionHandler: Function = () => {}) {
-		if (this.presentationForm == 'row') {
+		if (true) { //(this.presentationForm == 'row') {
+		// resizing should be done manually, otherwise too confusing
 			completionHandler()
 			return
 		}
@@ -372,9 +388,25 @@ export class Partition extends Linkable {
 		}
 	}
 
-	fullAnimation(completionHandler: Function = () => {}) {
-		this.splitBricks(
-			this.moveBricks.bind(this,
+	nextStep(completionHandler: Function = () => {}) {
+		switch (this.animationSubstep) {
+		case 0:
+			this.splitBricks(
+				this.moveBricks.bind(this,
+					this.mergeBricks.bind(this,
+						this.mixBricks.bind(this,
+							this.recenterBricks.bind(this,
+								this.resizeBricks.bind(this,
+									completionHandler
+								)
+							)
+						)
+					)
+				)
+			)
+			break
+		case 1:
+			this.moveBricks(
 				this.mergeBricks.bind(this,
 					this.mixBricks.bind(this,
 						this.recenterBricks.bind(this,
@@ -385,10 +417,38 @@ export class Partition extends Linkable {
 					)
 				)
 			)
-		)
+			break
+		case 2:
+			this.mixBricks(
+				this.recenterBricks.bind(this,
+					this.resizeBricks.bind(this,
+						completionHandler
+					)
+				)
+			)
+			break
+		default:
+			break
+		}
+		this.animationSubstep = 0
 	}
 
-
+	nextSubstep(completionHandler: Function = () => {}) {
+		switch (this.animationSubstep) {
+		case 0:
+			this.splitBricks(completionHandler)
+			break
+		case 1:
+			this.moveBricks(this.mergeBricks.bind(this, completionHandler))
+			break
+		case 2:
+			this.mixBricks(this.recenterBricks.bind(this, completionHandler))
+			break
+		default:
+			break
+		}
+		this.animationSubstep = (this.animationSubstep + 1) % 3
+	}
 
 
 

@@ -57,7 +57,6 @@ export class RadioButton extends MGroup {
 		this.add(this.innerCircle)
 		this.add(this.label)
 		this.addDependency('selected', this.innerCircle, 'visible')
-		
 	}
 
 	onTap(e: ScreenEvent) {

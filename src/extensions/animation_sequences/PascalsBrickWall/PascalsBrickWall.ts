@@ -242,11 +242,11 @@ export class PascalsBrickWall extends Linkable {
 			if (row == this.lastRow()) { break }
 			row.animate({ opacity: 0 }, FAST_ANIMATION_DURATION)
 		}
-		this.lastRow().toHistogram()
+		//this.lastRow().toHistogram()
 	}
 
 	centeredHistogramToHistogram() {
-		this.lastRow().centeredHistogramToHistogram()
+		//this.lastRow().centeredHistogramToHistogram()
 	}
 
 

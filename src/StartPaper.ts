@@ -29,18 +29,9 @@ export const paper = new StartPaper()
 
 let p = new Partition({
 	nbFlips: 1,
-	anchor: [200, 600],
-	presentationForm: 'histogram'
+	anchor: [200, 300],
+	presentationForm: 'row'
 })
 paper.addToContent(p)
-
-let dt = 2
-
-var anim = () => {}
-for (var i = 0; i < 5; i++) {
-	anim = p.fullAnimation.bind(p, anim)
-}
-anim()
-
 
 
