@@ -99,6 +99,8 @@ export class Partition extends Linkable {
 			this.add(brick)
 		}
 		this.positionBricks()
+		this.createBrickParts()
+		this.hideBrickParts()
 		this.presentationFormsList = new RadioButtonList({
 			anchor: [0, 100],
 			options: {
@@ -147,6 +149,14 @@ export class Partition extends Linkable {
 		for (var i = 0; i <= this.nbFlips; i++) {
 			this.bricks[i].animate({
 				anchor: anchors[i],
+				transformAngle: angle
+			}, this.animationDuration)
+			this.leftPartBricks[i].animate({
+				anchor: anchors[i],
+				transformAngle: angle
+			}, this.animationDuration)
+			this.rightPartBricks[i].animate({
+				anchor: vertexAdd(anchors[i], [0, this.bricks[i].getWidth() / 2]),
 				transformAngle: angle
 			}, this.animationDuration)
 		}
@@ -237,6 +247,17 @@ export class Partition extends Linkable {
 	}
 
 	actuallySplitBricks() {
+		this.createBrickParts()
+		for (let brick of this.bricks) {
+			this.remove(brick)
+		}
+		for (let line of this.splitLines) {
+			this.remove(line)
+		}
+		this.splitLines = []
+	}
+
+	createBrickParts() {
 		for (let brick of this.bricks) {
 			let lp = brick.makeLeftPart()
 			lp.update({
@@ -251,12 +272,14 @@ export class Partition extends Linkable {
 			})
 			this.add(rp)
 			this.rightPartBricks.push(rp)
-			this.remove(brick)
 		}
-		for (let line of this.splitLines) {
-			this.remove(line)
+	}
+
+	hideBrickParts() {
+		for (var i = 0; i <= this.nbFlips; i++) {
+			this.leftPartBricks[i].view.hide()
+			this.rightPartBricks[i].view.hide()
 		}
-		this.splitLines = []
 	}
 
 	moveBricks(completionHandler: Function = () => {}) {
