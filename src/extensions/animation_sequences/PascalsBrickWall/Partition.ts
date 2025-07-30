@@ -13,6 +13,8 @@ import { MGroup } from 'core/mobjects/MGroup'
 import { binomial } from 'core/functions/math'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
 
+const SHIFT = 0
+
 type PresentationForm = 'row' | 'histogram' | 'centered-histogram'
 
 export class Partition extends Linkable {
@@ -99,8 +101,8 @@ export class Partition extends Linkable {
 			this.add(brick)
 		}
 		this.positionBricks()
-		this.createBrickParts()
-		this.hideBrickParts()
+		//this.createBrickParts()
+		//this.hideBrickParts()
 		this.presentationFormsList = new RadioButtonList({
 			anchor: [0, 100],
 			options: {
@@ -151,14 +153,18 @@ export class Partition extends Linkable {
 				anchor: anchors[i],
 				transformAngle: angle
 			}, this.animationDuration)
-			this.leftPartBricks[i].animate({
-				anchor: anchors[i],
-				transformAngle: angle
-			}, this.animationDuration)
-			this.rightPartBricks[i].animate({
-				anchor: vertexAdd(anchors[i], [0, this.bricks[i].getWidth() / 2]),
-				transformAngle: angle
-			}, this.animationDuration)
+			if (this.leftPartBricks[i] !== undefined) {
+				this.leftPartBricks[i].animate({
+					anchor: anchors[i],
+					transformAngle: angle
+				}, this.animationDuration)
+			}
+			if (this.rightPartBricks[i] !== undefined) {
+				this.rightPartBricks[i].animate({
+					anchor: vertexAdd(anchors[i], [0, this.bricks[i].getWidth() / 2]),
+					transformAngle: angle
+				}, this.animationDuration)
+			}
 		}
 		
 	}
@@ -261,7 +267,7 @@ export class Partition extends Linkable {
 		for (let brick of this.bricks) {
 			let lp = brick.makeLeftPart()
 			lp.update({
-				anchor: brick.anchor
+				anchor: vertexAdd(brick.anchor, [SHIFT, SHIFT])
 			})
 			this.add(lp)
 			this.leftPartBricks.push(lp)
@@ -272,6 +278,13 @@ export class Partition extends Linkable {
 			})
 			this.add(rp)
 			this.rightPartBricks.push(rp)
+		}
+	}
+
+	showBrickParts() {
+		for (var i = 0; i <= this.nbFlips; i++) {
+			this.leftPartBricks[i].view.show()
+			this.rightPartBricks[i].view.show()
 		}
 	}
 
@@ -300,11 +313,14 @@ export class Partition extends Linkable {
 
 	mergeBricks(completionHandler: Function = () => {}) {
 		for (var i = 0; i <= this.nbFlips; i++) {
+			log(i)
 			let lp = this.leftPartBricks[i]
 			let rp = this.rightPartBricks[i]
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
 			rp.animate({ strokeWidth: 0 }, this.animationDuration)
+			log(lp.view.visible)
+			log(rp.view.visible)
 			let newWidth = (i == 0) ? lp.width : this.rightPartBricks[i - 1].width + lp.width
 			b.update({
 				fillOpacity: 0,
