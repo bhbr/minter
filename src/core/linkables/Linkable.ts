@@ -9,6 +9,8 @@ import { LinkHook } from './LinkHook'
 import { log } from 'core/functions/logging'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { Checkbox } from 'core/mobjects/Checkbox'
+import { RadioButtonList } from 'core/mobjects/RadioButtonList'
+
 
 export interface IOProperty {
 	name: string
@@ -139,7 +141,7 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.submobs) {
-			if (mob instanceof SimpleButton || mob instanceof Checkbox) {
+			if (mob instanceof SimpleButton || mob instanceof Checkbox || mob instanceof RadioButtonList) {
 				mob.update({
 					visible: visible
 				})

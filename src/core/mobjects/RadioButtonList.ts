@@ -14,7 +14,8 @@ export class RadioButtonList extends MGroup {
 			options: {},
 			selection: null,
 			buttons: [],
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			visible: false
 		}
 	}
 
