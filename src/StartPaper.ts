@@ -12,6 +12,8 @@ import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { PlayableCoin } from './extensions/creations/CoinFlipper/PlayableCoin'
 import { CoinRow } from './extensions/creations/CoinFlipper/CoinRow'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
+import { DesmosCalculator } from './extensions/creations/DesmosCalculator/DesmosCalculator'
+import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/TestDesmosCalculator'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
 
@@ -23,58 +25,16 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let coin = new PlayableCoin({
-	anchor: [200, 200]
+let calc = new DesmosCalculator({
+	anchor: [100, 100],
+	frameWidth: 600,
+	frameHeight: 400,
+	a: 3,
+	inputProperties: [{
+		name: 'a', displayName: null, type: 'number'
+	}]
 })
-let box = new AddBox({
-	anchor: [500, 200]
-})
-paper.addToContent(coin)
-paper.addToContent(box)
 
-// let startPos = [100, 100]
-// let endPos = [300, 200]
-// let duration = 1000 // ms
-// let dt = 50
-// let nbPos = Math.round(duration / dt)
-// let dx = (endPos[0] - startPos[0]) / nbPos
-// let dy = (endPos[1] - startPos[1]) / nbPos
-// let positions = []
-// for (var i = 0; i < nbPos; i++) {
-// 	let pos = [endPos[0] - i * dx, endPos[1] - i * dy]
-// 	positions.push(pos)
-// }
-
-// let downEvent = new MouseEvent('mousedown', {
-// 	clientX: startPos[0],
-// 	clientY: startPos[1]
-// })
-// paper.view.div.dispatchEvent(downEvent)
-
-// var handle = 0
-
-// function liftMouse() {
-// 	let upEvent =  new PointerEvent('pointerup', {
-// 		clientX: endPos[0],
-// 		clientY: endPos[1]
-// 	})
-// 	paper.view.div.dispatchEvent(upEvent)
-// }
-
-// function moveMouse() {
-// 	let pos = positions.pop()
-// 	if (!pos) {
-// 		window.clearInterval(handle)
-// 		liftMouse()
-// 		return
-// 	}
-// 	let moveEvent =  new MouseEvent('mousemove', {
-// 		clientX: pos[0],
-// 		clientY: pos[1]
-// 	})
-// 	paper.view.div.dispatchEvent(moveEvent)
-// }
-
-// handle = window.setInterval(moveMouse, dt)
+paper.addToContent(calc)
 
 

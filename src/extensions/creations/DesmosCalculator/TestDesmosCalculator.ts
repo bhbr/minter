@@ -6,7 +6,7 @@ import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { log } from 'core/functions/logging'
-import { DesmosCalculator } from 'DesmosCalculator'
+import { DesmosCalculator } from './DesmosCalculator'
 
 declare var Desmos: any
 
@@ -28,6 +28,7 @@ export class TestDesmosCalculator extends DesmosCalculator {
 			X: 1,
 			Y: 1,
 			inputProperties: [
+				{ name: 'a', displayName: null, type: 'number' },
 				{ name: 'X', displayName: null, type: 'number' },
 				{ name: 'b', displayName: null, type: 'number' }
 			],
@@ -45,7 +46,7 @@ export class TestDesmosCalculator extends DesmosCalculator {
 		this.calculator.setExpression({id:'graph1', latex:`f(x)=ax^2+${this.b}`})
 
 		this.calculator.setExpressions([
-			{ id: 'a', latex: `a=1` },
+			{ id: 'a', latex: `a=1`, secret: true },
 			{ id: 'Y', latex: `Y=f(${this.X})` },
 			{ id: 'point', latex: `(${this.X},Y)` }
 		]);

@@ -57,6 +57,23 @@ export class DesmosCalculator extends Linkable {
 
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
+		this.createInputVariables()
+		this.calculator.observeEvent('change', this.onChange.bind(this))
+	}
+
+	createInputVariables() {
+		for (let input of this.inputProperties) {
+			this.createInputVariable(input.name, this[input.name])
+		}
+	}
+
+	createInputVariable(name: string, value: number | Array<number>) {
+		this.calculator.setExpression({
+			id: name, latex: `${name}=${value}`, secret: true
+		})
+		this.calculator.setExpression({
+			id: name + "_display", latex: `${name}`
+		})
 	}
 
 	setupCanvas() {
@@ -114,9 +131,20 @@ export class DesmosCalculator extends Linkable {
 		}
 	}
 
+	onChange(eventName: string, event: object) {
+		this.createInputVariables()
+	}
 
-
-
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		for (let input of this.inputProperties) {
+			if (args[input.name] !== undefined) {
+				this.calculator.setExpression({
+					id: input.name, latex: `${input.name}=${args[input.name]}`, secret: true
+				})
+			}
+		}
+	}
 
 
 
