@@ -42,6 +42,7 @@ export class DraggingCreator extends Creator {
 		this.creation.update({
 			anchor: this.getEndPoint()
 		})
+		this.remove(this.creation)
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
 		this.parent.remove(this)
