@@ -28,11 +28,7 @@ export const paper = new StartPaper()
 let calc = new DesmosCalculator({
 	anchor: [100, 100],
 	frameWidth: 600,
-	frameHeight: 400,
-	a: 3,
-	inputProperties: [{
-		name: 'a', displayName: null, type: 'number'
-	}]
+	frameHeight: 400
 })
 
 paper.addToContent(calc)

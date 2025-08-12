@@ -822,6 +822,9 @@ The content children can also be dragged and panned.
 		if (h === null) {
 			if (this.openLink) {
 				this.remove(this.openLink)
+				this.openLink.startHook.update({ linked: false })
+				this.openLink.endHook.update({ linked: false })
+
 			}
 			this.openLink = null
 			this.openHook = null
@@ -844,6 +847,9 @@ The content children can also be dragged and panned.
 				endHook: h
 			})
 		}
+		this.openLink.startHook.update({ linked: true })
+		this.openLink.endHook.update({ linked: true })
+
 		this.links.push(this.openLink)
 		this.createNewDependency()
 		this.openLink = null
@@ -915,6 +921,7 @@ The content children can also be dragged and panned.
 		startHook.outlet.removeHook()
 		startHook.outlet.ioList.mobject.update()
 	}
+
 
 
 	// innerInputHooks(): Array<LinkHook> {

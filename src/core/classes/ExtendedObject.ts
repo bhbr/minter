@@ -8,7 +8,7 @@ import { AssignmentError } from './Errors'
 export class ExtendedObject {
 /*
 An ExtendedObject has concise functionality for:
- - settingting initial values for its properties,
+ - setting initial values for its properties,
  - set default values for them in subclasses,
  - updating these values while maintaining a consistent state,
  - and defining permissions to change them ('mutability').
@@ -209,7 +209,7 @@ A property can have one of five mutability levels:
 	}
 
 	createProperty(prop: string, value: any) {
-	// that can only the changed via the update() method
+	// i. e. a property that can only the changed via the update() method
 		let isSettable = (this.mutability(prop) == 'always')
 		if (isSettable) {
 			Object.defineProperty(this, prop, {
@@ -261,7 +261,6 @@ A property can have one of five mutability levels:
 		let pd = this.propertyDescriptor(prop)
 		return (pd === undefined || pd.enumerable) ? undefined : pd.set
 	}
-
 
 	mutability(prop: string): string {
 		return ExtendedObject.classDeclarations[this.constructor.name].mutability(prop)

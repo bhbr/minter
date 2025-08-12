@@ -32,8 +32,10 @@ which can be linked to such-exposed variables of other mobjects.
 		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
-			inputs: [],
-			outputs: [],
+			inputProperties: [],
+			outputProperties: [],
+//			inputs: [],
+//			outputs: [],
 			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self
 		}

@@ -102,14 +102,27 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		})
 	}
 
-	hookNamed(name, index: number = 0): LinkHook | null {
+	hookNamed(name: string, index: number = 0): LinkHook | null {
+		// for (let outlet of this.linkOutlets) {
+		// 	if (outlet.name == name) {
+		// 		return outlet.linkHooks[index]
+		// 	}
+		// }
+		// return null
+		let outlet = this.outletNamed(name)
+		if (outlet === null) { return null }
+		let hooks = outlet.linkHooks
+		if (hooks.length <= index) { return null }
+		return hooks[index]
+	}
+
+	outletNamed(name: string): LinkOutlet | null {
 		for (let outlet of this.linkOutlets) {
-			if (outlet.name == name) {
-				return outlet.linkHooks[index]
-			}
+			if (outlet.name == name) { return outlet }
 		}
 		return null
 	}
+
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
