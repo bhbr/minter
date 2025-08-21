@@ -167,6 +167,22 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
+	linkedInputProperty(prop: string) {
+		this.update()
+	}
+
+	linkedOutputProperty(prop: string) {
+		this.update()
+	}
+
+	unlinkedInputProperty(prop: string) {
+		this.update()
+	}
+
+	unlinkedOutputProperty(prop: string) {
+		this.update()
+	}
+
 }
 
 

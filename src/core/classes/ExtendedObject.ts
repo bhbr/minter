@@ -4,6 +4,7 @@ import { ClassDeclaration } from './ClassDeclaration'
 import { log } from 'core/functions/logging'
 import { isVertex, vertexEquals, isVertexArray, vertexArrayEquals } from 'core/functions/vertex'
 import { AssignmentError } from './Errors'
+import { remove } from 'core/functions/arrays'
 
 export class ExtendedObject {
 /*
@@ -230,6 +231,11 @@ A property can have one of five mutability levels:
 			})
 		}
 		this.properties.push(prop)
+	}
+
+	removeProperty(prop: string) {
+		delete this[prop]
+		remove(this.properties, prop)
 	}
 
 	isAccessor(prop: string): boolean {

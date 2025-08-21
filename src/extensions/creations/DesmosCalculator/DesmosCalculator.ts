@@ -8,6 +8,7 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { log } from 'core/functions/logging'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { deepCopy } from 'core/functions/copying'
+import { remove } from 'core/functions/arrays'
 
 declare var Desmos: any
 
@@ -278,6 +279,32 @@ export class DesmosCalculator extends Linkable {
 		this.outputList.view.hide()
 	}
 
+	removeInputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		delete this.secretInputExpressions[name]
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				remove(this.inputProperties, prop)
+				break
+			}
+		}
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.inputList.view.hide()
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				remove(this.outputProperties, prop)
+				break
+			}
+		}
+		this.outputList.update({
+			outletProperties: this.outputProperties
+		})
+		this.outputList.view.hide()
+	}
+
 	createOutputVariable(name: string) {
 		if (name == null) { return }
 		this.createProperty(name, this.getValueOf(name))
@@ -325,8 +352,10 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	makeImmutableVariable(name: string, value: number) {
+		log('makeImmutableVariable')
 		let sliderExpr = this.getExpressionNamed(name)
 		let id = sliderExpr['id']
+		log(id)
 		this.calculator.setExpression({
 			id: id,
 			latex: name
@@ -337,6 +366,28 @@ export class DesmosCalculator extends Linkable {
 			secret: true
 		})
 		this.secretInputExpressions[id] = secretInputExpr
+	}
+
+	makeSliderVariable(name: string) {
+		log('makeSliderVariable')
+		log(name)
+		let fixedExpr =  this.getExpressionNamed(name)
+		let id = fixedExpr['id'].split('secret_')[1]
+		let value = this[name]
+		log(id)
+		delete this.secretInputExpressions[id]
+		this.calculator.removeExpression({
+			id: `secret_${id}`
+		})
+		this.calculator.setExpression({
+			id: id,
+			latex: `${name}=${value}`
+		})
+	}
+
+	unlinkedInputProperty(name: string) {
+		this.makeSliderVariable(name)
+		super.unlinkedInputProperty(name)
 	}
 
 

@@ -84,6 +84,7 @@ The content children can also be dragged and panned.
 			editingLinkName: false,
 			openLink: null,
 			openHook: null,
+			previousHook: null,
 			openBullet: null,
 			compatibleHooks: [],
 			creationTool: null,
@@ -602,6 +603,7 @@ The content children can also be dragged and panned.
 	// editingLinkName: boolean
 	openLink?: DependencyLink
 	openHook?: LinkHook
+	previousHook?: LinkHook
 	openBullet?: LinkBullet
 	compatibleHooks: Array<LinkHook>
 	// the list of dependencies between the linkable content children
@@ -823,8 +825,12 @@ The content children can also be dragged and panned.
 			if (this.openLink) {
 				this.remove(this.openLink)
 				this.openLink.startHook.update({ linked: false })
-				this.openLink.endHook.update({ linked: false })
-
+				this.openLink.startHook.outlet.ioList.mobject.unlinkedOutputProperty(this.openLink.startHook.outlet.name)
+				if (this.previousHook) {
+					this.previousHook.update({ linked: false })
+					log(this.previousHook.outlet.ioList.mobject)
+					this.previousHook.outlet.ioList.mobject.unlinkedInputProperty(this.previousHook.outlet.name)
+				}
 			}
 			this.openLink = null
 			this.openHook = null
@@ -846,6 +852,7 @@ The content children can also be dragged and panned.
 			this.openLink.update({
 				endHook: h
 			})
+			this.previousHook = this.openLink.endHook
 		}
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
@@ -907,7 +914,8 @@ The content children can also be dragged and panned.
 		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
 			startHook.outlet.addHook()
 		}
-		startHook.outlet.ioList.mobject.update()
+		startHook.outlet.ioList.mobject.linkedOutputProperty(startHook.outlet.name)
+		endHook.outlet.ioList.mobject.linkedInputProperty(endHook.outlet.name)
 	}
 
 	removeDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
@@ -919,7 +927,8 @@ The content children can also be dragged and panned.
 		startHook.removeDependencyBetween('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.removeDependencyBetween('positionInBoard', this.openLink.endBullet, 'midpoint')
 		startHook.outlet.removeHook()
-		startHook.outlet.ioList.mobject.update()
+		startHook.outlet.ioList.mobject.unlinkedOutputProperty(startHook.outlet.name)
+		endHook.outlet.ioList.mobject.unlinkedInputProperty(endHook.outlet.name)
 	}
 
 
