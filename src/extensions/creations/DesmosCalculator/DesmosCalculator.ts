@@ -43,6 +43,7 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	setup() {
+		log('setup')
 		super.setup()
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
@@ -66,6 +67,7 @@ export class DesmosCalculator extends Linkable {
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
+		this.hideGrapher()
 	}
 
 
@@ -352,10 +354,8 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	makeImmutableVariable(name: string, value: number) {
-		log('makeImmutableVariable')
 		let sliderExpr = this.getExpressionNamed(name)
 		let id = sliderExpr['id']
-		log(id)
 		this.calculator.setExpression({
 			id: id,
 			latex: name
@@ -369,12 +369,9 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	makeSliderVariable(name: string) {
-		log('makeSliderVariable')
-		log(name)
 		let fixedExpr =  this.getExpressionNamed(name)
 		let id = fixedExpr['id'].split('secret_')[1]
 		let value = this[name]
-		log(id)
 		delete this.secretInputExpressions[id]
 		this.calculator.removeExpression({
 			id: `secret_${id}`
@@ -390,6 +387,27 @@ export class DesmosCalculator extends Linkable {
 		super.unlinkedInputProperty(name)
 	}
 
+	hideGrapher() {
+		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
+		el1.style.visibility = 'hidden'
+		let el2 = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement
+		el2.style.width = `${this.frameWidth}px`
+		let el3 = this.innerCanvas.view.div.getElementsByClassName('dcg-pillbox-container')[0] as HTMLElement
+		el3.style.visibility = 'hidden'
+		let el4 = this.innerCanvas.view.div.getElementsByClassName('dcg-add-expression-btn')[0] as HTMLElement
+		el4.style.top = '-25px'
+		let el5 = this.innerCanvas.view.div.getElementsByClassName('dcg-action-undo')[0] as HTMLElement
+		el5.style.top = '-25px'
+		el5.style.left = '-35px'
+		let el6 = this.innerCanvas.view.div.getElementsByClassName('dcg-action-redo')[0] as HTMLElement
+		el6.style.top = '-25px'
+		el6.style.right = '-35px'
+		let el7 = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement
+		el7.style.top = '0px'
+		el7.style.height = `${this.frameHeight}px`
+		let el8 = this.innerCanvas.view.div.getElementsByClassName('dcg-graphpaper-branding')[0] as HTMLElement
+		el8.style.bottom = '0px'
+	}
 
 
 
