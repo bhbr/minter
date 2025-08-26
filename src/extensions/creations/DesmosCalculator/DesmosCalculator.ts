@@ -195,9 +195,11 @@ export class DesmosCalculator extends Linkable {
 		} else {
 			if (value !== null) {
 				this.createSlidableVariable(variable, value)
-			}
-			 else if (term !== null && term.length > 0) {
-				this.createOutputVariable(variable)
+			} else if (term !== null && term.length > 0) {
+				let isError: boolean = this.calculator.expressionAnalysis[id].isError
+				if (!isError) {
+					this.createOutputVariable(variable)
+				}
 			}
 		}
 		this.expressions[id]['latex'] = newExpr['latex']
