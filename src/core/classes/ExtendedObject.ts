@@ -234,7 +234,7 @@ A property can have one of five mutability levels:
 	}
 
 	removeProperty(prop: string) {
-		delete this[prop]
+		this[prop] = undefined
 		remove(this.properties, prop)
 	}
 

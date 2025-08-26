@@ -16,6 +16,7 @@ import { DesmosCalculator } from './extensions/creations/DesmosCalculator/Desmos
 import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/TestDesmosCalculator'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
+import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -27,10 +28,24 @@ export const paper = new StartPaper()
 
 let calc = new DesmosCalculator({
 	anchor: [100, 100],
-	frameWidth: 300,
+	frameWidth: 500,
+	frameHeight: 400
+})
+paper.addToContent(calc)
+
+let slider = new BoxSlider({
+	anchor: [700, 100],
+	height: 200,
 	frameHeight: 200
 })
+paper.addToContent(slider)
 
-paper.addToContent(calc)
+// window.setTimeout(() => {
+// 	calc.calculator.setExpression({
+// 		id: '1',
+// 		latex: 'a=1'
+// 	})
+// }, 1000)
+
 
 

@@ -21,6 +21,7 @@ linkable mobjects
 	startHook: LinkHook | null
 	endBullet: LinkBullet
 	endHook: LinkHook | null
+	previousHook: LinkHook | null
 	linkLine: Line
 	borderLinkLine: Line
 
@@ -31,6 +32,7 @@ linkable mobjects
 			endBullet: new LinkBullet(),
 			startHook: null,
 			endHook: null,
+			previousHook: null,
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH }),
 			borderLinkLine: new Line({
 				strokeWidth: LINK_LINE_WIDTH + 4,

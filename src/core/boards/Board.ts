@@ -84,7 +84,6 @@ The content children can also be dragged and panned.
 			editingLinkName: false,
 			openLink: null,
 			openHook: null,
-			previousHook: null,
 			openBullet: null,
 			compatibleHooks: [],
 			creationTool: null,
@@ -684,13 +683,15 @@ The content children can also be dragged and panned.
 		} else {
 			let link = this.linkForHook(clickedHook)
 			link.dependency.source.removeDependency(link.dependency)
+			link.previousHook = clickedHook
+			clickedHook.update({ linked: false })
 			remove(this.links, link)
 			this.remove(link)
 			if (clickedHook.outlet.kind == 'output') {
 				clickedHook.outlet.removeHook()
-				this.createNewOpenLink(link.endHook)
+				this.createNewOpenLink(link.endHook, link.previousHook)
 			} else {
-				this.createNewOpenLink(link.startHook)
+				this.createNewOpenLink(link.startHook, link.previousHook)
 			}
 		}
 		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
@@ -713,7 +714,7 @@ The content children can also be dragged and panned.
 		return this.linkForHook(hook) == null
 	}
 
-	createNewOpenLink(hook: LinkHook) {
+	createNewOpenLink(hook: LinkHook, previousHook: LinkHook | null = null) {
 		this.hideLinksOfContent()
 		hook.outlet.ioList.view.show()
 		this.openHook = hook
@@ -724,14 +725,16 @@ The content children can also be dragged and panned.
 			this.openLink = new DependencyLink({
 				startBullet: sb,
 				endBullet: eb,
-				startHook: hook
+				startHook: hook,
+				previousHook: previousHook
 			})
 			this.openBullet = eb
 		} else {
 			this.openLink = new DependencyLink({
 				startBullet: sb,
 				endBullet: eb,
-				endHook: hook
+				endHook: hook,
+				previousHook: previousHook
 			})
 			this.openBullet = sb
 		}
@@ -824,12 +827,20 @@ The content children can also be dragged and panned.
 		if (h === null) {
 			if (this.openLink) {
 				this.remove(this.openLink)
-				this.openLink.startHook.update({ linked: false })
-				this.openLink.startHook.outlet.ioList.mobject.unlinkedOutputProperty(this.openLink.startHook.outlet.name)
-				if (this.previousHook) {
-					this.previousHook.update({ linked: false })
-					log(this.previousHook.outlet.ioList.mobject)
-					this.previousHook.outlet.ioList.mobject.unlinkedInputProperty(this.previousHook.outlet.name)
+				if (this.openLink.startHook) {
+					this.openLink.startHook.update({ linked: false })
+					this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+				} else if (this.openLink.endHook) {
+					this.openLink.endHook.update({ linked: false })
+					this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
+				}
+				if (this.openLink.previousHook) {
+					this.openLink.previousHook.update({ linked: false })
+					if (this.openLink.previousHook.outlet.kind == 'input') {
+						this.openLink.previousHook.outlet.ioList.mobject.removedInputLink(this.openLink)
+					} else {
+						this.openLink.previousHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+					}
 				}
 			}
 			this.openLink = null
@@ -852,10 +863,11 @@ The content children can also be dragged and panned.
 			this.openLink.update({
 				endHook: h
 			})
-			this.previousHook = this.openLink.endHook
+			this.openLink.previousHook = this.openLink.endHook
 		}
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
+		this.openLink.previousHook = null
 
 		this.links.push(this.openLink)
 		this.createNewDependency()
@@ -914,8 +926,8 @@ The content children can also be dragged and panned.
 		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
 			startHook.outlet.addHook()
 		}
-		startHook.outlet.ioList.mobject.linkedOutputProperty(startHook.outlet.name)
-		endHook.outlet.ioList.mobject.linkedInputProperty(endHook.outlet.name)
+		startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
+		endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
 	}
 
 	removeDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
@@ -927,8 +939,8 @@ The content children can also be dragged and panned.
 		startHook.removeDependencyBetween('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.removeDependencyBetween('positionInBoard', this.openLink.endBullet, 'midpoint')
 		startHook.outlet.removeHook()
-		startHook.outlet.ioList.mobject.unlinkedOutputProperty(startHook.outlet.name)
-		endHook.outlet.ioList.mobject.unlinkedInputProperty(endHook.outlet.name)
+		startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+		endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 	}
 
 

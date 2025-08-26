@@ -9,6 +9,7 @@ import { log } from 'core/functions/logging'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { deepCopy } from 'core/functions/copying'
 import { remove } from 'core/functions/arrays'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 declare var Desmos: any
 
@@ -43,7 +44,6 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	setup() {
-		log('setup')
 		super.setup()
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
@@ -67,9 +67,8 @@ export class DesmosCalculator extends Linkable {
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
-		this.hideGrapher()
+		this.customizeLayout()
 	}
-
 
 	setupCanvas() {
 		this.innerCanvas.view.frame.update({
@@ -195,8 +194,9 @@ export class DesmosCalculator extends Linkable {
 			}
 		} else {
 			if (value !== null) {
-				this.createInputVariable(variable, value)
-			} else if (term !== null && term.length > 0) {
+				this.createSlidableVariable(variable, value)
+			}
+			 else if (term !== null && term.length > 0) {
 				this.createOutputVariable(variable)
 			}
 		}
@@ -257,10 +257,15 @@ export class DesmosCalculator extends Linkable {
 		return !isNaN(parseFloat(value))
 	}
 
-	createInputVariable(name: string, value: number) {
+	createSlidableVariable(name: string, value: number) {
 		if (name == null) { return }
-		this.createProperty(name, value)
 	 	this.secretInputExpressions[name] = this.calculator.HelperExpression({ latex: name })
+		this.createInputVariable(name, value)
+		this.createOutputVariable(name)
+	}
+
+	createInputVariable(name: string, value: number) {
+		this.createProperty(name, value)
 		this.inputProperties.push({
 			name: name,
 			type: 'number',
@@ -270,15 +275,6 @@ export class DesmosCalculator extends Linkable {
 			outletProperties: this.inputProperties
 		})
 		this.inputList.view.hide()
-		this.outputProperties.push({
-			name: name,
-			type: 'number',
-			displayName: name
-		})
-		this.outputList.update({
-			outletProperties: this.outputProperties
-		})
-		this.outputList.view.hide()
 	}
 
 	removeInputVariable(name: string) {
@@ -295,16 +291,6 @@ export class DesmosCalculator extends Linkable {
 			outletProperties: this.inputProperties
 		})
 		this.inputList.view.hide()
-		for (let prop of this.outputProperties) {
-			if (prop['name'] == name) {
-				remove(this.outputProperties, prop)
-				break
-			}
-		}
-		this.outputList.update({
-			outletProperties: this.outputProperties
-		})
-		this.outputList.view.hide()
 	}
 
 	createOutputVariable(name: string) {
@@ -326,20 +312,29 @@ export class DesmosCalculator extends Linkable {
 		this.outputList.view.hide()
 	}
 
+	removeOutputVariable(name: string) {
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				remove(this.outputProperties, prop)
+				break
+			}
+		}
+		this.outputList.update({
+			outletProperties: this.outputProperties
+		})
+		this.outputList.view.hide()
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		// set the latex values of updated input variables contained
 		this.updating = true
 		for (let [key, value] of Object.entries(args)) {
 			let expr = this.getExpressionNamed(key)
 			if (expr === null) { continue }
-			if (parseInt(expr['id']) >= 0) {
-				this.makeImmutableVariable(key, value)
-			} else {
-				this.calculator.setExpression({
-					id: expr['id'],
-					latex: `${key}=${value}`
-				})
-			}
+			this.calculator.setExpression({
+				id: expr['id'],
+				latex: `${key}=${value}`
+			})
 		}
 		for (let [id, expr] of Object.entries(this.expressions)) {
 			let name = this.definedVariable(expr)
@@ -353,23 +348,29 @@ export class DesmosCalculator extends Linkable {
 		this.updating = false
 	}
 
-	makeImmutableVariable(name: string, value: number) {
+	linkFreeVariable(name: string) {
 		let sliderExpr = this.getExpressionNamed(name)
 		let id = sliderExpr['id']
-		this.calculator.setExpression({
-			id: id,
-			latex: name
-		})
+		let value = this[name] ?? 1
 		let secretInputExpr = this.calculator.setExpression({
 			id: `secret_${id}`,
 			latex: `${name}=${value}`,
 			secret: true
 		})
 		this.secretInputExpressions[id] = secretInputExpr
+		this.calculator.setExpression({
+			id: id,
+			latex: name
+		})
 	}
 
-	makeSliderVariable(name: string) {
-		let fixedExpr =  this.getExpressionNamed(name)
+	addedInputLink(link: DependencyLink) {
+		super.addedInputLink(link)
+		this.linkFreeVariable(link.endHook.outlet.name)
+	}
+
+	unlinkFreeVariable(name: string) {
+		let fixedExpr = this.getExpressionNamed(name)
 		let id = fixedExpr['id'].split('secret_')[1]
 		let value = this[name]
 		delete this.secretInputExpressions[id]
@@ -380,14 +381,16 @@ export class DesmosCalculator extends Linkable {
 			id: id,
 			latex: `${name}=${value}`
 		})
+		// TODO: remove links to input variable
 	}
 
-	unlinkedInputProperty(name: string) {
-		this.makeSliderVariable(name)
-		super.unlinkedInputProperty(name)
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		let hook = link.endHook ?? link.previousHook
+		this.unlinkFreeVariable(hook.outlet.name)
 	}
 
-	hideGrapher() {
+	customizeLayout() {
 		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		el1.style.visibility = 'hidden'
 		let el2 = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement

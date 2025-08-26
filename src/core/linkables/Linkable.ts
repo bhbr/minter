@@ -6,9 +6,11 @@ import { IOList } from './IOList'
 import { InputList } from './InputList'
 import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
+import { DependencyLink } from './DependencyLink'
 import { log } from 'core/functions/logging'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { Checkbox } from 'core/mobjects/Checkbox'
+import { HOOK_HORIZONTAL_SPACING } from './constants'
 
 export interface IOProperty {
 	name: string
@@ -167,21 +169,25 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
-	linkedInputProperty(prop: string) {
+	addedInputLink(link: DependencyLink) {
+		link.startHook.outlet.ioList.mobject.updateDependents()
+	}
+
+	addedOutputLink(link: DependencyLink) {
+		this.update()
+		this.updateDependents()
+	}
+
+	removedInputLink(link: DependencyLink) {
 		this.update()
 	}
 
-	linkedOutputProperty(prop: string) {
+	removedOutputLink(link: DependencyLink) {
 		this.update()
+		if (!link.startHook) { return }
+		link.startHook.outlet.removeUnlinkedHook()
 	}
 
-	unlinkedInputProperty(prop: string) {
-		this.update()
-	}
-
-	unlinkedOutputProperty(prop: string) {
-		this.update()
-	}
 
 }
 
