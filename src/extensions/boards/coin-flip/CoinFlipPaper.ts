@@ -7,7 +7,7 @@ import { NumberListBoxCreator } from 'core/boxes/NumberListBox'
 import { InputNumberBoxCreator } from 'extensions/creations/math/InputNumberBox/InputNumberBoxCreator'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
-import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'core/boxes/BinaryOperatorBoxCreator'
+import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator, LessThanBoxCreator } from 'core/boxes/BinaryOperatorBoxCreator'
 import { SumBoxCreator } from 'core/boxes/SumBox'
 import { AverageBoxCreator } from 'core/boxes/AverageBox'
 import { CumSumBoxCreator } from 'core/boxes/CumSumBox'
@@ -33,6 +33,7 @@ export class CoinFlipPaper extends Paper {
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
+				'<': LessThanBoxCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
 				'plot': SequencePlotCreator,

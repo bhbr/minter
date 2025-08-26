@@ -7,7 +7,7 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
-type operatorString = "+" | "–" | "&times;" | "/"
+type operatorString = "+" | "–" | "&times;" | "/" | "<"
 
 export class BinaryOperatorBox extends Linkable {
 
@@ -22,7 +22,7 @@ export class BinaryOperatorBox extends Linkable {
 
 	defaults(): object {
 		return {
-			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/"},
+			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/", "<": "<"},
 			operatorSign: new Circle({
 				radius: 10,
 				fillColor: Color.black(),
@@ -123,6 +123,8 @@ export class BinaryOperatorBox extends Linkable {
 			return a * b
 		case "/":
 			return a / b
+		case "<":
+			return a < b ? 1 : 0
 		}
 	}
 
@@ -239,6 +241,26 @@ export class DivideBox extends BinaryOperatorBox {
 	}
 }
 
+
+export class LessThanBox extends BinaryOperatorBox {
+	defaults(): object {
+		return {
+			operator: '<',
+ 			inputProperties: [
+				{ name: 'operand1', displayName: 'left side', type: 'number|Array<number>' },
+				{ name: 'operand2', displayName: 'right side', type: 'number|Array<number>' }
+			],
+			outputProperties: [
+				{ name: 'result', displayName: 'result', type: 'number|Array<number>' }
+			]
+		}
+	}
+	mutabilities(): object {
+		return {
+			operator: 'never'
+		}
+	}
+}
 
 
 

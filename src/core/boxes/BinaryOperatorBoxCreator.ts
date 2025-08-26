@@ -1,6 +1,6 @@
 
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox } from './BinaryOperatorBox'
+import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox, LessThanBox } from './BinaryOperatorBox'
 
 export class BinaryOperatorBoxCreator extends DraggingCreator {
 	declare creation: BinaryOperatorBox
@@ -42,5 +42,12 @@ export class DivideBoxCreator extends BinaryOperatorBoxCreator {
 	declare creation: DivideBox
 	createMobject(): DivideBox {
 		return new DivideBox()
+	}
+}
+
+export class LessThanBoxCreator extends BinaryOperatorBoxCreator {
+	declare creation: LessThanBox
+	createMobject(): LessThanBox {
+		return new LessThanBox()
 	}
 }
