@@ -2,6 +2,7 @@
 import { Creator } from 'core/creators/Creator'
 import { CoinRow } from './CoinRow'
 import { vertex, vertexSubtract } from 'core/functions/vertex'
+import { log } from 'core/functions/logging'
 
 export class CoinRowCreator extends Creator {
 	
@@ -34,8 +35,11 @@ export class CoinRowCreator extends Creator {
 	dissolve() {
 		if (this.creation === null) { return }
 		this.creation.update({
-			anchor: this.getStartPoint()
+			anchor: this.getStartPoint(),
+			frameWidth: this.creation.computeWidth()
 		})
+		this.creation.inputList.positionSelf()
+		this.creation.outputList.positionSelf()
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
 		this.parent.remove(this)

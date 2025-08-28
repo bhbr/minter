@@ -218,6 +218,10 @@ export class CoinRow extends Linkable implements Playable {
 		}
 	}
 
+	computeWidth(): number {
+		return (this.nbCoins - 1) * this.coinSpacing + 2 * this.coinRadius + this.nbHeadsLabel.frameWidth + this.nbTailsLabel.frameWidth
+	}
+
 
 
 

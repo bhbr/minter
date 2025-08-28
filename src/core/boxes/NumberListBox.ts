@@ -47,6 +47,8 @@ export class NumberListBox extends Linkable {
 		this.add(this.scroll)
 		this.scroll.view.div.style.fontSize = '20px'
 		this.scroll.view.div.style.color = Color.white().toCSS()
+		this.inputList.positionSelf()
+		this.outputList.positionSelf()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

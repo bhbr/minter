@@ -91,6 +91,7 @@ export class BinaryOperatorBox extends Linkable {
 		this.update({
 			frameHeight: this.valueBox.frameHeight
 		})
+		this.outputList.positionSelf()
 		this.add(this.valueBox)
 		this.moveToTop(this.operatorSign)
 	}
