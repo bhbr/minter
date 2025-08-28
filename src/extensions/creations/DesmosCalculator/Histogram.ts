@@ -14,8 +14,8 @@ export class Histogram extends DesmosCalculator {
 		return {
 			nbBins: 10,
 			data: [],
-			leftColor: Color.green(),
-			rightColor: Color.purple(),
+			leftColor: Color.blue(),
+			rightColor: Color.red(),
 			inputProperties: [
 				{ name: 'data', displayName: null, type: 'Array<number>' },
 				{ name: 'nbBins', displayName: '# bins', type: 'number' },
@@ -38,6 +38,9 @@ export class Histogram extends DesmosCalculator {
 			bottom:  - 1,
 			top: 10
 		})
+	}
+
+	customizeLayout() {
 	}
 
 	sampleSize() {

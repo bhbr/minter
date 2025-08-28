@@ -12,7 +12,7 @@ import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { PlayableCoin } from './extensions/creations/CoinFlipper/PlayableCoin'
 import { CoinRow } from './extensions/creations/CoinFlipper/CoinRow'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
-import { DesmosCalculator } from './extensions/creations/DesmosCalculator/DesmosCalculator'
+import { VariableSheet } from './extensions/creations/DesmosCalculator/VariableSheet'
 import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/TestDesmosCalculator'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
@@ -26,7 +26,7 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-let calc = new DesmosCalculator({
+let calc = new VariableSheet({
 	anchor: [100, 100],
 	frameWidth: 500,
 	frameHeight: 400
@@ -39,13 +39,6 @@ let slider = new BoxSlider({
 	frameHeight: 200
 })
 paper.addToContent(slider)
-
-// window.setTimeout(() => {
-// 	calc.calculator.setExpression({
-// 		id: '1',
-// 		latex: 'a=1'
-// 	})
-// }, 1000)
 
 
 
