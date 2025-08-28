@@ -438,6 +438,11 @@ The content children can also be dragged and panned.
 			this.content.remove(child)
 			child = this.contentChildren.pop()
 		}
+		for (let child of this.children) {
+			if (child instanceof Creator) {
+				this.remove(child)
+			}
+		}
 	}
 
 	setControlsVisibility(visible: boolean) {
@@ -902,6 +907,9 @@ The content children can also be dragged and panned.
 
 	updateLinks() {
 		for (let hook of this.allHooks()) {
+			hook.outlet.update()
+			hook.outlet.updateDependents()
+			hook.update()
 			hook.updateDependents() // this is supposed to update start and end points of links
 		}
 	}
@@ -923,6 +931,13 @@ The content children can also be dragged and panned.
 		})
 		startHook.addDependency('positionInBoard', this.openLink.startBullet, 'midpoint')
 		endHook.addDependency('positionInBoard', this.openLink.endBullet, 'midpoint')
+
+		// these should not be necessary
+		startHook.addDependency('positionInBoard', this.openLink.linkLine, 'startPoint')
+		endHook.addDependency('positionInBoard', this.openLink.linkLine, 'endPoint')
+		startHook.addDependency('positionInBoard', this.openLink.borderLinkLine, 'startPoint')
+		endHook.addDependency('positionInBoard', this.openLink.borderLinkLine, 'endPoint')
+
 		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
 			startHook.outlet.addHook()
 		}

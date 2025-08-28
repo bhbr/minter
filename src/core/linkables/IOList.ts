@@ -30,6 +30,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			outletProperties: [],
 			cornerRadius: 20,
 			width: IO_LIST_WIDTH,
+			frameWidth: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1.0,
 			strokeColor: Color.gray(0.4),
@@ -59,7 +60,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 	setup() {
 		super.setup()
-		this.createOutlets()
+		this.updateOutlets()
 		this.update({ height: this.getHeight() })
 	}
 
@@ -70,18 +71,20 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		else { return 2 * HOOK_INSET_Y + HOOK_VERTICAL_SPACING * this.outletProperties.length }
 	}
 
-	createOutlets() {
+	updateOutlets() {
 	// create the hooks (empty circles) and their labels
-		for (let outlet of this.linkOutlets) {
-			this.remove(outlet)
-		}
-		clear(this.linkOutlets)
 		for (var i = 0; i < this.outletProperties.length; i++) {
 			let prop = this.outletProperties[i]
-			this.createOutlet(prop)
+			if (!this.outletNamed(prop.name)) {
+				this.createOutlet(prop)
+			}
+		}
+		for (let outlet of this.linkOutlets) {
+			for (let hook of outlet.linkHooks) {
+				hook.updateDependents()
+			}
 		}
 	}
-
 
 	createOutlet(prop: IOProperty) {
 		let outlet = new LinkOutlet({
@@ -100,15 +103,12 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		outlet.update({
 			anchor: [HOOK_INSET_X, HOOK_INSET_Y + HOOK_VERTICAL_SPACING * index]
 		})
+		for (let hook of outlet.linkHooks) {
+			hook.updateDependents()
+		}
 	}
 
 	hookNamed(name: string, index: number = 0): LinkHook | null {
-		// for (let outlet of this.linkOutlets) {
-		// 	if (outlet.name == name) {
-		// 		return outlet.linkHooks[index]
-		// 	}
-		// }
-		// return null
 		let outlet = this.outletNamed(name)
 		if (outlet === null) { return null }
 		let hooks = outlet.linkHooks
@@ -137,8 +137,11 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 
 		if (args['outletProperties'] === undefined) { return }
 
-		this.createOutlets()
+		this.updateOutlets()
 		if (this.mobject == null) { return }
+		if (this.mobject.board) {
+			this.mobject.board.updateLinks()
+		}
 		this.positionSelf()
 		if (redraw) {
 			this.redraw()
