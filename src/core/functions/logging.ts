@@ -16,7 +16,10 @@ function logInto(obj: any, id: string) {
 	htmlConsole.scrollTop = htmlConsole.scrollHeight
 }
 
-export function logString(msg: any) {
+
+
+
+function mereLogString(msg: any): string {
 	if (msg === undefined) {
 		return 'undefined'
 	} else if (msg === null) {
@@ -60,13 +63,25 @@ export function logString(msg: any) {
 	}
 }
 
+function datedLogString(msg: any): string {
+	return `${Date.now()} ${mereLogString(msg)}`
+}
+
+export function logString(msg: any): string {
+	return datedLogString(msg)
+}
+
 export function htmlLog(msg: any) {
 	logInto(logString(msg), 'htmlConsole')
 }
 function jsLog(msg: any) {
-	console.log(msg)
+	if (typeof msg == 'string') {
+		console.log(datedLogString(msg))
+	} else {
+		console.log(`${Date.now()}`)
+		console.log(msg)
+	}
 }
-
 
 export function log(msg: any) {
 	// device-agnostic log function
