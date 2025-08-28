@@ -13,10 +13,6 @@ export class InputList extends IOList {
 	}
 
 	getAnchor(): vertex {
-		log(this.mobject.getCompactWidth())
-		log(IO_LIST_WIDTH)
-		log(this.view.frame.width)
-		log(this.view.frameWidth)
 		return [0.5 * (this.mobject.getCompactWidth() - IO_LIST_WIDTH), -IO_LIST_OFFSET - this.getHeight()]
 	}
 

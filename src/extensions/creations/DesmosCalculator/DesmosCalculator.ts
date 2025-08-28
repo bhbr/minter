@@ -103,6 +103,9 @@ export class DesmosCalculator extends Linkable {
 
 	blur() {
 		super.blur()
+		let area = this.view.div.querySelector('.dcg-mq-textarea').querySelector('textarea')
+		log(area)
+		area.blur()
 		this.outerFrame.update({
 			screenEventHandler: ScreenEventHandler.Self
 		})

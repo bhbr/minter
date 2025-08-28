@@ -217,7 +217,7 @@ export class VariableSheet extends DesmosCalculator {
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})
-		//this.outputList.view.hide()
+		this.outputList.view.hide()
 	}
 
 	removeOutputVariable(name: string) {
@@ -230,7 +230,7 @@ export class VariableSheet extends DesmosCalculator {
 		this.outputList.update({
 			outletProperties: this.outputProperties
 		})
-		//this.outputList.view.hide()
+		this.outputList.view.hide()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
