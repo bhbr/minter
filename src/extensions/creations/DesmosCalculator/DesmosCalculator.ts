@@ -45,13 +45,13 @@ export class DesmosCalculator extends Linkable {
 
 	setup() {
 		super.setup()
+		this.setupCanvases()
+		this.setupOuterFrame()
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
 		} else {
 			this.createCalculator(this.options)
 		}
-		this.setupCanvases()
-		this.setupOuterFrame()
 	}
 
 	loadDesmosAPI() {
@@ -63,11 +63,10 @@ export class DesmosCalculator extends Linkable {
 		getPaper().loadedAPIs.push('desmos-calc')
 	}
 
-
 	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
-		this.customizeLayout()
+		window.setTimeout(this.customizeLayout.bind(this), 50)
 	}
 
 	setupCanvases() {
@@ -76,8 +75,8 @@ export class DesmosCalculator extends Linkable {
 			height: this.view.frame.height
 		})
 		this.innerCanvas.view.frame.update({
-			width: 500,
-			height: 500
+			width: 1000,
+			height: 1000
 		})
 		this.innerCanvas.update({
 			screenEventHandler: ScreenEventHandler.Auto
@@ -85,6 +84,7 @@ export class DesmosCalculator extends Linkable {
 		this.clippingCanvas.add(this.innerCanvas)
 		this.add(this.clippingCanvas)
 
+		this.clippingCanvas.view.div.style.overflow = 'hidden'
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
 		this.innerCanvas.view.div.id = 'desmos-calc'
 	}
@@ -134,7 +134,7 @@ export class DesmosCalculator extends Linkable {
 
 	onChange(eventName: string, event: object) { }
 
-
+	adjustWidth() { }
 
 
 

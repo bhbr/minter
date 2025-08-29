@@ -12,8 +12,6 @@ import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { PlayableCoin } from './extensions/creations/CoinFlipper/PlayableCoin'
 import { CoinRow } from './extensions/creations/CoinFlipper/CoinRow'
 import { LinkableNumberListBox } from './core/boxes/NumberListBox'
-import { VariableSheet } from './extensions/creations/DesmosCalculator/VariableSheet'
-import { AlgebraExpression } from './extensions/creations/DesmosCalculator/AlgebraExpression'
 import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/TestDesmosCalculator'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
@@ -27,11 +25,5 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let calc = new AlgebraExpression({
-	anchor: [100, 100]
-})
-paper.addToContent(calc)
-
 
 

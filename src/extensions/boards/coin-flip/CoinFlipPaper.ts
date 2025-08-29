@@ -16,6 +16,8 @@ import { SequencePlotCreator } from 'extensions/creations/DesmosCalculator/Seque
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
+import { DesmosExpressionCreator } from 'extensions/creations/DesmosCalculator/DesmosExpressionCreator'
+import { DesmosExpressionSheetCreator } from 'extensions/creations/DesmosCalculator/DesmosExpressionSheetCreator'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -34,6 +36,8 @@ export class CoinFlipPaper extends Paper {
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
 				'<': LessThanBoxCreator,
+				'expression': DesmosExpressionCreator,
+				'expression-sheet': DesmosExpressionSheetCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
 				'plot': SequencePlotCreator,
@@ -48,6 +52,7 @@ export class CoinFlipPaper extends Paper {
 				'CoinButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'AlgebraButton',
 				'ListFunctionsButton',
 				'PlotButton',
 				'ColorSampleButton',

@@ -3,6 +3,7 @@ import { Creator } from './Creator'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { vertex } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class SpanningCreator extends Creator {
 	
@@ -54,14 +55,17 @@ export class SpanningCreator extends Creator {
 	}
 
 	dissolve() {
+		log('dissolve')
 		let w = this.getWidth()
 		let h = this.getHeight()
-		this.remove(this.creation)
+		if (this.creation) {
+			this.remove(this.creation)
+		}
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.topLeftVertex(),
-			width: w,
-			height: h
+			frameWidth: w,
+			frameHeight: h
 		})
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null

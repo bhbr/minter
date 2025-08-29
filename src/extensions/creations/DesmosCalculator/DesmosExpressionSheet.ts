@@ -4,13 +4,12 @@ import { remove } from 'core/functions/arrays'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { log } from 'core/functions/logging'
 
-export class VariableSheet extends DesmosCalculator {
+export class DesmosExpressionSheet extends DesmosCalculator {
 
 	customizeLayout() {
 		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		el1.style.visibility = 'hidden'
-		let el2 = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement
-		el2.style.width = `${this.frameWidth}px`
+		this.adjustSize()
 		let el3 = this.innerCanvas.view.div.getElementsByClassName('dcg-pillbox-container')[0] as HTMLElement
 		el3.style.visibility = 'hidden'
 		let el4 = this.innerCanvas.view.div.getElementsByClassName('dcg-add-expression-btn')[0] as HTMLElement
@@ -21,13 +20,29 @@ export class VariableSheet extends DesmosCalculator {
 		let el6 = this.innerCanvas.view.div.getElementsByClassName('dcg-action-redo')[0] as HTMLElement
 		el6.style.top = '-25px'
 		el6.style.right = '-35px'
-		let el7 = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement
-		el7.style.top = '0px'
-		el7.style.height = `${this.frameHeight}px`
 		let el8 = this.innerCanvas.view.div.getElementsByClassName('dcg-graphpaper-branding')[0] as HTMLElement
 		el8.style.bottom = '0px'
 	}
 
+	adjustSize() {
+		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
+		if (el) {
+			if (this.frameWidth < 300) {
+				this.update({ frameWidth: 300 })
+			}
+			if (this.frameHeight < 200) {
+				this.update({ frameHeight: 200 })
+			}
+			let htmlel = el as HTMLElement
+			log(htmlel.style.width)
+			htmlel.style.width = `${this.frameWidth}px`
+			htmlel.style.top = '0px'
+			htmlel.style.height = `${this.frameHeight}px`
+			log(htmlel.style.width)
+		} else {
+			window.setTimeout(this.adjustWidth.bind(this), 50)
+		}
+	}
 
 	calculatorExpressionDict(): object {
 		let dict: object = {}
@@ -140,6 +155,7 @@ export class VariableSheet extends DesmosCalculator {
 	}
 
 	getExpressionNamed(name: string): object | null {
+		if (!this.calculator) { return null }
 		for (let expr of this.calculator.getExpressions()) {
 			if (!expr['latex'].includes('=')) { continue }
 			let variable = this.definedVariable(expr)

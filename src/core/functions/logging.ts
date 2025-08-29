@@ -2,6 +2,7 @@
 import { isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
 
 let debugging = true
+let logTimestamps = false
 
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
@@ -43,9 +44,9 @@ function mereLogString(msg: any): string {
 		} else {
 			let ret = '['
 			for (let i = 0; i < msg.length - 1; i++) {
-				ret += logString(msg[i]) + ', '
+				ret += mereLogString(msg[i]) + ', '
 			}
-			ret += logString(msg[msg.length - 1]) + ']'
+			ret += mereLogString(msg[msg.length - 1]) + ']'
 			return ret
 		}
 	} else {
@@ -53,9 +54,9 @@ function mereLogString(msg: any): string {
 		if (keys.length <= 5) {
 			var ret = '{ '
 			for (let i = 0; i < keys.length - 1; i++) {
-				ret += keys[i] + ' : ' + logString(msg[keys[i]]) + ', '
+				ret += keys[i] + ' : ' + mereLogString(msg[keys[i]]) + ', '
 			}
-			ret += keys[keys.length - 1] + ' : ' + logString(msg[keys[keys.length - 1]]) + ' }'
+			ret += keys[keys.length - 1] + ' : ' + mereLogString(msg[keys[keys.length - 1]]) + ' }'
 			return ret
 		} else {
 			return msg.constructor.name
@@ -68,7 +69,7 @@ function datedLogString(msg: any): string {
 }
 
 export function logString(msg: any): string {
-	return datedLogString(msg)
+	return logTimestamps ? datedLogString(msg) : mereLogString(msg)
 }
 
 export function htmlLog(msg: any) {
@@ -76,7 +77,7 @@ export function htmlLog(msg: any) {
 }
 function jsLog(msg: any) {
 	if (typeof msg == 'string') {
-		console.log(datedLogString(msg))
+		console.log(logString(msg))
 	} else {
 		console.log(`${Date.now()}`)
 		console.log(msg)

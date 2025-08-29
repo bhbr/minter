@@ -1,11 +1,11 @@
 
-import { VariableSheet } from './VariableSheet'
+import { DesmosExpressionSheet } from './DesmosExpressionSheet'
 import { log } from 'core/functions/logging'
 import { removeAll, removeDuplicates } from 'core/functions/arrays'
 import { View } from 'core/mobjects/View'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 
-export class AlgebraExpression extends VariableSheet {
+export class DesmosExpression extends DesmosExpressionSheet {
 
 	freeVariables: Array<string>
 	outputVariable: string | null
@@ -43,7 +43,6 @@ export class AlgebraExpression extends VariableSheet {
 		this.update({
 			frameHeight: 50
 		})
-		this.clippingCanvas.view.div.style.overflow = 'hidden'
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'
 		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel') as HTMLElement
@@ -216,7 +215,6 @@ export class AlgebraExpression extends VariableSheet {
 	}
 
 	removedInputLink(link: DependencyLink) {
-		log('removedInputLink')
 		let name = link.endHook.outlet.name
 		this.calculator.removeExpression({
 			id: `secret_${name}`
