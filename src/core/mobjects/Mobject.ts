@@ -1,5 +1,5 @@
 
-import { remove } from 'core/functions/arrays'
+import { remove, clear } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { copy } from 'core/functions/copying'
 import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events'
@@ -310,6 +310,10 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	removeDependency(dep: Dependency) {
 		remove(this.dependencies, dep)
+	}
+
+	removeAllDependents() {
+		clear(this.dependencies)
 	}
 
 	getDependency(outputName: string | null, target: Mobject, inputName: string | null): Dependency | null {

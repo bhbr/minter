@@ -18,6 +18,7 @@ import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/Te
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
 import { AddBox } from './core/boxes/BinaryOperatorBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
+import { removeAll } from './core/functions/arrays'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -28,9 +29,7 @@ if (TESTING) { AllTests.run() }
 export const paper = new StartPaper()
 
 let calc = new AlgebraExpression({
-	anchor: [100, 100],
-	frameWidth: 500,
-	frameHeight: 400
+	anchor: [100, 100]
 })
 paper.addToContent(calc)
 

@@ -14,6 +14,7 @@ declare var Desmos: any
 export class DesmosCalculator extends Linkable {
 
 	calculator: any
+	clippingCanvas: Mobject
 	innerCanvas: Mobject
 	outerFrame: Rectangle
 	options: object
@@ -32,6 +33,7 @@ export class DesmosCalculator extends Linkable {
 			screenEventHandler: ScreenEventHandler.Self,
 			calculator: null,
 			options: {},
+			clippingCanvas: new Mobject(),
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			expressions: {},
@@ -48,7 +50,7 @@ export class DesmosCalculator extends Linkable {
 		} else {
 			this.createCalculator(this.options)
 		}
-		this.setupCanvas()
+		this.setupCanvases()
 		this.setupOuterFrame()
 	}
 
@@ -68,15 +70,20 @@ export class DesmosCalculator extends Linkable {
 		this.customizeLayout()
 	}
 
-	setupCanvas() {
-		this.innerCanvas.view.frame.update({
+	setupCanvases() {
+		this.clippingCanvas.view.frame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height
+		})
+		this.innerCanvas.view.frame.update({
+			width: 500,
+			height: 500
 		})
 		this.innerCanvas.update({
 			screenEventHandler: ScreenEventHandler.Auto
 		})
-		this.add(this.innerCanvas)
+		this.clippingCanvas.add(this.innerCanvas)
+		this.add(this.clippingCanvas)
 
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
 		this.innerCanvas.view.div.id = 'desmos-calc'
@@ -104,7 +111,6 @@ export class DesmosCalculator extends Linkable {
 	blur() {
 		super.blur()
 		let area = this.view.div.querySelector('.dcg-mq-textarea').querySelector('textarea')
-		log(area)
 		area.blur()
 		this.outerFrame.update({
 			screenEventHandler: ScreenEventHandler.Self

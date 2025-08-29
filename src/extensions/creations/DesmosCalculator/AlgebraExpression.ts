@@ -1,9 +1,23 @@
 
 import { VariableSheet } from './VariableSheet'
 import { log } from 'core/functions/logging'
+import { removeAll, removeDuplicates } from 'core/functions/arrays'
+import { View } from 'core/mobjects/View'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class AlgebraExpression extends VariableSheet {
+
+	freeVariables: Array<string>
+	outputVariable: string | null
 	
+	defaults(): object {
+		return {
+			freeVariables: [],
+			outputVariable: null,
+			frameWidth: 300,
+			frameHeight: 50
+		}
+	}
 
 	customizeLayout() {
 		super.customizeLayout()
@@ -29,13 +43,22 @@ export class AlgebraExpression extends VariableSheet {
 		this.update({
 			frameHeight: 50
 		})
-		this.view.div.style.overflow = 'hidden'
+		this.clippingCanvas.view.div.style.overflow = 'hidden'
+		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
+		container.style.overflow = 'hidden'
+		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel') as HTMLElement
+		panel.style.overflow = 'hidden'
+		let outerPanel = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer') as HTMLElement
+		outerPanel.style.overflow = 'hidden'
+		let list = this.innerCanvas.view.div.querySelector('.dcg-expressionlist') as HTMLElement
+		list.style.overflow = 'hidden'
+		let template = this.innerCanvas.view.div.querySelector('.dcg-template-expressioneach') as HTMLElement
+		template.style.overflow = 'hidden'
 	}
 
 	focus() {
 		super.focus()
 		document.addEventListener('keydown', this.boundButtonDownByKey, { capture: true })
-		this.calculator.focusFirstExpression()
 	}
 
 	setup() {
@@ -58,13 +81,159 @@ export class AlgebraExpression extends VariableSheet {
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
 	}
 
+	onChange(eventName: string, event: object) {
+		let newExpressions = this.calculatorExpressionDict()
+		let newExpr = newExpressions['1']
 
+		let oldExpr = this.expressions['1'] ?? newExpr
+		this.expressions['1'] =  this.expressions['1'] ?? oldExpr
+		this.onExpressionEdited(oldExpr, newExpr)
+	}
 
+	isInputVariable(name: string): boolean {
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				return true
+			}
+		}
+		return false
+	}
 
+	isOutputVariable(name: string): boolean {
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				return true
+			}
+		}
+		return false
+	}
 
+	onExpressionEdited(oldExpr: object, newExpr: object) {
 
+		let value = this.definingValue(newExpr)
+		let isFreeVariable = (value != null && !isNaN(value))
+		let h = 50 + (isFreeVariable ? 20 : 0)
 
+		window.setTimeout(function() {
+			this.setHeight(h)
+		}.bind(this), 50)
 
+		let outputVariable = this.definedVariable(newExpr)
+		if (outputVariable) {
+			if (!this.isOutputVariable(outputVariable)) {
+				let oldOutputVariable = this.outputProperties[0]
+				if (oldOutputVariable !== undefined) {
+					this.removeOutputVariable(oldOutputVariable['name'])
+				}
+				this.createOutputVariable(outputVariable)
+			}
+		}
+
+		let term = this.definingTerm(newExpr)
+		if (term) {
+			let inputVariables = this.extractInputVariables(term)
+			for (let variable of inputVariables) {
+				if (!this.isInputVariable(variable)) {
+					this.createInputVariable(variable, NaN)
+				}
+			}
+
+			for (let prop of this.inputProperties) {
+				let name = prop['name']
+				if (!inputVariables.includes(name)) {
+					this.removeInputVariable(name)
+				}
+			}
+		}
+
+		// if (this.properties.includes(variable)) {
+		// 	// if it is a linked input variable, undo this edit
+		// 	let hook = this.inputList.hookNamed(variable)
+		// 	if (hook) {
+		// 		if (hook.linked) {
+		// 			this.calculator.setExpression({
+		// 				id: id,
+		// 				latex: this.expressions[id]['latex']
+		// 			})
+		// 		} else {
+		// 			this.update()
+		// 			this.updateDependents()
+		// 		}
+		// 		return
+		// 	}
+		// } else {
+		// 	if (value !== null) {
+		// 		this.createSlidableVariable(variable, value)
+		// 	} else if (term !== null && term.length > 0) {
+		// 		let isError: boolean = this.calculator.expressionAnalysis[id].isError
+		// 		if (!isError) {
+		// 			this.createOutputVariable(variable)
+		// 		}
+		// 	}
+		// }		
+
+		this.expressions['1']['latex'] = newExpr['latex']
+	}
+
+	extractInputVariables(term: string): Array<string> {
+		var term2 = term
+		let specialCharsFullString = '0 1 2 3 4 5 6 7 8 9 . + - \\cdot / \\frac ( ) [ ] { } \\{ \\} \\left \\right \\sqrt ^ * \\log \\ln \\exp \\sin \\cos \\tan \\cot \\sec \\csc \\arcsin \\arccos \\arctan \\atan \\arccot \\arcsec \\arccsc \\pi'
+		let specialChars = specialCharsFullString.split(' ')
+		for (let char of specialChars) {
+			term2 = term2.replace(char, ' ')
+		}
+		let arr = term2.split(' ')
+		removeAll(arr, '')
+		let vars = removeDuplicates(arr)
+		return vars
+	}
+
+	setHeight(h: number) {
+		this.update({
+			frameHeight: h
+		})
+		this.clippingCanvas.update({
+			frameHeight: h
+		})
+		this.outerFrame.update({
+			frameHeight: h,
+			height: h
+		})
+		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer') as HTMLElement
+		panel.style.height = `${h}px`
+		this.outputList.positionSelf()
+	}
+
+	addedInputLink(link: DependencyLink) {
+		let name = link.endHook.outlet.name
+		link.startHook.outlet.ioList.mobject.update()
+		let secretInputExpr = this.calculator.setExpression({
+			id: `secret_${name}`,
+			latex: `${name}=${this[name]}`,
+			secret: true
+		})
+		this.secretInputExpressions[name] = secretInputExpr
+	}
+
+	removedInputLink(link: DependencyLink) {
+		log('removedInputLink')
+		let name = link.endHook.outlet.name
+		this.calculator.removeExpression({
+			id: `secret_${name}`
+		})
+		delete this.secretInputExpressions[name]
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		for (let [name, expr] of Object.entries(this.secretInputExpressions)) {
+			this.calculator.setExpression({
+				id: `secret_${name}`,
+				latex: `${name}=${this[name]}`,
+				secret: true
+			})
+		}
+	}
 
 
 

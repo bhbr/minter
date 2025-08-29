@@ -8,7 +8,7 @@ import { LinkOutlet } from './LinkOutlet'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 import { log } from 'core/functions/logging'
-import { clear } from 'core/functions/arrays'
+import { clear, remove } from 'core/functions/arrays'
 import { IOProperty } from './Linkable'
 
 export class IOList extends RoundedRectangle {
@@ -80,6 +80,16 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			}
 		}
 		for (let outlet of this.linkOutlets) {
+			var found = false
+			for (let prop of this.outletProperties) {
+				if (outlet.name == prop['name']) {
+					found = true
+					break
+				}
+			}
+			if (!found) {
+				this.removeOutlet(outlet)
+			}
 			for (let hook of outlet.linkHooks) {
 				hook.updateDependents()
 			}
@@ -97,6 +107,16 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		this.add(outlet)
 		this.linkOutlets.push(outlet)
 		this.positionOutlet(outlet, this.linkOutlets.length - 1)
+	}
+
+	removeOutlet(outlet: LinkOutlet) {
+		for (let hook of outlet.linkHooks) {
+			if (hook.linked) {
+				this.mobject.board.removeDependencyAtHook(hook)
+			}
+		}
+		this.remove(outlet)
+		remove(this.linkOutlets, outlet)
 	}
 
 	positionOutlet(outlet: LinkOutlet, index: number) {

@@ -1,13 +1,27 @@
 
-export function remove(arr: Array<any>, value: any, all: boolean = false) {
-	// remove an object or value from an Array
-	// either the first encountered matching entry (if all = false)
-	// or every matching entry (if all = true)
-   for (let i = 0; i < arr.length; i++) {
+export function removeOne(arr: Array<any>, value: any): boolean {
+	// remove the first encountered matching entry of an object or value from an Array
+	for (let i = 0; i < arr.length; i++) {
 		if (arr[i] == value) {
-			arr.splice(i,1)
-			if (!all) { break }
+			arr.splice(i, 1)
+			return true
 		}
+	}
+	return false
+}
+
+export function removeAll(arr: Array<any>, value: any) {
+	var found = true
+	while (found) {
+		found = removeOne(arr, value)
+	}
+}
+
+export function remove(arr: Array<any>, value: any, all: boolean = false) {
+	if (all) {
+		removeAll(arr, value)
+	} else {
+		removeOne(arr, value)
 	}
 }
 
@@ -54,7 +68,14 @@ export function convertArrayToString(array: Array<string>): string {
 	return arrayString
 }
 
-
+export function removeDuplicates(arr: Array<any>): Array<any> {
+	let ret: Array<any> = []
+	for (let x of arr) {
+		if (ret.includes(x)) { continue }
+		ret.push(x)
+	}
+	return ret
+}
 
 
 

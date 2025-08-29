@@ -951,14 +951,29 @@ The content children can also be dragged and panned.
 			endHook.outlet.ioList.mobject,
 			endHook.outlet.name
 		)
-		startHook.removeDependencyBetween('positionInBoard', this.openLink.startBullet, 'midpoint')
-		endHook.removeDependencyBetween('positionInBoard', this.openLink.endBullet, 'midpoint')
+		startHook.removeAllDependents()
+		endHook.removeAllDependents()
 		startHook.outlet.removeHook()
-		startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
-		endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
+		if (this.openLink) {
+			startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+			endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
+		}
 	}
 
+	removeLink(link: DependencyLink) {
+		this.removeDependencyBetweenHooks(link.startHook, link.endHook)
+		remove(this.links, link)
+		this.remove(link)
+	}
 
+	removeDependencyAtHook(hook: LinkHook) {
+		for (let link of this.links) {
+			if (link.startHook == hook || link.endHook == hook) {
+				this.removeLink(link)
+				return
+			}
+		}
+	}
 
 	// innerInputHooks(): Array<LinkHook> {
 	// 	let arr: Array<LinkHook>  = []
