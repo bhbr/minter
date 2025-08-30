@@ -1,6 +1,6 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { Scroll } from './Scroll'
+import { Scroll } from 'core/mobjects/Scroll'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'

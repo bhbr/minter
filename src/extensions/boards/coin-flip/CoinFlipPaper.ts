@@ -2,16 +2,15 @@
 import { Paper } from 'core/Paper'
 import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCoinCreator'
 import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
-import { NumberBoxCreator } from 'core/boxes/NumberBox'
-import { NumberListBoxCreator } from 'core/boxes/NumberListBox'
-import { InputNumberBoxCreator } from 'extensions/creations/math/InputNumberBox/InputNumberBoxCreator'
+import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
+import { NumberListBoxCreator } from 'extensions/creations/math/boxes/NumberListBox'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
-import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator, LessThanBoxCreator } from 'core/boxes/BinaryOperatorBoxCreator'
-import { SumBoxCreator } from 'core/boxes/SumBox'
-import { AverageBoxCreator } from 'core/boxes/AverageBox'
-import { CumSumBoxCreator } from 'core/boxes/CumSumBox'
-import { CumAverageBoxCreator } from 'core/boxes/CumAverageBox'
+import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator, LessThanBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
+import { SumBoxCreator } from 'extensions/creations/math/box_functions/SumBox'
+import { AverageBoxCreator } from 'extensions/creations/math/box_functions/AverageBox'
+import { CumSumBoxCreator } from 'extensions/creations/math/box_functions/CumSumBox'
+import { CumAverageBoxCreator } from 'extensions/creations/math/box_functions/CumAverageBox'
 import { SequencePlotCreator } from 'extensions/creations/DesmosCalculator/SequencePlotCreator'
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
@@ -26,7 +25,7 @@ export class CoinFlipPaper extends Paper {
 			creationConstructors: {
 				'number': NumberBoxCreator,
 				'list': NumberListBoxCreator,
-				'input': InputNumberBoxCreator,
+				'num': NumberBoxCreator,
 				'slider': BoxSliderCreator,
 				'stepper': BoxStepperCreator,
 				'coin': PlayableCoinCreator,

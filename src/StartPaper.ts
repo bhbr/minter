@@ -11,10 +11,10 @@ import { Mobject } from './core/mobjects/Mobject'
 import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { PlayableCoin } from './extensions/creations/CoinFlipper/PlayableCoin'
 import { CoinRow } from './extensions/creations/CoinFlipper/CoinRow'
-import { LinkableNumberListBox } from './core/boxes/NumberListBox'
+import { NumberListBox } from './extensions/creations/math/boxes/NumberListBox'
 import { TestDesmosCalculator } from './extensions/creations/DesmosCalculator/TestDesmosCalculator'
 import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePlot'
-import { AddBox } from './core/boxes/BinaryOperatorBox'
+import { AddBox } from './extensions/creations/math/box_functions/BinaryOperatorBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 import { removeAll } from './core/functions/arrays'
 import { DesmosExpression } from './extensions/creations/DesmosCalculator/DesmosExpression'
@@ -27,11 +27,6 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let exp = new DesmosExpression({
-	anchor: [100, 100]
-})
-paper.addToContent(exp)
 
 
 
