@@ -34,11 +34,9 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 				this.update({ frameHeight: 200 })
 			}
 			let htmlel = el as HTMLElement
-			log(htmlel.style.width)
 			htmlel.style.width = `${this.frameWidth}px`
 			htmlel.style.top = '0px'
 			htmlel.style.height = `${this.frameHeight}px`
-			log(htmlel.style.width)
 		} else {
 			window.setTimeout(this.adjustWidth.bind(this), 50)
 		}
