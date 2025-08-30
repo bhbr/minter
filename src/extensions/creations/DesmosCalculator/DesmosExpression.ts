@@ -21,28 +21,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 
 	customizeLayout() {
 		super.customizeLayout()
-		for (let el of this.innerCanvas.view.div.querySelectorAll('*')) {
-			(el as HTMLElement).style.visibility = 'hidden'
-		}
-		let expel = this.innerCanvas.view.div.getElementsByClassName('dcg-expressionitem')[0] as HTMLDivElement
-		var ancestor = expel
-		while (ancestor !== this.innerCanvas.view.div) {
-			ancestor.style.visibility = 'visible'
-			ancestor = ancestor.parentNode as HTMLDivElement
-		}
-		let top = this.innerCanvas.view.div.getElementsByClassName('dcg-expression-top-bar')[0] as HTMLDivElement
-		top.style.display = 'none'
-
-		window.setTimeout(function() {
-			for (let tab of this.innerCanvas.view.div.getElementsByClassName('dcg-tab')) {
-				(tab as HTMLElement).style.display = 'none'
-			}
-			let xLabel = document.querySelector('[aria-label="Delete Expression 1"]') as HTMLElement
-			xLabel.style.display = 'none'
-		}.bind(this), 50)
-		this.update({
-			frameHeight: 50
-		})
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'
 		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel') as HTMLElement
@@ -53,6 +31,34 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		list.style.overflow = 'hidden'
 		let template = this.innerCanvas.view.div.querySelector('.dcg-template-expressioneach') as HTMLElement
 		template.style.overflow = 'hidden'
+		this.update({
+			frameHeight: 50
+		})
+
+
+		for (let el of this.innerCanvas.view.div.querySelectorAll('*')) {
+			//(el as HTMLElement).style.visibility = 'hidden'
+		}
+		let expel = this.innerCanvas.view.div.getElementsByClassName('dcg-expressionitem')[0] as HTMLDivElement
+		var ancestor = expel
+		while (ancestor !== this.innerCanvas.view.div) {
+			ancestor.style.visibility = 'visible'
+			ancestor = ancestor.parentNode as HTMLDivElement
+		}
+		let top = this.innerCanvas.view.div.getElementsByClassName('dcg-expression-top-bar')[0] as HTMLDivElement
+		top.style.display = 'none'
+
+		for (let tab of this.innerCanvas.view.div.getElementsByClassName('dcg-tab')) {
+			(tab as HTMLElement).style.display = 'none'
+		}
+		let xLabel = document.querySelector('[aria-label="Delete Expression 1"]') as HTMLElement
+		xLabel.style.display = 'none'
+
+		let styleEl = document.createElement('style')
+		styleEl.type = 'text/css'
+		styleEl.innerText = '.dcg-create-sliders { visibility: hidden; height: 0px; }'
+		document.head.appendChild(styleEl)
+
 	}
 
 	focus() {
@@ -68,7 +74,8 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	boundButtonDownByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
-		if (e.key == 'Enter') {
+		log(e.key)
+		if (e.key == 'Enter' || e.key == 'Return' || e.key == 'ArrowUp' || e.key == 'ArrowDown') {
 			this.blur()
 			e.preventDefault()
 			e.stopPropagation()
@@ -144,32 +151,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 				}
 			}
 		}
-
-		// if (this.properties.includes(variable)) {
-		// 	// if it is a linked input variable, undo this edit
-		// 	let hook = this.inputList.hookNamed(variable)
-		// 	if (hook) {
-		// 		if (hook.linked) {
-		// 			this.calculator.setExpression({
-		// 				id: id,
-		// 				latex: this.expressions[id]['latex']
-		// 			})
-		// 		} else {
-		// 			this.update()
-		// 			this.updateDependents()
-		// 		}
-		// 		return
-		// 	}
-		// } else {
-		// 	if (value !== null) {
-		// 		this.createSlidableVariable(variable, value)
-		// 	} else if (term !== null && term.length > 0) {
-		// 		let isError: boolean = this.calculator.expressionAnalysis[id].isError
-		// 		if (!isError) {
-		// 			this.createOutputVariable(variable)
-		// 		}
-		// 	}
-		// }		
 
 		this.expressions['1']['latex'] = newExpr['latex']
 	}

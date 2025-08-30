@@ -17,6 +17,8 @@ import { SequencePlot } from './extensions/creations/DesmosCalculator/SequencePl
 import { AddBox } from './core/boxes/BinaryOperatorBox'
 import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 import { removeAll } from './core/functions/arrays'
+import { DesmosExpression } from './extensions/creations/DesmosCalculator/DesmosExpression'
+import { DesmosExpressionSheet } from './extensions/creations/DesmosCalculator/DesmosExpressionSheet'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -25,5 +27,17 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
+
+let exp = new DesmosExpression({
+	anchor: [100, 100]
+})
+paper.addToContent(exp)
+
+
+
+
+
+
+
 
 
