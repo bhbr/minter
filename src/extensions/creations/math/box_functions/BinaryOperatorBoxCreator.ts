@@ -1,6 +1,7 @@
 
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox, LessThanBox } from './BinaryOperatorBox'
+import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox } from './BinaryOperatorBox'
+import { LessThanBox } from './ComparisonBox'
 
 export class BinaryOperatorBoxCreator extends DraggingCreator {
 	declare creation: BinaryOperatorBox
@@ -8,7 +9,7 @@ export class BinaryOperatorBoxCreator extends DraggingCreator {
 	setup() {
 		super.setup()
 		this.creation.operatorLabel.update({
-			text: this.creation.operatorDict[this.creation.operator]
+			text: this.creation.operatorLabelText()
 		})
 	}
 
@@ -42,12 +43,5 @@ export class DivideBoxCreator extends BinaryOperatorBoxCreator {
 	declare creation: DivideBox
 	createMobject(): DivideBox {
 		return new DivideBox()
-	}
-}
-
-export class LessThanBoxCreator extends BinaryOperatorBoxCreator {
-	declare creation: LessThanBox
-	createMobject(): LessThanBox {
-		return new LessThanBox()
 	}
 }

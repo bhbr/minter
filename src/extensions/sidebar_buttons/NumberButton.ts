@@ -6,7 +6,7 @@ export class NumberButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['number', 'list', 'input', 'slider', 'stepper'],
+			creations: ['number', 'list'],
 			icon: new ImageView({
 				imageLocation: '../../assets/number.png',
 				frameWidth: 25,

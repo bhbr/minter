@@ -50,7 +50,7 @@ export class NumberBox extends Linkable {
 		return Number(this.inputElement.value)
 	}
 	set value(newValue: number) {
-		this.inputElement.value = newValue.toString()
+		this.inputElement.value = (newValue == null) ? '' : newValue.toString()
 	}
 
 	focus() {
@@ -97,6 +97,7 @@ export class NumberBox extends Linkable {
 			}
 		}
 		this.update({ value: this.valueFromString(this.inputElement.value) })
+		this.updateDependents()
 		this.onReturn()
 	}
 
@@ -128,6 +129,9 @@ export class NumberBox extends Linkable {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
+		if (args['value'] !== undefined) {
+			this.inputElement.textContent = `${args['value']}`
+		}
 		this.background.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height

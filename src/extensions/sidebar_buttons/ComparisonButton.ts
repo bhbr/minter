@@ -1,12 +1,12 @@
 
 import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
 
-export class ArithmeticButton extends CreativeButton {
+export class ComparisonButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['+', '–', '&times;', '/'],
-			baseFontSize: 36
+			creations: ['<', '≤', '>', '≥', '=', '≠'],
+			baseFontSize: 24
 		}
 	}
 

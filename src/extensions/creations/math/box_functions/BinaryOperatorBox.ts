@@ -7,7 +7,7 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
-type operatorString = "+" | "–" | "&times;" | "/" | "<"
+type operatorString = '+' | '–' | '&times;' | '/' | '<' | '≤' | '>' | '≥' | '=' | '≠' 
 
 export class BinaryOperatorBox extends Linkable {
 
@@ -15,14 +15,14 @@ export class BinaryOperatorBox extends Linkable {
 	operand2: number | Array<number>
 	operator: operatorString
 	operatorSign: Circle
+	operatorSignDict: object
 	operatorLabel: TextLabel
-	operatorDict: object
 	valueType: 'number' | 'Array<number>'
 	valueBox: NumberBox | NumberListBox
 
 	defaults(): object {
 		return {
-			operatorDict: {"+": "+", "–": "–", "&times;": "&times;", "/": "/", "<": "<"},
+			operatorSignDict: { '–': '–' },
 			operatorSign: new Circle({
 				radius: 10,
 				fillColor: Color.black(),
@@ -65,13 +65,23 @@ export class BinaryOperatorBox extends Linkable {
 			midpoint: [this.view.frame.width / 2, 0]
 		})
 		this.operatorLabel.update({
-			text: this.operatorDict[this.operator],
+			text: this.operatorLabelText(),
 			frameWidth: 2 * this.operatorSign.radius,
 			frameHeight: 2 * this.operatorSign.radius
 		})
 		this.operatorLabel.view.div.style.fontSize = '14px'
 		this.operatorSign.add(this.operatorLabel)
 		this.add(this.operatorSign)
+		if (this.valueBox instanceof NumberBox) {
+			this.valueBox.inputElement.disabled = true
+			this.valueBox.inputElement.value = ''
+		} else if (this.valueBox instanceof NumberListBox) {
+			this.valueBox.scroll.update({ list: [] })
+		}
+	}
+
+	operatorLabelText(): string {
+		return this.operatorSignDict[this.operator] ?? this.operator
 	}
 
 	setValueTypeTo(newType: 'number' | 'Array<number>') {
@@ -85,6 +95,7 @@ export class BinaryOperatorBox extends Linkable {
 			this.valueBox = new NumberBox({
 				value: this.result()
 			})
+			this.valueBox.inputElement.disabled = true
 		} else {
 			return
 		}
@@ -116,16 +127,26 @@ export class BinaryOperatorBox extends Linkable {
 
 	computeNumberAndNumber(a: number, b: number, op: operatorString): number {
 		switch (op) {
-		case "+":
+		case '+':
 			return a + b
-		case "–":
+		case '–':
 			return a - b
-		case "&times;":
+		case '&times;':
 			return a * b
-		case "/":
+		case '/':
 			return a / b
-		case "<":
+		case '<':
 			return a < b ? 1 : 0
+		case '≤':
+			return a <= b ? 1 : 0
+		case '>':
+			return a > b ? 1 : 0
+		case '≥':
+			return a >= b ? 1 : 0
+		case '=':
+			return a === b ? 1 : 0
+		case '≠':
+			return a !== b ? 1 : 0
 		}
 	}
 
@@ -242,26 +263,6 @@ export class DivideBox extends BinaryOperatorBox {
 	}
 }
 
-
-export class LessThanBox extends BinaryOperatorBox {
-	defaults(): object {
-		return {
-			operator: '<',
- 			inputProperties: [
-				{ name: 'operand1', displayName: 'left side', type: 'number|Array<number>' },
-				{ name: 'operand2', displayName: 'right side', type: 'number|Array<number>' }
-			],
-			outputProperties: [
-				{ name: 'result', displayName: 'result', type: 'number|Array<number>' }
-			]
-		}
-	}
-	mutabilities(): object {
-		return {
-			operator: 'never'
-		}
-	}
-}
 
 
 

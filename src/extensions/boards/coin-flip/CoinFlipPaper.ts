@@ -6,7 +6,8 @@ import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
 import { NumberListBoxCreator } from 'extensions/creations/math/boxes/NumberListBox'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
 import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
-import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator, LessThanBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
+import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
+import { LessThanBoxCreator, LessThanOrEqualBoxCreator,GreaterThanBoxCreator, GreaterThanOrEqualBoxCreator, EqualsBoxCreator, NotEqualsBoxCreator } from 'extensions/creations/math/box_functions/ComparisonBoxCreator'
 import { SumBoxCreator } from 'extensions/creations/math/box_functions/SumBox'
 import { AverageBoxCreator } from 'extensions/creations/math/box_functions/AverageBox'
 import { CumSumBoxCreator } from 'extensions/creations/math/box_functions/CumSumBox'
@@ -35,6 +36,11 @@ export class CoinFlipPaper extends Paper {
 				'&times;': MultiplyBoxCreator,
 				'/': DivideBoxCreator,
 				'<': LessThanBoxCreator,
+				'≤': LessThanOrEqualBoxCreator,
+				'>': GreaterThanBoxCreator,
+				'≥': GreaterThanOrEqualBoxCreator,
+				'=': EqualsBoxCreator,
+				'≠': NotEqualsBoxCreator,
 				'expr': DesmosExpressionCreator,
 				'exprs': DesmosExpressionSheetCreator,
 				'sum': SumBoxCreator,
@@ -51,6 +57,7 @@ export class CoinFlipPaper extends Paper {
 				'CoinButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'ComparisonButton',
 				'AlgebraButton',
 				'ListFunctionsButton',
 				'PlotButton',
