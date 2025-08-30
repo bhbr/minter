@@ -833,7 +833,6 @@ The content children can also be dragged and panned.
 			if (this.openLink) {
 				this.remove(this.openLink)
 				if (this.openLink.startHook) {
-					log('here')
 					this.openLink.startHook.update({ linked: false })
 					this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
 				} else if (this.openLink.endHook) {
