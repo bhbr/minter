@@ -443,6 +443,10 @@ The content children can also be dragged and panned.
 				this.remove(child)
 			}
 		}
+		for (let link of this.links) {
+			log(link)
+			this.content.remove(link)
+		}
 	}
 
 	setControlsVisibility(visible: boolean) {
