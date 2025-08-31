@@ -50,7 +50,8 @@ export class NumberBox extends Linkable {
 		return Number(this.inputElement.value)
 	}
 	set value(newValue: number) {
-		this.inputElement.value = (newValue == null) ? '' : newValue.toString()
+		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
+		this.inputElement.value = isFalsy ? '' : newValue.toString()
 	}
 
 	focus() {
@@ -105,7 +106,6 @@ export class NumberBox extends Linkable {
 		return valueString
 	}
 
-
 	activateKeyboard() {
 		document.removeEventListener('keyup', this.boundActivateKeyboard)
 		document.addEventListener('keydown', this.boundKeyPressed)
@@ -147,6 +147,11 @@ export class NumberBox extends Linkable {
 		this.inputElement.disabled = false
 	}
 
+	clear() {
+		this.value = NaN
+		this.inputElement.value = ''
+	}
+
 }
 
 export class NumberBoxCreator extends DraggingCreator {
@@ -155,7 +160,8 @@ export class NumberBoxCreator extends DraggingCreator {
 
 	createMobject() {
 		return new NumberBox({
-			anchor: this.getStartPoint()
+			anchor: this.getStartPoint(),
+			value: null
 		})
 	}
 

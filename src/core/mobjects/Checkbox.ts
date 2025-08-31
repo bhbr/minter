@@ -24,7 +24,7 @@ export class Checkbox extends MGroup {
 			box: new TextLabel({
 				frameWidth: 18,
 				frameHeight: 18,
-				text: '&#10004;'
+				text: '&#10003;'
 			}),
 			label: new TextLabel({
 				frameWidth: 100,

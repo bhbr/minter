@@ -14,6 +14,7 @@ export class NumberListBox extends Linkable {
 	value: Array<number>
 	background: Rectangle
 	scroll: Scroll
+	clearButton: SimpleButton
 
 	defaults(): object {
 		return {
@@ -25,7 +26,18 @@ export class NumberListBox extends Linkable {
 			frameWidth: 80,
 			frameHeight: 200,
 			value: [],
-			preventDefault: false
+			preventDefault: false,
+			inputProperties: [
+				{ name: 'value', displayName: 'list', type: 'Array<number>' },
+				{ name: 'newestEntry', displayName: 'add entry', type: 'number' },
+			],
+			outputProperties: [
+				{ name: 'value', displayName: 'list', type: 'Array<number>' },
+				{ name: 'length', displayName: null, type: 'number' },
+			],
+			clearButton: new SimpleButton({
+				text: 'clear'
+			})
 		}
 	}
 
@@ -49,6 +61,11 @@ export class NumberListBox extends Linkable {
 		this.scroll.view.div.style.color = Color.white().toCSS()
 		this.inputList.positionSelf()
 		this.outputList.positionSelf()
+		this.clearButton.update({
+			anchor: [20, this.frameHeight + 10]
+		})
+		this.clearButton.action = this.clear.bind(this)
+		this.add(this.clearButton)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -74,34 +91,13 @@ export class NumberListBox extends Linkable {
 	}
 
 	clear() {
-		this.update({
-			value: []
-		})
+		this.update({ value: [] })
 		this.updateDependents()
-	}
-
-
-}
-
-export class LinkableNumberListBox extends NumberListBox {
-
-	clearButton: SimpleButton
-
-	defaults(): object {
-		return {
-			inputProperties: [
-				{ name: 'value', displayName: 'list', type: 'Array<number>' },
-				{ name: 'newestEntry', displayName: 'add entry', type: 'number' },
-			],
-			outputProperties: [
-				{ name: 'value', displayName: 'list', type: 'Array<number>' },
-				{ name: 'length', displayName: null, type: 'number' },
-			],
-			clearButton: new SimpleButton({
-				text: 'clear'
-			})
+		for (let dep of this.dependents()) {
+			if (dep instanceof NumberListBox) {
+				dep.clear()
+			}
 		}
-
 	}
 
 	length(): number {
@@ -112,17 +108,9 @@ export class LinkableNumberListBox extends NumberListBox {
 		return undefined // this.list[this.list.length - 1]
 	}
 	set newestEntry(newValue: number) {
-		if (isNaN(newValue) || newValue == Infinity || newValue == -Infinity) { return }
+		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
+		if (isFalsy) { return }
 		this.list.push(newValue)
-	}
-
-	setup() {
-		super.setup()
-		this.clearButton.update({
-			anchor: [20, this.frameHeight + 10]
-		})
-		this.clearButton.action = this.clear.bind(this)
-		this.add(this.clearButton)
 	}
 
 }
@@ -130,10 +118,10 @@ export class LinkableNumberListBox extends NumberListBox {
 
 export class NumberListBoxCreator extends DraggingCreator {
 	
-	declare creation: LinkableNumberListBox
+	declare creation: NumberListBox
 
 	createMobject() {
-		return new LinkableNumberListBox({
+		return new NumberListBox({
 			anchor: this.getStartPoint()
 		})
 	}

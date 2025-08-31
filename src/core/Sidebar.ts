@@ -25,6 +25,7 @@ export class Sidebar extends Mobject {
 	availableButtonClasses: Array<any>
 	buttons: Array<SidebarButton>
 	activeButton: SidebarButton
+	defaultKeys: Array<string>
 
 	defaults(): object {
 		return {
@@ -37,7 +38,6 @@ export class Sidebar extends Mobject {
 				width: SIDEBAR_WIDTH,
 				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
-
 			availableButtonClasses: [
 				DragButton
 			],
@@ -46,7 +46,8 @@ export class Sidebar extends Mobject {
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			defaultKeys: '1 2 3 4 5 6 7 8 9 0 q w e r t z u i o p'.split(' ')
 		}
 	}
 
@@ -75,12 +76,9 @@ export class Sidebar extends Mobject {
 		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
 
-
 		this.addDependency('frameWidth', this.background, 'width')
 		this.addDependency('frameHeight', this.background, 'height')
-
 	}
-
 
 	addButton(button: SidebarButton) {
 		let i = this.buttons.length
@@ -115,7 +113,7 @@ export class Sidebar extends Mobject {
 			let button = this.createButton(names[i])
 			button.update({
 				locationIndex: i,
-				key: (i + 1).toString()
+				key: this.defaultKeys[i]
 			})
 			this.addButton(button)
 		}

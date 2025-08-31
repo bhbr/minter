@@ -35,7 +35,7 @@ export class DesmosCalculator extends Linkable {
 			options: {},
 			clippingCanvas: new Mobject(),
 			innerCanvas: new Mobject(),
-			outerFrame: new Rectangle(),
+			outerFrame: new Rectangle({ strokeWidth: 0 }),
 			expressions: {},
 			secretInputExpressions: {},
 			outputHelperExpressions: {},
@@ -75,8 +75,8 @@ export class DesmosCalculator extends Linkable {
 			height: this.view.frame.height
 		})
 		this.innerCanvas.view.frame.update({
-			width: 1000,
-			height: 1000
+			width: 500,
+			height: 500
 		})
 		this.innerCanvas.update({
 			screenEventHandler: ScreenEventHandler.Auto
@@ -136,7 +136,19 @@ export class DesmosCalculator extends Linkable {
 
 	adjustWidth() { }
 
-
+	showKeypad() {
+		log('showKeypad')
+		this.calculator.openKeypad()
+		window.setTimeout(function() {
+			let keypad = this.innerCanvas.view.div.querySelector('.dcg-keypad') as HTMLElement
+			var ancestor = keypad
+			while (ancestor !== this.innerCanvas.view.div) {
+				ancestor.style.visibility = 'visible'
+				ancestor = ancestor.parentNode as HTMLDivElement
+			}
+			this.clippingCanvas.view.div.style.overflow = 'visible'
+		}.bind(this), 500)
+	}
 
 
 

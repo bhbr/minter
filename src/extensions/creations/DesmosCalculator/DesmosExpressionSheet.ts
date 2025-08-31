@@ -6,6 +6,16 @@ import { log } from 'core/functions/logging'
 
 export class DesmosExpressionSheet extends DesmosCalculator {
 
+	width: number
+	height: number
+
+	defaults(): object {
+		return {
+			width: 300,
+			height: 300
+		}
+	}
+
 	customizeLayout() {
 		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		el1.style.visibility = 'hidden'
@@ -25,14 +35,14 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	adjustSize() {
+		this.width = Math.max(this.width, 300)
+		this.height = Math.max(this.height, 300)
 		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
 		if (el) {
-			if (this.frameWidth < 300) {
-				this.update({ frameWidth: 300 })
-			}
-			if (this.frameHeight < 200) {
-				this.update({ frameHeight: 200 })
-			}
+			this.update({
+				frameWidth: this.width,
+				frameHeight: this.height
+			})
 			let htmlel = el as HTMLElement
 			htmlel.style.width = `${this.frameWidth}px`
 			htmlel.style.top = '0px'
@@ -311,6 +321,28 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 		let hook = link.endHook ?? link.previousHook
 		this.unlinkFreeVariable(hook.outlet.name)
 	}
+
+	focus() {
+		super.focus()
+		this.update({
+			frameWidth: 502,
+			frameHeight: 270
+		})
+		this.showKeypad()
+		this.adjustSize()
+	}
+
+	blur() {
+		super.blur()
+		this.update({
+			frameWidth: this.width,
+			frameHeight: this.height
+		})
+		this.adjustSize()
+
+	}
+
+
 
 
 }

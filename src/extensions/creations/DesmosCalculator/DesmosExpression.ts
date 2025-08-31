@@ -4,6 +4,7 @@ import { log } from 'core/functions/logging'
 import { removeAll, removeDuplicates } from 'core/functions/arrays'
 import { View } from 'core/mobjects/View'
 import { DependencyLink } from 'core/linkables/DependencyLink'
+import { getPaper } from 'core/functions/getters'
 
 export class DesmosExpression extends DesmosExpressionSheet {
 
@@ -64,6 +65,7 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	focus() {
 		super.focus()
 		document.addEventListener('keydown', this.boundButtonDownByKey, { capture: true })
+		this.showKeypad()
 	}
 
 	setup() {
