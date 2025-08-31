@@ -50,17 +50,19 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip()
+		this.flip(true)
 	}
 
-	flip() {
-		this.coin.flip()
+	flip(animate: boolean = false) {
+		this.coin.flip(animate)
 		this.update()
 		this.updateDependents()
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(this.flip.bind(this), 250)
+		this.playIntervalID = window.setInterval(function() {
+			this.flip(true)
+		}.bind(this), 250)
 		this.playState = 'play'
 	}
 	

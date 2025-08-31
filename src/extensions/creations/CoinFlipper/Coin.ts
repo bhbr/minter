@@ -54,10 +54,20 @@ export class Coin extends Circle {
 		return args
 	}
 
-	flip() {
+	flip(animate: boolean = false) {
 		let x = Math.random()
 		let newState = (x < this.tailsProbability) ? 'tails' : 'heads'
-		this.update({ state: newState })
+		if (animate) {
+			this.update({
+				fillColor: Color.black(),
+				labelText: ''
+			})
+			window.setTimeout(function() {
+				this.update({ state: newState })
+			}.bind(this), 50)
+		} else {
+			this.update({ state: newState })
+		}
 	}
 
 	get labelText(): string {
