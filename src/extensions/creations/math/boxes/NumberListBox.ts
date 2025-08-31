@@ -8,6 +8,7 @@ import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class NumberListBox extends Linkable {
 	
@@ -111,6 +112,14 @@ export class NumberListBox extends Linkable {
 		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
 		if (isFalsy) { return }
 		this.list.push(newValue)
+	}
+
+	addedInputLink(link: DependencyLink) {
+		log(link)
+		if (link.endHook.outlet.name == 'newestEntry') {
+			log('clearing')
+			this.clear()
+		}
 	}
 
 }

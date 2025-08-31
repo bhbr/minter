@@ -12,7 +12,6 @@ import { Mobject } from 'core/mobjects/Mobject'
 export class LinkHook extends Circle {
 
 	mobject?: Linkable
-	name: string
 	outlet?: LinkOutlet // TODO: redirect to parent
 	linked: boolean
 
