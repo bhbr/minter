@@ -36,8 +36,6 @@ which can be linked to such-exposed variables of other mobjects.
 			outputList: new OutputList(),
 			inputProperties: [],
 			outputProperties: [],
-//			inputs: [],
-//			outputs: [],
 			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self
 		}

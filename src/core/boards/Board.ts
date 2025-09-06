@@ -383,6 +383,7 @@ The content children can also be dragged and panned.
 		}
 		if (mob instanceof Linkable) {
 			mob.hideLinks()
+			mob.setControlsVisibility(this.isShowingControls)
 		}
 		if (mob instanceof Board) {
 			if (mob.constructor.name == 'Construction') { return }
