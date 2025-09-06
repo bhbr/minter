@@ -17,6 +17,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	customizeLayout() {
+		log('DesmosExpressionSheet.customizeLayout')
 		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		el1.style.visibility = 'hidden'
 		this.adjustSize()
@@ -35,6 +36,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	adjustSize() {
+		log('DesmosExpressionSheet.adjustSize')
 		this.width = Math.max(this.width, 300)
 		this.height = Math.max(this.height, 300)
 		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
@@ -43,12 +45,16 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 				frameWidth: this.width,
 				frameHeight: this.height
 			})
+			this.clippingCanvas.update({
+				frameWidth: this.width,
+				frameHeight: this.height
+			})
 			let htmlel = el as HTMLElement
-			htmlel.style.width = `${this.frameWidth}px`
+			htmlel.style.width = `100%`
 			htmlel.style.top = '0px'
 			htmlel.style.height = `${this.frameHeight}px`
 		} else {
-			window.setTimeout(this.adjustWidth.bind(this), 50)
+			window.setTimeout(this.adjustSize.bind(this), 50)
 		}
 	}
 

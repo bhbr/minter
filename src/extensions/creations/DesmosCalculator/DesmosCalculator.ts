@@ -44,6 +44,7 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	setup() {
+		log('DesmosCalculator.setup')
 		super.setup()
 		this.setupCanvases()
 		this.setupOuterFrame()
@@ -64,12 +65,14 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	createCalculator(options: object = {}) {
+		log('createCalculator')
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
 		window.setTimeout(this.customizeLayout.bind(this), 50)
 	}
 
 	setupCanvases() {
+		log('setupCanvases')
 		this.clippingCanvas.view.frame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height

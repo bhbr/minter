@@ -21,6 +21,7 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	}
 
 	customizeLayout() {
+		log('DesmosExpression.customizeLayout')
 		super.customizeLayout()
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'

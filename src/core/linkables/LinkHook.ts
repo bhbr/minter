@@ -3,7 +3,7 @@ import { vertex } from 'core/functions/vertex'
 import { Linkable } from './Linkable'
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
-import { HOOK_RADIUS } from './constants'
+import { HOOK_RADIUS, BULLET_RADIUS } from './constants'
 import { LinkOutlet } from './LinkOutlet'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
@@ -14,6 +14,7 @@ export class LinkHook extends Circle {
 	mobject?: Linkable
 	outlet?: LinkOutlet // TODO: redirect to parent
 	linked: boolean
+	linkedBulletIndicator: Circle
 
 	defaults(): object {
 		return {
@@ -24,7 +25,13 @@ export class LinkHook extends Circle {
 			strokeColor: Color.white(),
 			mobject: null,
 			outlet: null,
-			linked: false
+			linked: false,
+			linkedBulletIndicator: new Circle({
+				radius: BULLET_RADIUS,
+				fillColor: Color.white(),
+				fillOpacity: 1,
+				midpoint: [HOOK_RADIUS, HOOK_RADIUS]
+			})
 		}
 	}
 
@@ -39,9 +46,27 @@ export class LinkHook extends Circle {
 		}
 	}
 
+	setup() {
+		super.setup()
+		if (this.linked) {
+			this.add(this.linkedBulletIndicator)
+		}
+	}
+
 	positionInBoard(): vertex {
 		let board = this.outlet.ioList.mobject.board
 		return this.parent.frame.transformLocalPoint(this.midpoint, board.frame)
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['linked'] !== undefined) {
+			if (this.linked) {
+				this.add(this.linkedBulletIndicator)
+			} else {
+				this.remove(this.linkedBulletIndicator)
+			}
+		}
 	}
 
 
