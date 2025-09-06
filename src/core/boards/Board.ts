@@ -88,6 +88,7 @@ The content children can also be dragged and panned.
 			compatibleHooks: [],
 			creationTool: null,
 			isShowingLinks: false,
+			isShowingControls: false,
 			allowingDrag: false,
 			lastHoveredChild: null
 		}
@@ -415,9 +416,15 @@ The content children can also be dragged and panned.
 				break
 			case 'link':
 				this.setLinking(value as boolean)
+				if (value) {
+					this.setControlsVisibility(false)
+				} else {
+					this.setControlsVisibility(this.isShowingControls)
+				}
 				break
 			case 'ctrl':
 				this.setControlsVisibility(value as boolean)
+				this.isShowingControls = value
 				break
 			case 'create':
 				this.creationMode = value
@@ -617,6 +624,7 @@ The content children can also be dragged and panned.
 	// the list of dependencies between the linkable content children
 	links: Array<DependencyLink>
 	isShowingLinks: boolean
+	isShowingControls: boolean
 	lastHoveredChild: Linkable | null
 
 	linkableChildren(): Array<Linkable> {
