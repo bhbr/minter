@@ -2,6 +2,7 @@
 import { SidebarButton } from './SidebarButton'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent } from 'core/mobjects/screen_events'
+import { ImageView } from 'core/mobjects/ImageView'
 
 export class RestartButton extends SidebarButton {
 	
@@ -9,17 +10,21 @@ export class RestartButton extends SidebarButton {
 		return {
 			baseColor: Color.green(),
 			baseFontSize: 36,
-			messageKey: 'restart',
-			messages: [],
-			outgoingMessage: { restart: true }
+			messageKey: 'clearStrokes',
+			touchDownMessages: [
+				{ 'clearStrokes': false },
+				{ 'restart': false }
+			],
+			touchUpMessages: [
+				{ clearStrokes: true },
+				{ restart: true }
+			],
+			icon: new ImageView({
+				imageLocation: '../../assets/clearStrokes.png',
+				frameWidth: 30,
+				frameHeight: 30
+			})
 		}
-	}
-
-	setup() {
-		super.setup()
-		this.label.update({
-			text: '&circlearrowleft;'
-		})
 	}
 
 	onPointerMove(e: ScreenEvent) { }

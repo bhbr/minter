@@ -408,8 +408,8 @@ The content children can also be dragged and panned.
 	}
 
 	handleMessage(key: string, value: any) {
-		if (value === "0") { value = false }
-		if (value === "1") { value = true }
+		if (value === '0') { value = false }
+		if (value === '1') { value = true }
 		this.enableContent()
 		switch (key) {
 			case 'drag':
@@ -434,9 +434,24 @@ The content children can also be dragged and panned.
 				this.creator = this.createCreator(this.creationMode)
 				this.add(this.creator)
 				break
-			case 'restart':
-				this.restart()
+			case 'clearStrokes':
+				if (value) {
+					this.clearStrokes()
+				}
 				break
+			case 'restart':
+				if (value) {
+					this.restart()
+				}
+				break
+		}
+	}
+
+	clearStrokes() {
+		for (let mob of this.contentChildren) {
+			if (mob instanceof Freehand) {
+				this.content.remove(mob)
+			}
 		}
 	}
 

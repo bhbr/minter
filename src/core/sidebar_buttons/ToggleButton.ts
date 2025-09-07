@@ -24,8 +24,8 @@ export class ToggleButton extends SidebarButton {
 		let outgoingMessage = {}
 		outgoingMessage[this.messageKey] = false
 		this.update({
-			messages: [message, message], // 2nd entry for locking
-			outgoingMessage: outgoingMessage
+			touchDownMessages: [message, message], // 2nd entry for locking
+			touchUpMessages: [outgoingMessage]
 		})
 	}
 

@@ -12,7 +12,7 @@ export class ColorChangeButton extends SidebarButton {
 	defaults(): object {
 		return {
 			colorNames: Object.keys(COLOR_PALETTE),
-			outgoingMessage: {},
+			touchUpMessages: [{}],
 			optionSpacing: 15,
 			showLabel: false
 		}
@@ -29,7 +29,7 @@ export class ColorChangeButton extends SidebarButton {
 		this.label.view.div.setAttribute('fill', 'black')
 
 		for (let name of this.colorNames) {
-			this.messages.push({color: name, target: 'paper'})
+			this.touchDownMessages.push({ color: name, target: 'paper' })
 		}
 	}
 
@@ -52,7 +52,7 @@ export class ColorChangeButton extends SidebarButton {
 		this.view.fillColor = this.colorForIndex(this.currentModeIndex)
 		this.updateLabel()
 		this.label.update({text: ''})
-		this.messagePaper(this.outgoingMessage)
+		this.messagePaper(this.touchUpMessages[0])
 		this.update()
 	}
 

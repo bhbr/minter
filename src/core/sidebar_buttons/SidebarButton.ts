@@ -34,8 +34,8 @@ export class SidebarButton extends Circle {
 	label?: TextLabel
 	icon?: ImageView
 
-	messages: Array<object>
-	outgoingMessage: object
+	touchDownMessages: Array<object>
+	touchUpMessages: Array<object>
 	key: string
 	activeKeyboard: boolean
 	paper?: Paper
@@ -50,8 +50,8 @@ export class SidebarButton extends Circle {
 
 			label: new TextLabel(),
 			icon: null,
-			messages: [],
-			outgoingMessage: {},
+			touchDownMessages: [],
+			touchUpMessages: [],
 
 			strokeWidth: 0,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -122,7 +122,7 @@ export class SidebarButton extends Circle {
 		}
 	}
 
-	numberOfIndices(): number { return this.messages.length }
+	numberOfIndices(): number { return this.touchDownMessages.length }
 
 	colorForIndex(i: number): Color {
 		return this.baseColor
@@ -158,8 +158,8 @@ export class SidebarButton extends Circle {
 		})
 		this.updateLabel()
 		this.updateIcon()
-		if (this.messages.length ==0) { return }
-		this.messagePaper(this.messages[0])
+		if (this.touchDownMessages.length ==0) { return }
+		this.messagePaper(this.touchDownMessages[0])
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -177,9 +177,9 @@ export class SidebarButton extends Circle {
 		var dx: number = p[0] - this.touchStart[0]
 
 		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
-		newIndex = Math.min(Math.max(newIndex, 0), this.messages.length - 1)
+		newIndex = Math.min(Math.max(newIndex, 0), this.touchDownMessages.length - 1)
 		dx += this.previousIndex * this.optionSpacing
-		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.messages.length - 1))
+		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
 
 		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
 		
@@ -204,6 +204,12 @@ export class SidebarButton extends Circle {
 	}
 
 	commonButtonUp() {
+		if (this.touchUpMessages.length == 1) {
+			this.messagePaper(this.touchUpMessages[0])
+		} else if (this.touchUpMessages.length > 1) {
+			this.messagePaper(this.touchUpMessages[this.currentModeIndex])
+		}
+
 		this.currentModeIndex = 0
 		let dx: number = this.currentModeIndex * this.optionSpacing
 		let newMidpoint = [buttonCenter(this.locationIndex)[0] + dx, buttonCenter(this.locationIndex)[1]]
@@ -227,7 +233,7 @@ export class SidebarButton extends Circle {
 		})
 		this.updateLabel()
 		this.updateIcon()
-		this.messagePaper(this.outgoingMessage)
+		
 	}
 	
 	messagePaper(message: object) {
@@ -248,7 +254,7 @@ export class SidebarButton extends Circle {
 
 		if (this.label) {
 			try {
-				let msg = this.messages[this.currentModeIndex]
+				let msg = this.touchDownMessages[this.currentModeIndex]
 				this.label.update({
 					text: this.labelFromMessage(msg)
 				})
@@ -274,7 +280,7 @@ export class SidebarButton extends Circle {
 	}
 
 	imageNameForIndex(index: number): string {
-		return 'key'
+		return (Object.keys(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
 	}
 
 	labelFromMessage(msg: object): string {
@@ -293,7 +299,7 @@ export class SidebarButton extends Circle {
 			return
 		}
 		this.currentModeIndex = newIndex
-		let message: object = this.messages[this.currentModeIndex]
+		let message: object = this.touchDownMessages[this.currentModeIndex]
 		this.update({
 			fillColor: this.colorForIndex(this.currentModeIndex)
 		})
@@ -306,7 +312,7 @@ export class SidebarButton extends Circle {
 	}
 	
 	selectNextOption() {
-		if (this.currentModeIndex == this.messages.length - 1) { return }
+		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
 		this.update({
 			midpoint: vertexTranslatedBy(this.midpoint, [this.optionSpacing, 0])
 		})

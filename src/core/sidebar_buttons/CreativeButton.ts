@@ -8,7 +8,7 @@ export class CreativeButton extends SidebarButton {
 	defaults(): object {
 		return {
 			creations: [],
-			outgoingMessage: { create: 'freehand' }
+			touchUpMessages: [{ create: 'freehand' }]
 		}
 	}
 
@@ -20,7 +20,7 @@ export class CreativeButton extends SidebarButton {
 
 	setup() {
 		for (let c of this.creations) {
-			this.messages.push({ create: c })
+			this.touchDownMessages.push({ create: c })
 		}
 		super.setup()
 	}
@@ -30,7 +30,7 @@ export class CreativeButton extends SidebarButton {
 	}
 
 	imageNameForIndex(index: number): string {
-		return (Object.values(this.messages[index] ?? {}) ?? ['key'])[0]
+		return (Object.values(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
 	}
 
 }
