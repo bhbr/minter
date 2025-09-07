@@ -6,56 +6,130 @@ import { log } from 'core/functions/logging'
 
 export class DesmosExpressionSheet extends DesmosCalculator {
 
-	width: number
-	height: number
+	compactWidth: number
+	compactHeight: number
+	expandedWidth: number
+	expandedHeight: number
+	expanded: boolean
 
 	defaults(): object {
 		return {
-			width: 300,
-			height: 300
+			compactWidth: 200,
+			compactHeight: 150,
+			expandedWidth: 502,
+			expandedHeight: 380,
+			minWidth: 200,
+			minHeight: 150,
+			expanded: false
 		}
 	}
 
-	customizeLayout() {
-		log('DesmosExpressionSheet.customizeLayout')
-		let el1 = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
-		el1.style.visibility = 'hidden'
-		this.adjustSize()
-		let el3 = this.innerCanvas.view.div.getElementsByClassName('dcg-pillbox-container')[0] as HTMLElement
-		el3.style.visibility = 'hidden'
-		let el4 = this.innerCanvas.view.div.getElementsByClassName('dcg-add-expression-btn')[0] as HTMLElement
-		el4.style.top = '-25px'
-		let el5 = this.innerCanvas.view.div.getElementsByClassName('dcg-action-undo')[0] as HTMLElement
-		el5.style.top = '-25px'
-		el5.style.left = '-35px'
-		let el6 = this.innerCanvas.view.div.getElementsByClassName('dcg-action-redo')[0] as HTMLElement
-		el6.style.top = '-25px'
-		el6.style.right = '-35px'
-		let el8 = this.innerCanvas.view.div.getElementsByClassName('dcg-graphpaper-branding')[0] as HTMLElement
-		el8.style.bottom = '0px'
+	ensureMinimumFrameSize() {
+		log('DesmosExpressionSheet.ensureMinimumFrameSize')
+		this.update({
+			compactWidth: Math.max(this.compactWidth, this.minWidth),
+			compactHeight: Math.max(this.compactHeight, this.minHeight),
+			expandedWidth: Math.max(this.expandedWidth, this.compactWidth),
+			expandedHeight: Math.max(this.expandedHeight, this.compactHeight)
+		}, false)
+		var changedFrame: boolean = false
+		if (this.frameWidth < this.minWidth) {
+			this.update({ frameWidth: this.minWidth })
+			changedFrame = true
+		}
+		if (this.frameHeight < this.minHeight) {
+			this.update({ frameHeight: this.minHeight })
+			changedFrame = true
+		}
+		if (changedFrame) {
+			this.layoutFrames()
+		}
 	}
 
-	adjustSize() {
-		log('DesmosExpressionSheet.adjustSize')
-		this.width = Math.max(this.width, 300)
-		this.height = Math.max(this.height, 300)
+	layoutFrames() {
+		log('DesmosExpressionSheet.layoutFrames')
+		log(`${this.frameWidth} ${this.frameHeight}`)
+		if (this.expanded) {
+			this.expand()
+		} else {
+			this.contract()
+		}
+	}
+
+	layoutContent() {
+		log('DesmosExpressionSheet.layoutContent')
+		let grapher = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
+		grapher.style.visibility = 'hidden'
+		grapher.style.width = '0%'
+		let expressionPanel = this.innerCanvas.view.div.getElementsByClassName('dcg-exppanel-outer')[0] as HTMLElement
+		expressionPanel.style.width = `${this.frameWidth}px`
+		expressionPanel.style.height = `${this.frameHeight}px`
+		expressionPanel.style.top = '0px'
+		let pillBoxes = this.innerCanvas.view.div.getElementsByClassName('dcg-pillbox-container')[0] as HTMLElement
+		pillBoxes.style.visibility = 'hidden'
+		let addButton = this.innerCanvas.view.div.getElementsByClassName('dcg-add-expression-btn')[0] as HTMLElement
+		addButton.style.top = '-25px'
+		let undoButton = this.innerCanvas.view.div.getElementsByClassName('dcg-action-undo')[0] as HTMLElement
+		undoButton.style.top = '-25px'
+		undoButton.style.left = '-35px'
+		let redoButton = this.innerCanvas.view.div.getElementsByClassName('dcg-action-redo')[0] as HTMLElement
+		redoButton.style.top = '-25px'
+		redoButton.style.right = '-35px'
+		let logo = this.innerCanvas.view.div.getElementsByClassName('dcg-expressions-branding')[0] as HTMLElement
+		logo.style.bottom = '0px'
+	}
+
+	contract() {
+		log('DesmosExpressionSheet.contract')
 		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
 		if (el) {
+			log(`compact width: ${this.compactWidth}`)
 			this.update({
-				frameWidth: this.width,
-				frameHeight: this.height
+				frameWidth: this.compactWidth,
+				frameHeight: this.compactHeight
 			})
-			this.clippingCanvas.update({
-				frameWidth: this.width,
-				frameHeight: this.height
-			})
-			let htmlel = el as HTMLElement
-			htmlel.style.width = `100%`
-			htmlel.style.top = '0px'
-			htmlel.style.height = `${this.frameHeight}px`
+			super.layoutFrames()
+			// let htmlel = el as HTMLElement
+			// htmlel.style.top = '0px'
+			// htmlel.style.width = `${this.visibleWidth}px`
+			// htmlel.style.height = `${this.visibleHeight}px`
 		} else {
-			window.setTimeout(this.adjustSize.bind(this), 50)
+			window.setTimeout(this.contract.bind(this), 50)
 		}
+	}
+
+	expand() {
+		log('DesmosExpressionSheet.expand')
+		// this.update({
+		// 	frameWidth: this.hiddenWidth,
+		// 	frameHeight: this.hiddenWidth
+		// })
+		// this.clippingCanvas.update({
+		// 	frameWidth: this.hiddenWidth,
+		// 	frameHeight: this.hiddenHeight
+		// })
+		// this.innerCanvas.update({
+		// 	frameWidth: this.hiddenWidth,
+		// 	frameHeight: this.hiddenHeight
+		// })
+		// let htmlel = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer') as HTMLElement
+		// htmlel.style.top = '0px'
+		// htmlel.style.width = `${this.hiddenWidth}px`
+		// htmlel.style.height = `${this.hiddenHeight}px`
+
+	}
+
+
+	focus() {
+		super.focus()
+		this.showKeypad()
+		this.expand()
+	}
+
+	blur() {
+		super.blur()
+		this.hideKeypad()
+		this.contract()
 	}
 
 	calculatorExpressionDict(): object {
@@ -328,25 +402,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 		this.unlinkFreeVariable(hook.outlet.name)
 	}
 
-	focus() {
-		super.focus()
-		this.update({
-			frameWidth: 502,
-			frameHeight: 270
-		})
-		this.showKeypad()
-		this.adjustSize()
-	}
-
-	blur() {
-		super.blur()
-		this.update({
-			frameWidth: this.width,
-			frameHeight: this.height
-		})
-		this.adjustSize()
-
-	}
 
 
 

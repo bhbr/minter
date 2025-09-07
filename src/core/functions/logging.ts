@@ -79,8 +79,11 @@ function jsLog(msg: any) {
 	if (typeof msg == 'string') {
 		console.log(logString(msg))
 	} else {
-		console.log(`${Date.now()}`)
-		console.log(msg)
+		if (logTimestamps) {
+			console.log(`${Date.now()}`, msg)
+		} else {
+			console.log(msg)
+		}
 	}
 }
 

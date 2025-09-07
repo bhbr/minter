@@ -4,7 +4,7 @@ import { SpanningCreator } from 'core/creators/SpanningCreator'
 
 export class HistogramCreator extends SpanningCreator {
 
-	createdMobject(): Histogram {
+	createMobject(): Histogram {
 		let p = this.getStartPoint()
 		return new Histogram({
 			anchor: p,
@@ -13,10 +13,5 @@ export class HistogramCreator extends SpanningCreator {
 		})
 	}
 
-	dissolve() {
-		let cm = this.createdMobject()
-		this.parent.addToContent(cm)
-		this.parent.remove(this)
-	}
 
 }

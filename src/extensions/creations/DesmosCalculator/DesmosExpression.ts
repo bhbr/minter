@@ -15,14 +15,25 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		return {
 			freeVariables: [],
 			outputVariable: null,
-			frameWidth: 300,
+			minWidth: 200,
+			minHeight: 50,
+			compactWidth: 200,
+			compactHeight: 50,
+			frameWidth: 200,
 			frameHeight: 50
 		}
 	}
 
-	customizeLayout() {
-		log('DesmosExpression.customizeLayout')
-		super.customizeLayout()
+	mutabilities(): object {
+		return {
+			minWidth: 'never',
+			minHeight: 'never'
+		}
+	}
+
+	layoutContent() {
+		log('DesmosExpression.layoutContent')
+		super.layoutContent()
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'
 		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel') as HTMLElement
@@ -33,14 +44,12 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		list.style.overflow = 'hidden'
 		let template = this.innerCanvas.view.div.querySelector('.dcg-template-expressioneach') as HTMLElement
 		template.style.overflow = 'hidden'
-		this.update({
-			frameHeight: 50
-		})
+		let logo = this.innerCanvas.view.div.getElementsByClassName('dcg-expressions-branding')[0] as HTMLElement
+		logo.style.display = 'none'
 
-
-		for (let el of this.innerCanvas.view.div.querySelectorAll('*')) {
-			//(el as HTMLElement).style.visibility = 'hidden'
-		}
+		//for (let el of this.innerCanvas.view.div.querySelectorAll('*')) {
+		//	(el as HTMLElement).style.visibility = 'hidden'
+		//}
 		let expel = this.innerCanvas.view.div.getElementsByClassName('dcg-expressionitem')[0] as HTMLDivElement
 		var ancestor = expel
 		while (ancestor !== this.innerCanvas.view.div) {
@@ -53,20 +62,23 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		for (let tab of this.innerCanvas.view.div.getElementsByClassName('dcg-tab')) {
 			(tab as HTMLElement).style.display = 'none'
 		}
-		let xLabel = document.querySelector('[aria-label="Delete Expression 1"]') as HTMLElement
+		let xLabel = this.innerCanvas.view.div.querySelector('[aria-label="Delete Expression 1"]') as HTMLElement
 		xLabel.style.display = 'none'
 
 		let styleEl = document.createElement('style')
 		styleEl.type = 'text/css'
 		styleEl.innerText = '.dcg-create-sliders { visibility: hidden; height: 0px; }'
 		document.head.appendChild(styleEl)
-
 	}
 
 	focus() {
 		super.focus()
 		document.addEventListener('keydown', this.boundButtonDownByKey, { capture: true })
-		this.showKeypad()
+	}
+
+	blur() {
+		super.blur()
+		document.removeEventListener('keydown', this.boundButtonDownByKey)
 	}
 
 	setup() {
@@ -82,11 +94,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 			e.preventDefault()
 			e.stopPropagation()
 		}
-	}
-
-	blur() {
-		super.blur()
-		document.removeEventListener('keydown', this.boundButtonDownByKey)
 	}
 
 	onChange(eventName: string, event: object) {
@@ -215,7 +222,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 			})
 		}
 	}
-
 
 
 

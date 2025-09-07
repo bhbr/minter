@@ -8,11 +8,11 @@ export class DesmosExpressionSheetCreator extends SpanningCreator {
 
 	declare creation: DesmosExpressionSheet
 
-	createMobject() {
+	createMobject(): DesmosExpressionSheet {
 		return new DesmosExpressionSheet({
 			anchor: this.getStartPoint(),
-			frameWidth: Math.max(this.getWidth(), 300),
-			frameHeight: Math.max(this.getHeight(), 200),
+			compactWidth: this.getWidth(),
+			compactHeight: this.getHeight()
 		})
 	}
 

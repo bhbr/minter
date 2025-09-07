@@ -8,15 +8,15 @@ export class DesmosExpressionCreator extends DraggingCreator {
 
 	declare creation: DesmosExpression
 
-	createMobject() {
+	createMobject(): DesmosExpression {
 		return new DesmosExpression({
 			anchor: this.getStartPoint()
 		})
 	}
 
-	updateFromTip(q: vertex, redraw: boolean = true) {
-		super.updateFromTip(q, redraw)
-		this.creation.hideLinks()
-	}
+	// updateFromTip(q: vertex, redraw: boolean = true) {
+	// 	super.updateFromTip(q, redraw)
+	// 	this.creation.hideLinks()
+	// }
 
 }

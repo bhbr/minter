@@ -4,7 +4,7 @@ import { SpanningCreator } from 'core/creators/SpanningCreator'
 
 export class SequencePlotCreator extends SpanningCreator {
 
-	createdMobject(): SequencePlot {
+	createMobject(): SequencePlot {
 		let p = this.getStartPoint()
 		return new SequencePlot({
 			anchor: p,
@@ -13,10 +13,5 @@ export class SequencePlotCreator extends SpanningCreator {
 		})
 	}
 
-	dissolve() {
-		let cm = this.createdMobject()
-		this.parent.addToContent(cm)
-		this.parent.remove(this)
-	}
 
 }
