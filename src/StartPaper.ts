@@ -19,6 +19,8 @@ import { BoxSlider } from './extensions/creations/math/BoxSlider/BoxSlider'
 import { removeAll } from './core/functions/arrays'
 import { DesmosExpression } from './extensions/creations/DesmosCalculator/DesmosExpression'
 import { DesmosExpressionSheet } from './extensions/creations/DesmosCalculator/DesmosExpressionSheet'
+import { Rectangle } from './core/shapes/Rectangle'
+import { ScreenEventHandler } from './core/mobjects/screen_events'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -27,11 +29,6 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-
-
-
-
 
 
 

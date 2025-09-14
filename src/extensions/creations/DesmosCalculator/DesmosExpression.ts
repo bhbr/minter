@@ -5,6 +5,7 @@ import { removeAll, removeDuplicates } from 'core/functions/arrays'
 import { View } from 'core/mobjects/View'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { getPaper } from 'core/functions/getters'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class DesmosExpression extends DesmosExpressionSheet {
 
@@ -15,12 +16,13 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		return {
 			freeVariables: [],
 			outputVariable: null,
-			minWidth: 200,
-			minHeight: 50,
-			compactWidth: 200,
-			compactHeight: 50,
-			frameWidth: 200,
-			frameHeight: 50
+			minWidth: 300,
+			minHeight: 100,
+			compactWidth: 300,
+			compactHeight: 100,
+			expandedHeight: 270,
+			frameWidth: 300,
+			frameHeight: 100
 		}
 	}
 
@@ -31,8 +33,9 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		}
 	}
 
+
 	layoutContent() {
-		log('DesmosExpression.layoutContent')
+		//log('DesmosExpression.layoutContent')
 		super.layoutContent()
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'
@@ -72,16 +75,31 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	}
 
 	focus() {
+		//log('DesmosExpression.focus')
 		super.focus()
+		this.expand()
 		document.addEventListener('keydown', this.boundButtonDownByKey, { capture: true })
 	}
 
 	blur() {
+		//log('DesmosExpression.blur')
 		super.blur()
+		this.contract()
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
+		//log(this.freeVariables)
+		// if (this.freeVariables.length == 0) {
+		// 	this.outerFrame.update({
+		// 		screenEventHandler: ScreenEventHandler.Parent
+		// 	})
+		// } else {
+		// 	this.outerFrame.update({
+		// 		screenEventHandler: ScreenEventHandler.Below
+		// 	})
+		// }
 	}
 
 	setup() {
+		//log('DesmosExpression.setup')
 		super.setup()
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 	}
@@ -89,6 +107,7 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	boundButtonDownByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
+		log('DesmosExpression.buttonDownByKey')
 		if (e.key == 'Enter' || e.key == 'Return' || e.key == 'ArrowUp' || e.key == 'ArrowDown') {
 			this.blur()
 			e.preventDefault()
@@ -129,10 +148,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		let isFreeVariable = (value != null && !isNaN(value))
 		let h = 50 + (isFreeVariable ? 20 : 0)
 
-		window.setTimeout(function() {
-			this.setHeight(h)
-		}.bind(this), 50)
-
 		let outputVariable = this.definedVariable(newExpr)
 		if (outputVariable) {
 			if (!this.isOutputVariable(outputVariable)) {
@@ -164,6 +179,11 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		this.expressions['1']['latex'] = newExpr['latex']
 	}
 
+	createSlidableVariable(name: string, value: number) {
+		super.createSlidableVariable(name, value)
+		this.freeVariables.push(name)
+	}
+
 	extractInputVariables(term: string): Array<string> {
 		var term2 = term
 		let specialCharsFullString = '0 1 2 3 4 5 6 7 8 9 . + - \\cdot / \\frac ( ) [ ] { } \\{ \\} \\left \\right \\sqrt ^ * \\log \\ln \\exp \\sin \\cos \\tan \\cot \\sec \\csc \\arcsin \\arccos \\arctan \\atan \\arccot \\arcsec \\arccsc \\pi'
@@ -175,22 +195,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		removeAll(arr, '')
 		let vars = removeDuplicates(arr)
 		return vars
-	}
-
-	setHeight(h: number) {
-		this.update({
-			frameHeight: h
-		})
-		this.clippingCanvas.update({
-			frameHeight: h
-		})
-		this.outerFrame.update({
-			frameHeight: h,
-			height: h
-		})
-		let panel = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer') as HTMLElement
-		panel.style.height = `${h}px`
-		this.outputList.positionSelf()
 	}
 
 	addedInputLink(link: DependencyLink) {

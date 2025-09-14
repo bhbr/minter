@@ -25,7 +25,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	ensureMinimumFrameSize() {
-		log('DesmosExpressionSheet.ensureMinimumFrameSize')
+		//log('DesmosExpressionSheet.ensureMinimumFrameSize')
 		this.update({
 			compactWidth: Math.max(this.compactWidth, this.minWidth),
 			compactHeight: Math.max(this.compactHeight, this.minHeight),
@@ -48,7 +48,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 
 	layoutFrames() {
 		log('DesmosExpressionSheet.layoutFrames')
-		log(`${this.frameWidth} ${this.frameHeight}`)
+		//log(`${this.frameWidth} ${this.frameHeight}`)
 		if (this.expanded) {
 			this.expand()
 		} else {
@@ -57,7 +57,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	layoutContent() {
-		log('DesmosExpressionSheet.layoutContent')
+		//log('DesmosExpressionSheet.layoutContent')
 		let grapher = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		grapher.style.visibility = 'hidden'
 		grapher.style.width = '0%'
@@ -79,57 +79,50 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 		logo.style.bottom = '0px'
 	}
 
-	contract() {
-		log('DesmosExpressionSheet.contract')
+	resizeFrame(width: number, height: number) {
+		//log('DesmosExpressionSheet.contract')
 		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
 		if (el) {
-			log(`compact width: ${this.compactWidth}`)
+			//log(`compact width: ${this.compactWidth}`)
 			this.update({
-				frameWidth: this.compactWidth,
-				frameHeight: this.compactHeight
+				frameWidth: width,
+				frameHeight: height
 			})
 			super.layoutFrames()
-			// let htmlel = el as HTMLElement
-			// htmlel.style.top = '0px'
-			// htmlel.style.width = `${this.visibleWidth}px`
-			// htmlel.style.height = `${this.visibleHeight}px`
+			let htmlel = el as HTMLElement
+			window.setTimeout(function() {
+				htmlel.style.top = '0px'
+				htmlel.style.width = `${width}px`
+				htmlel.style.height = `${height}px`
+			}, 50)
 		} else {
-			window.setTimeout(this.contract.bind(this), 50)
+			window.setTimeout(this.resizeFrame.bind(this, width, height), 50)
 		}
 	}
 
-	expand() {
-		log('DesmosExpressionSheet.expand')
-		// this.update({
-		// 	frameWidth: this.hiddenWidth,
-		// 	frameHeight: this.hiddenWidth
-		// })
-		// this.clippingCanvas.update({
-		// 	frameWidth: this.hiddenWidth,
-		// 	frameHeight: this.hiddenHeight
-		// })
-		// this.innerCanvas.update({
-		// 	frameWidth: this.hiddenWidth,
-		// 	frameHeight: this.hiddenHeight
-		// })
-		// let htmlel = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer') as HTMLElement
-		// htmlel.style.top = '0px'
-		// htmlel.style.width = `${this.hiddenWidth}px`
-		// htmlel.style.height = `${this.hiddenHeight}px`
-
+	contract() {
+		this.resizeFrame(this.compactWidth, this.compactHeight)
 	}
 
+	expand() {
+		this.resizeFrame(this.expandedWidth, this.expandedHeight)
+	}
 
 	focus() {
+		//log('DesmosExpressionSheet.focus')
 		super.focus()
 		this.showKeypad()
 		this.expand()
 	}
 
 	blur() {
+		//log('DesmosExpressionSheet.blur')
 		super.blur()
 		this.hideKeypad()
 		this.contract()
+		for (let label of this.innerCanvas.view.div.querySelectorAll('.dcg-minLabel')) {
+			(label as HTMLElement).style.display = 'none'
+		}
 	}
 
 	calculatorExpressionDict(): object {
@@ -270,13 +263,19 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	createSlidableVariable(name: string, value: number) {
+		log(`slidable ${name} ${value}`)
 		if (name == null) { return }
 	 	this.secretInputExpressions[name] = this.calculator.HelperExpression({ latex: name })
 		this.createInputVariable(name, value)
 		this.createOutputVariable(name)
+		// window.setTimeout( function() {
+		// 	this.innerCanvas.view.div.querySelector('.dcg-minLabel').addEventListener('click', this.handleClick.bind(this), true)
+		// 	this.innerCanvas.view.div.querySelector('.dcg-maxLabel').addEventListener('click', this.handleClick.bind(this), true)
+		// }.bind(this), 100)
 	}
 
 	createInputVariable(name: string, value: number) {
+		//log(`input ${name} ${value}`)
 		this.createProperty(name, value)
 		this.inputProperties.push({
 			name: name,
