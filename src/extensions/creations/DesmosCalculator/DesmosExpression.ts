@@ -20,7 +20,7 @@ export class DesmosExpression extends DesmosExpressionSheet {
 			minHeight: 100,
 			compactWidth: 300,
 			compactHeight: 100,
-			expandedHeight: 270,
+			expandedHeight: 300,
 			frameWidth: 300,
 			frameHeight: 100
 		}
@@ -86,6 +86,8 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		super.blur()
 		this.contract()
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
+		let keypad = this.view.div.querySelector('.dcg-keypad') as HTMLElement
+		keypad.style.display = 'none'
 		//log(this.freeVariables)
 		// if (this.freeVariables.length == 0) {
 		// 	this.outerFrame.update({

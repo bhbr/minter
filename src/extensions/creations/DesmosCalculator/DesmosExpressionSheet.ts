@@ -113,6 +113,9 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 		super.focus()
 		this.showKeypad()
 		this.expand()
+		for (let label of this.innerCanvas.view.div.querySelectorAll('.dcg-minLabel')) {
+			(label as HTMLElement).inert = false
+		}
 	}
 
 	blur() {
@@ -121,7 +124,7 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 		this.hideKeypad()
 		this.contract()
 		for (let label of this.innerCanvas.view.div.querySelectorAll('.dcg-minLabel')) {
-			(label as HTMLElement).style.display = 'none'
+			(label as HTMLElement).inert = true
 		}
 	}
 

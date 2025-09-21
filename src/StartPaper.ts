@@ -30,6 +30,3 @@ if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
-
-
-
