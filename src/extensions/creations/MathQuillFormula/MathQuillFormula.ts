@@ -7,6 +7,10 @@ import { log } from 'core/functions/logging'
 //import { evaluateTex } from 'tex-math-parser/src/index'
 import { Lexer } from './Lexer'
 import { Parser } from './Parser'
+import { createMinterMathNode } from './createMinterMathNode'
+import { equalArrays, remove } from 'core/functions/arrays'
+import { IOProperty } from 'core/linkables/Linkable'
+import { MinterAssignmentNode } from './MinterMathNode'
 
 declare var MathQuill: any
 
@@ -16,6 +20,8 @@ export class MathQuillFormula extends Linkable {
 	MQ: any
 	mathField: any
 	scope: object
+	parser: Parser
+	value: number
 
 	defaults(): object {
 		return {
@@ -24,7 +30,14 @@ export class MathQuillFormula extends Linkable {
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
 			mathField: null,
-			scope: {}
+			scope: {},
+			parser: new Parser([]),
+			outputProperties: [{
+				name: 'value',
+				type: 'number',
+				displayName: 'value'
+			}],
+			value: 0
 		}
 	}
 
@@ -64,16 +77,16 @@ export class MathQuillFormula extends Linkable {
 	}
 
 	loadTexMathParserAPI() {
-		log('loadTexMathParser')
-		let mathJSTag = document.createElement('script')
-		mathJSTag.src = 'https://cdn.jsdelivr.net/npm/mathjs'
-		mathJSTag.onload = function() {
-		log('done loading mathJS')
-		// // 	let parserTag = document.createElement('script')
-		// // 	parserTag.src = 'https://cdn.jsdelivr.net/npm/tex-math-parser'
-		// // 	document.head.append(parserTag)
-		}
-		document.head.append(mathJSTag)
+		// log('loadTexMathParser')
+		// let mathJSTag = document.createElement('script')
+		// mathJSTag.src = 'https://cdn.jsdelivr.net/npm/mathjs'
+		// mathJSTag.onload = function() {
+		// log('done loading mathJS')
+		// // // 	let parserTag = document.createElement('script')
+		// // // 	parserTag.src = 'https://cdn.jsdelivr.net/npm/tex-math-parser'
+		// // // 	document.head.append(parserTag)
+		// }
+		// document.head.append(mathJSTag)
 	}
 
 	createMathField() {
@@ -87,8 +100,8 @@ export class MathQuillFormula extends Linkable {
 		this.mathField = this.MQ.MathField(span, {
 			handlers: {
 				edit: function() {
-					var enteredMath = this.mathField.latex()
-					this.computeValue(enteredMath)
+					this.updateIOProperties()
+					this.updateValue()
 				}.bind(this)
 			}
 		})
@@ -115,8 +128,6 @@ export class MathQuillFormula extends Linkable {
 	}
 	boundDectivateKeyboard() { }
 
-
-
 	boundKeyPressed(e: ScreenEvent) { }
 
 	keyPressed(e: KeyboardEvent) {
@@ -141,12 +152,109 @@ export class MathQuillFormula extends Linkable {
 		getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
 	}
 
-	computeValue(latex: string): number {
+	updateIOProperties() {
+		let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
+		this.parser.tokens = tokens
+		let node = this.parser.parseTokens(this.parser.tokens)
+		let variables = node.variables()
+		let inputNames = this.inputNames()
+		for (let v of variables) {
+			if (!inputNames.includes(v)) {
+				this.createInputVariable(v, NaN)
+			}
+		}
+		for (let v of inputNames) {
+			if (!variables.includes(v)) {
+				this.removeInputVariable(v)
+			}
+		}
+		if (node instanceof MinterAssignmentNode) {
+			log(node)
+			if (this.outputNames()[0] !== node.name) {
+				this.createOutputVariable(node.name)
+			}
+		}
+	}
+
+	computeValue(): number {
+		let latex = this.mathField.latex()
 		let lexer = new Lexer()
 		let tokens = lexer.tokenizeTex(latex)
-		let parser = new Parser(tokens)
-		let result = parser.evaluateTex(latex, this.scope)
+		log(tokens)
+		let node = this.parser.parseTokens(tokens)
+		log(node)
+		let result = this.parser.evaluateTex(latex, this.scope)
 		return result
+	}
+
+	updateValue() {
+		let prop = this.outputNames()[0]
+		this[prop] = this.computeValue()
+	}
+
+	createInputVariable(name: string, value: number) {
+		//log(`input ${name} ${value}`)
+		this.createProperty(name, value)
+		this.inputProperties.push({
+			name: name,
+			type: 'number',
+			displayName: name
+		})
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.inputList.view.hide()
+	}
+
+	removeInputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				remove(this.inputProperties, prop)
+				break
+			}
+		}
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.inputList.view.hide()
+	}
+
+	createOutputVariable(name: string) {
+		if (name == null) { return }
+		this.createProperty(name, 0)
+		this.outputProperties = [{
+			name: name,
+			type: 'number',
+			displayName: name
+		}]
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.outputList.view.hide()
+	}
+
+	removeOutputVariable() {
+		this.outputProperties = [{
+			name: 'value',
+			type: 'number',
+			displayName: 'value'
+		}]
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.outputList.view.hide()
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		for (let v of this.inputNames()) {
+			if (Object.keys(args).includes(v)) {
+				this.scope[v] = args[v]
+			}
+			this.updateValue()
+		}
+		super.update(args, redraw)
 	}
 
 
@@ -155,3 +263,24 @@ export class MathQuillFormula extends Linkable {
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

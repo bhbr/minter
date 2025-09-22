@@ -3,6 +3,7 @@ import { ParseError } from './ParseError'
 import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
 import { Lexer } from './Lexer'
 import { createMinterMathNode, rightGrouping, primaryTypes } from './createMinterMathNode'
+import { MinterMathNode } from './MinterMathNode'
 
 // scope used by evaluateTex to resolve identifiers
 export type Scope = { [key: string]: any }
@@ -173,7 +174,7 @@ export class Parser {
 				implicitMult = true
 			}
 			leftFactor = createMinterMathNode(operator, [leftFactor, rightFactor])
-			(leftFactor as any).implicit = implicitMult
+			leftFactor.implicit = implicitMult
 		}
 		return leftFactor
 	}
@@ -285,8 +286,8 @@ export class Parser {
 			primary = this.nextFrac()
 			break
 		case TokenType.Begin:
-			// matrix is the only currently supported environnment: if more are added, another
-			// token of lookahead would be required to know which environnment to parse
+			// matrix is the only currently supported environment: if more are added, another
+			// token of lookahead would be required to know which environment to parse
 			primary = this.nextMatrix()
 			break
 		default:
@@ -374,7 +375,7 @@ export class Parser {
 	* Consume the next group of arguments according to the following production:
 	*
 	* argument => grouping
-	* | expr
+	* 	| expr
 	*
 	* @returns The root node of an expression tree.
 	*/
@@ -498,7 +499,8 @@ export class Parser {
 	*
 	* @returns The root node of a MathJS expression tree.
 	*/
-	parseTokens(tokens: Array<Token>): any {
+	parseTokens(tokens: Array<Token>): MinterMathNode {
+		//return this.nextExpression() as MinterMathNode
 		return (new Parser(tokens)).nextExpression()
 	}
 
@@ -507,7 +509,7 @@ export class Parser {
 	 * @returns Returns an object containing the root node of a MathJS expression tree
 	 *          and variables that need to be defined.
 	 */
-	parseTex(texStr: string): any {
+	parseTex(texStr: string): MinterMathNode {
 	  return this.parseTokens(this.lexer.tokenizeTex(texStr))
 	}
 

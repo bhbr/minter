@@ -3,6 +3,10 @@ export class MinterMathNode {
 	value(scope: object = {}): number {
 		return NaN
 	}
+
+	variables(): Array<string> {
+		return []
+	}
 }
 
 export class MinterSymbolNode extends MinterMathNode {
@@ -23,6 +27,13 @@ export class MinterSymbolNode extends MinterMathNode {
 			return scope[this.name] ?? NaN
 		}
 	}
+
+	variables(): Array<string> {
+		if (['tau', 'pi', 'e'].includes(this.name)) {
+			return []
+		}
+		return [this.name]
+	}
 }
 
 export class MinterConstantNode extends MinterMathNode {
@@ -37,15 +48,22 @@ export class MinterConstantNode extends MinterMathNode {
 }
 
 export class MinterAssignmentNode extends MinterMathNode {
-	name: string
+	symbol: MinterSymbolNode
 	child: MinterMathNode
-	constructor(name, child) {
+	constructor(symbol, child) {
 		super()
-		this.name = name
+		this.symbol = symbol
 		this.child = child
 	}
+	get name(): string {
+		return this.symbol.name
+	}
+
 	value(scope: object = {}): number {
 		return this.child.value(scope)
+	}
+	variables(): Array<string> {
+		return this.child.variables()
 	}
 }
 
@@ -57,6 +75,9 @@ export class MinterFunctionNode extends MinterMathNode {
 		super()
 		this.name = name
 		this.child = child
+	}
+	variables(): Array<string> {
+		return this.child.variables()
 	}
 
 	value(scope: object = {}): number {
@@ -111,6 +132,11 @@ export class MinterOperatorNode extends MinterMathNode {
 		super()
 		this.name = name
 		this.children = children
+	}
+	variables(): Array<string> {
+		let vars1 = this.children[0].variables()
+		let vars2 = this.children[1].variables()
+		return vars1.concat(vars2).sort()
 	}
 
 	value(scope: object = {}): number {

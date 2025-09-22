@@ -186,6 +186,13 @@ which can be linked to such-exposed variables of other mobjects.
 		link.startHook.outlet.removeUnlinkedHook()
 	}
 
+	inputNames(): Array<string> {
+		return this.inputProperties.map((prop) => prop.name)
+	}
+
+	outputNames(): Array<string> {
+		return this.outputProperties.map((prop) => prop.name)
+	}
 
 }
 

@@ -7,7 +7,7 @@ import { MinterMathNode, MinterSymbolNode, MinterConstantNode, MinterFunctionNod
 * Create the corresponding MathJS node of a Token and its children.
 * @returns A newly constructed MathJS node.
 */
-export function createMinterMathNode(token: Token, children: Array<MinterMathNode> = []): any {
+export function createMinterMathNode(token: Token, children: Array<MinterMathNode> = []): MinterMathNode {
 	let fn = typeToOperation[token.type]
 	switch (token.type) {
 	case TokenType.Minus:
@@ -15,7 +15,7 @@ export function createMinterMathNode(token: Token, children: Array<MinterMathNod
 		fn = children.length === 1 ? 'unaryMinus' : fn
 		// falls through
 	case TokenType.Plus:
-		return new MinterOperatorNode('+', children)
+		return new MinterOperatorNode((token.type == TokenType.Plus) ? '+' : '-', children)
 	case TokenType.Star:
 		return new MinterOperatorNode('*', children)
 	case TokenType.Frac:
@@ -44,7 +44,7 @@ export function createMinterMathNode(token: Token, children: Array<MinterMathNod
 	case TokenType.Ln:
 		return new MinterFunctionNode(fn, children[0])
 	case TokenType.Equals:
-		return new MinterAssignmentNode(children[0], children[1])
+		return new MinterAssignmentNode(children[0] as MinterSymbolNode, children[1])
 	case TokenType.Variable:
 		return new MinterSymbolNode(token.lexeme)
 	case TokenType.Number:
