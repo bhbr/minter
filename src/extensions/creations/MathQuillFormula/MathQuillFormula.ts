@@ -94,7 +94,7 @@ export class MathQuillFormula extends Linkable {
 		let p = document.createElement('p')
 		let span = document.createElement('span')
 		span.style.color = 'white'
-		span.style.caretColor = 'white'
+		span.style.backgroundColor = 'black'
 		p.append(span)
 		this.view.div.append(p)
 		this.mathField = this.MQ.MathField(span, {

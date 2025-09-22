@@ -17,7 +17,7 @@
   display: inline-block;
 }
 .mq-editable-field .mq-cursor {
-  border-left: 1px solid black;
+  border-left: 1px solid white;
   margin-left: -1px;
   position: relative;
   z-index: 1;
@@ -87,6 +87,7 @@
   white-space: nowrap;
   overflow: hidden;
   vertical-align: middle;
+  caret-color: white;
 }
 .mq-math-mode {
   font-variant: normal;
