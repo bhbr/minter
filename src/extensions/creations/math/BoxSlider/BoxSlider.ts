@@ -1,10 +1,13 @@
 
 import { Linkable } from 'core/linkables/Linkable'
 import { vertex, vertexSubtract } from 'core/functions/vertex'
+import { getPaper, getSidebar } from 'core/functions/getters'
+import { log } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
-import { eventVertex, ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
+import { SimpleNumberBox } from 'extensions/creations/math/boxes/SimpleNumberBox'
 
 export class BoxSlider extends Linkable {
 /*
@@ -35,6 +38,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	valueBeforeScrubbing: number
 	scrubStartingPoint: vertex
 
+	// limits
+	minValueInputBox: SimpleNumberBox
+	maxValueInputBox: SimpleNumberBox
+
 	defaults(): object {
 		return {
 			inputProperties: [],
@@ -64,7 +71,15 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			fillColor: Color.black(),
 			barFillColor: Color.gray(0.5),
 			screenEventHandler: ScreenEventHandler.Self,
-			precision: 3
+			precision: 3,
+			minValueInputBox: new SimpleNumberBox({
+				anchor: [10, 10],
+				value: 0
+			}),
+			maxValueInputBox: new SimpleNumberBox({
+				anchor: [10, -30],
+				value: 1
+			})
 		}
 	}
 
@@ -89,8 +104,52 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			frameWidth: this.width,
 			frameHeight: this.height
 		})
+
+		this.add(this.minValueInputBox)
+		this.add(this.maxValueInputBox)
+
+		this.minValueInputBox.blur = this.endMinValueEditing.bind(this)
+		this.minValueInputBox.onReturn = this.endMinValueEditing.bind(this)
+		this.maxValueInputBox.blur = this.endMaxValueEditing.bind(this)
+		this.maxValueInputBox.onReturn = this.endMaxValueEditing.bind(this)
 		this.updateDependents()
 		this.outputList.update()
+	}
+
+	endMinValueEditing() {
+		getPaper().blurFocusedChild()
+		this.minValueInputBox.inputElement.blur()
+		document.removeEventListener('keydown', this.minValueInputBox.boundKeyPressed)
+		this.updateMinValue()
+	}
+
+	endMaxValueEditing() {
+		getPaper().blurFocusedChild()
+		this.maxValueInputBox.inputElement.blur()
+		document.removeEventListener('keydown', this.maxValueInputBox.boundKeyPressed)
+		this.updateMaxValue()
+	}
+
+	updateMinValue() {
+		let minValue = Number(this.minValueInputBox.value)
+		if (minValue >= this.max) {
+			this.minValueInputBox.value = this.min
+		} else {
+			this.update({
+				min: minValue
+			}, true)
+		}
+	}
+
+	updateMaxValue() {
+		let maxValue = Number(this.maxValueInputBox.value)
+		if (maxValue <= this.min) {
+			this.maxValueInputBox.value = this.max
+		} else {
+			this.update({
+				max: maxValue
+			}, true)
+		}
 	}
 
 	normalizedValue(): number {
@@ -106,6 +165,9 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		}
 		if (args['height'] !== undefined) {
 			this.view.frame.height = this.height
+			this.minValueInputBox.update({
+				anchor: [10, this.height + 10]
+			})
 		}
 
 		//// updating submobs
@@ -142,8 +204,10 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		var newValue = this.valueBeforeScrubbing - scrubVector[1]/this.height * (this.max - this.min)
 		newValue = Math.max(Math.min(newValue, this.max), this.min)
 		newValue = Math.round(newValue * 10**this.precision) / 10**this.precision
-		this.update({ value: newValue})
+		this.update({ value: newValue })
 	}
+
+
 
 }
 
