@@ -23,6 +23,10 @@ import { Rectangle } from './core/shapes/Rectangle'
 import { ScreenEventHandler } from './core/mobjects/screen_events'
 import { MathQuillFormula } from './extensions/creations/MathQuillFormula/MathQuillFormula'
 
+//import { parseTex, evaluateTex, Scope } from './tex-math-parser/src/index'
+
+//declare var evaluateTex: any
+
 export class StartPaper extends CoinFlipPaper { }
 
 export const TESTING = true
@@ -38,3 +42,12 @@ paper.addToContent(mq)
 window.setTimeout(function() {
 	mq.mathField.latex('x^2')
 }, 1000)
+
+
+
+
+
+
+
+
+

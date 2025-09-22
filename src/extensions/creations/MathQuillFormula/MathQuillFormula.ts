@@ -4,13 +4,18 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { ScreenEventHandler, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
+//import { evaluateTex } from 'tex-math-parser/src/index'
+import { Lexer } from './Lexer'
+import { Parser } from './Parser'
 
 declare var MathQuill: any
+
 
 export class MathQuillFormula extends Linkable {
 
 	MQ: any
 	mathField: any
+	scope: object
 
 	defaults(): object {
 		return {
@@ -18,7 +23,8 @@ export class MathQuillFormula extends Linkable {
 			frameHeight: 50,
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
-			mathField: null
+			mathField: null,
+			scope: {}
 		}
 	}
 
@@ -26,6 +32,7 @@ export class MathQuillFormula extends Linkable {
 		super.setup()
 		if (!getPaper().loadedAPIs.includes('mathquill')) {
 			this.loadMathQuillAPI()
+			this.loadTexMathParserAPI()
 		} else {
 			this.createMathField()
 		}
@@ -54,6 +61,19 @@ export class MathQuillFormula extends Linkable {
 
 		}.bind(this)
 		document.head.append(cssLinkTag)
+	}
+
+	loadTexMathParserAPI() {
+		log('loadTexMathParser')
+		let mathJSTag = document.createElement('script')
+		mathJSTag.src = 'https://cdn.jsdelivr.net/npm/mathjs'
+		mathJSTag.onload = function() {
+		log('done loading mathJS')
+		// // 	let parserTag = document.createElement('script')
+		// // 	parserTag.src = 'https://cdn.jsdelivr.net/npm/tex-math-parser'
+		// // 	document.head.append(parserTag)
+		}
+		document.head.append(mathJSTag)
 	}
 
 	createMathField() {
@@ -121,15 +141,13 @@ export class MathQuillFormula extends Linkable {
 		getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
 	}
 
-	computeValue(latex: string) {
-		log(latex)
+	computeValue(latex: string): number {
+		let lexer = new Lexer()
+		let tokens = lexer.tokenizeTex(latex)
+		let parser = new Parser(tokens)
+		let result = parser.evaluateTex(latex, this.scope)
+		return result
 	}
-
-
-
-
-
-
 
 
 

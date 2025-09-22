@@ -20,6 +20,6 @@
     "include": [
         "../../src/core/*",
         "../../src/extensions/*",
-        "../../src/_tests/*",
+        "../../src/_tests/*"
     ]
 }
