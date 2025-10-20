@@ -22,6 +22,8 @@ import { DesmosExpressionSheet } from './extensions/creations/DesmosCalculator/D
 import { Rectangle } from './core/shapes/Rectangle'
 import { ScreenEventHandler } from './core/mobjects/screen_events'
 import { MathQuillFormula } from './extensions/creations/MathQuillFormula/MathQuillFormula'
+import {roundedString } from './core/functions/various'
+import { CoinSet } from './extensions/creations/CoinFlipper/CoinSet'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -30,15 +32,6 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let mq = new MathQuillFormula({
-	anchor: [100, 100]
-})
-paper.addToContent(mq)
-
-
-
-
 
 
 

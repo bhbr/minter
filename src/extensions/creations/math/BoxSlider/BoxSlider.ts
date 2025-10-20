@@ -107,13 +107,18 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 		this.add(this.minValueInputBox)
 		this.add(this.maxValueInputBox)
+		this.minValueInputBox.inputElement.value = this.min.toString()
+		this.maxValueInputBox.inputElement.value = this.max.toString()
 
 		this.minValueInputBox.blur = this.endMinValueEditing.bind(this)
 		this.minValueInputBox.onReturn = this.endMinValueEditing.bind(this)
 		this.maxValueInputBox.blur = this.endMaxValueEditing.bind(this)
 		this.maxValueInputBox.onReturn = this.endMaxValueEditing.bind(this)
+
 		this.updateDependents()
 		this.outputList.update()
+
+		this.moveToTop(this.outputList)
 	}
 
 	endMinValueEditing() {

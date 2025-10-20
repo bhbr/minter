@@ -3,12 +3,12 @@ import { Coin } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { Color } from 'core/classes/Color'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -32,8 +32,8 @@ export class CoinRow extends Linkable implements Playable {
 			coinRadius: 25,
 			nbCoins: 12,
 			coinSpacing: 16,
-			headsColor: new Color(0, 0.3, 1),
-			tailsColor: Color.red(),
+			headsColor: HEADS_COLOR,
+			tailsColor: TAILS_COLOR,
 			tailsProbability: 0.5,
 			playState: 'stop',
 			playIntervalID: null,
@@ -56,7 +56,8 @@ export class CoinRow extends Linkable implements Playable {
 			],
 			outputProperties: [
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
-				{ name: 'nbTails', displayName: '# tails', type: 'number' }
+				{ name: 'nbTails', displayName: '# tails', type: 'number' },
+				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 			frameWidth: 300,
 			frameHeight: 50
@@ -197,6 +198,10 @@ export class CoinRow extends Linkable implements Playable {
 
 	nbHeads(): number { return this.nbCoins - this.nbTails() }
 	nbHeadsAsString(): string { return this.nbHeads().toString() }
+
+	mean(): number {
+		return this.nbTails() / this.nbCoins
+	}
 
 	update(args: object = {}, redraw: boolean = false) {
 		let newNbCoins = args['nbCoins']

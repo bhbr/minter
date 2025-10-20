@@ -3,6 +3,7 @@ import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { TextLabel } from 'core/mobjects/TextLabel'
+import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
 export class Coin extends Circle {
 	
@@ -16,8 +17,8 @@ export class Coin extends Circle {
 		return {
 			state: 'heads',
 			radius: 25,
-			headsColor: new Color(0, 0.3, 1),
-			tailsColor: Color.red(),
+			headsColor: HEADS_COLOR,
+			tailsColor: TAILS_COLOR,
 			tailsProbability: 0.5,
 			label: new TextLabel({
 				fontSize: 24,

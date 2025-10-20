@@ -1,11 +1,11 @@
 
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
-import { ScreenEventDevice, separateSidebar, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'core/constants'
 import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
@@ -70,6 +70,8 @@ export class Paper extends Board {
 			width: width,
 			height: height
 		})
+		let el = document.querySelector('#htmlConsole') as HTMLElement
+		el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 		//window.addEventListener('resize', this.resize.bind(this))
 		this.resize()
 	}

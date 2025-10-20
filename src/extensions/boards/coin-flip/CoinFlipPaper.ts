@@ -2,6 +2,7 @@
 import { Paper } from 'core/Paper'
 import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCoinCreator'
 import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
+import { CoinSetCreator } from 'extensions/creations/CoinFlipper/CoinSetCreator'
 import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
 import { NumberListBoxCreator } from 'extensions/creations/math/boxes/NumberListBox'
 import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
@@ -31,6 +32,7 @@ export class CoinFlipPaper extends Paper {
 				'stepper': BoxStepperCreator,
 				'coin': PlayableCoinCreator,
 				'coinrow': CoinRowCreator,
+				'coinset': CoinSetCreator,
 				'+': AddBoxCreator,
 				'–': SubtractBoxCreator,
 				'&times;': MultiplyBoxCreator,

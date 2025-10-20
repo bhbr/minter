@@ -201,6 +201,7 @@ export class MathQuillFormula extends Linkable {
 	}
 
 	resultBoxText(): string {
+		if (isNaN(this.value)) { return '' }
 		return `=${this.value}`
 	}
 

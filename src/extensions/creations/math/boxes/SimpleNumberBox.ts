@@ -66,11 +66,12 @@ export class SimpleNumberBox extends Mobject {
 		super.setup()
 		this.add(this.background)
 		this.inputElement.setAttribute('type', 'text')
-		this.inputElement.style.width = '100%'
-		this.inputElement.style.height = '100%'
+		this.inputElement.style.width = '50px'
+		this.inputElement.style.position = 'absolute'
+		this.inputElement.style.height = '70%'
 		this.inputElement.style.padding = '0px 0px'
 		this.inputElement.style.color = 'white'
-		this.inputElement.style.backgroundColor = 'rgba(0, 0, 0, 0)'
+		this.inputElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
 		this.inputElement.style.textAlign = 'center'
 		this.inputElement.style.verticalAlign = 'center'
 		this.inputElement.style.fontSize = '14px'
