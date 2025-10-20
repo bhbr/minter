@@ -1,5 +1,6 @@
 
 import { isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
+import { SHOW_HTML_CONSOLE } from 'core/constants'
 
 let debugging = true
 let logTimestamps = false
@@ -9,7 +10,7 @@ let logTimestamps = false
 function logInto(obj: any, id: string) {
 	let msg = obj.toString() + '\n'
 	let htmlConsole: HTMLElement = document.querySelector('#' + id)
-	htmlConsole.hidden = false
+	htmlConsole.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 	htmlConsole.append(msg)
 	
 	// push old log entries out the top of the scroll view

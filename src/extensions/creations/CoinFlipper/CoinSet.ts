@@ -11,6 +11,7 @@ import { SimpleNumberBox } from 'extensions/creations/math/boxes/SimpleNumberBox
 import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
+import { randomBinomial } from 'core/functions/various'
 
 export class CoinSet extends Linkable implements Playable {
 	
@@ -28,7 +29,7 @@ export class CoinSet extends Linkable implements Playable {
 	labelSpacing: number
 	maxBarHeight: number
 	width: number
-	hitBox: Rectangle
+	background: Rectangle
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
@@ -48,7 +49,10 @@ export class CoinSet extends Linkable implements Playable {
 			tailsBar: new Rectangle(),
 			headsLabel: new TextLabel(),
 			tailsLabel: new TextLabel(),
-			hitBox: new Rectangle(),
+			background: new Rectangle({
+				fillColor: Color.gray(0.15),
+				fillOpacity: 1
+			}),
 			playState: 'stop',
 			playIntervalID: null,
 			playButton: new PlayButton({
@@ -66,6 +70,7 @@ export class CoinSet extends Linkable implements Playable {
 			outputProperties: [
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
 				{ name: 'nbTails', displayName: '# tails', type: 'number' },
+				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
 				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 		}
@@ -87,11 +92,21 @@ export class CoinSet extends Linkable implements Playable {
 			compactHeight: this.height
 		})
 		this.outputList.positionSelf()
+		this.setupBackground()
 		this.setupBars()
 		this.setupLabels()
-		this.setupHitBox()
 		this.setupButton()
 		this.setupInputBox()
+	}
+
+	setupBackground() {
+		this.background.update({
+			anchor: [0, this.labelHeight + this.labelSpacing],
+			strokeWidth: 0,
+			width: this.width,
+			height: this.maxBarHeight,
+		})
+		this.add(this.background)
 	}
 
 	setupBars() {
@@ -141,16 +156,6 @@ export class CoinSet extends Linkable implements Playable {
 		this.add(this.headsLabel)
 		this.add(this.tailsLabel)
 		this.nbCoinsInputBox.inputElement.style.left = '25px'
-	}
-
-	setupHitBox() {
-		this.hitBox.update({
-			strokeWidth: 0,
-			fillOpacity: 0,
-			width: this.width,
-			height: this.height,
-		})
-		this.add(this.hitBox)
 	}
 
 	setupButton() {
@@ -209,13 +214,8 @@ export class CoinSet extends Linkable implements Playable {
 	}
 
 	flip() {
-		var randomNumber: number = 0
-		for (var i = 0; i < this.nbCoins; i++) {
-			let p = (Math.random() < this.tailsProbability) ? 1 : 0
-			randomNumber += p
-		}
 		this.update({
-			nbTails: randomNumber
+			nbTails: randomBinomial(this.nbCoins, this.tailsProbability)
 		})
 		this.updateDependents()
 	}
@@ -271,11 +271,11 @@ export class CoinSet extends Linkable implements Playable {
 			this.nbTails = args['nbTails'] ?? this.nbTails
 			this.headsBar.update({
 				height: this.headsBarHeight(),
-				anchor: [0, this.height - this.headsBarHeight()]
+				anchor: [0, this.labelHeight + this.labelSpacing + this.maxBarHeight - this.headsBarHeight()]
 			}, redraw)
 			this.tailsBar.update({
 				height: this.tailsBarHeight(),
-				anchor: [0.5 * this.width, this.height - this.tailsBarHeight()]
+				anchor: [0.5 * this.width, this.labelHeight + this.labelSpacing + this.maxBarHeight - this.tailsBarHeight()]
 			}, redraw)
 			this.headsLabel.update({
 				text: `${this.nbHeads}`
