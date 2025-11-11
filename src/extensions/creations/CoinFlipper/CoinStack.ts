@@ -13,7 +13,7 @@ import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { randomBinomial } from 'core/functions/various'
 
-export class CoinSet extends Linkable implements Playable {
+export class CoinStack extends Linkable implements Playable {
 	
 	nbCoins: number
 	nbTails: number
