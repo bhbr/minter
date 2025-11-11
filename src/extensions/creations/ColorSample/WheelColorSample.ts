@@ -51,6 +51,16 @@ export class WheelColorSample extends ColorSample {
 	setup() {
 		super.setup()
 		this.add(this.marker)
+		this.updateHue(this.hue)
+	}
+
+	updateHue(newHue: number) {
+		this.hue = newHue
+		let rgb = Color.hsv_to_rgb(this.hue, this.saturation, this.value)
+		this.update({
+			red: rgb[0], green: rgb[1], blue: rgb[2]
+		})
+		this.updateDependents()
 	}
 
 	onPointerMove(e: ScreenEvent) {
@@ -58,15 +68,11 @@ export class WheelColorSample extends ColorSample {
 		let t = Date.now()
 		let dp = vertexSubtract(p, this.circle.midpoint)
 		let angle = Math.atan2(dp[1], dp[0])
-		this.hue = angle + TAU / 2
-		let rgb = Color.hsv_to_rgb(this.hue, this.saturation, this.value)
-		this.update({
-			red: rgb[0], green: rgb[1], blue: rgb[2]
-		})
+		this.updateHue(angle + TAU / 2)
 		this.marker.update({
 			midpoint: [
-				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.cos(this.hue)),
-				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.sin(this.hue))
+				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.cos(angle)),
+				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.sin(angle))
 			]
 		})
 	}
