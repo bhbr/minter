@@ -27,6 +27,5 @@ export class RestartButton extends SidebarButton {
 		}
 	}
 
-	onPointerMove(e: ScreenEvent) { }
 
 }
