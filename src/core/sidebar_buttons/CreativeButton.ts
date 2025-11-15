@@ -8,7 +8,7 @@ export class CreativeButton extends SidebarButton {
 	defaults(): object {
 		return {
 			creations: [],
-			touchUpMessages: [{ create: 'freehand' }]
+			touchUpMessages: [{ create: 'draw' }]
 		}
 	}
 

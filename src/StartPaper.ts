@@ -12,7 +12,3 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-log('tüt')
-
-

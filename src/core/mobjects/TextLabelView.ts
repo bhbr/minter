@@ -1,14 +1,14 @@
 
 import { View } from './View'
-import { TextLabel } from './TextLabel'
+import { TextLabel, HorizontalAlignment, VerticalAlignment } from './TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
 export class TextLabelView extends View {
 
 	declare mobject: TextLabel
-	horizontalAlign: 'left' | 'center' | 'right'
-	verticalAlign: 'top' | 'center' | 'bottom'
+	horizontalAlign: HorizontalAlignment
+	verticalAlign: VerticalAlignment
 	color?: Color
 	borderColor: Color
 	borderWidth: number

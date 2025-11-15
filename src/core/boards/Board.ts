@@ -75,7 +75,7 @@ The content children can also be dragged and panned.
 				'BoardButton'
 			],
 			creationStroke: [],
-			creationMode: 'freehand',
+			creationMode: 'draw',
 			creator: null,
 			sidebar: null,
 			expandedInputList: new ExpandedBoardInputList(),
@@ -423,7 +423,7 @@ The content children can also be dragged and panned.
 					this.setControlsVisibility(this.isShowingControls)
 				}
 				break
-			case 'ctrl':
+			case 'show controls':
 				this.setControlsVisibility(value as boolean)
 				this.isShowingControls = value
 				break
@@ -434,7 +434,7 @@ The content children can also be dragged and panned.
 				this.creator = this.createCreator(this.creationMode)
 				this.add(this.creator)
 				break
-			case 'clearStrokes':
+			case 'clear strokes':
 				if (value) {
 					this.clearStrokes()
 				}
@@ -483,7 +483,7 @@ The content children can also be dragged and panned.
 	createCreator(type: string): Creator {
 
 		switch (type) {
-			case 'freehand':
+			case 'draw':
 				if (this.creationTool == ScreenEventDevice.Finger) {
 					return new Creator()
 				}
@@ -532,7 +532,7 @@ The content children can also be dragged and panned.
 
 	startCreating(e: ScreenEvent) {
 		this.creationTool = screenEventDevice(e)
-		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
+		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
 		}
 		this.creationStroke.push(this.sensor.localEventVertex(e))
@@ -547,7 +547,7 @@ The content children can also be dragged and panned.
 	}
 
 	creating(e: ScreenEvent) {
-		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'freehand') {
+		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
 		}
 		let v: vertex = this.sensor.localEventVertex(e)

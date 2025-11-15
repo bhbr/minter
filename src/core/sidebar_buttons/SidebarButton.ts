@@ -10,6 +10,7 @@ import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_
 import { log } from 'core/functions/logging'
 import { ImageView } from 'core/mobjects/ImageView'
 import { Transform } from 'core/classes/Transform'
+import { Sidebar } from 'core/Sidebar'
 import { SidebarButtonView } from './SidebarButtonView'
 
 interface Window { webkit?: any }
@@ -23,7 +24,7 @@ export class SidebarButton extends Circle {
 	previousIndex: number
 	baseColor: Color
 	baseRadius: number
-	baseFontSize: number
+	labelFontSize: number
 	activeScalingFactor: number
 	
 	locationIndex: number
@@ -31,8 +32,7 @@ export class SidebarButton extends Circle {
 	touchStart: vertex
 	active: boolean
 	messageKey: string
-	label?: TextLabel
-	sideLabel: TextLabel
+	label: TextLabel
 	icon?: ImageView
 
 	touchDownMessages: Array<object>
@@ -40,12 +40,13 @@ export class SidebarButton extends Circle {
 	key: string
 	activeKeyboard: boolean
 	paper?: Paper
+	sidebar?: Sidebar | null
 
 	defaults(): object {
 		return {
 			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
-			baseFontSize: 12,
+			labelFontSize: 16,
 			activeScalingFactor: 1.2,
 			optionSpacing: OPTION_SPACING,
 
@@ -69,6 +70,7 @@ export class SidebarButton extends Circle {
 			activeKeyboard: true,
 
 			paper: null,
+			sidebar: null,
 			view: new SidebarButtonView({
 				radius: BUTTON_RADIUS
 			})
@@ -78,6 +80,7 @@ export class SidebarButton extends Circle {
 	mutabilities(): object {
 		return {
 			baseColor: 'in_subclass',
+			labelFontSize: 'never',
 			optionSpacing: 'never',
 			label: 'never',
 			sideLabel: 'never',
@@ -92,9 +95,8 @@ export class SidebarButton extends Circle {
 	setup() {
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
-		if (this.label && !this.icon) {
-			this.add(this.label)
-		}
+		this.add(this.label)
+		this.label.view.hide()
 		if (this.icon) {
 			this.updateIcon()
 			this.view.add(this.icon)
@@ -104,24 +106,15 @@ export class SidebarButton extends Circle {
 		this.view.update({
 			fillColor: this.baseColor
 		})
-		this.label?.update({
-			frameWidth: 2 * this.baseRadius,
+		this.label.update({
+			anchor: [2.5 * this.baseRadius, 0],
+			frameWidth: 150,
 			frameHeight: 2 * this.baseRadius,
-			text: this.messageKey
-		}, false)
-		this.sideLabel?.update({
-			anchor: [1.5 * this.baseRadius, this.baseRadius - 15],
-			frameWidth: 2 * this.baseRadius,
-			frameHeight: 2 * this.baseRadius,
-			text: this.messageKey
-		}, false)
-		if (this.sideLabel) {
-			this.add(this.sideLabel)
-		}
-		if (this.label) {
-			this.label.view.div.style['font-size'] = `${this.baseFontSize}px`
-			this.label.view.div.style['color'] = Color.white().toHex()
-		}
+			text: this.messageKey,
+			horizontalAlign: 'left',
+			verticalAlign: 'center',
+			fontSize: this.labelFontSize
+		})
 		this.updateLabel()
 		this.updateSideLabel()
 		if (!separateSidebar) {
@@ -156,32 +149,29 @@ export class SidebarButton extends Circle {
 		if (this.active) { return }
 		this.update({
 			active: true,
-			//radius: this.baseRadius * this.activeScalingFactor,
 			previousIndex: this.currentModeIndex,
 		})
 		this.frame.transform.update({
-			//anchor: vertexSubtract(this.midpoint, vertexMultiply([BUTTON_RADIUS, BUTTON_RADIUS], this.activeScalingFactor)),
 			scale: this.activeScalingFactor
 		})
 		this.redraw()
-		//this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize * this.activeScalingFactor}px`)
-		this.label?.update({
-			frameWidth: 2 * this.radius,
-			frameHeight: 2 * this.radius			
-		})
-		this.updateLabel()
+		this.label.view.show()
 		this.updateIcon()
-		if (this.touchDownMessages.length ==0) { return }
+		if (this.touchDownMessages.length == 0) { return }
 		this.messagePaper(this.touchDownMessages[0])
+		if (this.sidebar) {
+			this.sidebar.activeButton = this
+		}
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		log('down')
 		this.commonButtonDown()
 		this.touchStart = eventVertex(e)
 	}
 
 	onPointerMove(e: ScreenEvent) {
-	
+		log('move')
 		let t: MouseEvent | Touch = null
 		if (e instanceof MouseEvent) { t = e }
 		else { t = e.changedTouches[0] }
@@ -202,10 +192,12 @@ export class SidebarButton extends Circle {
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		log('up')
 		this.commonButtonUp()
 	}
 
-	onPointerOut(e: ScreenEvent) {
+	onPointerCancel(e: ScreenEvent) {
+		log('cancel')
 		this.commonButtonUp()
 	}
 	
@@ -217,6 +209,7 @@ export class SidebarButton extends Circle {
 	}
 
 	commonButtonUp() {
+		this.label.view.hide()
 		if (this.touchUpMessages.length == 1) {
 			this.messagePaper(this.touchUpMessages[0])
 		} else if (this.touchUpMessages.length > 1) {
@@ -230,20 +223,12 @@ export class SidebarButton extends Circle {
 		this.update({
 			active: false,
 			fillColor: this.colorForIndex(this.currentModeIndex),
-			midpoint: newMidpoint,
-			// radius: this.baseRadius,
-			// fontSize: this.baseFontSize
+			midpoint: newMidpoint
 		})
 		this.frame.transform.update({
-			//anchor: vertexSubtract(newMidpoint, [BUTTON_RADIUS, BUTTON_RADIUS]),
 			scale: 1
 		})
 		this.redraw()
-		//this.label?.view.div.style.setProperty('font-size', `${this.baseFontSize}px`)
-		this.label?.update({
-			frameWidth: 2 * this.radius,
-			frameHeight: 2 * this.radius			
-		})
 		this.updateLabel()
 		this.updateIcon()
 		
@@ -259,35 +244,20 @@ export class SidebarButton extends Circle {
 	}
 
 	updateLabel() {
-		if (this.label === undefined || this.label === null) { return }
+		let msg = this.touchDownMessages[this.currentModeIndex]
 		this.label.update({
-			frameWidth: 2 * this.radius,
-			frameHeight: 2 * this.radius
+			text: this.labelFromMessage(msg)
 		})
-
-		if (this.label) {
-			try {
-				let msg = this.touchDownMessages[this.currentModeIndex]
-				this.label.update({
-					text: this.labelFromMessage(msg)
-				})
-			} catch { }
-		} else {
-			this.label.text = ''
-		}
-		let f = this.active ? BUTTON_SCALE_FACTOR : 1
-		let fs = f * (this.baseFontSize) // ?? 12)
-		this.label.view?.div.style.setProperty('font-size', this.baseFontSize.toString().concat('px'))
 	}
 
 	updateIcon() {
 		if (this.icon === undefined || this.icon === null) { return }
-		let name = this.imageNameForIndex(this.currentModeIndex)
+		let name = this.imageNameForIndex(this.currentModeIndex).replaceAll(' ', '_')
 		this.icon.update({
 			imageLocation: `../../assets/${name}.png`,
 			anchor: [
-					0.5 * (this.frameWidth - this.icon.frameWidth),
-					0.5 * (this.frameHeight - this.icon.frameHeight)
+				0.5 * (this.frameWidth - this.icon.frameWidth),
+				0.5 * (this.frameHeight - this.icon.frameHeight)
 			]
 		})
 	}
@@ -301,7 +271,6 @@ export class SidebarButton extends Circle {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		//args['midpoint'] = buttonCenter(this.locationIndex)
 		super.update(args, false)
 		this.updateLabel()
 		this.updateSideLabel()
