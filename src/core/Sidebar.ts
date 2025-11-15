@@ -12,6 +12,7 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
+import { ScreenEvent } from 'core/mobjects/screen_events'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'StartSidebar'
@@ -24,12 +25,13 @@ export class Sidebar extends Mobject {
 	background: Rectangle
 	availableButtonClasses: Array<any>
 	buttons: Array<SidebarButton>
-	activeButton: SidebarButton
+	activeButton?: SidebarButton
 	defaultKeys: Array<string>
 
 	defaults(): object {
 		return {
 			view: new SidebarView(),
+			activeButton: null,
 			background: new Rectangle({
 				fillColor: Color.gray(0.1),
 				fillOpacity: 1.0,
@@ -66,7 +68,7 @@ export class Sidebar extends Mobject {
 			let paper = maybePaper as Paper
 			paper.sidebar = this
 			this.background.update({
-				fillColor: paper.background.view.fillColor
+				fillColor: Color.blue() // paper.background.view.fillColor
 			})
 		}
 		// initialize with the buttons it needs itself
@@ -100,7 +102,9 @@ export class Sidebar extends Mobject {
 	createButton(buttonName: string): SidebarButton | null {
 		for (let buttonClass of this.availableButtonClasses) {
 			if (buttonClass.name == buttonName) {
-				return new buttonClass()
+				let b = new buttonClass()
+				b.sidebar = this
+				return b
 			}
 		}
 		throw `Button class ${buttonName} not available!`
@@ -183,6 +187,13 @@ export class Sidebar extends Mobject {
 			convertedValue = convertStringToArray(value)
 		}
 		this.handleMessage(key, convertedValue)
+	}
+
+	onPointerCancel(e: ScreenEvent) {
+		log('sidebar pointer cancel')
+		log(this.activeButton)
+		if (!this.activeButton) { return }
+		this.activeButton.commonButtonUp()
 	}
 
 }

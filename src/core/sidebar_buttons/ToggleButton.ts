@@ -45,9 +45,9 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	updateLabel() {
-		if (this.label == undefined) { return }
-		let f: number = this.active ? BUTTON_SCALE_FACTOR : 1
-		this.label.view.div.setAttribute('font-size', (f * this.baseFontSize).toString())
+		// if (this.label == undefined) { return }
+		// let f: number = this.active ? BUTTON_SCALE_FACTOR : 1
+		// this.label.view.div.setAttribute('font-size', (f * this.baseFontSize).toString())
 	}
 
 

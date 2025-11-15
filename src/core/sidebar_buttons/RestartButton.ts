@@ -9,24 +9,21 @@ export class RestartButton extends SidebarButton {
 	defaults(): object {
 		return {
 			baseColor: Color.green(),
-			baseFontSize: 36,
-			messageKey: 'clearStrokes',
+			messageKey: 'clear strokes',
 			touchDownMessages: [
-				{ 'clearStrokes': false },
+				{ 'clear strokes': false },
 				{ 'restart': false }
 			],
 			touchUpMessages: [
-				{ clearStrokes: true },
-				{ restart: true }
+				{ 'clear strokes': true },
+				{ 'restart': true }
 			],
 			icon: new ImageView({
-				imageLocation: '../../assets/clearStrokes.png',
+				imageLocation: '../../assets/clear_strokes.png',
 				frameWidth: 30,
 				frameHeight: 30
 			})
 		}
 	}
-
-	onPointerMove(e: ScreenEvent) { }
 
 }
