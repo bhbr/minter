@@ -130,10 +130,16 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	set opacity(newValue: number) { this.view.opacity = newValue }
 	get backgroundColor(): Color { return this.view.backgroundColor }
 	set backgroundColor(newValue: Color) { this.view.backgroundColor = newValue }
+	get borderColor(): Color { return this.view.borderColor }
+	set borderColor(newValue: Color) { this.view.borderColor = newValue }
+	get borderWidth(): number { return this.view.borderWidth }
+	set borderWidth(newValue: number) { this.view.borderWidth = newValue }
 	get drawBorder(): boolean { return this.view.drawBorder }
 	set drawBorder(newValue: boolean) { this.view.drawBorder = newValue }
 	get drawShadow(): boolean { return this.view.drawShadow }
 	set drawShadow(newValue: boolean) { this.view.drawShadow = newValue }
+	get borderRadius(): number { return this.view.borderRadius }
+	set borderRadius(newValue: number) { this.view.borderRadius = newValue }
 
 	redraw() { this.view.redraw() }
 
@@ -207,6 +213,14 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			p = p.parent
 		}
 		return ret
+	}
+
+	descendsFrom(mob: Mobject): boolean {
+		return this.ancestors().includes(mob)
+	}
+
+	isDescendentFrom(mob: Mobject): boolean {
+		return mob.descendsFrom(this)
 	}
 
 	//////////// Aliases ////////////

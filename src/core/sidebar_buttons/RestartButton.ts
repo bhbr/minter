@@ -26,4 +26,5 @@ export class RestartButton extends SidebarButton {
 		}
 	}
 
+
 }

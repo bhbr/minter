@@ -10,8 +10,6 @@ export class TextLabelView extends View {
 	horizontalAlign: HorizontalAlignment
 	verticalAlign: VerticalAlignment
 	color?: Color
-	borderColor: Color
-	borderWidth: number
 	fontSize: number
 	fontFamily: string
 
@@ -20,8 +18,6 @@ export class TextLabelView extends View {
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			color: Color.white(),
-			borderColor: Color.white(),
-			borderWidth: 1,
 			fontSize: 16,
 			fontFamily: 'Helvetica'
 		}

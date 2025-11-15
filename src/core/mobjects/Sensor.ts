@@ -5,7 +5,7 @@ import { ScreenEventHandler, ScreenEventDevice, ScreenEvent, ScreenEventType, sc
 import { vertex } from 'core/functions/vertex'
 import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
 import { log } from 'core/functions/logging'
-import { getPaper } from 'core/functions/getters'
+import { getPaper, getSidebar } from 'core/functions/getters'
 
 export class Sensor extends ExtendedObject {
 	
@@ -203,7 +203,13 @@ export class Sensor extends ExtendedObject {
 
 	capturedOnPointerUp(e: ScreenEvent) {
 		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null) { return }
+		if (target == null || this.screenEventDevice == null) {
+			let p = getPaper()
+			if (this.mobject == p || this.mobject.descendsFrom(p)) {
+				getSidebar().activeButton?.onPointerUp(e)
+			}
+			return
+		}
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
 		e.stopPropagation()
 		if (this.eventTarget.preventDefault) {
@@ -212,7 +218,8 @@ export class Sensor extends ExtendedObject {
 
 		this.decideEventAction(e)
 		if (this.deleteHistoryTimeoutID != null) { return }
-		this.deleteHistoryTimeoutID = window.setTimeout(this.deleteScreenEventHistory.bind(this), 1000
+		this.deleteHistoryTimeoutID = window.setTimeout(
+			this.deleteScreenEventHistory.bind(this), 1000
 		)
 	}
 

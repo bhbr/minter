@@ -12,7 +12,7 @@ export class ToggleButton extends SidebarButton {
 	defaults(): object {
 		return {
 			messageKey: 'key',
-			baseColor: Color.gray(0.8),
+			baseColor: Color.gray(0.4),
 			locked: false
 		}
 	}
@@ -42,17 +42,20 @@ export class ToggleButton extends SidebarButton {
 		} else {
 			super.commonButtonUp()
 		}
+		this.label.view.hide()
 	}
-
-	updateLabel() {
-		// if (this.label == undefined) { return }
-		// let f: number = this.active ? BUTTON_SCALE_FACTOR : 1
-		// this.label.view.div.setAttribute('font-size', (f * this.baseFontSize).toString())
-	}
-
 
 	imageNameForIndex(index: number): string {
 		return this.messageKey
+	}
+
+
+	labelFromMessage(msg: object): string {
+		if (this.currentModeIndex == 0) {
+			return this.messageKey + ' &#9656;'
+		} else {
+			return '&#9666; lock'
+		}
 	}
 
 }

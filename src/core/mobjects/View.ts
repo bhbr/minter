@@ -17,6 +17,9 @@ export class View extends ExtendedObject {
 	opacity: number
 	visible: boolean
 	backgroundColor: Color
+	borderColor: Color
+	borderWidth: number
+	borderRadius: number
 	drawShadow: boolean
 	savedDrawShadow: boolean | null
 	drawBorder: boolean
@@ -28,6 +31,9 @@ export class View extends ExtendedObject {
 			visible: true,
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
+			borderColor: Color.clear(),
+			borderWidth: 0,
+			borderRadius: 0,
 			drawBorder: DRAW_BORDERS,
 			drawShadow: false,
 			savedDrawShadow: null,
@@ -87,7 +93,10 @@ export class View extends ExtendedObject {
 		// 'absolute' positions this mobject relative (sic) to its parent
 		this.div.style.overflow = 'visible'
 		// by default, the mobject can draw outside its view's borders
-		this.div.style.border = this.drawBorder ? '1px dashed green' : 'none'
+		this.div.style.border = this.drawBorder ? '1px dashed green' : 'solid'
+		this.div.style.borderColor = this.borderColor.toCSS()
+		this.div.style.borderWidth = `${this.borderWidth}px`
+		this.div.style.borderRadius = `${this.borderRadius}px`
 		this.div['view'] = this
 		this.frame.view = this
 		this.redraw()
@@ -109,8 +118,10 @@ export class View extends ExtendedObject {
 		this.div.style.width = `${this.frame.width.toString()}px`
 		this.div.style.height = `${this.frame.height.toString()}px`
 		this.div.style.backgroundColor = this.backgroundColor.toCSS()
+		this.div.style.borderColor = this.borderColor.toCSS()
+		this.div.style.borderWidth = `${this.borderWidth}px`
+		this.div.style.borderRadius = `${this.borderRadius}px`
 		this.div.style.opacity = this.opacity.toString()
-
 		this.setVisibility(this.shouldBeDrawn())
 	}
 

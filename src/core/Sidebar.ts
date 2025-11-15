@@ -68,7 +68,7 @@ export class Sidebar extends Mobject {
 			let paper = maybePaper as Paper
 			paper.sidebar = this
 			this.background.update({
-				fillColor: Color.blue() // paper.background.view.fillColor
+				fillColor: paper.background.view.fillColor
 			})
 		}
 		// initialize with the buttons it needs itself
@@ -187,13 +187,6 @@ export class Sidebar extends Mobject {
 			convertedValue = convertStringToArray(value)
 		}
 		this.handleMessage(key, convertedValue)
-	}
-
-	onPointerCancel(e: ScreenEvent) {
-		log('sidebar pointer cancel')
-		log(this.activeButton)
-		if (!this.activeButton) { return }
-		this.activeButton.commonButtonUp()
 	}
 
 }
