@@ -67,8 +67,8 @@ export class WheelColorSample extends ColorSample {
 		let p = this.sensor.localEventVertex(e)
 		let t = Date.now()
 		let dp = vertexSubtract(p, this.circle.midpoint)
-		let angle = Math.atan2(dp[1], dp[0])
-		this.updateHue(angle + TAU / 2)
+		let angle = Math.atan2(dp[1], dp[0]) + TAU / 2
+		this.updateHue(angle)
 		this.marker.update({
 			midpoint: [
 				COLOR_SAMPLE_RADIUS * (1 - 0.8 * Math.cos(angle)),
