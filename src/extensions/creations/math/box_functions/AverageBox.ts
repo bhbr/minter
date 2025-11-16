@@ -23,6 +23,11 @@ export class AverageBox extends NumberValuedFunctionBox {
 }
 
 export class AverageBoxCreator extends DraggingCreator {
+	defaults(): object {
+		return {
+			helpText: 'Average of a list of numbers.'
+		}
+	}
 	declare creation: AverageBox
 	createMobject(): AverageBox {
 		return new AverageBox()

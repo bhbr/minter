@@ -8,12 +8,14 @@ export class Creator extends Mobject {
 
 	creation?: Mobject
 	creationStroke: vertexArray
+	helpText: string
 
 	defaults(): object {
 		return {
 			creationStroke: [],
 			creation: null,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			helpText: ''
 		}
 	}
 

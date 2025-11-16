@@ -129,6 +129,12 @@ export class NumberListBoxCreator extends DraggingCreator {
 	
 	declare creation: NumberListBox
 
+	defaults(): object {
+		return {
+			helpText: 'A list of numbers. Its values can be linked from elsewhere, or a single entry added whenever another object changes. The list can be reset by tapping the clear button.'
+		}
+	}
+
 	createMobject() {
 		return new NumberListBox({
 			anchor: this.getStartPoint()

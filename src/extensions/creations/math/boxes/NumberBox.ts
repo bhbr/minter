@@ -158,6 +158,12 @@ export class NumberBoxCreator extends DraggingCreator {
 	
 	declare creation: NumberBox
 
+	defaults(): object {
+		return {
+			helpText: 'A number. Its value be edited or linked as an input variable.'
+		}
+	}
+
 	createMobject() {
 		return new NumberBox({
 			anchor: this.getStartPoint(),

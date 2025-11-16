@@ -24,6 +24,11 @@ export class CumSumBox extends NumberListValuedFunctionBox {
 }
 
 export class CumSumBoxCreator extends DraggingCreator {
+	defaults(): object {
+		return {
+			helpText: 'Cumulative sums of a list of numbers.'
+		}
+	}
 	declare creation: CumSumBox
 	createMobject(): CumSumBox {
 		return new CumSumBox()

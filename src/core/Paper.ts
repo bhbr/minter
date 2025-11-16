@@ -70,6 +70,9 @@ export class Paper extends Board {
 			width: width,
 			height: height
 		})
+		this.helpTextLabel.update({
+			frameWidth: width
+		})
 		let el = document.querySelector('#htmlConsole') as HTMLElement
 		el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 		//window.addEventListener('resize', this.resize.bind(this))

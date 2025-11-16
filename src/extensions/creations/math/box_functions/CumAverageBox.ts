@@ -25,6 +25,11 @@ export class CumAverageBox extends NumberListValuedFunctionBox {
 
 
 export class CumAverageBoxCreator extends DraggingCreator {
+	defaults(): object {
+		return {
+			helpText: 'Cumulative averages of a list of numbers.'
+		}
+	}
 	declare creation: CumAverageBox
 	createMobject(): CumAverageBox {
 		return new CumAverageBox()

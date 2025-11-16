@@ -7,6 +7,12 @@ export class RGBAColorSampleCreator extends DraggingCreator {
 	
 	declare creation: RGBAColorSample
 
+	defaults(): object {
+		return {
+			helpText: 'A color defined by its red, green and blue components as input variables.'
+		}
+	}
+
 	createMobject() {
 		return new RGBAColorSample({
 			midpoint: this.getStartPoint()

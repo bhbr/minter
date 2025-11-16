@@ -10,6 +10,12 @@ export class BoxSliderCreator extends Creator {
 
 	declare creation?: BoxSlider
 
+	defaults(): object {
+		return {
+			helpText: 'A vertical number slider. Drag to the desired size. The min and max values can be edited.'
+		}
+	}
+
 	setup() {
 		super.setup()
 		this.update({

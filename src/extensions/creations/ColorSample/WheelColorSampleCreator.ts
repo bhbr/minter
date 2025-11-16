@@ -7,6 +7,12 @@ export class WheelColorSampleCreator extends DraggingCreator {
 	
 	declare creation: WheelColorSample
 
+	defaults(): object {
+		return {
+			helpText: 'A wheel-shaped color picker. The angle sets its hue, the saturation and value are fixed to 100 %.'
+		}
+	}
+
 	createMobject() {
 		return new WheelColorSample({
 			midpoint: this.getStartPoint()

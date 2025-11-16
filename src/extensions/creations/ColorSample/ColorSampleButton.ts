@@ -11,7 +11,7 @@ export class ColorSampleButton extends CreativeButton {
 				imageLocation: '../../assets/color_wheel.png',
 				frameWidth: 32,
 				frameHeight: 32
-			})
+			}),
 		}
 	}
 
