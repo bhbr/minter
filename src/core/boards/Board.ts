@@ -505,6 +505,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		//log('onPointerDown')
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
@@ -541,6 +542,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerMove(e: ScreenEvent) {
+		//log('onPointerMove')
 		if (this.contracted) { return }
 		if (this.creationStroke.length == 0) { return }
 		this.creating(e)
@@ -556,6 +558,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		//log('onPointerUp')
 		if (this.contracted) { return }
 		this.endCreating(e)
 	}

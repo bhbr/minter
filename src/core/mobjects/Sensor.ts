@@ -156,7 +156,7 @@ export class Sensor extends ExtendedObject {
 	*/
 
 	capturedOnPointerDown(e: ScreenEvent) {
-
+		//log('capturedOnPointerDown')
 		if (this.eventStartTime == 0) {
 			this.eventStartTime = e.timeStamp
 		}
@@ -178,6 +178,7 @@ export class Sensor extends ExtendedObject {
 	}
 
 	capturedOnPointerMove(e: ScreenEvent) {
+		//log('capturedOnPointerMove')
 		let target = this.eventTarget
 		if (target == null || this.screenEventDevice == null) { return }
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
@@ -340,6 +341,7 @@ export class Sensor extends ExtendedObject {
 	}
 
 	rawOnTouchDown(e: ScreenEvent) {
+		//log('rawOnTouchDown')
 		this.longPressTimeoutID = window.setTimeout(this.onLongTouchDown, LONG_PRESS_DURATION)
 		this.onTouchDown(e)
 	}
@@ -367,6 +369,7 @@ export class Sensor extends ExtendedObject {
 	}
 
 	rawOnPenDown(e: ScreenEvent) {
+		//log('rawOnPenDown')
 		this.longPressTimeoutID = window.setTimeout(this.onLongPenDown, LONG_PRESS_DURATION)
 		this.onPenDown(e)
 	}
@@ -393,6 +396,7 @@ export class Sensor extends ExtendedObject {
 	}
 
 	rawOnMouseDown(e: ScreenEvent) {
+		//log('rawOnMouseDown')
 		this.longPressTimeoutID = window.setTimeout(this.mobject.onLongMouseDown.bind(this.mobject), LONG_PRESS_DURATION)
 		this.onMouseDown(e)
 	}

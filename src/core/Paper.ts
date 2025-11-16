@@ -1,7 +1,7 @@
 
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
-import { ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
@@ -74,7 +74,9 @@ export class Paper extends Board {
 		el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 		//window.addEventListener('resize', this.resize.bind(this))
 		this.resize()
+
 	}
+
 
 	resize() {
 		let size = Math.max(window.screen.width, window.screen.height)
