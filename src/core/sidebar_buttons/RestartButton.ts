@@ -8,7 +8,7 @@ export class RestartButton extends SidebarButton {
 	
 	defaults(): object {
 		return {
-			baseColor: Color.green(),
+			baseColor: Color.red().brighten(0.5),
 			messageKey: 'clear strokes',
 			touchDownMessages: [
 				{ 'clear strokes': false },
