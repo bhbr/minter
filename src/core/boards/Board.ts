@@ -96,7 +96,14 @@ The content children can also be dragged and panned.
 				frameHeight: 50,
 				text: '',
 				horizontalAlign: 'center'
-			})
+			}),
+			helpTexts: {
+				'drag': 'Drag objects or pan the board. Slide this button to the right to lock.',
+				'link': 'Show and edit links between objects. Slide this button to the right to lock.',
+				'show controls': 'Show control elements on objects. Slide this button to the right to lock.',
+				'clear strokes': 'Clear all drawing strokes.',
+				'restart': 'Clear the board.',
+			}
 		}
 	}
 
@@ -379,6 +386,7 @@ The content children can also be dragged and panned.
 	creationMode: string
 	creationTool: ScreenEventDevice | null
 	helpTextLabel: TextLabel
+	helpTexts: object
 
 	// a dictionary of constructors to use
 	// for creating new mobjects
@@ -427,6 +435,14 @@ The content children can also be dragged and panned.
 		switch (key) {
 			case 'drag':
 				this.setInternalDragging(value as boolean)
+				this.helpTextLabel.update({
+					text: this.helpTexts['drag']
+				})
+				if (value) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'link':
 				this.setLinking(value as boolean)
@@ -435,20 +451,40 @@ The content children can also be dragged and panned.
 				} else {
 					this.setControlsVisibility(this.isShowingControls)
 				}
+				this.helpTextLabel.update({
+					text: this.helpTexts['link']
+				})
+				if (value) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'show controls':
+				this.helpTextLabel.update({
+					text: this.helpTexts['show controls']
+				})
+				if (value) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				this.setControlsVisibility(value as boolean)
 				this.isShowingControls = value
 				break
 			case 'create':
 				this.creationMode = value
 				if (this.creator == null) {
-					// little hack I know
+					// little hack, I know
 					let dummyCreator = this.createCreator(this.creationMode)
 					this.helpTextLabel.update({
 						text: dummyCreator.helpText
 					})
-					this.helpTextLabel.view.show()
+					if (value) {
+						this.helpTextLabel.view.show()
+					} else {
+						this.helpTextLabel.view.hide()
+					}
 					return
 				}
 				this.remove(this.creator)
@@ -457,16 +493,36 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.creator.helpText
 				})
-				this.helpTextLabel.view.show()
+				if (value) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'clear strokes':
 				if (value) {
 					this.clearStrokes()
 				}
+				this.helpTextLabel.update({
+					text: this.helpTexts['clear strokes']
+				})
+				if (!value) { // merely touch down
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'restart':
 				if (value) {
 					this.restart()
+				}
+				this.helpTextLabel.update({
+					text: this.helpTexts['restart']
+				})
+				if (!value) { // merely touch down
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
 				}
 				break
 		}
