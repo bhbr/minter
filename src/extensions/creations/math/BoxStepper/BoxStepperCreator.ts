@@ -7,7 +7,7 @@ export class BoxStepperCreator extends BoxSliderCreator {
 	declare creation: BoxStepper
 
 	createMobject(): BoxStepper {
-		return this.creation || new BoxStepper()
+		return this.creation || new BoxStepper({ height: 0 })
 	}
 
 }
