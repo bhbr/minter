@@ -945,6 +945,18 @@ let Changing_mutability_and_default_values_in_subclass = new BundledTest({
 // ADDING PROPERTIES IN SUBCLASS //
 ///////////////////////////////////
 
+export const A_trivial_subclass_gets_registered_in_the_ancestry = new AssertionTest({
+	name: 'A trivial subclass gets registered in the ancestry',
+	function: function(): boolean {
+		ExtendedObject.clearClassDeclarations()
+		class SecondClass extends FirstClass { }
+		let A = new FirstClass()
+		let B = new SecondClass()
+		let ancestors = B.ancestry()
+		return (ancestors.includes('SecondClass') && B instanceof A.constructor)
+	}
+})
+
 export const An_immutable_property_can_be_added_in_a_subclass = new AssertionTest({
 	name: 'An immutable property can be added in a subclass',
 	function: function(): boolean {
@@ -980,7 +992,8 @@ export const ExtendedObjectTest = new BundledTest({
 		Changing_property_values_on_object_creation,
 		Changing_property_values_in_a_subclass,
 		Changing_mutability_and_default_values_in_subclass,
-		An_immutable_property_can_be_added_in_a_subclass
+		An_immutable_property_can_be_added_in_a_subclass,
+		A_trivial_subclass_gets_registered_in_the_ancestry
 	],
 	silenceSubtests: false
 })
