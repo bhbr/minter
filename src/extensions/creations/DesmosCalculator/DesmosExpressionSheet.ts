@@ -47,8 +47,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	layoutFrames() {
-		log('DesmosExpressionSheet.layoutFrames')
-		//log(`${this.frameWidth} ${this.frameHeight}`)
 		if (this.expanded) {
 			this.expand()
 		} else {
@@ -57,7 +55,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	layoutContent() {
-		//log('DesmosExpressionSheet.layoutContent')
 		let grapher = this.innerCanvas.view.div.getElementsByClassName('dcg-grapher')[0] as HTMLElement
 		grapher.style.visibility = 'hidden'
 		grapher.style.width = '0%'
@@ -80,10 +77,8 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	resizeFrame(width: number, height: number) {
-		//log('DesmosExpressionSheet.contract')
 		let el = this.innerCanvas.view.div.querySelector('.dcg-exppanel-outer')
 		if (el) {
-			//log(`compact width: ${this.compactWidth}`)
 			this.update({
 				frameWidth: width,
 				frameHeight: height
@@ -109,7 +104,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	focus() {
-		//log('DesmosExpressionSheet.focus')
 		super.focus()
 		this.showKeypad()
 		this.expand()
@@ -119,7 +113,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	blur() {
-		//log('DesmosExpressionSheet.blur')
 		super.blur()
 		this.hideKeypad()
 		this.contract()

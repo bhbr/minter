@@ -66,7 +66,9 @@ export class DesmosExpression extends DesmosExpressionSheet {
 			(tab as HTMLElement).style.display = 'none'
 		}
 		let xLabel = this.innerCanvas.view.div.querySelector('[aria-label="Delete Expression 1"]') as HTMLElement
-		xLabel.style.display = 'none'
+		if (xLabel) {
+			xLabel.style.display = 'none'
+		}
 
 		let styleEl = document.createElement('style')
 		styleEl.type = 'text/css'
