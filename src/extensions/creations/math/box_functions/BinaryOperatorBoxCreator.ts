@@ -8,7 +8,7 @@ export class BinaryOperatorBoxCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			pointOffset: [-80, -40]
+			pointOffset: [-40, -40]
 		}
 	}
 

@@ -13,7 +13,7 @@ export class BoxSliderCreator extends Creator {
 	defaults(): object {
 		return {
 			helpText: 'A vertical number slider. Drag to the desired size. The min and max values can be edited.',
-			pointOffset: [-70, 0]
+			pointOffset: [-35, 0]
 		}
 	}
 

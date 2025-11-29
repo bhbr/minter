@@ -10,7 +10,7 @@ export class PlayableCoinCreator extends DraggingCreator {
 	defaults(): object {
 		return {
 			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it.',
-			pointOffset: [-50, -50]
+			pointOffset: [-25, -50]
 		}
 	}
 

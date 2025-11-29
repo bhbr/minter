@@ -27,7 +27,7 @@ export class AverageBoxCreator extends DraggingCreator {
 	defaults(): object {
 		return {
 			helpText: 'Average of a list of numbers.',
-			pointOffset: [-80, -40]
+			pointOffset: [-40, -40]
 		}
 	}
 	declare creation: AverageBox

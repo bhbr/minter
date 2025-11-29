@@ -2,7 +2,7 @@
 import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
 import { ScreenEvent, eventVertex } from 'core/mobjects/screen_events'
 
-export class BoxStepper extends BoxSlider {
+export class BoxStepper extends BoxSlider { 
 
 	defaults(): object {
 		return {
