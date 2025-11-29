@@ -10,7 +10,8 @@ export class DesmosExpressionCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'An algebraic expression. Input variables are detected automatically. You can define the name of the output variable using an equals sign.'
+			helpText: 'An algebraic expression. Input variables are detected automatically. You can define the name of the output variable using an equals sign.',
+			pointOffset: [-300, -100]
 		}
 	}
 

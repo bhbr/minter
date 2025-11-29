@@ -4,6 +4,11 @@ import { ComparisonBox, LessThanBox, LessThanOrEqualBox, GreaterThanBox, Greater
 
 export class ComparisonBoxCreator extends DraggingCreator {
 	declare creation: ComparisonBox
+	defaults(): object {
+		return {
+			pointOffset: [-80, -40]
+		}
+	}
 	setup() {
 		super.setup()
 		this.creation.operatorLabel.update({
