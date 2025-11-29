@@ -169,7 +169,7 @@ export class Sidebar extends Mobject {
 		case 'buttonUp':
 			if (this.activeButton !== null && this.activeButton !== undefined) {
 				this.activeButton.buttonUpByKey(value)
-				if (this.activeButton.key == value) {
+				if (this.activeButton && this.activeButton.key == value) {
 					this.activeButton = null
 				}
 			}
