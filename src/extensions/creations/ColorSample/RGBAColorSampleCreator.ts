@@ -9,7 +9,7 @@ export class RGBAColorSampleCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A color defined by its red, green and blue components as input variables.'
+			helpText: 'A color defined by its red, green, blue and alpha (RGBA) components as input variables.'
 		}
 	}
 

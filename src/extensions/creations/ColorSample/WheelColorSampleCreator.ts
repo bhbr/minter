@@ -9,7 +9,7 @@ export class WheelColorSampleCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A wheel-shaped color picker. The angle sets its hue, the saturation and value are fixed to 100 %.'
+			helpText: 'A wheel-shaped color picker (HSV model). The angle sets its hue, the saturation and value are fixed to 100 %.'
 		}
 	}
 
