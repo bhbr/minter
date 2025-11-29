@@ -13,6 +13,8 @@ export class BoxStepper extends BoxSlider {
 		}
 	}
 
+
+
 	mutabilities(): object {
 		return {
 			precision: 'never'

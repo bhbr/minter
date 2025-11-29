@@ -131,7 +131,8 @@ export class NumberListBoxCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A list of numbers. Its values can be linked from elsewhere, or a single entry added whenever another object changes. The list can be reset by tapping the clear button.'
+			helpText: 'A list of numbers. Its values can be linked from elsewhere, or a single entry added whenever another object changes. The list can be reset by tapping the clear button.',
+			pointOffset: [-80, -200]
 		}
 	}
 

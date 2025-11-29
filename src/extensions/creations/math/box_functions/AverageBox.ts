@@ -16,6 +16,7 @@ export class AverageBox extends NumberValuedFunctionBox {
 			]
 		}
 	}
+	
 	result(): number {
 		return numberArraySum(this.argument) / this.argument.length
 	}
@@ -25,7 +26,8 @@ export class AverageBox extends NumberValuedFunctionBox {
 export class AverageBoxCreator extends DraggingCreator {
 	defaults(): object {
 		return {
-			helpText: 'Average of a list of numbers.'
+			helpText: 'Average of a list of numbers.',
+			pointOffset: [-50, -20]
 		}
 	}
 	declare creation: AverageBox

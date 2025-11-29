@@ -1,7 +1,7 @@
 
 import { Creator } from './Creator'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { vertex } from 'core/functions/vertex'
+import { vertex, vertexAdd } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
@@ -31,10 +31,10 @@ export class SpanningCreator extends Creator {
 	}
 
 	topLeftVertex(): vertex {
-		return [
+		return vertexAdd([
 			Math.min(this.getStartPoint()[0], this.getEndPoint()[0]),
 			Math.min(this.getStartPoint()[1], this.getEndPoint()[1])
-		]
+		], this.pointOffset)
 	}
 
 	getWidth(): number {

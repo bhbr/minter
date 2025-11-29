@@ -5,10 +5,11 @@ import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 
 export class CoinRowCreator extends Creator {
-	
+
 	defaults(): object {
 		return {
-			helpText: 'A row of coins. Drag horizontally to the desired number of coins. Tap the coins or the play button to flip them.'
+			helpText: 'A row of coins. Drag horizontally to the desired number of coins. Tap the coins or the play button to flip them.',
+			pointOffset: [-50, -50]
 		}
 	}
 

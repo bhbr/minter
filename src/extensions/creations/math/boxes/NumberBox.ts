@@ -160,7 +160,8 @@ export class NumberBoxCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A number. Its value be edited or linked as an input variable.'
+			helpText: 'A number. Its value be edited or linked as an input variable.',
+			pointOffset: [-80, -40]
 		}
 	}
 

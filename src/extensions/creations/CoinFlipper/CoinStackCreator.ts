@@ -8,7 +8,8 @@ export class CoinStackCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A stack of coins automatically sorted into heads (H) and tails (T). Tap the stack or the play button to flip all the coins. The number of coins can be edited.'
+			helpText: 'A stack of coins automatically sorted into heads (H) and tails (T). Tap the stack or the play button to flip all the coins. The number of coins can be edited.',
+			pointOffset: [-100, -250]
 		}
 	}
 

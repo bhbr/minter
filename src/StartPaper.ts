@@ -8,7 +8,6 @@ import { AllTests } from './_tests/allTests'
 export class StartPaper extends CoinFlipPaper { }
 
 export const TESTING = true
-
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()

@@ -1,7 +1,7 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { vertex, vertexArray } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexAdd } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 
 export class Creator extends Mobject {
@@ -9,13 +9,15 @@ export class Creator extends Mobject {
 	creation?: Mobject
 	creationStroke: vertexArray
 	helpText: string
+	pointOffset: vertex
 
 	defaults(): object {
 		return {
 			creationStroke: [],
 			creation: null,
 			screenEventHandler: ScreenEventHandler.Self,
-			helpText: ''
+			helpText: '',
+			pointOffset: [0, 0]
 		}
 	}
 
@@ -34,11 +36,11 @@ export class Creator extends Mobject {
 	}
 
 	getStartPoint(): vertex {
-		return this.creationStroke[0] ?? this.view.frame.anchor
+		return vertexAdd(this.creationStroke[0] ?? this.view.frame.anchor, this.pointOffset)
 	}
 
 	getEndPoint(): vertex {
-		return this.creationStroke[this.creationStroke.length - 1] ?? this.view.frame.anchor
+		return vertexAdd(this.creationStroke[this.creationStroke.length - 1] ?? this.view.frame.anchor, this.pointOffset)
 	}
 
 	dissolve() {
@@ -53,7 +55,9 @@ export class Creator extends Mobject {
 	}
 
 	createMobject(): Mobject {
-		return new Mobject()
+		return new Mobject({
+			anchor: this.pointOffset
+		})
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {

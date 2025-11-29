@@ -9,12 +9,18 @@ export class PlayableCoinCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it.'
+			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it.',
+			pointOffset: [-50, -50]
 		}
 	}
 
+
 	createMobject(): PlayableCoin {
-		return new PlayableCoin()
+		let c = new PlayableCoin()
+		c.update({
+			anchor: this.pointOffset
+		})
+		return c
 	}
 
 }

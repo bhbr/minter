@@ -2,7 +2,7 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { Creator } from './Creator'
 import { Color } from 'core/classes/Color'
-import { vertex, vertexSubtract } from 'core/functions/vertex'
+import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { VView } from 'core/vmobjects/VView'
 import { log } from 'core/functions/logging'
@@ -32,7 +32,7 @@ export class DraggingCreator extends Creator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.creation.update({
-			anchor: vertexSubtract(q, this.getStartPoint())
+			anchor: vertexAdd(vertexSubtract(q, this.getStartPoint()), this.pointOffset)
 		}, redraw)
 		if (redraw) { this.view.redraw() }
 	}
