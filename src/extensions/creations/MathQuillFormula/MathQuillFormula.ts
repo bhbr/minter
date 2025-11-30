@@ -12,6 +12,7 @@ import { IOProperty } from 'core/linkables/Linkable'
 import { MinterAssignmentNode } from './MinterMathNode'
 import { vertex } from 'core/functions/vertex'
 import { TextLabel } from 'core/mobjects/TextLabel'
+import { Color } from 'core/classes/Color'
 
 declare var MathQuill: any
 
@@ -29,7 +30,7 @@ export class MathQuillFormula extends Linkable {
 	defaults(): object {
 		return {
 			frameWidth: 100,
-			frameHeight: 60,
+			frameHeight: 50,
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
 			mathField: null,
@@ -96,7 +97,8 @@ export class MathQuillFormula extends Linkable {
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
 		this.span.style.color = 'white'
-		this.span.style.backgroundColor = 'black'
+		this.span.style.backgroundColor = this.backgroundColor.toCSS()
+		this.span.style.border = '2px solid white'
 		p.append(this.span)
 		this.view.div.append(p)
 		this.mathField = this.MQ.MathField(this.span, {
@@ -105,8 +107,14 @@ export class MathQuillFormula extends Linkable {
 					this.updateIOProperties()
 					this.updateValue()
 					this.updateResultBox()
+					this.updateLayout()
 				}.bind(this)
 			}
+		})
+		this.mathField.write('y=')
+		this.update({
+			frameWidth: this.span.clientWidth,
+			frameHeight: this.span.clientHeight
 		})
 	}
 
@@ -134,6 +142,7 @@ export class MathQuillFormula extends Linkable {
 	boundKeyPressed(e: ScreenEvent) { }
 
 	keyPressed(e: KeyboardEvent) {
+		this.updateLayout()
 		if (e.key == '13' || e.key == 'Enter' || e.key == 'Return') {
 			this.blur()
 		}
@@ -156,26 +165,33 @@ export class MathQuillFormula extends Linkable {
 	}
 
 	updateIOProperties() {
-		let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
-		this.parser.tokens = tokens
-		let node = this.parser.parseTokens(this.parser.tokens)
-		let variables = node.variables()
-		let inputNames = this.inputNames()
-		for (let v of variables) {
-			if (!inputNames.includes(v)) {
-				this.createInputVariable(v, NaN)
-			}
+		try {
+			let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
+			this.parser.tokens = tokens
+		} catch (ParseError) {
+			return
 		}
-		for (let v of inputNames) {
-			if (!variables.includes(v)) {
-				this.removeInputVariable(v)
+		try {
+			let node = this.parser.parseTokens(this.parser.tokens)
+			let variables = node.variables()
+			let inputNames = this.inputNames()
+			for (let v of variables) {
+				if (!inputNames.includes(v)) {
+					this.createInputVariable(v, NaN)
+				}
 			}
-		}
-		if (node instanceof MinterAssignmentNode) {
-			log(node)
-			if (this.outputNames()[0] !== node.name) {
-				this.createOutputVariable(node.name)
+			for (let v of inputNames) {
+				if (!variables.includes(v)) {
+					this.removeInputVariable(v)
+				}
 			}
+			if (node instanceof MinterAssignmentNode) {
+				if (this.outputNames()[0] !== node.name) {
+					this.createOutputVariable(node.name)
+				}
+			}
+		} catch (ParseError) {
+			return
 		}
 	}
 
@@ -184,9 +200,13 @@ export class MathQuillFormula extends Linkable {
 		let latex = this.mathField.latex()
 		let lexer = new Lexer()
 		let tokens = lexer.tokenizeTex(latex)
-		let node = this.parser.parseTokens(tokens)
-		let result = this.parser.evaluateTex(latex, this.scope)
-		return result
+		try {
+			let node = this.parser.parseTokens(tokens)
+			let result = this.parser.evaluateTex(latex, this.scope)
+			return result
+		} catch (ParseError) {
+			return NaN
+		}
 	}
 
 	updateValue() {
@@ -212,6 +232,14 @@ export class MathQuillFormula extends Linkable {
 		})
 	}
 
+	updateLayout() {
+		this.update({
+			frameWidth: this.span.clientWidth,
+			frameHeight: this.span.clientHeight + 30
+		})
+		this.positionIOLists()
+	}
+
 	createInputVariable(name: string, value: number) {
 		this.createProperty(name, value)
 		this.inputProperties.push({
@@ -222,6 +250,7 @@ export class MathQuillFormula extends Linkable {
 		this.inputList.update({
 			outletProperties: this.inputProperties
 		})
+		this.positionIOLists()
 		this.inputList.view.hide()
 	}
 
@@ -237,6 +266,7 @@ export class MathQuillFormula extends Linkable {
 		this.inputList.update({
 			outletProperties: this.inputProperties
 		})
+		this.positionIOLists()
 		this.inputList.view.hide()
 	}
 
@@ -251,6 +281,7 @@ export class MathQuillFormula extends Linkable {
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})
+		this.positionIOLists()
 		this.outputList.view.hide()
 	}
 
@@ -263,6 +294,7 @@ export class MathQuillFormula extends Linkable {
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})
+		this.positionIOLists()
 		this.outputList.view.hide()
 	}
 
@@ -276,11 +308,6 @@ export class MathQuillFormula extends Linkable {
 		this.updateResultBox()
 		super.update(args, redraw)
 	}
-
-
-
-
-
 
 }
 

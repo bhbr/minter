@@ -128,6 +128,13 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 		}
 	}
 
+	positionOutlets() {
+		for (let i = 0; i < this.linkOutlets.length; i++) {
+			let outlet = this.linkOutlets[i]
+			this.positionOutlet(outlet, i)
+		}
+	}
+
 	hookNamed(name: string, index: number = 0): LinkHook | null {
 		let outlet = this.outletNamed(name)
 		if (outlet === null) { return null }

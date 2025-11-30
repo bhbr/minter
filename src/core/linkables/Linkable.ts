@@ -194,6 +194,13 @@ which can be linked to such-exposed variables of other mobjects.
 		return this.outputProperties.map((prop) => prop.name)
 	}
 
+	positionIOLists() {
+		this.inputList.positionOutlets()
+		this.outputList.positionOutlets()
+		this.inputList.positionSelf()
+		this.outputList.positionSelf()
+	}
+
 }
 
 
