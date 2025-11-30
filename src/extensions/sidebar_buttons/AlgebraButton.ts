@@ -6,7 +6,7 @@ export class AlgebraButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['expression', 'expression list'],
+			creations: ['expression'],
 			icon: new ImageView({
 				imageLocation: '../../assets/expression.png',
 				frameWidth: 35,

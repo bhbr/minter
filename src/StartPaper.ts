@@ -11,11 +11,3 @@ export const TESTING = true
 if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
-
-let mq = new MathQuillFormula({
-	anchor: [100, 100],
-	frameWidth: 300,
-	frameHeight: 100
-})
-
-paper.addToContent(mq)

@@ -111,7 +111,8 @@ export class MathQuillFormula extends Linkable {
 				}.bind(this)
 			}
 		})
-		this.mathField.write('y=')
+		this.mathField.write('y=x')
+		this.updateIOProperties()
 		this.update({
 			frameWidth: this.span.clientWidth,
 			frameHeight: this.span.clientHeight

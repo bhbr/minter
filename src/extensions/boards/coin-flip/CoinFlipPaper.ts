@@ -17,8 +17,7 @@ import { SequencePlotCreator } from 'extensions/creations/DesmosCalculator/Seque
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
-import { DesmosExpressionCreator } from 'extensions/creations/DesmosCalculator/DesmosExpressionCreator'
-import { DesmosExpressionSheetCreator } from 'extensions/creations/DesmosCalculator/DesmosExpressionSheetCreator'
+import { MathQuillFormulaCreator } from 'extensions/creations/MathQuillFormula/MathQuillFormulaCreator'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -42,8 +41,7 @@ export class CoinFlipPaper extends Paper {
 				'greater or equal': GreaterThanOrEqualBoxCreator,
 				'equal': EqualsBoxCreator,
 				'not equal': NotEqualsBoxCreator,
-				'expression': DesmosExpressionCreator,
-				'expressions': DesmosExpressionSheetCreator,
+				'expression': MathQuillFormulaCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
 				'plot': SequencePlotCreator,
