@@ -258,6 +258,14 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		submob.view.div.remove()
 	}
 
+	removeAllChildren() {
+		while (this.children.length > 0) {
+			let child = this.children.pop()
+			child.parent = null
+			child.view.div.remove()
+		}
+	}
+
 	moveToTop(submob: Mobject) {
 	/*
 	Put this submob in front of every other sibling,
