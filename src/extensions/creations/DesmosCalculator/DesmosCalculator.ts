@@ -186,7 +186,6 @@ export class DesmosCalculator extends Linkable {
 	onChange(eventName: string, event: object) { }
 
 	showKeypad() {
-		log('showKeypad')
 		this.calculator.openKeypad()
 		window.setTimeout(function() {
 			// let keypad = this.innerCanvas.view.div.querySelector('.dcg-keypad') as HTMLElement

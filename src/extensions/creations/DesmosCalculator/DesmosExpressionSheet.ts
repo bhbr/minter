@@ -259,7 +259,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	createSlidableVariable(name: string, value: number) {
-		log(`slidable ${name} ${value}`)
 		if (name == null) { return }
 	 	this.secretInputExpressions[name] = this.calculator.HelperExpression({ latex: name })
 		this.createInputVariable(name, value)

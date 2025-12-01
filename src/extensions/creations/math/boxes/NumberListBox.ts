@@ -115,9 +115,7 @@ export class NumberListBox extends Linkable {
 	}
 
 	addedInputLink(link: DependencyLink) {
-		log(link)
 		if (link.endHook.outlet.name == 'newestEntry') {
-			log('clearing')
 			this.clear()
 		}
 	}

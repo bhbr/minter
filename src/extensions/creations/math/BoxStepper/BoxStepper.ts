@@ -46,7 +46,6 @@ export class BoxStepper extends BoxSlider {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		log(args)
 		super.update(args, redraw)
 		if (args['min'] !== undefined || args['max'] !== undefined) {
 			this.ticks.removeAllChildren()

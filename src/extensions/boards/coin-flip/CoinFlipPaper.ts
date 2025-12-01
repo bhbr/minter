@@ -13,7 +13,7 @@ import { SumBoxCreator } from 'extensions/creations/math/box_functions/SumBox'
 import { AverageBoxCreator } from 'extensions/creations/math/box_functions/AverageBox'
 import { CumSumBoxCreator } from 'extensions/creations/math/box_functions/CumSumBox'
 import { CumAverageBoxCreator } from 'extensions/creations/math/box_functions/CumAverageBox'
-import { SequencePlotCreator } from 'extensions/creations/DesmosCalculator/SequencePlotCreator'
+import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
@@ -44,7 +44,7 @@ export class CoinFlipPaper extends Paper {
 				'expression': MathQuillFormulaCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
-				'plot': SequencePlotCreator,
+				'plot': ScatterPlotCreator,
 				'histogram': HistogramCreator,
 				'rgb color': RGBAColorSampleCreator,
 				'color wheel': WheelColorSampleCreator,

@@ -111,7 +111,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	boundButtonDownByKey(e: KeyboardEvent) { }
 
 	buttonDownByKey(e: KeyboardEvent) {
-		log('DesmosExpression.buttonDownByKey')
 		if (e.key == 'Enter' || e.key == 'Return' || e.key == 'ArrowUp' || e.key == 'ArrowDown') {
 			this.blur()
 			e.preventDefault()

@@ -97,6 +97,7 @@ export class MathQuillFormula extends Linkable {
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
 		this.span.style.color = 'white'
+		this.span.style.fontSize = '40px'
 		this.span.style.backgroundColor = this.backgroundColor.toCSS()
 		this.span.style.border = '2px solid white'
 		p.append(this.span)

@@ -548,7 +548,6 @@ The content children can also be dragged and panned.
 			}
 		}
 		for (let link of this.links) {
-			log(link)
 			this.content.remove(link)
 		}
 	}
