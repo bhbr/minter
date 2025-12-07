@@ -29,9 +29,17 @@ export class Scroll extends Mobject {
 		super.update(args, redraw)
 		var innerHTML = ''
 		for (var i = 0; i < this.list.length; i++) {
-			innerHTML += `${this.list[i]}<br>`
+			innerHTML += (Scroll.stringRepresentation(this.list[i]) + `<br>`)
 		}
 		this.view.div.innerHTML = innerHTML
+	}
+
+	static stringRepresentation(value: any): string {
+		if (typeof value == 'number') {
+			return value.toPrecision(4)
+		} else {
+			return `${value}`
+		}
 	}
 
 }

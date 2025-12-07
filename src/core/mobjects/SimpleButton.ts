@@ -13,14 +13,15 @@ export class SimpleButton extends RoundedRectangle {
 		return {
 			width: 50,
 			height: 25,
-			cornerRadius: 5,
+			cornerRadius: 15,
 			label: new TextLabel({
 				textColor: Color.white()
 			}),
 			fillColor: Color.gray(0.3),
-			strokeWidth: 0,
+			strokeColor: Color.gray(0.4),
+			strokeWidth: 0.75,
 			screenEventHandler: ScreenEventHandler.Self,
-			visible: false
+			visible: false,
 		}
 	}
 

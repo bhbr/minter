@@ -67,6 +67,10 @@ export class NumberListBox extends Linkable {
 		})
 		this.clearButton.action = this.clear.bind(this)
 		this.add(this.clearButton)
+		// for (let i = 0; i < 5; i++) {
+		// 	this.list.push(Math.random())
+		// }
+		// this.scroll.update({ list: this.list })
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

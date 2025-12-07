@@ -3,6 +3,7 @@ import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCa
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { Checkbox } from 'core/mobjects/Checkbox'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class ScatterPlot extends DesmosCalculator {
 
@@ -18,7 +19,7 @@ export class ScatterPlot extends DesmosCalculator {
 				{ name: 'yData', displayName: 'y data', type: 'Array<number>' }
 			],
 			xData: [],
-			yData: [0],
+			yData: [],
 			showPointsCheckbox: new Checkbox({
 				text: 'points',
 				state: true
@@ -38,30 +39,25 @@ export class ScatterPlot extends DesmosCalculator {
 		this.calculator.setExpression({ id: 'yData', latex: `Y = [${listString}]` })
 	}
 
-	setXDataExpression() {
-		if (this.xData.length > 1) {
-			this.setXArrayExpression(`${this.xData}`)
-		} else {
+	setDataExpressions() {
+		if (this.xData.length == 0 && this.yData.length > 1) {
 			this.setXArrayExpression(`1, ..., ${this.yData.length}`)
+			this.setYArrayExpression(`${this.yData}`)
+		} else if (this.xData.length > 1 && this.yData.length == 0) {
+			this.setXArrayExpression(`${this.xData}`)
+			this.setYArrayExpression(`1, ..., ${this.xData.length}`)
+		} else {
+			this.setXArrayExpression(`${this.xData}`)
+			this.setYArrayExpression(`${this.yData}`)
 		}
 	}
 
-	setYDataExpression() {
-		this.setYArrayExpression(`${this.yData}`)
-	}
-
-	setDataExpressions() {
-		this.setXDataExpression()
-		this.setYDataExpression()
-	}
 
 	createCalculator(options: object = {}) {
 		options['expressions'] = false
 		super.createCalculator(options)
 		this.setDataExpressions()
-		//this.calculator.setExpression({ id: 'lines', latex: `\\{k<x<k+1:(1-x+k) D[k]+(x-k) D[k+1]\\}`})
 		this.calculator.setExpression({ id: 'dots', latex: `(X, Y)` })
-		//this.calculator.setExpression({ id: 'bars', latex: `0\\leq y\\leq \\{ k-1\\leq x < k: D[k]\\}` })
 		this.calculator.setMathBounds({
 			left: -0.5,
 			right: 10,
@@ -89,6 +85,18 @@ export class ScatterPlot extends DesmosCalculator {
 			this.setDataExpressions()
 		}
 	}
+
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		if (link.dependency.inputName == 'xData') {
+			this.xData = []
+			this.setDataExpressions()
+		} else if (link.dependency.inputName == 'yData') {
+			this.yData = []
+			this.setDataExpressions()
+		}
+	}
+
 
 	setPointsVisibility(visible: boolean) {
 		this.calculator.setExpression({

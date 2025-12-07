@@ -18,9 +18,7 @@ export class PlayButton extends SimpleButton {
 			frameWidth: 40,
 			frameHeight: 20,
 			backgroundColor: Color.black(),
-			color: Color.white(),
-			borderColor: Color.white(),
-			borderWidth: 1
+			color: Color.white()
 		}
 	}
 
