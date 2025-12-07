@@ -1,6 +1,7 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEvent } from 'core/mobjects/screen_events'
+import { prettyPrint } from 'core/functions/various'
 
 export class Scroll extends Mobject {
 
@@ -29,17 +30,10 @@ export class Scroll extends Mobject {
 		super.update(args, redraw)
 		var innerHTML = ''
 		for (var i = 0; i < this.list.length; i++) {
-			innerHTML += (Scroll.stringRepresentation(this.list[i]) + `<br>`)
+			innerHTML += (prettyPrint(this.list[i]) + `<br>`)
 		}
 		this.view.div.innerHTML = innerHTML
 	}
 
-	static stringRepresentation(value: any): string {
-		if (typeof value == 'number') {
-			return value.toPrecision(4)
-		} else {
-			return `${value}`
-		}
-	}
 
 }

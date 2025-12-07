@@ -47,8 +47,21 @@ export function randomBinomial(n: number = 1, p: number = 0.5): number {
 	return Math.round(gaussianRandom(n * p, (n * p * (1 - p)) ** 0.5))
 }
 
+function prettyPrintNumber(value: number, precision: number = 4): string {
+	if (Math.round(value) != value) {
+		return value.toPrecision(precision)
+	} else {
+		return `${value}`;
+	}
+}
 
-
+export function prettyPrint(value: any, precision: number =  4): string {
+	if (typeof value == 'number') {
+		return prettyPrintNumber(value as number)
+	} else {
+		return `${value}`;
+	}
+}
 
 
 

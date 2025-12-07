@@ -10,6 +10,7 @@ import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/sc
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { prettyPrint } from 'core/functions/various'
 
 export class NumberBox extends Linkable {
 
@@ -51,7 +52,7 @@ export class NumberBox extends Linkable {
 	}
 	set value(newValue: number) {
 		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
-		this.inputElement.value = isFalsy ? '' : newValue.toPrecision(4)
+		this.inputElement.value = isFalsy ? '' : prettyPrint(newValue)
 	}
 
 	focus() {
@@ -80,7 +81,7 @@ export class NumberBox extends Linkable {
 		this.inputElement.style.fontSize = '20px'
 		this.inputElement.style.border = 'none'
 		this.inputElement.style.outline = 'none'
-		this.inputElement.value = this.value.toString()
+		this.inputElement.value = prettyPrint(this.value)
 		this.view.div.appendChild(this.inputElement)
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		document.addEventListener('keyup', this.boundActivateKeyboard)
@@ -130,7 +131,7 @@ export class NumberBox extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (args['value'] !== undefined) {
-			this.inputElement.textContent = `${args['value']}`
+			this.inputElement.textContent = prettyPrint(args['value'])
 		}
 		this.background.update({
 			width: this.view.frame.width,
