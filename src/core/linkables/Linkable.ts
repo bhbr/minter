@@ -182,7 +182,7 @@ which can be linked to such-exposed variables of other mobjects.
 
 	removedOutputLink(link: DependencyLink) {
 		this.update()
-		if (!link.startHook || !link.endHook) { return }
+		if (!link.startHook) { return }
 		link.startHook.outlet.removeUnlinkedHook()
 	}
 

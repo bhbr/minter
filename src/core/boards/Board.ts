@@ -949,8 +949,11 @@ The content children can also be dragged and panned.
 				this.remove(this.openLink)
 				if (this.openLink.startHook) {
 					this.openLink.startHook.update({ linked: false })
-					this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
-				} else if (this.openLink.endHook) {
+					if (this.openLink.previousHook) {
+						this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+					}
+				}
+				if (this.openLink.endHook) {
 					this.openLink.endHook.update({ linked: false })
 					this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 				}
@@ -971,9 +974,10 @@ The content children can also be dragged and panned.
 		}
 
 		if (this.openLink.startHook == null) {
-			this.openLink.update({
-				startHook: h
-			})
+			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
+			this.openLink.update({ startHook: h })
+			this.openLink.previousHook = this.openLink.startHook
+			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
 		} else {
 			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
 			this.openLink.update({ endHook: h })
@@ -1056,7 +1060,6 @@ The content children can also be dragged and panned.
 	}
 
 	removeDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
-		log('removeDependencyBetweenHooks')
 		startHook.outlet.ioList.mobject.removeDependencyBetween(
 			startHook.outlet.name,
 			endHook.outlet.ioList.mobject,
@@ -1066,7 +1069,6 @@ The content children can also be dragged and panned.
 		endHook.removeAllDependents()
 		startHook.outlet.removeHook()
 		if (this.openLink) {
-			log('removing link')
 			startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
 			endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 		}
