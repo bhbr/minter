@@ -74,7 +74,9 @@ export class Paper extends Board {
 			frameWidth: width
 		})
 		let el = document.querySelector('#htmlConsole') as HTMLElement
-		el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
+		if (el) {
+			el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
+		}
 		//window.addEventListener('resize', this.resize.bind(this))
 		this.resize()
 
@@ -152,7 +154,7 @@ export class Paper extends Board {
 		if (e.key == 'Shift' || e.key == 'Alt') {
 			(window as any).emulatedDevice = ScreenEventDevice.Mouse
 		} else {
-			this.messageSidebar({'buttonUp': e.key})
+			this.messageSidebar({ 'buttonUp': e.key })
 		}
 	}
 

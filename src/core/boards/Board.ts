@@ -455,11 +455,11 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
-				if (value) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
+				// if (value as boolean) {
+				// 	this.helpTextLabel.view.show()
+				// } else {
+				// 	this.helpTextLabel.view.hide()
+				// }
 				break
 			case 'show controls':
 				this.helpTextLabel.update({
@@ -1088,34 +1088,6 @@ The content children can also be dragged and panned.
 			}
 		}
 	}
-
-	// innerInputHooks(): Array<LinkHook> {
-	// 	let arr: Array<LinkHook>  = []
-	// 	for (let submob of this.linkableChildren()) {
-	// 		for (let inputName of submob.inputNames) {
-	// 			arr.push(submob.inputList.hookNamed(inputName))
-	// 		}
-	// 	}
-	// 	return arr
-	// }
-
-	// innerOutputHooks(): Array<LinkHook> {
-	// 	let arr: Array<LinkHook>  = []
-	// 	for (let submob of this.linkableChildren()) {
-	// 		for (let outputName of submob.outputNames) {
-	// 			arr.push(submob.outputList.hookNamed(outputName))
-	// 		}
-	// 	}
-	// 	return arr
-	// }
-
-	// outerInputHooks(): Array<LinkHook> {
-	// 	return this.expandedInputList.linkHooks
-	// }
-
-	// outerOutputHooks(): Array<LinkHook> {
-	// 	return this.expandedOutputList.linkHooks
-	// }
 
 	allHooks(): Array<LinkHook> {
 		if (this.contracted) {

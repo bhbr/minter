@@ -43,6 +43,7 @@ export class ToggleButton extends SidebarButton {
 			super.commonButtonUp()
 		}
 		this.label.view.hide()
+		this.paper.helpTextLabel.view.hide()
 	}
 
 	imageNameForIndex(index: number): string {
