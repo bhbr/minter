@@ -2,10 +2,11 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { vertex, vertexArray } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexArrayImageUnder } from 'core/functions/vertex'
 import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'core/mobjects/screen_events'
 import { VView } from './VView'
 import { Frame } from 'core/mobjects/Frame'
+import { Transform } from 'core/classes/Transform'
 
 export class VMobject extends Mobject {
 /*
@@ -205,6 +206,10 @@ TODO: support mutiple paths e. g. for shapes with holes
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }
 
+	applyTransform(t: Transform) {
+		this.vertices = vertexArrayImageUnder(this.vertices, t)
+		this.redraw()
+	}
 
 
 

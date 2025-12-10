@@ -185,9 +185,6 @@ export class SidebarButton extends Circle {
 			this.sidebar.activeButton = this
 			this.sidebar.add(this.label)
 		}
-		this.paper.helpTextLabel.update({
-			text: this.paper.helpTexts[this.messageKey]
-		})
 		this.paper.helpTextLabel.view.show()
 	}
 

@@ -95,7 +95,7 @@ export class View extends ExtendedObject {
 		// by default, the mobject can draw outside its view's borders
 		this.div.style.border = this.drawBorder ? '1px dashed green' : 'solid'
 		this.div.style.borderColor = this.borderColor.toCSS()
-		this.div.style.borderWidth = `${this.borderWidth}px`
+		this.div.style.borderWidth = this.drawBorder ? '1px' : `${this.borderWidth}px`
 		this.div.style.borderRadius = `${this.borderRadius}px`
 		this.div['view'] = this
 		this.frame.view = this

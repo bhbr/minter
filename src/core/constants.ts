@@ -2,9 +2,9 @@
 import { Color } from 'core/classes/Color'
 
 export const SIDEBAR_WIDTH: number = 210
-export const SHOW_HTML_CONSOLE: boolean = true
+export const SHOW_HTML_CONSOLE: boolean = false
 
-export const DRAW_BORDERS: boolean = false
+export const DRAW_BORDERS: boolean = true
 
 export const MAX_TAP_DELAY: number = 250
 export const MERE_TAP_DELAY: number = 250

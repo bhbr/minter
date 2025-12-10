@@ -1,9 +1,10 @@
 
 import { Creator } from 'core/creators/Creator'
 import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
-import { vertex } from 'core/functions/vertex'
+import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Transform } from 'core/classes/Transform'
 
 export class Freehand extends Creator {
 
@@ -52,6 +53,15 @@ export class Freehand extends Creator {
 		this.update({
 			frameWidth: this.line.getWidth(),
 			frameHeight: this.line.getHeight()
+		})
+
+		let oldAnchor = this.line.anchor
+		let newAnchor = this.line.ulCorner()
+		let shift = vertexSubtract(oldAnchor, newAnchor)
+		let t = new Transform({ shift: shift })
+		this.line.applyTransform(t)
+		this.update({
+			anchor: vertexSubtract(this.anchor, shift)
 		})
 
 		let par = this.parent
