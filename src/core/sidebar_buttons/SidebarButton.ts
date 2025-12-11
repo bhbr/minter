@@ -90,7 +90,6 @@ export class SidebarButton extends Circle {
 			smallLabelFontSize: 'never',
 			optionSpacing: 'never',
 			label: 'never',
-			sideLabel: 'never',
 			icon: 'on_init',
 			activeScalingFactor: 'never',
 			messages: 'on_update',
