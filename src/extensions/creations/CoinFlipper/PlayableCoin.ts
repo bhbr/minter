@@ -1,5 +1,5 @@
 
-import { Coin } from './Coin'
+import { Coin, CoinState } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
@@ -15,6 +15,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	playIntervalID?: number
 	playButton: PlayButton
 	valueHistory: Array<number>
+	swipedSide: CoinState | null
 
 	defaults(): object {
 		return {
@@ -35,7 +36,8 @@ export class PlayableCoin extends Linkable implements Playable {
 			],
 			frameWidth: 50,
 			frameHeight: 80,
-			tailsProbability: 0.5
+			tailsProbability: 0.5,
+			swipedSide: null
 		}
 	}
 
@@ -56,6 +58,38 @@ export class PlayableCoin extends Linkable implements Playable {
 
 	onTap(e: ScreenEvent) {
 		this.flip(true)
+		this.coin.update({
+			opacity: 1
+		})
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		this.sensor.eventStartLocation = this.sensor.localEventVertex(e)
+		this.coin.update({
+			opacity: 0.5
+		})
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		if (this.sensor.eventStartLocation === null) { return }
+		let dx = this.sensor.localEventVertex(e)[0] - this.sensor.eventStartLocation[0]
+		if (dx > 10) {
+			this.swipedSide = 'tails'
+		} else if (dx < -10) {
+			this.swipedSide = 'heads'
+		}
+	}
+
+	onPointerUp(e: ScreenEvent) {
+		this.coin.update({
+			opacity: 1
+		})
+		if (this.swipedSide) {
+			this.coin.flipToState(this.swipedSide, true)
+			this.update()
+			this.updateDependents()
+			this.swipedSide = null
+		}
 	}
 
 	flip(animate: boolean = false) {

@@ -5,9 +5,11 @@ import { log } from 'core/functions/logging'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
+export type CoinState = 'heads' | 'tails'
+
 export class Coin extends Circle {
 	
-	state: 'heads' | 'tails'
+	state: CoinState
 	headsColor: Color
 	tailsColor: Color
 	tailsProbability: number
@@ -57,7 +59,11 @@ export class Coin extends Circle {
 
 	flip(animate: boolean = false) {
 		let x = Math.random()
-		let newState = (x < this.tailsProbability) ? 'tails' : 'heads'
+		let newState: CoinState = (x < this.tailsProbability) ? 'tails' : 'heads'
+		this.flipToState(newState, animate)
+	}
+
+	flipToState(newState: CoinState, animate: boolean = false) {
 		if (animate) {
 			this.update({
 				fillColor: Color.black(),
@@ -70,7 +76,7 @@ export class Coin extends Circle {
 		} else {
 			this.update({ state: newState })
 		}
-	}
+	} 
 
 	get labelText(): string {
 		return this.label.text

@@ -22,7 +22,7 @@ export class Sensor extends ExtendedObject {
 	mereTapTimeoutID?: number
 
 	eventStartTime: number
-
+	eventStartLocation: vertex | null
 
 	defaults(): object {
 		return {
@@ -33,6 +33,7 @@ export class Sensor extends ExtendedObject {
 			screenEventHistory: [],
 			screenEventDevice: null,
 			eventStartTime: 0,
+			eventStartLocation: null
 		}
 	}
 
@@ -156,11 +157,10 @@ export class Sensor extends ExtendedObject {
 	*/
 
 	capturedOnPointerDown(e: ScreenEvent) {
-		//log('capturedOnPointerDown')
+		this.eventStartLocation = this.localEventVertex(e)
 		if (this.eventStartTime == 0) {
 			this.eventStartTime = e.timeStamp
 		}
-
 		let target = this.eventTargetMobject(e)
 		this.eventTarget = target
 		if (target == null) { return }
@@ -218,6 +218,7 @@ export class Sensor extends ExtendedObject {
 		}
 
 		this.decideEventAction(e)
+		this.eventStartLocation = null
 		if (this.deleteHistoryTimeoutID != null) { return }
 		this.deleteHistoryTimeoutID = window.setTimeout(
 			this.deleteScreenEventHistory.bind(this), 1000
