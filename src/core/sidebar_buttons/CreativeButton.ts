@@ -1,5 +1,6 @@
 
 import { SidebarButton } from './SidebarButton'
+import { log } from 'core/functions/logging'
 
 export class CreativeButton extends SidebarButton {
 
@@ -38,6 +39,10 @@ export class CreativeButton extends SidebarButton {
 
 	imageNameForIndex(index: number): string {
 		return (Object.values(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
+	}
+
+	updateHelpText() {
+		// do nothing because the board handles it
 	}
 
 }
