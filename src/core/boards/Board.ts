@@ -469,12 +469,9 @@ The content children can also be dragged and panned.
 				if (this.creator == null) {
 					// little hack, I know
 					let dummyCreator = this.createCreator(this.creationMode)
-					log(this.creationMode)
-					log(dummyCreator.helpText)
 					this.helpTextLabel.update({
 						text: dummyCreator.helpText
 					})
-					log(this.helpTextLabel.text)
 					if (value) {
 						this.helpTextLabel.view.show()
 					} else {

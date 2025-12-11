@@ -92,7 +92,6 @@ export class Paper extends Board {
 
 	}
 
-
 	resize() {
 		let size = Math.max(window.screen.width, window.screen.height)
 		let buffer = 500

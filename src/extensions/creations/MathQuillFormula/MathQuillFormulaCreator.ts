@@ -8,6 +8,7 @@ export class MathQuillFormulaCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
+			helpText: 'An algebraic expression. Input variables are detected automatically. You can define the name of the output variable using an equals sign.',
 			pointOffset: [-20, -50]
 		}
 	}
