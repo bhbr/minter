@@ -542,22 +542,23 @@ The content children can also be dragged and panned.
 		}
 	}
 
-	contentChildClosestTo(p: vertex, maxDistance: number = 50): Mobject | null {
-		var d2 = Infinity
-		var candidate: Mobject | null = null
+	contentChildrenContaining(p: vertex): Array<Mobject> {
+		let mobs: Array<Mobject> = []
 		for (let child of this.contentChildren) {
-			let q = child.frame.viewCenter(this.frame)
-			let pq2 = vertexNorm2(vertexSubtract(p, q))
-			if (pq2 < d2) {
-				candidate = child
-				d2 = pq2
+			if (child.frame.contains(p)) {
+				mobs.push(child)
 			}
 		}
-		if (d2 < maxDistance ** 2) {
-			return candidate
-		} else {
-			return null
+		return mobs
+	}
+
+	firstContentChildContaining(p: vertex): Mobject | null {
+		for (let child of this.contentChildren) {
+			if (child.frame.contains(p)) {
+				return child
+			}
 		}
+		return null
 	}
 
 	startErasing(e: ScreenEvent) {
@@ -565,7 +566,7 @@ The content children can also be dragged and panned.
 	}
 
 	erasing(e: ScreenEvent) {
-		let mob = this.contentChildClosestTo(this.sensor.localEventVertex(e))
+		let mob = this.firstContentChildContaining(this.sensor.localEventVertex(e))
 		if (mob) {
 			this.removeFromContent(mob)
 		}
