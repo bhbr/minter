@@ -4,6 +4,7 @@ import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper'
 import { log } from './core/functions/logging'
 //import { AllTests } from './_tests/allTests'
 import { MathQuillFormula } from './extensions/creations/MathQuillFormula/MathQuillFormula'
+import { RadioButtonList } from './core/mobjects/RadioButtonList'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -11,3 +12,4 @@ export class StartPaper extends CoinFlipPaper { }
 // if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
+
