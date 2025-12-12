@@ -57,6 +57,7 @@ export class CoinRow extends Linkable implements Playable {
 			outputProperties: [
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
 				{ name: 'nbTails', displayName: '# tails', type: 'number' },
+				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
 				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 			frameWidth: 300,
