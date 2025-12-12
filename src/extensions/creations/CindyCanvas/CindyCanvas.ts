@@ -92,6 +92,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 
 		this.add(this.playButton)
+		this.controls.push(this.playButton)
 		this.playButton.update({
 			mobject: this
 		})

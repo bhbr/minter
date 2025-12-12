@@ -29,6 +29,7 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList
 	linksEditable: boolean
+	controls: Array<Mobject>
 
 	defaults(): object {
 		return {
@@ -37,7 +38,8 @@ which can be linked to such-exposed variables of other mobjects.
 			inputProperties: [],
 			outputProperties: [],
 			linksEditable: false,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			controls: []
 		}
 	}
 
@@ -140,12 +142,10 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	setControlsVisibility(visible: boolean) {
-		for (let mob of this.submobs) {
-			if (mob instanceof SimpleButton || mob instanceof Checkbox) {
-				mob.update({
-					visible: visible
-				})
-			}
+		for (let mob of this.controls) {
+			mob.update({
+				visible: visible
+			})
 		}
 	}
 

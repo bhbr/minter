@@ -118,6 +118,7 @@ export class InclinedScene extends Linkable implements Playable {
 		this.add(this.torques)
 		this.add(this.playButton)
 		this.add(this.showTorquesToggle)
+		this.push(this.playButton)
 
 		this.plane.update({
 			midpoint: this.view.frame.localCenter(),

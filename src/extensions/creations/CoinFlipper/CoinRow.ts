@@ -101,6 +101,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.playButton.update({
 			mobject: this
 		})
+		this.controls.push(this.playButton)
 	}
 
 

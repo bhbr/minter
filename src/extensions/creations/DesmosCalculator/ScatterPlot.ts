@@ -31,6 +31,12 @@ export class ScatterPlot extends DesmosCalculator {
 		}
 	}
 
+	setup() {
+		super.setup()
+		this.controls.push(this.showPointsCheckbox)
+		this.controls.push(this.showLinesCheckbox)
+	}
+
 	setXArrayExpression(listString: string) {
 		this.calculator.setExpression({ id: 'xData', latex: `X = [${listString}]` })
 	}

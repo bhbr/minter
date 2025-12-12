@@ -53,6 +53,7 @@ export class PlayableCoin extends Linkable implements Playable {
 		})
 		this.add(this.coin)
 		this.add(this.playButton)
+		this.controls.push(this.playButton)
 		this.playButton.mobject = this
 	}
 
