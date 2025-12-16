@@ -569,6 +569,23 @@ The content children can also be dragged and panned.
 		let mob = this.firstContentChildContaining(this.sensor.localEventVertex(e))
 		if (mob) {
 			this.removeFromContent(mob)
+			let linksToBeRemoved: Array<Mobject> = []
+			for (let link of this.links) {
+				if (link.startHook.outlet.ioList.mobject == mob || link.endHook.outlet.ioList.mobject == mob) {
+					link.startHook.update({
+						linked: false
+					})
+					link.startHook.outlet.removeHook()
+					link.endHook.update({
+						linked: false
+					})
+					linksToBeRemoved.push(link)
+					this.remove(link)
+				}
+			}
+			for (let link of linksToBeRemoved) {
+				remove(this.links, link)
+			}
 		}
 	}
 
