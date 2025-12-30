@@ -1,10 +1,10 @@
 
-import { MathQuillFormula } from './MathQuillFormula'
+import { MathQuillExpressionField } from './MathQuillExpressionField'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 
-export class MathQuillFormulaCreator extends DraggingCreator {
+export class MathQuillExpressionFieldCreator extends DraggingCreator {
 
-	declare creation: MathQuillFormula
+	declare creation: MathQuillExpressionField
 
 	defaults(): object {
 		return {
@@ -13,8 +13,8 @@ export class MathQuillFormulaCreator extends DraggingCreator {
 		}
 	}
 
-	createMobject(): MathQuillFormula {
-		return new MathQuillFormula({
+	createMobject(): MathQuillExpressionField {
+		return new MathQuillExpressionField({
 			anchor: this.getStartPoint()
 		})
 	}

@@ -28,8 +28,8 @@ export class PlayableCoin extends Linkable implements Playable {
 			valueHistory: [],
 			inputProperties: [
 				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
-				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
-				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
+				//{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				//{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
 			],
 			outputProperties: [
 				{ name: 'value', type: 'number' }

@@ -66,7 +66,7 @@ export class Frame extends ExtendedObject {
 
 		// If there is no frame, use the direct parent's coordinate frame.
 		// If there is no parent yet, use your own (local) coordinates.
-		let frame_: any = frame  || this
+		let frame_: any = frame || this
 		let t = Transform.identity()
 		let fr: Frame = this
 		while (fr && fr.transform instanceof Transform) {

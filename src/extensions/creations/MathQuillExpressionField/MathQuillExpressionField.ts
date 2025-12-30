@@ -17,7 +17,7 @@ import { Color } from 'core/classes/Color'
 declare var MathQuill: any
 
 
-export class MathQuillFormula extends Linkable {
+export class MathQuillExpressionField extends Linkable {
 
 	MQ: any
 	mathField: any
@@ -37,11 +37,18 @@ export class MathQuillFormula extends Linkable {
 			span: null,
 			scope: {},
 			parser: new Parser([]),
-			outputProperties: [{
-				name: 'value',
-				type: 'number',
-				displayName: 'value'
-			}],
+			outputProperties: [
+				{
+					name: 'value',
+					type: 'number',
+					displayName: 'value'
+				},
+				{
+					name: 'expression',
+					type: 'expression',
+					displayName: 'expression'
+				}
+			],
 			value: 0,
 			resultBox: new TextLabel(),
 		}

@@ -33,8 +33,8 @@ export class Histogram extends DesmosCalculator {
 				{ name: 'nbBins', displayName: '# bins', type: 'number' },
 				{ name: 'min', displayName: 'minimum', type: 'number' },
 				{ name: 'max', displayName: 'maximum', type: 'number' },
-				{ name: 'leftColor', displayName: 'left color', type: 'Color' },
-				{ name: 'rightColor', displayName: 'right color', type: 'Color' }
+				//{ name: 'leftColor', displayName: 'left color', type: 'Color' },
+				//{ name: 'rightColor', displayName: 'right color', type: 'Color' }
 			],
 			outputProperties: [
 				{ name: 'bins', type: 'Array<number>' }

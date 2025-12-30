@@ -2,7 +2,7 @@
 import { Transform } from 'core/classes/Transform'
 import { vertex, vertexEquals } from 'core/functions/vertex'
 import { DEGREES } from 'core/constants'
-import { AssertionTest, BundledTest } from '_tests/Tests'
+import { AssertionTest, ValueTest, BundledTest } from '_tests/Tests'
 
 export const TransformTest = new BundledTest({
 	name: 'Transform test',
@@ -52,7 +52,7 @@ export const TransformTest = new BundledTest({
 		}),
 
 		new AssertionTest({
-			name: 'Transforms concatenate properly',
+			name: 'Transforms concatenate properly to the right',
 			function: function(): boolean {
 				let t1 = new Transform({
 					anchor: [1, 2],
@@ -71,6 +71,50 @@ export const TransformTest = new BundledTest({
 				let w1 = t2.appliedTo(t1.appliedTo(v))
 				let w2 = t12.appliedTo(v)
 				return vertexEquals(w1, w2)
+			}
+		}),
+
+		new AssertionTest({
+			name: "Transforms concatenate properly to the left",
+			function: function(): boolean {
+				let t1 = new Transform({
+					anchor: [1, 2],
+					angle: 3 * DEGREES,
+					scale: 4,
+					shift: [5, 6]
+				})
+				let t2 = new Transform({
+					anchor: [7, 8],
+					angle: 9 * DEGREES,
+					scale: 10,
+					shift: [11, 12]
+				})
+				let t21 = t1.leftComposedWith(t2)
+				let v = [13, 14]
+				let w1 = t2.appliedTo(t1.appliedTo(v))
+				let w2 = t21.appliedTo(v)
+				return vertexEquals(w1, w2)
+			}
+		}),
+
+		new AssertionTest({
+			name: "Transform's left and right composition work equivalently",
+			function: function(): boolean {
+				let t1 = new Transform({
+					anchor: [1, 2],
+					angle: 3 * DEGREES,
+					scale: 4,
+					shift: [5, 6]
+				})
+				let t2 = new Transform({
+					anchor: [7, 8],
+					angle: 9 * DEGREES,
+					scale: 10,
+					shift: [11, 12]
+				})
+				let t12a = t1.rightComposedWith(t2)
+				let t12b = t2.leftComposedWith(t1)
+				return t12a.equals(t12b)
 			}
 		}),
 
@@ -102,6 +146,22 @@ export const TransformTest = new BundledTest({
 				})
 				let inv = t.inverse()
 				let prod = t.rightComposedWith(inv)
+				let id = Transform.identity()
+				return prod.equals(id)
+			}
+		}),
+
+		new AssertionTest({
+			name: "A transform's inverse times itself equals the identity",
+			function: function(): boolean {
+				let t = new Transform({
+					anchor: [50, -100],
+					angle: 25 * DEGREES,
+					scale: 2.5,
+					shift: [-150, 200]
+				})
+				let inv = t.inverse()
+				let prod = inv.rightComposedWith(t)
 				let id = Transform.identity()
 				return prod.equals(id)
 			}
@@ -146,7 +206,8 @@ export const TransformTest = new BundledTest({
 				let d2 = t.a() * t.d() - t.b() * t.c()
 				return (Math.abs((d1 - d2) / d1) < 1e-6)
 			}
-		})
+		}),
+
 	]
 })
 
