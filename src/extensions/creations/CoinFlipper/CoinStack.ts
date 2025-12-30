@@ -63,8 +63,8 @@ export class CoinStack extends Linkable implements Playable {
 			}),
 			inputProperties: [
 				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
-				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
-				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
+				//{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				//{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' }
 			],
 			outputProperties: [
@@ -187,7 +187,6 @@ export class CoinStack extends Linkable implements Playable {
 		document.removeEventListener('keydown', this.nbCoinsInputBox.boundKeyPressed)
 		this.update({ nbCoins: this.nbCoinsInputBox.value })
 	}
-
 
 	headsBarHeight(): number {
 		return Math.round(this.nbHeads / this.nbCoins * this.height)

@@ -9,6 +9,8 @@ import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
+import { SimpleNumberBox } from 'extensions/creations/math/boxes/SimpleNumberBox'
+import { getPaper } from 'core/functions/getters'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -25,6 +27,7 @@ export class CoinRow extends Linkable implements Playable {
 	nbHeadsLabel: TextLabel
 	nbTailsLabel: TextLabel
 	labelWidth: number
+	nbCoinsInputBox: SimpleNumberBox
 
 	defaults(): object {
 		return {
@@ -51,8 +54,8 @@ export class CoinRow extends Linkable implements Playable {
 			inputProperties: [
 				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
-				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
-				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
+				//{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				//{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
 			],
 			outputProperties: [
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
@@ -61,7 +64,10 @@ export class CoinRow extends Linkable implements Playable {
 				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 			frameWidth: 300,
-			frameHeight: 50
+			frameHeight: 50,
+			nbCoinsInputBox: new SimpleNumberBox({
+				value: 1
+			}),
 		}
 	}
 
@@ -70,6 +76,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.createCoins()
 		this.setupLabels()
 		this.setupButton()
+		this.setupInputBox()
 	}
 
 	createCoins() {
@@ -104,6 +111,21 @@ export class CoinRow extends Linkable implements Playable {
 		this.controls.push(this.playButton)
 	}
 
+	setupInputBox() {
+		this.add(this.nbCoinsInputBox)
+		this.nbCoinsInputBox.blur = this.endNbCoinsEditing.bind(this)
+		this.nbCoinsInputBox.onReturn = this.endNbCoinsEditing.bind(this)
+		this.controls.push(this.nbCoinsInputBox)
+		this.nbCoinsInputBox.inputElement.style.left = '25px'
+
+	}
+
+	endNbCoinsEditing() {
+		getPaper().blurFocusedChild()
+		this.nbCoinsInputBox.inputElement.blur()
+		document.removeEventListener('keydown', this.nbCoinsInputBox.boundKeyPressed)
+		this.update({ nbCoins: this.nbCoinsInputBox.value })
+	}
 
 	addCoin() {
 		let coin = new Coin({
@@ -125,6 +147,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
 		this.positionButton()
+		this.positionNbCoinsInputBox()
 	}
 
 	removeCoin() {
@@ -133,6 +156,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
 		this.positionButton()
+		this.positionNbCoinsInputBox()
 	}
 
 	adjustFrameWidth() {
@@ -155,6 +179,15 @@ export class CoinRow extends Linkable implements Playable {
 			anchor: [
 				this.frameWidth / 2 - this.playButton.frameWidth / 2,
 				2 * this.coinRadius + 15
+			]
+		})
+	}
+
+	positionNbCoinsInputBox() {
+		this.nbCoinsInputBox.update({
+			anchor: [
+				this.frameWidth / 2 - this.nbCoinsInputBox.frameWidth / 2 - 25,
+				-35
 			]
 		})
 	}
@@ -223,6 +256,7 @@ export class CoinRow extends Linkable implements Playable {
 				this.addCoin()
 			}
 		}
+		this.nbCoinsInputBox.inputElement.value = newNbCoins.toString()
 	}
 
 	computeWidth(): number {

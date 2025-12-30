@@ -9,7 +9,7 @@ export class PlayableCoinCreator extends DraggingCreator {
 
 	defaults(): object {
 		return {
-			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it. Swipe the coin left or right to pick a side.',
+			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it. Swipe the coin left or right to fix the outcome, e. g. for creating an artificial streak.',
 			pointOffset: [-25, -50]
 		}
 	}
