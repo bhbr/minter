@@ -11,6 +11,7 @@ import { log } from 'core/functions/logging'
 import { SimpleButton } from 'core/mobjects/SimpleButton'
 import { Checkbox } from 'core/mobjects/Checkbox'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
+import { remove } from 'core/functions/arrays'
 
 export interface IOProperty {
 	name: string
@@ -199,6 +200,67 @@ which can be linked to such-exposed variables of other mobjects.
 		this.outputList.positionOutlets()
 		this.inputList.positionSelf()
 		this.outputList.positionSelf()
+	}
+
+
+	createInputVariable(name: string, value: number) {
+		this.createProperty(name, value)
+		this.inputProperties.push({
+			name: name,
+			type: 'number',
+			displayName: name
+		})
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+
+		this.positionIOLists()
+		this.inputList.view.hide()
+	}
+
+	removeInputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				remove(this.inputProperties, prop)
+				break
+			}
+		}
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.positionIOLists()
+		this.inputList.view.hide()
+		this.update()
+	}
+
+	createOutputVariable(name: string) {
+		if (name == null) { return }
+		this.createProperty(name, 0)
+		this.outputProperties = [{
+			name: name,
+			type: 'number',
+			displayName: name
+		}]
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
+	}
+
+	removeOutputVariable() {
+		this.outputProperties = [{
+			name: 'value',
+			type: 'number',
+			displayName: 'value'
+		}]
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
 	}
 
 }

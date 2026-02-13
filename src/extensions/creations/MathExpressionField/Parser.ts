@@ -2,8 +2,8 @@
 import { ParseError } from './ParseError'
 import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
 import { Lexer } from './Lexer'
-import { createMinterMathNode, rightGrouping, primaryTypes } from './createMinterMathNode'
-import { MinterMathNode } from './MinterMathNode'
+import { createMathNode, rightGrouping, primaryTypes } from './createMathNode'
+import { MathNode } from './MathNode'
 
 // scope used by evaluateTex to resolve identifiers
 export type Scope = { [key: string]: any }
@@ -54,7 +54,7 @@ export class Parser {
 	*
 	* @param tokens A list of Tokens to be parsed.
 	*/
-	constructor(tokens: Array<Token>) {
+	constructor(tokens: Array<Token> = []) {
 		this.lexer = new Lexer()
 		this.tokens = tokens
 		this.pos = 0
@@ -116,7 +116,7 @@ export class Parser {
 			}
 			const equals = this.nextToken()
 			const rightExpr = this.nextExpression()
-			return createMinterMathNode(equals, [leftTerm, rightExpr])
+			return createMathNode(equals, [leftTerm, rightExpr])
 		}
 		// term ((PLUS | MINUS) term)*
 
@@ -124,7 +124,7 @@ export class Parser {
 			// build the tree with left-associativity
 			const operator = this.nextToken()
 			const rightTerm = this.nextTerm()
-			leftTerm = createMinterMathNode(operator, [leftTerm, rightTerm])
+			leftTerm = createMathNode(operator, [leftTerm, rightTerm])
 		}
 		return leftTerm
 	}
@@ -173,7 +173,7 @@ export class Parser {
 				operator = new Token('*', TokenType.Star, starPos)
 				implicitMult = true
 			}
-			leftFactor = createMinterMathNode(operator, [leftFactor, rightFactor])
+			leftFactor = createMathNode(operator, [leftFactor, rightFactor])
 			leftFactor.implicit = implicitMult
 		}
 		return leftFactor
@@ -190,7 +190,7 @@ export class Parser {
 		if (this.match(TokenType.Minus)) {
 			const negate = this.nextToken()
 			const primary = this.nextPower()
-			return createMinterMathNode(negate, [primary])
+			return createMathNode(negate, [primary])
 		}
 		return this.nextPower()
 	}
@@ -206,7 +206,7 @@ export class Parser {
 		while (this.match(TokenType.Caret)) {
 			const caret = this.nextToken()
 			const exponent = this.nextPrimary()
-			base = createMinterMathNode(caret, [base, exponent])
+			base = createMathNode(caret, [base, exponent])
 		}
 		return base
 	}
@@ -259,7 +259,7 @@ export class Parser {
 		case TokenType.Pi:
 		case TokenType.E:
 		case TokenType.T:
-			primary = createMinterMathNode(this.nextToken())
+			primary = createMathNode(this.nextToken())
 			break
 		case TokenType.Sqrt:
 		case TokenType.Sin:
@@ -325,7 +325,7 @@ export class Parser {
 		if (leftGrouping.type === TokenType.Bar) {
 			// grouping with bars |x| also applies a function, so we create the corresponding function
 			// here
-			grouping = createMinterMathNode(leftGrouping, [grouping])
+			grouping = createMathNode(leftGrouping, [grouping])
 		}
 		// a grouping can contain multiple children if the
 		// grouping is parenthetical and the values are comma-seperated
@@ -353,7 +353,7 @@ export class Parser {
 	nextUnaryFunc(): any {
 		const func = this.nextToken()
 		const argument = this.nextArgument()
-		return createMinterMathNode(func, argument)
+		return createMathNode(func, argument)
 	}
 
 	/**
@@ -368,7 +368,7 @@ export class Parser {
 		const customFunc = this.nextToken()
 		this.tryConsume("expected '}' after operator name", TokenType.Rbrace)
 		const argument = this.nextArgument()
-		return createMinterMathNode(customFunc, argument)
+		return createMathNode(customFunc, argument)
 	}
 
 	/**
@@ -418,7 +418,7 @@ export class Parser {
 		} else {
 			denominator = this.nextExpression()
 		}
-		return createMinterMathNode(frac, [numerator, denominator])
+		return createMathNode(frac, [numerator, denominator])
 	}
 
 	/**
@@ -451,7 +451,7 @@ export class Parser {
 				if (row.length === 1) {
 					rows.push(element)
 				} else {
-					rows.push(createMinterMathNode(matrixToken, row))
+					rows.push(createMathNode(matrixToken, row))
 				}
 				row = []
 				if (delimiter.type === TokenType.End) {
@@ -469,7 +469,7 @@ export class Parser {
 		this.tryConsume("expected 'matrix' after '\\end{' (no other environnments"
 		+ 'are supported yet)', TokenType.Matrix)
 		this.tryConsume("expected '}' after \\end{matrix", TokenType.Rbrace)
-		return createMinterMathNode(matrixToken, rows)
+		return createMathNode(matrixToken, rows)
 	}
 
 	/**
@@ -499,8 +499,8 @@ export class Parser {
 	*
 	* @returns The root node of a MathJS expression tree.
 	*/
-	parseTokens(tokens: Array<Token>): MinterMathNode {
-		//return this.nextExpression() as MinterMathNode
+	parseTokens(tokens: Array<Token>): MathNode {
+		//return this.nextExpression() as MathNode
 		return (new Parser(tokens)).nextExpression()
 	}
 
@@ -509,7 +509,7 @@ export class Parser {
 	 * @returns Returns an object containing the root node of a MathJS expression tree
 	 *          and variables that need to be defined.
 	 */
-	parseTex(texStr: string): MinterMathNode {
+	parseTex(texStr: string): MathNode {
 	  return this.parseTokens(this.lexer.tokenizeTex(texStr))
 	}
 

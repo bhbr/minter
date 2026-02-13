@@ -20,7 +20,7 @@ export class DesmosCalculator extends Linkable {
 	outerFrame: Rectangle
 	options: object
 	expressions: object
-	secretInputExpressions: object // hidden definition `a=${this.a}`` of linked input property
+	secretInputExpressions: object // hidden definition `a=${this.a}` of linked input property
 	outputHelperExpressions: object // copy of visible definition `b = a^2` to access its numericValue
 	updating: boolean
 	minWidth: number
@@ -59,7 +59,7 @@ export class DesmosCalculator extends Linkable {
 		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
 			this.loadDesmosAPI()
 		} else {
-			this.createCalculator(this.options)
+			this.createCalculator()
 		}
 	}
 
@@ -136,13 +136,13 @@ export class DesmosCalculator extends Linkable {
 		document.head.append(scriptTag)
 	}
 
-	createCalculator(options: object = {}) {
+	createCalculator() {
 		//log('createCalculator')
 		let apis = getPaper().loadedAPIs
 		if (!apis.includes('desmos-calc')) {
 			apis.push('desmos-calc')
 		}
-		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, options)
+		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, this.options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
 		window.setTimeout(this.layoutContent.bind(this), 50)
 	}

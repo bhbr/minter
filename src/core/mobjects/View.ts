@@ -106,10 +106,18 @@ export class View extends ExtendedObject {
 	}
 
 	// called by mobject.add
-	add(subView: View) {
-		subView.setup()
-		this.div.appendChild(subView.div)
+	add(subview: View) {
+		subview.setup()
+		this.div.appendChild(subview.div)
 	}
+
+	// insertBefore(subview: View, beforeSubview: View) {
+	// 	if (this.div.contains(subview.div)) {
+	// 		subview.div.remove()
+	// 	}
+	// 	subview.setup()
+	// 	this.div.insertBefore(subview.div, beforeSubview.div)
+	// }
 
 	redraw() {
 		this.div.style.transform = this.transform.withoutAnchor().toCSSString()
@@ -127,9 +135,14 @@ export class View extends ExtendedObject {
 
 	// TODO: put into setter for this.visible?
 	setVisibility(visibility: boolean) {
-		this.div.style.visibility = visibility ? 'visible' : 'hidden'
-		for (let submob of this.mobject?.submobs ?? []) {
-			submob.view.setVisibility(submob.view.visible && visibility)
+		// this.div.style.visibility = visibility ? 'visible' : 'hidden'
+		// for (let submob of this.mobject?.submobs ?? []) {
+		// 	submob.view.setVisibility(submob.view.visible && visibility)
+		// }
+		if (visibility) {
+			this.div.style.removeProperty('display')
+		} else {
+			this.div.style.display = 'none'
 		}
 	}
 

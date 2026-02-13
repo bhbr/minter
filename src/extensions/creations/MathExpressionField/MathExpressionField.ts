@@ -6,26 +6,28 @@ import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { Lexer } from './Lexer'
 import { Parser } from './Parser'
-import { createMinterMathNode } from './createMinterMathNode'
+import { createMathNode } from './createMathNode'
 import { equalArrays, remove } from 'core/functions/arrays'
 import { IOProperty } from 'core/linkables/Linkable'
-import { MinterAssignmentNode } from './MinterMathNode'
+import { AssignmentNode } from './MathNode'
 import { vertex } from 'core/functions/vertex'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Color } from 'core/classes/Color'
+import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
+import { Mobject } from 'core/mobjects/Mobject'
 
 declare var MathQuill: any
 
-
-export class MathQuillExpressionField extends Linkable {
+export class MathExpressionField extends Linkable {
 
 	MQ: any
 	mathField: any
 	span: HTMLSpanElement | null
 	scope: object
 	parser: Parser
-	value: number
+	value: number | null
 	resultBox: TextLabel
+	grapher: DesmosCalculator
 
 	defaults(): object {
 		return {
@@ -37,25 +39,27 @@ export class MathQuillExpressionField extends Linkable {
 			span: null,
 			scope: {},
 			parser: new Parser([]),
-			outputProperties: [
-				{
-					name: 'value',
-					type: 'number',
-					displayName: 'value'
-				},
-				{
-					name: 'expression',
-					type: 'expression',
-					displayName: 'expression'
+			value: null,
+			resultBox: new TextLabel({
+				anchor: [100, 0],
+				frameWidth: 100,
+				frameHeight: 50,
+				backgroundColor: Color.black()
+			}),
+			grapher: new DesmosCalculator({
+				frameWidth: 300,
+				frameHeight: 200,
+				options: {
+					expressions: false
 				}
-			],
-			value: 0,
-			resultBox: new TextLabel(),
+			})
 		}
 	}
 
 	setup() {
 		super.setup()
+		this.add(this.grapher)
+		this.add(this.resultBox)
 		if (!getPaper().loadedAPIs.includes('mathquill')) {
 			this.loadMathQuillAPI()
 		} else {
@@ -63,7 +67,6 @@ export class MathQuillExpressionField extends Linkable {
 		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
-		this.add(this.resultBox)
 	}
 
 	mathFieldWidth(): number {
@@ -74,7 +77,6 @@ export class MathQuillExpressionField extends Linkable {
 	resultBoxAnchor(): vertex {
 		return [this.mathFieldWidth(), 0]
 	}
-
 
 	loadMathQuillAPI() {
 		let cssLinkTag = document.createElement('link')
@@ -101,14 +103,17 @@ export class MathQuillExpressionField extends Linkable {
 
 	createMathField() {
 		this.MQ = MathQuill.getInterface(2)
+		let mob = new Mobject()
+
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
 		this.span.style.color = 'white'
-		this.span.style.fontSize = '40px'
-		this.span.style.backgroundColor = this.backgroundColor.toCSS()
+		this.span.style.fontSize = '28px'
+		this.span.style.backgroundColor = Color.black().toCSS()
 		this.span.style.border = '2px solid white'
 		p.append(this.span)
-		this.view.div.append(p)
+		mob.view.div.append(p)
+		this.add(mob)
 		this.mathField = this.MQ.MathField(this.span, {
 			handlers: {
 				edit: function() {
@@ -119,7 +124,7 @@ export class MathQuillExpressionField extends Linkable {
 				}.bind(this)
 			}
 		})
-		this.mathField.write('y=x')
+		this.mathField.write('')
 		this.updateIOProperties()
 		this.update({
 			frameWidth: this.span.clientWidth,
@@ -185,7 +190,7 @@ export class MathQuillExpressionField extends Linkable {
 			let variables = node.variables()
 			let inputNames = this.inputNames()
 			for (let v of variables) {
-				if (!inputNames.includes(v)) {
+				if (!inputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
 					this.createInputVariable(v, NaN)
 				}
 			}
@@ -194,7 +199,7 @@ export class MathQuillExpressionField extends Linkable {
 					this.removeInputVariable(v)
 				}
 			}
-			if (node instanceof MinterAssignmentNode) {
+			if (node instanceof AssignmentNode) {
 				if (this.outputNames()[0] !== node.name) {
 					this.createOutputVariable(node.name)
 				}
@@ -223,6 +228,9 @@ export class MathQuillExpressionField extends Linkable {
 		let value = this.computeValue()
 		this[prop] = value
 		this.value = value
+		if (prop != 'value') {
+			getPaper().globals[prop] = value
+		}
 	}
 
 	outputPropertyName(): string {
@@ -239,6 +247,32 @@ export class MathQuillExpressionField extends Linkable {
 			anchor: this.resultBoxAnchor(),
 			text: this.resultBoxText()
 		})
+		this.resultBox.view.show()
+		this.grapher.view.hide()
+	}
+
+	updateGrapher() {
+		for (let [key, value] of Object.entries(this.scope)) {
+			this.passVariableToCalculator(key, value)
+		}
+		this.grapher.calculator.setExpression({
+			id: `func`,
+			latex: this.mathField.latex(),
+		})
+
+		this.resultBox.view.hide()
+		this.grapher.view.show()
+
+	}
+
+	passVariableToCalculator(name: string, value: number) {
+		if (name == 'x' || name == 'y') {
+			name += '_1'
+		}
+		this.grapher.calculator.setExpression({
+			id: name,
+			latex: name + `=${value}`
+		})
 	}
 
 	updateLayout() {
@@ -249,62 +283,20 @@ export class MathQuillExpressionField extends Linkable {
 		this.positionIOLists()
 	}
 
-	createInputVariable(name: string, value: number) {
-		this.createProperty(name, value)
-		this.inputProperties.push({
-			name: name,
-			type: 'number',
-			displayName: name
-		})
-		this.inputList.update({
-			outletProperties: this.inputProperties
-		})
-		this.positionIOLists()
-		this.inputList.view.hide()
+	nbFreeVariables(): number {
+		return this.freeVariables().length
 	}
 
-	removeInputVariable(name: string) {
-		if (name == null) { return }
-		this.removeProperty(name)
-		for (let prop of this.inputProperties) {
-			if (prop['name'] == name) {
-				remove(this.inputProperties, prop)
-				break
+	freeVariables(): Array<string> {
+		let ret: Array<string> = []
+		for (let outlet of this.inputList.linkOutlets) {
+			for (let hook of outlet.linkHooks) {
+				if (!hook.linked) {
+					ret.push(outlet.name)
+				}
 			}
 		}
-		this.inputList.update({
-			outletProperties: this.inputProperties
-		})
-		this.positionIOLists()
-		this.inputList.view.hide()
-	}
-
-	createOutputVariable(name: string) {
-		if (name == null) { return }
-		this.createProperty(name, 0)
-		this.outputProperties = [{
-			name: name,
-			type: 'number',
-			displayName: name
-		}]
-		this.outputList.update({
-			outletProperties: this.outputProperties // should not be necessary
-		})
-		this.positionIOLists()
-		this.outputList.view.hide()
-	}
-
-	removeOutputVariable() {
-		this.outputProperties = [{
-			name: 'value',
-			type: 'number',
-			displayName: 'value'
-		}]
-		this.outputList.update({
-			outletProperties: this.outputProperties // should not be necessary
-		})
-		this.positionIOLists()
-		this.outputList.view.hide()
+		return ret
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -313,8 +305,13 @@ export class MathQuillExpressionField extends Linkable {
 				this.scope[v] = args[v]
 			}
 		}
+		Object.assign(this.scope, getPaper().globals)
 		this.updateValue()
-		this.updateResultBox()
+		if (this.nbFreeVariables() == 0) {
+			this.updateResultBox()
+		} else if (this.nbFreeVariables() == 1) {
+			this.updateGrapher()
+		}
 		super.update(args, redraw)
 	}
 

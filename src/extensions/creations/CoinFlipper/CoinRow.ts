@@ -9,7 +9,7 @@ import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
-import { SimpleNumberBox } from 'extensions/creations/math/boxes/SimpleNumberBox'
+import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
 import { getPaper } from 'core/functions/getters'
 
 export class CoinRow extends Linkable implements Playable {
@@ -27,7 +27,7 @@ export class CoinRow extends Linkable implements Playable {
 	nbHeadsLabel: TextLabel
 	nbTailsLabel: TextLabel
 	labelWidth: number
-	nbCoinsInputBox: SimpleNumberBox
+	nbCoinsInputBox: SimpleNumberInputBox
 
 	defaults(): object {
 		return {
@@ -65,7 +65,7 @@ export class CoinRow extends Linkable implements Playable {
 			],
 			frameWidth: 300,
 			frameHeight: 50,
-			nbCoinsInputBox: new SimpleNumberBox({
+			nbCoinsInputBox: new SimpleNumberInputBox({
 				value: 1
 			}),
 		}

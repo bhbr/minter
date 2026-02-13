@@ -1,5 +1,10 @@
+import { getPaper } from 'core/functions/getters'
 
-export class MinterMathNode {
+export class MathNode {
+	globals: object
+	constructor() {
+		this.globals = getPaper().globals
+	}
 	value(scope: object = {}): number {
 		return NaN
 	}
@@ -9,7 +14,7 @@ export class MinterMathNode {
 	}
 }
 
-export class MinterSymbolNode extends MinterMathNode {
+export class SymbolNode extends MathNode {
 	name: string
 	constructor(name: string) {
 		super()
@@ -22,9 +27,9 @@ export class MinterSymbolNode extends MinterMathNode {
 		case 'pi':
 			return Math.PI
 		case 'e':
-			return scope['e'] ?? Math.E
+			return scope['e'] ?? this.globals['e'] ?? Math.E
 		default:
-			return scope[this.name] ?? NaN
+			return scope[this.name] ?? this.globals[this.name] ?? NaN
 		}
 	}
 
@@ -36,7 +41,7 @@ export class MinterSymbolNode extends MinterMathNode {
 	}
 }
 
-export class MinterConstantNode extends MinterMathNode {
+export class ConstantNode extends MathNode {
 	_value: number
 	constructor(value: number) {
 		super()
@@ -47,9 +52,9 @@ export class MinterConstantNode extends MinterMathNode {
 	}
 }
 
-export class MinterAssignmentNode extends MinterMathNode {
-	symbol: MinterSymbolNode
-	child: MinterMathNode
+export class AssignmentNode extends MathNode {
+	symbol: SymbolNode
+	child: MathNode
 	constructor(symbol, child) {
 		super()
 		this.symbol = symbol
@@ -67,11 +72,11 @@ export class MinterAssignmentNode extends MinterMathNode {
 	}
 }
 
-export class MinterFunctionNode extends MinterMathNode {
+export class FunctionNode extends MathNode {
 	name: string
-	child: MinterMathNode
+	child: MathNode
 
-	constructor(name: string, child: MinterMathNode) {
+	constructor(name: string, child: MathNode) {
 		super()
 		this.name = name
 		this.child = child
@@ -124,15 +129,16 @@ export class MinterFunctionNode extends MinterMathNode {
 	}
 }
 
-export class MinterOperatorNode extends MinterMathNode {
+export class OperatorNode extends MathNode {
 	name: string
-	children: Array<MinterMathNode>
+	children: Array<MathNode>
 
-	constructor(name: string, children: Array<MinterMathNode>) {
+	constructor(name: string, children: Array<MathNode>) {
 		super()
 		this.name = name
 		this.children = children
 	}
+
 	variables(): Array<string> {
 		let vars1 = this.children[0].variables()
 		let vars2 = this.children[1].variables()
@@ -153,13 +159,34 @@ export class MinterOperatorNode extends MinterMathNode {
 			return a / b
 		case '^':
 			return a ** b
+		case '=':
+			return (a == b) ? 1 : 0
+		case '<':
+			return (a < b) ? 1 : 0
+		case '>':
+			return (a > b) ? 1 : 0
+		case '<=':
+			return (a <= b) ? 1 : 0
+		case '>=':
+			return (a >= b) ? 1 : 0
+		case '!=':
+			return (a != b) ? 1 : 0
 		default:
 			return NaN
 		}
 	}
 }
 
+export class ComparisonNode extends OperatorNode {
+	declare name: '=' | '<' | '>' | '<=' | '>=' | '!='
+}
 
+export class EquationNode extends ComparisonNode {
+	declare name: '='
+	constructor(children: Array<MathNode>) {
+		super('=', children)
+	}
+}
 
 
 

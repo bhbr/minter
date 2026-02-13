@@ -73,6 +73,7 @@ The content children can also be dragged and panned.
 			buttonNames: [
 				'DragButton'
 			],
+			globals: {},
 			creationStroke: [],
 			creationMode: 'draw',
 			creator: null,
@@ -117,6 +118,8 @@ The content children can also be dragged and panned.
 	sidebar?: any
 	// by creating buttons named this:
 	buttonNames: Array<string>
+
+	globals: object // global variables e. g. for computing MathExpressions
 
 	//////////////////////////////////////////////////////////
 	//                                                      //

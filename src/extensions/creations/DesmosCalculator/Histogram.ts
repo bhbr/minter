@@ -46,7 +46,10 @@ export class Histogram extends DesmosCalculator {
 			}),
 			frequencyLabel: new TextLabel({
 				text: 'frequency'
-			})
+			}),
+			options: {
+				expressions: false
+			}
 		}
 	}
 
@@ -81,9 +84,8 @@ export class Histogram extends DesmosCalculator {
 		}
 	}
 
-	createCalculator(options: object = {}) {
-		options['expressions'] = false
-		super.createCalculator(options)
+	createCalculator() {
+		super.createCalculator()
 		this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]/${this.scale}` })
 		this.calculator.setMathBounds({
 			left: this.min - 0.1 * (this.max - this.min),

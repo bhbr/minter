@@ -44,7 +44,12 @@ export class Frame extends ExtendedObject {
 	}
 
 	get parent(): Frame | null {
-		return this.view?.parent.frame ?? null
+		// log(this.view)
+		// log(this.view?.mobject)
+		// log(this.view?.mobject.parent)
+		// log(this.view?.mobject.parent?.frame)
+		
+		return this.view?.mobject.parent?.frame ?? null
 	}
 
 	contains(p: vertex): boolean {
@@ -81,8 +86,7 @@ export class Frame extends ExtendedObject {
 	transformLocalPoint(point: vertex, frame?: Frame): vertex {
 	/*
 	Given a point (vertex) in local coordinates,
-	compute its coordinates in the given ancestor
-	Frame's frame.
+	compute its coordinates in the given ancestor's frame.
 	*/
 		let t = this.relativeTransform(frame)
 		return t.appliedTo(point)

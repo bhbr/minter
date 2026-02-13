@@ -60,7 +60,7 @@ export class Sidebar extends Mobject {
 		}
 	}
 
-	setup() { 
+	setup() {
 		this.add(this.background)
 		this.view.mobject = this
 		let maybePaper = getPaper()

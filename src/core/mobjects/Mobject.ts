@@ -251,6 +251,28 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		submob.view.redraw()
 	}
 
+	// insertRelativeTo(submob: Mobject, child: Mobject, shift: number) {
+	// 	if (submob.parent == this) {
+	// 		this.remove(submob)
+	// 	}
+	// 	let i = this.children.indexOf(child)
+	// 	if (i == -1) {
+	// 		console.error(`${this.constructor.name} does not have ${child.constructor.name} as a child`)
+	// 		return
+	// 	}
+	// 	let shiftedChild = this.children[i + shift]
+	// 	this.children.splice(i + shift, 0, submob)
+	// 	this.view.insertBefore(submob.view, shiftedChild.view)
+	// }
+
+	// insertBefore(submob: Mobject, child: Mobject) {
+	// 	this.insertRelativeTo(submob, child, 0)
+	// }
+
+	// insertAfter(submob: Mobject, child: Mobject) {
+	// 	this.insertRelativeTo(submob, child, 1)
+	// }
+
 	remove(submob: Mobject) {
 	// Remove from the array of children (with an imported helper method)
 		remove(this.children, submob)

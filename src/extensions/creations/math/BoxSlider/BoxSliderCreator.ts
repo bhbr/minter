@@ -29,7 +29,12 @@ export class BoxSliderCreator extends Creator {
 	}
 
 	createMobject(): BoxSlider {
-		return this.creation || new BoxSlider({ height: 0 })
+		if (this.creation) {
+			return this.creation
+		}
+		let slider = new BoxSlider({ height: 0 })
+		slider.setControlsVisibility(false)
+		return slider
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
@@ -61,8 +66,8 @@ export class BoxSliderCreator extends Creator {
 			frameHeight: this.creation.height
 		})
 		this.creation.outerBar.update({ anchor: vertexOrigin() }) // necessary?
-		this.creation.label.update({
-			anchor: [this.creation.width/2 - this.creation.label.view.frame.width/2, this.creation.height/2 - this.creation.label.view.frame.height/2]
+		this.creation.valueLabel.update({
+			anchor: [this.creation.width/2 - this.creation.valueLabel.view.frame.width/2, this.creation.height/2 - this.creation.valueLabel.view.frame.height/2]
 		})
 		this.creation.outputList.positionSelf()
 

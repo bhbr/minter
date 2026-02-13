@@ -27,7 +27,10 @@ export class ScatterPlot extends DesmosCalculator {
 			showLinesCheckbox: new Checkbox({
 				text: 'lines',
 				state: false
-			})
+			}),
+			options: {
+				expressions: false
+			}
 		}
 	}
 
@@ -59,9 +62,8 @@ export class ScatterPlot extends DesmosCalculator {
 	}
 
 
-	createCalculator(options: object = {}) {
-		options['expressions'] = false
-		super.createCalculator(options)
+	createCalculator() {
+		super.createCalculator()
 		this.setDataExpressions()
 		this.calculator.setExpression({ id: 'dots', latex: `(X, Y)` })
 		this.calculator.setMathBounds({

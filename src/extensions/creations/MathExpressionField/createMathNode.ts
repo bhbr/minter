@@ -1,38 +1,32 @@
 import { MathWrapper } from './customMath'
 import { ParseError } from './ParseError'
 import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
-
+import { MathNode, SymbolNode, ConstantNode, FunctionNode, OperatorNode, AssignmentNode } from './MathNode'
 
 /**
 * Create the corresponding MathJS node of a Token and its children.
 * @returns A newly constructed MathJS node.
 */
-export function createMathJSNode(token: Token, children: Array<any> = []): any {
-	let math = (new MathWrapper()).math
+export function createMathNode(token: Token, children: Array<MathNode> = []): MathNode {
 	let fn = typeToOperation[token.type]
 	switch (token.type) {
-	case TokenType.Times:
-		return new (math as any).FunctionNode('cross', children)
 	case TokenType.Minus:
 		// mathjs differentiates between subtraction and the unary minus
 		fn = children.length === 1 ? 'unaryMinus' : fn
 		// falls through
 	case TokenType.Plus:
+		return new OperatorNode((token.type == TokenType.Plus) ? '+' : '-', children)
 	case TokenType.Star:
+		return new OperatorNode('*', children)
 	case TokenType.Frac:
 	case TokenType.Slash:
-		return new (math as any).OperatorNode(token.lexeme, fn, children)
+		return new OperatorNode('/', children)
 	case TokenType.Caret:
 		if (children.length < 2) {
 			throw new ParseError('Expected two children for ^ operator', token)
 		}
-		// manually check for ^T as the transpose operation
-		if ('isSymbolNode' in children[1] && children[1].isSymbolNode && children[1].name === 'T') {
-			return new (math as any).FunctionNode('transpose', [children[0]])
-		}
-		return new (math as any).OperatorNode(token.lexeme, fn, children)
+		return new OperatorNode('^', children)
 	// mathjs built-in functions
-	case TokenType.Bar:
 	case TokenType.Sqrt:
 	case TokenType.Sin:
 	case TokenType.Cos:
@@ -48,31 +42,19 @@ export function createMathJSNode(token: Token, children: Array<any> = []): any {
 	case TokenType.Arctan:
 	case TokenType.Log:
 	case TokenType.Ln:
-	case TokenType.Eigenvalues:
-	case TokenType.Eigenvectors:
-	case TokenType.Det:
-	case TokenType.Cross:
-	case TokenType.Proj:
-	case TokenType.Comp:
-	case TokenType.Norm:
-	case TokenType.Inv:
-		return new (math as any).FunctionNode(fn, children)
+		return new FunctionNode(fn, children[0])
 	case TokenType.Equals:
-		return new (math as any).AssignmentNode(children[0], children[1])
+		return new AssignmentNode(children[0] as SymbolNode, children[1])
 	case TokenType.Variable:
-		return new (math as any).SymbolNode(token.lexeme)
+		return new SymbolNode(token.lexeme)
 	case TokenType.Number:
 		// convert string lexeme to number if posssible
-		const constant = Number.isNaN(Number(token.lexeme)) ? token.lexeme : +token.lexeme
-		return new (math as any).ConstantNode(constant)
+		const constant = Number(token.lexeme)
+		return new ConstantNode(constant)
 	case TokenType.Pi:
-		return new (math as any).SymbolNode('pi')
+		return new SymbolNode('pi')
 	case TokenType.E:
-		return new (math as any).SymbolNode('e')
-	case TokenType.Matrix:
-		return new (math as any).ArrayNode(children)
-	case TokenType.T:
-		return new (math as any).SymbolNode('T')
+		return new SymbolNode('e')
 	default:
 		throw new ParseError('unknown token type', token)
 	}
@@ -114,6 +96,5 @@ export const primaryTypes = [
 	TokenType.Pi,
 	TokenType.E,
 	TokenType.Begin,
-	TokenType.T, // e.g. [[1,2],[3,4]]^T
 	TokenType.Opname
 ]

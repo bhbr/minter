@@ -7,7 +7,7 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Playable } from 'extensions/mobjects/PlayButton/Playable'
 import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleNumberBox } from 'extensions/creations/math/boxes/SimpleNumberBox'
+import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
@@ -24,7 +24,7 @@ export class CoinStack extends Linkable implements Playable {
 	tailsBar: Rectangle
 	headsLabel: TextLabel
 	tailsLabel: TextLabel
-	nbCoinsInputBox: SimpleNumberBox
+	nbCoinsInputBox: SimpleNumberInputBox
 	labelHeight: number
 	labelSpacing: number
 	maxBarHeight: number
@@ -58,7 +58,7 @@ export class CoinStack extends Linkable implements Playable {
 			playButton: new PlayButton({
 				anchor: [0, 50]
 			}),
-			nbCoinsInputBox: new SimpleNumberBox({
+			nbCoinsInputBox: new SimpleNumberInputBox({
 				value: 100
 			}),
 			inputProperties: [

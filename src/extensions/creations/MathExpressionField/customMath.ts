@@ -1,5 +1,4 @@
 
-//import { create, all, MathJsInstance } from '../../../mathjs/math'
 declare var create: any
 declare var all: any
 declare var MathJsInstance: any

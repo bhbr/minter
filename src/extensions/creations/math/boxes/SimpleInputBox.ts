@@ -12,7 +12,7 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 
 
-export class SimpleNumberBox extends Mobject {
+export class SimpleInputBox extends Mobject {
 
 	inputElement: HTMLInputElement
 	background: Rectangle
@@ -42,13 +42,6 @@ export class SimpleNumberBox extends Mobject {
 		this.focus()
 	}
 
-	get value(): number {
-		return Number(this.inputElement.value)
-	}
-	set value(newValue: number) {
-		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
-		this.inputElement.value = isFalsy ? '' : newValue.toString()
-	}
 
 	focus() {
 		super.focus()
@@ -71,13 +64,13 @@ export class SimpleNumberBox extends Mobject {
 		this.inputElement.style.height = '70%'
 		this.inputElement.style.padding = '0px 0px'
 		this.inputElement.style.color = 'white'
-		this.inputElement.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'
+		this.inputElement.style.backgroundColor = 'rgba(50, 50, 50, 1)'
 		this.inputElement.style.textAlign = 'center'
 		this.inputElement.style.verticalAlign = 'center'
 		this.inputElement.style.fontSize = '14px'
 		this.inputElement.style.border = 'none'
 		this.inputElement.style.outline = 'none'
-		this.inputElement.value = this.value.toString()
+		this.inputElement.value = this.inputElement.value.toString()
 		this.view.div.appendChild(this.inputElement)
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		document.addEventListener('keyup', this.boundActivateKeyboard)
@@ -137,3 +130,4 @@ export class SimpleNumberBox extends Mobject {
 	}
 
 }
+

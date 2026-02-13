@@ -6,6 +6,7 @@ import { vertex } from 'core/functions/vertex'
 import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
 import { log } from 'core/functions/logging'
 import { getPaper, getSidebar } from 'core/functions/getters'
+import { Transform } from 'core/classes/Transform'
 
 export class Sensor extends ExtendedObject {
 	
@@ -432,7 +433,12 @@ export class Sensor extends ExtendedObject {
 	finds them in the mobject's local frame.
 	*/
 		let p: vertex = eventVertex(e)
-		let rt = this.mobject.view.frame.relativeTransform(getPaper().frame)
+		var rt: Transform
+		try {
+			rt = this.mobject.view.frame.relativeTransform(getPaper().frame)
+		} catch {
+			rt = this.mobject.view.frame.relativeTransform(getSidebar().frame)
+		}
 		let q = rt.inverse().appliedTo(p)
 		return q
 	}
