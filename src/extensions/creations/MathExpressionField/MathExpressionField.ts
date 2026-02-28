@@ -255,6 +255,8 @@ export class MathExpressionField extends Linkable {
 		for (let [key, value] of Object.entries(this.scope)) {
 			this.passVariableToCalculator(key, value)
 		}
+
+
 		this.grapher.calculator.setExpression({
 			id: `func`,
 			latex: this.mathField.latex(),
@@ -262,7 +264,6 @@ export class MathExpressionField extends Linkable {
 
 		this.resultBox.view.hide()
 		this.grapher.view.show()
-
 	}
 
 	passVariableToCalculator(name: string, value: number) {

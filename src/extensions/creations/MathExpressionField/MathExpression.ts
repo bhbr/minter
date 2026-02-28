@@ -1,5 +1,4 @@
 import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { Lexer } from './Lexer'
 import { Parser } from './Parser'
 import { AssignmentNode } from './MathNode'
 import { remove } from 'core/functions/arrays'
@@ -9,15 +8,13 @@ export class MathExpression extends ExtendedObject {
 	
 	latex: string
 	scope: object
-	parser: Parser
-	lexer: Lexer
+	parser: Parser | null
 
 	defaults(): object {
 		return {
 			latex: '',
 			scope: getPaper().globals,
-			parser: new Parser(),
-			lexer: new Lexer()
+			parser: null
 		}
 	}
 
@@ -31,6 +28,7 @@ export class MathExpression extends ExtendedObject {
 	}
 
 	outputVariable(): string | null {
+		if (!this.parser) { return null }
 		let node = this.parser.parseTex(this.latex)
 		if (node instanceof AssignmentNode) {
 			return node.symbol.name
