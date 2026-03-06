@@ -40,6 +40,7 @@ export class SidebarButton extends Pill {
 	messageKey: string
 	label: TextLabel
 	icon?: ImageView
+	innerCircle: Circle
 
 	dragArrow: Polygon
 
@@ -52,7 +53,7 @@ export class SidebarButton extends Pill {
 
 	defaults(): object {
 		return {
-			baseColor: Color.gray(0.2),
+			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
 			smallLabelFontSize: 12,
 			bigLabelFontSize: 12,
@@ -63,9 +64,18 @@ export class SidebarButton extends Pill {
 				verticalAlign: 'center',
 				horizontalAlign: 'center'
 			}),
-			labelWidth: 110,
+			labelWidth: 85,
 			labelHeight: 25,
 			icon: null,
+
+			innerCircle: new Circle({
+				midpoint: [BUTTON_RADIUS, BUTTON_RADIUS],
+				radius: 0.9 * BUTTON_RADIUS,
+				fillOpacity: 1,
+				fillColor: Color.gray(0.2),
+				strokeWidth: 0
+			}),
+
 			touchDownMessages: [],
 			touchUpMessages: [],
 
@@ -86,9 +96,9 @@ export class SidebarButton extends Pill {
 			dragArrow: new Polygon({
 				anchor: [2 * BUTTON_RADIUS, BUTTON_RADIUS],
 				vertices: [
-					[10, -0.5 * BUTTON_RADIUS],
-					[10 + 0.5 * BUTTON_RADIUS, 0],
-					[10, 0.5 * BUTTON_RADIUS]
+					[10, -0.3 * BUTTON_RADIUS],
+					[10 + 0.3 * BUTTON_RADIUS, 0],
+					[10, 0.3 * BUTTON_RADIUS]
 				],
 				fillOpacity: 1,
 				strokeWidth: 0
@@ -121,6 +131,7 @@ export class SidebarButton extends Pill {
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
 		this.sidebar?.add(this.label)
+		this.add(this.innerCircle)
 		this.label.view.hide()
 		if (this.icon) {
 			this.updateIcon()
@@ -135,8 +146,8 @@ export class SidebarButton extends Pill {
 			anchor: [10, this.anchor[1] - 38],
 			frameWidth: this.labelWidth,
 			frameHeight: this.labelHeight,
-			backgroundColor: this.fillColor.brighten(1.2),
-			borderColor: this.fillColor.brighten(1.4),
+			backgroundColor: this.innerCircle.fillColor,
+			borderColor: this.baseColor,
 			borderWidth: 2,
 			borderRadius: 7,
 			drawShadow: false,
@@ -262,6 +273,9 @@ export class SidebarButton extends Pill {
 		this.icon.update({
 			anchor: [this.width - this.radius - 0.5 * this.icon.frameWidth, this.radius - 0.5 * this.icon.frameHeight]
 		})
+		this.innerCircle.update({
+			midpoint: [this.width - this.radius, BUTTON_RADIUS]
+		})
 	}
 
 	onPointerUp(e: ScreenEvent) {
@@ -294,6 +308,9 @@ export class SidebarButton extends Pill {
 		})
 		this.dragArrow.update({
 			anchor: [this.width, this.radius]
+		})
+		this.innerCircle.update({
+			midpoint: [this.radius, this.radius]
 		})
 		this.frame.transform.update({
 			scale: 1
@@ -369,34 +386,31 @@ export class SidebarButton extends Pill {
  
 		this.updateLabel()
 		this.updateIcon()
+		this.update({
+			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
+		})
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		this.innerCircle.update({
+			midpoint: [this.width - this.radius, this.radius]
+		})
+		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
+			this.dragArrow.view.hide()
+		} else {
+			this.dragArrow.view.show()
+		}
 	}
 	
 	selectNextOption() {
 		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
 		this.updateModeIndex(this.currentModeIndex + 1, true)
-		this.update({
-			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
-			this.dragArrow.view.hide()
-		}
+
 	}
 	
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
 		this.updateModeIndex(this.currentModeIndex - 1, true)
-		this.update({
-			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 2) {
-			this.dragArrow.view.show()
-		}
 	}
 
 	labelFromMessage(msg: object): string {

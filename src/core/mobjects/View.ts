@@ -140,7 +140,8 @@ export class View extends ExtendedObject {
 		// 	submob.view.setVisibility(submob.view.visible && visibility)
 		// }
 		if (visibility) {
-			this.div.style.removeProperty('display')
+			//this.div.style.removeProperty('display')
+			this.div.style.display = 'flex'
 		} else {
 			this.div.style.display = 'none'
 		}

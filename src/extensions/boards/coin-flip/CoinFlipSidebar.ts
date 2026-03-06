@@ -39,7 +39,7 @@ export class CoinFlipSidebar extends Sidebar {
 				new NumberButton(),
 				new ArithmeticButton(),
 				new ComparisonButton(),
-				new AlgebraButton(),
+				//new AlgebraButton(),
 				new ListFunctionsButton(),
 				new PlotButton(),
 				//new ColorSampleButton(),

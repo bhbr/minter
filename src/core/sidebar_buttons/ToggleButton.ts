@@ -12,7 +12,7 @@ export class ToggleButton extends SidebarButton {
 	defaults(): object {
 		return {
 			messageKey: 'key',
-			baseColor: Color.gray(0.4),
+			baseColor: Color.gray(0.6),
 			locked: false
 		}
 	}
@@ -26,6 +26,12 @@ export class ToggleButton extends SidebarButton {
 		this.update({
 			touchDownMessages: [message, message], // 2nd entry for locking
 			touchUpMessages: [outgoingMessage]
+		})
+		this.innerCircle.update({
+			fillColor: Color.gray(0.4)
+		})
+		this.label.update({
+			backgroundColor: this.innerCircle.fillColor
 		})
 	}
 
@@ -53,9 +59,9 @@ export class ToggleButton extends SidebarButton {
 
 	labelFromMessage(msg: object): string {
 		if (this.currentModeIndex == 0) {
-			return this.messageKey + ' &#9656;'
+			return this.messageKey
 		} else {
-			return '&#9666; lock'
+			return 'lock'
 		}
 	}
 

@@ -8,7 +8,7 @@ export class EraseButton extends SidebarButton {
 	
 	defaults(): object {
 		return {
-			baseColor: Color.red().brighten(0.5),
+			baseColor: Color.red().brighten(0.7),
 			messageKey: 'erase',
 			touchDownMessages: [
 				{ 'erase': true },
@@ -24,6 +24,16 @@ export class EraseButton extends SidebarButton {
 				frameHeight: 30
 			})
 		}
+	}
+
+	setup() {
+		super.setup()
+		this.innerCircle.update({
+			fillColor: Color.red().brighten(0.5)
+		})
+		this.label.update({
+			backgroundColor: this.innerCircle.fillColor
+		})
 	}
 
 

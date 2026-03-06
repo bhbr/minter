@@ -8,6 +8,8 @@ import { MathExpression } from './extensions/creations/MathExpressionField/MathE
 import { RadioButtonList } from './core/mobjects/RadioButtonList'
 import { DesmosCalculator } from './extensions/creations/DesmosCalculator/DesmosCalculator'
 import { ScatterPlot } from './extensions/creations/DesmosCalculator/ScatterPlot'
+import { TextLabel } from './core/mobjects/TextLabel'
+import { Color } from './core/classes/Color'
 
 export class StartPaper extends CoinFlipPaper { }
 

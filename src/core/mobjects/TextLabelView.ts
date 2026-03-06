@@ -42,24 +42,24 @@ export class TextLabelView extends View {
 		this.div.style.fontSize = `${this.fontSize}px`
 		switch (this.verticalAlign) {
 		case 'top':
-			this.div.style.alignItems = 'flex-start'
+			this.div.style.alignItems = 'start'
 			break
 		case 'center':
 			this.div.style.alignItems = 'center'
 			break
 		case 'bottom':
-			this.div.style.alignItems = 'flex-end'
+			this.div.style.alignItems = 'end'
 			break
 		}
 		switch (this.horizontalAlign) {
 		case 'left':
-			this.div.style.justifyContent = 'flex-start'
+			this.div.style.justifyContent = 'left'
 			break
 		case 'center':
 			this.div.style.justifyContent = 'center'
 			break
 		case 'right':
-			this.div.style.justifyContent = 'flex-end'
+			this.div.style.justifyContent = 'right'
 			break
 		}
 	}
