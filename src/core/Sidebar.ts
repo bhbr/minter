@@ -5,7 +5,7 @@ import { convertStringToArray } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 import { Color } from 'core/classes/Color'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { buttonCenter } from 'core/sidebar_buttons/button_geometry'
+import { buttonAnchor } from 'core/sidebar_buttons/button_geometry'
 import { Paper } from 'core/Paper'
 import { Mobject } from 'core/mobjects/Mobject'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
@@ -87,7 +87,8 @@ export class Sidebar extends Mobject {
 		this.add(button)
 		this.buttons.push(button)
 		button.update({
-			midpoint: buttonCenter(i),
+//			midpoint: buttonCenter(i),
+			anchor: buttonAnchor(i),
 			locationIndex: i
 		})
 	}

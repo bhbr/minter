@@ -12,3 +12,8 @@ export function buttonCenter(verticalIndex: number, horizontalIndex: number = 0)
 	let y: number = BUTTON_CENTER_Y + verticalIndex * (BUTTON_SPACING + 2 * BUTTON_RADIUS)
 	return [BUTTON_CENTER_X + horizontalIndex * OPTION_SPACING, y]
 }
+
+export function buttonAnchor(verticalIndex: number, horizontalIndex: number = 0): vertex {
+	let c = buttonCenter(verticalIndex, horizontalIndex)
+	return [c[0] - BUTTON_RADIUS, c[1] - BUTTON_RADIUS]
+}

@@ -13,12 +13,14 @@ import { Transform } from 'core/classes/Transform'
 import { Sidebar } from 'core/Sidebar'
 import { SidebarButtonView } from './SidebarButtonView'
 import { SIDEBAR_WIDTH } from 'core/constants'
+import { Polygon } from 'core/vmobjects/Polygon'
+import { Pill } from 'core/shapes/Pill'
 
 interface Window { webkit?: any }
 
 export const buttonDict: object = {}
 
-export class SidebarButton extends Circle {
+export class SidebarButton extends Pill {
 	
 	declare view: SidebarButtonView
 	currentModeIndex: number
@@ -39,6 +41,8 @@ export class SidebarButton extends Circle {
 	label: TextLabel
 	icon?: ImageView
 
+	dragArrow: Polygon
+
 	touchDownMessages: Array<object>
 	touchUpMessages: Array<object>
 	key: string
@@ -55,7 +59,10 @@ export class SidebarButton extends Circle {
 			activeScalingFactor: 1.2,
 			optionSpacing: OPTION_SPACING,
 
-			label: new TextLabel(),
+			label: new TextLabel({
+				verticalAlign: 'center',
+				horizontalAlign: 'center'
+			}),
 			labelWidth: 110,
 			labelHeight: 25,
 			icon: null,
@@ -70,10 +77,22 @@ export class SidebarButton extends Circle {
 			active: false,
 			messageKey: 'key',
 			radius: BUTTON_RADIUS,
+			width: 2 * BUTTON_RADIUS,
 			frameWidth: 2 * BUTTON_RADIUS,
 			frameHeight: 2 * BUTTON_RADIUS,
 			fillOpacity: 1.0,
 			activeKeyboard: true,
+
+			dragArrow: new Polygon({
+				anchor: [2 * BUTTON_RADIUS, BUTTON_RADIUS],
+				vertices: [
+					[10, -0.5 * BUTTON_RADIUS],
+					[10 + 0.5 * BUTTON_RADIUS, 0],
+					[10, 0.5 * BUTTON_RADIUS]
+				],
+				fillOpacity: 1,
+				strokeWidth: 0
+			}),
 
 			paper: null,
 			sidebar: null,
@@ -130,7 +149,13 @@ export class SidebarButton extends Circle {
 		this.label.view.div.style.paddingLeft = `5px`
 		this.label.view.div.style.paddingRight = `5px`
 
+		this.dragArrow.update({
+			fillColor: this.fillColor
+		})
+
 		this.updateLabel()
+		this.add(this.dragArrow)
+		this.dragArrow.view.hide()
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -186,6 +211,10 @@ export class SidebarButton extends Circle {
 		}
 		this.updateHelpText()
 		this.paper.helpTextLabel.view.show()
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		this.dragArrow.view.show()
 	}
 
 	updateHelpText() {
@@ -213,13 +242,26 @@ export class SidebarButton extends Circle {
 		dx += this.previousIndex * this.optionSpacing
 		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
 
-		let newMidpoint = [
-			buttonCenter(this.locationIndex)[0] + dx,
-			buttonCenter(this.locationIndex)[1]
-		]
+		let newWidth = 2 * BUTTON_RADIUS + dx
 		
 		this.updateModeIndex(newIndex, true)
-		this.update({ midpoint: newMidpoint })
+		this.update({
+			width: newWidth
+		})
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
+			this.dragArrow.view.hide()
+		} else {
+			this.dragArrow.view.show()
+		}
+		this.label.update({
+			anchor: [10 + dx, this.anchor[1] - 38]
+		})
+		this.icon.update({
+			anchor: [this.width - this.radius - 0.5 * this.icon.frameWidth, this.radius - 0.5 * this.icon.frameHeight]
+		})
 	}
 
 	onPointerUp(e: ScreenEvent) {
@@ -242,15 +284,16 @@ export class SidebarButton extends Circle {
 
 		this.currentModeIndex = 0
 		let dx: number = this.currentModeIndex * this.optionSpacing
-		let newMidpoint = [
-			buttonCenter(this.locationIndex)[0] + dx,
-			buttonCenter(this.locationIndex)[1]
-		]
+		let newWidth = 2 * BUTTON_RADIUS + dx
 		
 		this.update({
 			active: false,
 			fillColor: this.colorForIndex(this.currentModeIndex),
-			midpoint: newMidpoint
+			//midpoint: newMidpoint,
+			width: newWidth
+		})
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
 		})
 		this.frame.transform.update({
 			scale: 1
@@ -265,6 +308,10 @@ export class SidebarButton extends Circle {
 		this.label.view.hide()
 		
 		this.paper.helpTextLabel.view.hide()
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		this.dragArrow.view.hide()
 	}
 	
 	messagePaper(message: object) {
@@ -291,7 +338,7 @@ export class SidebarButton extends Circle {
 		this.icon.update({
 			imageLocation: `../../assets/${name}.png`,
 			anchor: [
-				0.5 * (this.frameWidth - this.icon.frameWidth),
+				0.5 * (this.frameWidth - this.icon.frameWidth) + this.optionSpacing * this.currentModeIndex,
 				0.5 * (this.frameHeight - this.icon.frameHeight)
 			]
 		})
@@ -326,28 +373,40 @@ export class SidebarButton extends Circle {
 	
 	selectNextOption() {
 		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
-		this.update({
-			midpoint: vertexTranslatedBy(this.midpoint, [this.optionSpacing, 0])
-		})
 		this.updateModeIndex(this.currentModeIndex + 1, true)
+		this.update({
+			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
+		})
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
+			this.dragArrow.view.hide()
+		}
 	}
 	
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
-		this.update({
-			midpoint: vertexTranslatedBy(this.midpoint, [-this.optionSpacing, 0])
-		})
 		this.updateModeIndex(this.currentModeIndex - 1, true)
+		this.update({
+			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
+		})
+		this.dragArrow.update({
+			anchor: [this.width, this.radius]
+		})
+		if (this.currentModeIndex == this.touchDownMessages.length - 2) {
+			this.dragArrow.view.show()
+		}
 	}
 
 	labelFromMessage(msg: object): string {
 		var key = Object.keys(msg)[0]
-		if (this.currentModeIndex > 0) {
-			key = '&#9666; ' + key
-		}
-		if (this.currentModeIndex < this.touchDownMessages.length - 1) {
-			key = key + ' &#9656;'
-		}
+		// if (this.currentModeIndex > 0) {
+		// 	key = '&#9666; ' + key
+		// }
+		// if (this.currentModeIndex < this.touchDownMessages.length - 1) {
+		// 	key = key + ' &#9656;'
+		// }
 		return key
 	}
 	

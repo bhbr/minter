@@ -28,12 +28,12 @@ export class CreativeButton extends SidebarButton {
 
 	labelFromMessage(msg: object): string {
 		var key = Object.values(msg)[0]
-		if (this.currentModeIndex > 0) {
-			key = '&#9666; ' + key
-		}
-		if (this.currentModeIndex < this.creations.length - 1) {
-			key = key + ' &#9656;'
-		}
+		// if (this.currentModeIndex > 0) {
+		// 	key = '&#9666; ' + key
+		// }
+		// if (this.currentModeIndex < this.creations.length - 1) {
+		// 	key = key + ' &#9656;'
+		// }
 		return key
 	}
 

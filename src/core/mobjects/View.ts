@@ -186,6 +186,13 @@ export class View extends ExtendedObject {
 		this.setVisibility(this.visible)
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args)
+		if (redraw) {
+			this.redraw()
+		}
+	}
+
 
 
 

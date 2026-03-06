@@ -14,11 +14,3 @@ export class StartPaper extends CoinFlipPaper { }
 //AllTests.run()
 
 export const paper = new StartPaper()
-
-
-let exp = new MathExpressionField({
-	anchor: [100, 100]
-})
-
-paper.addToContent(exp)
-
