@@ -81,6 +81,15 @@ linkable mobjects
 		this.add(this.linkLine)
 	}
 
+	showLine() {
+		this.borderLinkLine.view.show()
+		this.linkLine.view.show()
+	}
+
+	hideLine() {
+		this.borderLinkLine.view.hide()
+		this.linkLine.view.hide()
+	}
 
 
 
