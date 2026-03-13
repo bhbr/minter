@@ -139,8 +139,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.controls.push(this.minValueInputBox)
 		this.controls.push(this.maxValueInputBox)
 
-		this.add(this.nameLabel)
-		this.add(this.nameInputBox)
+		//this.add(this.nameLabel)
+		//this.add(this.nameInputBox)
 
 		this.nameLabel.update({
 			horizontalAlign: 'center',
