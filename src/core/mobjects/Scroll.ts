@@ -21,9 +21,11 @@ export class Scroll extends Mobject {
 	setup() {
 		super.setup()
 		this.view.div.style['overflow-y'] = 'auto'
-		this.view.div.style['text-align'] = 'center'
+		//this.view.div.style['text-align'] = 'center'
+		this.view.div.style.justifyContent = 'center'
 		this.view.div.style.fontFamily = this.fontFamily
 		this.view.div.style.fontSize = `${this.fontSize}px`
+		this.view.div.style.display = 'flex'
 	}
 
 	update(args: object = {}, redraw: boolean = false) {
