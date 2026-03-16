@@ -19,8 +19,3 @@ export class StartPaper extends CoinFlipPaper { }
 
 export const paper = new StartPaper()
 
-let l = new NumberListBox({
-	value: [1, 2, 3],
-	anchor: [100, 100]
-})
-paper.addToContent(l)
