@@ -212,10 +212,6 @@ export class Sensor extends ExtendedObject {
 	capturedOnPointerUp(e: ScreenEvent) {
 		let target = this.eventTarget
 		if (target == null || this.screenEventDevice == null) {
-			let p = getPaper()
-			if (this.mobject == p || this.mobject.descendsFrom(p)) { //} || p === undefined) {
-				getSidebar().activeButton?.onPointerUp(e)
-			}
 			return
 		}
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
