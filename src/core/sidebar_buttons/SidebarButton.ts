@@ -235,8 +235,9 @@ export class SidebarButton extends Pill {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		this.commonButtonDown()
+		//log('setting touchStart:')
 		this.touchStart = eventVertex(e)
+		this.commonButtonDown()
 	}
 
 	onPointerMove(e: ScreenEvent) {
@@ -244,17 +245,14 @@ export class SidebarButton extends Pill {
 		let t: MouseEvent | Touch = null
 		if (e instanceof MouseEvent) { t = e }
 		else { t = e.changedTouches[0] }
-
 		let p: vertex = eventVertex(e)
 		var dx: number = p[0] - this.touchStart[0]
-
 		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
 		newIndex = Math.min(Math.max(newIndex, 0), this.touchDownMessages.length - 1)
 		dx += this.previousIndex * this.optionSpacing
 		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
 
 		let newWidth = 2 * BUTTON_RADIUS + dx
-		
 		this.updateModeIndex(newIndex, true)
 		this.update({
 			width: newWidth
@@ -295,7 +293,6 @@ export class SidebarButton extends Pill {
 		} else if (this.touchUpMessages.length > 1) {
 			this.messagePaper(this.touchUpMessages[this.currentModeIndex])
 		}
-
 		this.currentModeIndex = 0
 		let dx: number = this.currentModeIndex * this.optionSpacing
 		let newWidth = 2 * BUTTON_RADIUS + dx
@@ -303,11 +300,7 @@ export class SidebarButton extends Pill {
 		this.update({
 			active: false,
 			fillColor: this.colorForIndex(this.currentModeIndex),
-			//midpoint: newMidpoint,
 			width: newWidth
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
 		})
 		this.innerCircle.update({
 			midpoint: [this.radius, this.radius]
@@ -323,8 +316,6 @@ export class SidebarButton extends Pill {
 		this.updateLabel()
 		this.updateIcon()
 		this.label.view.hide()
-		
-		this.paper.helpTextLabel.view.hide()
 		this.dragArrow.update({
 			anchor: [this.width, this.radius]
 		})
@@ -415,12 +406,6 @@ export class SidebarButton extends Pill {
 
 	labelFromMessage(msg: object): string {
 		var key = Object.keys(msg)[0]
-		// if (this.currentModeIndex > 0) {
-		// 	key = '&#9666; ' + key
-		// }
-		// if (this.currentModeIndex < this.touchDownMessages.length - 1) {
-		// 	key = key + ' &#9656;'
-		// }
 		return key
 	}
 	

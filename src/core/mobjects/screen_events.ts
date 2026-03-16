@@ -22,8 +22,7 @@ export type ScreenEvent = MouseEvent | TouchEvent
 // this includes PointerEvent (subclass of MouseEvent)
 export enum ScreenEventDevice { Mouse, Finger, Pen, Unknown }
 export enum ScreenEventType { Down, Move, Up, Cancel, Unknown }
-(window as any).emulatedDevice = ScreenEventDevice.Mouse
-
+(window as any).emulatedDevice = ScreenEventDevice.Pen
 
 export enum ScreenEventHandler {
 	Auto, // don't interfere with event capturing
@@ -55,7 +54,9 @@ instead of in the app (paper.html)
 	}
 	let t: MouseEvent | Touch = null
 	if (e instanceof MouseEvent) { t = e }
-	else { t = e.changedTouches[0] }
+	else {
+		t = e.changedTouches[0]
+	}
 	return [t.pageX - sidebarWidth, t.pageY]
 }
 
@@ -74,10 +75,13 @@ export function screenEventTypeAsString(e: ScreenEvent): string {
 export function screenEventDevice(e: ScreenEvent): ScreenEventDevice {
 	if (isTouchDevice) {
 		if (e instanceof TouchEvent) {
-			if (e.touches[0].force == 0) {
+			switch ((e.touches[0] as any).touchType) {
+			case 'direct':
 				return ScreenEventDevice.Finger
-			} else {
+			case 'stylus':
 				return ScreenEventDevice.Pen
+			default:
+				return ScreenEventDevice.Unknown
 			}
 		} else if (e instanceof MouseEvent) {
 			return ScreenEventDevice.Mouse

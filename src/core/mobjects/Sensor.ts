@@ -4,7 +4,7 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { ScreenEventHandler, ScreenEventDevice, ScreenEvent, ScreenEventType, screenEventDevice, screenEventType, eventVertex, isTouchDevice } from './screen_events'
 import { vertex } from 'core/functions/vertex'
 import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constants'
-import { log } from 'core/functions/logging'
+import { log, logString } from 'core/functions/logging'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { Transform } from 'core/classes/Transform'
 
@@ -164,9 +164,13 @@ export class Sensor extends ExtendedObject {
 		}
 		let target = this.eventTargetMobject(e)
 		this.eventTarget = target
-		if (target == null) { return }
+		if (target == null) {
+			return
+		}
 		
-		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
+		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) {
+			return
+		}
 		e.stopPropagation()
 		if (this.eventTarget.preventDefault) {
 			e.preventDefault()
@@ -179,15 +183,17 @@ export class Sensor extends ExtendedObject {
 	}
 
 	capturedOnPointerMove(e: ScreenEvent) {
-		//log('capturedOnPointerMove')
 		let target = this.eventTarget
-		if (target == null || this.screenEventDevice == null) { return }
-		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }
+		if (target == null || this.screenEventDevice == null) {
+			return
+		}
+		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) {
+			return
+		}
 		e.stopPropagation()
 		if (this.eventTarget.preventDefault) {
 			e.preventDefault()
 		}
-
 		switch (this.screenEventDevice) {
 		case ScreenEventDevice.Finger:
 			target.sensor.onTouchMove(e)
@@ -199,7 +205,7 @@ export class Sensor extends ExtendedObject {
 			target.sensor.onMouseMove(e)
 			break
 		default:
-			throw `Unknown pointer device ${target.sensor.screenEventDevice}`
+			throw `Unknown pointer device ${this.screenEventDevice}`
 		}
 	}
 
@@ -207,7 +213,7 @@ export class Sensor extends ExtendedObject {
 		let target = this.eventTarget
 		if (target == null || this.screenEventDevice == null) {
 			let p = getPaper()
-			if (this.mobject == p || this.mobject.descendsFrom(p)) {
+			if (this.mobject == p || this.mobject.descendsFrom(p)) { //} || p === undefined) {
 				getSidebar().activeButton?.onPointerUp(e)
 			}
 			return
@@ -310,13 +316,14 @@ export class Sensor extends ExtendedObject {
 				this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 			}
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
-			// ignore
 			//log('case 9')
+			// ignore
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 			//log('case 10')
+			this.screenEventDevice = ScreenEventDevice.Finger
+			//log(this.screenEventDevice)
 			this.eventTarget.sensor.rawOnTouchDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
-			this.screenEventDevice = ScreenEventDevice.Finger
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
 			//log('case 11')
 			this.eventTarget.sensor.rawOnPenDown(e)
@@ -343,36 +350,37 @@ export class Sensor extends ExtendedObject {
 	}
 
 	rawOnTouchDown(e: ScreenEvent) {
-		//log('rawOnTouchDown')
-		this.longPressTimeoutID = window.setTimeout(this.onLongTouchDown, LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongTouchDown.bind(this), LONG_PRESS_DURATION)
 		this.onTouchDown(e)
 	}
 
 	rawOnTouchUp(e: ScreenEvent) {
-		let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
-		if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
-			this.clearMereTapTimeout()
-			this.onTouchTap(e)
-			this.mereTapTimeoutID = window.setTimeout(function() {
-				this.mereTapTimeoutID = null
-				if (this.screenEventHistory.length == 2) {
-					this.onMereTouchTap(e)
-				}
-			}.bind(this), MERE_TAP_DELAY)
-			if (this.screenEventHistory.length == 3) {
-				let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
-				let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
-				if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
-					this.onDoubleTouchTap(e)
+		if (this.screenEventHistory.length > 0) {
+			let e1 = this.screenEventHistory[this.screenEventHistory.length - 1]
+			if (e.timeStamp - e1.timeStamp < MAX_TAP_DELAY) {
+				this.clearMereTapTimeout()
+				this.onTouchTap(e)
+				this.mereTapTimeoutID = window.setTimeout(function() {
+					this.mereTapTimeoutID = null
+					if (this.screenEventHistory.length == 2) {
+						this.onMereTouchTap(e)
+					}
+				}.bind(this), MERE_TAP_DELAY)
+				if (this.screenEventHistory.length == 3) {
+					let e2 = this.screenEventHistory[this.screenEventHistory.length - 2]
+					let e3 = this.screenEventHistory[this.screenEventHistory.length - 3]
+					if (e1.timeStamp - e2.timeStamp < MAX_TAP_DELAY && e2.timeStamp - e3.timeStamp < MAX_TAP_DELAY) {
+						this.onDoubleTouchTap(e)
+					}
 				}
 			}
 		}
+		this.clearLongPressTimeout()
 		this.onTouchUp(e)
 	}
 
 	rawOnPenDown(e: ScreenEvent) {
-		//log('rawOnPenDown')
-		this.longPressTimeoutID = window.setTimeout(this.onLongPenDown, LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongPenDown.bind(this), LONG_PRESS_DURATION)
 		this.onPenDown(e)
 	}
 
@@ -394,12 +402,12 @@ export class Sensor extends ExtendedObject {
 				}
 			}
 		}
+		this.clearLongPressTimeout()
 		this.onPenUp(e)
 	}
 
 	rawOnMouseDown(e: ScreenEvent) {
-		//log('rawOnMouseDown')
-		this.longPressTimeoutID = window.setTimeout(this.mobject.onLongMouseDown.bind(this.mobject), LONG_PRESS_DURATION)
+		this.longPressTimeoutID = window.setTimeout(this.onLongMouseDown.bind(this), LONG_PRESS_DURATION)
 		this.onMouseDown(e)
 	}
 
@@ -421,6 +429,7 @@ export class Sensor extends ExtendedObject {
 				}
 			}
 		}
+		this.clearLongPressTimeout()
 		this.onMouseUp(e)
 	}
 
@@ -454,18 +463,24 @@ export class Sensor extends ExtendedObject {
 
 	clearDeleteHistoryTimeout() {
 		if (this.deleteHistoryTimeoutID) {
-			clearTimeout(this.deleteHistoryTimeoutID)
+			window.clearTimeout(this.deleteHistoryTimeoutID)
 			this.deleteHistoryTimeoutID = null
 		}
 	}
 
 	clearMereTapTimeout() {
 		if (this.mereTapTimeoutID) {
-			window.clearInterval(this.mereTapTimeoutID)
+			window.clearTimeout(this.mereTapTimeoutID)
 			this.mereTapTimeoutID = null
 		}
 	}
 
+	clearLongPressTimeout() {
+		if (this.longPressTimeoutID) {
+			window.clearTimeout(this.longPressTimeoutID)
+			this.longPressTimeoutID = null
+		}
+	}
 
 
 	onPointerDown(e: ScreenEvent) { this.mobject.onPointerDown(e) }

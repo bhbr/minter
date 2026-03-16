@@ -414,9 +414,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	}
 
-	
-
-
 	getUpdateCalls(): UpdateCalls {
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {

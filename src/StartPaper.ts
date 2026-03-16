@@ -10,9 +10,17 @@ import { DesmosCalculator } from './extensions/creations/DesmosCalculator/Desmos
 import { ScatterPlot } from './extensions/creations/DesmosCalculator/ScatterPlot'
 import { TextLabel } from './core/mobjects/TextLabel'
 import { Color } from './core/classes/Color'
+import { NumberListBox } from './extensions/creations/math/boxes/NumberListBox'
+import { ScreenEventDevice } from './core/mobjects/screen_events'
 
 export class StartPaper extends CoinFlipPaper { }
 
 //AllTests.run()
 
 export const paper = new StartPaper()
+
+let l = new NumberListBox({
+	value: [1, 2, 3],
+	anchor: [100, 100]
+})
+paper.addToContent(l)

@@ -52,7 +52,9 @@ function mereLogString(msg: any): string {
 		}
 	} else {
 		let keys = Object.keys(msg)
-		if (keys.length <= 5) {
+		if (keys.length == 0) {
+			return '{}'
+		} else if (keys.length <= 5) {
 			var ret = '{ '
 			for (let i = 0; i < keys.length - 1; i++) {
 				ret += keys[i] + ' : ' + mereLogString(msg[keys[i]]) + ', '
