@@ -20,8 +20,7 @@ export class SimpleButton extends RoundedRectangle {
 			fillColor: Color.gray(0.3),
 			strokeColor: Color.gray(0.4),
 			strokeWidth: 0.75,
-			screenEventHandler: ScreenEventHandler.Self,
-			visible: false,
+			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
 

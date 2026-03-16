@@ -66,7 +66,10 @@ export class NumberListBox extends Linkable {
 			anchor: [20, this.frameHeight + 10]
 		})
 		this.clearButton.action = this.clear.bind(this)
+		this.clearButton.remove(this.clearButton.label)
+		// remove and add the label to fight lazy rendering bug
 		this.add(this.clearButton)
+		this.clearButton.add(this.clearButton.label)
 		this.controls.push(this.clearButton)
 	}
 
@@ -93,7 +96,10 @@ export class NumberListBox extends Linkable {
 	}
 
 	clear() {
+		// remove and add to fight lazy rendering bug
+		this.remove(this.scroll)
 		this.update({ value: [] })
+		this.add(this.scroll)
 		this.updateDependents()
 		for (let dep of this.dependents()) {
 			if (dep instanceof NumberListBox) {
@@ -107,7 +113,7 @@ export class NumberListBox extends Linkable {
 	}
 
 	get newestEntry(): number {
-		return undefined // this.list[this.list.length - 1]
+		return this.list[this.list.length - 1]
 	}
 	set newestEntry(newValue: number) {
 		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
