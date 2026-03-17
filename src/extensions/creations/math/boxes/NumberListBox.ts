@@ -119,6 +119,7 @@ export class NumberListBox extends Linkable {
 		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
 		if (isFalsy) { return }
 		this.list.push(newValue)
+		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 	}
 
 	addedInputLink(link: DependencyLink) {
