@@ -113,7 +113,7 @@ export class NumberListBox extends Linkable {
 	}
 
 	get newestEntry(): number {
-		return this.list[this.list.length - 1]
+		return undefined
 	}
 	set newestEntry(newValue: number) {
 		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
