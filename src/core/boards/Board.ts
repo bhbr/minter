@@ -1017,7 +1017,6 @@ The content children can also be dragged and panned.
 					this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 				}
 				if (this.openLink.previousHook) {
-					this.openLink.previousHook.update({ linked: false })
 					if (this.openLink.previousHook.outlet.kind == 'input') {
 						this.openLink.previousHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 					} else {
