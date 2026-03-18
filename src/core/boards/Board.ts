@@ -403,7 +403,7 @@ The content children can also be dragged and panned.
 			this.moveToTop(this.expandButton)
 		}
 		if (mob instanceof Linkable) {
-			mob.hideLinks()
+			mob.setLinksVisibility(this.isShowingLinks)
 			mob.setControlsVisibility(this.isShowingControls)
 		}
 		if (mob instanceof Board) {
@@ -637,7 +637,8 @@ The content children can also be dragged and panned.
 					creationStroke: this.creationStroke
 				})
 				if (cm.creation instanceof Linkable) {
-					cm.creation.hideLinks()
+					cm.creation.setLinksVisibility(this.isShowingLinks)
+					cm.creation.setControlsVisibility(this.isShowingControls)
 				}
 				return cm
 		}

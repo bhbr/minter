@@ -150,6 +150,5 @@ export class NumberListBoxCreator extends DraggingCreator {
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
-		this.creation.hideLinks()
 	}
 }

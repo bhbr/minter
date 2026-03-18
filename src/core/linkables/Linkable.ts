@@ -150,6 +150,14 @@ which can be linked to such-exposed variables of other mobjects.
 		}
 	}
 
+	setLinksVisibility(visible: boolean) {
+		if (visible) {
+			this.showLinks()
+		} else {
+			this.hideLinks()
+		}
+	}
+
 	allHooks(): Array<LinkHook> {
 		return this.inputList.allHooks().concat(this.outputList.allHooks())
 	}

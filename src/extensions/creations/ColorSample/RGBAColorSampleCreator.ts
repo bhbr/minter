@@ -23,6 +23,5 @@ export class RGBAColorSampleCreator extends DraggingCreator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		let r = this.creation.circle.radius
 		super.updateFromTip(q, redraw)
-		this.creation.hideLinks()
 	}
 }

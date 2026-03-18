@@ -25,7 +25,6 @@ export class BoxSliderCreator extends Creator {
 		})
 		if (this.creation == null) { return }
 		this.add(this.creation)
-		this.creation.hideLinks()
 	}
 
 	createMobject(): BoxSlider {
@@ -33,7 +32,6 @@ export class BoxSliderCreator extends Creator {
 			return this.creation
 		}
 		let slider = new BoxSlider({ height: 0 })
-		slider.setControlsVisibility(false)
 		return slider
 	}
 
@@ -54,7 +52,6 @@ export class BoxSliderCreator extends Creator {
 		this.creation.filledBar.update({
 			fillColor: Color.gray(0.5)
 		}, redraw)
-		this.creation.hideLinks()
 		if (redraw) { this.view.redraw() }
 	}
 
