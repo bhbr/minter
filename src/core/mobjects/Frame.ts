@@ -44,11 +44,6 @@ export class Frame extends ExtendedObject {
 	}
 
 	get parent(): Frame | null {
-		// log(this.view)
-		// log(this.view?.mobject)
-		// log(this.view?.mobject.parent)
-		// log(this.view?.mobject.parent?.frame)
-		
 		return this.view?.mobject.parent?.frame ?? null
 	}
 

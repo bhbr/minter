@@ -644,7 +644,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		//log('onPointerDown')
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
@@ -681,7 +680,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		//log('onPointerMove')
 		if (this.contracted) { return }
 		if (this.creationStroke.length == 0) { return }
 		this.creating(e)
@@ -697,7 +695,6 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		//log('onPointerUp')
 		if (this.contracted) { return }
 		this.endCreating(e)
 	}
@@ -806,8 +803,8 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
-		this.expandedInputList.view.show()
-		this.expandedOutputList.view.show()
+		//this.expandedInputList.view.show()
+		//this.expandedOutputList.view.show()
 	}
 	
 	hideLinksOfContent() {
@@ -819,8 +816,8 @@ The content children can also be dragged and panned.
 			submob.hideLinks()
 		}
 
-		this.expandedInputList.view.hide()
-		this.expandedOutputList.view.hide()
+		//this.expandedInputList.view.hide()
+		//this.expandedOutputList.view.hide()
 	}
 
 	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
@@ -832,27 +829,31 @@ The content children can also be dragged and panned.
 	setLinking(flag: boolean) {
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
 		}
 		this.isShowingLinks = flag
 		if (flag) {
 			this.disableContent()
+			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
+
 		} else {
 			this.enableContent()
+			this.sensor.restoreTouchMethods()
+			this.sensor.restorePenMethods()
+			this.sensor.restoreMouseMethods()
 		}
 	}
 
 	startLinking(e: ScreenEvent) {
 		var p = this.sensor.localEventVertex(e)
 		let clickedHook = this.hookAtLocation(p)
-		if (clickedHook == null) { return }
+		if (clickedHook == null) {
+			this.startCreating(e)
+			return
+		}
 		p = this.locationOfHook(clickedHook)
 		if (this.isFree(clickedHook)) {
 			this.createNewOpenLink(clickedHook)
@@ -921,7 +922,10 @@ The content children can also be dragged and panned.
 	}
 
 	linking(e: ScreenEvent) {
-		if (this.openLink === null) { return }
+		if (this.openLink === null) {
+			this.creating(e)
+			return
+		}
 		var p = this.sensor.localEventVertex(e)
 		let endHook = this.freeCompatibleHookAtLocation(p)
 		if (endHook !== null) {
@@ -1002,6 +1006,10 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
+		if (!this.openLink) {
+			this.endCreating(e)
+			return
+		}
 		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null) {
 			if (this.openLink) {

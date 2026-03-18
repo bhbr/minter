@@ -77,7 +77,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	}
 
 	focus() {
-		//log('DesmosExpression.focus')
 		super.focus()
 		this.expand()
 		document.addEventListener('keydown', this.boundButtonDownByKey, { capture: true })
@@ -90,7 +89,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
 		let keypad = this.view.div.querySelector('.dcg-keypad') as HTMLElement
 		keypad.style.display = 'none'
-		//log(this.freeVariables)
 		// if (this.freeVariables.length == 0) {
 		// 	this.outerFrame.update({
 		// 		screenEventHandler: ScreenEventHandler.Parent

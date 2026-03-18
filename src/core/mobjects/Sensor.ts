@@ -317,7 +317,6 @@ export class Sensor extends ExtendedObject {
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 			//log('case 10')
 			this.screenEventDevice = ScreenEventDevice.Finger
-			//log(this.screenEventDevice)
 			this.eventTarget.sensor.rawOnTouchDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
@@ -548,7 +547,6 @@ export class Sensor extends ExtendedObject {
 	savedOnMereTap(e: ScreenEvent) { }
 	savedOnDoubleTap(e: ScreenEvent) { }
 	savedOnLongPress(e: ScreenEvent) { }
-	// Dragging methods
 
 
 
