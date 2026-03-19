@@ -144,9 +144,8 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setControlsVisibility(visible: boolean) {
 		for (let mob of this.controls) {
-			mob.update({
-				visible: visible
-			})
+			mob.view.setVisibility(visible)
+
 		}
 	}
 
