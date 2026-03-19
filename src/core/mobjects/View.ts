@@ -130,21 +130,20 @@ export class View extends ExtendedObject {
 		this.div.style.borderWidth = `${this.borderWidth}px`
 		this.div.style.borderRadius = `${this.borderRadius}px`
 		this.div.style.opacity = this.opacity.toString()
-		this.setVisibility(this.shouldBeDrawn())
+
 	}
 
-	// TODO: put into setter for this.visible?
-	setVisibility(visibility: boolean) {
-		// this.div.style.visibility = visibility ? 'visible' : 'hidden'
-		// for (let submob of this.mobject?.submobs ?? []) {
-		// 	submob.view.setVisibility(submob.view.visible && visibility)
-		// }
+	setCSSVisibility(visibility: boolean) {
 		if (visibility) {
-			//this.div.style.removeProperty('display')
 			this.div.style.display = 'flex'
 		} else {
 			this.div.style.display = 'none'
 		}
+	}
+
+	setVisibility(visibility: boolean) {
+		this.update({ visible: visibility })
+		this.setCSSVisibility(this.shouldBeDrawn())
 	}
 
 	showShadow() {
@@ -166,25 +165,39 @@ export class View extends ExtendedObject {
 	shouldBeDrawn(): boolean {
 		if (!this.visible) { return false }
 		for (let v of this.superViews()) {
-			if (!v.visible) { return false }
+			if (!v.visible) {
+				return false
+			}
 		}
 		return true
 	}
 
 	superViews(): Array<View> | null {
 		return this.mobject?.ancestors().map((mob) => mob.view) ?? []
-}
+	}
+
+	visibilities(): Array<object> {
+		let obj = {}
+		obj[this.mobject.constructor.name] = this.visible
+		let ret: Array<object> = [obj]
+		var m: Mobject = this.mobject
+		while (m.parent) {
+			m = m.parent
+			let obj2 = {}
+			obj2[m.constructor.name] = m.view.visible
+			ret.push(obj2)
+		}
+		return ret
+	}
 
 	// Show and hide //
 
 	show() {
-		this.visible = true
-		this.setVisibility(this.visible)
+		this.setVisibility(true)
 	}
 
 	hide() {
-		this.visible = false
-		this.setVisibility(this.visible)
+		this.setVisibility(false)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

@@ -157,25 +157,25 @@ The content children can also be dragged and panned.
 		this.add(this.content)
 		this.moveToTop(this.inputList)
 		this.moveToTop(this.outputList)
-		this.add(this.expandButton)
+		//this.add(this.expandButton)
 
-		this.expandedInputList.update({
-			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
-			mobject: this,
-			outletProperties: this.inputProperties
-		})
-		this.add(this.expandedInputList)
+		// this.expandedInputList.update({
+		// 	height: EXPANDED_IO_LIST_HEIGHT,
+		// 	width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+		// 	anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, EXPANDED_IO_LIST_INSET],
+		// 	mobject: this,
+		// 	outletProperties: this.inputProperties
+		// })
+		// this.add(this.expandedInputList)
 
-		this.expandedOutputList.update({
-			height: EXPANDED_IO_LIST_HEIGHT,
-			width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
-			anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
-			mobject: this,
-			outletProperties: this.outputProperties
-		})
-		this.add(this.expandedOutputList)
+		// this.expandedOutputList.update({
+		// 	height: EXPANDED_IO_LIST_HEIGHT,
+		// 	width: this.expandedWidth() - this.expandButton.view.frame.width - 2 * EXPANDED_IO_LIST_INSET,
+		// 	anchor: [this.expandButton.view.frame.width + EXPANDED_IO_LIST_INSET, this.expandedHeight() - EXPANDED_IO_LIST_INSET - EXPANDED_IO_LIST_HEIGHT],
+		// 	mobject: this,
+		// 	outletProperties: this.outputProperties
+		// })
+		// this.add(this.expandedOutputList)
 
 		if (this.contracted) {
 			this.contractStateChange()
