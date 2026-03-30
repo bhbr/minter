@@ -164,6 +164,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.playButton.update({
 			mobject: this
 		})
+		this.controls.push(this.playButton)
 	}
 
 	positionButton() {
@@ -179,6 +180,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.nbCoinsInputBox.blur = this.endNbCoinsEditing.bind(this)
 		this.nbCoinsInputBox.onReturn = this.endNbCoinsEditing.bind(this)
 		this.add(this.nbCoinsInputBox)
+		this.controls.push(this.nbCoinsInputBox)
 	}
 
 	endNbCoinsEditing() {

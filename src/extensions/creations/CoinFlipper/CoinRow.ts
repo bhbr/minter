@@ -148,6 +148,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.positionTailsLabel()
 		this.positionButton()
 		this.positionNbCoinsInputBox()
+		this.positionIOLists()
 	}
 
 	removeCoin() {
@@ -157,6 +158,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.positionTailsLabel()
 		this.positionButton()
 		this.positionNbCoinsInputBox()
+		this.positionIOLists()
 	}
 
 	adjustFrameWidth() {

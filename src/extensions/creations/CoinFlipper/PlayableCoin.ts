@@ -32,10 +32,11 @@ export class PlayableCoin extends Linkable implements Playable {
 				//{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
 			],
 			outputProperties: [
-				{ name: 'value', type: 'number' }
+				{ name: 'value', type: 'number' },
+				
 			],
 			frameWidth: 50,
-			frameHeight: 80,
+			frameHeight: 50,
 			tailsProbability: 0.5,
 			swipedSide: null
 		}
