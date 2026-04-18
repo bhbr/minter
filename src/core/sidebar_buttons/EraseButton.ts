@@ -18,11 +18,7 @@ export class EraseButton extends SidebarButton {
 				{ 'erase': false },
 				{ 'restart': true }
 			],
-			icon: new ImageView({
-				imageLocation: '../../assets/erase.png',
-				frameWidth: 30,
-				frameHeight: 30
-			})
+			iconSize: 30
 		}
 	}
 

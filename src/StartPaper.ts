@@ -18,4 +18,3 @@ export class StartPaper extends CoinFlipPaper { }
 //AllTests.run()
 
 export const paper = new StartPaper()
-

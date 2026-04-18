@@ -7,11 +7,7 @@ export class DragButton extends ToggleButton {
 	defaults(): object {
 		return {
 			messageKey: 'drag',
-			icon: new ImageView({
-				imageLocation: '../../assets/drag.png',
-				frameWidth: 30,
-				frameHeight: 30
-			})
+			iconSize: 30
 		}
 	}
 

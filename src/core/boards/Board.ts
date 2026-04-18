@@ -30,7 +30,8 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { Dependency } from 'core/mobjects/Dependency'
 
 declare var paper: Paper
-export declare interface Window { webkit?: any }
+
+interface Window { webkit?: any }
 
 export class BoardContent extends MGroup { }
 
@@ -703,9 +704,11 @@ The content children can also be dragged and panned.
 	endCreating(e: ScreenEvent) {
 		this.creationStroke = []
 		this.creationTool = null
-		if (this.creator == null) { return }
-		this.creator.dissolve()
-		this.helpTextLabel.view.hide()
+		if (this.creator !== null) {
+			this.creator.dissolve()
+			this.helpTextLabel.view.hide()
+		}
+		this.messageSidebar({'button': 'collapse'})
 	}
 
 
@@ -1213,18 +1216,15 @@ The content children can also be dragged and panned.
 	//////////////////////////////////////////////////////////
 
 	messageSidebar(message: object) {
-		if (isTouchDevice) {
+		try {
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
-		} else {
-			if (this.sidebar !== null && this.sidebar !== undefined) {
-				this.sidebar.getMessage(message)
-			}
+		} catch {
+			this.sidebar.getMessage(message)
 		}
 	}
 
 }
-
 
 
 

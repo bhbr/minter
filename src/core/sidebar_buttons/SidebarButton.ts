@@ -4,6 +4,7 @@ import { Color } from 'core/classes/Color'
 import { vertex, vertexTranslatedBy, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR, OPTION_SPACING } from './button_geometry'
+import { MAX_TAP_DELAY } from 'core/constants'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Paper } from 'core/Paper'
 import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_events'
@@ -35,14 +36,14 @@ export class SidebarButton extends Pill {
 	
 	locationIndex: number
 	optionSpacing: number
-	touchStart: vertex
+	touchStartLocation?: vertex
+	touchStartTime?: number
 	active: boolean
 	messageKey: string
 	label: TextLabel
-	icon?: ImageView
+	icons: Array<ImageView>
+	iconSize: number
 	innerCircle: Circle
-
-	dragArrow: Polygon
 
 	touchDownMessages: Array<object>
 	touchUpMessages: Array<object>
@@ -66,7 +67,8 @@ export class SidebarButton extends Pill {
 			}),
 			labelWidth: 85,
 			labelHeight: 25,
-			icon: null,
+			icons: [],
+			iconSize: 40,
 
 			innerCircle: new Circle({
 				midpoint: [BUTTON_RADIUS, BUTTON_RADIUS],
@@ -93,22 +95,14 @@ export class SidebarButton extends Pill {
 			fillOpacity: 1.0,
 			activeKeyboard: true,
 
-			dragArrow: new Polygon({
-				anchor: [2 * BUTTON_RADIUS, BUTTON_RADIUS],
-				vertices: [
-					[10, -0.3 * BUTTON_RADIUS],
-					[10 + 0.3 * BUTTON_RADIUS, 0],
-					[10, 0.3 * BUTTON_RADIUS]
-				],
-				fillOpacity: 1,
-				strokeWidth: 0
-			}),
-
 			paper: null,
 			sidebar: null,
 			view: new SidebarButtonView({
 				radius: BUTTON_RADIUS
-			})
+			}),
+
+			touchStartLocation: null,
+			touchStartTime: null
 		}
 	}
 
@@ -133,12 +127,11 @@ export class SidebarButton extends Pill {
 		this.sidebar?.add(this.label)
 		this.add(this.innerCircle)
 		this.label.view.hide()
-		if (this.icon) {
-			this.updateIcon()
-			this.view.add(this.icon)
-		}
+		this.setupBaseIcon()
+		this.setupOtherIcons()
+
 		this.addDependency('midpoint', this.label, 'midpoint')
-		this.updateModeIndex(0)
+		//this.updateModeIndex(0)
 		this.view.update({
 			fillColor: this.baseColor
 		})
@@ -160,13 +153,7 @@ export class SidebarButton extends Pill {
 		this.label.view.div.style.paddingLeft = `5px`
 		this.label.view.div.style.paddingRight = `5px`
 
-		this.dragArrow.update({
-			fillColor: this.fillColor
-		})
-
 		this.updateLabel()
-		this.add(this.dragArrow)
-		this.dragArrow.view.hide()
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -175,6 +162,40 @@ export class SidebarButton extends Pill {
 					this.paper = paperView['mobject'] as Paper
 				}
 			}
+		}
+	}
+
+	baseIconName(): string {
+		return this.messageKey.replaceAll(' ', '_')
+	}
+
+	setupBaseIcon() {
+		let baseIcon = new ImageView({
+				imageLocation: `../../assets/${this.baseIconName()}.png`,
+				frameWidth: this.iconSize,
+				frameHeight: this.iconSize
+			})
+		this.icons.push(baseIcon)
+		this.view.add(baseIcon)
+		// Center the icon inside the pill.
+		baseIcon.update({
+			anchor: [
+				BUTTON_RADIUS - 0.5 * this.iconSize,
+				BUTTON_RADIUS - 0.5 * this.iconSize
+			]
+		})
+	}
+
+	setupOtherIcons() {
+		for (let i = 1; i < this.touchDownMessages.length; i++) {
+			let iconName = this.imageNameForIndex(i).replaceAll(' ', '_')
+			let icon = new ImageView({
+				imageLocation: `../../assets/${iconName}.png`,
+				frameWidth: this.iconSize,
+				frameHeight: this.iconSize,
+				anchor: [this.icons[0].anchor[0] + i * this.optionSpacing, this.icons[0].anchor[1]]
+			})
+			this.icons.push(icon)
 		}
 	}
 
@@ -196,36 +217,39 @@ export class SidebarButton extends Pill {
 	}
 
 	commonButtonDown() {
-		this.frame.transform.update({
-			scale: this.activeScalingFactor
-		})
-		this.label.view.show()
-		if (this.active) {
-			this.redraw()
+		//log('commonButtonDown')
+		this.touchStartTime = Date.now()
+		if (this.sidebar && this.sidebar.activeButton != this) {
+			this.sidebar.setActiveButton(this)
+			this.updateModeIndex(0, true)
 			return
 		}
-		this.update({
-			active: true,
-			previousIndex: this.currentModeIndex,
-		})
-		this.label.update({
-			anchor: [10, this.anchor[1] - 38]
-		})
-		this.redraw()
-		this.updateIcon()
-		this.updateLabel()
-		if (this.touchDownMessages.length == 0) { return }
-		this.messagePaper(this.touchDownMessages[0])
-		if (this.sidebar) {
-			this.sidebar.activeButton = this
-			this.sidebar.add(this.label)
-		}
-		this.updateHelpText()
-		this.paper.helpTextLabel.view.show()
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		this.dragArrow.view.show()
+
+		// this.frame.transform.update({
+		// 	scale: this.activeScalingFactor
+		// })
+		// this.label.view.show()
+		// if (this.active) {
+		// 	this.redraw()
+		// 	return
+		// }
+		// this.update({
+		// 	active: true,
+		// 	previousIndex: this.currentModeIndex,
+		// })
+		// this.label.update({
+		// 	anchor: [10, this.anchor[1] - 38]
+		// })
+		// this.redraw()
+		// this.updateLabel()
+		// if (this.touchDownMessages.length == 0) { return }
+		// this.messagePaper(this.touchDownMessages[0])
+		// if (this.sidebar) {
+		// 	this.sidebar.activeButton = this
+		// 	this.sidebar.add(this.label)
+		// }
+		// this.updateHelpText()
+		// this.paper.helpTextLabel.view.show()
 	}
 
 	updateHelpText() {
@@ -235,48 +259,35 @@ export class SidebarButton extends Pill {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		//log('setting touchStart:')
-		this.touchStart = eventVertex(e)
+		//log('onPointerDown')
+		// this.touchStartLocation = eventVertex(e)
 		this.commonButtonDown()
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		if (!this.sidebar.activeButton) { return }
-		let t: MouseEvent | Touch = null
-		if (e instanceof MouseEvent) { t = e }
-		else { t = e.changedTouches[0] }
-		let p: vertex = eventVertex(e)
-		var dx: number = p[0] - this.touchStart[0]
-		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
-		newIndex = Math.min(Math.max(newIndex, 0), this.touchDownMessages.length - 1)
-		dx += this.previousIndex * this.optionSpacing
-		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
-
-		let newWidth = 2 * BUTTON_RADIUS + dx
-		this.updateModeIndex(newIndex, true)
-		this.update({
-			width: newWidth
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
-			this.dragArrow.view.hide()
-		} else {
-			this.dragArrow.view.show()
-		}
-		this.label.update({
-			anchor: [10 + dx, this.anchor[1] - 38]
-		})
-		this.icon.update({
-			anchor: [this.width - this.radius - 0.5 * this.icon.frameWidth, this.radius - 0.5 * this.icon.frameHeight]
-		})
+		let dx = this.xShift(e)
 		this.innerCircle.update({
-			midpoint: [this.width - this.radius, BUTTON_RADIUS]
+			midpoint: [this.baseRadius + dx, this.baseRadius]
 		})
+		let i = this.selectedIndex(e)
+		this.updateModeIndex(i, true)
+		// let newWidth = 2 * BUTTON_RADIUS + dx
+		// this.updateModeIndex(newIndex, true)
+		// this.update({
+		// 	width: newWidth
+		// })
+		// this.label.update({
+		// 	anchor: [10 + dx, this.anchor[1] - 38]
+		// })
+		// this.innerCircle.update({
+		// 	midpoint: [this.width - this.radius, BUTTON_RADIUS]
+		// })
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		//log('onPointerUp')
+		this.touchStartLocation = this.sensor.localEventVertex(e)
+		//log(this.touchStartLocation)
 		this.commonButtonUp()
 	}
 	
@@ -288,38 +299,83 @@ export class SidebarButton extends Pill {
 	}
 
 	commonButtonUp() {
-		if (this.touchUpMessages.length == 1) {
-			this.messagePaper(this.touchUpMessages[0])
-		} else if (this.touchUpMessages.length > 1) {
-			this.messagePaper(this.touchUpMessages[this.currentModeIndex])
+		//log('commonButtonUp')
+		if (Date.now() - this.touchStartTime > MAX_TAP_DELAY) {
+			//log('no tap')
+			if (this.sidebar) {
+				this.sidebar.setActiveButton(null)
+				this.messagePaper({'create': 'draw'})
+				this.hideOptions()
+			}
+			return
 		}
-		this.currentModeIndex = 0
-		let dx: number = this.currentModeIndex * this.optionSpacing
-		let newWidth = 2 * BUTTON_RADIUS + dx
-		
-		this.update({
-			active: false,
-			fillColor: this.colorForIndex(this.currentModeIndex),
-			width: newWidth
-		})
-		this.innerCircle.update({
-			midpoint: [this.radius, this.radius]
-		})
-		this.frame.transform.update({
-			scale: 1
-		})
-		this.sidebar.update({
-			activeButton: null
-		})
 
-		this.redraw()
-		this.updateLabel()
-		this.updateIcon()
-		this.label.view.hide()
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
+		//log('tap')
+		if (this.sidebar.activeButton != this) { return }
+		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
+		let i = Math.round(dx / this.optionSpacing)
+		this.highlightOption(i)
+		this.updateModeIndex(i, true)
+		this.touchStartLocation = null
+		this.touchStartTime = null
+
+		// if (this.touchUpMessages.length == 1) {
+		// 	this.messagePaper(this.touchUpMessages[0])
+		// } else if (this.touchUpMessages.length > 1) {
+		// 	this.messagePaper(this.touchUpMessages[this.currentModeIndex])
+		// }
+		// this.currentModeIndex = 0
+		// let dx: number = this.currentModeIndex * this.optionSpacing
+		// let newWidth = 2 * BUTTON_RADIUS + dx
+		
+		// this.update({
+		// 	active: false,
+		// 	fillColor: this.colorForIndex(this.currentModeIndex),
+		// 	width: newWidth
+		// })
+		// this.innerCircle.update({
+		// 	midpoint: [this.radius, this.radius]
+		// })
+		// this.frame.transform.update({
+		// 	scale: 1
+		// })
+		// this.sidebar.update({
+		// 	activeButton: null
+		// })
+
+		// this.redraw()
+		// this.updateLabel()
+		// this.label.view.hide()
+	}
+
+	// onTap(e: ScreenEvent) {
+	// 	log('onTap')
+	// 	if (this.sidebar.activeButton != this) { return }
+	// 	let i = this.selectedIndex(e)
+	// 	this.highlightOption(i)
+	// 	this.updateModeIndex(i, true)
+	// }
+
+	selectedIndex(e: ScreenEvent): number {
+		let dx = this.xShift(e)
+		var newIndex: number = Math.round(dx / this.optionSpacing)
+		return newIndex
+	}
+
+	xShift(e: ScreenEvent): number {
+		let t: MouseEvent | Touch = null
+		if (e instanceof MouseEvent) { t = e }
+		else { t = e.changedTouches[0] }
+		let p: vertex = this.sensor.localEventVertex(e)
+		var dx: number = p[0] - this.baseRadius + this.sidebar.frameWidth
+		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
+		return dx
+	}
+
+	highlightOption(i: number) {
+		this.innerCircle.update({
+			midpoint: [this.baseRadius + i * this.optionSpacing, this.baseRadius]
 		})
-		this.dragArrow.view.hide()
 	}
 	
 	messagePaper(message: object) {
@@ -327,6 +383,7 @@ export class SidebarButton extends Pill {
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
+			//log(message)
 			this.paper.getMessage(message)
 		}
 	}
@@ -337,18 +394,6 @@ export class SidebarButton extends Pill {
 		this.label.update({
 			text: text,
 			fontSize: (text.length < 15) ? this.bigLabelFontSize : this.smallLabelFontSize
-		})
-	}
-
-	updateIcon() {
-		if (this.icon === undefined || this.icon === null) { return }
-		let name = this.imageNameForIndex(this.currentModeIndex).replaceAll(' ', '_')
-		this.icon.update({
-			imageLocation: `../../assets/${name}.png`,
-			anchor: [
-				0.5 * (this.frameWidth - this.icon.frameWidth) + this.optionSpacing * this.currentModeIndex,
-				0.5 * (this.frameHeight - this.icon.frameHeight)
-			]
 		})
 	}
 
@@ -363,34 +408,17 @@ export class SidebarButton extends Pill {
 	}
 	
 	updateModeIndex(newIndex: number, withMessage: any = {}) {
-		if (newIndex == this.currentModeIndex || newIndex == -1) {
+		//log('updateModeIndex')
+		if ((newIndex !== 0 && newIndex === this.currentModeIndex) || newIndex < 0) {
 			return
 		}
 		this.currentModeIndex = newIndex
 		let message: object = this.touchDownMessages[this.currentModeIndex]
-		this.update({
-			fillColor: this.colorForIndex(this.currentModeIndex)
-		})
 		if (withMessage as boolean) {
 			this.messagePaper(message)
 		}
  
 		this.updateLabel()
-		this.updateIcon()
-		this.update({
-			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		this.innerCircle.update({
-			midpoint: [this.width - this.radius, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
-			this.dragArrow.view.hide()
-		} else {
-			this.dragArrow.view.show()
-		}
 	}
 	
 	selectNextOption() {
@@ -407,6 +435,28 @@ export class SidebarButton extends Pill {
 	labelFromMessage(msg: object): string {
 		var key = Object.keys(msg)[0]
 		return key
+	}
+
+
+	showOptions() {
+		//log('showOptions')
+		this.update({
+			width: 2 * this.baseRadius + (this.icons.length - 1) * this.optionSpacing
+		})
+		for (let i = 1; i < this.icons.length; i++) {
+			this.view.add(this.icons[i])
+		}
+	}
+	
+	hideOptions() {
+		//log('hideOptions')
+		this.update({
+			width: 2 * this.baseRadius
+		})
+		for (let i = 1; i < this.icons.length; i++) {
+			this.icons[i].div.remove()
+		}
+		this.highlightOption(0)
 	}
 	
 }

@@ -7,11 +7,7 @@ export class ArithmeticButton extends CreativeButton {
 	defaults(): object {
 		return {
 			creations: ['add', 'subtract', 'multiply', 'divide'],
-			icon: new ImageView({
-				imageLocation: '../../assets/add.png',
-				frameWidth: 20,
-				frameHeight: 20
-			})
+			iconSize: 20
 		}
 	}
 

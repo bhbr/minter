@@ -93,6 +93,16 @@ export class Sidebar extends Mobject {
 		})
 	}
 
+	setActiveButton(newButton: SidebarButton | null) {
+		if (this.activeButton) {
+			this.activeButton.hideOptions()
+		}
+		this.activeButton = newButton
+		if (newButton) {
+			newButton.showOptions()
+		}
+	}
+
 	clear() {
 		for (let button of Object.values(this.buttons)) {
 			this.remove(button)
@@ -175,6 +185,11 @@ export class Sidebar extends Mobject {
 				}
 			}
 			break
+		case 'button':
+			if (value == 'collapse') {
+				this.setActiveButton(null)
+			}
+			break
 		}
 	}
 
@@ -188,6 +203,11 @@ export class Sidebar extends Mobject {
 			convertedValue = convertStringToArray(value)
 		}
 		this.handleMessage(key, convertedValue)
+	}
+
+	onTap(e: ScreenEvent) {
+		this.activeButton.messagePaper({'create': 'draw'})
+		this.setActiveButton(null)
 	}
 
 }

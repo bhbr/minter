@@ -36,20 +36,20 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	commonButtonUp() {
-		if (this.currentModeIndex == 1) {
-			if (this.locked) {
-				super.commonButtonUp()
-			}
-			this.locked = !this.locked
-			this.view.transform.update({
-				scale: 1
-			})
-			this.redraw()
-		} else {
-			super.commonButtonUp()
-		}
-		this.label.view.hide()
-		this.paper.helpTextLabel.view.hide()
+		// if (this.currentModeIndex == 1) {
+		// 	if (this.locked) {
+		// 		super.commonButtonUp()
+		// 	}
+		// 	this.locked = !this.locked
+		// 	this.view.transform.update({
+		// 		scale: 1
+		// 	})
+		// 	this.redraw()
+		// } else {
+		// 	super.commonButtonUp()
+		// }
+		// this.label.view.hide()
+		// this.paper.helpTextLabel.view.hide()
 	}
 
 	imageNameForIndex(index: number): string {
