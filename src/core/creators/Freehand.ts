@@ -5,6 +5,8 @@ import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Transform } from 'core/classes/Transform'
+import { log } from  'core/functions/logging'
+import { deepCopy } from 'core/functions/copying'
 
 export class Freehand extends Creator {
 
@@ -34,7 +36,11 @@ export class Freehand extends Creator {
 
 	setup() {
 		super.setup()
+		this.update({
+			anchor: [0, 0]
+		})
 		this.line.update({
+			anchor: [0, 0],
 			vertices: this.creationStroke
 		})
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
@@ -54,16 +60,15 @@ export class Freehand extends Creator {
 			frameWidth: this.line.getWidth(),
 			frameHeight: this.line.getHeight()
 		})
-
-		let oldAnchor = this.line.anchor
-		let newAnchor = this.line.ulCorner()
-		let shift = vertexSubtract(oldAnchor, newAnchor)
-		let t = new Transform({ shift: shift })
-		this.line.applyTransform(t)
+		let tl = this.line.ulCorner()
 		this.update({
-			anchor: vertexSubtract(this.anchor, shift)
+			anchor: tl
 		})
-
+		for (var i = 0; i < this.line.vertices.length; i++) {
+			this.line.vertices[i][0] -= tl[0]
+			this.line.vertices[i][1] -= tl[1]
+		}
+		this.line.view.redraw()
 		let par = this.parent
 		par.creator = null
 		par.remove(this)

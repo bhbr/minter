@@ -12,9 +12,6 @@ export class DraggingCreator extends Creator {
 	setup() {
 		super.setup()
 		this.creation = this.createMobject()
-		this.creation.update({
-			anchor: vertexSubtract(this.getEndPoint(), this.getStartPoint())
-		})
 		this.add(this.creation)
 	}
 	
@@ -25,7 +22,8 @@ export class DraggingCreator extends Creator {
 			view: new VView({
 				fillColor: Color.red(),
 				fillOpacity: 1.0
-			})
+			}),
+			anchor: this.pointOffset
 		})
 	}
 
@@ -40,7 +38,7 @@ export class DraggingCreator extends Creator {
 	dissolve() {
 		if (this.creation === null) { return }
 		this.creation.update({
-			anchor: this.getEndPoint()
+			anchor: vertexAdd(this.creation.anchor, this.anchor)
 		})
 		this.remove(this.creation)
 		this.parent.addToContent(this.creation)

@@ -485,6 +485,9 @@ The content children can also be dragged and panned.
 				}
 				this.remove(this.creator)
 				this.creator = this.createCreator(this.creationMode)
+				this.creator.update({
+					anchor: (this.creationMode == 'draw') ? [0, 0] : this.creationStroke[0]
+				})
 				this.add(this.creator)
 				this.helpTextLabel.update({
 					text: this.creator.helpText
@@ -500,7 +503,7 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.helpTexts['erase']
 				})
-				if (!value) { // merely touch down
+				if (value) {
 					this.helpTextLabel.view.show()
 				} else {
 					this.helpTextLabel.view.hide()
@@ -523,6 +526,8 @@ The content children can also be dragged and panned.
 	}
 
 	setEraser(erasing: boolean) {
+		log('setEraser')
+		log(erasing)
 		if (erasing) {
 			this.sensor.setMouseMethodsTo(
 				this.startErasing.bind(this),
@@ -627,9 +632,8 @@ The content children can also be dragged and panned.
 				if (this.creationTool == ScreenEventDevice.Finger) {
 					return new Creator()
 				}
-				let fh = new Freehand()
-				fh.line.update({
-					vertices: this.creationStroke
+				let fh = new Freehand({
+					creationStroke: this.creationStroke
 				})
 				return fh
 			default:
