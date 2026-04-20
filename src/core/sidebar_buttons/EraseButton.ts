@@ -11,11 +11,11 @@ export class EraseButton extends SidebarButton {
 		return {
 			baseColor: Color.red().brighten(0.7),
 			messageKey: 'erase',
-			touchDownMessages: [
+			selectMessages: [
 				{ 'erase': true },
 				{ 'restart': false }
 			],
-			touchUpMessages: [
+			deselectMessages: [
 				{ 'erase': false },
 				{ 'restart': true }
 			],
@@ -31,37 +31,6 @@ export class EraseButton extends SidebarButton {
 		this.label.update({
 			backgroundColor: this.innerCircle.fillColor
 		})
-	}
-
-	commonButtonTap() {
-		if (this.sidebar.activeButton != this) { return }
-		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
-		let i = Math.round(dx / this.optionSpacing)
-		this.highlightOption(i)
-		if (i == 0) { // erase
-			this.updateModeIndex(i, this.touchDownMessages[i])
-		} else if (i == 1) { // restart
-			this.updateModeIndex(i, this.touchUpMessages[i])
-			this.sidebar.setActiveButton(null)
-		}
-		this.touchStartLocation = null
-		this.touchStartTime = null
-	}
-
-	commonMereButtonUp() {
-		// i. e. without a tap
-		if (this.sidebar.activeButton != this) { return }
-		if (this.touchStartLocation == null) { return }
-		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
-		let i = Math.round(dx / this.optionSpacing)
-		if (i == 0) { // erase
-			this.updateModeIndex(i, this.touchDownMessages[i])
-		} else if (i == 1) { // restart
-			this.updateModeIndex(i, this.touchUpMessages[i])
-		}
-		this.touchStartLocation = null
-		this.touchStartTime = null
-		this.sidebar.setActiveButton(null)
 	}
 
 

@@ -128,7 +128,7 @@ export class Sidebar extends Mobject {
 			let button = this.createButton(names[i])
 			button.update({
 				locationIndex: i,
-				key: this.defaultKeys[i]
+				shortcutKey: this.defaultKeys[i]
 			})
 			this.addButton(button)
 		}
@@ -151,7 +151,7 @@ export class Sidebar extends Mobject {
 
 	buttonForKey(key: string): SidebarButton | null {
 		for (let b of this.buttons) {
-			if (b.key == key) { return b }
+			if (b.shortcutKey == key) { return b }
 		}
 		return null
 	}
@@ -170,25 +170,23 @@ export class Sidebar extends Mobject {
 			this.initialize(value)
 			break
 		case 'buttonDown':
-			if (this.activeButton === null || this.activeButton === undefined) {
-				this.activeButton = this.buttonForKey(value)
-			}
-			if (this.activeButton !== null) {
-				this.activeButton.buttonDownByKey(value)
+			let button1 = this.activeButton ?? this.buttonForKey(value)
+			if (button1) {
+				button1.buttonDownByKey(value)
 			}
 			break
 		case 'buttonUp':
-			if (this.activeButton !== null && this.activeButton !== undefined) {
-				this.activeButton.buttonUpByKey(value)
-				if (this.activeButton && this.activeButton.key == value) {
-					this.activeButton = null
-				}
+			let button2 = this.activeButton ?? this.buttonForKey(value)
+			if (button2) {
+				button2.buttonUpByKey(value)
 			}
 			break
 		case 'button':
 			if (value == 'collapse') {
 				this.setActiveButton(null)
 			}
+			break
+		default:
 			break
 		}
 	}
@@ -208,7 +206,6 @@ export class Sidebar extends Mobject {
 	onTap(e: ScreenEvent) {
 		if (!this.activeButton) { return }
 		this.activeButton.commonButtonUp()
-		this.setActiveButton(null)
 	}
 
 }

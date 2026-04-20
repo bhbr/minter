@@ -523,6 +523,8 @@ The content children can also be dragged and panned.
 					this.helpTextLabel.view.hide()
 				}
 				break
+			default:
+				break
 		}
 	}
 

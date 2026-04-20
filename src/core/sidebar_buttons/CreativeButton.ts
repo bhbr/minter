@@ -8,8 +8,7 @@ export class CreativeButton extends SidebarButton {
 
 	defaults(): object {
 		return {
-			creations: [],
-			touchUpMessages: [{ create: 'draw' }]
+			creations: []
 		}
 	}
 
@@ -19,11 +18,17 @@ export class CreativeButton extends SidebarButton {
 		}
 	}
 
-	setup() {
+	setupMessages() {
+		let newSelectMessages = []
+		let newDeselectMessages = []
 		for (let c of this.creations) {
-			this.touchDownMessages.push({ create: c })
+			newSelectMessages.push({ create: c })
+			newDeselectMessages.push({ create: 'draw' })
 		}
-		super.setup()
+		this.update({
+			selectMessages: newSelectMessages,
+			deselectMessages: newDeselectMessages
+		})
 	}
 
 	labelFromMessage(msg: object): string {
@@ -35,18 +40,11 @@ export class CreativeButton extends SidebarButton {
 	}
 
 	imageNameForIndex(index: number): string {
-		return (Object.values(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
+		return (Object.values(this.selectMessages[index] ?? {}) ?? ['key'])[0]
 	}
 
 	updateHelpText() {
 		// do nothing because the board handles it
-	}
-
-
-	commonMereButtonUp() {
-		if (this.sidebar.activeButton != this) { return }
-		this.sidebar.setActiveButton(null)
-		//this.messagePaper({'create': 'draw'})
 	}
 
 

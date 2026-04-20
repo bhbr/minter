@@ -7,34 +7,46 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class ToggleButton extends SidebarButton {
 
+	messageKey: string
 	locked: boolean
 	lockColor: Color
 
 	defaults(): object {
 		return {
-			messageKey: 'key',
 			baseColor: Color.gray(0.4),
 			lockColor: Color.gray(0.7),
-			locked: false
+			locked: false,
+			messageKey: 'toggle'
 		}
 	}
 
 	setup() {
 		super.setup()
-		let message = {}
-		message[this.messageKey] = true
-		let outgoingMessage = {}
-		outgoingMessage[this.messageKey] = false
-		this.update({
-			touchDownMessages: [message],
-			touchUpMessages: [outgoingMessage]
-		})
 		this.innerCircle.update({
 			fillColor: this.baseColor
 		})
 		this.label.update({
 			backgroundColor: this.innerCircle.fillColor
 		})
+	}
+
+	setupMessages() {
+		let message = {}
+		message[this.messageKey] = true
+		let outgoingMessage = {}
+		outgoingMessage[this.messageKey] = false
+		this.update({
+			selectMessages: [message],
+			deselectMessages: [outgoingMessage]
+		})
+	}
+
+	baseMessageKey(): string {
+		return this.messageKey
+	}
+
+	imageNameForIndex(index: number): string {
+		return this.messageKey
 	}
 
 	commonButtonDown() {
@@ -45,8 +57,7 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	commonMereButtonUp() {
-		this.updateModeIndex(0, this.touchUpMessages[0])
-		this.touchStartLocation = null
+		this.messagePaper(this.deselectMessages[0])
 		this.touchStartTime = null
 		this.sidebar.setActiveButton(null)
 		this.innerCircle.update({
@@ -57,11 +68,10 @@ export class ToggleButton extends SidebarButton {
 	commonButtonTap() {
 		if (this.sidebar.activeButton != this) { return }
 		if (this.locked) {
-			this.updateModeIndex(0, this.touchUpMessages[0])
+			this.messagePaper(this.deselectMessages[0])
 		} else {
-			this.updateModeIndex(0, this.touchDownMessages[0])
+			this.messagePaper(this.selectMessages[0])
 		}
-		this.touchStartLocation = null
 		this.touchStartTime = null
 		this.locked = !this.locked
 		this.innerCircle.update({
@@ -69,17 +79,11 @@ export class ToggleButton extends SidebarButton {
 		})
 	}
 
-	imageNameForIndex(index: number): string {
-		return this.messageKey
-	}
-
-
-	labelFromMessage(msg: object): string {
-		if (this.currentModeIndex == 0) {
-			return this.messageKey
-		} else {
-			return 'lock'
-		}
-	}
-
 }
+
+
+
+
+	
+
+

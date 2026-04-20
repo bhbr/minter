@@ -24,33 +24,32 @@ export const buttonDict: object = {}
 export class SidebarButton extends Pill {
 	
 	declare view: SidebarButtonView
-	currentModeIndex: number
-	previousIndex: number
 	baseColor: Color
 	baseRadius: number
 	bigLabelFontSize: number
 	labelWidth: number
 	labelHeight: number
 	smallLabelFontSize: number
-	activeScalingFactor: number
 	
 	locationIndex: number
 	optionSpacing: number
 	touchStartLocation?: vertex
 	touchStartTime?: number
-	active: boolean
-	messageKey: string
 	label: TextLabel
 	icons: Array<ImageView>
 	iconSize: number
 	innerCircle: Circle
 
-	touchDownMessages: Array<object>
-	touchUpMessages: Array<object>
-	key: string
+	selectMessages: Array<object>
+	deselectMessages: Array<object>
+	shortcutKey: string
 	activeKeyboard: boolean
 	paper?: Paper
-	sidebar?: Sidebar | null
+	sidebar?: Sidebar
+
+	pressed: boolean
+	expanded: boolean
+	selectedIndex: number
 
 	defaults(): object {
 		return {
@@ -78,16 +77,12 @@ export class SidebarButton extends Pill {
 				strokeWidth: 0
 			}),
 
-			touchDownMessages: [],
-			touchUpMessages: [],
+			selectMessages: [],
+			deselectMessages: [],
 
 			strokeWidth: 0,
 			screenEventHandler: ScreenEventHandler.Self,
-			currentModeIndex: 0,
-			previousIndex: 0,
 			locationIndex: 0,
-			active: false,
-			messageKey: 'key',
 			radius: BUTTON_RADIUS,
 			width: 2 * BUTTON_RADIUS,
 			frameWidth: 2 * BUTTON_RADIUS,
@@ -102,7 +97,12 @@ export class SidebarButton extends Pill {
 			}),
 
 			touchStartLocation: null,
-			touchStartTime: null
+			touchStartTime: null,
+
+			pressed: false,
+			expanded: false,
+			selectedIndex: 0,
+			shortcutKey: '1'
 		}
 	}
 
@@ -114,9 +114,8 @@ export class SidebarButton extends Pill {
 			optionSpacing: 'never',
 			label: 'never',
 			icon: 'on_init',
-			activeScalingFactor: 'never',
-			messages: 'on_update',
-			outgoingMessage: 'on_update',
+			selectMessages: 'on_update',
+			deselectMessages: 'on_update',
 			messageKey: 'on_init'
 		}
 	}
@@ -127,11 +126,11 @@ export class SidebarButton extends Pill {
 		this.sidebar?.add(this.label)
 		this.add(this.innerCircle)
 		this.label.view.hide()
+		this.setupMessages()
 		this.setupBaseIcon()
 		this.setupOtherIcons()
 
 		this.addDependency('midpoint', this.label, 'midpoint')
-		//this.updateModeIndex(0)
 		this.view.update({
 			fillColor: this.baseColor
 		})
@@ -144,7 +143,7 @@ export class SidebarButton extends Pill {
 			borderWidth: 2,
 			borderRadius: 7,
 			drawShadow: false,
-			text: this.messageKey,
+			text: this.baseMessageKey(),
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			fontSize: this.bigLabelFontSize
@@ -165,8 +164,16 @@ export class SidebarButton extends Pill {
 		}
 	}
 
+	setupMessages() {
+		// subclassed in CreativeButton
+	}
+
 	baseIconName(): string {
-		return this.messageKey.replaceAll(' ', '_')
+		return this.baseMessageKey().replaceAll(' ', '_')
+	}
+
+	baseMessageKey(): string {
+		return Object.keys(this.selectMessages[0])[0]
 	}
 
 	setupBaseIcon() {
@@ -187,7 +194,7 @@ export class SidebarButton extends Pill {
 	}
 
 	setupOtherIcons() {
-		for (let i = 1; i < this.touchDownMessages.length; i++) {
+		for (let i = 1; i < this.nbOptions(); i++) {
 			let iconName = this.imageNameForIndex(i).replaceAll(' ', '_')
 			let icon = new ImageView({
 				imageLocation: `../../assets/${iconName}.png`,
@@ -199,255 +206,16 @@ export class SidebarButton extends Pill {
 		}
 	}
 
-	numberOfIndices(): number { return this.touchDownMessages.length }
-
-	colorForIndex(i: number): Color {
-		return this.baseColor
-	}
-	
-	buttonDownByKey(key: string) {
-		if (!this.activeKeyboard) { return }
-		if (key == this.key) {
-			this.commonButtonDown()
-		} else if (key == 'ArrowRight' && this.active) {
-			this.selectNextOption()
-		} else if (key == 'ArrowLeft' && this.active) {
-			this.selectPreviousOption()
-		}
-	}
-
-	commonButtonDown() {
-		this.touchStartTime = Date.now()
-		if (this.sidebar && this.sidebar.activeButton != this) {
-			this.sidebar.setActiveButton(this)
-			this.updateModeIndex(0, this.touchDownMessages[0])
-			return
-		}
-
-		// this.frame.transform.update({
-		// 	scale: this.activeScalingFactor
-		// })
-		// this.label.view.show()
-		// if (this.active) {
-		// 	this.redraw()
-		// 	return
-		// }
-		// this.update({
-		// 	active: true,
-		// 	previousIndex: this.currentModeIndex,
-		// })
-		// this.label.update({
-		// 	anchor: [10, this.anchor[1] - 38]
-		// })
-		// this.redraw()
-		// this.updateLabel()
-		// if (this.touchDownMessages.length == 0) { return }
-		// this.messagePaper(this.touchDownMessages[0])
-		// if (this.sidebar) {
-		// 	this.sidebar.activeButton = this
-		// 	this.sidebar.add(this.label)
-		// }
-		// this.updateHelpText()
-		// this.paper.helpTextLabel.view.show()
-	}
-
-	updateHelpText() {
-		this.paper.helpTextLabel.update({
-			text: this.paper.helpTexts[this.messageKey]
-		})
-	}
-
-	onPointerDown(e: ScreenEvent) {
-		//log('onPointerDown')
-		// this.touchStartLocation = eventVertex(e)
-		this.commonButtonDown()
-	}
-
-	onPointerMove(e: ScreenEvent) {
-		let dx = this.xShift(e)
-		this.innerCircle.update({
-			midpoint: [this.baseRadius + dx, this.baseRadius]
-		})
-		let i = this.selectedIndex(e)
-		if (i != this.currentModeIndex) {
-			this.updateModeIndex(i, this.touchDownMessages[i])
-		}
-		// let newWidth = 2 * BUTTON_RADIUS + dx
-		// this.updateModeIndex(newIndex, true)
-		// this.update({
-		// 	width: newWidth
-		// })
-		// this.label.update({
-		// 	anchor: [10 + dx, this.anchor[1] - 38]
-		// })
-		// this.innerCircle.update({
-		// 	midpoint: [this.width - this.radius, BUTTON_RADIUS]
-		// })
-	}
-
-	onPointerUp(e: ScreenEvent) {
-		this.touchStartLocation = this.sensor.localEventVertex(e)
-		this.commonButtonUp()
-	}
-	
-	buttonUpByKey(key) {
-		if (!this.activeKeyboard) { return }
-		if (key == this.key) {
-			this.commonButtonUp()
-		}
-	}
-
-	commonMereButtonUp() {
-		// i. e. without a tap
-		if (this.sidebar.activeButton != this) { return }
-		if (this.touchStartLocation == null) { return }
-		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
-		let i = Math.round(dx / this.optionSpacing)
-		this.highlightOption(i)
-		this.updateModeIndex(i, this.touchUpMessages[i])
-		this.touchStartLocation = null
-		this.touchStartTime = null
-		this.sidebar.setActiveButton(null)
-	}
-
-	commonButtonTap() {
-		if (this.sidebar.activeButton != this) { return }
-		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
-		let i = Math.round(dx / this.optionSpacing)
-		this.highlightOption(i)
-		this.updateModeIndex(i, this.touchDownMessages[i])
-		this.touchStartLocation = null
-		this.touchStartTime = null
-	}
-
-	commonButtonUp() {
-		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
-			this.commonButtonTap()
-		} else {
-			this.commonMereButtonUp()
-		}
-
-
-		// if (this.touchUpMessages.length == 1) {
-		// 	this.messagePaper(this.touchUpMessages[0])
-		// } else if (this.touchUpMessages.length > 1) {
-		// 	this.messagePaper(this.touchUpMessages[this.currentModeIndex])
-		// }
-		// this.currentModeIndex = 0
-		// let dx: number = this.currentModeIndex * this.optionSpacing
-		// let newWidth = 2 * BUTTON_RADIUS + dx
-		
-		// this.update({
-		// 	active: false,
-		// 	fillColor: this.colorForIndex(this.currentModeIndex),
-		// 	width: newWidth
-		// })
-		// this.innerCircle.update({
-		// 	midpoint: [this.radius, this.radius]
-		// })
-		// this.frame.transform.update({
-		// 	scale: 1
-		// })
-		// this.sidebar.update({
-		// 	activeButton: null
-		// })
-
-		// this.redraw()
-		// this.updateLabel()
-		// this.label.view.hide()
-	}
-
-	// onTap(e: ScreenEvent) {
-	// 	log('onTap')
-	// 	if (this.sidebar.activeButton != this) { return }
-	// 	let i = this.selectedIndex(e)
-	// 	this.highlightOption(i)
-	// 	this.updateModeIndex(i, true)
-	// }
-
-	selectedIndex(e: ScreenEvent): number {
-		let dx = this.xShift(e)
-		var newIndex: number = Math.round(dx / this.optionSpacing)
-		return newIndex
-	}
-
-	xShift(e: ScreenEvent): number {
-		let t: MouseEvent | Touch = null
-		if (e instanceof MouseEvent) { t = e }
-		else { t = e.changedTouches[0] }
-		let p: vertex = this.sensor.localEventVertex(e)
-		var dx: number = p[0] - this.baseRadius + this.sidebar.frameWidth
-		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
-		return dx
-	}
-
-	highlightOption(i: number) {
-		this.innerCircle.update({
-			midpoint: [this.baseRadius + i * this.optionSpacing, this.baseRadius]
-		})
-	}
-	
-	messagePaper(message: object) {
-		try {
-			let w = window as Window
-			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
-		} catch {
-			//log(message)K
-			this.paper.getMessage(message)
-		}
-	}
-
-	updateLabel() {
-		let msg = this.touchDownMessages[this.currentModeIndex]
-		let text = this.labelFromMessage(msg)
-		this.label.update({
-			text: text,
-			fontSize: (text.length < 15) ? this.bigLabelFontSize : this.smallLabelFontSize
-		})
-	}
-
-	imageNameForIndex(index: number): string {
-		return (Object.keys(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
-	}
-
-	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, false)
-		this.updateLabel()
-		if (redraw) { this.view.redraw() }
-	}
-	
-	updateModeIndex(newIndex: number, withMessage: any = null) {
-		if (((newIndex !== 0 && newIndex === this.currentModeIndex) || newIndex < 0)  && !withMessage) {
-			return
-		}
-		this.currentModeIndex = newIndex
-		let message: object = withMessage ?? this.touchDownMessages[this.currentModeIndex]
-		this.messagePaper(message)
-		this.updateLabel()
-	}
-	
-	selectNextOption() {
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
-		this.updateModeIndex(this.currentModeIndex + 1, this.touchDownMessages[this.currentModeIndex + 1])
-
-	}
-	
-	selectPreviousOption() {
-		if (this.currentModeIndex == 0) { return }
-		this.updateModeIndex(this.currentModeIndex - 1, this.touchDownMessages[this.currentModeIndex - 1])
-	}
-
 	labelFromMessage(msg: object): string {
-		var key = Object.keys(msg)[0]
-		return key
+		return Object.keys(msg)[0]
 	}
 
 
 	showOptions() {
 		this.update({
-			width: 2 * this.baseRadius + (this.icons.length - 1) * this.optionSpacing
+			width: 2 * this.baseRadius + (this.nbOptions() - 1) * this.optionSpacing
 		})
-		for (let i = 1; i < this.icons.length; i++) {
+		for (let i = 1; i < this.nbOptions(); i++) {
 			this.view.add(this.icons[i])
 		}
 	}
@@ -456,12 +224,170 @@ export class SidebarButton extends Pill {
 		this.update({
 			width: 2 * this.baseRadius
 		})
-		for (let i = 1; i < this.icons.length; i++) {
+		for (let i = 1; i < this.nbOptions(); i++) {
 			this.icons[i].div.remove()
 		}
 		this.highlightOption(0)
 	}
+
+	highlightOption(i: number) {
+		this.innerCircle.update({
+			midpoint: [this.baseRadius + i * this.optionSpacing, this.baseRadius]
+		})
+	}
+
+	isActive(): boolean {
+		return this.sidebar.activeButton === this
+	}
+
+	messagePaper(message: object) {
+		try {
+			let w = window as Window
+			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
+		} catch {
+			this.paper.getMessage(message)
+		}
+	}
+
+	updateLabel() {
+		let msg = this.selectMessages[this.selectedIndex]
+		let text = this.labelFromMessage(msg)
+		this.label.update({
+			text: text,
+			fontSize: (text.length < 15) ? this.bigLabelFontSize : this.smallLabelFontSize
+		})
+	}
+
+	updateHelpText() {
+		this.paper.helpTextLabel.update({
+			text: this.paper.helpTexts[this.selectedMessageKey()]
+		})
+	}
+
+	selectedMessageKey(): string {
+		return Object.keys(this.selectMessages)[this.selectedIndex]
+	}
+
+	imageNameForIndex(index: number): string {
+		return (Object.keys(this.selectMessages[index] ?? {}) ?? ['key'])[0]
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, false)
+		this.updateLabel()
+		if (redraw) { this.view.redraw() }
+	}
+
+	xShift(e: ScreenEvent): number {
+		let t: MouseEvent | Touch = null
+		if (e instanceof MouseEvent) { t = e }
+		else { t = e.changedTouches[0] }
+		let p: vertex = this.sensor.localEventVertex(e)
+		var dx: number = p[0] - this.baseRadius + this.sidebar.frameWidth
+		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.selectMessages.length - 1))
+		return dx
+	}
+
+	nbOptions(): number {
+		return this.selectMessages.length
+	}
+
+	triggerSelectedOption() {
+		this.messagePaper(this.selectMessages[this.selectedIndex])
+		this.highlightOption(this.selectedIndex)
+	}
+
+	computeSelectedIndex(e: ScreenEvent) {
+		let dx = this.xShift(e)
+		this.selectedIndex = Math.round(dx / this.optionSpacing)
+	}
+
+	commonButtonDown() {
+		this.touchStartTime = Date.now()
+		if (!this.sidebar) { return }
+		if (!this.isActive()) {
+			// pressed for the first time
+			this.sidebar.setActiveButton(this)
+			this.messagePaper(this.selectMessages[0])
+			this.update({
+				pressed: true,
+				expanded: true
+			})
+			this.showOptions()
+		} else {
+			// pressed on an option
+			this.triggerSelectedOption()
+		}
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		this.computeSelectedIndex(e)
+		this.commonButtonDown()
+	}
+
+	commonButtonUp() {
+		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
+			this.commonButtonTap()
+		} else {
+			this.commonMereButtonUp()
+		}
+	}
+
+
+	commonMereButtonUp() {
+		if (!this.sidebar || !this.isActive()) { return }
+		this.sidebar.setActiveButton(null)
+		this.messagePaper(this.deselectMessages[this.selectedIndex])
+		this.update({
+			pressed: false,
+			expanded: false
+		})
+		this.hideOptions()
+	}
+
+	commonButtonTap() { }
 	
+	onPointerUp(e: ScreenEvent) {
+		this.computeSelectedIndex(e)
+		this.commonButtonUp()
+		this.touchStartTime = null
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		let dx = this.xShift(e)
+		this.innerCircle.update({
+			midpoint: [this.baseRadius + dx, this.baseRadius]
+		})
+		let previousIndex = this.selectedIndex
+		this.computeSelectedIndex(e)
+		if (this.selectedIndex != previousIndex) {
+			this.messagePaper(this.selectMessages[this.selectedIndex])
+		}
+	}
+
+	buttonDownByKey(key: string) {
+		if (!this.activeKeyboard) { return }
+		if (key == this.shortcutKey) {
+			this.update({ selectedIndex: 0 })
+			this.commonButtonDown()
+		} else if (key == 'ArrowRight' && this.isActive()) {
+			this.update({ selectedIndex: this.selectedIndex + 1 })
+			this.triggerSelectedOption()
+		} else if (key == 'ArrowLeft' && this.isActive()) {
+			this.update({ selectedIndex: this.selectedIndex - 1 })
+			this.triggerSelectedOption()
+		} else if (key == 'Escape' && this.isActive()) {
+			this.commonButtonUp()
+		}
+	}
+	
+	buttonUpByKey(key) {
+		if (!this.activeKeyboard) { return }
+		if (key == this.shortcutKey) {
+			this.commonButtonUp()
+		}
+	}
+
 }
 
 
