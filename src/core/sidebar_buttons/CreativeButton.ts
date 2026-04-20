@@ -42,4 +42,12 @@ export class CreativeButton extends SidebarButton {
 		// do nothing because the board handles it
 	}
 
+
+	commonMereButtonUp() {
+		if (this.sidebar.activeButton != this) { return }
+		this.sidebar.setActiveButton(null)
+		//this.messagePaper({'create': 'draw'})
+	}
+
+
 }

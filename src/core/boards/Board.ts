@@ -471,6 +471,7 @@ The content children can also be dragged and panned.
 			case 'create':
 				this.creationMode = value
 				if (this.creator == null) {
+					// create a dummy creator just to display the help text
 					// little hack, I know
 					let dummyCreator = this.createCreator(this.creationMode)
 					this.helpTextLabel.update({
@@ -526,9 +527,7 @@ The content children can also be dragged and panned.
 	}
 
 	setEraser(erasing: boolean) {
-		log('setEraser')
-		log(erasing)
-		if (erasing) {
+		if (erasing && this.creationMode !== 'erase') {
 			this.sensor.setMouseMethodsTo(
 				this.startErasing.bind(this),
 				this.erasing.bind(this),
@@ -544,10 +543,14 @@ The content children can also be dragged and panned.
 				this.erasing.bind(this),
 				this.endErasing.bind(this)
 			)
-		} else {
+			this.update({
+				creationMode: 'erase'
+			})
+		} else if (!erasing && this.creationMode == 'erase') {
 			this.sensor.restoreMouseMethods()
 			this.sensor.restorePenMethods()
 			this.sensor.restoreTouchMethods()
+			this.handleMessage('create', 'draw')
 		}
 	}
 

@@ -217,11 +217,10 @@ export class SidebarButton extends Pill {
 	}
 
 	commonButtonDown() {
-		//log('commonButtonDown')
 		this.touchStartTime = Date.now()
 		if (this.sidebar && this.sidebar.activeButton != this) {
 			this.sidebar.setActiveButton(this)
-			this.updateModeIndex(0, true)
+			this.updateModeIndex(0, this.touchDownMessages[0])
 			return
 		}
 
@@ -270,7 +269,9 @@ export class SidebarButton extends Pill {
 			midpoint: [this.baseRadius + dx, this.baseRadius]
 		})
 		let i = this.selectedIndex(e)
-		this.updateModeIndex(i, true)
+		if (i != this.currentModeIndex) {
+			this.updateModeIndex(i, this.touchDownMessages[i])
+		}
 		// let newWidth = 2 * BUTTON_RADIUS + dx
 		// this.updateModeIndex(newIndex, true)
 		// this.update({
@@ -285,9 +286,7 @@ export class SidebarButton extends Pill {
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		//log('onPointerUp')
 		this.touchStartLocation = this.sensor.localEventVertex(e)
-		//log(this.touchStartLocation)
 		this.commonButtonUp()
 	}
 	
@@ -298,26 +297,36 @@ export class SidebarButton extends Pill {
 		}
 	}
 
-	commonButtonUp() {
-		//log('commonButtonUp')
-		if (Date.now() - this.touchStartTime > MAX_TAP_DELAY) {
-			//log('no tap')
-			if (this.sidebar) {
-				this.sidebar.setActiveButton(null)
-				this.messagePaper({'create': 'draw'})
-				this.hideOptions()
-			}
-			return
-		}
+	commonMereButtonUp() {
+		// i. e. without a tap
+		if (this.sidebar.activeButton != this) { return }
+		if (this.touchStartLocation == null) { return }
+		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
+		let i = Math.round(dx / this.optionSpacing)
+		this.highlightOption(i)
+		this.updateModeIndex(i, this.touchUpMessages[i])
+		this.touchStartLocation = null
+		this.touchStartTime = null
+		this.sidebar.setActiveButton(null)
+	}
 
-		//log('tap')
+	commonButtonTap() {
 		if (this.sidebar.activeButton != this) { return }
 		let dx = this.touchStartLocation[0] - this.baseRadius + this.sidebar.frameWidth
 		let i = Math.round(dx / this.optionSpacing)
 		this.highlightOption(i)
-		this.updateModeIndex(i, true)
+		this.updateModeIndex(i, this.touchDownMessages[i])
 		this.touchStartLocation = null
 		this.touchStartTime = null
+	}
+
+	commonButtonUp() {
+		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
+			this.commonButtonTap()
+		} else {
+			this.commonMereButtonUp()
+		}
+
 
 		// if (this.touchUpMessages.length == 1) {
 		// 	this.messagePaper(this.touchUpMessages[0])
@@ -383,7 +392,7 @@ export class SidebarButton extends Pill {
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromSidebar.postMessage(message)
 		} catch {
-			//log(message)
+			//log(message)K
 			this.paper.getMessage(message)
 		}
 	}
@@ -407,29 +416,25 @@ export class SidebarButton extends Pill {
 		if (redraw) { this.view.redraw() }
 	}
 	
-	updateModeIndex(newIndex: number, withMessage: any = {}) {
-		//log('updateModeIndex')
-		if ((newIndex !== 0 && newIndex === this.currentModeIndex) || newIndex < 0) {
+	updateModeIndex(newIndex: number, withMessage: any = null) {
+		if (((newIndex !== 0 && newIndex === this.currentModeIndex) || newIndex < 0)  && !withMessage) {
 			return
 		}
 		this.currentModeIndex = newIndex
-		let message: object = this.touchDownMessages[this.currentModeIndex]
-		if (withMessage as boolean) {
-			this.messagePaper(message)
-		}
- 
+		let message: object = withMessage ?? this.touchDownMessages[this.currentModeIndex]
+		this.messagePaper(message)
 		this.updateLabel()
 	}
 	
 	selectNextOption() {
 		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
-		this.updateModeIndex(this.currentModeIndex + 1, true)
+		this.updateModeIndex(this.currentModeIndex + 1, this.touchDownMessages[this.currentModeIndex + 1])
 
 	}
 	
 	selectPreviousOption() {
 		if (this.currentModeIndex == 0) { return }
-		this.updateModeIndex(this.currentModeIndex - 1, true)
+		this.updateModeIndex(this.currentModeIndex - 1, this.touchDownMessages[this.currentModeIndex - 1])
 	}
 
 	labelFromMessage(msg: object): string {
@@ -439,7 +444,6 @@ export class SidebarButton extends Pill {
 
 
 	showOptions() {
-		//log('showOptions')
 		this.update({
 			width: 2 * this.baseRadius + (this.icons.length - 1) * this.optionSpacing
 		})
@@ -449,7 +453,6 @@ export class SidebarButton extends Pill {
 	}
 	
 	hideOptions() {
-		//log('hideOptions')
 		this.update({
 			width: 2 * this.baseRadius
 		})

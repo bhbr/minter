@@ -206,7 +206,8 @@ export class Sidebar extends Mobject {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.activeButton.messagePaper({'create': 'draw'})
+		if (!this.activeButton) { return }
+		this.activeButton.commonButtonUp()
 		this.setActiveButton(null)
 	}
 

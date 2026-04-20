@@ -8,11 +8,13 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 export class ToggleButton extends SidebarButton {
 
 	locked: boolean
+	lockColor: Color
 
 	defaults(): object {
 		return {
 			messageKey: 'key',
-			baseColor: Color.gray(0.6),
+			baseColor: Color.gray(0.4),
+			lockColor: Color.gray(0.7),
 			locked: false
 		}
 	}
@@ -24,32 +26,47 @@ export class ToggleButton extends SidebarButton {
 		let outgoingMessage = {}
 		outgoingMessage[this.messageKey] = false
 		this.update({
-			touchDownMessages: [message, message], // 2nd entry for locking
+			touchDownMessages: [message],
 			touchUpMessages: [outgoingMessage]
 		})
 		this.innerCircle.update({
-			fillColor: Color.gray(0.4)
+			fillColor: this.baseColor
 		})
 		this.label.update({
 			backgroundColor: this.innerCircle.fillColor
 		})
 	}
 
-	commonButtonUp() {
-		// if (this.currentModeIndex == 1) {
-		// 	if (this.locked) {
-		// 		super.commonButtonUp()
-		// 	}
-		// 	this.locked = !this.locked
-		// 	this.view.transform.update({
-		// 		scale: 1
-		// 	})
-		// 	this.redraw()
-		// } else {
-		// 	super.commonButtonUp()
-		// }
-		// this.label.view.hide()
-		// this.paper.helpTextLabel.view.hide()
+	commonButtonDown() {
+		super.commonButtonDown()
+		this.innerCircle.update({
+			fillColor: this.lockColor
+		})
+	}
+
+	commonMereButtonUp() {
+		this.updateModeIndex(0, this.touchUpMessages[0])
+		this.touchStartLocation = null
+		this.touchStartTime = null
+		this.sidebar.setActiveButton(null)
+		this.innerCircle.update({
+			fillColor: this.baseColor
+		})
+	}
+
+	commonButtonTap() {
+		if (this.sidebar.activeButton != this) { return }
+		if (this.locked) {
+			this.updateModeIndex(0, this.touchUpMessages[0])
+		} else {
+			this.updateModeIndex(0, this.touchDownMessages[0])
+		}
+		this.touchStartLocation = null
+		this.touchStartTime = null
+		this.locked = !this.locked
+		this.innerCircle.update({
+			fillColor: this.locked ? this.lockColor : this.baseColor
+		})
 	}
 
 	imageNameForIndex(index: number): string {
