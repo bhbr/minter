@@ -123,7 +123,6 @@ export class SidebarButton extends Pill {
 	setup() {
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
-		this.sidebar?.add(this.label)
 		this.add(this.innerCircle)
 		this.label.view.hide()
 		this.setupMessages()
@@ -135,7 +134,6 @@ export class SidebarButton extends Pill {
 			fillColor: this.baseColor
 		})
 		this.label.update({
-			anchor: [10, this.anchor[1] - 38],
 			frameWidth: this.labelWidth,
 			frameHeight: this.labelHeight,
 			backgroundColor: this.innerCircle.fillColor,
@@ -152,7 +150,7 @@ export class SidebarButton extends Pill {
 		this.label.view.div.style.paddingLeft = `5px`
 		this.label.view.div.style.paddingRight = `5px`
 
-		this.updateLabel()
+		this.updateLabelText()
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -210,7 +208,6 @@ export class SidebarButton extends Pill {
 		return Object.keys(msg)[0]
 	}
 
-
 	showOptions() {
 		this.update({
 			width: 2 * this.baseRadius + (this.nbOptions() - 1) * this.optionSpacing
@@ -249,7 +246,7 @@ export class SidebarButton extends Pill {
 		}
 	}
 
-	updateLabel() {
+	updateLabelText() {
 		let msg = this.selectMessages[this.selectedIndex]
 		let text = this.labelFromMessage(msg)
 		this.label.update({
@@ -274,7 +271,7 @@ export class SidebarButton extends Pill {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
-		this.updateLabel()
+		this.updateLabelText()
 		if (redraw) { this.view.redraw() }
 	}
 
@@ -295,6 +292,10 @@ export class SidebarButton extends Pill {
 	triggerSelectedOption() {
 		this.messagePaper(this.selectMessages[this.selectedIndex])
 		this.highlightOption(this.selectedIndex)
+		this.updateLabelText()
+		this.label.update({
+			anchor: [10 + this.optionSpacing * this.selectedIndex, this.anchor[1] - 38]
+		})
 	}
 
 	computeSelectedIndex(e: ScreenEvent) {
@@ -305,6 +306,7 @@ export class SidebarButton extends Pill {
 	commonButtonDown() {
 		this.touchStartTime = Date.now()
 		if (!this.sidebar) { return }
+		this.label.view.show()
 		if (!this.isActive()) {
 			// pressed for the first time
 			this.sidebar.setActiveButton(this)
@@ -314,9 +316,17 @@ export class SidebarButton extends Pill {
 				expanded: true
 			})
 			this.showOptions()
+			this.updateLabelText()
+			this.label.update({
+				anchor: [10, this.anchor[1] - 38]
+			})
 		} else {
 			// pressed on an option
 			this.triggerSelectedOption()
+			this.updateLabelText()
+			this.label.update({
+				anchor: [10 + this.optionSpacing * this.selectedIndex, this.anchor[1] - 38]
+			})
 		}
 	}
 
@@ -327,12 +337,13 @@ export class SidebarButton extends Pill {
 
 	commonButtonUp() {
 		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
+			log('tap')
 			this.commonButtonTap()
 		} else {
+			log('mere up')
 			this.commonMereButtonUp()
 		}
 	}
-
 
 	commonMereButtonUp() {
 		if (!this.sidebar || !this.isActive()) { return }
@@ -343,6 +354,7 @@ export class SidebarButton extends Pill {
 			expanded: false
 		})
 		this.hideOptions()
+		this.label.view.hide()
 	}
 
 	commonButtonTap() { }
@@ -362,7 +374,11 @@ export class SidebarButton extends Pill {
 		this.computeSelectedIndex(e)
 		if (this.selectedIndex != previousIndex) {
 			this.messagePaper(this.selectMessages[this.selectedIndex])
+			this.updateLabelText()
 		}
+		this.label.update({
+		 	anchor: [10 + dx, this.anchor[1] - 38]
+		})
 	}
 
 	buttonDownByKey(key: string) {

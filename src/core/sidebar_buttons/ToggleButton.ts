@@ -26,7 +26,8 @@ export class ToggleButton extends SidebarButton {
 			fillColor: this.baseColor
 		})
 		this.label.update({
-			backgroundColor: this.innerCircle.fillColor
+			backgroundColor: this.baseColor,
+			borderColor: this.lockColor
 		})
 	}
 
@@ -63,6 +64,7 @@ export class ToggleButton extends SidebarButton {
 		this.innerCircle.update({
 			fillColor: this.baseColor
 		})
+		this.label.view.hide()
 	}
 
 	commonButtonTap() {
@@ -77,6 +79,7 @@ export class ToggleButton extends SidebarButton {
 		this.innerCircle.update({
 			fillColor: this.locked ? this.lockColor : this.baseColor
 		})
+		this.label.view.hide()
 	}
 
 }

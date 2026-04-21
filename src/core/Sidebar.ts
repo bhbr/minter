@@ -132,6 +132,14 @@ export class Sidebar extends Mobject {
 			})
 			this.addButton(button)
 		}
+		for (let i = 0; i < names.length; i++) {
+			let label = this.buttons[i].label
+			this.add(label)
+			label.view.hide()
+			label.update({
+				anchor: [10, this.buttons[i].anchor[1] - 38]
+			})
+		}
 	}
 
 	requestInit() {
