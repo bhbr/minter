@@ -16,6 +16,7 @@ import { SidebarButtonView } from './SidebarButtonView'
 import { SIDEBAR_WIDTH } from 'core/constants'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { Pill } from 'core/shapes/Pill'
+import { isTouchDevice } from 'core/mobjects/screen_events'
 
 interface Window { webkit?: any }
 
@@ -43,6 +44,7 @@ export class SidebarButton extends Pill {
 	selectMessages: Array<object>
 	deselectMessages: Array<object>
 	shortcutKey: string
+	shortcutLabel: TextLabel
 	activeKeyboard: boolean
 	paper?: Paper
 	sidebar?: Sidebar
@@ -102,7 +104,12 @@ export class SidebarButton extends Pill {
 			pressed: false,
 			expanded: false,
 			selectedIndex: 0,
-			shortcutKey: '1'
+			shortcutKey: '1',
+			shortcutLabel: new TextLabel({
+				frameWidth: 13,
+				frameHeight: 13,
+				textColor: Color.gray(0.3)
+			})
 		}
 	}
 
@@ -159,6 +166,14 @@ export class SidebarButton extends Pill {
 					this.paper = paperView['mobject'] as Paper
 				}
 			}
+		}
+
+		this.shortcutLabel.update({
+			text: this.shortcutKey,
+			anchor: [-18, this.baseRadius - this.shortcutLabel.frameHeight / 2 - 2]
+		})
+		if (!isTouchDevice) {
+			this.add(this.shortcutLabel)
 		}
 	}
 
@@ -272,6 +287,12 @@ export class SidebarButton extends Pill {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
 		this.updateLabelText()
+		let shortcutKey = args['shortcutKey']
+		if (shortcutKey) {
+			this.shortcutLabel.update({
+				text: shortcutKey
+			})
+		}
 		if (redraw) { this.view.redraw() }
 	}
 
@@ -337,10 +358,8 @@ export class SidebarButton extends Pill {
 
 	commonButtonUp() {
 		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
-			log('tap')
 			this.commonButtonTap()
 		} else {
-			log('mere up')
 			this.commonMereButtonUp()
 		}
 	}
