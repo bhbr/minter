@@ -181,12 +181,6 @@ export class Sidebar extends Mobject {
 			break
 		case 'buttonDown':
 			let pressedButton = this.buttonForKey(value) ?? null
-			if (this.activeButton) {
-				log(`active: ${this.activeButton.shortcutKey}`)
-			}
-			if (pressedButton) {
-				log(`pressed: ${pressedButton.shortcutKey}`)
-			}
 			if (pressedButton !== this.activeButton && pressedButton !== null) {
 				this.setActiveButton(pressedButton)
 			}
@@ -194,12 +188,6 @@ export class Sidebar extends Mobject {
 			break
 		case 'buttonUp':
 			let pressedButton2 = this.buttonForKey(value) ?? null
-			if (this.activeButton) {
-				log(`active: ${this.activeButton.shortcutKey}`)
-			}
-			if (pressedButton2) {
-				log(`pressed: ${pressedButton2.shortcutKey}`)
-			}
 			if (pressedButton2 !== this.activeButton && pressedButton2 !== null) {
 				this.setActiveButton(pressedButton2)
 			}
