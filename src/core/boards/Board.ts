@@ -872,7 +872,7 @@ The content children can also be dragged and panned.
 			this.createNewOpenLink(clickedHook)
 		} else {
 			let link = this.linkForHook(clickedHook)
-			link.showLine()
+			link.view.show() //link.showLine()
 			link.dependency.source.removeDependency(link.dependency)
 			link.previousHook = clickedHook
 			clickedHook.update({ linked: false })
@@ -886,6 +886,7 @@ The content children can also be dragged and panned.
 			}
 		}
 		this.compatibleHooks = this.getCompatibleHooks(this.openHook)
+		this.greyOutHooksIncompatibleWithHook(clickedHook)
 	}
 
 	locationOfHook(hook: LinkHook): vertex {
@@ -953,28 +954,21 @@ The content children can also be dragged and panned.
 			child.inputList.view.hide()
 			child.outputList.view.hide()
 		}
-		if (this.openLink.startHook) { this.openLink.startHook.outlet.ioList.view.show() }
-		if (this.openLink.endHook) { this.openLink.endHook.outlet.ioList.view.show() }
+		let linkedHook = this.openLink.startHook ?? this.openLink.endHook
+		linkedHook.outlet.ioList.view.show()
 
 		let child = this.hoveredChild(p)
 		let listOfLists = this.hoveredIOLists(p)
 		if (!child && listOfLists.length == 0) { return }
 		let compHooks = this.getCompatibleHooks(this.openLink.startHook ?? this.openLink.endHook)
-		if (child && listOfLists.length == 0) {
-			for (let hook of child.inputList.allHooks()) {
-				if (compHooks.includes(hook)) {
-					child.inputList.view.show()
-					return
-				}
-			}
-			for (let hook of child.outputList.allHooks()) {
-				if (compHooks.includes(hook)) {
-					child.outputList.view.show()
-					return
-				}
+		if (child && child !== linkedHook.outlet.ioList.mobject && listOfLists.length == 0) {
+			if (linkedHook.outlet.kind == 'input' && child.outputProperties.length > 0) {
+				child.outputList.view.show()
+			} else if (linkedHook.outlet.kind == 'output' && child.inputProperties.length > 0) {
+				child.inputList.view.show()
 			}
 		}
-		if (child && listOfLists.length > 1) {
+		if (child && child !== linkedHook.outlet.ioList.mobject && listOfLists.length > 1) {
 			for (let list of listOfLists) {
 				if (list.mobject == child) {
 					list.view.show()
@@ -984,11 +978,8 @@ The content children can also be dragged and panned.
 		}
 		let list = listOfLists[0]
 		if (list) {
-			for (let hook of list.allHooks()) {
-				if (compHooks.includes(hook)) {
-					list.view.show()
-					return
-				}
+			if (list.kind !== linkedHook.outlet.kind && list.mobject !== linkedHook.outlet.ioList.mobject && list.linkOutlets.length > 0) {
+				list.view.show()
 			}
 		}
 	}
@@ -1023,6 +1014,7 @@ The content children can also be dragged and panned.
 			this.endCreating(e)
 			return
 		}
+		this.showAllHooks()
 		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null) {
 			if (this.openLink) {
@@ -1066,7 +1058,7 @@ The content children can also be dragged and panned.
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
 		this.openLink.previousHook = null
-		this.openLink.hideLine()
+		this.openLink.view.hide() //this.openLink.hideLine()
 
 		this.links.push(this.openLink)
 		this.createNewDependency()
@@ -1075,6 +1067,38 @@ The content children can also be dragged and panned.
 		this.openBullet = null
 		this.compatibleHooks = []
 
+	}
+
+	showAllHooks() {
+		for (let mob of this.linkableChildren()) {
+			for (let outlet of mob.inputList.linkOutlets) {
+				outlet.label.update({
+					opacity: 1
+				})
+				for (let hook of outlet.linkHooks) {
+					hook.update({
+						opacity: 1
+					})
+				}
+			}
+		}
+	}
+
+	greyOutHooksIncompatibleWithHook(baseHook: LinkHook) {
+		for (let mob of this.linkableChildren()) {
+			for (let outlet of mob.inputList.linkOutlets) {
+				for (let hook of outlet.linkHooks) {
+					if (!this.compatibleHooks.includes(hook) && baseHook !== hook) {
+						hook.update({
+							opacity: 0.25
+						})
+						outlet.label.update({
+							opacity: 0.25
+						})
+					}
+				}
+			}
+		}
 	}
 
 	getCompatibleHooks(startHook: LinkHook): Array<LinkHook> {

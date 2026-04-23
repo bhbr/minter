@@ -8,6 +8,7 @@ import { LinkOutlet } from './LinkOutlet'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 import { Mobject } from 'core/mobjects/Mobject'
+import { LinkBullet } from './LinkBullet'
 
 export class LinkHook extends Circle {
 
@@ -26,10 +27,7 @@ export class LinkHook extends Circle {
 			mobject: null,
 			outlet: null,
 			linked: false,
-			linkedBulletIndicator: new Circle({
-				radius: BULLET_RADIUS,
-				fillColor: Color.white(),
-				fillOpacity: 1,
+			linkedBulletIndicator: new LinkBullet({
 				midpoint: [HOOK_RADIUS, HOOK_RADIUS]
 			})
 		}
