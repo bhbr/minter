@@ -3,6 +3,7 @@ import { SidebarButton } from './SidebarButton'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { ImageView } from 'core/mobjects/ImageView'
+import { log } from 'core/functions/logging'
 
 export class EraseButton extends SidebarButton {
 	
@@ -10,19 +11,15 @@ export class EraseButton extends SidebarButton {
 		return {
 			baseColor: Color.red().brighten(0.7),
 			messageKey: 'erase',
-			touchDownMessages: [
+			selectMessages: [
 				{ 'erase': true },
 				{ 'restart': false }
 			],
-			touchUpMessages: [
+			deselectMessages: [
 				{ 'erase': false },
 				{ 'restart': true }
 			],
-			icon: new ImageView({
-				imageLocation: '../../assets/erase.png',
-				frameWidth: 30,
-				frameHeight: 30
-			})
+			iconSize: 30
 		}
 	}
 

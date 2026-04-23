@@ -1,8 +1,9 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { vertex, vertexArray, vertexAdd } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
+import { log } from 'core/functions/logging'
 
 export class Creator extends Mobject {
 
@@ -36,18 +37,18 @@ export class Creator extends Mobject {
 	}
 
 	getStartPoint(): vertex {
-		return vertexAdd(this.creationStroke[0] ?? this.view.frame.anchor, this.pointOffset)
+		return this.creationStroke[0] ?? this.view.frame.anchor
 	}
 
 	getEndPoint(): vertex {
-		return vertexAdd(this.creationStroke[this.creationStroke.length - 1] ?? this.view.frame.anchor, this.pointOffset)
+		return this.creationStroke[this.creationStroke.length - 1] ?? this.view.frame.anchor
 	}
 
 	dissolve() {
 		this.remove(this.creation)
 		this.creation = this.createMobject()
 		this.creation.update({
-			anchor: this.getStartPoint()
+			anchor: vertexAdd(this.getStartPoint(), this.pointOffset)
 		}, true)
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
@@ -61,7 +62,6 @@ export class Creator extends Mobject {
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
-		this.creationStroke.push(q)
 		this.updateDependents()
 		if (redraw) { this.view.redraw() }
 	}

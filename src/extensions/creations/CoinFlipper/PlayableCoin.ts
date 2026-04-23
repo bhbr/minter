@@ -10,7 +10,6 @@ import { log } from 'core/functions/logging'
 export class PlayableCoin extends Linkable implements Playable {
 
 	coin: Coin
-	tailsProbability: number
 	playState: 'play' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
@@ -37,9 +36,16 @@ export class PlayableCoin extends Linkable implements Playable {
 			],
 			frameWidth: 50,
 			frameHeight: 50,
-			tailsProbability: 0.5,
 			swipedSide: null
 		}
+	}
+
+	get tailsProbability(): number {
+		return this.coin.tailsProbability
+	}
+
+	set tailsProbability(newValue: number) {
+		this.coin.tailsProbability = newValue
 	}
 
 	setup() {
@@ -123,8 +129,15 @@ export class PlayableCoin extends Linkable implements Playable {
 	get value(): number { return this.coin.value }
 	set value(newValue: number) { this.coin.value = newValue }
 
-
-
+	update(args: object = {}, redraw: boolean = true) {
+		let p = args['tailsProbability']
+		if (p !== undefined) {
+			this.coin.update({
+				tailsProbability: p
+			}, true)
+		}
+		super.update(args, redraw)
+	}
 
 
 

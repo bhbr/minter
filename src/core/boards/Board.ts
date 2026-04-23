@@ -30,7 +30,8 @@ import { TextLabel } from 'core/mobjects/TextLabel'
 import { Dependency } from 'core/mobjects/Dependency'
 
 declare var paper: Paper
-export declare interface Window { webkit?: any }
+
+interface Window { webkit?: any }
 
 export class BoardContent extends MGroup { }
 
@@ -470,6 +471,7 @@ The content children can also be dragged and panned.
 			case 'create':
 				this.creationMode = value
 				if (this.creator == null) {
+					// create a dummy creator just to display the help text
 					// little hack, I know
 					let dummyCreator = this.createCreator(this.creationMode)
 					this.helpTextLabel.update({
@@ -484,6 +486,9 @@ The content children can also be dragged and panned.
 				}
 				this.remove(this.creator)
 				this.creator = this.createCreator(this.creationMode)
+				this.creator.update({
+					anchor: (this.creationMode == 'draw') ? [0, 0] : this.creationStroke[0]
+				})
 				this.add(this.creator)
 				this.helpTextLabel.update({
 					text: this.creator.helpText
@@ -499,7 +504,7 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.helpTexts['erase']
 				})
-				if (!value) { // merely touch down
+				if (value) {
 					this.helpTextLabel.view.show()
 				} else {
 					this.helpTextLabel.view.hide()
@@ -518,11 +523,13 @@ The content children can also be dragged and panned.
 					this.helpTextLabel.view.hide()
 				}
 				break
+			default:
+				break
 		}
 	}
 
 	setEraser(erasing: boolean) {
-		if (erasing) {
+		if (erasing && this.creationMode !== 'erase') {
 			this.sensor.setMouseMethodsTo(
 				this.startErasing.bind(this),
 				this.erasing.bind(this),
@@ -538,10 +545,14 @@ The content children can also be dragged and panned.
 				this.erasing.bind(this),
 				this.endErasing.bind(this)
 			)
-		} else {
+			this.update({
+				creationMode: 'erase'
+			})
+		} else if (!erasing && this.creationMode == 'erase') {
 			this.sensor.restoreMouseMethods()
 			this.sensor.restorePenMethods()
 			this.sensor.restoreTouchMethods()
+			this.handleMessage('create', 'draw')
 		}
 	}
 
@@ -626,9 +637,8 @@ The content children can also be dragged and panned.
 				if (this.creationTool == ScreenEventDevice.Finger) {
 					return new Creator()
 				}
-				let fh = new Freehand()
-				fh.line.update({
-					vertices: this.creationStroke
+				let fh = new Freehand({
+					creationStroke: this.creationStroke
 				})
 				return fh
 			default:
@@ -703,9 +713,11 @@ The content children can also be dragged and panned.
 	endCreating(e: ScreenEvent) {
 		this.creationStroke = []
 		this.creationTool = null
-		if (this.creator == null) { return }
-		this.creator.dissolve()
-		this.helpTextLabel.view.hide()
+		if (this.creator !== null) {
+			this.creator.dissolve()
+			this.helpTextLabel.view.hide()
+		}
+		this.messageSidebar({'button': 'collapse'})
 	}
 
 
@@ -1213,18 +1225,15 @@ The content children can also be dragged and panned.
 	//////////////////////////////////////////////////////////
 
 	messageSidebar(message: object) {
-		if (isTouchDevice) {
+		try {
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
-		} else {
-			if (this.sidebar !== null && this.sidebar !== undefined) {
-				this.sidebar.getMessage(message)
-			}
+		} catch {
+			this.sidebar.getMessage(message)
 		}
 	}
 
 }
-
 
 
 

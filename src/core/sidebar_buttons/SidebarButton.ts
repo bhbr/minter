@@ -4,6 +4,7 @@ import { Color } from 'core/classes/Color'
 import { vertex, vertexTranslatedBy, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR, OPTION_SPACING } from './button_geometry'
+import { MAX_TAP_DELAY } from 'core/constants'
 import { TextLabel } from 'core/mobjects/TextLabel'
 import { Paper } from 'core/Paper'
 import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_events'
@@ -15,6 +16,7 @@ import { SidebarButtonView } from './SidebarButtonView'
 import { SIDEBAR_WIDTH } from 'core/constants'
 import { Polygon } from 'core/vmobjects/Polygon'
 import { Pill } from 'core/shapes/Pill'
+import { isTouchDevice } from 'core/mobjects/screen_events'
 
 interface Window { webkit?: any }
 
@@ -23,40 +25,40 @@ export const buttonDict: object = {}
 export class SidebarButton extends Pill {
 	
 	declare view: SidebarButtonView
-	currentModeIndex: number
-	previousIndex: number
 	baseColor: Color
 	baseRadius: number
 	bigLabelFontSize: number
 	labelWidth: number
 	labelHeight: number
 	smallLabelFontSize: number
-	activeScalingFactor: number
 	
 	locationIndex: number
 	optionSpacing: number
-	touchStart: vertex
-	active: boolean
-	messageKey: string
+	touchStartLocation?: vertex
+	touchStartTime?: number
 	label: TextLabel
-	icon?: ImageView
+	icons: Array<ImageView>
+	iconSize: number
 	innerCircle: Circle
 
-	dragArrow: Polygon
-
-	touchDownMessages: Array<object>
-	touchUpMessages: Array<object>
-	key: string
+	selectMessages: Array<object>
+	deselectMessages: Array<object>
+	shortcutKey: string
+	shortcutLabel: TextLabel
 	activeKeyboard: boolean
 	paper?: Paper
-	sidebar?: Sidebar | null
+	sidebar?: Sidebar
+
+	pressed: boolean
+	expanded: boolean
+	selectedIndex: number
 
 	defaults(): object {
 		return {
 			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
 			smallLabelFontSize: 12,
-			bigLabelFontSize: 12,
+			bigLabelFontSize: 14,
 			activeScalingFactor: 1.2,
 			optionSpacing: OPTION_SPACING,
 
@@ -66,7 +68,8 @@ export class SidebarButton extends Pill {
 			}),
 			labelWidth: 85,
 			labelHeight: 25,
-			icon: null,
+			icons: [],
+			iconSize: 40,
 
 			innerCircle: new Circle({
 				midpoint: [BUTTON_RADIUS, BUTTON_RADIUS],
@@ -76,16 +79,12 @@ export class SidebarButton extends Pill {
 				strokeWidth: 0
 			}),
 
-			touchDownMessages: [],
-			touchUpMessages: [],
+			selectMessages: [],
+			deselectMessages: [],
 
 			strokeWidth: 0,
 			screenEventHandler: ScreenEventHandler.Self,
-			currentModeIndex: 0,
-			previousIndex: 0,
 			locationIndex: 0,
-			active: false,
-			messageKey: 'key',
 			radius: BUTTON_RADIUS,
 			width: 2 * BUTTON_RADIUS,
 			frameWidth: 2 * BUTTON_RADIUS,
@@ -93,21 +92,23 @@ export class SidebarButton extends Pill {
 			fillOpacity: 1.0,
 			activeKeyboard: true,
 
-			dragArrow: new Polygon({
-				anchor: [2 * BUTTON_RADIUS, BUTTON_RADIUS],
-				vertices: [
-					[10, -0.3 * BUTTON_RADIUS],
-					[10 + 0.3 * BUTTON_RADIUS, 0],
-					[10, 0.3 * BUTTON_RADIUS]
-				],
-				fillOpacity: 1,
-				strokeWidth: 0
-			}),
-
 			paper: null,
 			sidebar: null,
 			view: new SidebarButtonView({
 				radius: BUTTON_RADIUS
+			}),
+
+			touchStartLocation: null,
+			touchStartTime: null,
+
+			pressed: false,
+			expanded: false,
+			selectedIndex: 0,
+			shortcutKey: '1',
+			shortcutLabel: new TextLabel({
+				frameWidth: 13,
+				frameHeight: 13,
+				textColor: Color.gray(0.5)
 			})
 		}
 	}
@@ -120,9 +121,8 @@ export class SidebarButton extends Pill {
 			optionSpacing: 'never',
 			label: 'never',
 			icon: 'on_init',
-			activeScalingFactor: 'never',
-			messages: 'on_update',
-			outgoingMessage: 'on_update',
+			selectMessages: 'on_update',
+			deselectMessages: 'on_update',
 			messageKey: 'on_init'
 		}
 	}
@@ -130,20 +130,17 @@ export class SidebarButton extends Pill {
 	setup() {
 		super.setup()
 		buttonDict[this.constructor.name] = this.constructor
-		this.sidebar?.add(this.label)
 		this.add(this.innerCircle)
 		this.label.view.hide()
-		if (this.icon) {
-			this.updateIcon()
-			this.view.add(this.icon)
-		}
+		this.setupMessages()
+		this.setupBaseIcon()
+		this.setupOtherIcons()
+
 		this.addDependency('midpoint', this.label, 'midpoint')
-		this.updateModeIndex(0)
 		this.view.update({
 			fillColor: this.baseColor
 		})
 		this.label.update({
-			anchor: [10, this.anchor[1] - 38],
 			frameWidth: this.labelWidth,
 			frameHeight: this.labelHeight,
 			backgroundColor: this.innerCircle.fillColor,
@@ -151,7 +148,7 @@ export class SidebarButton extends Pill {
 			borderWidth: 2,
 			borderRadius: 7,
 			drawShadow: false,
-			text: this.messageKey,
+			text: this.baseMessageKey(),
 			horizontalAlign: 'center',
 			verticalAlign: 'center',
 			fontSize: this.bigLabelFontSize
@@ -160,13 +157,7 @@ export class SidebarButton extends Pill {
 		this.label.view.div.style.paddingLeft = `5px`
 		this.label.view.div.style.paddingRight = `5px`
 
-		this.dragArrow.update({
-			fillColor: this.fillColor
-		})
-
-		this.updateLabel()
-		this.add(this.dragArrow)
-		this.dragArrow.view.hide()
+		this.updateLabelText()
 		if (!separateSidebar) {
 			const paperDiv = document.querySelector('#paper_id')
 			if (paperDiv !== null) {
@@ -176,152 +167,91 @@ export class SidebarButton extends Pill {
 				}
 			}
 		}
+
+		this.shortcutLabel.update({
+			text: this.shortcutKey,
+			anchor: [-18, this.baseRadius - this.shortcutLabel.frameHeight / 2 - 2]
+		})
+		if (!isTouchDevice) {
+			this.add(this.shortcutLabel)
+		}
 	}
 
-	numberOfIndices(): number { return this.touchDownMessages.length }
+	setupMessages() {
+		// subclassed in CreativeButton
+	}
 
-	colorForIndex(i: number): Color {
-		return this.baseColor
+	baseIconName(): string {
+		return this.baseMessageKey().replaceAll(' ', '_')
+	}
+
+	baseMessageKey(): string {
+		return Object.keys(this.selectMessages[0])[0]
+	}
+
+	setupBaseIcon() {
+		let baseIcon = new ImageView({
+				imageLocation: `../../assets/${this.baseIconName()}.png`,
+				frameWidth: this.iconSize,
+				frameHeight: this.iconSize
+			})
+		this.icons.push(baseIcon)
+		this.view.add(baseIcon)
+		// Center the icon inside the pill.
+		baseIcon.update({
+			anchor: [
+				BUTTON_RADIUS - 0.5 * this.iconSize,
+				BUTTON_RADIUS - 0.5 * this.iconSize
+			]
+		})
+	}
+
+	setupOtherIcons() {
+		for (let i = 1; i < this.nbOptions(); i++) {
+			let iconName = this.imageNameForIndex(i).replaceAll(' ', '_')
+			let icon = new ImageView({
+				imageLocation: `../../assets/${iconName}.png`,
+				frameWidth: this.iconSize,
+				frameHeight: this.iconSize,
+				anchor: [this.icons[0].anchor[0] + i * this.optionSpacing, this.icons[0].anchor[1]]
+			})
+			this.icons.push(icon)
+		}
+	}
+
+	labelFromMessage(msg: object): string {
+		return Object.keys(msg)[0]
+	}
+
+	showOptions() {
+		this.update({
+			width: 2 * this.baseRadius + (this.nbOptions() - 1) * this.optionSpacing
+		})
+		for (let i = 1; i < this.nbOptions(); i++) {
+			this.view.add(this.icons[i])
+		}
 	}
 	
-	buttonDownByKey(key: string) {
-		if (!this.activeKeyboard) { return }
-		if (key == this.key) {
-			this.commonButtonDown()
-		} else if (key == 'ArrowRight' && this.active) {
-			this.selectNextOption()
-		} else if (key == 'ArrowLeft' && this.active) {
-			this.selectPreviousOption()
-		}
-	}
-
-	commonButtonDown() {
-		this.frame.transform.update({
-			scale: this.activeScalingFactor
-		})
-		this.label.view.show()
-		if (this.active) {
-			this.redraw()
-			return
-		}
+	hideOptions() {
 		this.update({
-			active: true,
-			previousIndex: this.currentModeIndex,
+			width: 2 * this.baseRadius
 		})
-		this.label.update({
-			anchor: [10, this.anchor[1] - 38]
-		})
-		this.redraw()
-		this.updateIcon()
-		this.updateLabel()
-		if (this.touchDownMessages.length == 0) { return }
-		this.messagePaper(this.touchDownMessages[0])
-		if (this.sidebar) {
-			this.sidebar.activeButton = this
-			this.sidebar.add(this.label)
+		for (let i = 1; i < this.nbOptions(); i++) {
+			this.icons[i].div.remove()
 		}
-		this.updateHelpText()
-		this.paper.helpTextLabel.view.show()
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		this.dragArrow.view.show()
+		this.highlightOption(0)
 	}
 
-	updateHelpText() {
-		this.paper.helpTextLabel.update({
-			text: this.paper.helpTexts[this.messageKey]
-		})
-	}
-
-	onPointerDown(e: ScreenEvent) {
-		//log('setting touchStart:')
-		this.touchStart = eventVertex(e)
-		this.commonButtonDown()
-	}
-
-	onPointerMove(e: ScreenEvent) {
-		if (!this.sidebar.activeButton) { return }
-		let t: MouseEvent | Touch = null
-		if (e instanceof MouseEvent) { t = e }
-		else { t = e.changedTouches[0] }
-		let p: vertex = eventVertex(e)
-		var dx: number = p[0] - this.touchStart[0]
-		var newIndex: number = Math.floor(this.previousIndex + dx / this.optionSpacing)
-		newIndex = Math.min(Math.max(newIndex, 0), this.touchDownMessages.length - 1)
-		dx += this.previousIndex * this.optionSpacing
-		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.touchDownMessages.length - 1))
-
-		let newWidth = 2 * BUTTON_RADIUS + dx
-		this.updateModeIndex(newIndex, true)
-		this.update({
-			width: newWidth
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
-			this.dragArrow.view.hide()
-		} else {
-			this.dragArrow.view.show()
-		}
-		this.label.update({
-			anchor: [10 + dx, this.anchor[1] - 38]
-		})
-		this.icon.update({
-			anchor: [this.width - this.radius - 0.5 * this.icon.frameWidth, this.radius - 0.5 * this.icon.frameHeight]
-		})
+	highlightOption(i: number) {
 		this.innerCircle.update({
-			midpoint: [this.width - this.radius, BUTTON_RADIUS]
+			midpoint: [this.baseRadius + i * this.optionSpacing, this.baseRadius]
 		})
 	}
 
-	onPointerUp(e: ScreenEvent) {
-		this.commonButtonUp()
-	}
-	
-	buttonUpByKey(key) {
-		if (!this.activeKeyboard) { return }
-		if (key == this.key) {
-			this.commonButtonUp()
-		}
+	isActive(): boolean {
+		return this.sidebar.activeButton === this
 	}
 
-	commonButtonUp() {
-		if (this.touchUpMessages.length == 1) {
-			this.messagePaper(this.touchUpMessages[0])
-		} else if (this.touchUpMessages.length > 1) {
-			this.messagePaper(this.touchUpMessages[this.currentModeIndex])
-		}
-		this.currentModeIndex = 0
-		let dx: number = this.currentModeIndex * this.optionSpacing
-		let newWidth = 2 * BUTTON_RADIUS + dx
-		
-		this.update({
-			active: false,
-			fillColor: this.colorForIndex(this.currentModeIndex),
-			width: newWidth
-		})
-		this.innerCircle.update({
-			midpoint: [this.radius, this.radius]
-		})
-		this.frame.transform.update({
-			scale: 1
-		})
-		this.sidebar.update({
-			activeButton: null
-		})
-
-		this.redraw()
-		this.updateLabel()
-		this.updateIcon()
-		this.label.view.hide()
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		this.dragArrow.view.hide()
-	}
-	
 	messagePaper(message: object) {
 		try {
 			let w = window as Window
@@ -331,8 +261,8 @@ export class SidebarButton extends Pill {
 		}
 	}
 
-	updateLabel() {
-		let msg = this.touchDownMessages[this.currentModeIndex]
+	updateLabelText() {
+		let msg = this.selectMessages[this.selectedIndex]
 		let text = this.labelFromMessage(msg)
 		this.label.update({
 			text: text,
@@ -340,75 +270,159 @@ export class SidebarButton extends Pill {
 		})
 	}
 
-	updateIcon() {
-		if (this.icon === undefined || this.icon === null) { return }
-		let name = this.imageNameForIndex(this.currentModeIndex).replaceAll(' ', '_')
-		this.icon.update({
-			imageLocation: `../../assets/${name}.png`,
-			anchor: [
-				0.5 * (this.frameWidth - this.icon.frameWidth) + this.optionSpacing * this.currentModeIndex,
-				0.5 * (this.frameHeight - this.icon.frameHeight)
-			]
+	updateHelpText() {
+		this.paper.helpTextLabel.update({
+			text: this.paper.helpTexts[this.selectedMessageKey()]
 		})
 	}
 
+	selectedMessageKey(): string {
+		return Object.keys(this.selectMessages)[this.selectedIndex]
+	}
+
 	imageNameForIndex(index: number): string {
-		return (Object.keys(this.touchDownMessages[index] ?? {}) ?? ['key'])[0]
+		return (Object.keys(this.selectMessages[index] ?? {}) ?? ['key'])[0]
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, false)
-		this.updateLabel()
+		this.updateLabelText()
+		let shortcutKey = args['shortcutKey']
+		if (shortcutKey) {
+			this.shortcutLabel.update({
+				text: shortcutKey
+			})
+		}
 		if (redraw) { this.view.redraw() }
 	}
-	
-	updateModeIndex(newIndex: number, withMessage: any = {}) {
-		if (newIndex == this.currentModeIndex || newIndex == -1) {
-			return
-		}
-		this.currentModeIndex = newIndex
-		let message: object = this.touchDownMessages[this.currentModeIndex]
-		this.update({
-			fillColor: this.colorForIndex(this.currentModeIndex)
+
+	xShift(e: ScreenEvent): number {
+		let t: MouseEvent | Touch = null
+		if (e instanceof MouseEvent) { t = e }
+		else { t = e.changedTouches[0] }
+		let p: vertex = this.sensor.localEventVertex(e)
+		var dx: number = p[0] - this.baseRadius + this.sidebar.frameWidth
+		dx = Math.min(Math.max(dx, 0), this.optionSpacing * (this.selectMessages.length - 1))
+		return dx
+	}
+
+	nbOptions(): number {
+		return this.selectMessages.length
+	}
+
+	triggerSelectedOption() {
+		this.messagePaper(this.selectMessages[this.selectedIndex])
+		this.highlightOption(this.selectedIndex)
+		this.updateLabelText()
+		this.label.update({
+			anchor: [10 + this.optionSpacing * this.selectedIndex, this.anchor[1] - 38]
 		})
-		if (withMessage as boolean) {
-			this.messagePaper(message)
-		}
- 
-		this.updateLabel()
-		this.updateIcon()
-		this.update({
-			width: this.optionSpacing * this.currentModeIndex + 2 * BUTTON_RADIUS
-		})
-		this.dragArrow.update({
-			anchor: [this.width, this.radius]
-		})
-		this.innerCircle.update({
-			midpoint: [this.width - this.radius, this.radius]
-		})
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) {
-			this.dragArrow.view.hide()
+	}
+
+	computeSelectedIndex(e: ScreenEvent) {
+		let dx = this.xShift(e)
+		this.selectedIndex = Math.round(dx / this.optionSpacing)
+	}
+
+	commonButtonDown() {
+		this.touchStartTime = Date.now()
+		if (!this.sidebar) { return }
+		this.label.view.show()
+		if (!this.isActive()) {
+			// pressed for the first time
+			this.sidebar.setActiveButton(this)
+			this.messagePaper(this.selectMessages[0])
+			this.update({
+				pressed: true,
+				expanded: true
+			})
+			this.showOptions()
+			this.updateLabelText()
+			this.label.update({
+				anchor: [10, this.anchor[1] - 38]
+			})
 		} else {
-			this.dragArrow.view.show()
+			// pressed on an option
+			this.triggerSelectedOption()
+			this.updateLabelText()
+			this.label.update({
+				anchor: [10 + this.optionSpacing * this.selectedIndex, this.anchor[1] - 38]
+			})
+		}
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		this.computeSelectedIndex(e)
+		this.commonButtonDown()
+	}
+
+	commonButtonUp() {
+		if (Date.now() - this.touchStartTime < MAX_TAP_DELAY) {
+			this.commonButtonTap()
+		} else {
+			this.commonMereButtonUp()
+		}
+	}
+
+	commonMereButtonUp() {
+		if (!this.sidebar || !this.isActive()) { return }
+		this.sidebar.setActiveButton(null)
+		this.messagePaper(this.deselectMessages[this.selectedIndex])
+		this.update({
+			pressed: false,
+			expanded: false
+		})
+		this.hideOptions()
+		this.label.view.hide()
+	}
+
+	commonButtonTap() { }
+	
+	onPointerUp(e: ScreenEvent) {
+		this.computeSelectedIndex(e)
+		this.commonButtonUp()
+		this.touchStartTime = null
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		let dx = this.xShift(e)
+		this.innerCircle.update({
+			midpoint: [this.baseRadius + dx, this.baseRadius]
+		})
+		let previousIndex = this.selectedIndex
+		this.computeSelectedIndex(e)
+		if (this.selectedIndex != previousIndex) {
+			this.messagePaper(this.selectMessages[this.selectedIndex])
+			this.updateLabelText()
+		}
+		this.label.update({
+		 	anchor: [10 + dx, this.anchor[1] - 38]
+		})
+	}
+
+	buttonDownByKey(key: string) {
+		if (!this.activeKeyboard) { return }
+		if (key == this.shortcutKey) {
+			this.update({ selectedIndex: 0 })
+			this.commonButtonDown()
+		} else if (key == 'ArrowRight' && this.isActive()) {
+			this.update({ selectedIndex: this.selectedIndex + 1 })
+			this.triggerSelectedOption()
+		} else if (key == 'ArrowLeft' && this.isActive()) {
+			this.update({ selectedIndex: this.selectedIndex - 1 })
+			this.triggerSelectedOption()
+		} else if (key == 'Escape' && this.isActive()) {
+			this.commonButtonUp()
 		}
 	}
 	
-	selectNextOption() {
-		if (this.currentModeIndex == this.touchDownMessages.length - 1) { return }
-		this.updateModeIndex(this.currentModeIndex + 1, true)
-
-	}
-	
-	selectPreviousOption() {
-		if (this.currentModeIndex == 0) { return }
-		this.updateModeIndex(this.currentModeIndex - 1, true)
+	buttonUpByKey(key) {
+		if (!this.activeKeyboard) { return }
+		if (key == this.shortcutKey) {
+			this.commonButtonUp()
+		}
 	}
 
-	labelFromMessage(msg: object): string {
-		var key = Object.keys(msg)[0]
-		return key
-	}
-	
 }
 
 

@@ -7,62 +7,86 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 
 export class ToggleButton extends SidebarButton {
 
+	messageKey: string
 	locked: boolean
+	lockColor: Color
 
 	defaults(): object {
 		return {
-			messageKey: 'key',
-			baseColor: Color.gray(0.6),
-			locked: false
+			baseColor: Color.gray(0.3),
+			lockColor: Color.gray(0.6),
+			locked: false,
+			messageKey: 'toggle'
 		}
 	}
 
 	setup() {
 		super.setup()
+		this.innerCircle.update({
+			fillColor: this.baseColor
+		})
+		this.label.update({
+			backgroundColor: this.lockColor,
+			borderColor: Color.gray(0.8)
+		})
+	}
+
+	setupMessages() {
 		let message = {}
 		message[this.messageKey] = true
 		let outgoingMessage = {}
 		outgoingMessage[this.messageKey] = false
 		this.update({
-			touchDownMessages: [message, message], // 2nd entry for locking
-			touchUpMessages: [outgoingMessage]
-		})
-		this.innerCircle.update({
-			fillColor: Color.gray(0.4)
-		})
-		this.label.update({
-			backgroundColor: this.innerCircle.fillColor
+			selectMessages: [message],
+			deselectMessages: [outgoingMessage]
 		})
 	}
 
-	commonButtonUp() {
-		if (this.currentModeIndex == 1) {
-			if (this.locked) {
-				super.commonButtonUp()
-			}
-			this.locked = !this.locked
-			this.view.transform.update({
-				scale: 1
-			})
-			this.redraw()
-		} else {
-			super.commonButtonUp()
-		}
-		this.label.view.hide()
-		this.paper.helpTextLabel.view.hide()
+	baseMessageKey(): string {
+		return this.messageKey
 	}
 
 	imageNameForIndex(index: number): string {
 		return this.messageKey
 	}
 
+	commonButtonDown() {
+		super.commonButtonDown()
+		this.innerCircle.update({
+			fillColor: this.lockColor
+		})
+	}
 
-	labelFromMessage(msg: object): string {
-		if (this.currentModeIndex == 0) {
-			return this.messageKey
+	commonMereButtonUp() {
+		this.messagePaper(this.deselectMessages[0])
+		this.touchStartTime = null
+		this.sidebar.setActiveButton(null)
+		this.innerCircle.update({
+			fillColor: this.baseColor
+		})
+		this.label.view.hide()
+	}
+
+	commonButtonTap() {
+		if (this.sidebar.activeButton != this) { return }
+		if (this.locked) {
+			this.messagePaper(this.deselectMessages[0])
 		} else {
-			return 'lock'
+			this.messagePaper(this.selectMessages[0])
 		}
+		this.touchStartTime = null
+		this.locked = !this.locked
+		this.innerCircle.update({
+			fillColor: this.locked ? this.lockColor : this.baseColor
+		})
+		this.label.view.hide()
 	}
 
 }
+
+
+
+
+	
+
+

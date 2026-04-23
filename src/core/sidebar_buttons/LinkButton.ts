@@ -6,12 +6,7 @@ export class LinkButton extends ToggleButton {
 
 	defaults(): object {
 		return {
-			messageKey: 'link',
-			icon: new ImageView({
-				imageLocation: '../../assets/link.png',
-				frameWidth: 40,
-				frameHeight: 40
-			})
+			messageKey: 'link'
 		}
 	}
 

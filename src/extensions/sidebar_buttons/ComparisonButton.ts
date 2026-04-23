@@ -7,11 +7,7 @@ export class ComparisonButton extends CreativeButton {
 	defaults(): object {
 		return {
 			creations: ['less than', 'less or equal', 'greater than', 'greater or equal', 'equal', 'not equal'],
-			icon: new ImageView({
-				imageLocation: '../../assets/less_than.png',
-				frameWidth: 25,
-				frameHeight: 25
-			})
+			iconSize: 25,
 		}
 	}
 

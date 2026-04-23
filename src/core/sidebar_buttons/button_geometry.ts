@@ -6,7 +6,7 @@ export const BUTTON_CENTER_Y: number = 70
 export const BUTTON_SPACING: number = 12.5
 export const BUTTON_RADIUS: number = 25
 export const BUTTON_SCALE_FACTOR: number = 1.3
-export const OPTION_SPACING: number = 25
+export const OPTION_SPACING: number = 40
 
 export function buttonCenter(verticalIndex: number, horizontalIndex: number = 0): vertex {
 	let y: number = BUTTON_CENTER_Y + verticalIndex * (BUTTON_SPACING + 2 * BUTTON_RADIUS)
