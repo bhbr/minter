@@ -455,6 +455,11 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
+				if (value) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'show controls':
 				this.helpTextLabel.update({
@@ -467,6 +472,13 @@ The content children can also be dragged and panned.
 				}
 				this.setControlsVisibility(value as boolean)
 				this.isShowingControls = value
+				break
+			case 'show help':
+				if (value as boolean) {
+					this.helpTextLabel.view.show()
+				} else {
+					this.helpTextLabel.view.hide()
+				}
 				break
 			case 'create':
 				this.creationMode = value
