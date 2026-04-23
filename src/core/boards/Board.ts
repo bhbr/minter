@@ -194,7 +194,7 @@ The content children can also be dragged and panned.
 		this.hideLinksOfContent()
 		this.setControlsVisibility(false)
 
-		let newAnchor = [this.frameWidth / 2 - HELP_TEXT_LABEL_WIDTH / 2 - SIDEBAR_WIDTH, 20]
+		let newAnchor = [0.5 * (this.frameWidth - HELP_TEXT_LABEL_WIDTH - SIDEBAR_WIDTH), 20]
 		this.helpTextLabel.update({
 			anchor: newAnchor,
 			frameWidth: HELP_TEXT_LABEL_WIDTH
