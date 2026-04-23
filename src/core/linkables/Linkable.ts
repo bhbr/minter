@@ -257,12 +257,15 @@ which can be linked to such-exposed variables of other mobjects.
 		this.outputList.view.hide()
 	}
 
-	removeOutputVariable() {
-		this.outputProperties = [{
-			name: 'value',
-			type: 'number',
-			displayName: 'value'
-		}]
+	removeOutputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				remove(this.outputProperties, prop)
+				break
+			}
+		}
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})

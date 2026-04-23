@@ -184,14 +184,18 @@ export class Sidebar extends Mobject {
 			if (pressedButton !== this.activeButton && pressedButton !== null) {
 				this.setActiveButton(pressedButton)
 			}
-			this.activeButton.buttonDownByKey(value)
+			if (this.activeButton !== null) {
+				this.activeButton.buttonDownByKey(value)
+			}
 			break
 		case 'buttonUp':
 			let pressedButton2 = this.buttonForKey(value) ?? null
 			if (pressedButton2 !== this.activeButton && pressedButton2 !== null) {
 				this.setActiveButton(pressedButton2)
 			}
-			this.activeButton.buttonUpByKey(value)
+			if (this.activeButton !== null) {
+				this.activeButton.buttonUpByKey(value)
+			}
 			break
 		case 'button':
 			if (value == 'collapse') {

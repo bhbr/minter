@@ -11,6 +11,8 @@ import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
 import { getPaper } from 'core/functions/getters'
+import { DependencyLink } from 'core/linkables/DependencyLink'
+import { remove } from 'core/functions/arrays'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -268,6 +270,38 @@ export class CoinRow extends Linkable implements Playable {
 	computeWidth(): number {
 		return (this.nbCoins - 1) * this.coinSpacing + 2 * this.coinRadius + this.nbHeadsLabel.frameWidth + this.nbTailsLabel.frameWidth
 	}
+
+	addedInputLink(link: DependencyLink) {
+		super.addedInputLink(link)
+		if (link.endHook.outlet.name == 'nbCoins') {
+			remove(this.controls, this.nbCoinsInputBox)
+			this.remove(this.nbCoinsInputBox)
+		}
+	}
+
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		if (link.previousHook.outlet.name == 'nbCoins') {
+			this.controls.push(this.nbCoinsInputBox)
+			this.add(this.nbCoinsInputBox)
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
