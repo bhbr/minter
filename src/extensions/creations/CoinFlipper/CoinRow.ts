@@ -274,16 +274,14 @@ export class CoinRow extends Linkable implements Playable {
 	addedInputLink(link: DependencyLink) {
 		super.addedInputLink(link)
 		if (link.endHook.outlet.name == 'nbCoins') {
-			remove(this.controls, this.nbCoinsInputBox)
-			this.remove(this.nbCoinsInputBox)
+			this.nbCoinsInputBox.inputElement.disabled = true
 		}
 	}
 
 	removedInputLink(link: DependencyLink) {
 		super.removedInputLink(link)
-		if (link.previousHook.outlet.name == 'nbCoins') {
-			this.controls.push(this.nbCoinsInputBox)
-			this.add(this.nbCoinsInputBox)
+		if (link.endHook.outlet.name == 'nbCoins') {
+			this.nbCoinsInputBox.inputElement.disabled = false
 		}
 	}
 
