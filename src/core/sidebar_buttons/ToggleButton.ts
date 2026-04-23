@@ -13,8 +13,8 @@ export class ToggleButton extends SidebarButton {
 
 	defaults(): object {
 		return {
-			baseColor: Color.gray(0.4),
-			lockColor: Color.gray(0.7),
+			baseColor: Color.gray(0.3),
+			lockColor: Color.gray(0.6),
 			locked: false,
 			messageKey: 'toggle'
 		}
@@ -26,8 +26,8 @@ export class ToggleButton extends SidebarButton {
 			fillColor: this.baseColor
 		})
 		this.label.update({
-			backgroundColor: this.baseColor,
-			borderColor: this.lockColor
+			backgroundColor: this.lockColor,
+			borderColor: Color.gray(0.8)
 		})
 	}
 

@@ -58,7 +58,7 @@ export class SidebarButton extends Pill {
 			baseColor: Color.gray(0.4),
 			baseRadius: BUTTON_RADIUS,
 			smallLabelFontSize: 12,
-			bigLabelFontSize: 12,
+			bigLabelFontSize: 14,
 			activeScalingFactor: 1.2,
 			optionSpacing: OPTION_SPACING,
 
@@ -108,7 +108,7 @@ export class SidebarButton extends Pill {
 			shortcutLabel: new TextLabel({
 				frameWidth: 13,
 				frameHeight: 13,
-				textColor: Color.gray(0.3)
+				textColor: Color.gray(0.5)
 			})
 		}
 	}
