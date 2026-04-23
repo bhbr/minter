@@ -725,11 +725,12 @@ The content children can also be dragged and panned.
 	endCreating(e: ScreenEvent) {
 		this.creationStroke = []
 		this.creationTool = null
+		this.creationMode = 'draw'
 		if (this.creator !== null) {
 			this.creator.dissolve()
 			this.helpTextLabel.view.hide()
 		}
-		this.messageSidebar({'button': 'collapse'})
+		this.messageSidebar({ 'button': 'collapse' })
 	}
 
 
