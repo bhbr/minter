@@ -39,9 +39,9 @@ export class Paper extends Board {
 				'EraseButton'
 			],
 			helpTexts: {
-				'drag': 'Drag objects or pan the board. Slide this button to the right to lock.',
-				'link': 'Show and edit links between objects. Slide this button to the right to lock.',
-				'show controls': 'Show control elements on objects. Slide this button to the right to lock.',
+				'drag': 'Drag objects or pan the board. Tap this button to lock.',
+				'link': 'Show and edit links between objects. Tap this button to lock.',
+				'show controls': 'Show control elements on objects. Tap this button to lock.',
 				'erase': 'Erase objects or drawings by swiping over them.',
 				'restart': 'Clear the board.',
 			}
