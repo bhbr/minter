@@ -24,7 +24,7 @@ export class SimpleInputBox extends Mobject {
 				strokeWidth: 0
 			}),
 			inputElement: document.createElement('input'),
-			frameWidth: 50,
+			frameWidth: 60,
 			frameHeight: 30,
 			strokeWidth: 0.0,
 			screenEventHandler: ScreenEventHandler.Self
@@ -67,7 +67,7 @@ export class SimpleInputBox extends Mobject {
 		this.inputElement.style.backgroundColor = 'rgba(50, 50, 50, 1)'
 		this.inputElement.style.textAlign = 'center'
 		this.inputElement.style.verticalAlign = 'center'
-		this.inputElement.style.fontSize = '14px'
+		this.inputElement.style.fontSize = '16px'
 		this.inputElement.style.border = 'none'
 		this.inputElement.style.outline = 'none'
 		this.inputElement.value = this.inputElement.value.toString()

@@ -2,7 +2,7 @@
 import { Color } from 'core/classes/Color'
 
 export const SIDEBAR_WIDTH: number = 300
-export const SHOW_HTML_CONSOLE: boolean = false
+export const SHOW_HTML_CONSOLE: boolean = true
 
 export const DRAW_BORDERS: boolean = false
 

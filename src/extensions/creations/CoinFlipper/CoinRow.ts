@@ -119,7 +119,6 @@ export class CoinRow extends Linkable implements Playable {
 		this.nbCoinsInputBox.onReturn = this.endNbCoinsEditing.bind(this)
 		this.controls.push(this.nbCoinsInputBox)
 		this.nbCoinsInputBox.inputElement.style.left = '25px'
-
 	}
 
 	endNbCoinsEditing() {
@@ -151,13 +150,14 @@ export class CoinRow extends Linkable implements Playable {
 		this.positionButton()
 		this.positionNbCoinsInputBox()
 		this.positionIOLists()
+		this.updateDependents() // in particular this updates the heads and tails labels
 	}
 
 	removeCoin() {
 		let coin = this.coins.pop()
 		this.remove(coin)
 		if (coin.state == 'tails') {
-			this.update() // in particular this updates the heads and tails labels
+			this.updateDependents() // in particular this updates the heads and tails labels
 		}
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
