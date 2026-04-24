@@ -116,7 +116,7 @@ export class SidebarButton extends Pill {
 	mutabilities(): object {
 		return {
 			baseColor: 'in_subclass',
-			bigLabelFontSize: 'never',
+			bigLabelFontSize: 'on_init',
 			smallLabelFontSize: 'never',
 			optionSpacing: 'never',
 			label: 'never',

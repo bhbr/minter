@@ -7,7 +7,8 @@ export class ControlsButton extends ToggleButton {
 	defaults(): object {
 		return {
 			messageKey: 'show controls',
-			iconSize: 30
+			iconSize: 30,
+			bigLabelFontSize: 12
 		}
 	}
 
