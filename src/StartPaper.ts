@@ -19,7 +19,3 @@ export class StartPaper extends CoinFlipPaper { }
 //AllTests.run()
 
 export const paper = new StartPaper()
-
-window.setTimeout( function() {
-	let button = paper.sidebar.buttons[1]
-}, 1000)
