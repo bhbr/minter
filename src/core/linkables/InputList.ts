@@ -16,7 +16,6 @@ export class InputList extends IOList {
 		return [0.5 * (this.mobject.getCompactWidth() - IO_LIST_WIDTH), -IO_LIST_OFFSET - this.getHeight()]
 	}
 
-
 }
 
 

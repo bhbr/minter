@@ -91,7 +91,6 @@ The content children can also be dragged and panned.
 			isShowingLinks: false,
 			isShowingControls: false,
 			allowingDrag: false,
-			lastHoveredChild: null,
 			helpTextLabel: new TextLabel({
 				frameHeight: HELP_TEXT_LABEL_HEIGHT,
 				frameWidth: HELP_TEXT_LABEL_WIDTH,
@@ -807,7 +806,6 @@ The content children can also be dragged and panned.
 	links: Array<DependencyLink>
 	isShowingLinks: boolean
 	isShowingControls: boolean
-	lastHoveredChild: Linkable | null
 
 	linkableChildren(): Array<Linkable> {
 	// the content children that are linkable
@@ -984,6 +982,7 @@ The content children can also be dragged and panned.
 		if (child && child !== linkedHook.outlet.ioList.mobject && listOfLists.length > 1) {
 			for (let list of listOfLists) {
 				if (list.mobject == child) {
+					//log(`showing ${list.constructor.name}`)
 					list.view.show()
 					return
 				}
@@ -1001,21 +1000,26 @@ The content children can also be dragged and panned.
 		for (let child of this.linkableChildren()) {
 			if (child.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.view.frameWidth
 				&& child.anchor[1] <= p[1] && p[1] <= child.anchor[1] + child.view.frameHeight) {
-				this.lastHoveredChild = child
+				return child
 			}
 		}
-		return this.lastHoveredChild
 	}
 
 	hoveredIOLists(p: vertex): Array<IOList> {
 		let ret: Array<IOList> = []
 		for (let child of this.linkableChildren()) {
-			if (child.anchor[0] + child.inputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.inputList.anchor[0] + child.inputList.view.frameWidth
-				&& child.anchor[1] + child.inputList.anchor[1] <= p[1] && p[1] <= child.anchor[1]) {
+			let minX1 = child.anchor[0] + child.inputList.anchor[0]
+			let maxX1 = minX1 + child.inputList.view.frameWidth
+			let minY1 = child.anchor[1] + child.inputList.anchor[1]
+			let maxY1 = child.anchor[1]
+			if (minX1 <= p[0] && p[0] <= maxX1 && minY1 <= p[1] && p[1] <= maxY1) {
 				ret.push(child.inputList)
 			}
-			if (child.anchor[0] + child.outputList.anchor[0] <= p[0] && p[0] <= child.anchor[0] + child.outputList.anchor[0] + child.outputList.view.frameWidth
-				&& child.anchor[1] + child.view.frameHeight <= p[1] && p[1] <= child.anchor[1] + child.outputList.anchor[1] + child.outputList.view.frameHeight) {
+			let minX2 = child.anchor[0] + child.outputList.anchor[0]
+			let maxX2 = minX2 + child.outputList.view.frameWidth
+			let minY2 = child.anchor[1] + child.view.frameHeight
+			let maxY2 = minY2 + child.outputList.view.frameHeight
+			if (minX2 <= p[0] && p[0] <= maxX2 && minY2 <= p[1] && p[1] <= maxY2) {
 				ret.push(child.outputList)
 			}
 		}
