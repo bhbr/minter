@@ -12,7 +12,7 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
-import { ScreenEvent } from 'core/mobjects/screen_events'
+import { ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'StartSidebar'
@@ -33,8 +33,8 @@ export class Sidebar extends Mobject {
 			view: new SidebarView(),
 			activeButton: null,
 			background: new Rectangle({
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
+				fillColor: Color.black(),
+				fillOpacity: isTouchDevice ? 0.0 : 1.0,
 				strokeWidth: 0,
 				screenEventHandler: ScreenEventHandler.Parent,
 				width: SIDEBAR_WIDTH,
