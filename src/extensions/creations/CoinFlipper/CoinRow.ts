@@ -68,6 +68,7 @@ export class CoinRow extends Linkable implements Playable {
 			frameWidth: 300,
 			frameHeight: 50,
 			nbCoinsInputBox: new SimpleNumberInputBox({
+				labelText: '# coins:',
 				value: 1
 			}),
 		}
@@ -118,7 +119,9 @@ export class CoinRow extends Linkable implements Playable {
 		this.nbCoinsInputBox.blur = this.endNbCoinsEditing.bind(this)
 		this.nbCoinsInputBox.onReturn = this.endNbCoinsEditing.bind(this)
 		this.controls.push(this.nbCoinsInputBox)
-		this.nbCoinsInputBox.inputElement.style.left = '25px'
+		this.nbCoinsInputBox.update({
+			anchor: [this.frameWidth / 2 - this.nbCoinsInputBox.frameWidth / 2, 0]
+		})
 	}
 
 	endNbCoinsEditing() {
