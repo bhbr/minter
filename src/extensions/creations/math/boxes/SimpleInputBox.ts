@@ -48,8 +48,7 @@ export class SimpleInputBox extends Mobject {
 	mutabilities(): object {
 		return {
 			background: 'never',
-			inputElement: 'never',
-			labelGap: 'never'
+			inputElement: 'never'
 		}
 	}
 
