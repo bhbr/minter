@@ -365,7 +365,10 @@ export class SidebarButton extends Pill {
 	}
 
 	commonMereButtonUp() {
-		if (!this.sidebar || !this.isActive()) { return }
+		if (!this.sidebar || !this.isActive()) {
+			this.hideOptions()
+			return
+		}
 		this.sidebar.setActiveButton(null)
 		this.messagePaper(this.deselectMessages[this.selectedIndex])
 		this.update({
