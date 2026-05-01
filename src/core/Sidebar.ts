@@ -12,7 +12,7 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
-import { ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
+import { ScreenEvent, isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'StartSidebar'
@@ -80,6 +80,18 @@ export class Sidebar extends Mobject {
 
 		this.addDependency('frameWidth', this.background, 'width')
 		this.addDependency('frameHeight', this.background, 'height')
+
+		if (isTouchDevice) {
+			if (separateSidebar) {
+				this.view.div.style.background = 'clear'
+				this.view.div.style.backgroundColor = 'clear'
+				this.background.update({
+					fillColor: Color.clear()
+				})
+			} else {
+				document.body.style.backgroundColor = 'black'
+			}
+		}
 	}
 
 	addButton(button: SidebarButton) {
