@@ -33,5 +33,10 @@ export class EraseButton extends SidebarButton {
 		})
 	}
 
+	commonButtonTap() {
+		if (this.selectedIndex == 1) {
+			this.commonMereButtonUp()
+		}
+	}
 
 }

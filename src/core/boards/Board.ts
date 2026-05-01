@@ -556,6 +556,9 @@ The content children can also be dragged and panned.
 				this.erasing.bind(this),
 				this.endErasing.bind(this)
 			)
+			this.sensor.onMouseClick = this.onTap.bind(this)
+			this.sensor.onPenTap = this.onTap.bind(this)
+			this.sensor.onTouchTap = this.onTap.bind(this)
 			this.update({
 				creationMode: 'erase'
 			})
@@ -642,7 +645,6 @@ The content children can also be dragged and panned.
 	}
 
 	createCreator(type: string): Creator {
-
 		switch (type) {
 			case 'draw':
 				if (this.creationTool == ScreenEventDevice.Finger) {
@@ -669,8 +671,20 @@ The content children can also be dragged and panned.
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
-		if (this.contracted) { return }
-		this.startCreating(e)
+		if (this.creationMode !== 'erase') {
+			this.startCreating(e)
+		}
+	}
+
+	onTap(e: ScreenEvent) {
+		if (this.creationMode == 'erase') {
+			this.sidebar.setActiveButton(null)
+			this.setEraser(false)
+			this.update({ creationMode: 'draw '})
+			this.sensor.onMouseClick = this.sensor.savedOnMouseClick
+			this.sensor.onPenTap = this.sensor.savedOnPenTap
+			this.sensor.onTouchTap = this.sensor.savedOnTouchTap
+		}
 	}
 
 	focusOn(child: Mobject) {
@@ -982,7 +996,6 @@ The content children can also be dragged and panned.
 		if (child && child !== linkedHook.outlet.ioList.mobject && listOfLists.length > 1) {
 			for (let list of listOfLists) {
 				if (list.mobject == child) {
-					//log(`showing ${list.constructor.name}`)
 					list.view.show()
 					return
 				}
