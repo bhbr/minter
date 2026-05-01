@@ -12,6 +12,7 @@ export class MathNode {
 	variables(): Array<string> {
 		return []
 	}
+
 }
 
 export class SymbolNode extends MathNode {
@@ -39,6 +40,7 @@ export class SymbolNode extends MathNode {
 		}
 		return [this.name]
 	}
+
 }
 
 export class ConstantNode extends MathNode {
@@ -127,6 +129,7 @@ export class FunctionNode extends MathNode {
 			return NaN
 		}
 	}
+
 }
 
 export class OperatorNode extends MathNode {
