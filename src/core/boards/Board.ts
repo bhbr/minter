@@ -1063,6 +1063,11 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
+		if (this.isShowingLinks) {
+			this.disableContent()
+		} else {
+			this.enableContent()
+		}
 		if (!this.openLink) {
 			this.endCreating(e)
 			return
