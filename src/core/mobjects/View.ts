@@ -93,10 +93,14 @@ export class View extends ExtendedObject {
 		// 'absolute' positions this mobject relative (sic) to its parent
 		this.div.style.overflow = 'visible'
 		// by default, the mobject can draw outside its view's borders
-		this.div.style.border = this.drawBorder ? '1px dashed green' : 'solid'
+		
 		this.div.style.borderColor = this.borderColor.toCSS()
-		this.div.style.borderWidth = this.drawBorder ? '1px' : `${this.borderWidth}px`
+		this.div.style.borderWidth = `${this.borderWidth}px`
 		this.div.style.borderRadius = `${this.borderRadius}px`
+		if (this.drawBorder) {
+			this.div.style.border = '1px dashed green'
+		}
+
 		this.div['view'] = this
 		this.frame.view = this
 		this.redraw()
@@ -129,6 +133,9 @@ export class View extends ExtendedObject {
 		this.div.style.borderColor = this.borderColor.toCSS()
 		this.div.style.borderWidth = `${this.borderWidth}px`
 		this.div.style.borderRadius = `${this.borderRadius}px`
+		if (this.drawBorder) {
+			this.div.style.border = '1px dashed green'
+		}
 		this.div.style.opacity = this.opacity.toString()
 
 	}
