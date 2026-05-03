@@ -453,7 +453,7 @@ The content children can also be dragged and panned.
 					break
 				}
 				this.setLinking(value as boolean)
-				if (value) {
+				if (value as boolean) {
 					this.setControlsVisibility(false)
 				} else {
 					this.setControlsVisibility(this.isShowingControls)
@@ -650,6 +650,9 @@ The content children can also be dragged and panned.
 		}
 		for (let link of this.links) {
 			this.content.remove(link)
+		}
+		if (this.openLink) { // edge case
+			this.content.remove(this.openLink)
 		}
 	}
 
@@ -871,6 +874,9 @@ The content children can also be dragged and panned.
 		for (let submob of this.linkableChildren()) {
 			submob.hideLinks()
 		}
+		if (this.openLink) {
+			this.content.remove(this.openLink)
+		}
 
 		//this.expandedInputList.view.hide()
 		//this.expandedOutputList.view.hide()
@@ -889,6 +895,7 @@ The content children can also be dragged and panned.
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
 			this.disableContent()
+			this.ungreyAllHooks()
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
 			this.enableContent()
@@ -1063,11 +1070,9 @@ The content children can also be dragged and panned.
 	}
 
 	endLinking(e: ScreenEvent) {
-		if (this.isShowingLinks) {
-			this.disableContent()
-		} else {
-			this.enableContent()
-		}
+		this.disableContent()
+		this.ungreyAllHooks()
+		this.showLinksOfContent()
 		if (!this.openLink) {
 			this.endCreating(e)
 			return
@@ -1154,6 +1159,21 @@ The content children can also be dragged and panned.
 							opacity: 0.25
 						})
 					}
+				}
+			}
+		}
+	}
+
+	ungreyAllHooks() {
+		for (let mob of this.linkableChildren()) {
+			for (let outlet of mob.inputList.linkOutlets) {
+				for (let hook of outlet.linkHooks) {
+					hook.update({
+						opacity: 1.0
+					})
+					outlet.label.update({
+						opacity: 1.0
+					})
 				}
 			}
 		}
