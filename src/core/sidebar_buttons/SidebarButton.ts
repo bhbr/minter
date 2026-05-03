@@ -426,6 +426,10 @@ export class SidebarButton extends Pill {
 		}
 	}
 
+	getID(): string {
+		return 'button'
+	}
+
 }
 
 

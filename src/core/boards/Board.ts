@@ -695,9 +695,10 @@ The content children can also be dragged and panned.
 
 	onTap(e: ScreenEvent) {
 		if (this.creationMode == 'erase') {
-			this.sidebar.setActiveButton(null)
+			log('end erasing')
+			this.messageSidebar({ 'buttonUp': 'erase' })
 			this.setEraser(false)
-			this.update({ creationMode: 'draw '})
+			this.update({ creationMode: 'draw' })
 			this.sensor.onMouseClick = this.sensor.savedOnMouseClick
 			this.sensor.onPenTap = this.sensor.savedOnPenTap
 			this.sensor.onTouchTap = this.sensor.savedOnTouchTap

@@ -173,7 +173,7 @@ export class Sidebar extends Mobject {
 
 	buttonForKey(key: string): SidebarButton | null {
 		for (let b of this.buttons) {
-			if (b.shortcutKey == key) { return b }
+			if (b.getID() == key || b.shortcutKey == key) { return b }
 		}
 		return null
 	}

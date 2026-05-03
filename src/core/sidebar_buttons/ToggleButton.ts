@@ -83,6 +83,10 @@ export class ToggleButton extends SidebarButton {
 		this.label.view.hide()
 	}
 
+	getID(): string {
+		return this.messageKey
+	}
+
 }
 
 
