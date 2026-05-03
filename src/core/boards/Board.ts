@@ -421,6 +421,11 @@ The content children can also be dragged and panned.
 
 	setInternalDragging(value: boolean) {
 		if (value == this.allowingDrag) { return }
+		if (value) {
+			this.disableContent()
+		} else {
+			this.enableContent()
+		}
 		this.allowingDrag = value
 		this.setPanning(value)
 		for (let mob of this.contentChildren) {
@@ -431,7 +436,6 @@ The content children can also be dragged and panned.
 	handleMessage(key: string, value: any) {
 		if (value === '0') { value = false }
 		if (value === '1') { value = true }
-		this.enableContent()
 		switch (key) {
 			case 'drag':
 				this.setInternalDragging(value as boolean)
@@ -445,6 +449,9 @@ The content children can also be dragged and panned.
 				}
 				break
 			case 'link':
+				if ((value as boolean) === this.isShowingLinks) {
+					break
+				}
 				this.setLinking(value as boolean)
 				if (value) {
 					this.setControlsVisibility(false)
@@ -454,20 +461,29 @@ The content children can also be dragged and panned.
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
-				if (value) {
+				if (value as boolean) {
 					this.helpTextLabel.view.show()
 				} else {
 					this.helpTextLabel.view.hide()
 				}
 				break
 			case 'show controls':
+				if ((value as boolean) === this.isShowingControls) { return }
 				this.helpTextLabel.update({
 					text: this.helpTexts['show controls']
 				})
-				if (value) {
+				if (value as boolean) {
 					this.helpTextLabel.view.show()
+					//this.hideLinksOfContent()
 				} else {
 					this.helpTextLabel.view.hide()
+					if (this.isShowingLinks) {
+						this.showLinksOfContent()
+						this.disableContent()
+					} else {
+						this.hideLinksOfContent()
+						this.enableContent()
+					}
 				}
 				this.setControlsVisibility(value as boolean)
 				this.isShowingControls = value
@@ -480,6 +496,7 @@ The content children can also be dragged and panned.
 				}
 				break
 			case 'create':
+				this.enableContent()
 				this.creationMode = value
 				if (this.creator == null) {
 					// create a dummy creator just to display the help text
@@ -775,8 +792,8 @@ The content children can also be dragged and panned.
 			if (mob.dragAnchorStart == null) { return }
 			let newAnchor: vertex = vertexAdd(mob.dragAnchorStart, dr)
 			mob.update({ anchor: newAnchor })
-			mob.view.div.style.left = `${newAnchor[0]}px`
-			mob.view.div.style.top = `${newAnchor[1]}px`
+			mob.view.div.style.left = `${newAnchor[0]}px`;
+			mob.view.div.style.top = `${newAnchor[1]}px`;
 		}
 		this.updateLinks()
 	}
@@ -865,10 +882,15 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
+		if (flag === this.isShowingLinks) {
+			return
+		}
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
+			this.disableContent()
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
+			this.enableContent()
 		}
 		this.isShowingLinks = flag
 		if (flag) {
