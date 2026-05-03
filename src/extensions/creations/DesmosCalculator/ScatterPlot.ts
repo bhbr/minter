@@ -36,8 +36,8 @@ export class ScatterPlot extends DesmosCalculator {
 
 	setup() {
 		super.setup()
-		this.controls.push(this.showPointsCheckbox)
-		this.controls.push(this.showLinesCheckbox)
+		this.controls.add(this.showPointsCheckbox)
+		this.controls.add(this.showLinesCheckbox)
 	}
 
 	setXArrayExpression(listString: string) {

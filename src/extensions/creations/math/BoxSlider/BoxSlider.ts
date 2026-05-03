@@ -141,9 +141,9 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.maxValueInputBox.blur = this.endMaxValueEditing.bind(this)
 		this.maxValueInputBox.onReturn = this.endMaxValueEditing.bind(this)
 
-		this.controls.push(this.nameInputBox)
-		this.controls.push(this.minValueInputBox)
-		this.controls.push(this.maxValueInputBox)
+		this.controls.add(this.nameInputBox)
+		this.controls.add(this.minValueInputBox)
+		this.controls.add(this.maxValueInputBox)
 
 		//this.add(this.nameLabel)
 		//this.add(this.nameInputBox)

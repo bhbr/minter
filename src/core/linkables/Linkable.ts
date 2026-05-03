@@ -1,6 +1,7 @@
 
 import { Board } from 'core/boards/Board'
 import { Mobject } from 'core/mobjects/Mobject'
+import { MGroup } from 'core/mobjects/MGroup'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { IOList } from './IOList'
 import { InputList } from './InputList'
@@ -30,7 +31,7 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList
 	linksEditable: boolean
-	controls: Array<Mobject>
+	controls: MGroup
 
 	defaults(): object {
 		return {
@@ -40,7 +41,7 @@ which can be linked to such-exposed variables of other mobjects.
 			outputProperties: [],
 			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self,
-			controls: []
+			controls: new MGroup()
 		}
 	}
 
@@ -83,6 +84,11 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.add(this.outputList)
 		this.outputList.view.hide()
+		this.controls.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.add(this.controls)
 	}
 
 	showLinks() {
@@ -143,10 +149,10 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	setControlsVisibility(visible: boolean) {
-		for (let mob of this.controls) {
-			mob.view.setVisibility(visible)
-
-		}
+		this.controls.view.setVisibility(visible)
+	// 	for (let mob of this.controls.children) {
+	// 		mob.view.setVisibility(visible)
+	// 	}
 	}
 
 	setLinksVisibility(visible: boolean) {

@@ -164,7 +164,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.playButton.update({
 			mobject: this
 		})
-		this.controls.push(this.playButton)
+		this.controls.add(this.playButton)
 	}
 
 	positionButton() {
@@ -183,7 +183,7 @@ export class CoinStack extends Linkable implements Playable {
 			anchor: [this.frameWidth / 2 - this.nbCoinsInputBox.frameWidth / 2 - 40, 0]
 		})
 		this.add(this.nbCoinsInputBox)
-		this.controls.push(this.nbCoinsInputBox)
+		this.controls.add(this.nbCoinsInputBox)
 	}
 
 	endNbCoinsEditing() {

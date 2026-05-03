@@ -111,14 +111,14 @@ export class CoinRow extends Linkable implements Playable {
 		this.playButton.update({
 			mobject: this
 		})
-		this.controls.push(this.playButton)
+		this.controls.add(this.playButton)
 	}
 
 	setupInputBox() {
 		this.add(this.nbCoinsInputBox)
 		this.nbCoinsInputBox.blur = this.endNbCoinsEditing.bind(this)
 		this.nbCoinsInputBox.onReturn = this.endNbCoinsEditing.bind(this)
-		this.controls.push(this.nbCoinsInputBox)
+		this.controls.add(this.nbCoinsInputBox)
 		this.nbCoinsInputBox.update({
 			anchor: [this.frameWidth / 2 - this.nbCoinsInputBox.frameWidth / 2, 0]
 		})

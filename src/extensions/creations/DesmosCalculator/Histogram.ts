@@ -62,13 +62,13 @@ export class Histogram extends DesmosCalculator {
 		})
 		this.scalingSelector.radioButtons[0].select()
 		this.add(this.scalingSelector)
-		this.controls.push(this.scalingSelector)
+		this.controls.add(this.scalingSelector)
 		this.frequencyLabel.update({
 			anchor: [200, this.frameHeight + 10],
 			frameHeight: 18
 		})
 		this.add(this.frequencyLabel)
-		this.controls.push(this.frequencyLabel)
+		this.controls.add(this.frequencyLabel)
 	}
 
 	setScaling(option: string) {
