@@ -70,6 +70,8 @@ export class NumberListBox extends Linkable {
 		// remove and add the label to fight lazy rendering bug
 		this.clearButton.add(this.clearButton.label)
 		this.controls.add(this.clearButton)
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

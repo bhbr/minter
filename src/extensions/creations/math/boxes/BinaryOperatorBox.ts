@@ -92,6 +92,7 @@ export class BinaryOperatorBox extends Linkable {
 			this.valueBox = new NumberListBox({
 				value: this.result()
 			})
+			this.valueBox.controls.remove(this.valueBox.clearButton)
 			this.valueBox.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else if (this.valueType == 'Array<number>' && newType == 'number') {
 			this.remove(this.valueBox)
