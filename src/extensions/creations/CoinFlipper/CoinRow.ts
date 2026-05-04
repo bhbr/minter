@@ -128,7 +128,8 @@ export class CoinRow extends Linkable implements Playable {
 		getPaper().blurFocusedChild()
 		this.nbCoinsInputBox.inputElement.blur()
 		document.removeEventListener('keydown', this.nbCoinsInputBox.boundKeyPressed)
-		this.update({ nbCoins: this.nbCoinsInputBox.value })
+		this.updateNbCoins(this.nbCoinsInputBox.value, false)
+		this.updateDependents()
 	}
 
 	addCoin() {
@@ -153,18 +154,18 @@ export class CoinRow extends Linkable implements Playable {
 		this.positionButton()
 		this.positionNbCoinsInputBox()
 		this.positionIOLists()
-		this.updateDependents() // in particular this updates the heads and tails labels
+		this.updateDependents()
 	}
 
 	removeCoin() {
 		let coin = this.coins.pop()
 		this.remove(coin)
-		this.updateDependents() // in particular this updates the heads and tails labels
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
 		this.positionButton()
 		this.positionNbCoinsInputBox()
 		this.positionIOLists()
+		this.updateDependents()
 	}
 
 	adjustFrameWidth() {
@@ -237,9 +238,17 @@ export class CoinRow extends Linkable implements Playable {
 		}
 		return t
 	}
-	nbTailsAsString(): string { return this.nbTails().toString() }
 
-	nbHeads(): number { return this.nbCoins - this.nbTails() }
+	nbTailsAsString(): string {
+		return this.nbTails().toString()
+	}
+
+	nbHeads(): number {
+		log(`we have ${this.nbCoins} coins`)
+		let h = this.nbCoins - this.nbTails()
+		log(`we have ${h} heads`)
+		return this.nbCoins - this.nbTails()
+	}
 	nbHeadsAsString(): string { return this.nbHeads().toString() }
 
 	mean(): number {
@@ -249,12 +258,12 @@ export class CoinRow extends Linkable implements Playable {
 	update(args: object = {}, redraw: boolean = false) {
 		let newNbCoins = args['nbCoins']
 		if (newNbCoins !== undefined && newNbCoins != this.nbCoins) {
-			this.updateNbCoins(newNbCoins)
+			this.updateNbCoins(newNbCoins, true)
 		}
 		super.update(args, redraw)
 	}
 
-	updateNbCoins(newNbCoins: number) {
+	updateNbCoins(newNbCoins: number, updateInputBox: boolean = false) {
 		if (newNbCoins < this.nbCoins) {
 			for (var i = this.nbCoins - 1; i >= newNbCoins; i--) {
 				this.removeCoin()
@@ -264,8 +273,13 @@ export class CoinRow extends Linkable implements Playable {
 				this.addCoin()
 			}
 		}
-		this.nbCoinsInputBox.inputElement.value = newNbCoins.toString()
-
+		this.nbCoins = this.coins.length
+		this.updateDependents()
+		if (updateInputBox) {
+			this.nbCoinsInputBox.update({
+				value: newNbCoins
+			})
+		}
 	}
 
 	computeWidth(): number {
