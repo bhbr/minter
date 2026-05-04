@@ -70,6 +70,11 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setup() {
 		super.setup()
+		this.controls.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.add(this.controls)
 		this.inputList.update({
 			mobject: this,
 			outletProperties: this.inputProperties,
@@ -84,11 +89,6 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.add(this.outputList)
 		this.outputList.view.hide()
-		this.controls.update({
-			frameWidth: this.frameWidth,
-			frameHeight: this.frameHeight
-		})
-		this.add(this.controls)
 	}
 
 	showLinks() {
