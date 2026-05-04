@@ -421,11 +421,11 @@ The content children can also be dragged and panned.
 
 	setInternalDragging(value: boolean) {
 		if (value == this.allowingDrag) { return }
-		if (value) {
-			this.disableContent()
-		} else {
-			this.enableContent()
-		}
+		// if (value) {
+		// 	this.disableContent()
+		// } else {
+		// 	this.enableContent()
+		// }
 		this.allowingDrag = value
 		this.setPanning(value)
 		for (let mob of this.contentChildren) {
