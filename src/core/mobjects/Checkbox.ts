@@ -29,7 +29,8 @@ export class Checkbox extends MGroup {
 			label: new TextLabel({
 				frameWidth: 100,
 				frameHeight: 20,
-				anchor: [30, 0]
+				anchor: [30, 0],
+				horizontalAlign: 'left'
 			})
 		}
 	}

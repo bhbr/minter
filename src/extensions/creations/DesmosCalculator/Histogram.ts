@@ -4,6 +4,7 @@ import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { RadioButtonList } from 'core/mobjects/RadioButtonList'
 import { TextLabel } from 'core/mobjects/TextLabel'
+import { Checkbox } from 'core/mobjects/Checkbox'
 
 export class Histogram extends DesmosCalculator {
 
@@ -17,6 +18,8 @@ export class Histogram extends DesmosCalculator {
 	scalingSelector: RadioButtonList
 	scaling: 'absolute' | 'relative'
 	scale: number
+	autoadjustScale: boolean
+	autoadjustScaleCheckBox: Checkbox
 
 	defaults(): object {
 		return {
@@ -47,7 +50,12 @@ export class Histogram extends DesmosCalculator {
 			scaling: 'absolute',
 			options: {
 				expressions: false
-			}
+			},
+			autoadjustScale: false,
+			autoadjustScaleCheckBox: new Checkbox({
+				text: 'auto-adjust scale',
+				state: false
+			})
 		}
 	}
 
@@ -66,6 +74,14 @@ export class Histogram extends DesmosCalculator {
 		})
 		this.scalingSelector.radioButtons[0].select()
 		this.controls.add(this.scalingSelector)
+		this.autoadjustScaleCheckBox.update({
+			anchor: [0, this.frameHeight + 40]
+		})
+		this.autoadjustScaleCheckBox.label.update({
+			frameWidth: 180
+		})
+		this.controls.add(this.autoadjustScaleCheckBox)
+		this.autoadjustScaleCheckBox.onToggle = this.toggleYScale.bind(this)
 	}
 
 	setScaling(redraw: boolean = true) {
@@ -126,6 +142,23 @@ export class Histogram extends DesmosCalculator {
 		}
 	}
 
+	toggleYScale() {
+		this.autoadjustScale = !this.autoadjustScale
+	}
+
+	setYMax(unpaddedYMax: number) {
+		let xMin = this.calculator.graphpaperBounds.mathCoordinates.left
+		let xMax = this.calculator.graphpaperBounds.mathCoordinates.right
+		let yMin = -0.1 * unpaddedYMax
+		let yMax = 1.1 * unpaddedYMax
+		this.calculator.setMathBounds({
+			left: xMin,
+			right: xMax,
+			top: yMax,
+			bottom: yMin
+		})
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (args['min'] !== undefined || args['max'] !== undefined || args['nbBins'] !== undefined) {
@@ -135,6 +168,22 @@ export class Histogram extends DesmosCalculator {
 			this.setScaling(false)
 			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]/${this.scale}` })
 			this.createBars()
+			if (this.autoadjustScale) {
+				let yMax = Math.max(...this.bins())
+				this.setYMax(yMax)
+			}
+		}
+		if (args['min'] !== undefined || args['max'] !== undefined) {
+			let newXMin = args['min'] ?? this.min
+			let newXMax = args['max'] ?? this.max
+			let yMin = this.calculator.graphpaperBounds.mathCoordinates.bottom
+			let yMax = this.calculator.graphpaperBounds.mathCoordinates.top
+			this.calculator.setMathBounds({
+				left: newXMin - 0.1 * (this.max - newXMin),
+				right: newXMax + 0.1 * (newXMax - this.min),
+				top: yMax,
+				bottom: yMin
+			})
 		}
 	}
 
