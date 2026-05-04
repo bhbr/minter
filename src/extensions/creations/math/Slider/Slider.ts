@@ -4,15 +4,15 @@ import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { VariableNameBox } from './VariableNameBox'
 
-export class BoxSlider extends Linkable {
+export class Slider extends Linkable {
 /*
-A BoxSlider represents a continuous variable. Its value varies
+A Slider represents a continuous variable. Its value varies
 between a min (0 for now) and max (1 for now) value via scrubbing.
 */
 
@@ -41,8 +41,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	scrubStartingPoint: vertex
 
 	// limits
-	minValueInputBox: SimpleNumberInputBox
-	maxValueInputBox: SimpleNumberInputBox
+	minValueInputBox: NumberInputBox
+	maxValueInputBox: NumberInputBox
 
 	defaults(): object {
 		return {
@@ -55,7 +55,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				anchor: [10, -30],
 
 			}),
-			maxValueInputBox: new SimpleNumberInputBox({
+			maxValueInputBox: new NumberInputBox({
 				labelText: '',
 				labelWidth: 0,
 				labelGap: 0,
@@ -77,7 +77,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				verticalAlign: 'center',
 				fontSize: 20
 			}),
-			minValueInputBox: new SimpleNumberInputBox({
+			minValueInputBox: new NumberInputBox({
 				labelText: '',
 				labelWidth: 0,
 				labelGap: 0,

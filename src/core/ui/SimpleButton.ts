@@ -1,6 +1,6 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'

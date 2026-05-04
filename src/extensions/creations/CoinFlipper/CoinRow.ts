@@ -1,15 +1,15 @@
 
 import { Coin } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
 import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
-import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { remove } from 'core/functions/arrays'
@@ -29,7 +29,7 @@ export class CoinRow extends Linkable implements Playable {
 	nbHeadsLabel: TextLabel
 	nbTailsLabel: TextLabel
 	labelWidth: number
-	nbCoinsInputBox: SimpleNumberInputBox
+	nbCoinsInputBox: NumberInputBox
 
 	defaults(): object {
 		return {
@@ -67,7 +67,7 @@ export class CoinRow extends Linkable implements Playable {
 			],
 			frameWidth: 300,
 			frameHeight: 50,
-			nbCoinsInputBox: new SimpleNumberInputBox({
+			nbCoinsInputBox: new NumberInputBox({
 				labelText: '# coins:',
 				value: 1
 			}),

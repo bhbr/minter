@@ -1,14 +1,14 @@
 
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Creator } from 'core/creators/Creator'
-import { BoxSlider } from './BoxSlider'
+import { Slider } from './Slider'
 import { Linkable } from 'core/linkables/Linkable'
 import { Color } from 'core/classes/Color'
 
 
-export class BoxSliderCreator extends Creator {
+export class SliderCreator extends Creator {
 
-	declare creation?: BoxSlider
+	declare creation?: Slider
 
 	defaults(): object {
 		return {
@@ -27,11 +27,11 @@ export class BoxSliderCreator extends Creator {
 		this.add(this.creation)
 	}
 
-	createMobject(): BoxSlider {
+	createMobject(): Slider {
 		if (this.creation) {
 			return this.creation
 		}
-		let slider = new BoxSlider({ height: 0 })
+		let slider = new Slider({ height: 0 })
 		return slider
 	}
 

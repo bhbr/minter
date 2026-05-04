@@ -1,6 +1,6 @@
 
 import { Circle } from 'core/shapes/Circle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { RadioButtonList } from './RadioButtonList'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'

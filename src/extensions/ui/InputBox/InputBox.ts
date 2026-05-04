@@ -1,6 +1,6 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { Mobject } from 'core/mobjects/Mobject'
 import { log } from 'core/functions/logging'
@@ -12,7 +12,7 @@ import { DependencyLink } from 'core/linkables/DependencyLink'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 
 
-export class SimpleInputBox extends Mobject {
+export class InputBox extends Mobject {
 
 	label: TextLabel
 	inputElement: HTMLInputElement

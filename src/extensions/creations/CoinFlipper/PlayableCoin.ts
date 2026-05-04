@@ -1,9 +1,9 @@
 
 import { Coin, CoinState } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 

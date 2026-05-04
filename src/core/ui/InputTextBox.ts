@@ -1,13 +1,13 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { Color } from 'core/classes/Color'
 import { Linkable } from 'core/linkables/Linkable'
 import { log  } from 'core/functions/logging'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
-import { Mobject } from './Mobject'
+import { Mobject } from 'core/mobjects/Mobject'
 
 
 export class InputTextBox extends Mobject {

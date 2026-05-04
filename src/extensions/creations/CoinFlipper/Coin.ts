@@ -2,7 +2,7 @@
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
 export type CoinState = 'heads' | 'tails'

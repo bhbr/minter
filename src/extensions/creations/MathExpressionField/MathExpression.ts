@@ -1,3 +1,4 @@
+
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Parser } from './Parser'
 import { AssignmentNode } from './MathNode'

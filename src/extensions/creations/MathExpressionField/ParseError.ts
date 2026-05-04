@@ -1,3 +1,4 @@
+
 import { Token } from './Token'
 
 export class ParseError extends Error {

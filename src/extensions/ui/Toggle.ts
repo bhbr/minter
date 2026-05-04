@@ -2,7 +2,7 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEvent, ScreenEventHandler, eventVertex } from 'core/mobjects/screen_events'
 import { getPaper } from 'core/functions/getters'
 import { vertex, vertexNorm, vertexTranslatedBy } from 'core/functions/vertex'

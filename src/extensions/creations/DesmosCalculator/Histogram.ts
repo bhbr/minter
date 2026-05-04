@@ -2,9 +2,9 @@
 import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
-import { RadioButtonList } from 'core/mobjects/RadioButtonList'
-import { TextLabel } from 'core/mobjects/TextLabel'
-import { Checkbox } from 'core/mobjects/Checkbox'
+import { RadioButtonList } from 'core/ui/RadioButtonList'
+import { TextLabel } from 'core/ui/TextLabel'
+import { Checkbox } from 'core/ui/Checkbox'
 
 export class Histogram extends DesmosCalculator {
 

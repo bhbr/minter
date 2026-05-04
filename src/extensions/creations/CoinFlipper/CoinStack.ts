@@ -3,11 +3,11 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Color } from 'core/classes/Color'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
@@ -24,7 +24,7 @@ export class CoinStack extends Linkable implements Playable {
 	tailsBar: Rectangle
 	headsLabel: TextLabel
 	tailsLabel: TextLabel
-	nbCoinsInputBox: SimpleNumberInputBox
+	nbCoinsInputBox: NumberInputBox
 	labelHeight: number
 	labelSpacing: number
 	maxBarHeight: number
@@ -58,7 +58,7 @@ export class CoinStack extends Linkable implements Playable {
 			playButton: new PlayButton({
 				anchor: [0, 50]
 			}),
-			nbCoinsInputBox: new SimpleNumberInputBox({
+			nbCoinsInputBox: new NumberInputBox({
 				labelText: '# coins:',
 				value: 100
 			}),

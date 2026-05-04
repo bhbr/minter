@@ -1,6 +1,6 @@
 
-import { TextLabel } from 'core/mobjects/TextLabel'
-import { InputTextBox } from 'core/mobjects/InputTextBox'
+import { TextLabel } from 'core/ui/TextLabel'
+import { InputTextBox } from 'core/ui/InputTextBox'
 import { LinkHook } from './LinkHook'
 import { MGroup } from 'core/mobjects/MGroup'
 import { HOOK_HORIZONTAL_SPACING, IO_LIST_WIDTH } from './constants'

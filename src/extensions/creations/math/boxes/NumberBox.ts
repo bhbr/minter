@@ -1,6 +1,6 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { Linkable } from 'core/linkables/Linkable'
 import { log } from 'core/functions/logging'

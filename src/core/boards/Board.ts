@@ -26,7 +26,7 @@ import { Paper } from 'core/Paper'
 import { MGroup } from 'core/mobjects/MGroup'
 import { View } from 'core/mobjects/View'
 import { IOList } from 'core/linkables/IOList'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Dependency } from 'core/mobjects/Dependency'
 
 declare var paper: Paper

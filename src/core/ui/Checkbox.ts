@@ -1,5 +1,5 @@
 
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Square } from 'core/shapes/Square'
 import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'

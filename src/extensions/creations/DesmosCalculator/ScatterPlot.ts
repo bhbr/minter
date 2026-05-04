@@ -2,7 +2,7 @@
 import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
-import { Checkbox } from 'core/mobjects/Checkbox'
+import { Checkbox } from 'core/ui/Checkbox'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class ScatterPlot extends DesmosCalculator {

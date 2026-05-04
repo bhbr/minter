@@ -1,13 +1,13 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { Scroll } from 'core/mobjects/Scroll'
+import { Scroll } from 'core/ui/Scroll'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class NumberListBox extends Linkable {

@@ -1,3 +1,4 @@
+
 import { SpanningCreator } from 'core/creators/SpanningCreator'
 import { vertex } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'

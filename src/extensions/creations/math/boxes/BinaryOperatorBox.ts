@@ -1,9 +1,9 @@
 
-import { NumberBox } from 'extensions/creations/math/boxes/NumberBox'
-import { NumberListBox } from 'extensions/creations/math/boxes/NumberListBox'
+import { NumberBox } from './NumberBox'
+import { NumberListBox } from './NumberListBox'
 import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 
