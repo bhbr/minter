@@ -244,9 +244,7 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	nbHeads(): number {
-		log(`we have ${this.nbCoins} coins`)
 		let h = this.nbCoins - this.nbTails()
-		log(`we have ${h} heads`)
 		return this.nbCoins - this.nbTails()
 	}
 	nbHeadsAsString(): string { return this.nbHeads().toString() }

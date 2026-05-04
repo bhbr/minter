@@ -6,9 +6,13 @@ import { Coin } from './extensions/creations/CoinFlipper/Coin'
 import { Transform } from './core/classes/Transform'
 import { MathExpressionField } from './extensions/creations/MathExpressionField/MathExpressionField'
 import { isTouchDevice, separateSidebar } from './core/mobjects/screen_events'
+import { Rectangle } from './core/shapes/Rectangle'
+import { Color } from './core/classes/Color'
 
 export class StartPaper extends CoinFlipPaper { }
 
 //AllTests.run()
 
 export const paper = new StartPaper()
+
+
