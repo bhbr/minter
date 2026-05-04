@@ -927,7 +927,7 @@ The content children can also be dragged and panned.
 			this.createNewOpenLink(clickedHook)
 		} else {
 			let link = this.linkForHook(clickedHook)
-			link.view.show() //link.showLine()
+			link.showLine()
 			link.dependency.source.removeDependency(link.dependency)
 			link.previousHook = clickedHook
 			clickedHook.update({ linked: false })
