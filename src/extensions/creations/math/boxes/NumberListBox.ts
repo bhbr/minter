@@ -68,7 +68,6 @@ export class NumberListBox extends Linkable {
 		this.clearButton.action = this.clear.bind(this)
 		this.clearButton.remove(this.clearButton.label)
 		// remove and add the label to fight lazy rendering bug
-		this.add(this.clearButton)
 		this.clearButton.add(this.clearButton.label)
 		this.controls.add(this.clearButton)
 	}
