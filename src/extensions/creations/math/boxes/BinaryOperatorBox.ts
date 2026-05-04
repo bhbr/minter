@@ -6,6 +6,7 @@ import { Circle } from 'core/shapes/Circle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 type operatorString = '+' | '–' | '&times;' | '/' | '<' | '≤' | '>' | '≥' | '=' | '≠' 
 
@@ -75,6 +76,7 @@ export class BinaryOperatorBox extends Linkable {
 		if (this.valueBox instanceof NumberBox) {
 			this.valueBox.inputElement.disabled = true
 			this.valueBox.inputElement.value = ''
+			this.valueBox.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else if (this.valueBox instanceof NumberListBox) {
 			this.valueBox.scroll.update({ list: [] })
 		}
@@ -90,6 +92,7 @@ export class BinaryOperatorBox extends Linkable {
 			this.valueBox = new NumberListBox({
 				value: this.result()
 			})
+			this.valueBox.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else if (this.valueType == 'Array<number>' && newType == 'number') {
 			this.remove(this.valueBox)
 			this.valueBox = new NumberBox({
