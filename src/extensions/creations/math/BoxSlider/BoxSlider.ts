@@ -24,7 +24,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	outerBar: Rectangle
 	filledBar: Rectangle
 	valueLabel: TextLabel
-	nameLabel: TextLabel
 
 	// style
 	fillColor: Color
@@ -45,9 +44,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	minValueInputBox: SimpleNumberInputBox
 	maxValueInputBox: SimpleNumberInputBox
 
-	// name
-	nameInputBox: VariableNameBox
-
 	defaults(): object {
 		return {
 			inputProperties: [],
@@ -58,13 +54,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				width: 20,
 				anchor: [10, -30],
 
-			}),
-			nameLabel: new TextLabel({
-				backgroundColor: Color.clear(),
-				frameWidth: 50,
-				frameHeight: 20,
-				text: '',
-				anchor: [10, -30]
 			}),
 			maxValueInputBox: new SimpleNumberInputBox({
 				labelText: '',
@@ -92,10 +81,9 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				labelText: '',
 				labelWidth: 0,
 				labelGap: 0,
-				anchor: [-70, 10],
+				anchor: [-70, -10],
 				value: 0
 			}),
-			name: null,
 			min: 0,
 			max: 1,
 			value: 0.6,
@@ -141,29 +129,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.maxValueInputBox.blur = this.endMaxValueEditing.bind(this)
 		this.maxValueInputBox.onReturn = this.endMaxValueEditing.bind(this)
 
-		this.controls.add(this.nameInputBox)
 		this.controls.add(this.minValueInputBox)
 		this.controls.add(this.maxValueInputBox)
-
-		//this.add(this.nameLabel)
-		//this.add(this.nameInputBox)
-
-		this.nameLabel.update({
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
-			fontSize: 14,
-			screenEventHandler: ScreenEventHandler.Below
-		})
-
-		// this.nameInputBox.update({
-		// 	width: 20,
-		// 	anchor: [(this.width - 20) / 2, this.height + 20]
-		// })
-		this.nameInputBox.onReturn = function() {
-			this.update({
-				name: this.nameInputBox.value
-			})
-		}.bind(this)
 
 		this.updateDependents()
 		this.outputList.update()
@@ -215,9 +182,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	update(args: object = {}, redraw: boolean = true) {
 		if (args['name'] !== undefined) {
 			this.renameLinkableProperty('output', this.name ?? 'value', args['name'])
-			this.nameLabel.update({
-				text: args['name']
-			})
 		}
 
 		super.update(args, false)
