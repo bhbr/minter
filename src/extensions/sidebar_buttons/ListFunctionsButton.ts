@@ -6,7 +6,7 @@ export class ListFunctionsButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['sum', 'mean'],
+			creations: ['list', 'sum', 'mean'],
 			iconSize: 25
 		}
 	}
