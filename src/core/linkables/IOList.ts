@@ -10,6 +10,7 @@ import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTI
 import { log } from 'core/functions/logging'
 import { clear, remove } from 'core/functions/arrays'
 import { IOProperty } from './Linkable'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class IOList extends RoundedRectangle {
 /*

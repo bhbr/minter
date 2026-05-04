@@ -919,6 +919,12 @@ The content children can also be dragged and panned.
 		var p = this.sensor.localEventVertex(e)
 		let clickedHook = this.hookAtLocation(p)
 		if (clickedHook == null) {
+			let l = this.sensor.eventTargetMobjectChain(e)
+			for (let mob of l) {
+				if (mob instanceof IOList) {
+					return
+				}
+			}
 			this.startCreating(e)
 			return
 		}
