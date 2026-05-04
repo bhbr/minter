@@ -22,7 +22,8 @@ export class RadioButton extends Circle {
 				fillOpacity: 1
 			}),
 			label: new TextLabel({
-				text: 'bla'
+				text: 'bla',
+				horizontalAlign: 'left'
 			}),
 			screenEventHandler: ScreenEventHandler.Self
 		}
@@ -35,7 +36,7 @@ export class RadioButton extends Circle {
 		})
 		this.label.update({
 			frameHeight: 2 * this.radius,
-			anchor: [this.radius, 0]
+			anchor: [3 * this.radius, 0]
 		})
 		this.add(this.label)
 	}
