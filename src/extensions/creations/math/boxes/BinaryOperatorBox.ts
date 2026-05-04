@@ -103,7 +103,8 @@ export class BinaryOperatorBox extends Linkable {
 			return
 		}
 		this.update({
-			frameHeight: this.valueBox.frameHeight
+			frameHeight: this.valueBox.frameHeight,
+			valueType: newType
 		})
 		this.outputList.positionSelf()
 		this.add(this.valueBox)
