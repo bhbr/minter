@@ -45,7 +45,8 @@ export class NumberValuedFunctionBox extends NumberBox {
 			frameHeight: this.functionSign.height
 		})
 		this.functionSign.add(this.functionLabel)
-		this.add(this.functionSign)
+		this.insertBehind(this.functionSign, this.inputList)
+		this.inputElement.disabled = true
 	}
 
 	result(): number {

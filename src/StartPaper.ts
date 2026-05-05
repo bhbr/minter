@@ -8,6 +8,7 @@ import { MathExpressionField } from './extensions/creations/MathExpressionField/
 import { isTouchDevice, separateSidebar } from './core/mobjects/screen_events'
 import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
+import { NumberListBox } from './extensions/creations/math/boxes/NumberListBox'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -15,4 +16,8 @@ export class StartPaper extends CoinFlipPaper { }
 
 export const paper = new StartPaper()
 
-
+let box = new NumberListBox({
+	value: [0, 1, 0],
+	anchor: [100, 100]
+})
+paper.addToContent(box)

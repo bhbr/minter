@@ -698,7 +698,6 @@ The content children can also be dragged and panned.
 
 	onTap(e: ScreenEvent) {
 		if (this.creationMode == 'erase') {
-			log('end erasing')
 			this.messageSidebar({ 'buttonUp': 'erase' })
 			this.setEraser(false)
 			this.update({ creationMode: 'draw' })
