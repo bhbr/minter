@@ -48,6 +48,7 @@ export class SpanningCreator extends Creator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.update({
+			anchor: this.topLeftVertex(),
 			frameWidth: this.getWidth(),
 			frameHeight: this.getHeight()
 		})
