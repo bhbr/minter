@@ -1,6 +1,7 @@
 
 import { Board } from 'core/boards/Board'
 import { Mobject } from 'core/mobjects/Mobject'
+import { MGroup } from 'core/mobjects/MGroup'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { IOList } from './IOList'
 import { InputList } from './InputList'
@@ -8,8 +9,8 @@ import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
 import { DependencyLink } from './DependencyLink'
 import { log } from 'core/functions/logging'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
-import { Checkbox } from 'core/mobjects/Checkbox'
+import { SimpleButton } from 'core/ui/SimpleButton'
+import { Checkbox } from 'core/ui/Checkbox'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { remove } from 'core/functions/arrays'
 
@@ -30,7 +31,7 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList
 	linksEditable: boolean
-	controls: Array<Mobject>
+	controls: MGroup
 
 	defaults(): object {
 		return {
@@ -40,7 +41,7 @@ which can be linked to such-exposed variables of other mobjects.
 			outputProperties: [],
 			linksEditable: false,
 			screenEventHandler: ScreenEventHandler.Self,
-			controls: []
+			controls: new MGroup()
 		}
 	}
 
@@ -69,6 +70,11 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setup() {
 		super.setup()
+		this.controls.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.add(this.controls)
 		this.inputList.update({
 			mobject: this,
 			outletProperties: this.inputProperties,
@@ -143,10 +149,10 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	setControlsVisibility(visible: boolean) {
-		for (let mob of this.controls) {
-			mob.view.setVisibility(visible)
-
-		}
+		this.controls.view.setVisibility(visible)
+	// 	for (let mob of this.controls.children) {
+	// 		mob.view.setVisibility(visible)
+	// 	}
 	}
 
 	setLinksVisibility(visible: boolean) {

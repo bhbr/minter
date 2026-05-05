@@ -2,8 +2,8 @@
 import { Paper } from 'core/Paper'
 import { InclinedScene } from 'extensions/creations/inclined_plane/InclinedScene'
 import { Vertex } from 'core/classes/vertex/Vertex'
-import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
-import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
+import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
+import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
 import { ValueBoxCreator } from 'extensions/creations/math/ValueBox/ValueBoxCreator'
 import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
 import { Rectangle } from 'core/shapes/Rectangle'
@@ -11,7 +11,7 @@ import { Transform } from 'core/classes/vertex/Transform'
 import { DEGREES } from 'core/constants'
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
-import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
+import { Slider } from 'extensions/creations/math/Slider/Slider'
 
 export class PhysicsPaper extends Paper {
 
@@ -23,8 +23,8 @@ export class PhysicsPaper extends Paper {
 				anchor: new Vertex(100, 100)
 			}),
 			creationConstructors: {
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
+				'slider': SliderCreator,
+				'stepper': StepperCreator,
 				'value': ValueBoxCreator,
 				'input': InputValueBoxCreator
 			},

@@ -1,8 +1,8 @@
 
-import { SimpleTextInputBox } from 'extensions/creations/math/boxes/SimpleTextInputBox'
+import { TextInputBox } from 'extensions/ui/InputBox/TextInputBox'
 import { getPaper } from 'core/functions/getters'
 
-export class VariableNameBox extends SimpleTextInputBox {
+export class VariableNameBox extends TextInputBox {
 
 	keyPressed(e: KeyboardEvent) {
 		super.keyPressed(e)

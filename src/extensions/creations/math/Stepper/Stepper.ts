@@ -1,11 +1,11 @@
 
-import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
+import { Slider } from 'extensions/creations/math/Slider/Slider'
 import { ScreenEvent, eventVertex } from 'core/mobjects/screen_events'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Line } from 'core/shapes/Line'
 import { log } from 'core/functions/logging'
 
-export class BoxStepper extends BoxSlider {
+export class Stepper extends Slider {
 
 	ticks: MGroup
 

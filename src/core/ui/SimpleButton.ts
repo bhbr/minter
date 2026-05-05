@@ -1,6 +1,6 @@
 
 import { Mobject } from 'core/mobjects/Mobject'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
@@ -13,13 +13,13 @@ export class SimpleButton extends RoundedRectangle {
 		return {
 			width: 50,
 			height: 25,
-			cornerRadius: 15,
+			cornerRadius: 20,
 			label: new TextLabel({
 				textColor: Color.white()
 			}),
 			fillColor: Color.gray(0.3),
 			strokeColor: Color.gray(0.4),
-			strokeWidth: 0.75,
+			strokeWidth: 1.0,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}

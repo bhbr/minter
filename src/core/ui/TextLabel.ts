@@ -1,5 +1,5 @@
 
-import { Mobject } from './Mobject'
+import { Mobject } from 'core/mobjects/Mobject'
 import { TextLabelView } from './TextLabelView'
 import { Color } from 'core/classes/Color'
 

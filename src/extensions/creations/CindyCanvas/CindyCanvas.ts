@@ -3,8 +3,8 @@ import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { vertex } from 'core/functions/vertex'
 import { Mobject } from 'core/mobjects/Mobject'
 import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { getPaper } from 'core/functions/getters'
 
@@ -92,7 +92,7 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 
 		this.add(this.playButton)
-		this.controls.push(this.playButton)
+		this.controls.add(this.playButton)
 		this.playButton.update({
 			mobject: this
 		})

@@ -1,13 +1,13 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { Scroll } from 'core/mobjects/Scroll'
+import { Scroll } from 'core/ui/Scroll'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Color } from 'core/classes/Color'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 import { vertex } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class NumberListBox extends Linkable {
@@ -68,9 +68,10 @@ export class NumberListBox extends Linkable {
 		this.clearButton.action = this.clear.bind(this)
 		this.clearButton.remove(this.clearButton.label)
 		// remove and add the label to fight lazy rendering bug
-		this.add(this.clearButton)
 		this.clearButton.add(this.clearButton.label)
-		this.controls.push(this.clearButton)
+		this.controls.add(this.clearButton)
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -81,6 +82,7 @@ export class NumberListBox extends Linkable {
 			list: this.list
 		}, redraw)
 		this.scroll.view.div.style['overflow-y'] = 'auto'
+		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 	}
 
 	startDragging(e: ScreenEvent) {
@@ -113,12 +115,17 @@ export class NumberListBox extends Linkable {
 	}
 
 	get newestEntry(): number {
-		return undefined
+		if (this.length() == 0) { return null }
+		return this.list[this.list.length - 1]
 	}
-	set newestEntry(newValue: number) {
-		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
-		if (isFalsy) { return }
-		this.list.push(newValue)
+	set newestEntry(newValue: number | Array<number>) {
+		if (typeof newValue === 'number') {
+			let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
+			if (isFalsy) { return }
+			this.list.push(newValue)
+		} else {
+			this.list.push(...newValue)
+		}
 		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 	}
 

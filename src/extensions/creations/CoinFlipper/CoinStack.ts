@@ -3,11 +3,11 @@ import { Linkable } from 'core/linkables/Linkable'
 import { Color } from 'core/classes/Color'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
@@ -24,7 +24,7 @@ export class CoinStack extends Linkable implements Playable {
 	tailsBar: Rectangle
 	headsLabel: TextLabel
 	tailsLabel: TextLabel
-	nbCoinsInputBox: SimpleNumberInputBox
+	nbCoinsInputBox: NumberInputBox
 	labelHeight: number
 	labelSpacing: number
 	maxBarHeight: number
@@ -58,7 +58,7 @@ export class CoinStack extends Linkable implements Playable {
 			playButton: new PlayButton({
 				anchor: [0, 50]
 			}),
-			nbCoinsInputBox: new SimpleNumberInputBox({
+			nbCoinsInputBox: new NumberInputBox({
 				labelText: '# coins:',
 				value: 100
 			}),
@@ -164,7 +164,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.playButton.update({
 			mobject: this
 		})
-		this.controls.push(this.playButton)
+		this.controls.add(this.playButton)
 	}
 
 	positionButton() {
@@ -183,7 +183,7 @@ export class CoinStack extends Linkable implements Playable {
 			anchor: [this.frameWidth / 2 - this.nbCoinsInputBox.frameWidth / 2 - 40, 0]
 		})
 		this.add(this.nbCoinsInputBox)
-		this.controls.push(this.nbCoinsInputBox)
+		this.controls.add(this.nbCoinsInputBox)
 	}
 
 	endNbCoinsEditing() {
@@ -217,11 +217,18 @@ export class CoinStack extends Linkable implements Playable {
 		this.flip()
 	}
 
-	flip() {
-		this.update({
-			nbTails: randomBinomial(this.nbCoins, this.tailsProbability)
-		})
-		this.updateDependents()
+	onLongPress(e: ScreenEvent) {
+		this.flip(100)
+	}
+
+	flip(nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			this.update({
+				nbTails: randomBinomial(this.nbCoins, this.tailsProbability)
+			}, false)
+			this.updateDependents()
+		}
+		this.update()
 	}
 
 	play() {

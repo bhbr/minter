@@ -2,7 +2,7 @@
 import { Circle } from 'core/shapes/Circle'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
 export type CoinState = 'heads' | 'tails'
@@ -57,10 +57,12 @@ export class Coin extends Circle {
 		return args
 	}
 
-	flip(animate: boolean = false) {
-		let x = Math.random()
-		let newState: CoinState = (x < this.tailsProbability) ? 'tails' : 'heads'
-		this.flipToState(newState, animate)
+	flip(animate: boolean = false, nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			let x = Math.random()
+			let newState: CoinState = (x < this.tailsProbability) ? 'tails' : 'heads'
+			this.flipToState(newState, i == nbFlips - 1 ? animate : false)
+		}
 	}
 
 	flipToState(newState: CoinState, animate: boolean = false) {

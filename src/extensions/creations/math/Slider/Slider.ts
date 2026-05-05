@@ -4,15 +4,15 @@ import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { SimpleNumberInputBox } from 'extensions/creations/math/boxes/SimpleNumberInputBox'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { VariableNameBox } from './VariableNameBox'
 
-export class BoxSlider extends Linkable {
+export class Slider extends Linkable {
 /*
-A BoxSlider represents a continuous variable. Its value varies
+A Slider represents a continuous variable. Its value varies
 between a min (0 for now) and max (1 for now) value via scrubbing.
 */
 
@@ -24,7 +24,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	outerBar: Rectangle
 	filledBar: Rectangle
 	valueLabel: TextLabel
-	nameLabel: TextLabel
 
 	// style
 	fillColor: Color
@@ -42,11 +41,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	scrubStartingPoint: vertex
 
 	// limits
-	minValueInputBox: SimpleNumberInputBox
-	maxValueInputBox: SimpleNumberInputBox
-
-	// name
-	nameInputBox: VariableNameBox
+	minValueInputBox: NumberInputBox
+	maxValueInputBox: NumberInputBox
 
 	defaults(): object {
 		return {
@@ -59,14 +55,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				anchor: [10, -30],
 
 			}),
-			nameLabel: new TextLabel({
-				backgroundColor: Color.clear(),
-				frameWidth: 50,
-				frameHeight: 20,
-				text: '',
-				anchor: [10, -30]
-			}),
-			maxValueInputBox: new SimpleNumberInputBox({
+			maxValueInputBox: new NumberInputBox({
 				labelText: '',
 				labelWidth: 0,
 				labelGap: 0,
@@ -88,14 +77,13 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 				verticalAlign: 'center',
 				fontSize: 20
 			}),
-			minValueInputBox: new SimpleNumberInputBox({
+			minValueInputBox: new NumberInputBox({
 				labelText: '',
 				labelWidth: 0,
 				labelGap: 0,
-				anchor: [-70, 10],
+				anchor: [-70, -10],
 				value: 0
 			}),
-			name: null,
 			min: 0,
 			max: 1,
 			value: 0.6,
@@ -141,29 +129,8 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.maxValueInputBox.blur = this.endMaxValueEditing.bind(this)
 		this.maxValueInputBox.onReturn = this.endMaxValueEditing.bind(this)
 
-		this.controls.push(this.nameInputBox)
-		this.controls.push(this.minValueInputBox)
-		this.controls.push(this.maxValueInputBox)
-
-		//this.add(this.nameLabel)
-		//this.add(this.nameInputBox)
-
-		this.nameLabel.update({
-			horizontalAlign: 'center',
-			verticalAlign: 'center',
-			fontSize: 14,
-			screenEventHandler: ScreenEventHandler.Below
-		})
-
-		// this.nameInputBox.update({
-		// 	width: 20,
-		// 	anchor: [(this.width - 20) / 2, this.height + 20]
-		// })
-		this.nameInputBox.onReturn = function() {
-			this.update({
-				name: this.nameInputBox.value
-			})
-		}.bind(this)
+		this.controls.add(this.minValueInputBox)
+		this.controls.add(this.maxValueInputBox)
 
 		this.updateDependents()
 		this.outputList.update()
@@ -215,9 +182,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 	update(args: object = {}, redraw: boolean = true) {
 		if (args['name'] !== undefined) {
 			this.renameLinkableProperty('output', this.name ?? 'value', args['name'])
-			this.nameLabel.update({
-				text: args['name']
-			})
 		}
 
 		super.update(args, false)

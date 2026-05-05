@@ -2,6 +2,7 @@
 import { NumberValuedFunctionBox } from './NumberValuedFunctionBox'
 import { numberArraySum } from 'core/functions/numberArray'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { log } from 'core/functions/logging'
 
 export class AverageBox extends NumberValuedFunctionBox {
 	
@@ -18,7 +19,11 @@ export class AverageBox extends NumberValuedFunctionBox {
 	}
 
 	result(): number {
-		return numberArraySum(this.argument) / this.argument.length
+		if (this.argument.length > 0) {
+			return numberArraySum(this.argument) / this.argument.length
+		} else {
+			return 0
+		}
 	}
 
 }

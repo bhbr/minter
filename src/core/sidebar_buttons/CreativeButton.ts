@@ -47,5 +47,13 @@ export class CreativeButton extends SidebarButton {
 		// do nothing because the board handles it
 	}
 
+	getID(): string {
+		if (this.creations.length > 0) {
+			return this.creations[0]
+		} else {
+			return super.getID()
+		}
+	}
+
 
 }

@@ -115,13 +115,13 @@ export class View extends ExtendedObject {
 		this.div.appendChild(subview.div)
 	}
 
-	// insertBefore(subview: View, beforeSubview: View) {
-	// 	if (this.div.contains(subview.div)) {
-	// 		subview.div.remove()
-	// 	}
-	// 	subview.setup()
-	// 	this.div.insertBefore(subview.div, beforeSubview.div)
-	// }
+	insertBehind(subview: View, beforeSubview: View) {
+		if (this.div.contains(subview.div)) {
+			subview.div.remove()
+		}
+		subview.setup()
+		this.div.insertBefore(subview.div, beforeSubview.div)
+	}
 
 	redraw() {
 		this.div.style.transform = this.transform.withoutAnchor().toCSSString()

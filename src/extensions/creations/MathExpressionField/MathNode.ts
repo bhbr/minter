@@ -1,3 +1,4 @@
+
 import { getPaper } from 'core/functions/getters'
 
 export class MathNode {

@@ -2,15 +2,15 @@
 import { Paper } from 'core/Paper'
 import { WavyCreator } from 'extensions/creations/Wavy/WavyCreator'
 import { DesmosCalculatorCreator } from 'extensions/creations/DesmosCalculator/DesmosCalculatorCreator'
-import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
-import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
+import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
+import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
 import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
 import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
 import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
-import { BoxStepper } from 'extensions/creations/math/BoxStepper/BoxStepper'
+import { Stepper } from 'extensions/creations/math/Stepper/Stepper'
 import { Swing } from 'extensions/creations/Swing/Swing'
 import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
 import { ConRayConstructor } from 'extensions/boards/construction/straits/ConRay/ConRayConstructor'
@@ -25,7 +25,7 @@ import { Circle } from 'core/shapes/Circle'
 import { Board } from 'core/boards/Board'
 import { Construction } from 'extensions/boards/construction/Construction'
 import { Wavy } from 'extensions/creations/Wavy/Wavy'
-import { BoxSlider } from 'extensions/creations/math/BoxSlider/BoxSlider'
+import { Slider } from 'extensions/creations/math/Slider/Slider'
 import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
@@ -37,8 +37,8 @@ export class DemoPaper extends Paper {
 			creationConstructors: {
 				'wavy': WavyCreator,
 				'desmos': DesmosCalculatorCreator,
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
+				'slider': SliderCreator,
+				'stepper': StepperCreator,
 				'number': NumberBoxCreator,
 				'add': AddBoxCreator,
 				'subtract': SubtractBoxCreator,

@@ -2,7 +2,7 @@
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
-import { Linkable } from 'core/linkables/Linkable'
+import { Mobject } from 'core/mobjects/Mobject'
 import { log } from 'core/functions/logging'
 import { vertex } from 'core/functions/vertex'
 import { getPaper, getSidebar } from 'core/functions/getters'
@@ -10,28 +10,37 @@ import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/sc
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { prettyPrint } from 'core/functions/various'
 
-export class NumberBox extends Linkable {
 
+export class InputBox extends Mobject {
+
+	label: TextLabel
 	inputElement: HTMLInputElement
+	inputWidth: number
 	background: Rectangle
+	labelGap: number
 
 	defaults(): object {
 		return {
-			inputProperties: [
-				{ name: 'value', type: 'number' }
-			],
-			outputProperties: [
-				{ name: 'value', type: 'number' }
-			],
+			label: new TextLabel({
+				text: 'label',
+				verticalAlign: 'middle',
+				frameWidth: 60,
+				frameHeight: 30,
+			}),
 			background: new Rectangle({
-				fillColor: Color.black()
+				width: 60,
+				height: 30,
+				anchor: [60, 0],
+				fillColor: Color.black(),
+				strokeWidth: 0
 			}),
 			inputElement: document.createElement('input'),
-			frameWidth: 80,
-			frameHeight: 40,
+			inputWidth: 60,
+			frameWidth: 120,
+			frameHeight: 30,
 			strokeWidth: 0.0,
+			labelGap: 10.0,
 			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
@@ -47,12 +56,24 @@ export class NumberBox extends Linkable {
 		this.focus()
 	}
 
-	get value(): number {
-		return Number(this.inputElement.value)
+	get labelWidth(): number {
+		return this.label.frameWidth
 	}
-	set value(newValue: number) {
-		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue) && (newValue !== 0)
-		this.inputElement.value = isFalsy ? '' : prettyPrint(newValue)
+
+	set labelWidth(newValue: number) {
+		this.label.update({
+			frameWidth: newValue
+		})
+	}
+
+	get labelText(): string {
+		return this.label.text
+	}
+
+	set labelText(newValue: string) {
+		this.label.update({
+			text: newValue
+		})
 	}
 
 	focus() {
@@ -70,19 +91,30 @@ export class NumberBox extends Linkable {
 	setup() {
 		super.setup()
 		this.add(this.background)
+		this.add(this.label)
 		this.inputElement.setAttribute('type', 'text')
-		this.inputElement.style.width = '100%'
-		this.inputElement.style.height = '100%'
+		this.inputElement.style.left = `${this.labelWidth + this.labelGap}px`
+		this.inputElement.style.width = `${this.inputWidth}px`
+		this.inputElement.style.position = 'absolute'
+		this.inputElement.style.height = '70%'
 		this.inputElement.style.padding = '0px 0px'
 		this.inputElement.style.color = 'white'
-		this.inputElement.style.backgroundColor = 'black'
+		this.inputElement.style.backgroundColor = 'rgba(50, 50, 50, 1)'
 		this.inputElement.style.textAlign = 'center'
 		this.inputElement.style.verticalAlign = 'center'
-		this.inputElement.style.fontSize = '20px'
+		this.inputElement.style.fontSize = '16px'
 		this.inputElement.style.border = 'none'
 		this.inputElement.style.outline = 'none'
-		this.inputElement.value = prettyPrint(this.value)
+		this.inputElement.value = this.inputElement.value.toString()
 		this.view.div.appendChild(this.inputElement)
+		this.background.update({
+			width: this.inputWidth,
+			height: this.frameHeight,
+			anchor: [this.labelWidth + this.labelGap, 0]
+		})
+		this.label.update({
+			frameHeight: this.frameHeight
+		})
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		document.addEventListener('keyup', this.boundActivateKeyboard)
 	}
@@ -129,55 +161,30 @@ export class NumberBox extends Linkable {
 	onReturn() { }
 
 	update(args: object = {}, redraw: boolean = true) {
+		let newLabelWidth = args['labelWidth']
+		let newInputWidth = args['inputWidth']
+		if (newLabelWidth !== undefined) {
+			this.inputElement.style.left = `${newLabelWidth + this.labelGap}px`;
+		}
+		if (newLabelWidth !== undefined) {
+			this.inputElement.style.width = `${newInputWidth}px`;
+		}
+		if (newLabelWidth !== undefined || newInputWidth !== undefined) {
+			args['frameWidth'] = (newLabelWidth ?? this.labelWidth) + (newInputWidth ?? this.inputWidth)
+		}
+		if (newInputWidth !== undefined) {
+			this.inputElement.style.width = `${newInputWidth}px`
+		}
 		super.update(args, redraw)
 		if (args['value'] !== undefined) {
-			this.inputElement.textContent = prettyPrint(args['value'])
+			this.inputElement.textContent = `${args['value']}`
 		}
 		this.background.update({
-			width: this.view.frame.width,
-			height: this.view.frame.height
+			anchor: [this.labelWidth + this.labelGap, 0],
+			inputWidth: newInputWidth ?? this.inputWidth
 		}, redraw)
 
 	}
 
-	addedInputLink(link: DependencyLink) {
-		this.inputElement.disabled = true
-	}
-
-	removedInputLink(link: DependencyLink) {
-		this.inputElement.disabled = false
-	}
-
-	clear() {
-		this.value = NaN
-		this.inputElement.value = ''
-	}
-
 }
-
-export class NumberBoxCreator extends DraggingCreator {
-	
-	declare creation: NumberBox
-
-	defaults(): object {
-		return {
-			helpText: 'A number. Its value be edited or linked as an input variable.',
-			pointOffset: [-40, -40]
-		}
-	}
-
-	createMobject() {
-		return new NumberBox({
-			anchor: this.getStartPoint(),
-			value: null
-		})
-	}
-
-	updateFromTip(q: vertex, redraw: boolean = true) {
-		super.updateFromTip(q, redraw)
-	}
-}
-
-
-
 

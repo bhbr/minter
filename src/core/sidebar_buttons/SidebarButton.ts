@@ -5,7 +5,7 @@ import { vertex, vertexTranslatedBy, vertexSubtract, vertexMultiply } from 'core
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { buttonCenter, BUTTON_RADIUS, BUTTON_SCALE_FACTOR, OPTION_SPACING } from './button_geometry'
 import { MAX_TAP_DELAY } from 'core/constants'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Paper } from 'core/Paper'
 import { eventVertex, ScreenEvent, separateSidebar } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
@@ -424,6 +424,10 @@ export class SidebarButton extends Pill {
 		if (key == this.shortcutKey) {
 			this.commonButtonUp()
 		}
+	}
+
+	getID(): string {
+		return 'button'
 	}
 
 }

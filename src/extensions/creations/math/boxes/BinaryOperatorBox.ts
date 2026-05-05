@@ -1,11 +1,14 @@
 
-import { NumberBox } from 'extensions/creations/math/boxes/NumberBox'
-import { NumberListBox } from 'extensions/creations/math/boxes/NumberListBox'
+import { NumberBox } from './NumberBox'
+import { NumberListBox } from './NumberListBox'
 import { Linkable } from 'core/linkables/Linkable'
 import { Circle } from 'core/shapes/Circle'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 type operatorString = '+' | '–' | '&times;' | '/' | '<' | '≤' | '>' | '≥' | '=' | '≠' 
 
@@ -19,6 +22,7 @@ export class BinaryOperatorBox extends Linkable {
 	operatorLabel: TextLabel
 	valueType: 'number' | 'Array<number>'
 	valueBox: NumberBox | NumberListBox
+	operand2InputBox: NumberInputBox
 
 	defaults(): object {
 		return {
@@ -40,7 +44,16 @@ export class BinaryOperatorBox extends Linkable {
 			],
 			outputProperties: [
 				{ name: 'result', displayName: null, type: 'number|Array<number>' }
-			]
+			],
+			operand2InputBox: new NumberInputBox({
+				label: new TextLabel({
+					text: '',
+					frameWidth: 0
+				}),
+				inputWidth: 55,
+				labelGap: 0,
+				anchor: [25,  -30]
+			})
 		}
 	}
 
@@ -62,7 +75,7 @@ export class BinaryOperatorBox extends Linkable {
 		})
 		this.outputList.positionSelf()
 		this.operatorSign.update({
-			midpoint: [this.view.frame.width / 2, 0]
+			midpoint: [10, -20]
 		})
 		this.operatorLabel.update({
 			text: this.operatorLabelText(),
@@ -71,13 +84,23 @@ export class BinaryOperatorBox extends Linkable {
 		})
 		this.operatorLabel.view.div.style.fontSize = '14px'
 		this.operatorSign.add(this.operatorLabel)
-		this.add(this.operatorSign)
+		this.insertBehind(this.operand2InputBox, this.inputList)
+		this.insertBehind(this.operatorSign, this.inputList)
 		if (this.valueBox instanceof NumberBox) {
 			this.valueBox.inputElement.disabled = true
 			this.valueBox.inputElement.value = ''
+			this.valueBox.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else if (this.valueBox instanceof NumberListBox) {
 			this.valueBox.scroll.update({ list: [] })
 		}
+		this.moveToTop(this.inputList)
+		this.moveToTop(this.outputList)
+
+		this.operand2InputBox.onReturn = function() {
+			this.update({
+				operand2: this.operand2InputBox.value
+			})
+		}.bind(this)
 	}
 
 	operatorLabelText(): string {
@@ -90,6 +113,8 @@ export class BinaryOperatorBox extends Linkable {
 			this.valueBox = new NumberListBox({
 				value: this.result()
 			})
+			this.valueBox.controls.remove(this.valueBox.clearButton)
+			this.valueBox.sensor.screenEventHandler = ScreenEventHandler.Parent
 		} else if (this.valueType == 'Array<number>' && newType == 'number') {
 			this.remove(this.valueBox)
 			this.valueBox = new NumberBox({
@@ -100,7 +125,8 @@ export class BinaryOperatorBox extends Linkable {
 			return
 		}
 		this.update({
-			frameHeight: this.valueBox.frameHeight
+			frameHeight: this.valueBox.frameHeight,
+			valueType: newType
 		})
 		this.outputList.positionSelf()
 		this.add(this.valueBox)
@@ -165,6 +191,28 @@ export class BinaryOperatorBox extends Linkable {
 			r.push(this.computeNumberAndNumber(a[i], b[i], op))
 		}
 		return r
+	}
+
+	addedInputLink(link: DependencyLink) {
+		super.addedInputLink(link)
+		if (this.inputList.linkOutlets[1].linkHooks[0].linked) {
+			this.remove(this.operand2InputBox)
+			this.operatorSign.update({
+				midpoint: [this.frameWidth / 2, -20]
+			})
+		}
+	}
+
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		if (!this.inputList.linkOutlets[1].linkHooks[0].linked) {
+			this.operatorSign.update({
+				midpoint: [10, -20]
+			})
+			this.add(this.operand2InputBox)
+			this.moveToTop(this.inputList)
+			this.operand2InputBox.onReturn()
+		}
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

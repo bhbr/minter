@@ -1,7 +1,7 @@
 
-import { SimpleInputBox } from './SimpleInputBox'
+import { InputBox } from './InputBox'
 
-export class SimpleTextInputBox extends SimpleInputBox {
+export class TextInputBox extends InputBox {
 	
 	get value(): string {
 		return this.inputElement.value

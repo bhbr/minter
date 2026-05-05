@@ -1,5 +1,5 @@
 
-import { View } from './View'
+import { View } from 'core/mobjects/View'
 import { TextLabel, HorizontalAlignment, VerticalAlignment } from './TextLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'

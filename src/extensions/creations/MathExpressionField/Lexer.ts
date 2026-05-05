@@ -1,3 +1,4 @@
+
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Token, TokenType, lexemeToType } from './Token'
 import { LexError } from './LexError'

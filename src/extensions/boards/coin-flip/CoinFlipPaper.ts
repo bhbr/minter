@@ -5,14 +5,14 @@ import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
 import { CoinStackCreator } from 'extensions/creations/CoinFlipper/CoinStackCreator'
 import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
 import { NumberListBoxCreator } from 'extensions/creations/math/boxes/NumberListBox'
-import { BoxSliderCreator } from 'extensions/creations/math/BoxSlider/BoxSliderCreator'
-import { BoxStepperCreator } from 'extensions/creations/math/BoxStepper/BoxStepperCreator'
-import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
-import { LessThanBoxCreator, LessThanOrEqualBoxCreator,GreaterThanBoxCreator, GreaterThanOrEqualBoxCreator, EqualsBoxCreator, NotEqualsBoxCreator } from 'extensions/creations/math/box_functions/ComparisonBoxCreator'
-import { SumBoxCreator } from 'extensions/creations/math/box_functions/SumBox'
-import { AverageBoxCreator } from 'extensions/creations/math/box_functions/AverageBox'
-import { CumSumBoxCreator } from 'extensions/creations/math/box_functions/CumSumBox'
-import { CumAverageBoxCreator } from 'extensions/creations/math/box_functions/CumAverageBox'
+import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
+import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
+import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/boxes/BinaryOperatorBoxCreator'
+import { LessThanBoxCreator, LessThanOrEqualBoxCreator,GreaterThanBoxCreator, GreaterThanOrEqualBoxCreator, EqualsBoxCreator, NotEqualsBoxCreator } from 'extensions/creations/math/boxes/ComparisonBoxCreator'
+import { SumBoxCreator } from 'extensions/creations/math/boxes/SumBox'
+import { AverageBoxCreator } from 'extensions/creations/math/boxes/AverageBox'
+import { CumSumBoxCreator } from 'extensions/creations/math/boxes/CumSumBox'
+import { CumAverageBoxCreator } from 'extensions/creations/math/boxes/CumAverageBox'
 import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
@@ -26,8 +26,8 @@ export class CoinFlipPaper extends Paper {
 			creationConstructors: {
 				'number': NumberBoxCreator,
 				'list': NumberListBoxCreator,
-				'slider': BoxSliderCreator,
-				'stepper': BoxStepperCreator,
+				'slider': SliderCreator,
+				'stepper': StepperCreator,
 				'coin': PlayableCoinCreator,
 				'coin row': CoinRowCreator,
 				'coin stack': CoinStackCreator,

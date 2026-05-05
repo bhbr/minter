@@ -1,9 +1,9 @@
 
 import { Coin, CoinState } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 
@@ -59,13 +59,20 @@ export class PlayableCoin extends Linkable implements Playable {
 			tailsProbability: this.tailsProbability
 		})
 		this.add(this.coin)
-		this.add(this.playButton)
-		this.controls.push(this.playButton)
+		//this.add(this.playButton)
+		this.controls.add(this.playButton)
 		this.playButton.mobject = this
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip(true)
+		this.flip()
+		this.coin.update({
+			opacity: 1
+		})
+	}
+
+	onLongPress(e: ScreenEvent) {
+		this.flip(true, 100)
 		this.coin.update({
 			opacity: 1
 		})
@@ -100,10 +107,13 @@ export class PlayableCoin extends Linkable implements Playable {
 		}
 	}
 
-	flip(animate: boolean = false) {
-		this.coin.flip(animate)
-		this.update()
-		this.updateDependents()
+	flip(animate: boolean = false, nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			var an = (i == nbFlips - 1)
+			this.coin.flip(animate && an)
+			this.update({}, an)
+			this.updateDependents()
+		}
 	}
 
 	play() {

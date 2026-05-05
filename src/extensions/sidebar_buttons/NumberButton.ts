@@ -6,7 +6,7 @@ export class NumberButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['number', 'slider', 'stepper', 'list'],
+			creations: ['number', 'slider', 'stepper'],
 			iconSize: 25
 		}
 	}

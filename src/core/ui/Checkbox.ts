@@ -1,5 +1,5 @@
 
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from './TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Square } from 'core/shapes/Square'
 import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
@@ -29,7 +29,8 @@ export class Checkbox extends MGroup {
 			label: new TextLabel({
 				frameWidth: 100,
 				frameHeight: 20,
-				anchor: [30, 0]
+				anchor: [30, 0],
+				horizontalAlign: 'left'
 			})
 		}
 	}

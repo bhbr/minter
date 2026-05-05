@@ -5,11 +5,12 @@ import { Linkable } from './Linkable'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { LinkHook } from './LinkHook'
 import { LinkOutlet } from './LinkOutlet'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants'
 import { log } from 'core/functions/logging'
 import { clear, remove } from 'core/functions/arrays'
 import { IOProperty } from './Linkable'
+import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class IOList extends RoundedRectangle {
 /*

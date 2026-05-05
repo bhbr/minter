@@ -1,3 +1,4 @@
+
 import { View } from 'core/mobjects/View'
 import { VMobject } from './VMobject'
 import { Color } from 'core/classes/Color'
