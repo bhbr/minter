@@ -11,6 +11,7 @@ export class Histogram extends DesmosCalculator {
 	data: Array<number>
 	nbBins: number
 	binWidth: number
+	bins: Array<number>
 	min: number
 	max: number
 	leftColor: Color
@@ -28,6 +29,7 @@ export class Histogram extends DesmosCalculator {
 			max: 10,
 			binWidth: 1,
 			data: [],
+			bins: [],
 			leftColor: Color.blue(),
 			rightColor: Color.red(),
 			inputProperties: [
@@ -91,14 +93,14 @@ export class Histogram extends DesmosCalculator {
 			this.scale = 1
 		}
 		if (redraw) {
-			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]/${this.scale}` })
+			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
 			this.createBars()
 		}
 	}
 
 	createCalculator() {
 		super.createCalculator()
-		this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]/${this.scale}` })
+		this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
 		this.calculator.setMathBounds({
 			left: this.min - 0.1 * (this.max - this.min),
 			right: this.max + 0.1 * (this.max - this.min),
@@ -114,18 +116,17 @@ export class Histogram extends DesmosCalculator {
 		return this.data.length
 	}
 
-	bins() {
-		let bins = []
+	rebin() {
+		this.bins = []
 		for (var i = 0; i < this.nbBins; i++) {
-			bins.push(0)
+			this.bins.push(0)
 		}
 		for (var n of this.data) {
 			let i = Math.floor((n - this.min) / this.binWidth)
 			if (i >= 0 && i < this.nbBins) {
-				bins[i]++
+				this.bins[i]++
 			}
 		}
-		return bins
 	}
 
 	createBars() {
@@ -166,10 +167,11 @@ export class Histogram extends DesmosCalculator {
 		}
 		if (args['data'] !== undefined) {
 			this.setScaling(false)
-			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins()}]/${this.scale}` })
+			this.rebin()
+			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
 			this.createBars()
 			if (this.autoadjustScale) {
-				let yMax = Math.max(...this.bins())
+				let yMax = Math.max(...this.bins)
 				this.setYMax(yMax)
 			}
 		}
