@@ -65,6 +65,13 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
+		this.flip()
+		this.coin.update({
+			opacity: 1
+		})
+	}
+
+	onLongPress(e: ScreenEvent) {
 		this.flip(true, 100)
 		this.coin.update({
 			opacity: 1

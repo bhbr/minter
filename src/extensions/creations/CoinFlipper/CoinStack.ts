@@ -217,7 +217,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.flip()
 	}
 
-	onDoubleMouseClick(e: ScreenEvent) {
+	onLongPress(e: ScreenEvent) {
 		this.flip(100)
 	}
 
