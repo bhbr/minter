@@ -418,14 +418,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	}
 
-	batchUpdate(batchArgs: Record<string, Array<any>> | Array<object> = {}, redraw: boolean = true) {
-		if (batchArgs instanceof Array) {
-			for (let args of batchArgs) {
-				this.update(args, false)
-			}
-			this.update({}, true)
-			return
-		}
+	batchUpdate(batchArgs: Record<string, Array<any>>, redraw: boolean = true) {
 		var length: number = undefined
 		for (let value of Object.values(batchArgs)) {
 			if (length === undefined) {
@@ -441,9 +434,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			for (let key of Object.keys(batchArgs)) {
 				args[key] = batchArgs[key][i]
 			}
-			this.update(args, false)
+			this.update(args, redraw)
 		}
-		this.update({}, true)
 	}
 
 	getUpdateCalls(): UpdateCalls {

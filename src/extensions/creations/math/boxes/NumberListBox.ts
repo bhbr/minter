@@ -115,12 +115,17 @@ export class NumberListBox extends Linkable {
 	}
 
 	get newestEntry(): number {
-		return undefined
+		if (this.length() == 0) { return null }
+		return this.list[this.list.length - 1]
 	}
-	set newestEntry(newValue: number) {
-		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
-		if (isFalsy) { return }
-		this.list.push(newValue)
+	set newestEntry(newValue: number | Array<number>) {
+		if (typeof newValue === 'number') {
+			let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
+			if (isFalsy) { return }
+			this.list.push(newValue)
+		} else {
+			this.list.push(...newValue)
+		}
 		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 	}
 
