@@ -1,4 +1,5 @@
 
+import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes'
 
 
@@ -16,9 +17,15 @@ function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 }
 
 
-export class FormalLanguage {
+export class FormalLanguage extends ExtendedObject {
 
 	arities: Record<TerminalSymbol, number>
+
+	defaults(): object {
+		return {
+			arities: { }
+		}
+	}
 
 	terminalSymbols(): Array<TerminalSymbol> {
 		return Object.keys(this.arities)
@@ -142,13 +149,13 @@ export class FormalLanguage {
 			} else if (equalArrays(existingMatch, tree)) {
 				return record
 			} else {
-				throw `${tree} does not match ${form}, should equal ${existingMatch}`;
+				return null
 			}
 		}
 		let formTopSymbol = (form as ComposedSentenceTreeForm)[0]
 		let treeTopSymbol = tree[0]
 		if (formTopSymbol !== treeTopSymbol) {
-			throw `node symbols ${formTopSymbol} and ${treeTopSymbol} do not match`;
+			return null
 		}
 		let formArgs = (form as ComposedSentenceTreeForm)[1]
 		let treeArgs = tree[1]
@@ -179,6 +186,14 @@ export class FormalLanguage {
 		let ret: SentenceTreeForm = [(form as ComposedSentenceTreeForm)[0], (form as ComposedSentenceTreeForm)[1]]
 		return ret
 	}
+
+	isNumber(str: string): boolean {
+		return str !== '' && isFinite(Number(str))
+	}
+
+	isVariable(str: string): boolean {
+		return !this.isNumber(str) && str.length == 1
+	}
 }
 
 
@@ -186,7 +201,13 @@ export class FormalLanguage {
 
 export class FormalSystem extends FormalLanguage {
 
-	rules: Record<string, Rule> = {}
+	rules: Record<string, Rule>
+
+	defaults(): object {
+		return {
+			rules: { }
+		}
+	}
 
 	applyRuleToTree(ruleName: string, tree: SentenceTree): SentenceTree {
 		let rule = this.rules[ruleName]
