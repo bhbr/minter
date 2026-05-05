@@ -82,6 +82,7 @@ export class NumberListBox extends Linkable {
 			list: this.list
 		}, redraw)
 		this.scroll.view.div.style['overflow-y'] = 'auto'
+		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 	}
 
 	startDragging(e: ScreenEvent) {
