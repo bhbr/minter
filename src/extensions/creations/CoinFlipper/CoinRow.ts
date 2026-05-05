@@ -201,20 +201,42 @@ export class CoinRow extends Linkable implements Playable {
 		})
 	}
 
-	flipCoins() {
-		for (let coin of this.coins) {
-			coin.flip()
+	flipCoins(nbFlips: number = 1) {
+		if (nbFlips == 1) {
+			for (let coin of this.coins) {
+				coin.flip(false)
+			}
+			this.update()
+			this.updateDependents()
+		} else {
+			let nbHeadsArray: Array<number> = []
+			let nbTailsArray: Array<number> = []
+			let meanArray: Array<number> = []
+			for (let i = 0; i < nbFlips; i++) {
+				for (let coin of this.coins) {
+					coin.flip(false)
+				}
+				nbHeadsArray.push(this.nbHeads())
+				nbTailsArray.push(this.nbTails())
+				meanArray.push(this.mean())	
+			}
+
 		}
-		this.update()
-		this.updateDependents()
 	}
 
 	onTap(e: ScreenEvent) {
 		this.flipCoins()
 	}
 
+	onDoubleTap(e: ScreenEvent) {
+		this.flipCoins(100)
+	}
+
 	play() {
-		this.playIntervalID = window.setInterval(this.flipCoins.bind(this), 100)
+		this.playIntervalID = window.setInterval(
+			function() {
+				this.flipCoins(100)
+			}.bind(this), 100)
 		this.playState = 'play'
 	}
 	

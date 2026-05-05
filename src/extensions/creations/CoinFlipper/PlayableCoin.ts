@@ -65,7 +65,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip(true)
+		this.flip(true, 100)
 		this.coin.update({
 			opacity: 1
 		})
@@ -100,10 +100,13 @@ export class PlayableCoin extends Linkable implements Playable {
 		}
 	}
 
-	flip(animate: boolean = false) {
-		this.coin.flip(animate)
-		this.update()
-		this.updateDependents()
+	flip(animate: boolean = false, nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			var an = (i == nbFlips - 1)
+			this.coin.flip(animate && an)
+			this.update({}, an)
+			this.updateDependents()
+		}
 	}
 
 	play() {

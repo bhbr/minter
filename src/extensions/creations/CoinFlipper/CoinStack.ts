@@ -217,11 +217,18 @@ export class CoinStack extends Linkable implements Playable {
 		this.flip()
 	}
 
-	flip() {
-		this.update({
-			nbTails: randomBinomial(this.nbCoins, this.tailsProbability)
-		})
-		this.updateDependents()
+	onDoubleMouseClick(e: ScreenEvent) {
+		this.flip(100)
+	}
+
+	flip(nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			this.update({
+				nbTails: randomBinomial(this.nbCoins, this.tailsProbability)
+			}, false)
+			this.updateDependents()
+		}
+		this.update()
 	}
 
 	play() {

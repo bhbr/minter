@@ -418,6 +418,34 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	}
 
+	batchUpdate(batchArgs: Record<string, Array<any>> | Array<object> = {}, redraw: boolean = true) {
+		if (batchArgs instanceof Array) {
+			for (let args of batchArgs) {
+				this.update(args, false)
+			}
+			this.update({}, true)
+			return
+		}
+		var length: number = undefined
+		for (let value of Object.values(batchArgs)) {
+			if (length === undefined) {
+				length = value.length
+				continue
+			}
+			if (value.length != length) {
+				throw 'Argument arrays in batch update must have the same length'
+			}
+		}
+		for (let i = 0; i < length; i++) {
+			var args = {}
+			for (let key of Object.keys(batchArgs)) {
+				args[key] = batchArgs[key][i]
+			}
+			this.update(args, false)
+		}
+		this.update({}, true)
+	}
+
 	getUpdateCalls(): UpdateCalls {
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {
