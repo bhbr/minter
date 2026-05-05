@@ -115,8 +115,7 @@ export class NumberListBox extends Linkable {
 	}
 
 	get newestEntry(): number {
-		if (this.length() == 0) { return null }
-		return this.list[this.list.length - 1]
+		return undefined
 	}
 	set newestEntry(newValue: number | Array<number>) {
 		if (typeof newValue === 'number') {

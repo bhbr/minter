@@ -74,7 +74,6 @@ export class FormulaVisualizer extends Mobject {
 			this.renderSpans()
 			this.setupSubtermHighlighting()
 			let node = this.parser.parseTex(tex)
-			console.log(node)
 		}.bind(this), 1000)
 	}
 
