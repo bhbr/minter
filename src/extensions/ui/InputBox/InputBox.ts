@@ -172,6 +172,9 @@ export class InputBox extends Mobject {
 		if (newLabelWidth !== undefined || newInputWidth !== undefined) {
 			args['frameWidth'] = (newLabelWidth ?? this.labelWidth) + (newInputWidth ?? this.inputWidth)
 		}
+		if (newInputWidth !== undefined) {
+			this.inputElement.style.width = `${newInputWidth}px`
+		}
 		super.update(args, redraw)
 		if (args['value'] !== undefined) {
 			this.inputElement.textContent = `${args['value']}`

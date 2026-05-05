@@ -51,7 +51,7 @@ export class NumberBox extends Linkable {
 		return Number(this.inputElement.value)
 	}
 	set value(newValue: number) {
-		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
+		let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue) && (newValue !== 0)
 		this.inputElement.value = isFalsy ? '' : prettyPrint(newValue)
 	}
 
