@@ -171,7 +171,7 @@ export class Histogram extends DesmosCalculator {
 			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
 			this.createBars()
 			if (this.autoadjustScale) {
-				let yMax = Math.max(...this.bins)
+				let yMax = Math.max(...this.bins) / this.scale
 				this.setYMax(yMax)
 			}
 		}
