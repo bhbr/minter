@@ -7,6 +7,7 @@ import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Transform } from 'core/classes/Transform'
 import { log } from  'core/functions/logging'
 import { deepCopy } from 'core/functions/copying'
+import { Board } from 'core/boards/Board'
 
 export class Freehand extends Creator {
 
@@ -69,11 +70,12 @@ export class Freehand extends Creator {
 			this.line.vertices[i][1] -= tl[1]
 		}
 		this.line.view.redraw()
-		let par = this.parent
+		let par = this.parent as Board
 		par.creator = null
 		par.remove(this)
 		if (this.view.visible) {
 			par.addToContent(this)
+			par.content.moveToBack(this)
 		}
 	}
 

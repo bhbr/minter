@@ -251,9 +251,9 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		submob.view.redraw()
 	}
 
-	insertRelativeTo(submob: Mobject, child: Mobject, shift: number) {
-		if (submob.parent == this) {
-			this.remove(submob)
+	insertRelativeTo(newChild: Mobject, child: Mobject, shift: number) {
+		if (newChild.parent == this) {
+			this.remove(newChild)
 		}
 		let i = this.children.indexOf(child)
 		if (i == -1) {
@@ -261,27 +261,27 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			return
 		}
 		if (i + shift >= this.children.length) {
-			this.add(submob)
+			this.add(newChild)
 			return
 		}
 		let shiftedChild = this.children[i + shift]
-		this.children.splice(i + shift, 0, submob)
-		this.view.insertBehind(submob.view, shiftedChild.view)
+		this.children.splice(i + shift, 0, newChild)
+		this.view.insertBehind(newChild.view, shiftedChild.view)
 	}
 
-	insertBehind(submob: Mobject, child: Mobject) {
-		this.insertRelativeTo(submob, child, 0)
+	insertBehind(newChild: Mobject, child: Mobject) {
+		this.insertRelativeTo(newChild, child, 0)
 	}
 
-	insertBefore(submob: Mobject, child: Mobject) {
-		this.insertRelativeTo(submob, child, 1)
+	insertBefore(newChild: Mobject, child: Mobject) {
+		this.insertRelativeTo(newChild, child, 1)
 	}
 
-	remove(submob: Mobject) {
+	remove(child: Mobject) {
 	// Remove from the array of children (with an imported helper method)
-		remove(this.children, submob)
-		submob.parent = null
-		submob.view.div.remove()
+		remove(this.children, child)
+		child.parent = null
+		child.view.div.remove()
 	}
 
 	removeAllChildren() {
@@ -292,16 +292,22 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		}
 	}
 
-	moveToTop(submob: Mobject) {
+	moveToTop(newChild: Mobject) {
 	/*
 	Put this submob in front of every other sibling,
 	so that it will obstruct them and catch screen events
 	*/
-		if (submob.parent != this) { return }
-		this.remove(submob)
-		this.add(submob)
+		if (newChild.parent === this) {
+			this.remove(newChild)
+		}
+		this.add(newChild)
 	}
 
+	moveToBack(newChild: Mobject) {
+		if (newChild.parent !== this) { this.add(newChild) }
+		if (this.children.length < 2) { return }
+		this.insertBehind(newChild, this.children[0])
+	}
 
 
 	//////////////////////////////////////////////////////////
