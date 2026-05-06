@@ -64,13 +64,14 @@ export class NumberBox extends Linkable {
 	blur() {
 		super.blur()
 		this.inputElement.blur()
+		this.updateOnReturn()
 		document.removeEventListener('keydown', this.boundKeyPressed)
 	}
 
 	setup() {
 		super.setup()
 		this.add(this.background)
-		this.inputElement.setAttribute('type', 'text')
+		this.inputElement.setAttribute('type', 'numeric')
 		this.inputElement.style.width = '100%'
 		this.inputElement.style.height = '100%'
 		this.inputElement.style.padding = '0px 0px'
@@ -98,6 +99,10 @@ export class NumberBox extends Linkable {
 				button.activeKeyboard = true
 			}
 		}
+		this.updateOnReturn()
+	}
+
+	updateOnReturn() {
 		this.update({ value: this.valueFromString(this.inputElement.value) })
 		this.updateDependents()
 		this.onReturn()

@@ -85,7 +85,13 @@ export class InputBox extends Mobject {
 	blur() {
 		super.blur()
 		this.inputElement.blur()
-		document.removeEventListener('keydown', this.boundKeyPressed)
+		this.updateOnReturn()
+	}
+
+	updateOnReturn() {
+		this.update()
+		this.updateDependents()
+		this.onReturn()
 	}
 
 	setup() {
@@ -119,7 +125,6 @@ export class InputBox extends Mobject {
 		document.addEventListener('keyup', this.boundActivateKeyboard)
 	}
 
-	boundKeyPressed(e: ScreenEvent) { }
 
 	keyPressed(e: KeyboardEvent) {
 		if (e.which != 13) { return }
@@ -130,10 +135,9 @@ export class InputBox extends Mobject {
 				button.activeKeyboard = true
 			}
 		}
-		this.update({ value: this.valueFromString(this.inputElement.value) })
-		this.updateDependents()
-		this.onReturn()
+		this.updateOnReturn()
 	}
+	boundKeyPressed(e: ScreenEvent) { }
 
 	valueFromString(valueString: string): any {
 		return valueString
@@ -147,7 +151,6 @@ export class InputBox extends Mobject {
 			button.activeKeyboard = false
 		}
 	}
-
 	boundActivateKeyboard() { }
 
 	deactivateKeyboard() {
@@ -157,6 +160,7 @@ export class InputBox extends Mobject {
 			button.activeKeyboard = true
 		}
 	}
+	boundDeactivateKeyboard() { }
 
 	onReturn() { }
 
