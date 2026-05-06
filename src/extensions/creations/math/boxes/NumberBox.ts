@@ -71,7 +71,8 @@ export class NumberBox extends Linkable {
 	setup() {
 		super.setup()
 		this.add(this.background)
-		this.inputElement.setAttribute('type', 'numeric')
+		//this.inputElement.setAttribute('type', 'numeric')
+		// needs adjustment for iPad
 		this.inputElement.style.width = '100%'
 		this.inputElement.style.height = '100%'
 		this.inputElement.style.padding = '0px 0px'

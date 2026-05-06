@@ -13,7 +13,8 @@ export class NumberInputBox extends InputBox {
 
 	setup() {
 		super.setup()
-		this.inputElement.setAttribute('type', 'number')
+		//this.inputElement.setAttribute('type', 'number')
+		// needs adjustment for iPad
 	}
 
 }
