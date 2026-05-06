@@ -34,7 +34,7 @@ export class Histogram extends DesmosCalculator {
 			rightColor: Color.red(),
 			inputProperties: [
 				{ name: 'data', displayName: null, type: 'Array<number>' },
-				{ name: 'nbBins', displayName: '# bins', type: 'number' },
+				{ name: 'binWidth', displayName: 'bin width', type: 'number' },
 				{ name: 'min', displayName: 'minimum', type: 'number' },
 				{ name: 'max', displayName: 'maximum', type: 'number' },
 				//{ name: 'leftColor', displayName: 'left color', type: 'Color' },
@@ -162,10 +162,13 @@ export class Histogram extends DesmosCalculator {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		if (args['min'] !== undefined || args['max'] !== undefined || args['nbBins'] !== undefined) {
-			this.binWidth = (this.max - this.min) / this.nbBins
+		if (this.binWidth == 0) {
+			this.binWidth = 1
 		}
-		if (args['data'] !== undefined) {
+		if (args['min'] !== undefined || args['max'] !== undefined || args['binWidth'] !== undefined) {
+			this.nbBins = Math.floor((this.max - this.min) / this.binWidth)
+		}
+		if (args['data'] !== undefined || args['binWidth'] !== undefined) {
 			this.setScaling(false)
 			this.rebin()
 			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
@@ -187,6 +190,7 @@ export class Histogram extends DesmosCalculator {
 				bottom: yMin
 			})
 		}
+//		this.calculator.updateSetting({ lockViewport: false })
 	}
 
 }
