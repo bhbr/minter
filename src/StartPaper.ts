@@ -5,6 +5,7 @@ import { log } from './core/functions/logging'
 import { Color } from './core/classes/Color'
 import { AllTests } from './_tests/allTests'
 import { Partition } from './extensions/animation_sequences/PascalsBrickWall/Partition'
+import { PascalsBrickWall } from './extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
 import { TextLabel } from './core/ui/TextLabel'
 import { isTouchDevice } from './core/mobjects/screen_events'
 import { ImageView } from './core/mobjects/ImageView'
@@ -17,7 +18,7 @@ export class StartPaper extends CoinFlipPaper { }
 
 export const TESTING = true
 
-if (TESTING) { AllTests.run() }
+//if (TESTING) { AllTests.run() }
 
 export const paper = new StartPaper()
 
@@ -29,3 +30,7 @@ let p = new Partition({
 paper.addToContent(p)
 
 
+// let wall = new PascalsBrickWall({
+// 	anchor: [200, 600]
+// })
+// paper.addToContent(wall)

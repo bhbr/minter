@@ -15,7 +15,7 @@ import { SimpleButton } from 'core/ui/SimpleButton'
 
 const SHIFT = 0
 
-type PresentationForm = 'row' | 'histogram' | 'centered-histogram'
+type PresentationForm = 'row' | 'histogram' | 'centered histogram'
 
 export class Partition extends Linkable {
 
@@ -104,18 +104,26 @@ export class Partition extends Linkable {
 		//this.createBrickParts()
 		//this.hideBrickParts()
 		this.presentationFormsList = new RadioButtonList({
-			anchor: [0, 100],
-			options: {
-				'row': this.animateToRow.bind(this),
-				'histogram': this.animateToHistogram.bind(this),
-				'centered-histogram': this.animateToCenteredHistogram.bind(this),
-			},
-			selection: this.presentationForm
+			anchor: [0, 150],
+			options: [
+				'row',
+				'histogram',
+				'centered histogram'
+			],
+			orientation: 'horizontal',
+			optionSpacing: 150,
+			action: this.animateTo.bind(this)
 		})
-		this.add(this.presentationFormsList)
-		this.add(this.nextSubstepButton)
+		this.presentationFormsList.update({
+			selectedButton: this.presentationFormsList.radioButtons[0]
+		})
+		this.presentationFormsList.radioButtons[2].label.update({
+			frameWidth: 300
+		})
+		this.controls.add(this.presentationFormsList)
+		this.controls.add(this.nextSubstepButton)
 		this.nextSubstepButton.action = this.nextSubstep.bind(this)
-		this.add(this.nextStepButton)
+		this.controls.add(this.nextStepButton)
 		this.nextStepButton.action = this.nextStep.bind(this)
 	}
 
@@ -130,6 +138,17 @@ export class Partition extends Linkable {
 		}
 	}
 
+	animateTo() {
+		let i = this.presentationFormsList.radioButtons.indexOf(this.presentationFormsList.selectedButton)
+		if (i == 0) {
+			this.animateToRow()
+		} else if (i == 1) {
+			this.animateToHistogram()
+		} else if (i == 2) {
+			this.animateToCenteredHistogram()
+		}
+	}
+
 	animateToRow() {
 		this.presentationForm = 'row'
 		this.animateToForm('row')
@@ -141,8 +160,8 @@ export class Partition extends Linkable {
 	}
 
 	animateToCenteredHistogram() {
-		this.presentationForm = 'centered-histogram'
-		this.animateToForm('centered-histogram')
+		this.presentationForm = 'centered histogram'
+		this.animateToForm('centered histogram')
 	}
 
 	animateToForm(newForm: PresentationForm) {
@@ -184,7 +203,7 @@ export class Partition extends Linkable {
 			return this.brickAnchorsForRow()
 		case 'histogram':
 			return this.brickAnchorsForHistogram()
-		case 'centered-histogram':
+		case 'centered histogram':
 			return this.brickAnchorsForCenteredHistogram()
 		default:
 			return []
@@ -313,14 +332,11 @@ export class Partition extends Linkable {
 
 	mergeBricks(completionHandler: Function = () => {}) {
 		for (var i = 0; i <= this.nbFlips; i++) {
-			log(i)
 			let lp = this.leftPartBricks[i]
 			let rp = this.rightPartBricks[i]
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
 			rp.animate({ strokeWidth: 0 }, this.animationDuration)
-			log(lp.view.visible)
-			log(rp.view.visible)
 			let newWidth = (i == 0) ? lp.width : this.rightPartBricks[i - 1].width + lp.width
 			b.update({
 				fillOpacity: 0,
@@ -381,7 +397,7 @@ export class Partition extends Linkable {
 	}
 
 	recenterBricks(completionHandler: Function = () => {}) {
-		if (this.presentationForm == 'centered-histogram') {
+		if (this.presentationForm == 'centered histogram') {
 			for (var i = 0; i <= this.nbFlips; i++) {
 				let b = this.bricks[i]
 				let newAnchor = [i * this.brickWidth, 0.5 * b.width]
