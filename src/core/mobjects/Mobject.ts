@@ -1,5 +1,5 @@
 
-import { remove } from 'core/functions/arrays'
+import { remove, clear } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { copy } from 'core/functions/copying'
 import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events'
@@ -136,10 +136,16 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	set opacity(newValue: number) { this.view.opacity = newValue }
 	get backgroundColor(): Color { return this.view.backgroundColor }
 	set backgroundColor(newValue: Color) { this.view.backgroundColor = newValue }
+	get borderColor(): Color { return this.view.borderColor }
+	set borderColor(newValue: Color) { this.view.borderColor = newValue }
+	get borderWidth(): number { return this.view.borderWidth }
+	set borderWidth(newValue: number) { this.view.borderWidth = newValue }
 	get drawBorder(): boolean { return this.view.drawBorder }
 	set drawBorder(newValue: boolean) { this.view.drawBorder = newValue }
 	get drawShadow(): boolean { return this.view.drawShadow }
 	set drawShadow(newValue: boolean) { this.view.drawShadow = newValue }
+	get borderRadius(): number { return this.view.borderRadius }
+	set borderRadius(newValue: number) { this.view.borderRadius = newValue }
 
 	redraw() { this.view.redraw() }
 
@@ -215,6 +221,14 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return ret
 	}
 
+	descendsFrom(mob: Mobject): boolean {
+		return this.ancestors().includes(mob)
+	}
+
+	isDescendentFrom(mob: Mobject): boolean {
+		return mob.descendsFrom(this)
+	}
+
 	//////////// Aliases ////////////
 	get superMobject(): this { return this.parent as this }
 	set superMobject(newValue: this) { this.parent = newValue }
@@ -243,23 +257,63 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		submob.view.redraw()
 	}
 
-	remove(submob: Mobject) {
-	// Remove from the array of children (with an imported helper method)
-		remove(this.children, submob)
-		submob.parent = null
-		submob.view.div.remove()
+	insertRelativeTo(newChild: Mobject, child: Mobject, shift: number) {
+		if (newChild.parent == this) {
+			this.remove(newChild)
+		}
+		let i = this.children.indexOf(child)
+		if (i == -1) {
+			console.error(`${this.constructor.name} does not have ${child.constructor.name} as a child`)
+			return
+		}
+		if (i + shift >= this.children.length) {
+			this.add(newChild)
+			return
+		}
+		let shiftedChild = this.children[i + shift]
+		this.children.splice(i + shift, 0, newChild)
+		this.view.insertBehind(newChild.view, shiftedChild.view)
 	}
 
-	moveToTop(submob: Mobject) {
+	insertBehind(newChild: Mobject, child: Mobject) {
+		this.insertRelativeTo(newChild, child, 0)
+	}
+
+	insertBefore(newChild: Mobject, child: Mobject) {
+		this.insertRelativeTo(newChild, child, 1)
+	}
+
+	remove(child: Mobject) {
+	// Remove from the array of children (with an imported helper method)
+		remove(this.children, child)
+		child.parent = null
+		child.view.div.remove()
+	}
+
+	removeAllChildren() {
+		while (this.children.length > 0) {
+			let child = this.children.pop()
+			child.parent = null
+			child.view.div.remove()
+		}
+	}
+
+	moveToTop(newChild: Mobject) {
 	/*
 	Put this submob in front of every other sibling,
 	so that it will obstruct them and catch screen events
 	*/
-		if (submob.parent != this) { return }
-		this.remove(submob)
-		this.add(submob)
+		if (newChild.parent === this) {
+			this.remove(newChild)
+		}
+		this.add(newChild)
 	}
 
+	moveToBack(newChild: Mobject) {
+		if (newChild.parent !== this) { this.add(newChild) }
+		if (this.children.length < 2) { return }
+		this.insertBehind(newChild, this.children[0])
+	}
 
 
 	//////////////////////////////////////////////////////////
@@ -318,6 +372,10 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		remove(this.dependencies, dep)
 	}
 
+	removeAllDependents() {
+		clear(this.dependencies)
+	}
+
 	getDependency(outputName: string | null, target: Mobject, inputName: string | null): Dependency | null {
 		for (let dep of this.dependencies) {
 			if (dep.outputName == outputName && dep.target == target && dep.inputName == inputName) {
@@ -372,8 +430,25 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	}
 
-	
-
+	batchUpdate(batchArgs: Record<string, Array<any>>, redraw: boolean = true) {
+		var length: number = undefined
+		for (let value of Object.values(batchArgs)) {
+			if (length === undefined) {
+				length = value.length
+				continue
+			}
+			if (value.length != length) {
+				throw 'Argument arrays in batch update must have the same length'
+			}
+		}
+		for (let i = 0; i < length; i++) {
+			var args = {}
+			for (let key of Object.keys(batchArgs)) {
+				args[key] = batchArgs[key][i]
+			}
+			this.update(args, redraw)
+		}
+	}
 
 	getUpdateCalls(): UpdateCalls {
 		let ret = new UpdateCalls()

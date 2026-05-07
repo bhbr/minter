@@ -6,12 +6,8 @@ export class CoinButton extends CreativeButton {
 	
 	defaults(): object {
 		return {
-			creations: ['coin', 'coinrow'],
-			icon: new ImageView({
-				imageLocation: '../../assets/coin.png',
-				frameWidth: 40,
-				frameHeight: 40
-			})
+			creations: ['coin', 'coin row', 'coin stack'],
+			iconSize: 30
 		}
 	}
 

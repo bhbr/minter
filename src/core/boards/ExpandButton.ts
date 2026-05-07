@@ -1,6 +1,6 @@
 
 import { Board } from './Board'
-import { TextLabel } from 'core/mobjects/TextLabel'
+import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform'

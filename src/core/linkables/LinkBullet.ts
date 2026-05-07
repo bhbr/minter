@@ -15,7 +15,8 @@ a dependency between two linkable mobjects.
 		return {
 			radius: BULLET_RADIUS,
 			fillOpacity: 1,
-			strokeColor: Color.white()
+			strokeColor: Color.black(),
+			strokeWidth: 2
 		}
 	}
 

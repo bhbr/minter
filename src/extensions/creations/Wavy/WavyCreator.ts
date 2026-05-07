@@ -20,7 +20,7 @@ export class WavyCreator extends SpanningCreator {
 		}
 	}
 
-	createdMobject(): Wavy {
+	createMobject(): Wavy {
 		let p = this.getStartPoint()
 		return new Wavy({
 			anchor: p,
@@ -31,7 +31,7 @@ export class WavyCreator extends SpanningCreator {
 	}
 
 	dissolve() {
-		let cm = this.createdMobject()
+		let cm = this.createMobject()
 		this.parent.addToContent(cm)
 		this.parent.remove(this)
 		cm.play()

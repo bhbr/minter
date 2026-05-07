@@ -1,11 +1,11 @@
 
 import { log } from 'core/functions/logging'
 import { remove, convertStringToArray } from 'core/functions/arrays'
-import { ScreenEventDevice, separateSidebar, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { SIDEBAR_WIDTH, COLOR_PALETTE } from 'core/constants'
+import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'core/constants'
 import { PaperView } from './PaperView'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
@@ -31,7 +31,20 @@ export class Paper extends Board {
 			activeKeyboard: true,
 			currentColor: Color.white(),
 			drawShadow: false,
-			loadedAPIs: []
+			loadedAPIs: [],
+			buttonNames: [
+				'DragButton',
+				'LinkButton',
+				'ControlsButton',
+				'EraseButton'
+			],
+			helpTexts: {
+				'drag': 'Drag objects or pan the board. Tap this button to lock.',
+				'link': 'Show and edit links between objects. Tap this button to lock.',
+				'show controls': 'Show control elements on objects. Tap this button to lock.',
+				'erase': 'Erase objects or drawings by swiping over them.',
+				'restart': 'Clear the board.',
+			}
 		}
 	}
 
@@ -60,6 +73,18 @@ export class Paper extends Board {
 		})
 		this.background.view.hideShadow()
 
+		if (isTouchDevice) {
+			if (separateSidebar) {
+				this.view.div.style.background = 'clear'
+				this.view.div.style.backgroundColor = 'clear'
+				this.background.update({
+					fillColor: Color.clear()
+				})
+			} else {
+				document.body.style.backgroundColor = 'black'
+			}
+		}
+
 		let width = window.innerWidth - (separateSidebar ? 0 : SIDEBAR_WIDTH)
 		let height = window.innerHeight
 		this.update({
@@ -70,8 +95,13 @@ export class Paper extends Board {
 			width: width,
 			height: height
 		})
+		let el = document.querySelector('#htmlConsole') as HTMLElement
+		if (el) {
+			el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
+		}
 		//window.addEventListener('resize', this.resize.bind(this))
 		this.resize()
+
 	}
 
 	resize() {
@@ -145,7 +175,7 @@ export class Paper extends Board {
 		if (e.key == 'Shift' || e.key == 'Alt') {
 			(window as any).emulatedDevice = ScreenEventDevice.Mouse
 		} else {
-			this.messageSidebar({'buttonUp': e.key})
+			this.messageSidebar({ 'buttonUp': e.key })
 		}
 	}
 

@@ -1,6 +1,6 @@
 
-import { TextLabel } from 'core/mobjects/TextLabel'
-import { InputTextBox } from 'core/mobjects/InputTextBox'
+import { TextLabel } from 'core/ui/TextLabel'
+import { InputTextBox } from 'core/ui/InputTextBox'
 import { LinkHook } from './LinkHook'
 import { MGroup } from 'core/mobjects/MGroup'
 import { HOOK_HORIZONTAL_SPACING, IO_LIST_WIDTH } from './constants'
@@ -9,6 +9,7 @@ import { getPaper, getSidebar } from 'core/functions/getters'
 import { IOList } from './IOList'
 import { InputList } from './InputList'
 import { log } from 'core/functions/logging'
+import { remove } from 'core/functions/arrays'
 
 export class LinkOutlet extends MGroup {
 
@@ -116,9 +117,9 @@ export class LinkOutlet extends MGroup {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		let newName = args['displayName']
+		let newName = args['displayName'] ?? args['name']
 		if (newName == '') {
-			throw `Name of property ${this.displayName} cannot be changed to an empty string`;
+			throw `Name of property ${this.displayName} cannot be changed to an empty string`
 		}
 		super.update(args, redraw)
 		if (newName !== undefined) {
@@ -131,6 +132,23 @@ export class LinkOutlet extends MGroup {
 				}, redraw)
 			}
 		}
+	}
+
+	removeUnlinkedHook() {
+		var i = 0
+		for (let hook of this.linkHooks) {
+			if (!hook.linked) { break }
+			i += 1
+		}
+		let unlinkedHook = this.linkHooks[i]
+		this.remove(unlinkedHook)
+		while (i < this.linkHooks.length) {
+			this.linkHooks[i].update({
+				midpoint: [this.linkHooks[i].midpoint[0] - HOOK_HORIZONTAL_SPACING, this.linkHooks[i].midpoint[1]]
+			})
+			i += 1
+		}
+		remove(this.linkHooks, unlinkedHook)
 	}
 
 

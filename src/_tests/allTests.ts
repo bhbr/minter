@@ -6,6 +6,7 @@ import { ExtendedObjectTest } from './unit_tests/core/classes/ExtendedObjectTest
 import { MobjectTest } from './unit_tests/core/mobjects/MobjectTest'
 import { TransformTest } from './unit_tests/core/classes/TransformTest'
 import { VertexTest } from './unit_tests/core/functions/VertexTest'
+import { FrameTest } from './unit_tests/core/mobjects/FrameTest'
 
 export const AllTests = new BundledTest({
 	name: 'all tests',
@@ -15,7 +16,8 @@ export const AllTests = new BundledTest({
 		ExtendedObjectTest,
 		MobjectTest,
 		TransformTest,
-		VertexTest
+		VertexTest,
+		FrameTest
 	],
-	silenceSubtests: true
+	silenceSubtests: false
 })

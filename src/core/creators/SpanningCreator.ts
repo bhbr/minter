@@ -1,8 +1,9 @@
 
 import { Creator } from './Creator'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { vertex } from 'core/functions/vertex'
+import { vertex, vertexAdd } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class SpanningCreator extends Creator {
 	
@@ -30,10 +31,10 @@ export class SpanningCreator extends Creator {
 	}
 
 	topLeftVertex(): vertex {
-		return [
+		return vertexAdd([
 			Math.min(this.getStartPoint()[0], this.getEndPoint()[0]),
 			Math.min(this.getStartPoint()[1], this.getEndPoint()[1])
-		]
+		], this.pointOffset)
 	}
 
 	getWidth(): number {
@@ -47,6 +48,7 @@ export class SpanningCreator extends Creator {
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.update({
+			anchor: this.topLeftVertex(),
 			frameWidth: this.getWidth(),
 			frameHeight: this.getHeight()
 		})
@@ -56,12 +58,14 @@ export class SpanningCreator extends Creator {
 	dissolve() {
 		let w = this.getWidth()
 		let h = this.getHeight()
-		this.remove(this.creation)
+		if (this.creation) {
+			this.remove(this.creation)
+		}
 		this.creation = this.createMobject()
 		this.creation.update({
 			anchor: this.topLeftVertex(),
-			width: w,
-			height: h
+			frameWidth: w,
+			frameHeight: h
 		})
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null

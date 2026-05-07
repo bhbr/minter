@@ -10,9 +10,9 @@ import { ForceVector } from './ForceVector'
 import { Torque } from './Torque'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { Toggle } from 'extensions/mobjects/Toggle'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { Toggle } from 'extensions/ui/Toggle'
 import { MGroup } from 'core/mobjects/MGroup'
 
 const FORCE_SCALE: number = 50
@@ -118,6 +118,7 @@ export class InclinedScene extends Linkable implements Playable {
 		this.add(this.torques)
 		this.add(this.playButton)
 		this.add(this.showTorquesToggle)
+		this.push(this.playButton)
 
 		this.plane.update({
 			midpoint: this.view.frame.localCenter(),

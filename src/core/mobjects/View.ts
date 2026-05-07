@@ -18,6 +18,9 @@ export class View extends ExtendedObject {
 	opacity: number
 	visible: boolean
 	backgroundColor: Color
+	borderColor: Color
+	borderWidth: number
+	borderRadius: number
 	drawShadow: boolean
 	savedDrawShadow: boolean | null
 	drawBorder: boolean
@@ -29,6 +32,9 @@ export class View extends ExtendedObject {
 			visible: true,
 			opacity: 1.0,
 			backgroundColor: Color.clear(),
+			borderColor: Color.clear(),
+			borderWidth: 0,
+			borderRadius: 0,
 			drawBorder: DRAW_BORDERS,
 			drawShadow: false,
 			savedDrawShadow: null,
@@ -88,7 +94,14 @@ export class View extends ExtendedObject {
 		// 'absolute' positions this mobject relative (sic) to its parent
 		this.div.style.overflow = 'visible'
 		// by default, the mobject can draw outside its view's borders
-		this.div.style.border = this.drawBorder ? '1px dashed green' : 'none'
+		
+		this.div.style.borderColor = this.borderColor.toCSS()
+		this.div.style.borderWidth = `${this.borderWidth}px`
+		this.div.style.borderRadius = `${this.borderRadius}px`
+		if (this.drawBorder) {
+			this.div.style.border = '1px dashed green'
+		}
+
 		this.div['view'] = this
 		this.frame.view = this
 		this.redraw()
@@ -98,9 +111,17 @@ export class View extends ExtendedObject {
 	}
 
 	// called by mobject.add
-	add(subView: View) {
-		subView.setup()
-		this.div.appendChild(subView.div)
+	add(subview: View) {
+		subview.setup()
+		this.div.appendChild(subview.div)
+	}
+
+	insertBehind(subview: View, beforeSubview: View) {
+		if (this.div.contains(subview.div)) {
+			subview.div.remove()
+		}
+		subview.setup()
+		this.div.insertBefore(subview.div, beforeSubview.div)
 	}
 
 	redraw() {
@@ -110,17 +131,27 @@ export class View extends ExtendedObject {
 		this.div.style.width = `${this.frame.width.toString()}px`
 		this.div.style.height = `${this.frame.height.toString()}px`
 		this.div.style.backgroundColor = this.backgroundColor.toCSS()
+		this.div.style.borderColor = this.borderColor.toCSS()
+		this.div.style.borderWidth = `${this.borderWidth}px`
+		this.div.style.borderRadius = `${this.borderRadius}px`
+		if (this.drawBorder) {
+			this.div.style.border = '1px dashed green'
+		}
 		this.div.style.opacity = this.opacity.toString()
 
-		this.setVisibility(this.shouldBeDrawn())
 	}
 
-	// TODO: put into setter for this.visible?
-	setVisibility(visibility: boolean) {
-		this.div.style.visibility = visibility ? 'visible' : 'hidden'
-		for (let submob of this.mobject?.submobs ?? []) {
-			submob.view.setVisibility(submob.view.visible && visibility)
+	setCSSVisibility(visibility: boolean) {
+		if (visibility) {
+			this.div.style.display = 'flex'
+		} else {
+			this.div.style.display = 'none'
 		}
+	}
+
+	setVisibility(visibility: boolean) {
+		this.update({ visible: visibility })
+		this.setCSSVisibility(this.shouldBeDrawn())
 	}
 
 	showShadow() {
@@ -142,25 +173,46 @@ export class View extends ExtendedObject {
 	shouldBeDrawn(): boolean {
 		if (!this.visible) { return false }
 		for (let v of this.superViews()) {
-			if (!v.visible) { return false }
+			if (!v.visible) {
+				return false
+			}
 		}
 		return true
 	}
 
 	superViews(): Array<View> | null {
 		return this.mobject?.ancestors().map((mob) => mob.view) ?? []
-}
+	}
+
+	visibilities(): Array<object> {
+		let obj = {}
+		obj[this.mobject.constructor.name] = this.visible
+		let ret: Array<object> = [obj]
+		var m: Mobject = this.mobject
+		while (m.parent) {
+			m = m.parent
+			let obj2 = {}
+			obj2[m.constructor.name] = m.view.visible
+			ret.push(obj2)
+		}
+		return ret
+	}
 
 	// Show and hide //
 
 	show() {
-		this.visible = true
-		this.setVisibility(this.visible)
+		this.setVisibility(true)
 	}
 
 	hide() {
-		this.visible = false
-		this.setVisibility(this.visible)
+		this.setVisibility(false)
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args)
+		if (redraw) {
+			this.redraw()
+		}
 	}
 
 

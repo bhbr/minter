@@ -6,12 +6,9 @@ export class ControlsButton extends ToggleButton {
 
 	defaults(): object {
 		return {
-			messageKey: 'ctrl',
-			icon: new ImageView({
-				imageLocation: '../../assets/ctrl.png',
-				frameWidth: 30,
-				frameHeight: 30
-			})
+			messageKey: 'show controls',
+			iconSize: 30,
+			bigLabelFontSize: 12
 		}
 	}
 

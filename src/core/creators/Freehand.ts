@@ -1,9 +1,13 @@
 
 import { Creator } from 'core/creators/Creator'
 import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
-import { vertex } from 'core/functions/vertex'
+import { vertex, vertexSubtract } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Transform } from 'core/classes/Transform'
+import { log } from  'core/functions/logging'
+import { deepCopy } from 'core/functions/copying'
+import { Board } from 'core/boards/Board'
 
 export class Freehand extends Creator {
 
@@ -33,7 +37,11 @@ export class Freehand extends Creator {
 
 	setup() {
 		super.setup()
+		this.update({
+			anchor: [0, 0]
+		})
 		this.line.update({
+			anchor: [0, 0],
 			vertices: this.creationStroke
 		})
 		this.addDependency('penStrokeColor', this.line, 'strokeColor')
@@ -53,12 +61,21 @@ export class Freehand extends Creator {
 			frameWidth: this.line.getWidth(),
 			frameHeight: this.line.getHeight()
 		})
-
-		let par = this.parent
+		let tl = this.line.ulCorner()
+		this.update({
+			anchor: tl
+		})
+		for (var i = 0; i < this.line.vertices.length; i++) {
+			this.line.vertices[i][0] -= tl[0]
+			this.line.vertices[i][1] -= tl[1]
+		}
+		this.line.view.redraw()
+		let par = this.parent as Board
 		par.creator = null
 		par.remove(this)
 		if (this.view.visible) {
 			par.addToContent(this)
+			par.content.moveToBack(this)
 		}
 	}
 

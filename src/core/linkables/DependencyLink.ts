@@ -21,6 +21,7 @@ linkable mobjects
 	startHook: LinkHook | null
 	endBullet: LinkBullet
 	endHook: LinkHook | null
+	previousHook: LinkHook | null
 	linkLine: Line
 	borderLinkLine: Line
 
@@ -31,6 +32,7 @@ linkable mobjects
 			endBullet: new LinkBullet(),
 			startHook: null,
 			endHook: null,
+			previousHook: null,
 			linkLine: new Line({ strokeWidth: LINK_LINE_WIDTH }),
 			borderLinkLine: new Line({
 				strokeWidth: LINK_LINE_WIDTH + 4,
@@ -79,6 +81,15 @@ linkable mobjects
 		this.add(this.linkLine)
 	}
 
+	showLine() {
+		this.borderLinkLine.view.show()
+		this.linkLine.view.show()
+	}
+
+	hideLine() {
+		this.borderLinkLine.view.hide()
+		this.linkLine.view.hide()
+	}
 
 
 

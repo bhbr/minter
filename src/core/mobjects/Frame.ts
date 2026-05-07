@@ -3,6 +3,7 @@ import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform'
 import { View } from './View'
+import { log } from 'core/functions/logging'
 
 export class Frame extends ExtendedObject {
 	/*
@@ -43,7 +44,15 @@ export class Frame extends ExtendedObject {
 	}
 
 	get parent(): Frame | null {
-		return this.view?.parent.frame ?? null
+		return this.view?.mobject.parent?.frame ?? null
+	}
+
+	contains(p: vertex): boolean {
+		let flag1 = (p[0] > this.anchor[0])
+		let flag2 = (p[0] < this.anchor[0] + this.width)
+		let flag3 = (p[1] > this.anchor[1])
+		let flag4 = (p[1] < this.anchor[1] + this.height)
+		return (flag1 && flag2 && flag3 && flag4)
 	}
 
 	relativeTransform(frame?: Frame): Transform {
@@ -57,7 +66,7 @@ export class Frame extends ExtendedObject {
 
 		// If there is no frame, use the direct parent's coordinate frame.
 		// If there is no parent yet, use your own (local) coordinates.
-		let frame_: any = frame  || this
+		let frame_: any = frame || this
 		let t = Transform.identity()
 		let fr: Frame = this
 		while (fr && fr.transform instanceof Transform) {
@@ -72,8 +81,7 @@ export class Frame extends ExtendedObject {
 	transformLocalPoint(point: vertex, frame?: Frame): vertex {
 	/*
 	Given a point (vertex) in local coordinates,
-	compute its coordinates in the given ancestor
-	Frame's frame.
+	compute its coordinates in the given ancestor's frame.
 	*/
 		let t = this.relativeTransform(frame)
 		return t.appliedTo(point)

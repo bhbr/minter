@@ -7,8 +7,20 @@ export class PlayableCoinCreator extends DraggingCreator {
 
 	declare mobject: PlayableCoin
 
+	defaults(): object {
+		return {
+			helpText: 'A coin that shows either heads (H) or tails (T). Tap the coin or the play button to flip it. Long press to flip 100 times. Swipe the coin left or right to fix the outcome, e. g. for creating an artificial streak.',
+			pointOffset: [-25, -50]
+		}
+	}
+
+
 	createMobject(): PlayableCoin {
-		return new PlayableCoin()
+		let c = new PlayableCoin()
+		c.update({
+			anchor: this.pointOffset
+		})
+		return c
 	}
 
 }

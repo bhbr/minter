@@ -1,16 +1,18 @@
 
 import { Board } from 'core/boards/Board'
 import { Mobject } from 'core/mobjects/Mobject'
+import { MGroup } from 'core/mobjects/MGroup'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { IOList } from './IOList'
 import { InputList } from './InputList'
 import { OutputList } from './OutputList'
 import { LinkHook } from './LinkHook'
+import { DependencyLink } from './DependencyLink'
 import { log } from 'core/functions/logging'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
-import { Checkbox } from 'core/mobjects/Checkbox'
-import { RadioButtonList } from 'core/mobjects/RadioButtonList'
-
+import { SimpleButton } from 'core/ui/SimpleButton'
+import { Checkbox } from 'core/ui/Checkbox'
+import { HOOK_HORIZONTAL_SPACING } from './constants'
+import { remove } from 'core/functions/arrays'
 
 export interface IOProperty {
 	name: string
@@ -29,15 +31,17 @@ which can be linked to such-exposed variables of other mobjects.
 	inputList: InputList
 	outputList: OutputList
 	linksEditable: boolean
+	controls: MGroup
 
 	defaults(): object {
 		return {
 			inputList: new InputList(),
 			outputList: new OutputList(),
-			inputs: [],
-			outputs: [],
+			inputProperties: [],
+			outputProperties: [],
 			linksEditable: false,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			controls: new MGroup()
 		}
 	}
 
@@ -66,6 +70,11 @@ which can be linked to such-exposed variables of other mobjects.
 
 	setup() {
 		super.setup()
+		this.controls.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.add(this.controls)
 		this.inputList.update({
 			mobject: this,
 			outletProperties: this.inputProperties,
@@ -140,12 +149,17 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	setControlsVisibility(visible: boolean) {
-		for (let mob of this.submobs) {
-			if (mob instanceof SimpleButton || mob instanceof Checkbox || mob instanceof RadioButtonList) {
-				mob.update({
-					visible: visible
-				})
-			}
+		this.controls.view.setVisibility(visible)
+	// 	for (let mob of this.controls.children) {
+	// 		mob.view.setVisibility(visible)
+	// 	}
+	}
+
+	setLinksVisibility(visible: boolean) {
+		if (visible) {
+			this.showLinks()
+		} else {
+			this.hideLinks()
 		}
 	}
 
@@ -165,6 +179,104 @@ which can be linked to such-exposed variables of other mobjects.
 				outletProperties: args['outputProperties']
 			}, true)
 		}
+	}
+
+	addedInputLink(link: DependencyLink) {
+		link.startHook.outlet.ioList.mobject.updateDependents()
+	}
+
+	addedOutputLink(link: DependencyLink) {
+		this.update()
+		this.updateDependents()
+	}
+
+	removedInputLink(link: DependencyLink) {
+		this.update()
+	}
+
+	removedOutputLink(link: DependencyLink) {
+		this.update()
+		if (!link.startHook) { return }
+		link.startHook.outlet.removeUnlinkedHook()
+	}
+
+	inputNames(): Array<string> {
+		return this.inputProperties.map((prop) => prop.name)
+	}
+
+	outputNames(): Array<string> {
+		return this.outputProperties.map((prop) => prop.name)
+	}
+
+	positionIOLists() {
+		this.inputList.positionOutlets()
+		this.outputList.positionOutlets()
+		this.inputList.positionSelf()
+		this.outputList.positionSelf()
+	}
+
+
+	createInputVariable(name: string, value: number) {
+		this.createProperty(name, value)
+		this.inputProperties.push({
+			name: name,
+			type: 'number',
+			displayName: name
+		})
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+
+		this.positionIOLists()
+		this.inputList.view.hide()
+	}
+
+	removeInputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				remove(this.inputProperties, prop)
+				break
+			}
+		}
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.positionIOLists()
+		this.inputList.view.hide()
+		this.update()
+	}
+
+	createOutputVariable(name: string) {
+		if (name == null) { return }
+		this.createProperty(name, 0)
+		this.outputProperties = [{
+			name: name,
+			type: 'number',
+			displayName: name
+		}]
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
+	}
+
+	removeOutputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				remove(this.outputProperties, prop)
+				break
+			}
+		}
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
 	}
 
 }

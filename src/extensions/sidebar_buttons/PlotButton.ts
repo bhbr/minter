@@ -6,12 +6,8 @@ export class PlotButton extends CreativeButton {
 	
 	defaults(): object {
 		return {
-			creations: ['plot', 'hist'],
-			icon: new ImageView({
-				imageLocation: '../../assets/plot.png',
-				frameWidth: 32,
-				frameHeight: 32
-			})
+			creations: ['plot', 'histogram'],
+			iconSize: 28
 		}
 	}
 

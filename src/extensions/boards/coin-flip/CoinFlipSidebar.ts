@@ -5,11 +5,13 @@ import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { ControlsButton } from 'core/sidebar_buttons/ControlsButton'
 import { CoinButton } from './CoinButton'
 import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
+import { ComparisonButton } from 'extensions/sidebar_buttons/ComparisonButton'
+import { AlgebraButton } from 'extensions/sidebar_buttons/AlgebraButton'
 import { ListFunctionsButton } from 'extensions/sidebar_buttons/ListFunctionsButton'
 import { PlotButton } from 'extensions/sidebar_buttons/PlotButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
-import { RestartButton } from 'core/sidebar_buttons/RestartButton'
+import { EraseButton } from 'core/sidebar_buttons/EraseButton'
 
 export class CoinFlipSidebar extends Sidebar {
 	
@@ -22,10 +24,12 @@ export class CoinFlipSidebar extends Sidebar {
 				CoinButton,
 				NumberButton,
 				ArithmeticButton,
+				ComparisonButton,
+				AlgebraButton,
 				ListFunctionsButton,
 				PlotButton,
-				ColorSampleButton,
-				RestartButton
+				//ColorSampleButton,
+				EraseButton
 			],
 			buttons: [
 				new DragButton(),
@@ -34,10 +38,12 @@ export class CoinFlipSidebar extends Sidebar {
 				new CoinButton(),
 				new NumberButton(),
 				new ArithmeticButton(),
+				new ComparisonButton(),
+				//new AlgebraButton(),
 				new ListFunctionsButton(),
 				new PlotButton(),
-				new ColorSampleButton(),
-				new RestartButton()
+				//new ColorSampleButton(),
+				new EraseButton()
 			],
 		}
 	}

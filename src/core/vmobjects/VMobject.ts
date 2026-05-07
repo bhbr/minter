@@ -2,10 +2,11 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { vertex, vertexArray } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexArrayImageUnder } from 'core/functions/vertex'
 import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'core/mobjects/screen_events'
 import { VView } from './VView'
 import { Frame } from 'core/mobjects/Frame'
+import { Transform } from 'core/classes/Transform'
 
 export class VMobject extends Mobject {
 /*
@@ -64,14 +65,13 @@ TODO: support mutiple paths e. g. for shapes with holes
 		this.view.setup()
 		// screen events are detected on the path
 		// so the active area is clipped to its shape
-
 		// move to sensor setup?
-		removePointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this))
-		removePointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this))
-		removePointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this))
-		addPointerDown(this.view.path, this.sensor.capturedOnPointerDown.bind(this))
-		addPointerMove(this.view.path, this.sensor.capturedOnPointerMove.bind(this))
-		addPointerUp(this.view.path, this.sensor.capturedOnPointerUp.bind(this))
+		removePointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this.sensor))
+		removePointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this.sensor))
+		removePointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this.sensor))
+		addPointerDown(this.view.path, this.sensor.capturedOnPointerDown.bind(this.sensor))
+		addPointerMove(this.view.path, this.sensor.capturedOnPointerMove.bind(this.sensor))
+		addPointerUp(this.view.path, this.sensor.capturedOnPointerUp.bind(this.sensor))
 	}
 
 
@@ -206,6 +206,10 @@ TODO: support mutiple paths e. g. for shapes with holes
 	getWidth(): number { return this.localXMax() - this.localXMin() }
 	getHeight(): number { return this.localYMax() - this.localYMin() }
 
+	applyTransform(t: Transform) {
+		this.vertices = vertexArrayImageUnder(this.vertices, t)
+		this.redraw()
+	}
 
 
 

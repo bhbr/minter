@@ -2,6 +2,7 @@
 import { IOList } from './IOList'
 import { vertex } from 'core/functions/vertex'
 import { IO_LIST_OFFSET } from './constants'
+import { log } from 'core/functions/logging'
 
 export class OutputList extends IOList {
 

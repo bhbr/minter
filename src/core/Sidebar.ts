@@ -5,13 +5,14 @@ import { convertStringToArray } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
 import { Color } from 'core/classes/Color'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { buttonCenter } from 'core/sidebar_buttons/button_geometry'
+import { buttonAnchor } from 'core/sidebar_buttons/button_geometry'
 import { Paper } from 'core/Paper'
 import { Mobject } from 'core/mobjects/Mobject'
 import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { log } from 'core/functions/logging'
 import { SidebarView } from './SidebarView'
+import { ScreenEvent, isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
 
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { StartSidebar } from 'StartSidebar'
@@ -24,20 +25,21 @@ export class Sidebar extends Mobject {
 	background: Rectangle
 	availableButtonClasses: Array<any>
 	buttons: Array<SidebarButton>
-	activeButton: SidebarButton
+	activeButton?: SidebarButton
+	defaultKeys: Array<string>
 
 	defaults(): object {
 		return {
 			view: new SidebarView(),
+			activeButton: null,
 			background: new Rectangle({
-				fillColor: Color.gray(0.1),
-				fillOpacity: 1.0,
+				fillColor: Color.black(),
+				fillOpacity: isTouchDevice ? 0.0 : 1.0,
 				strokeWidth: 0,
 				screenEventHandler: ScreenEventHandler.Parent,
 				width: SIDEBAR_WIDTH,
 				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
-
 			availableButtonClasses: [
 				DragButton
 			],
@@ -46,7 +48,8 @@ export class Sidebar extends Mobject {
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
-			screenEventHandler: ScreenEventHandler.Self
+			screenEventHandler: ScreenEventHandler.Self,
+			defaultKeys: '1 2 3 4 5 6 7 8 9 0 q w e r t z u i o p'.split(' ')
 		}
 	}
 
@@ -57,7 +60,7 @@ export class Sidebar extends Mobject {
 		}
 	}
 
-	setup() { 
+	setup() {
 		this.add(this.background)
 		this.view.mobject = this
 		let maybePaper = getPaper()
@@ -75,21 +78,43 @@ export class Sidebar extends Mobject {
 		super.setup()
 		this.requestInit() // bc only it knows the initial buttons
 
-
 		this.addDependency('frameWidth', this.background, 'width')
 		this.addDependency('frameHeight', this.background, 'height')
 
+		if (isTouchDevice) {
+			if (separateSidebar) {
+				this.view.div.style.background = 'clear'
+				this.view.div.style.backgroundColor = 'clear'
+				this.background.update({
+					fillColor: Color.clear()
+				})
+			} else {
+				document.body.style.backgroundColor = 'black'
+			}
+		}
 	}
-
 
 	addButton(button: SidebarButton) {
 		let i = this.buttons.length
 		this.add(button)
 		this.buttons.push(button)
 		button.update({
-			midpoint: buttonCenter(i),
+//			midpoint: buttonCenter(i),
+			anchor: buttonAnchor(i),
 			locationIndex: i
 		})
+	}
+
+	setActiveButton(newButton: SidebarButton | null) {
+		if (this.activeButton) {
+			this.activeButton.hideOptions()
+			this.activeButton.label.view.hide()
+		}
+		this.activeButton = newButton
+		if (newButton) {
+			newButton.showOptions()
+			this.activeButton.label.view.show()
+		}
 	}
 
 	clear() {
@@ -102,7 +127,9 @@ export class Sidebar extends Mobject {
 	createButton(buttonName: string): SidebarButton | null {
 		for (let buttonClass of this.availableButtonClasses) {
 			if (buttonClass.name == buttonName) {
-				return new buttonClass()
+				let b = new buttonClass()
+				b.sidebar = this
+				return b
 			}
 		}
 		throw `Button class ${buttonName} not available!`
@@ -115,9 +142,17 @@ export class Sidebar extends Mobject {
 			let button = this.createButton(names[i])
 			button.update({
 				locationIndex: i,
-				key: (i + 1).toString()
+				shortcutKey: this.defaultKeys[i]
 			})
 			this.addButton(button)
+		}
+		for (let i = 0; i < names.length; i++) {
+			let label = this.buttons[i].label
+			this.add(label)
+			label.view.hide()
+			label.update({
+				anchor: [10, this.buttons[i].anchor[1] - 38]
+			})
 		}
 	}
 
@@ -138,7 +173,7 @@ export class Sidebar extends Mobject {
 
 	buttonForKey(key: string): SidebarButton | null {
 		for (let b of this.buttons) {
-			if (b.key == key) { return b }
+			if (b.getID() == key || b.shortcutKey == key) { return b }
 		}
 		return null
 	}
@@ -157,20 +192,29 @@ export class Sidebar extends Mobject {
 			this.initialize(value)
 			break
 		case 'buttonDown':
-			if (this.activeButton === null || this.activeButton === undefined) {
-				this.activeButton = this.buttonForKey(value)
+			let pressedButton = this.buttonForKey(value) ?? null
+			if (pressedButton !== this.activeButton && pressedButton !== null) {
+				this.setActiveButton(pressedButton)
 			}
 			if (this.activeButton !== null) {
 				this.activeButton.buttonDownByKey(value)
 			}
 			break
 		case 'buttonUp':
-			if (this.activeButton !== null && this.activeButton !== undefined) {
-				this.activeButton.buttonUpByKey(value)
-				if (this.activeButton.key == value) {
-					this.activeButton = null
-				}
+			let pressedButton2 = this.buttonForKey(value) ?? null
+			if (pressedButton2 !== this.activeButton && pressedButton2 !== null) {
+				this.setActiveButton(pressedButton2)
 			}
+			if (this.activeButton !== null) {
+				this.activeButton.buttonUpByKey(value)
+			}
+			break
+		case 'button':
+			if (value == 'collapse') {
+				this.setActiveButton(null)
+			}
+			break
+		default:
 			break
 		}
 	}
@@ -185,6 +229,11 @@ export class Sidebar extends Mobject {
 			convertedValue = convertStringToArray(value)
 		}
 		this.handleMessage(key, convertedValue)
+	}
+
+	onTap(e: ScreenEvent) {
+		if (!this.activeButton) { return }
+		this.activeButton.commonButtonUp()
 	}
 
 }

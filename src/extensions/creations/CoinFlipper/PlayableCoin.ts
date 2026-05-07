@@ -1,20 +1,20 @@
 
-import { Coin } from './Coin'
+import { Coin, CoinState } from './Coin'
 import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/mobjects/PlayButton/Playable'
-import { PlayButton } from 'extensions/mobjects/PlayButton/PlayButton'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { Playable } from 'extensions/ui/PlayButton/Playable'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
 
 export class PlayableCoin extends Linkable implements Playable {
 
 	coin: Coin
-	tailsProbability: number
 	playState: 'play' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
 	valueHistory: Array<number>
+	swipedSide: CoinState | null
 
 	defaults(): object {
 		return {
@@ -25,13 +25,27 @@ export class PlayableCoin extends Linkable implements Playable {
 				anchor: [0, 70]
 			}),
 			valueHistory: [],
+			inputProperties: [
+				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
+				//{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
+				//{ name: 'tailsColor', displayName: 'tails color', type: 'Color' }
+			],
 			outputProperties: [
-				{ name: 'value', type: 'number' }
+				{ name: 'value', type: 'number' },
+				
 			],
 			frameWidth: 50,
-			frameHeight: 80,
-			tailsProbability: 0.5
+			frameHeight: 50,
+			swipedSide: null
 		}
+	}
+
+	get tailsProbability(): number {
+		return this.coin.tailsProbability
+	}
+
+	set tailsProbability(newValue: number) {
+		this.coin.tailsProbability = newValue
 	}
 
 	setup() {
@@ -45,22 +59,67 @@ export class PlayableCoin extends Linkable implements Playable {
 			tailsProbability: this.tailsProbability
 		})
 		this.add(this.coin)
-		this.add(this.playButton)
+		//this.add(this.playButton)
+		this.controls.add(this.playButton)
 		this.playButton.mobject = this
 	}
 
 	onTap(e: ScreenEvent) {
 		this.flip()
+		this.coin.update({
+			opacity: 1
+		})
 	}
 
-	flip() {
-		this.coin.flip()
-		this.update()
-		this.updateDependents()
+	onLongPress(e: ScreenEvent) {
+		this.flip(true, 100)
+		this.coin.update({
+			opacity: 1
+		})
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		this.sensor.eventStartLocation = this.sensor.localEventVertex(e)
+		this.coin.update({
+			opacity: 0.5
+		})
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		if (this.sensor.eventStartLocation === null) { return }
+		let dx = this.sensor.localEventVertex(e)[0] - this.sensor.eventStartLocation[0]
+		if (dx > 10) {
+			this.swipedSide = 'tails'
+		} else if (dx < -10) {
+			this.swipedSide = 'heads'
+		}
+	}
+
+	onPointerUp(e: ScreenEvent) {
+		this.coin.update({
+			opacity: 1
+		})
+		if (this.swipedSide) {
+			this.coin.flipToState(this.swipedSide, true)
+			this.update()
+			this.updateDependents()
+			this.swipedSide = null
+		}
+	}
+
+	flip(animate: boolean = false, nbFlips: number = 1) {
+		for (let i = 0; i < nbFlips; i++) {
+			var an = (i == nbFlips - 1)
+			this.coin.flip(animate && an)
+			this.update({}, an)
+			this.updateDependents()
+		}
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(this.flip.bind(this), 250)
+		this.playIntervalID = window.setInterval(function() {
+			this.flip(true)
+		}.bind(this), 250)
 		this.playState = 'play'
 	}
 	
@@ -80,8 +139,15 @@ export class PlayableCoin extends Linkable implements Playable {
 	get value(): number { return this.coin.value }
 	set value(newValue: number) { this.coin.value = newValue }
 
-
-
+	update(args: object = {}, redraw: boolean = true) {
+		let p = args['tailsProbability']
+		if (p !== undefined) {
+			this.coin.update({
+				tailsProbability: p
+			}, true)
+		}
+		super.update(args, redraw)
+	}
 
 
 

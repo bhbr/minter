@@ -2,7 +2,7 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { Creator } from './Creator'
 import { Color } from 'core/classes/Color'
-import { vertex, vertexSubtract } from 'core/functions/vertex'
+import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { VView } from 'core/vmobjects/VView'
 import { log } from 'core/functions/logging'
@@ -12,9 +12,6 @@ export class DraggingCreator extends Creator {
 	setup() {
 		super.setup()
 		this.creation = this.createMobject()
-		this.creation.update({
-			anchor: vertexSubtract(this.getEndPoint(), this.getStartPoint())
-		})
 		this.add(this.creation)
 	}
 	
@@ -25,14 +22,15 @@ export class DraggingCreator extends Creator {
 			view: new VView({
 				fillColor: Color.red(),
 				fillOpacity: 1.0
-			})
+			}),
+			anchor: this.pointOffset
 		})
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, false)
 		this.creation.update({
-			anchor: vertexSubtract(q, this.getStartPoint())
+			anchor: vertexAdd(vertexSubtract(q, this.getStartPoint()), this.pointOffset)
 		}, redraw)
 		if (redraw) { this.view.redraw() }
 	}
@@ -40,8 +38,9 @@ export class DraggingCreator extends Creator {
 	dissolve() {
 		if (this.creation === null) { return }
 		this.creation.update({
-			anchor: this.getEndPoint()
+			anchor: vertexAdd(this.creation.anchor, this.anchor)
 		})
+		this.remove(this.creation)
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
 		this.parent.remove(this)

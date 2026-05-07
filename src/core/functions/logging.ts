@@ -1,14 +1,16 @@
 
 import { isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
+import { SHOW_HTML_CONSOLE } from 'core/constants'
 
 let debugging = true
+let logTimestamps = false
 
 // logging inside HTML instead of the console
 // for debugging the app e. g. on iPad
 function logInto(obj: any, id: string) {
 	let msg = obj.toString() + '\n'
 	let htmlConsole: HTMLElement = document.querySelector('#' + id)
-	htmlConsole.hidden = false
+	htmlConsole.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 	htmlConsole.append(msg)
 	
 	// push old log entries out the top of the scroll view
@@ -16,7 +18,10 @@ function logInto(obj: any, id: string) {
 	htmlConsole.scrollTop = htmlConsole.scrollHeight
 }
 
-export function logString(msg: any) {
+
+
+
+function mereLogString(msg: any): string {
 	if (msg === undefined) {
 		return 'undefined'
 	} else if (msg === null) {
@@ -40,19 +45,21 @@ export function logString(msg: any) {
 		} else {
 			let ret = '['
 			for (let i = 0; i < msg.length - 1; i++) {
-				ret += logString(msg[i]) + ', '
+				ret += mereLogString(msg[i]) + ', '
 			}
-			ret += logString(msg[msg.length - 1]) + ']'
+			ret += mereLogString(msg[msg.length - 1]) + ']'
 			return ret
 		}
 	} else {
 		let keys = Object.keys(msg)
-		if (keys.length <= 5) {
+		if (keys.length == 0) {
+			return '{}'
+		} else if (keys.length <= 5) {
 			var ret = '{ '
 			for (let i = 0; i < keys.length - 1; i++) {
-				ret += keys[i] + ' : ' + logString(msg[keys[i]]) + ', '
+				ret += keys[i] + ' : ' + mereLogString(msg[keys[i]]) + ', '
 			}
-			ret += keys[keys.length - 1] + ' : ' + logString(msg[keys[keys.length - 1]]) + ' }'
+			ret += keys[keys.length - 1] + ' : ' + mereLogString(msg[keys[keys.length - 1]]) + ' }'
 			return ret
 		} else {
 			return msg.constructor.name
@@ -60,13 +67,28 @@ export function logString(msg: any) {
 	}
 }
 
+function datedLogString(msg: any): string {
+	return `${Date.now()} ${mereLogString(msg)}`
+}
+
+export function logString(msg: any): string {
+	return logTimestamps ? datedLogString(msg) : mereLogString(msg)
+}
+
 export function htmlLog(msg: any) {
 	logInto(logString(msg), 'htmlConsole')
 }
 function jsLog(msg: any) {
-	console.log(msg)
+	if (typeof msg == 'string') {
+		console.log(logString(msg))
+	} else {
+		if (logTimestamps) {
+			console.log(`${Date.now()}`, msg)
+		} else {
+			console.log(msg)
+		}
+	}
 }
-
 
 export function log(msg: any) {
 	// device-agnostic log function

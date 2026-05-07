@@ -7,59 +7,57 @@ import { BUTTON_RADIUS, BUTTON_SCALE_FACTOR } from 'core/sidebar_buttons/button_
 
 export class ColorChangeButton extends SidebarButton {
 
-	colorNames: Array<string>
+	// colorNames: Array<string>
 
-	defaults(): object {
-		return {
-			colorNames: Object.keys(COLOR_PALETTE),
-			outgoingMessage: {},
-			optionSpacing: 15,
-			showLabel: false
-		}
-	}
+	// defaults(): object {
+	// 	return {
+	// 		colorNames: Object.keys(COLOR_PALETTE),
+	// 		touchUpMessages: [{}],
+	// 		optionSpacing: 15
+	// 	}
+	// }
 
-	mutabilities(): object {
-		return {
-			colorNames: 'in_subclass'
-		}
-	}
+	// mutabilities(): object {
+	// 	return {
+	// 		colorNames: 'in_subclass'
+	// 	}
+	// }
 
-	setup() {
-		super.setup()
-		this.label.view.div.setAttribute('fill', 'black')
+	// setup() {
+	// 	super.setup()
+	// 	this.label.view.div.setAttribute('fill', 'black')
 
-		for (let name of this.colorNames) {
-			this.messages.push({color: name, target: 'paper'})
-		}
-	}
+	// 	for (let name of this.colorNames) {
+	// 		this.touchDownMessages.push({ color: name, target: 'paper' })
+	// 	}
+	// }
 
-	colorForIndex(i): Color {
-		return COLOR_PALETTE[this.colorNames[i]]
-	}
+	// colorForIndex(i): Color {
+	// 	return COLOR_PALETTE[this.colorNames[i]]
+	// }
 
-	commonButtonDown() {
-		if (this.active) { return }
-		this.active = true
-		this.radius = BUTTON_RADIUS * BUTTON_SCALE_FACTOR
-		this.previousIndex = this.currentModeIndex
-		this.update()
-	}
+	// commonButtonDown() {
+	// 	if (this.active) { return }
+	// 	this.active = true
+	// 	this.radius = BUTTON_RADIUS * BUTTON_SCALE_FACTOR
+	// 	this.previousIndex = this.currentModeIndex
+	// 	this.update()
+	// }
 
-	commonButtonUp() {
-		this.radius = BUTTON_RADIUS
-		this.update({}, false)
-		this.active = false
-		this.view.fillColor = this.colorForIndex(this.currentModeIndex)
-		this.updateLabel()
-		this.label.update({text: ''})
-		this.messagePaper(this.outgoingMessage)
-		this.update()
-	}
+	// commonButtonUp() {
+	// 	this.radius = BUTTON_RADIUS
+	// 	this.update({}, false)
+	// 	this.active = false
+	// 	this.view.fillColor = this.colorForIndex(this.currentModeIndex)
+	// 	this.updateLabel()
+	// 	this.messagePaper(this.touchUpMessages[0])
+	// 	this.update()
+	// }
 
-	onPointerMove(e: ScreenEvent) {
-		super.onPointerMove(e)
-		this.remove(this.label)
-	}
+	// onPointerMove(e: ScreenEvent) {
+	// 	super.onPointerMove(e)
+	// 	this.remove(this.label)
+	// }
 
 }
 

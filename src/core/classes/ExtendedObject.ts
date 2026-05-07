@@ -4,11 +4,12 @@ import { ClassDeclaration } from './ClassDeclaration'
 import { log } from 'core/functions/logging'
 import { isVertex, vertexEquals, isVertexArray, vertexArrayEquals } from 'core/functions/vertex'
 import { AssignmentError } from './Errors'
+import { remove } from 'core/functions/arrays'
 
 export class ExtendedObject {
 /*
 An ExtendedObject has concise functionality for:
- - settingting initial values for its properties,
+ - setting initial values for its properties,
  - set default values for them in subclasses,
  - updating these values while maintaining a consistent state,
  - and defining permissions to change them ('mutability').
@@ -209,7 +210,7 @@ A property can have one of five mutability levels:
 	}
 
 	createProperty(prop: string, value: any) {
-	// that can only the changed via the update() method
+	// i. e. a property that can only the changed via the update() method
 		let isSettable = (this.mutability(prop) == 'always')
 		if (isSettable) {
 			Object.defineProperty(this, prop, {
@@ -230,6 +231,11 @@ A property can have one of five mutability levels:
 			})
 		}
 		this.properties.push(prop)
+	}
+
+	removeProperty(prop: string) {
+		this[prop] = undefined
+		remove(this.properties, prop)
 	}
 
 	isAccessor(prop: string): boolean {
@@ -261,7 +267,6 @@ A property can have one of five mutability levels:
 		let pd = this.propertyDescriptor(prop)
 		return (pd === undefined || pd.enumerable) ? undefined : pd.set
 	}
-
 
 	mutability(prop: string): string {
 		return ExtendedObject.classDeclarations[this.constructor.name].mutability(prop)
