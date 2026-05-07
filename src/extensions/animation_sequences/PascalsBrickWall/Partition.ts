@@ -6,12 +6,12 @@ import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
 import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, BRICK_STROKE_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION, BRICK_FILL_OPACITY } from './constants'
 import { Color } from 'core/classes/Color'
-import { RadioButtonList } from 'core/mobjects/RadioButtonList'
+import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { Line } from 'core/shapes/Line'
 import { MGroup } from 'core/mobjects/MGroup'
 import { binomial } from 'core/functions/math'
-import { SimpleButton } from 'core/mobjects/SimpleButton'
+import { SimpleButton } from 'core/ui/SimpleButton'
 
 const SHIFT = 0
 

@@ -5,7 +5,7 @@ import { DesmosCalculatorCreator } from 'extensions/creations/DesmosCalculator/D
 import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
 import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
 import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
-import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/box_functions/BinaryOperatorBoxCreator'
+import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/boxes/BinaryOperatorBoxCreator'
 import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
