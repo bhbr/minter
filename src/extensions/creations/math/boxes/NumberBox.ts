@@ -137,6 +137,8 @@ export class NumberBox extends Linkable {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (args['value'] !== undefined) {
+			log(args['value'])
+			log(prettyPrint(args['value']))
 			this.inputElement.textContent = prettyPrint(args['value'])
 		}
 		this.background.update({

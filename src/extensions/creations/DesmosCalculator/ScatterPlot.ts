@@ -76,14 +76,12 @@ export class ScatterPlot extends DesmosCalculator {
 			anchor: [this.frameWidth / 2 - 100, this.frameHeight + 10]
 		})
 		this.showPointsCheckbox.onToggle = this.setPointsVisibility.bind(this)
-		this.add(this.showPointsCheckbox)
 		this.setPointsVisibility(true)
 
 		this.showLinesCheckbox.update({
 			anchor: [this.frameWidth / 2 + 10, this.frameHeight + 10]
 		})
 		this.showLinesCheckbox.onToggle = this.setLinesVisibility.bind(this)
-		this.add(this.showLinesCheckbox)
 		this.setLinesVisibility(false)
 	}
 

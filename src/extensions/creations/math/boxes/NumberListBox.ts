@@ -35,6 +35,8 @@ export class NumberListBox extends Linkable {
 			outputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
 				{ name: 'length', displayName: null, type: 'number' },
+				{ name: 'sum', displayName: null, type: 'number' },
+				{ name: 'mean', displayName: null, type: 'number' },
 			],
 			clearButton: new SimpleButton({
 				text: 'clear'
@@ -112,6 +114,18 @@ export class NumberListBox extends Linkable {
 
 	length(): number {
 		return this.list.length
+	}
+
+	sum(): number {
+		var sum = 0
+		for (let n of this.list) {
+			sum += n
+		}
+		return sum
+	}
+
+	mean(): number {
+		return this.sum() / this.length()
 	}
 
 	get newestEntry(): number {

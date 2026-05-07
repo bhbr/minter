@@ -3,7 +3,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { LinkBullet } from 'core/linkables/LinkBullet'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexEquals, vertexAdd, vertexSubtract, vertexCloseTo, vertexNorm2 } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexOrigin, vertexCopy, vertexEquals, vertexAdd, vertexSubtract, vertexMultiply, vertexCloseTo, vertexNorm2 } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { remove } from 'core/functions/arrays'
 import { BoardCreator } from './BoardCreator'
@@ -28,6 +28,7 @@ import { View } from 'core/mobjects/View'
 import { IOList } from 'core/linkables/IOList'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Dependency } from 'core/mobjects/Dependency'
+import { Transform } from 'core/classes/Transform'
 
 declare var paper: Paper
 
@@ -99,7 +100,9 @@ The content children can also be dragged and panned.
 			}),
 			helpTexts: {
 				'drag': 'Drag objects or pan the board. Slide this button to the right to lock.',
-			}
+			},
+			// zoomStartCenter: [0, 0],
+			// zoomStartScale: 1,
 		}
 	}
 
@@ -420,6 +423,7 @@ The content children can also be dragged and panned.
 	}
 
 	setInternalDragging(value: boolean) {
+		log(`setInternalDragging ${value}`)
 		if (value == this.allowingDrag) { return }
 		// if (value) {
 		// 	this.disableContent()
@@ -777,6 +781,12 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
+		// if (e instanceof TouchEvent) {
+		// 	if (e.touches.length == 2) {
+		// 		this.startZooming(e)
+		// 		return
+		// 	}
+		// }
 		this.panPointStart = this.sensor.localEventVertex(e)
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
@@ -785,6 +795,15 @@ The content children can also be dragged and panned.
 	}
 
 	panning(e: ScreenEvent) {
+		// log(e.constructor.name)
+		// if (e instanceof TouchEvent) {
+		// 	log(e.touches.length)
+		// 	if (e.touches.length == 2) {
+		// 		this.zooming(e)
+		// 		return
+		// 	}
+		// } else
+
 		if (this.panPointStart == null) {
 			this.startPanning(e)
 			return
@@ -820,6 +839,29 @@ The content children can also be dragged and panned.
 			this.sensor.restoreMouseMethods()
 		}
 	}
+
+	// startZooming(e: TouchEvent) {
+	// 	let p = [e.touches[0].clientX, e.touches[0].clientY]
+	// 	let q = [e.touches[1].clientX, e.touches[1].clientY]
+	// 	this.zoomStartCenter = vertexMultiply(vertexAdd(p, q), 0.5)
+	// 	this.zoomStartLength = Math.sqrt(vertexNorm2(vertexSubtract(p, q)))
+	// }
+
+	// zooming(e: TouchEvent) {
+	// 	let p = [e.touches[0].clientX, e.touches[0].clientY]
+	// 	let q = [e.touches[1].clientX, e.touches[1].clientY]
+	// 	let center = vertexMultiply(vertexAdd(p, q), 0.5)
+	// 	let length = Math.sqrt(vertexNorm2(vertexSubtract(p, q)))
+	// 	let zoomScale = length / this.zoomStartLength
+	// 	let zoomShift = vertexSubtract(center, this.zoomStartCenter)
+	// 	log(zoomShift)
+	// 	this.view.update({
+	// 		transform: new Transform({ scale: zoomScale, shift: zoomShift })
+	// 	})
+	// }
+
+	// zoomStartCenter: vertex
+	// zoomStartLength: number
 
 
 	//////////////////////////////////////////////////////////

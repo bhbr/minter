@@ -192,7 +192,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		if (args['height'] !== undefined) {
 			this.view.frame.height = this.height
 			this.minValueInputBox.update({
-				anchor: [-60, this.height - 10]
+				anchor: [-70, this.height - 10]
 			})
 		}
 
