@@ -9,6 +9,7 @@ import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { SimpleButton } from 'core/ui/SimpleButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
+import { TextLabel } from 'core/ui/TextLabel'
 
 export class NumberListBox extends Linkable {
 	
@@ -44,8 +45,12 @@ export class NumberListBox extends Linkable {
 		}
 	}
 
-	get list(): Array<number> { return this.value }
-	set list(newValue: Array<number>) { this.value = newValue }
+	get list(): Array<number> {
+		return this.value
+	}
+	set list(newValue: Array<number>) {
+		this.value = newValue
+	}
 
 	setup() {
 		super.setup()
@@ -141,7 +146,6 @@ export class NumberListBox extends Linkable {
 		}
 		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
 		this.update()
-		this.updateDependents()
 	}
 
 	addedInputLink(link: DependencyLink) {
