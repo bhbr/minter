@@ -22,7 +22,7 @@ export class AverageBox extends NumberValuedFunctionBox {
 		if (this.argument.length > 0) {
 			return numberArraySum(this.argument) / this.argument.length
 		} else {
-			return 0
+			return NaN
 		}
 	}
 

@@ -444,9 +444,10 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		}
 	}
 
-	getUpdateCalls(): UpdateCalls {
+	getUpdateCalls(onlyValues: boolean = false): UpdateCalls {
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {
+			if (onlyValues && dep.kind == 'action') { continue }
 			let dict = {}
 			if (typeof this[dep.outputName] == 'function') {
 				dict[dep.inputName] = this[dep.outputName].bind(this)
@@ -460,8 +461,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return ret
 	}
 
-	updateDependents() {
-		let calls = this.getUpdateCalls()
+	updateDependents(onlyValues: boolean = false) {
+		let calls = this.getUpdateCalls(onlyValues)
 		calls.call()
 	}
 

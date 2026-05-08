@@ -423,13 +423,7 @@ The content children can also be dragged and panned.
 	}
 
 	setInternalDragging(value: boolean) {
-		log(`setInternalDragging ${value}`)
 		if (value == this.allowingDrag) { return }
-		// if (value) {
-		// 	this.disableContent()
-		// } else {
-		// 	this.enableContent()
-		// }
 		this.allowingDrag = value
 		this.setPanning(value)
 		for (let mob of this.contentChildren) {
@@ -1154,24 +1148,31 @@ The content children can also be dragged and panned.
 			return
 		}
 
-		if (this.openLink.startHook == null) {
-			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
+		let startHookWasNull = this.openLink.startHook == null
+
+		if (startHookWasNull) {
 			this.openLink.update({ startHook: h })
 			this.openLink.previousHook = this.openLink.startHook
-			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
 		} else {
-			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
 			this.openLink.update({ endHook: h })
 			this.openLink.previousHook = this.openLink.endHook
-			this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
 		}
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
-		this.openLink.previousHook = null
 		this.openLink.view.hide() //this.openLink.hideLine()
 
 		this.links.push(this.openLink)
 		this.createNewDependency()
+
+		if (startHookWasNull) {
+			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
+			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)	
+		} else {
+			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
+			this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
+		}
+
+		this.openLink.previousHook = null
 		this.openLink = null
 		this.openHook = null
 		this.openBullet = null

@@ -10,6 +10,7 @@ This class here is almost entirely representational, the actual updating is done
 	outputName: string | null
 	target: Mobject
 	inputName: string | null
+	kind: 'value' | 'action'
 
 	constructor(args: object = {}) {
 

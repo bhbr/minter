@@ -140,10 +140,13 @@ export class NumberListBox extends Linkable {
 			this.list.push(...newValue)
 		}
 		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
+		this.update()
+		this.updateDependents()
 	}
 
 	addedInputLink(link: DependencyLink) {
-		if (link.endHook.outlet.name == 'newestEntry') {
+		if (link.startHook.outlet.name == 'newestEntry' || link.endHook.outlet.name == 'newestEntry') {
+			link.dependency.kind = 'action'
 			this.clear()
 		}
 	}

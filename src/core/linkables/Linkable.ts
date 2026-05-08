@@ -182,12 +182,12 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	addedInputLink(link: DependencyLink) {
-		link.startHook.outlet.ioList.mobject.updateDependents()
+		link.startHook.outlet.ioList.mobject.updateDependents(true)
 	}
 
 	addedOutputLink(link: DependencyLink) {
 		this.update()
-		this.updateDependents()
+		this.updateDependents(true)
 	}
 
 	removedInputLink(link: DependencyLink) {

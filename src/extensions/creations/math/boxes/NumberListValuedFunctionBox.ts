@@ -51,9 +51,16 @@ export class NumberListValuedFunctionBox extends NumberListBox {
 		return []
 	}
 
+	get list(): Array<number> {
+		return this.result()
+	}
+	set list(newValue: Array<number>) {
+		throw `Readonly property`;
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
-		args['value'] = this.result()
-		super.update(args, redraw)
+		super.update(args, false)
+		super.update({ value: this.result() }, redraw)
 	}
 
 
