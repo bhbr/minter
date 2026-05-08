@@ -407,10 +407,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		if (this.constructor.name == 'NumberListBox') {
-			log(`Mobject.update of list with id ${this['id']} using:`)
-			log(args)
-		}
 		super.update(args)
 
 		// TODO: move to CindyCanvas
@@ -450,7 +446,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	getUpdateCalls(onlyValues: boolean = false): UpdateCalls {
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {
-			console.log(dep)
 			if (onlyValues && dep.kind == 'action') { continue }
 			let dict = {}
 			if (typeof this[dep.outputName] == 'function') {

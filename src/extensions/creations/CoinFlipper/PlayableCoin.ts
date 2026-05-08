@@ -6,6 +6,8 @@ import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
 import { SimpleButton } from 'core/ui/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
+import { Color } from 'core/classes/Color'
+import { MERE_TAP_DELAY } from 'core/constants'
 
 export class PlayableCoin extends Linkable implements Playable {
 
@@ -15,6 +17,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	playButton: PlayButton
 	valueHistory: Array<number>
 	swipedSide: CoinState | null
+	doubleTapStartTime: number | null
 
 	defaults(): object {
 		return {
@@ -36,7 +39,8 @@ export class PlayableCoin extends Linkable implements Playable {
 			],
 			frameWidth: 50,
 			frameHeight: 50,
-			swipedSide: null
+			swipedSide: null,
+			doubleTapStartTime: null
 		}
 	}
 
@@ -65,17 +69,22 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip()
-		this.coin.update({
-			opacity: 1
-		})
-	}
-
-	onLongPress(e: ScreenEvent) {
-		this.flip(true, 100)
-		this.coin.update({
-			opacity: 1
-		})
+		if (this.doubleTapStartTime) {
+			if (Date.now() - this.doubleTapStartTime < MERE_TAP_DELAY) {
+				this.flip(false, 98)
+				this.flip() // animate the last flip
+			}
+			this.doubleTapStartTime = null
+		} else {
+			this.doubleTapStartTime = Date.now()
+			window.setTimeout(function() {
+				this.doubleTapStartTime = null
+			}.bind(this), MERE_TAP_DELAY)
+			this.flip()
+			this.coin.update({
+				opacity: 1
+			})
+		}
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -106,6 +115,7 @@ export class PlayableCoin extends Linkable implements Playable {
 			this.swipedSide = null
 		}
 	}
+
 
 	flip(animate: boolean = false, nbFlips: number = 1) {
 		for (let i = 0; i < nbFlips; i++) {

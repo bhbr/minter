@@ -12,6 +12,7 @@ import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { randomBinomial } from 'core/functions/various'
+import { MERE_TAP_DELAY } from 'core/constants'
 
 export class CoinStack extends Linkable implements Playable {
 	
@@ -33,6 +34,7 @@ export class CoinStack extends Linkable implements Playable {
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
+	doubleTapStartTime: number | null
 
 	defaults(): object {
 		return {
@@ -74,6 +76,7 @@ export class CoinStack extends Linkable implements Playable {
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
 				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
+			doubleTapStartTime: null
 		}
 	}
 
@@ -214,11 +217,18 @@ export class CoinStack extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip()
-	}
-
-	onLongPress(e: ScreenEvent) {
-		this.flip(100)
+		if (this.doubleTapStartTime) {
+			if (Date.now() - this.doubleTapStartTime < MERE_TAP_DELAY) {
+				this.flip(99)
+			}
+			this.doubleTapStartTime = null
+		} else {
+			this.doubleTapStartTime = Date.now()
+			window.setTimeout(function() {
+				this.doubleTapStartTime = null
+			}.bind(this), MERE_TAP_DELAY)
+			this.flip()
+		}
 	}
 
 	flip(nbFlips: number = 1) {

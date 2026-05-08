@@ -13,6 +13,7 @@ import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { remove } from 'core/functions/arrays'
+import { MERE_TAP_DELAY } from 'core/constants'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -30,6 +31,7 @@ export class CoinRow extends Linkable implements Playable {
 	nbTailsLabel: TextLabel
 	labelWidth: number
 	nbCoinsInputBox: NumberInputBox
+	doubleTapStartTime: number | null
 
 	defaults(): object {
 		return {
@@ -71,6 +73,7 @@ export class CoinRow extends Linkable implements Playable {
 				labelText: '# coins:',
 				value: 1
 			}),
+			doubleTapStartTime: null
 		}
 	}
 
@@ -213,13 +216,19 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flipCoins()
+		if (this.doubleTapStartTime) {
+			if (Date.now() - this.doubleTapStartTime < MERE_TAP_DELAY) {
+				this.flipCoins(99)
+			}
+			this.doubleTapStartTime = null
+		} else {
+			this.doubleTapStartTime = Date.now()
+			window.setTimeout(function() {
+				this.doubleTapStartTime = null
+			}.bind(this), MERE_TAP_DELAY)
+			this.flipCoins()
+		}
 	}
-
-	onLongPress(e: ScreenEvent) {
-		this.flipCoins(100)
-	}
-
 	play() {
 		this.playIntervalID = window.setInterval(
 			function() {
