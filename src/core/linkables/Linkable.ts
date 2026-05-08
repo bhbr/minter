@@ -18,6 +18,7 @@ export interface IOProperty {
 	name: string
 	type: string
 	displayName: string | null
+	kind?: 'value' | 'action'
 }
 
 export class Linkable extends Mobject {
@@ -197,7 +198,7 @@ which can be linked to such-exposed variables of other mobjects.
 	removedOutputLink(link: DependencyLink) {
 		this.update()
 		if (!link.startHook) { return }
-		link.startHook.outlet.removeUnlinkedHook()
+		//link.startHook.outlet.removeUnlinkedHook()
 	}
 
 	inputNames(): Array<string> {
@@ -277,6 +278,19 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.positionIOLists()
 		this.outputList.view.hide()
+	}
+
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, kind: 'value' | 'action' = 'value', refresh: boolean = true) {
+		var newKind: 'value' | 'action' = 'value'
+		if (target instanceof Linkable) {
+			for (let prop of (target as Linkable).inputProperties) {
+				if (prop['name'] == inputName) {
+					newKind = prop['kind'] ?? 'value'
+					break
+				}
+			}
+		}
+		super.addDependency(outputName, target, inputName, newKind, refresh)
 	}
 
 }

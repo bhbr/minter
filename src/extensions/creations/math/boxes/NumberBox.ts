@@ -17,6 +17,7 @@ export class NumberBox extends Linkable {
 	inputElement: HTMLInputElement
 	background: Rectangle
 	value: number
+	returnHasBeenPressedBeforeBlur: boolean
 
 	defaults(): object {
 		return {
@@ -34,7 +35,8 @@ export class NumberBox extends Linkable {
 			frameHeight: 40,
 			strokeWidth: 0.0,
 			screenEventHandler: ScreenEventHandler.Self,
-			value: NaN
+			value: NaN,
+			returnHasBeenPressedBeforeBlur: false
 		}
 	}
 
@@ -53,13 +55,21 @@ export class NumberBox extends Linkable {
 		super.focus()
 		this.inputElement.focus()
 		document.addEventListener('keydown', this.boundKeyPressed)
+		this.update({
+			returnHasBeenPressedBeforeBlur: false
+		})
 	}
 
 	blur() {
 		super.blur()
 		this.inputElement.blur()
-		this.updateOnReturn()
+		if (!this.returnHasBeenPressedBeforeBlur) {
+			this.updateOnReturn()
+		}
 		document.removeEventListener('keydown', this.boundKeyPressed)
+		this.update({
+			returnHasBeenPressedBeforeBlur: false
+		})
 	}
 
 	setup() {
@@ -88,7 +98,6 @@ export class NumberBox extends Linkable {
 	keyPressed(e: KeyboardEvent) {
 		if (e.which != 13) { return }
 		this.inputElement.blur()
-		getPaper().activeKeyboard = true
 		if (!isTouchDevice) {
 			for (let button of getSidebar().buttons) {
 				button.activeKeyboard = true
@@ -101,10 +110,13 @@ export class NumberBox extends Linkable {
 		this.update({ value: this.valueFromString(this.inputElement.value) })
 		this.updateDependents()
 		this.onReturn()
+		this.update({
+			returnHasBeenPressedBeforeBlur: true
+		})
 	}
 
-	valueFromString(valueString: string): any {
-		return valueString
+	valueFromString(valueString: string): number {
+		return Number(valueString)
 	}
 
 	activateKeyboard() {

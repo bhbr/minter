@@ -56,7 +56,7 @@ A ClassDeclaration is an abstracted version of the default values and associated
 		this.fullDefaults = function() {
 			let parentDefaults = this.parent ? this.parent.fullDefaults() : {}
 			return Object.assign(parentDefaults, this.defaults())
-		}
+		}.bind(this)
 	}
 
 	checkMutabilities() {

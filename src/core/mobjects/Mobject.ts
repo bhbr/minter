@@ -14,6 +14,7 @@ import { Motor } from './Motor'
 import { Sensor } from './Sensor'
 import { getPaper } from 'core/functions/getters'
 import { UpdateCall, UpdateCalls } from './UpdateCall'
+import { Linkable } from 'core/linkables/Linkable'
 
 export class Mobject extends ExtendedObject {
 
@@ -340,7 +341,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return otherMobject.allDependents().includes(this)
 	}
 
-	addDependency(outputName: string | null, target: Mobject, inputName: string | null, refresh: boolean = true) {
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, kind: 'value' | 'action' = 'value', refresh: boolean = true) {
 		if (this.dependsOn(target)) {
 			throw 'Circular dependency!'
 		}
@@ -348,7 +349,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			source: this,
 			outputName: outputName,
 			target: target,
-			inputName: inputName
+			inputName: inputName,
+			kind: kind
 		})
 		this.dependencies.push(dep)
 		if (refresh) {
@@ -447,6 +449,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {
 			if (onlyValues && dep.kind == 'action') { continue }
+			//log('A')
 			let dict = {}
 			if (typeof this[dep.outputName] == 'function') {
 				dict[dep.inputName] = this[dep.outputName].bind(this)
