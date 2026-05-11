@@ -9,6 +9,7 @@ import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'cor
 import { Rectangle } from 'core/shapes/Rectangle'
 import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { VariableNameBox } from './VariableNameBox'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class Slider extends Linkable {
 /*
@@ -46,7 +47,9 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 
 	defaults(): object {
 		return {
-			inputProperties: [],
+			inputProperties: [
+				{ name: 'max', type: 'number' }
+			],
 			outputProperties: [
 				{ name: 'value', type: 'number' }
 			],
@@ -167,6 +170,7 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		let maxValue = Number(this.maxValueInputBox.value)
 		if (maxValue <= this.min) {
 			this.maxValueInputBox.value = this.max
+			this.maxValueInputBox.inputElement.value = this.max.toString()
 		} else {
 			this.update({
 				max: maxValue
@@ -194,6 +198,13 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			this.minValueInputBox.update({
 				anchor: [-70, this.height - 10]
 			})
+		}
+
+		let newMax = args['max']
+		if (newMax !== undefined && newMax != this.max) {
+			this.maxValueInputBox.inputElement.value = `${newMax}`
+			this.maxValueInputBox.value = newMax
+			this.updateMaxValue()
 		}
 
 		//// updating submobs
@@ -237,6 +248,20 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 		this.update({ value: newValue })
 	}
 
+	addedInputLink(link: DependencyLink) {
+		super.addedInputLink(link)
+		if (link.endHook.outlet.name == 'max') {
+			this.maxValueInputBox.value = this.max
+			this.maxValueInputBox.inputElement.disabled = true
+		}
+	}
+
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		if (link.endHook.outlet.name == 'max') {
+			this.maxValueInputBox.inputElement.disabled = false
+		}
+	}
 
 
 }
