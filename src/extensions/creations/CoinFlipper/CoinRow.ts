@@ -65,7 +65,6 @@ export class CoinRow extends Linkable implements Playable {
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
 				{ name: 'nbTails', displayName: '# tails', type: 'number' },
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
-				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 			frameWidth: 300,
 			frameHeight: 50,
@@ -267,10 +266,6 @@ export class CoinRow extends Linkable implements Playable {
 		return this.nbCoins - this.nbTails()
 	}
 	nbHeadsAsString(): string { return this.nbHeads().toString() }
-
-	mean(): number {
-		return this.nbTails() / this.nbCoins
-	}
 
 	update(args: object = {}, redraw: boolean = false) {
 		let newNbCoins = args['nbCoins']
