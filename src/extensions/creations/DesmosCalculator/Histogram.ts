@@ -5,6 +5,7 @@ import { log } from 'core/functions/logging'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Checkbox } from 'core/ui/Checkbox'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 
 export class Histogram extends DesmosCalculator {
 
@@ -21,6 +22,11 @@ export class Histogram extends DesmosCalculator {
 	scale: number
 	autoadjustScale: boolean
 	autoadjustScaleCheckBox: Checkbox
+	minInputBox: NumberInputBox
+	maxInputBox: NumberInputBox
+	binWidthInputBox: NumberInputBox
+	//nbBinsInputBox: NumberInputBox
+
 
 	defaults(): object {
 		return {
@@ -57,7 +63,23 @@ export class Histogram extends DesmosCalculator {
 			autoadjustScaleCheckBox: new Checkbox({
 				text: 'auto-adjust scale',
 				state: false
-			})
+			}),
+			minInputBox: new NumberInputBox({
+				anchor: [-10, -30],
+				value: 0,
+				labelText: 'min:'
+			}),
+			maxInputBox: new NumberInputBox({
+				anchor: [300, -230],
+				value: 10,
+				labelText: 'max:'
+			}),
+			binWidthInputBox: new NumberInputBox({
+				anchor: [150, -25],
+				value: 1,
+				labelText: 'bin width:'
+			}),
+			
 		}
 	}
 
@@ -84,6 +106,34 @@ export class Histogram extends DesmosCalculator {
 		})
 		this.controls.add(this.autoadjustScaleCheckBox)
 		this.autoadjustScaleCheckBox.onToggle = this.toggleYScale.bind(this)
+
+		this.controls.add(this.minInputBox)
+		this.controls.add(this.maxInputBox)
+		this.controls.add(this.binWidthInputBox)
+		this.minInputBox.onReturn = function() {
+			this.update({
+				min: this.minInputBox.value
+			})
+		}.bind(this)
+		this.maxInputBox.onReturn = function() {
+			this.update({
+				max: this.maxInputBox.value
+			})
+		}.bind(this)
+		this.binWidthInputBox.onReturn = function() {
+			this.update({
+				binWidth: this.binWidthInputBox.value
+			})
+		}.bind(this)
+		this.binWidthInputBox.update({
+			anchor: [this.frameWidth / 2 - 120, -30],
+			labelWidth: 120,
+			value: this.binWidth
+		})
+		this.maxInputBox.update({
+			anchor: [this.frameWidth - this.maxInputBox.frameWidth - 10, -30],
+			value: this.max
+		})
 	}
 
 	setScaling(redraw: boolean = true) {
