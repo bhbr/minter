@@ -18,7 +18,6 @@ export class PlayableCoin extends Linkable implements Playable {
 	playButton: PlayButton
 	valueHistory: Array<number>
 	swipedSide: CoinState | null
-	//doubleTapStartTime: number | null
 	fasterCheckbox: Checkbox
 	playFaster: boolean
 	speedMultiplier: number
@@ -44,7 +43,6 @@ export class PlayableCoin extends Linkable implements Playable {
 			frameWidth: 50,
 			frameHeight: 50,
 			swipedSide: null,
-			doubleTapStartTime: null,
 
 			fasterCheckbox: new Checkbox({
 				anchor: [60, 70],
@@ -91,22 +89,6 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		// if (this.doubleTapStartTime) {
-		// 	if (Date.now() - this.doubleTapStartTime < MERE_TAP_DELAY) {
-		// 		this.flip(false, 98)
-		// 		this.flip() // animate the last flip
-		// 	}
-		// 	this.doubleTapStartTime = null
-		// } else {
-		// 	this.doubleTapStartTime = Date.now()
-		// 	window.setTimeout(function() {
-		// 		this.doubleTapStartTime = null
-		// 	}.bind(this), MERE_TAP_DELAY)
-		// 	this.flip()
-		// 	this.coin.update({
-		// 		opacity: 1
-		// 	})
-		// }
 		if (this.playFaster) {
 			this.flip(false, this.speedMultiplier)
 		} else {
