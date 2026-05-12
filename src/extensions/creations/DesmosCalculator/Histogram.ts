@@ -211,12 +211,18 @@ export class Histogram extends DesmosCalculator {
 			let color = this.leftColor.interpolate(this.rightColor, i / this.nbBins)
 			let x1 = this.min + i * this.binWidth
 			let x2 = x1 + this.binWidth
-			let latex = `0\\leq y\\leq \\{ ${x1}\\leq x < ${x2}: B[${i + 1}]\\}`
-			this.calculator.setExpression({
-				id: `bar-${i}`,
-				latex: latex,
-				color: color.toHex()
-			})
+			if (this.bins[i] > 0) {
+				let latex = `0\\leq y\\leq \\{ ${x1}\\leq x < ${x2}: B[${i + 1}]\\}`
+				this.calculator.setExpression({
+					id: `bar-${i}`,
+					latex: latex,
+					color: color.toHex()
+				})
+			} else {
+				this.calculator.removeExpression({
+					id: `bar-${i}`
+				})
+			}
 		}
 	}
 
