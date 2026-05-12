@@ -89,6 +89,7 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
+		if (this.swipedSide) { return } // bc onPointerUp handles the flip
 		if (this.playFaster) {
 			this.flip(false, this.speedMultiplier)
 		} else {
@@ -121,12 +122,14 @@ export class PlayableCoin extends Linkable implements Playable {
 			if (this.playFaster) {
 				for (let i = 0; i < this.speedMultiplier; i++) {
 					this.coin.flipToState(this.swipedSide, false)
+					this.update()
+					this.updateDependents()
 				}
 			} else {
 				this.coin.flipToState(this.swipedSide, true)
+				this.update()
+				this.updateDependents()
 			}
-			this.update()
-			this.updateDependents()
 			this.swipedSide = null
 		}
 	}
