@@ -622,6 +622,9 @@ The content children can also be dragged and panned.
 					link.endHook.update({
 						linked: false
 					})
+					if (link.dependency.kind == 'action') {
+						link.endHook.outlet.removeHook()
+					}
 					linksToBeRemoved.push(link)
 					this.remove(link)
 				}
