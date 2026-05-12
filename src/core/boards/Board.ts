@@ -775,6 +775,7 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
+		let target = this.sensor.eventTarget
 		// if (e instanceof TouchEvent) {
 		// 	if (e.touches.length == 2) {
 		// 		this.startZooming(e)
@@ -929,21 +930,21 @@ The content children can also be dragged and panned.
 		}
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			this.disableContent()
+			//this.disableContent()
 			this.ungreyAllHooks()
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			this.enableContent()
+			//this.enableContent()
 		}
 		this.isShowingLinks = flag
 		if (flag) {
-			this.disableContent()
+			//this.disableContent()
 			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 
 		} else {
-			this.enableContent()
+			//this.enableContent()
 			this.sensor.restoreTouchMethods()
 			this.sensor.restorePenMethods()
 			this.sensor.restoreMouseMethods()

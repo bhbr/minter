@@ -526,6 +526,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	draggingEnabled: boolean
 
 	setDragging(flag: boolean) {
+		log('setDragging on')
+		log(this.constructor.name)
 		if (flag) {
 			if (this.draggingEnabled) { return }
 			this.sensor.setTouchMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
@@ -541,6 +543,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	startDragging(e: ScreenEvent) {
+		log('startDragging on')
+		log(this.constructor.name)
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
 		this.hideShadow()
 		this.parent.update()
