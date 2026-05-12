@@ -227,7 +227,7 @@ export class CoinRow extends Linkable implements Playable {
 			anchor: [
 				this.playButton.anchor[0] + this.playButton.frameWidth + 10,
 				this.playButton.anchor[1]
-		]
+			]
 		})
 	}
 
@@ -251,7 +251,6 @@ export class CoinRow extends Linkable implements Playable {
 		this.update()
 	}
 
-
 	onTap(e: ScreenEvent) {
 		if (this.playFaster) {
 			this.flipCoins(this.speedMultiplier)
@@ -259,7 +258,6 @@ export class CoinRow extends Linkable implements Playable {
 			this.flipCoins()
 		}
 	}
-
 
 	play() {
 		if (!this.playFaster) {

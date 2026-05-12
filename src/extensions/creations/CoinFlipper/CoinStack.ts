@@ -13,6 +13,7 @@ import { log } from 'core/functions/logging'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { randomBinomial } from 'core/functions/various'
 import { MERE_TAP_DELAY } from 'core/constants'
+import { Checkbox } from 'core/ui/Checkbox'
 
 export class CoinStack extends Linkable implements Playable {
 	
@@ -34,7 +35,9 @@ export class CoinStack extends Linkable implements Playable {
 	playState: 'play' | 'pause' | 'stop'
 	playIntervalID?: number
 	playButton: PlayButton
-	doubleTapStartTime: number | null
+	fasterCheckbox: Checkbox
+	playFaster: boolean
+	speedMultiplier: number
 
 	defaults(): object {
 		return {
@@ -76,7 +79,14 @@ export class CoinStack extends Linkable implements Playable {
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
 				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
-			doubleTapStartTime: null
+
+			fasterCheckbox: new Checkbox({
+				anchor: [60, 70],
+				text: 'x10',
+				state: false
+			}),
+			playFaster: false,
+			speedMultiplier: 10
 		}
 	}
 
@@ -101,6 +111,7 @@ export class CoinStack extends Linkable implements Playable {
 		this.setupLabels()
 		this.setupButton()
 		this.setupInputBox()
+		this.setupCheckbox()
 	}
 
 	setupBackground() {
@@ -170,11 +181,36 @@ export class CoinStack extends Linkable implements Playable {
 		this.controls.add(this.playButton)
 	}
 
+	setupCheckbox() {
+		this.controls.add(this.fasterCheckbox)
+		this.fasterCheckbox.label.update({
+			frameWidth: 50
+		})
+		this.positionCheckbox()
+
+		this.fasterCheckbox.onToggle = function() {
+			this.playFaster = !this.playFaster
+			if (this.playState == 'play') {
+				this.pause()
+				this.play()
+			}
+		}.bind(this)
+	}
+
 	positionButton() {
 		this.playButton.update({
 			anchor: [
 				this.frameWidth / 2 - this.playButton.frameWidth / 2,
 				this.height
+			]
+		})
+	}
+
+	positionCheckbox() {
+		this.fasterCheckbox.update({
+			anchor: [
+				this.playButton.anchor[0] + this.playButton.frameWidth + 10,
+				this.playButton.anchor[1]
 			]
 		})
 	}
@@ -217,16 +253,9 @@ export class CoinStack extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		if (this.doubleTapStartTime) {
-			if (Date.now() - this.doubleTapStartTime < MERE_TAP_DELAY) {
-				this.flip(99)
-			}
-			this.doubleTapStartTime = null
+		if (this.playFaster) {
+			this.flip(this.speedMultiplier)
 		} else {
-			this.doubleTapStartTime = Date.now()
-			window.setTimeout(function() {
-				this.doubleTapStartTime = null
-			}.bind(this), MERE_TAP_DELAY)
 			this.flip()
 		}
 	}
@@ -242,7 +271,13 @@ export class CoinStack extends Linkable implements Playable {
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(this.flip.bind(this), 100)
+		this.playIntervalID = window.setInterval(function() {
+			if (this.playFaster) {
+				this.flip(this.speedMultiplier)
+			} else {
+				this.flip()
+			}
+		}.bind(this), 100)
 		this.playState = 'play'
 	}
 	
