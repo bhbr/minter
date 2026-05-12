@@ -99,13 +99,13 @@ which can be linked to such-exposed variables of other mobjects.
 		if (this.outputList.height != 0) {
 			this.outputList.view.show()
 		}
-		this.disable()
+		//this.disable()
 	}
 
 	hideLinks() {
 		this.inputList.view.hide()
 		this.outputList.view.hide()
-		this.enable()
+		//this.enable()
 	}
 
 	inputHooks(): Array<LinkHook> {

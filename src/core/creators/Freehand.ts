@@ -71,6 +71,7 @@ export class Freehand extends Creator {
 		}
 		this.line.view.redraw()
 		let par = this.parent as Board
+		if (par === null || par === undefined) { return }
 		par.creator = null
 		par.remove(this)
 		if (this.view.visible) {
