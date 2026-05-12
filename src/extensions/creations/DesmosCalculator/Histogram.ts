@@ -6,6 +6,7 @@ import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Checkbox } from 'core/ui/Checkbox'
 import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
+import { DependencyLink } from 'core/linkables/DependencyLink'
 
 export class Histogram extends DesmosCalculator {
 
@@ -335,5 +336,30 @@ export class Histogram extends DesmosCalculator {
 		}
 //		this.calculator.updateSetting({ lockViewport: false })
 	}
+
+	addedInputLink(link: DependencyLink) {
+		super.addedInputLink(link)
+		let linkedProps = this.linkedInputProperties()
+		if (linkedProps.includes('min') && linkedProps.includes('max') && linkedProps.includes('binWidth') && linkedProps.includes('nbBins')) {
+			this.board.removeInputLinkForPropertyAtMobject(link.endHook.outlet.name, this)
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
