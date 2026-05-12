@@ -40,9 +40,10 @@ export class Histogram extends DesmosCalculator {
 			rightColor: Color.red(),
 			inputProperties: [
 				{ name: 'data', displayName: null, type: 'Array<number>' },
-				{ name: 'binWidth', displayName: 'bin width', type: 'number' },
 				{ name: 'min', displayName: 'minimum', type: 'number' },
 				{ name: 'max', displayName: 'maximum', type: 'number' },
+				{ name: 'binWidth', displayName: 'bin width', type: 'number' },
+				{ name: 'nbBins', displayName: '# bins', type: 'number' }
 				//{ name: 'leftColor', displayName: 'left color', type: 'Color' },
 				//{ name: 'rightColor', displayName: 'right color', type: 'Color' }
 			],
@@ -304,6 +305,11 @@ export class Histogram extends DesmosCalculator {
 		} else if (a && b && c && d) {
 			throw `Cannot update all four properties of histogram`;
 		}
+
+		this.minInputBox.update({ value: this.min })
+		this.maxInputBox.update({ value: this.max })
+		this.binWidthInputBox.update({ value: this.binWidth })
+		this.nbBinsInputBox.update({ value: this.nbBins })
 
 		if (args['data'] !== undefined || shouldRebin) {
 			this.setScaling(false)

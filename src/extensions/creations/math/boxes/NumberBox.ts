@@ -52,7 +52,6 @@ export class NumberBox extends Linkable {
 	}
 
 	focus() {
-		log('focus')
 		super.focus()
 		this.inputElement.focus()
 		document.addEventListener('keydown', this.boundKeyPressed)
@@ -62,7 +61,6 @@ export class NumberBox extends Linkable {
 	}
 
 	blur() {
-		log('blur')
 		super.blur()
 		this.inputElement.blur()
 		if (!this.returnHasBeenPressedBeforeBlur) {
@@ -98,7 +96,6 @@ export class NumberBox extends Linkable {
 	boundKeyPressed(e: ScreenEvent) { }
 
 	keyPressed(e: KeyboardEvent) {
-		log('key pressed')
 		if (e.which != 13) { return }
 		this.inputElement.blur()
 		if (!isTouchDevice) {
@@ -110,7 +107,6 @@ export class NumberBox extends Linkable {
 	}
 
 	updateOnReturn() {
-		log('updateOnReturn')
 		this.update({ value: this.valueFromString(this.inputElement.value) })
 		this.updateDependents()
 		this.onReturn()
@@ -124,7 +120,6 @@ export class NumberBox extends Linkable {
 	}
 
 	activateKeyboard() {
-		log('activateKeyboard')
 		document.removeEventListener('keyup', this.boundActivateKeyboard)
 		document.addEventListener('keydown', this.boundKeyPressed)
 		getPaper().activeKeyboard = false
@@ -136,7 +131,6 @@ export class NumberBox extends Linkable {
 	boundActivateKeyboard() { }
 
 	deactivateKeyboard() {
-		log('deactivateKeyboard')
 		document.removeEventListener('keydown', this.boundKeyPressed)
 		getPaper().activeKeyboard = true
 		for (let button of getSidebar().buttons) {

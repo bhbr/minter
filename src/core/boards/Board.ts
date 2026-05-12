@@ -1346,6 +1346,7 @@ The content children can also be dragged and panned.
 		this.removeLink(link)
 		link.startHook.update({ linked: false })
 		link.endHook.update({ linked: false })
+		link.startHook.outlet.removeHook()
 	}
 
 	removeDependencyAtHook(hook: LinkHook) {
