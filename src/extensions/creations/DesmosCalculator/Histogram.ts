@@ -67,14 +67,15 @@ export class Histogram extends DesmosCalculator {
 				state: false
 			}),
 			minInputBox: new NumberInputBox({
-				anchor: [-30, -60],
+				anchor: [10, -60],
 				value: 0,
-				labelText: 'min:'
+				labelText: 'minimum:'
 			}),
 			maxInputBox: new NumberInputBox({
-				anchor: [-30, -30],
+				anchor: [12, -30],
 				value: 10,
-				labelText: 'max:'
+				labelText: 'maximum:',
+				labelGap: 8
 			}),
 			binWidthInputBox: new NumberInputBox({
 				anchor: [150, -60],
@@ -86,7 +87,6 @@ export class Histogram extends DesmosCalculator {
 				value: 1,
 				labelText: '# bins:'
 			}),
-			
 		}
 	}
 
