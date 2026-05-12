@@ -25,7 +25,7 @@ export class Histogram extends DesmosCalculator {
 	minInputBox: NumberInputBox
 	maxInputBox: NumberInputBox
 	binWidthInputBox: NumberInputBox
-	//nbBinsInputBox: NumberInputBox
+	nbBinsInputBox: NumberInputBox
 
 
 	defaults(): object {
@@ -65,19 +65,24 @@ export class Histogram extends DesmosCalculator {
 				state: false
 			}),
 			minInputBox: new NumberInputBox({
-				anchor: [-10, -30],
+				anchor: [-30, -60],
 				value: 0,
 				labelText: 'min:'
 			}),
 			maxInputBox: new NumberInputBox({
-				anchor: [300, -230],
+				anchor: [-30, -30],
 				value: 10,
 				labelText: 'max:'
 			}),
 			binWidthInputBox: new NumberInputBox({
-				anchor: [150, -25],
+				anchor: [150, -60],
 				value: 1,
 				labelText: 'bin width:'
+			}),
+			nbBinsInputBox: new NumberInputBox({
+				anchor: [150, -30],
+				value: 1,
+				labelText: '# bins:'
 			}),
 			
 		}
@@ -110,29 +115,49 @@ export class Histogram extends DesmosCalculator {
 		this.controls.add(this.minInputBox)
 		this.controls.add(this.maxInputBox)
 		this.controls.add(this.binWidthInputBox)
+		this.controls.add(this.nbBinsInputBox)
+
 		this.minInputBox.onReturn = function() {
 			this.update({
 				min: this.minInputBox.value
 			})
+			this.minInputBox.deactivateKeyboard()
+			this.board.removeInputLinkForPropertyAtMobject('min', this)
 		}.bind(this)
+
 		this.maxInputBox.onReturn = function() {
 			this.update({
 				max: this.maxInputBox.value
 			})
+			this.maxInputBox.deactivateKeyboard()
+			this.board.removeInputLinkForPropertyAtMobject('max', this)
 		}.bind(this)
+
 		this.binWidthInputBox.onReturn = function() {
 			this.update({
 				binWidth: this.binWidthInputBox.value
 			})
+			this.binWidthInputBox.deactivateKeyboard()
+			this.board.removeInputLinkForPropertyAtMobject('binWidth', this)
 		}.bind(this)
+
+		this.nbBinsInputBox.onReturn = function() {
+			this.update({
+				nbBins: this.nbBinsInputBox.value
+			})
+			this.nbBinsInputBox.deactivateKeyboard()
+			this.board.removeInputLinkForPropertyAtMobject('nbBins', this)
+		}.bind(this)
+
 		this.binWidthInputBox.update({
-			anchor: [this.frameWidth / 2 - 120, -30],
+			anchor: [this.frameWidth - 190, -60],
 			labelWidth: 120,
 			value: this.binWidth
 		})
-		this.maxInputBox.update({
-			anchor: [this.frameWidth - this.maxInputBox.frameWidth - 10, -30],
-			value: this.max
+		this.nbBinsInputBox.update({
+			anchor: [this.frameWidth - 190, -30],
+			labelWidth: 120,
+			value: this.nbBins
 		})
 	}
 
@@ -210,15 +235,77 @@ export class Histogram extends DesmosCalculator {
 		})
 	}
 
+	recomputeNbBins() {
+		this.nbBins = Math.floor((this.max - this.min) / this.binWidth)
+		this.nbBinsInputBox.update({ value: this.nbBins })
+	}
+
+	recomputeBinWidth() {
+		this.binWidth = (this.max - this.min) / this.nbBins
+		this.binWidthInputBox.update({ value: this.binWidth })
+	}
+
+	recomputeMin() {
+		this.min = this.max - this.nbBins * this.binWidth
+		this.minInputBox.update({ value: this.min })
+	}
+	recomputeMax() {
+		this.max = this.min + this.nbBins * this.binWidth
+		this.maxInputBox.update({ value: this.max })
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (this.binWidth == 0) {
 			this.binWidth = 1
 		}
-		if (args['min'] !== undefined || args['max'] !== undefined || args['binWidth'] !== undefined) {
-			this.nbBins = Math.floor((this.max - this.min) / this.binWidth)
+
+		var newMin = args['min']
+		var newMax = args['max']
+		var newBinWidth = args['binWidth']
+		var newNbBins = args['nbBins']
+
+		let a = (newMin !== undefined)
+		let b = (newMax !== undefined)
+		let c = (newBinWidth !== undefined)
+		let d = (newNbBins !== undefined)
+
+
+		let shouldRebin = a || b || c || d
+
+		if (a && !b && !c && !d) {
+			this.recomputeNbBins()
+		} else if (!a && b && !c && !d) {
+			this.recomputeNbBins()
+		} else if (!a && !b && c && !d) {
+			this.recomputeNbBins()
+		} else if (!a && !b && !c && d) {
+			this.recomputeBinWidth()
+		} else if (a && b && !c && !d) {
+			this.recomputeNbBins()
+		} else if (a && !b && c && !d) {
+			this.recomputeNbBins()
+		} else if (a && !b && !c && d) {
+			this.recomputeBinWidth()
+		} else if (!a && b && c && !d) {
+			this.recomputeNbBins()
+		} else if (!a && b && !c && d) {
+			this.recomputeBinWidth()
+		} else if (!a && !b && c && d) {
+			this.recomputeMax()
+		} else if (a && b && c && !d) {
+			this.recomputeNbBins()
+		} else if (a && b && !c && d) {
+			this.recomputeBinWidth()
+		} else if (a && !b && c && d) {
+			this.recomputeMax()
+		} else if (!a && b && c && d) {
+			this.recomputeMin()
+		} else if (a && b && c && d) {
+			throw `Cannot update all four properties of histogram`;
 		}
-		if (args['data'] !== undefined || args['binWidth'] !== undefined) {
+
+		if (args['data'] !== undefined || shouldRebin) {
 			this.setScaling(false)
 			this.rebin()
 			this.calculator.setExpression({ id:'B', latex: `B=[${this.bins}]/${this.scale}` })
@@ -234,8 +321,8 @@ export class Histogram extends DesmosCalculator {
 			let yMin = this.calculator.graphpaperBounds.mathCoordinates.bottom
 			let yMax = this.calculator.graphpaperBounds.mathCoordinates.top
 			this.calculator.setMathBounds({
-				left: newXMin - 0.1 * (this.max - newXMin),
-				right: newXMax + 0.1 * (newXMax - this.min),
+				left: this.min - 0.1 * (this.max - this.min),
+				right: this.max + 0.1 * (this.max - this.min),
 				top: yMax,
 				bottom: yMin
 			})

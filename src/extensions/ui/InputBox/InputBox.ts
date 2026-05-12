@@ -25,6 +25,7 @@ export class InputBox extends Mobject {
 			label: new TextLabel({
 				text: 'label',
 				verticalAlign: 'middle',
+				horizontalAlign: 'right',
 				frameWidth: 60,
 				frameHeight: 30,
 			}),

@@ -1311,10 +1311,41 @@ The content children can also be dragged and panned.
 		}
 	}
 
+	removeDependencyOfLink(link: DependencyLink) {
+		let startHook = link.startHook
+		let endHook = link.endHook
+		startHook.outlet.ioList.mobject.removeDependencyBetween(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		startHook.removeAllDependents()
+		endHook.removeAllDependents()
+		//startHook.outlet.removeHook()
+		startHook.outlet.ioList.mobject.removedOutputLink(link)
+		endHook.outlet.ioList.mobject.removedInputLink(link)
+	}
+
 	removeLink(link: DependencyLink) {
-		this.removeDependencyBetweenHooks(link.startHook, link.endHook)
+		if (this.openLink) {
+			this.removeDependencyBetweenHooks(link.startHook, link.endHook)
+		} else {
+			this.removeDependencyOfLink(link)
+		}
 		remove(this.links, link)
 		this.remove(link)
+	}
+
+	removeInputLinkForPropertyAtMobject(prop: string, mob: Linkable, index: number = 0) {
+		let outlet = mob.inputList.outletNamed(prop)
+		if (!outlet) { return }
+		let hook = outlet.linkHooks[index]
+		if (!hook) { return }
+		let link = this.linkForHook(hook)
+		if (!link) { return }
+		this.removeLink(link)
+		link.startHook.update({ linked: false })
+		link.endHook.update({ linked: false })
 	}
 
 	removeDependencyAtHook(hook: LinkHook) {
