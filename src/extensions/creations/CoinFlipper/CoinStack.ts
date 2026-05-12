@@ -209,8 +209,8 @@ export class CoinStack extends Linkable implements Playable {
 	positionCheckbox() {
 		this.fasterCheckbox.update({
 			anchor: [
-				this.playButton.anchor[0] + this.playButton.frameWidth + 10,
-				this.playButton.anchor[1]
+				this.playButton.anchor[0] + 65,
+				this.playButton.anchor[1] + 4
 			]
 		})
 	}

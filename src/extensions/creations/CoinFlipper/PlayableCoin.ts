@@ -45,7 +45,7 @@ export class PlayableCoin extends Linkable implements Playable {
 			swipedSide: null,
 
 			fasterCheckbox: new Checkbox({
-				anchor: [60, 70],
+				anchor: [65, 74],
 				text: 'x10',
 				state: false
 			}),
