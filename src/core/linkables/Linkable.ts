@@ -216,6 +216,19 @@ which can be linked to such-exposed variables of other mobjects.
 		this.outputList.positionSelf()
 	}
 
+	isLinked(prop: string, kind: 'input' | 'output'): boolean {
+		let ioList = (kind == 'input') ? this.inputList : this.outputList
+		let outlet = ioList.outletNamed(prop)
+		return outlet.linkHooks[0].linked
+	}
+
+	linkedInputProperties(): Array<string> {
+		return this.inputNames().filter((x) => this.isLinked(x, 'input'))
+	}
+
+	linkedOutputProperties(): Array<string> {
+		return this.outputNames().filter((x) => this.isLinked(x, 'output'))
+	}
 
 	createInputVariable(name: string, value: number) {
 		this.createProperty(name, value)
