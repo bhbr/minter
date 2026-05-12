@@ -342,7 +342,37 @@ export class Histogram extends DesmosCalculator {
 		let linkedProps = this.linkedInputProperties()
 		if (linkedProps.includes('min') && linkedProps.includes('max') && linkedProps.includes('binWidth') && linkedProps.includes('nbBins')) {
 			this.board.removeInputLinkForPropertyAtMobject(link.endHook.outlet.name, this)
+			return
 		}
+		if (link.endHook.outlet.name == 'min') {
+			this.minInputBox.inputElement.disabled = true
+		}
+		if (link.endHook.outlet.name == 'max') {
+			this.maxInputBox.inputElement.disabled = true
+		}
+		if (link.endHook.outlet.name == 'binWidth') {
+			this.binWidthInputBox.inputElement.disabled = true
+		}
+		if (link.endHook.outlet.name == 'nbBins') {
+			this.nbBinsInputBox.inputElement.disabled = true
+		}
+	}
+
+	removedInputLink(link: DependencyLink) {
+		super.removedInputLink(link)
+		if (link.endHook.outlet.name == 'min') {
+			this.minInputBox.inputElement.disabled = false
+		}
+		if (link.endHook.outlet.name == 'max') {
+			this.maxInputBox.inputElement.disabled = false
+		}
+		if (link.endHook.outlet.name == 'binWidth') {
+			this.binWidthInputBox.inputElement.disabled = false
+		}
+		if (link.endHook.outlet.name == 'nbBins') {
+			this.nbBinsInputBox.inputElement.disabled = false
+		}
+
 	}
 
 
