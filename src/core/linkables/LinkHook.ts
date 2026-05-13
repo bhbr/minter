@@ -12,7 +12,6 @@ import { LinkBullet } from './LinkBullet'
 
 export class LinkHook extends Circle {
 
-	mobject?: Linkable
 	outlet?: LinkOutlet // TODO: redirect to parent
 	linked: boolean
 	linkedBulletIndicator: Circle
@@ -20,11 +19,9 @@ export class LinkHook extends Circle {
 	defaults(): object {
 		return {
 			name: '',
-			kind: 'input',
 			radius: HOOK_RADIUS,
 			fillOpacity: 0,
 			strokeColor: Color.white(),
-			mobject: null,
 			outlet: null,
 			linked: false,
 			linkedBulletIndicator: new LinkBullet({
@@ -39,7 +36,6 @@ export class LinkHook extends Circle {
 			fillOpacity: 'never',
 			strokeColor: 'never',
 			name: 'always',
-			kind: 'on_init',
 			outlet: 'on_init'
 		}
 	}

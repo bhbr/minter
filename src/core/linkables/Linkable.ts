@@ -18,6 +18,7 @@ export interface IOProperty {
 	name: string
 	type: string
 	displayName: string | null
+	kind?: 'value' | 'action'
 }
 
 export class Linkable extends Mobject {
@@ -98,13 +99,13 @@ which can be linked to such-exposed variables of other mobjects.
 		if (this.outputList.height != 0) {
 			this.outputList.view.show()
 		}
-		this.disable()
+		//this.disable()
 	}
 
 	hideLinks() {
 		this.inputList.view.hide()
 		this.outputList.view.hide()
-		this.enable()
+		//this.enable()
 	}
 
 	inputHooks(): Array<LinkHook> {
@@ -182,12 +183,12 @@ which can be linked to such-exposed variables of other mobjects.
 	}
 
 	addedInputLink(link: DependencyLink) {
-		link.startHook.outlet.ioList.mobject.updateDependents()
+		link.startHook.outlet.ioList.mobject.updateDependents(true)
 	}
 
 	addedOutputLink(link: DependencyLink) {
 		this.update()
-		this.updateDependents()
+		this.updateDependents(true)
 	}
 
 	removedInputLink(link: DependencyLink) {
@@ -197,7 +198,7 @@ which can be linked to such-exposed variables of other mobjects.
 	removedOutputLink(link: DependencyLink) {
 		this.update()
 		if (!link.startHook) { return }
-		link.startHook.outlet.removeUnlinkedHook()
+		//link.startHook.outlet.removeUnlinkedHook()
 	}
 
 	inputNames(): Array<string> {
@@ -215,6 +216,19 @@ which can be linked to such-exposed variables of other mobjects.
 		this.outputList.positionSelf()
 	}
 
+	isLinked(prop: string, kind: 'input' | 'output'): boolean {
+		let ioList = (kind == 'input') ? this.inputList : this.outputList
+		let outlet = ioList.outletNamed(prop)
+		return outlet.linkHooks[0].linked
+	}
+
+	linkedInputProperties(): Array<string> {
+		return this.inputNames().filter((x) => this.isLinked(x, 'input'))
+	}
+
+	linkedOutputProperties(): Array<string> {
+		return this.outputNames().filter((x) => this.isLinked(x, 'output'))
+	}
 
 	createInputVariable(name: string, value: number) {
 		this.createProperty(name, value)
@@ -277,6 +291,19 @@ which can be linked to such-exposed variables of other mobjects.
 		})
 		this.positionIOLists()
 		this.outputList.view.hide()
+	}
+
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, kind: 'value' | 'action' = 'value', refresh: boolean = true) {
+		var newKind: 'value' | 'action' = 'value'
+		if (target instanceof Linkable) {
+			for (let prop of (target as Linkable).inputProperties) {
+				if (prop['name'] == inputName) {
+					newKind = prop['kind'] ?? 'value'
+					break
+				}
+			}
+		}
+		super.addDependency(outputName, target, inputName, newKind, refresh)
 	}
 
 }

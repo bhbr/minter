@@ -5,6 +5,7 @@ import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { numberArraySum } from 'core/functions/numberArray'
 import { log } from 'core/functions/logging'
+import { prettyPrint } from 'core/functions/various'
 
 export class NumberValuedFunctionBox extends NumberBox {
 	
@@ -54,9 +55,14 @@ export class NumberValuedFunctionBox extends NumberBox {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		args['value'] = this.result()
-		super.update(args, redraw)
+		let hasNewValue = (args['argument'] !== undefined)
+		super.update(args, !hasNewValue)
+		if (hasNewValue) {
+			super.update({ value: this.result() }, redraw)
+		}
 	}
+
+
 
 
 

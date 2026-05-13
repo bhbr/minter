@@ -10,6 +10,7 @@ This class here is almost entirely representational, the actual updating is done
 	outputName: string | null
 	target: Mobject
 	inputName: string | null
+	kind: 'value' | 'action'
 
 	constructor(args: object = {}) {
 
@@ -21,6 +22,7 @@ This class here is almost entirely representational, the actual updating is done
 		this.inputName = args['inputName']
 		if (this.inputName === undefined) { this.inputName = null }
 			
+		this.kind = args['kind'] ?? 'value'
 	}
 
 	delete() {

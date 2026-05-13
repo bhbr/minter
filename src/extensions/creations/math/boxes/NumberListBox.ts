@@ -9,6 +9,7 @@ import { log } from 'core/functions/logging'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { SimpleButton } from 'core/ui/SimpleButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
+import { TextLabel } from 'core/ui/TextLabel'
 
 export class NumberListBox extends Linkable {
 	
@@ -30,7 +31,7 @@ export class NumberListBox extends Linkable {
 			preventDefault: false,
 			inputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
-				{ name: 'newestEntry', displayName: 'add entry', type: 'number' },
+				{ name: 'newestEntry', displayName: 'add entry', type: 'number', kind: 'action' },
 			],
 			outputProperties: [
 				{ name: 'value', displayName: 'list', type: 'Array<number>' },
@@ -44,8 +45,12 @@ export class NumberListBox extends Linkable {
 		}
 	}
 
-	get list(): Array<number> { return this.value }
-	set list(newValue: Array<number>) { this.value = newValue }
+	get list(): Array<number> {
+		return this.value
+	}
+	set list(newValue: Array<number>) {
+		this.value = newValue
+	}
 
 	setup() {
 		super.setup()
@@ -136,14 +141,16 @@ export class NumberListBox extends Linkable {
 			let isFalsy = [null, undefined, NaN, Infinity, -Infinity].includes(newValue)
 			if (isFalsy) { return }
 			this.list.push(newValue)
-		} else {
+		} else if (newValue instanceof Array) {
 			this.list.push(...newValue)
 		}
 		this.scroll.view.div.scrollTop = this.scroll.view.div.scrollHeight
+		this.update()
 	}
 
 	addedInputLink(link: DependencyLink) {
-		if (link.endHook.outlet.name == 'newestEntry') {
+		if (link.startHook.outlet.name == 'newestEntry' || link.endHook.outlet.name == 'newestEntry') {
+			link.dependency.kind = 'action'
 			this.clear()
 		}
 	}

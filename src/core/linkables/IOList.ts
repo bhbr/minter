@@ -10,7 +10,7 @@ import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTI
 import { log } from 'core/functions/logging'
 import { clear, remove } from 'core/functions/arrays'
 import { IOProperty } from './Linkable'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 export class IOList extends RoundedRectangle {
 /*
@@ -36,7 +36,8 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			fillOpacity: 1.0,
 			strokeColor: Color.gray(0.4),
 			strokeWidth: 0.75,
-			editable: false
+			editable: false,
+			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
 
@@ -205,6 +206,21 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			ret = ret.concat(outlet.linkHooks)
 		}
 		return ret
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		
+		let t = this.sensor.eventTargetMobject(e)
+		log(`event target as seen by IOList: ${t.constructor.name}`)
+		this.mobject.board.startLinking(e)
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		this.mobject.board.linking(e)
+	}
+
+	onPointerUp(e: ScreenEvent) {
+		this.mobject.board.endLinking(e)
 	}
 
 }

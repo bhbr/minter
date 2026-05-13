@@ -14,6 +14,7 @@ import { Motor } from './Motor'
 import { Sensor } from './Sensor'
 import { getPaper } from 'core/functions/getters'
 import { UpdateCall, UpdateCalls } from './UpdateCall'
+import { Linkable } from 'core/linkables/Linkable'
 
 export class Mobject extends ExtendedObject {
 
@@ -346,7 +347,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return otherMobject.allDependents().includes(this)
 	}
 
-	addDependency(outputName: string | null, target: Mobject, inputName: string | null, refresh: boolean = true) {
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, kind: 'value' | 'action' = 'value', refresh: boolean = true) {
 		if (this.dependsOn(target)) {
 			throw 'Circular dependency!'
 		}
@@ -354,7 +355,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			source: this,
 			outputName: outputName,
 			target: target,
-			inputName: inputName
+			inputName: inputName,
+			kind: kind
 		})
 		this.dependencies.push(dep)
 		if (refresh) {
@@ -413,7 +415,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-
 		super.update(args)
 
 		// TODO: move to CindyCanvas
@@ -450,9 +451,11 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		}
 	}
 
-	getUpdateCalls(): UpdateCalls {
+	getUpdateCalls(onlyValues: boolean = false): UpdateCalls {
 		let ret = new UpdateCalls()
 		for (let dep of this.dependencies) {
+			if (onlyValues && dep.kind == 'action') { continue }
+			//log('A')
 			let dict = {}
 			if (typeof this[dep.outputName] == 'function') {
 				dict[dep.inputName] = this[dep.outputName].bind(this)
@@ -466,8 +469,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		return ret
 	}
 
-	updateDependents() {
-		let calls = this.getUpdateCalls()
+	updateDependents(onlyValues: boolean = false) {
+		let calls = this.getUpdateCalls(onlyValues)
 		calls.call()
 	}
 
@@ -529,8 +532,13 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	draggingEnabled: boolean
 
 	setDragging(flag: boolean) {
+		log('setDragging on')
+		log(this.constructor.name)
+		log(flag)
+		log(this.draggingEnabled)
 		if (flag) {
 			if (this.draggingEnabled) { return }
+			log('here')
 			this.sensor.setTouchMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
 			this.sensor.setPenMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
 			this.sensor.setMouseMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
@@ -544,6 +552,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	startDragging(e: ScreenEvent) {
+		log(`startDragging on ${this.constructor.name}`)
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
 		this.hideShadow()
 		this.parent.update()

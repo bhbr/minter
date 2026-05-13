@@ -74,9 +74,11 @@ export class Coin extends Circle {
 			this.update({ state: newState }, false)
 			window.setTimeout(function() {
 				this.update()
+				this.updateDependents()
 			}.bind(this), 50)
 		} else {
 			this.update({ state: newState })
+			this.updateDependents()
 		}
 	} 
 

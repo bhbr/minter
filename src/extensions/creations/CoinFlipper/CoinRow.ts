@@ -13,6 +13,8 @@ import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 import { getPaper } from 'core/functions/getters'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { remove } from 'core/functions/arrays'
+import { MERE_TAP_DELAY } from 'core/constants'
+import { Checkbox } from 'core/ui/Checkbox'
 
 export class CoinRow extends Linkable implements Playable {
 
@@ -30,6 +32,9 @@ export class CoinRow extends Linkable implements Playable {
 	nbTailsLabel: TextLabel
 	labelWidth: number
 	nbCoinsInputBox: NumberInputBox
+	fasterCheckbox: Checkbox
+	playFaster: boolean
+	speedMultiplier: number
 
 	defaults(): object {
 		return {
@@ -63,7 +68,6 @@ export class CoinRow extends Linkable implements Playable {
 				{ name: 'nbHeads', displayName: '# heads', type: 'number' },
 				{ name: 'nbTails', displayName: '# tails', type: 'number' },
 				{ name: 'nbCoins', displayName: '# coins', type: 'number' },
-				{ name: 'mean', displayName: 'mean', type: 'number' }
 			],
 			frameWidth: 300,
 			frameHeight: 50,
@@ -71,6 +75,14 @@ export class CoinRow extends Linkable implements Playable {
 				labelText: '# coins:',
 				value: 1
 			}),
+
+			fasterCheckbox: new Checkbox({
+				anchor: [60, 70],
+				text: 'x10',
+				state: false
+			}),
+			playFaster: false,
+			speedMultiplier: 10
 		}
 	}
 
@@ -80,6 +92,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.setupLabels()
 		this.setupButton()
 		this.setupInputBox()
+		this.setupCheckbox()
 	}
 
 	createCoins() {
@@ -124,6 +137,21 @@ export class CoinRow extends Linkable implements Playable {
 		})
 	}
 
+	setupCheckbox() {
+		this.controls.add(this.fasterCheckbox)
+		this.fasterCheckbox.label.update({
+			frameWidth: 50
+		})
+
+		this.fasterCheckbox.onToggle = function() {
+			this.playFaster = !this.playFaster
+			if (this.playState == 'play') {
+				this.pause()
+				this.play()
+			}
+		}.bind(this)
+	}
+
 	endNbCoinsEditing() {
 		getPaper().blurFocusedChild()
 		this.nbCoinsInputBox.inputElement.blur()
@@ -152,6 +180,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
 		this.positionButton()
+		this.positionCheckbox()
 		this.positionNbCoinsInputBox()
 		this.positionIOLists()
 		this.updateDependents()
@@ -163,6 +192,7 @@ export class CoinRow extends Linkable implements Playable {
 		this.adjustFrameWidth()
 		this.positionTailsLabel()
 		this.positionButton()
+		this.positionCheckbox()
 		this.positionNbCoinsInputBox()
 		this.positionIOLists()
 		this.updateDependents()
@@ -192,6 +222,15 @@ export class CoinRow extends Linkable implements Playable {
 		})
 	}
 
+	positionCheckbox() {
+		this.fasterCheckbox.update({
+			anchor: [
+				this.playButton.anchor[0] + 65,
+				this.playButton.anchor[1] + 4
+			]
+		})
+	}
+
 	positionNbCoinsInputBox() {
 		this.nbCoinsInputBox.update({
 			anchor: [
@@ -213,18 +252,23 @@ export class CoinRow extends Linkable implements Playable {
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flipCoins()
-	}
-
-	onLongPress(e: ScreenEvent) {
-		this.flipCoins(100)
+		if (this.playFaster) {
+			this.flipCoins(this.speedMultiplier)
+		} else {
+			this.flipCoins()
+		}
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(
-			function() {
+		if (!this.playFaster) {
+			this.playIntervalID = window.setInterval(function() {
 				this.flipCoins()
-			}.bind(this), 100)
+			}.bind(this), 250)
+		} else {
+			this.playIntervalID = window.setInterval(function() {
+				this.flipCoins(this.speedMultiplier)
+			}.bind(this), 250)
+		}
 		this.playState = 'play'
 	}
 	
@@ -258,10 +302,6 @@ export class CoinRow extends Linkable implements Playable {
 		return this.nbCoins - this.nbTails()
 	}
 	nbHeadsAsString(): string { return this.nbHeads().toString() }
-
-	mean(): number {
-		return this.nbTails() / this.nbCoins
-	}
 
 	update(args: object = {}, redraw: boolean = false) {
 		let newNbCoins = args['nbCoins']

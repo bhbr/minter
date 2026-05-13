@@ -6,6 +6,9 @@ import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
 import { SimpleButton } from 'core/ui/SimpleButton'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { log } from 'core/functions/logging'
+import { Color } from 'core/classes/Color'
+import { MERE_TAP_DELAY } from 'core/constants'
+import { Checkbox } from 'core/ui/Checkbox'
 
 export class PlayableCoin extends Linkable implements Playable {
 
@@ -15,6 +18,9 @@ export class PlayableCoin extends Linkable implements Playable {
 	playButton: PlayButton
 	valueHistory: Array<number>
 	swipedSide: CoinState | null
+	fasterCheckbox: Checkbox
+	playFaster: boolean
+	speedMultiplier: number
 
 	defaults(): object {
 		return {
@@ -36,7 +42,15 @@ export class PlayableCoin extends Linkable implements Playable {
 			],
 			frameWidth: 50,
 			frameHeight: 50,
-			swipedSide: null
+			swipedSide: null,
+
+			fasterCheckbox: new Checkbox({
+				anchor: [65, 74],
+				text: 'x10',
+				state: false
+			}),
+			playFaster: false,
+			speedMultiplier: 10
 		}
 	}
 
@@ -62,20 +76,25 @@ export class PlayableCoin extends Linkable implements Playable {
 		//this.add(this.playButton)
 		this.controls.add(this.playButton)
 		this.playButton.mobject = this
+
+		this.controls.add(this.fasterCheckbox)
+
+		this.fasterCheckbox.onToggle = function() {
+			this.playFaster = !this.playFaster
+			if (this.playState == 'play') {
+				this.pause()
+				this.play()
+			}
+		}.bind(this)
 	}
 
 	onTap(e: ScreenEvent) {
-		this.flip()
-		this.coin.update({
-			opacity: 1
-		})
-	}
-
-	onLongPress(e: ScreenEvent) {
-		this.flip(true, 100)
-		this.coin.update({
-			opacity: 1
-		})
+		if (this.swipedSide) { return } // bc onPointerUp handles the flip
+		if (this.playFaster) {
+			this.flip(false, this.speedMultiplier)
+		} else {
+			this.flip(true)
+		}
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -100,12 +119,21 @@ export class PlayableCoin extends Linkable implements Playable {
 			opacity: 1
 		})
 		if (this.swipedSide) {
-			this.coin.flipToState(this.swipedSide, true)
-			this.update()
-			this.updateDependents()
+			if (this.playFaster) {
+				for (let i = 0; i < this.speedMultiplier; i++) {
+					this.coin.flipToState(this.swipedSide, false)
+					this.update()
+					this.updateDependents()
+				}
+			} else {
+				this.coin.flipToState(this.swipedSide, true)
+				this.update()
+				this.updateDependents()
+			}
 			this.swipedSide = null
 		}
 	}
+
 
 	flip(animate: boolean = false, nbFlips: number = 1) {
 		for (let i = 0; i < nbFlips; i++) {
@@ -117,9 +145,15 @@ export class PlayableCoin extends Linkable implements Playable {
 	}
 
 	play() {
-		this.playIntervalID = window.setInterval(function() {
-			this.flip(true)
-		}.bind(this), 250)
+		if (!this.playFaster) {
+			this.playIntervalID = window.setInterval(function() {
+				this.flip(true)
+			}.bind(this), 250)
+		} else {
+			this.playIntervalID = window.setInterval(function() {
+				this.flip(false, this.speedMultiplier)
+			}.bind(this), 250)
+		}
 		this.playState = 'play'
 	}
 	

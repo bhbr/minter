@@ -423,9 +423,16 @@ The content children can also be dragged and panned.
 	}
 
 	setInternalDragging(value: boolean) {
+		log(`setInternalDragging to ${value}, and this.allowingDrag = ${this.allowingDrag}`)
 		if (value == this.allowingDrag) { return }
 		this.allowingDrag = value
+		log('still here')
 		this.setPanning(value)
+		// if (this.isShowingLinks) {
+		// 	log('disable linking, but still show links')
+		// 	this.setLinking(false)
+		// 	this.showLinksOfContent()
+		// }
 		for (let mob of this.contentChildren) {
 			mob.setDragging(value)
 		}
@@ -451,11 +458,6 @@ The content children can also be dragged and panned.
 					break
 				}
 				this.setLinking(value as boolean)
-				if (value as boolean) {
-					this.setControlsVisibility(false)
-				} else {
-					this.setControlsVisibility(this.isShowingControls)
-				}
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
@@ -472,16 +474,8 @@ The content children can also be dragged and panned.
 				})
 				if (value as boolean) {
 					this.helpTextLabel.view.show()
-					//this.hideLinksOfContent()
 				} else {
 					this.helpTextLabel.view.hide()
-					if (this.isShowingLinks) {
-						this.showLinksOfContent()
-						this.disableContent()
-					} else {
-						this.hideLinksOfContent()
-						this.enableContent()
-					}
 				}
 				this.setControlsVisibility(value as boolean)
 				this.isShowingControls = value
@@ -515,7 +509,7 @@ The content children can also be dragged and panned.
 				this.creator.update({
 					anchor: (this.creationMode == 'draw') ? [0, 0] : this.creationStroke[0]
 				})
-				this.add(this.creator)
+				//this.add(this.creator)
 				this.helpTextLabel.update({
 					text: this.creator.helpText
 				})
@@ -604,6 +598,35 @@ The content children can also be dragged and panned.
 		return null
 	}
 
+	ioListContaining(p: vertex): Array<Mobject> {
+		let mobs: Array<Mobject> = []
+		for (let child of this.contentChildren) {
+			if (!(child instanceof Linkable)) { continue }
+			let q = vertexSubtract(p, child.anchor)
+			if (child.inputList.frame.contains(q)) {
+				mobs.push(child.inputList)
+			}
+			if (child.outputList.frame.contains(q)) {
+				mobs.push(child.outputList)
+			}
+		}
+		return mobs
+	}
+
+	firstIOListContaining(p: vertex): Mobject | null {
+		for (let child of this.contentChildren) {
+			if (!(child instanceof Linkable)) { continue }
+			let q = vertexSubtract(p, child.anchor)
+			if (child.inputList.frame.contains(q)) {
+				return child.inputList
+			}
+			if (child.outputList.frame.contains(q)) {
+				return child.outputList
+			}
+		}
+		return null
+	}
+
 	startErasing(e: ScreenEvent) {
 		this.erasing(e)
 	}
@@ -622,6 +645,9 @@ The content children can also be dragged and panned.
 					link.endHook.update({
 						linked: false
 					})
+					if (link.dependency.kind == 'action') {
+						link.endHook.outlet.removeHook()
+					}
 					linksToBeRemoved.push(link)
 					this.remove(link)
 				}
@@ -724,6 +750,7 @@ The content children can also be dragged and panned.
 	}
 
 	startCreating(e: ScreenEvent) {
+		log('startCreating')
 		this.creationTool = screenEventDevice(e)
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
@@ -740,6 +767,9 @@ The content children can also be dragged and panned.
 	}
 
 	creating(e: ScreenEvent) {
+		if (this.creator === null) {
+			return
+		}
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
 		}
@@ -775,6 +805,9 @@ The content children can also be dragged and panned.
 	panPointStart?: vertex
 
 	startPanning(e: ScreenEvent) {
+		log('startPanning')
+		let target = this.sensor.eventTarget
+		log(target.constructor.name)
 		// if (e instanceof TouchEvent) {
 		// 	if (e.touches.length == 2) {
 		// 		this.startZooming(e)
@@ -823,6 +856,7 @@ The content children can also be dragged and panned.
 	}
 
 	setPanning(flag: boolean) {
+		log(`setPanning to ${flag}`)
 		if (flag) {
 			this.sensor.setTouchMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
 			this.sensor.setPenMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
@@ -924,26 +958,26 @@ The content children can also be dragged and panned.
 	}
 
 	setLinking(flag: boolean) {
+		log(`setLinking to ${flag}`)
 		if (flag === this.isShowingLinks) {
 			return
 		}
 		if (flag && !this.isShowingLinks) {
 			this.showLinksOfContent()
-			this.disableContent()
+			//this.disableContent()
 			this.ungreyAllHooks()
 		} else if (!flag && this.isShowingLinks) { // if (!this.editingLinkName) {
 			this.hideLinksOfContent()
-			this.enableContent()
+			//this.enableContent()
 		}
 		this.isShowingLinks = flag
 		if (flag) {
-			this.disableContent()
+			//this.disableContent()
 			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
 			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-
 		} else {
-			this.enableContent()
+			//this.enableContent()
 			this.sensor.restoreTouchMethods()
 			this.sensor.restorePenMethods()
 			this.sensor.restoreMouseMethods()
@@ -951,16 +985,52 @@ The content children can also be dragged and panned.
 	}
 
 	startLinking(e: ScreenEvent) {
+		log('startLinking')
+		let t = this.sensor.eventTarget
+		log(`event target as seen by Board: ${t.constructor.name}`)
 		var p = this.sensor.localEventVertex(e)
 		let clickedHook = this.hookAtLocation(p)
 		if (clickedHook == null) {
-			let l = this.sensor.eventTargetMobjectChain(e)
-			for (let mob of l) {
-				if (mob instanceof IOList) {
-					return
-				}
+			log('no hook')
+			// if (this.allowingDrag) {
+			// 	log('drag allowed')
+			// 	this.setLinking(false)
+			// 	this.showLinksOfContent()
+			// 	//this.setInternalDragging(true)
+			// 	let t = this.sensor.eventTargetMobject(e)
+			// 	log(`target: ${t.constructor.name}`)
+			// 	t.startDragging(e)
+			// 	return
+			// }
+			// let l = this.sensor.eventTargetMobjectChain(e).reverse()
+			// for (let mob of l) {
+			// 	if (mob instanceof IOList) {
+			// 		return
+			// 	}
+			// }
+			
+			// let t1 = this.sensor.eventTargetMobject(e)
+			// let t2 = this.sensor.eventTarget
+			// log(t1)
+			// log(t2)
+			// if (this.sensor.eventTargetMobject(e) == this) {
+			// 	this.startCreating(e)
+			// }
+			let l = this.firstIOListContaining(p)
+			let mob = this.firstContentChildContaining(p)
+			log(p)
+			log(l)
+			log(mob)
+			if (l !== null) {
+				return
 			}
-			this.startCreating(e)
+			if (mob === null) {
+				this.sensor.eventTarget = this
+				this.startCreating(e)
+				return
+			}
+			this.sensor.eventTarget = mob
+			mob.onPointerDown(e)
 			return
 		}
 		p = this.locationOfHook(clickedHook)
@@ -975,7 +1045,6 @@ The content children can also be dragged and panned.
 			remove(this.links, link)
 			this.remove(link)
 			if (clickedHook.outlet.kind == 'output') {
-				clickedHook.outlet.removeHook()
 				this.createNewOpenLink(link.endHook, link.previousHook, link.dependency)
 			} else {
 				this.createNewOpenLink(link.startHook, link.previousHook, link.dependency)
@@ -1110,8 +1179,9 @@ The content children can also be dragged and panned.
 		return ret
 	}
 
+
 	endLinking(e: ScreenEvent) {
-		this.disableContent()
+		//this.disableContent()
 		this.ungreyAllHooks()
 		this.showLinksOfContent()
 		if (!this.openLink) {
@@ -1120,24 +1190,29 @@ The content children can also be dragged and panned.
 		}
 		this.showAllHooks()
 		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
-		if (h === null) {
+		if (h === null || h === undefined) {
+			// TODO: remove the possibility of h being undefined
 			if (this.openLink) {
 				this.remove(this.openLink)
 				if (this.openLink.startHook) {
 					this.openLink.startHook.update({ linked: false })
 					if (this.openLink.previousHook) {
+						this.openLink.startHook.outlet.removeHook()
+						if (this.openLink.dependency.kind == 'action') {
+							this.openLink.previousHook.outlet.removeHook()
+						}
 						this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
-					}
-				}
-				if (this.openLink.endHook) {
-					this.openLink.endHook.update({ linked: false })
-					this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
-				}
-				if (this.openLink.previousHook) {
-					if (this.openLink.previousHook.outlet.kind == 'input') {
 						this.openLink.previousHook.outlet.ioList.mobject.removedInputLink(this.openLink)
-					} else {
+					}
+				} else if (this.openLink.endHook) {
+					this.openLink.endHook.update({ linked: false })
+					if (this.openLink.previousHook) {
+						this.openLink.previousHook.outlet.removeHook()
+						if (this.openLink.dependency.kind == 'action') {
+							this.openLink.endHook.outlet.removeHook()
+						}
 						this.openLink.previousHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+						this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 					}
 				}
 			}
@@ -1148,24 +1223,31 @@ The content children can also be dragged and panned.
 			return
 		}
 
-		if (this.openLink.startHook == null) {
-			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
+
+		let startHookWasNull = (this.openLink.startHook == null)
+		if (startHookWasNull) {
 			this.openLink.update({ startHook: h })
 			this.openLink.previousHook = this.openLink.startHook
-			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
 		} else {
-			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
 			this.openLink.update({ endHook: h })
 			this.openLink.previousHook = this.openLink.endHook
-			this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
 		}
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
-		this.openLink.previousHook = null
 		this.openLink.view.hide() //this.openLink.hideLine()
 
 		this.links.push(this.openLink)
 		this.createNewDependency()
+
+		if (startHookWasNull) {
+			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
+			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)	
+		} else {
+			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
+			this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
+		}
+
+		this.openLink.previousHook = null
 		this.openLink = null
 		this.openHook = null
 		this.openBullet = null
@@ -1278,6 +1360,9 @@ The content children can also be dragged and panned.
 		if (startHook == startHook.outlet.linkHooks[startHook.outlet.linkHooks.length - 1]) {
 			startHook.outlet.addHook()
 		}
+		if (endHook == endHook.outlet.linkHooks[endHook.outlet.linkHooks.length - 1] && this.openLink.dependency.kind == 'action') {
+			endHook.outlet.addHook()
+		}
 		startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
 		endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
 	}
@@ -1290,17 +1375,49 @@ The content children can also be dragged and panned.
 		)
 		startHook.removeAllDependents()
 		endHook.removeAllDependents()
-		startHook.outlet.removeHook()
+		//startHook.outlet.removeHook()
 		if (this.openLink) {
 			startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
 			endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 		}
 	}
 
+	removeDependencyOfLink(link: DependencyLink) {
+		let startHook = link.startHook
+		let endHook = link.endHook
+		startHook.outlet.ioList.mobject.removeDependencyBetween(
+			startHook.outlet.name,
+			endHook.outlet.ioList.mobject,
+			endHook.outlet.name
+		)
+		startHook.removeAllDependents()
+		endHook.removeAllDependents()
+		//startHook.outlet.removeHook()
+		startHook.outlet.ioList.mobject.removedOutputLink(link)
+		endHook.outlet.ioList.mobject.removedInputLink(link)
+	}
+
 	removeLink(link: DependencyLink) {
-		this.removeDependencyBetweenHooks(link.startHook, link.endHook)
+		if (this.openLink) {
+			this.removeDependencyBetweenHooks(link.startHook, link.endHook)
+		} else {
+			this.removeDependencyOfLink(link)
+		}
 		remove(this.links, link)
 		this.remove(link)
+	}
+
+	removeInputLinkForPropertyAtMobject(prop: string, mob: Linkable, index: number = 0) {
+		let outlet = mob.inputList.outletNamed(prop)
+		if (!outlet) { return }
+		let hook = outlet.linkHooks[index]
+		if (!hook) { return }
+		let link = this.linkForHook(hook)
+		if (!link) { return }
+		this.removeLink(link)
+		link.startHook.update({ linked: false })
+		link.endHook.update({ linked: false })
+		link.startHook.outlet.removeHook()
 	}
 
 	removeDependencyAtHook(hook: LinkHook) {
@@ -1358,7 +1475,9 @@ The content children can also be dragged and panned.
 	}
 
 	freeCompatibleHookAtLocation(p: vertex): LinkHook | null {
-		return this.hookAtLocationFromList(p, this.freeCompatibleHooks())
+		let freeHooks = this.freeCompatibleHooks()
+		let hook = this.hookAtLocationFromList(p, freeHooks)
+		return hook
 	}
 
 	//////////////////////////////////////////////////////////
