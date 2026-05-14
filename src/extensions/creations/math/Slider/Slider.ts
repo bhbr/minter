@@ -188,6 +188,24 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			this.renameLinkableProperty('output', this.name ?? 'value', args['name'])
 		}
 
+		let newValue = args['value'] ?? this.value
+		let newMax = args['max'] ?? this.max
+		let newMin = args['min'] ?? this.min
+		if (newMin > newMax) {
+			if (args['max']) {
+				args['max'] = newMin
+			}
+			if (args['min']) {
+				args['min'] = newMax
+			}
+		}
+		if (newValue > newMax) {
+			args['value'] = newMax
+		}
+		if (newValue < newMin) {
+			args['value'] = newMin
+		}
+
 		super.update(args, false)
 
 		if (args['width'] !== undefined) {
@@ -200,7 +218,6 @@ between a min (0 for now) and max (1 for now) value via scrubbing.
 			})
 		}
 
-		let newMax = args['max']
 		if (newMax !== undefined && newMax != this.max) {
 			this.maxValueInputBox.inputElement.value = `${newMax}`
 			this.maxValueInputBox.value = newMax
