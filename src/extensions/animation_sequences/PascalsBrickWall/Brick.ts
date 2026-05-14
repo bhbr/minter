@@ -1,11 +1,12 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
-import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BRICK_WIDTH, ROW_LENGTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
 import { vertex, vertexAdd } from 'core/functions/vertex'
 import { Line } from 'core/shapes/Line'
+import { Circle } from 'core/shapes/Circle'
 
 export class Brick extends Rectangle {
 	
@@ -15,19 +16,33 @@ export class Brick extends Rectangle {
 	headsColor: Color
 	tailsColor: Color
 	widthScale: number
+	anchorMarker: Circle
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			nbTails: 0,
 			tailsProbability: 0.5,
-			height: BRICK_HEIGHT,
-			widthScale: ROW_WIDTH,
+			height: BRICK_WIDTH,
+			widthScale: ROW_LENGTH,
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH,
 			headsColor: HEADS_COLOR,
-			tailsColor: TAILS_COLOR
+			tailsColor: TAILS_COLOR,
+			anchorMarker: new Circle({
+				fillColor: Color.green(),
+				fillOpacity: 1,
+				radius: 5
+			})
 		}
+	}
+
+	setup() {
+		super.setup()
+		this.anchorMarker.update({
+			midpoint: this.anchor
+		})
+		this.add(this.anchorMarker)
 	}
 
 	headsProbability(): number {
@@ -70,7 +85,7 @@ export class Brick extends Rectangle {
 			transform: this.transform.copy(),
 			height: this.height,
 			width: this.rightPartWidth(),
-			fillColor: this.getFillColor(),
+			fillColor: this.getFillColor().brighten(0.8),
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH
 		})

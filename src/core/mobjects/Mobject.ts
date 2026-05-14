@@ -66,6 +66,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			motor: new Motor(),
 			sensor: new Sensor(),
 			preventDefault: true,
+			divComment: null,
 
 			draggingEnabled: false,
 
@@ -92,6 +93,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		addPointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this.sensor))
 		addPointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this.sensor))
 		addPointerOut(this.view.div, this.sensor.capturedOnPointerOut.bind(this.sensor))
+
 	}
 
 
@@ -103,6 +105,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	//////////////////////////////////////////////////////////
 
 	view: View
+	divComment: string | null
 
 	//////////// Aliases ////////////
 
@@ -426,6 +429,11 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 				this.view.div.style['pointer-events'] = 'auto'
 			}
 		}
+	
+		if (this.divComment !== null) {
+			this.view.div.setAttribute('comment', this.divComment)
+		}
+
 
 		if (redraw) { this.view.redraw() }
 

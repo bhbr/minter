@@ -2,7 +2,7 @@
 import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
 import { Partition } from './Partition'
 import { Linkable } from 'core/linkables/Linkable'
-import { HEADS_COLOR, TAILS_COLOR, BRICK_HEIGHT, ROW_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BRICK_WIDTH, ROW_LENGTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
 import { vertexTranslatedBy } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { Line } from 'core/shapes/Line'
@@ -38,15 +38,15 @@ export class PascalsBrickWall extends Linkable {
 				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
 			],
 			nextSubstepButton: new SimpleButton({
-				anchor: [0.5 * (ROW_WIDTH - 50), BRICK_HEIGHT + 10],
+				anchor: [0.5 * (ROW_LENGTH - 50), BRICK_WIDTH + 10],
 				text: ">"
 			}),
 			nextStepButton: new SimpleButton({
-				anchor: [0.5 * (ROW_WIDTH - 50) + 60, BRICK_HEIGHT + 10],
+				anchor: [0.5 * (ROW_LENGTH - 50) + 60, BRICK_WIDTH + 10],
 				text: ">>"
 			}),
 			histogramButton: new SimpleButton({
-				anchor: [800, BRICK_HEIGHT + 10],
+				anchor: [800, BRICK_WIDTH + 10],
 				text: "H"
 			}),
 			nextRow: null
@@ -64,7 +64,7 @@ export class PascalsBrickWall extends Linkable {
 
 		for (var i = 0; i < this.nbFlips; i++) {
 			let row = new Partition({
-				anchor: [0, -BRICK_HEIGHT * i],
+				anchor: [0, -BRICK_WIDTH * i],
 				nbFlips: i + 1,
 				tailsProbability: this.tailsProbability,
 				headsColor: this.headsColor,
@@ -110,7 +110,7 @@ export class PascalsBrickWall extends Linkable {
 		this.duplicatedRow.view.show()
 		for (var i = 0; i < this.rows.length; i++) {
 			this.rows[i].animate({
-				anchor: [0, -(this.nbFlips - i) * BRICK_HEIGHT]
+				anchor: [0, -(this.nbFlips - i) * BRICK_WIDTH]
 			}, duration)
 		}
 		this.temporarilyDisableButtons()
@@ -131,7 +131,7 @@ export class PascalsBrickWall extends Linkable {
 			splitLines.push(line)
 			this.duplicatedRow.add(line)
 			line.animate({
-				endPoint: [x, BRICK_HEIGHT]
+				endPoint: [x, BRICK_WIDTH]
 			}, duration)
 		}
 		this.temporarilyDisableButtons()

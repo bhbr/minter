@@ -23,8 +23,8 @@ export const TESTING = true
 export const paper = new StartPaper()
 
 let p = new Partition({
-	nbFlips: 1,
-	anchor: [200, 300],
+	nbFlips: 4,
+	anchor: [0, 500],
 	presentationForm: 'row'
 })
 paper.addToContent(p)
