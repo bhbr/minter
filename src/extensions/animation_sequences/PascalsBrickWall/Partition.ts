@@ -755,7 +755,13 @@ export class Partition extends Linkable {
 	}
 
 	recenterBricksForCenteredHistogram(completionHandler: Function = () => {}) {
-		completionHandler()
+		for (let i = 0; i <= this.nbFlips + 1; i++) {
+			let b = this.bricks[i]
+			let newAnchor = [i * this.brickWidth, 0.5 * b.width]
+			b.animate(
+				this.brickPositionForCenteredHistogram(this.nbFlips, i),
+			this.animationDuration, false, (i == this.nbFlips) ? completionHandler : () => {})
+		}
 	}
 
 	// recenterBricks(completionHandler: Function = () => {}) {
