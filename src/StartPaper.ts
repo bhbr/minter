@@ -23,7 +23,7 @@ export const TESTING = true
 export const paper = new StartPaper()
 
 let p = new Partition({
-	nbFlips: 4,
+	nbFlips: 3,
 	anchor: [0, 500],
 	presentationForm: 'row'
 })

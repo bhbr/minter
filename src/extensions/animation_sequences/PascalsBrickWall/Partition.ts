@@ -104,9 +104,12 @@ export class Partition extends Linkable {
 	}
 
 	cumulatedBrickLength(nbFlips: number, nbTails: number): number {
-		// inclusive
+		// exclusive
+		if (nbTails == 0) {
+			return 0
+		}
 		var sum = 0
-		for (let i = 0; i <= nbTails; i++) {
+		for (let i = 0; i < nbTails; i++) {
 			sum += this.brickLength(nbFlips, i)
 		}
 		return sum
@@ -121,7 +124,8 @@ export class Partition extends Linkable {
 		log('setup')
 		super.setup()
 		this.add(this.anchorMarker)
-		for (var i = 0; i <= this.nbFlips; i++) {
+		log('brick lengths:')
+		for (let i = 0; i <= this.nbFlips; i++) {
 			let brick = new Brick({
 				nbFlips: this.nbFlips,
 				nbTails: i,
@@ -135,6 +139,10 @@ export class Partition extends Linkable {
 			this.addDependency('tailsColor', brick, 'tailsColor')
 			this.add(brick)
 			log(this.brickLength(this.nbFlips, i))
+		}
+		log('cumulated:')
+		for (let i = 0; i <= this.nbFlips; i++) {
+			log(this.cumulatedBrickLength(this.nbFlips, i))
 		}
 		this.positionBricks()
 		//this.createBrickParts()
@@ -172,7 +180,7 @@ export class Partition extends Linkable {
 		let angle = this.brickAngle(this.presentationForm)
 		for (var i = 0; i <= this.nbFlips; i++) {
 			this.bricks[i].update(
-				this.leftBrickPosition(this.presentationForm, this.nbFlips, i, 0)
+				this.leftBrickPosition(this.presentationForm, this.nbFlips, i)
 			)
 		}
 	}
@@ -201,20 +209,21 @@ export class Partition extends Linkable {
 
 	animateToForm(newForm: PresentationForm) {
 		let angle = this.brickAngle(newForm)
+		log('==============================================================')
 		log(`animating to ${newForm} after substep: ${this.animationSubstep}`)
-		for (var i = 0; i < this.bricks.length; i++) { // here we may already have more bricks than nbFlips (after merge, before mix)
+		for (let i = 0; i < this.bricks.length; i++) { // here we may already have more bricks than nbFlips (after merge, before mix)
 			log(`i = ${i}`)
 			this.bricks[i].animate(
-				this.leftBrickPosition(newForm, this.animationSubstep < 3 ? this.nbFlips : this.nbFlips + 1, i, this.animationSubstep),
+				this.brickPosition(newForm, this.nbFlips, i),
 			this.animationDuration)
 			if (this.leftBricks[i] !== undefined) { // see above, possibly one too few leftBricks
 				this.leftBricks[i].animate(
-					this.leftBrickPosition(newForm, this.nbFlips, i, this.animationSubstep),
+					this.leftBrickPosition(newForm, this.nbFlips, i),
 				this.animationDuration)
 			}
 			if (this.rightBricks[i] !== undefined) { // see above, possibly one too few rightBricks
 				this.rightBricks[i].animate(
-					this.rightBrickPosition(newForm, this.nbFlips, i, this.animationSubstep),
+					this.rightBrickPosition(newForm, this.nbFlips, i),
 				this.animationDuration)
 			}
 		}
@@ -235,65 +244,122 @@ export class Partition extends Linkable {
 	}
 
 
-	leftBrickPosition(presentationForm: PresentationForm, nbFlips: number, i: number, substep: number): BrickPosition {
+	brickPosition(presentationForm: PresentationForm, nbFlips: number, i: number): BrickPosition {
 		if (presentationForm == 'row') {
-			return this.leftBrickPositionForRow(nbFlips, i, substep)
+			return this.brickPositionForRow(nbFlips, i)
 		} else if (presentationForm == 'histogram') {
-			return this.leftBrickPositionForHistogram(nbFlips, i, substep)
-		} // else { // presentationForm == 'centered histogram'
-		// 	return this.leftBrickAnchorForCenteredHistogram(nbFlips, i)
-		// }
-	}
-
-	leftBrickPositionForRow(nbFlips: number, i: number, substep: number): BrickPosition {
-		log(`getting leftBrickPositionForRow with N = ${nbFlips}, i = ${i}, substep = ${substep}`)
-		return {
-			anchor: [this.cumulatedBrickLength(nbFlips, i - 1), 0],
-			transformAngle: this.brickAngle('row')
+			return this.brickPositionForHistogram(nbFlips, i)
+		} else { // presentationForm == 'centered histogram'
+			return this.brickPositionForCenteredHistogram(nbFlips, i)
 		}
 	}
 
-	leftBrickPositionForHistogram(nbFlips: number, i: number, substep: number): BrickPosition {
-		log(`getting leftBrickPositionForHistogram with N = ${nbFlips}, i = ${i}, substep = ${substep}`)
+	brickPositionForRow(nbFlips: number, i: number): BrickPosition {
+		log(`getting brickPositionForRow with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		if (this.animationSubstep < 3) { // before merging
+			return {
+				anchor: [this.cumulatedBrickLength(nbFlips, i), 0],
+				transformAngle: this.brickAngle('row')
+			}
+		} else { // when merging and afterwards
+			return {
+				anchor: [this.cumulatedBrickLength(nbFlips + 1, i), 0],
+				transformAngle: this.brickAngle('row')
+			}
+		}
+	}
+
+	brickPositionForHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting brickPositionForHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
 		return {
 			anchor: [i * this.brickWidth, 0],
 			transformAngle: this.brickAngle('histogram')
 		}
 	}
 
-	// leftBrickAnchorForCenteredHistogram(nbFlips: number, i: number): vertex {
+	brickPositionForCenteredHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting brickPositionForCenteredHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		if (this.animationSubstep < 5) { // before recentering
+			return {
+				anchor: [i * this.brickWidth, this.brickLength(nbFlips, i) / 2],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		} else { // when recentering and afterwards
+			return {
+				anchor: [i * this.brickWidth, this.brickLength(nbFlips + 1, i) / 2],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		}
+	}
 
-	// }
-
-
-	rightBrickPosition(presentationForm: PresentationForm, nbFlips: number, i: number, substep: number): BrickPosition {
+	leftBrickPosition(presentationForm: PresentationForm, nbFlips: number, i: number): BrickPosition {
 		if (presentationForm == 'row') {
-			return this.rightBrickPositionForRow(nbFlips, i, substep)
+			return this.leftBrickPositionForRow(nbFlips, i)
 		} else if (presentationForm == 'histogram') {
-			return this.rightBrickPositionForHistogram(nbFlips, i, substep)
-		} // else { // presentationForm == 'centered histogram'
-		// 	return this.rightBrickAnchorForCenteredHistogram(nbFlips, i)
-		// }
+			return this.leftBrickPositionForHistogram(nbFlips, i)
+		} else { // presentationForm == 'centered histogram'
+			return this.leftBrickPositionForCenteredHistogram(nbFlips, i)
+		}
 	}
 
-
-	rightBrickPositionForRow(nbFlips: number, i: number, substep: number): BrickPosition {
-		log(`getting rightBrickPositionForRow with N = ${nbFlips}, i = ${i}, substep = ${substep}`)
+	leftBrickPositionForRow(nbFlips: number, i: number): BrickPosition {
+		log(`getting leftBrickPositionForRow with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		log(this.cumulatedBrickLength(nbFlips, i))
 		return {
-			anchor: [this.cumulatedBrickLength(nbFlips, i - 1) + this.brickLength(nbFlips, i) / 2, 0],
-			transformAngle: this.brickAngle('row')}
+			anchor: [this.cumulatedBrickLength(nbFlips, i), 0],
+			transformAngle: this.brickAngle('row')
+		}
 	}
 
-	rightBrickPositionForHistogram(nbFlips: number, i: number, substep: number): BrickPosition {
-		log(`getting rightBrickPositionForHistogram with N = ${nbFlips}, i = ${i}, substep = ${substep}`)
-		if (substep < 2) { // split, but not yet moved
-			log('right brick position before')
+	leftBrickPositionForHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting leftBrickPositionForHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		return {
+			anchor: [i * this.brickWidth, 0],
+			transformAngle: this.brickAngle('histogram')
+		}
+	}
+
+	leftBrickPositionForCenteredHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting leftBrickPositionForCenteredHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		if (this.animationSubstep < 5) { // before recentering
+			return {
+				anchor: [i * this.brickWidth, this.brickLength(nbFlips, i) / 2],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		} else { // when recentering and afterwards
+			return {
+				anchor: [i * this.brickWidth, this.brickLength(nbFlips + 1, i) / 2],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		}
+	}
+
+	rightBrickPosition(presentationForm: PresentationForm, nbFlips: number, i: number): BrickPosition {
+		if (presentationForm == 'row') {
+			return this.rightBrickPositionForRow(nbFlips, i)
+		} else if (presentationForm == 'histogram') {
+			return this.rightBrickPositionForHistogram(nbFlips, i)
+		} else { // presentationForm == 'centered histogram'
+			return this.rightBrickPositionForCenteredHistogram(nbFlips, i)
+		}
+	}
+
+	rightBrickPositionForRow(nbFlips: number, i: number): BrickPosition {
+		log(`getting rightBrickPositionForRow with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		return {
+			anchor: [this.cumulatedBrickLength(nbFlips, i) + this.brickLength(nbFlips, i) / 2, 0],
+			transformAngle: this.brickAngle('row')
+		}
+	}
+
+	rightBrickPositionForHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting rightBrickPositionForHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		if (this.animationSubstep < 2) { // before moving
 			return {
 				anchor: [i * this.brickWidth, -this.brickLength(nbFlips, i) / 2],
 				transformAngle: this.brickAngle('histogram')
 			}
-		} else { // after moving
-			log('right brick position after')
+		} else { // when moving and afterwards
 			return {
 				anchor: [(i + 1) * this.brickWidth, -this.brickLength(nbFlips, i + 1) / 2],
 				transformAngle: this.brickAngle('histogram')
@@ -301,9 +367,20 @@ export class Partition extends Linkable {
 		}
 	}
 
-	// rightBrickAnchorForCenteredHistogram(nbFlips: number, i: number): vertex {
-
-	// }
+	rightBrickPositionForCenteredHistogram(nbFlips: number, i: number): BrickPosition {
+		log(`getting rightBrickPositionForCenteredHistogram with N = ${nbFlips}, i = ${i}, substep = ${this.animationSubstep}`)
+		if (this.animationSubstep < 2) { // before moving
+			return {
+				anchor: [i * this.brickWidth, 0],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		} else { // when moving and afterwards
+			return {
+				anchor: [(i + 1) * this.brickWidth, 0],
+				transformAngle: this.brickAngle('centered histogram')
+			}
+		}
+	}
 
 
 
@@ -312,7 +389,9 @@ export class Partition extends Linkable {
 	///////////////////////////////
 
 	splitBricks(completionHandler: Function = () => {}) {
+		log('===============================================')
 		log('split')
+		this.animationSubstep += 1
 		this.animateBrickSplitting(function() {
 			this.actuallySplitBricks()
 			completionHandler()
@@ -320,7 +399,7 @@ export class Partition extends Linkable {
 	}
 
 	animateBrickSplitting(completionHandler: Function = () => {}) {
-		for (var i = 0; i < this.bricks.length; i++) {
+		for (let i = 0; i < this.bricks.length; i++) {
 			let brick = this.bricks[i]
 			let startPoint = this.presentationForm == 'row' ? brick.frame.topCenter(brick.parent.frame) : brick.frame.leftCenter(brick.parent.frame)
 			let endPoint = this.presentationForm == 'row' ? brick.frame.bottomCenter(brick.parent.frame) : brick.frame.rightCenter(brick.parent.frame)
@@ -350,18 +429,18 @@ export class Partition extends Linkable {
 	}
 
 	createBrickParts() {
-		for (let brick of this.bricks) {
+		for (let i = 0; i < this.bricks.length; i++) {
+			let brick = this.bricks[i]
 			let lp = brick.makeLeftPart()
-			lp.update({
-				anchor: vertexAdd(brick.anchor, [SHIFT, SHIFT])
-			})
+			lp.update(
+				this.leftBrickPosition(this.presentationForm, this.nbFlips, i)
+			)
 			this.add(lp)
 			this.leftBricks.push(lp)
 			let rp = brick.makeRightPart()
-			let a = lp.urCorner(lp.parent.frame)
-			rp.update({
-				anchor: a
-			})
+			rp.update(
+				this.rightBrickPosition(this.presentationForm, this.nbFlips, i)
+			)
 			this.add(rp)
 			this.rightBricks.push(rp)
 		}
@@ -389,8 +468,9 @@ export class Partition extends Linkable {
 
 
 	moveBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep += 1
 		log('===============================================')
-		log(`move with N = ${this.nbFlips} substep = ${this.animationSubstep}`)
+		log(`move with N = ${this.nbFlips} and substep = ${this.animationSubstep}`)
 		if (this.presentationForm == 'row') {
 			this.moveBricksForRow(completionHandler)
 		} else if (this.presentationForm == 'histogram') {
@@ -398,13 +478,6 @@ export class Partition extends Linkable {
 		} else if (this.presentationForm == 'centered histogram') {
 			this.moveBricksForCenteredHistogram(completionHandler)
 		}
-		
-		// for (var i = 0; i <= this.nbFlips; i++) {
-		// 	let rp = this.rightBricks[i]
-		// 	rp.animate({
-		// 		anchor: vertexAdd(rp.anchor, shift)
-		// 	}, this.animationDuration, false, (i == this.nbFlips) ? completionHandler : () => {})
-		// }
 	}
 
 	moveBricksForRow(completionHandler: Function = () => {}) {
@@ -415,12 +488,17 @@ export class Partition extends Linkable {
 	moveBricksForHistogram(completionHandler: Function = () => {}) {
 		for (let i = 0; i <= this.nbFlips; i++) {
 			this.rightBricks[i].animate(
-				this.rightBrickPositionForHistogram(this.nbFlips, i, 2),
+				this.rightBrickPositionForHistogram(this.nbFlips, i),
 			this.animationDuration, false, completionHandler)
 		}
 	}
 
 	moveBricksForCenteredHistogram(completionHandler: Function = () => {}) {
+		for (let i = 0; i <= this.nbFlips; i++) {
+			this.rightBricks[i].animate(
+				this.rightBrickPositionForCenteredHistogram(this.nbFlips, i),
+			this.animationDuration, false, completionHandler)
+		}
 
 	}
 
@@ -433,6 +511,7 @@ export class Partition extends Linkable {
 	/////////////////////////////
 
 	mergeBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep += 1
 		log('===============================================')
 		log(`merge with N = ${this.nbFlips} and substep = ${this.animationSubstep}`)
 		if (this.presentationForm == 'row') {
@@ -452,7 +531,7 @@ export class Partition extends Linkable {
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
 			rp.animate({ strokeWidth: 0 }, this.animationDuration)
-			let updateObject = this.leftBrickPositionForRow(this.nbFlips + 1, i, 2) as object
+			let updateObject = this.brickPositionForRow(this.nbFlips, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
 			b.update(updateObject)
@@ -466,7 +545,7 @@ export class Partition extends Linkable {
 			transformAngle: this.brickAngle('row')
 		})
 		newBrick.update(
-			this.leftBrickPositionForRow(this.nbFlips + 1, this.nbFlips + 1, 2)
+			this.brickPositionForRow(this.nbFlips, this.nbFlips + 1) // sic, don't ask
 		)
 		this.add(newBrick)
 		this.bricks.push(newBrick)
@@ -503,7 +582,7 @@ export class Partition extends Linkable {
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
 			rp.animate({ strokeWidth: 0 }, this.animationDuration)
-			let updateObject = this.leftBrickPositionForHistogram(this.nbFlips + 1, i, 2) as object
+			let updateObject = this.leftBrickPositionForHistogram(this.nbFlips + 1, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
 			b.update(updateObject)
@@ -517,14 +596,37 @@ export class Partition extends Linkable {
 			transformAngle: this.brickAngle('histogram')
 		})
 		newBrick.update(
-			this.leftBrickPositionForHistogram(this.nbFlips + 1, this.nbFlips + 1, 2)
+			this.leftBrickPositionForHistogram(this.nbFlips + 1, this.nbFlips + 1)
 		)
 		this.add(newBrick)
 		this.bricks.push(newBrick)
 	}
 
 	mergeBricksForCenteredHistogram(completionHandler: Function = () => {}) {
-
+		for (let i = 0; i <= this.nbFlips; i++) {
+			let lp = this.leftBricks[i]
+			let rp = this.rightBricks[i]
+			let b = this.bricks[i]
+			lp.animate({ strokeWidth: 0 }, this.animationDuration)
+			rp.animate({ strokeWidth: 0 }, this.animationDuration)
+			let updateObject = this.leftBrickPositionForCenteredHistogram(this.nbFlips, i) as object
+			updateObject['fillOpacity'] = 0
+			updateObject['nbFlips'] = this.nbFlips + 1
+			b.update(updateObject)
+		 	this.add(b)
+		}
+		let newBrick = new Brick({
+			nbFlips: this.nbFlips + 1,
+			nbTails: this.nbFlips + 1,
+			fillOpacity: 0,
+			strokeWidth: BRICK_STROKE_WIDTH,
+			transformAngle: this.brickAngle('centered histogram')
+		})
+		newBrick.update(
+			this.rightBrickPositionForCenteredHistogram(this.nbFlips, this.nbFlips)
+		)
+		this.add(newBrick)
+		this.bricks.push(newBrick)
 	}
 
 
@@ -580,6 +682,7 @@ export class Partition extends Linkable {
 
 
 	mixBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep += 1
 		log('===============================================')
 		log(`mix with N = ${this.nbFlips} and substep = ${this.animationSubstep}`)
 		for (let i = 0; i <= this.nbFlips + 1; i++) {
@@ -630,6 +733,7 @@ export class Partition extends Linkable {
 	/////////////////////////////////
 
 	recenterBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep += 1
 		log('recenter')
 		if (this.presentationForm == 'row') {
 			this.recenterBricksForRow(completionHandler)
@@ -677,6 +781,7 @@ export class Partition extends Linkable {
 
 
 	squishBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep += 1
 		log('squish')
 		if (this.presentationForm == 'row') {
 			this.squishBricksForRow(completionHandler)
@@ -719,6 +824,7 @@ export class Partition extends Linkable {
 
 
 	stretchBricks(completionHandler: Function = () => {}) {
+		this.animationSubstep = 0
 		log('stretch')
 		let completeAndIncrement = function() {
 			completionHandler()
@@ -856,7 +962,6 @@ export class Partition extends Linkable {
 		default:
 			break
 		}
-		this.animationSubstep = 0
 	}
 
 	nextSubstep(completionHandler: Function = () => {}) {
@@ -888,7 +993,6 @@ export class Partition extends Linkable {
 		default:
 			break
 		}
-		this.animationSubstep = (this.animationSubstep + 1) % 7
 		log(`updating animation substep to ${this.animationSubstep}`)
 	}
 
