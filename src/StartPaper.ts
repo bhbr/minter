@@ -10,6 +10,7 @@ import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
 import { NumberListBox } from './extensions/creations/math/boxes/NumberListBox'
 import { NumberBox } from './extensions/creations/math/boxes/NumberBox'
+import { AddBox } from './extensions/creations/math/boxes/BinaryOperatorBox'
 
 
 export class StartPaper extends CoinFlipPaper { }
@@ -17,4 +18,3 @@ export class StartPaper extends CoinFlipPaper { }
 //AllTests.run()
 
 export const paper = new StartPaper()
-
