@@ -75,6 +75,7 @@ export class ToggleButton extends SidebarButton {
 			this.messagePaper(this.selectMessages[0])
 		}
 		this.messagePaper({ 'show help': false })
+		this.sidebar.setActiveButton(null)
 		this.touchStartTime = null
 		this.locked = !this.locked
 		this.innerCircle.update({
