@@ -13,7 +13,7 @@ export class PlayButton extends SimpleButton {
 	defaults(): object {
 		return {
 			screenEventHandler: ScreenEventHandler.Self,
-			mobject: undefined,
+			mobject: null,
 			text: 'play',
 			frameWidth: 40,
 			frameHeight: 20,
