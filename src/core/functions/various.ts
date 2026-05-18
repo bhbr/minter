@@ -36,7 +36,7 @@ export function gaussianRandom(mean: number = 0, stdev: number = 1): number {
 }
 
 export function randomBinomial(n: number = 1, p: number = 0.5): number {
-	if (n < 1e7) {
+	if (n < 5e3) {
 		var X: number = 0
 		for (var i = 0; i < n; i++) {
 			let v = (Math.random() < p) ? 1 : 0
