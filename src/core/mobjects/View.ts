@@ -103,6 +103,7 @@ export class View extends ExtendedObject {
 		}
 
 		this.div['view'] = this
+		this.div['mobject'] = this.mobject
 		this.frame.view = this
 		this.redraw()
 		if (this.drawShadow) {

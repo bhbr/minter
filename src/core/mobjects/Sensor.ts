@@ -7,6 +7,7 @@ import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'core/constan
 import { log, logString } from 'core/functions/logging'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { Transform } from 'core/classes/Transform'
+import { Board } from 'core/boards/Board'
 
 export class Sensor extends ExtendedObject {
 	
@@ -212,6 +213,12 @@ export class Sensor extends ExtendedObject {
 	capturedOnPointerUp(e: ScreenEvent) {
 		let target = this.eventTarget
 		if (target == null || this.screenEventDevice == null) {
+			if (this.mobject instanceof Board) {
+				let board = this.mobject as Board
+				if (board.sidebar.activeButton) {
+					board.sidebar.activeButton.commonButtonUp()
+				}
+			}
 			return
 		}
 		if (target.sensor.screenEventHandler == ScreenEventHandler.Auto) { return }

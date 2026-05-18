@@ -388,6 +388,7 @@ export class SidebarButton extends Pill {
 	}
 
 	onPointerMove(e: ScreenEvent) {
+		if (this.sidebar.activeButton ===  null) { return }
 		let dx = this.xShift(e)
 		this.innerCircle.update({
 			midpoint: [this.baseRadius + dx, this.baseRadius]

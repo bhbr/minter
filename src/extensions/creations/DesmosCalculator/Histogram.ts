@@ -31,7 +31,7 @@ export class Histogram extends DesmosCalculator {
 
 	defaults(): object {
 		return {
-			nbBins: 10,
+			nbBins: 11,
 			min: 0,
 			max: 10,
 			binWidth: 1,
@@ -92,7 +92,7 @@ export class Histogram extends DesmosCalculator {
 
 	setup() {
 		super.setup()
-		this.binWidth = (this.max - this.min) / this.nbBins
+		this.recomputeNbBins()
 		this.scalingSelector.update({
 			action: this.setScaling.bind(this),
 			anchor: [0, this.frameHeight + 10]
@@ -244,12 +244,23 @@ export class Histogram extends DesmosCalculator {
 	}
 
 	recomputeNbBins() {
-		this.nbBins = Math.floor((this.max - this.min) / this.binWidth)
+		this.nbBins = Math.ceil((this.max - this.min) / this.binWidth)
+		// special case of integers: [0, N] => N + 1 bins
+		if (Math.floor(this.min) == this.min && Math.floor(this.max) == this.max) {
+			this.nbBins = Math.ceil((this.max - this.min) / this.binWidth) + 1
+		} else {
+			this.nbBins = Math.ceil((this.max - this.min) / this.binWidth)
+		}
 		this.nbBinsInputBox.update({ value: this.nbBins })
 	}
 
 	recomputeBinWidth() {
-		this.binWidth = (this.max - this.min) / this.nbBins
+		// special case of integers: [0, N] => N + 1 bins
+		if (Math.floor(this.min) == this.min && Math.floor(this.max) == this.max) {
+			this.binWidth = (this.max - this.min) / (this.nbBins - 1)
+		} else {
+			this.binWidth = (this.max - this.min) / this.nbBins
+		}
 		this.binWidthInputBox.update({ value: this.binWidth })
 	}
 

@@ -264,12 +264,14 @@ which can be linked to such-exposed variables of other mobjects.
 
 	createOutputVariable(name: string) {
 		if (name == null) { return }
-		this.createProperty(name, 0)
-		this.outputProperties = [{
+		if (this[name] === undefined) {
+			this.createProperty(name, 0)
+		}
+		this.outputProperties.push({
 			name: name,
 			type: 'number',
 			displayName: name
-		}]
+		})
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})
@@ -279,7 +281,7 @@ which can be linked to such-exposed variables of other mobjects.
 
 	removeOutputVariable(name: string) {
 		if (name == null) { return }
-		this.removeProperty(name)
+		//this.removeProperty(name)
 		for (let prop of this.outputProperties) {
 			if (prop['name'] == name) {
 				remove(this.outputProperties, prop)
