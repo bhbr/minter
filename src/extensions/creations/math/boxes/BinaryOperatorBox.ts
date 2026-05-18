@@ -156,11 +156,9 @@ export class BinaryOperatorBox extends Linkable {
 	}
 
 	sum(): number {
-		log('computing sum')
 		if (this.valueType === 'number') {
 			throw `Result is not a list`
 		} else {
-			log('for a list')
 			return (this.valueBox as NumberListBox).sum()
 		}
 	}

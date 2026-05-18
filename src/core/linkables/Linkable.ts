@@ -265,7 +265,6 @@ which can be linked to such-exposed variables of other mobjects.
 	createOutputVariable(name: string) {
 		if (name == null) { return }
 		if (this[name] === undefined) {
-			log(`creating property ${name}`)
 			this.createProperty(name, 0)
 		}
 		this.outputProperties.push({
@@ -289,7 +288,6 @@ which can be linked to such-exposed variables of other mobjects.
 				break
 			}
 		}
-		log('updating output list...')
 		this.outputList.update({
 			outletProperties: this.outputProperties // should not be necessary
 		})
