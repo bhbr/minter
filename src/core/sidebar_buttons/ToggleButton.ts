@@ -58,7 +58,7 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	commonMereButtonUp() {
-		if (this.sidebar.activeButton != this || this.sensor.eventTarget === null) { return }
+		if (this.sidebar.activeButton !== this) { return }
 		this.messagePaper(this.deselectMessages[0])
 		this.touchStartTime = null
 		this.sidebar.setActiveButton(null)
@@ -69,7 +69,7 @@ export class ToggleButton extends SidebarButton {
 	}
 
 	commonButtonTap() {
-		if (this.sidebar.activeButton != this || this.sensor.eventTarget === null) { return }
+		if (this.sidebar.activeButton !== this) { return }
 		if (this.locked) {
 			this.messagePaper(this.deselectMessages[0])
 		} else {
