@@ -5,6 +5,7 @@ import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { copy } from 'core/functions/copying'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
+import { log } from 'core/functions/logging'
 
 export class Motor extends ExtendedObject {
 

@@ -1,6 +1,6 @@
 
 import { Rectangle } from 'core/shapes/Rectangle'
-import { HEADS_COLOR, TAILS_COLOR, BRICK_WIDTH, ROW_LENGTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
@@ -13,22 +13,17 @@ export class Brick extends Rectangle {
 	nbFlips: number
 	nbTails: number
 	tailsProbability: number
-	headsColor: Color
-	tailsColor: Color
-	widthScale: number
 	anchorMarker: Circle
+	scale: number
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			nbTails: 0,
 			tailsProbability: 0.5,
-			height: BRICK_WIDTH,
-			widthScale: ROW_LENGTH,
+			scale: 1,
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH,
-			headsColor: HEADS_COLOR,
-			tailsColor: TAILS_COLOR,
 			anchorMarker: new Circle({
 				fillColor: Color.green(),
 				fillOpacity: 1,
@@ -37,12 +32,30 @@ export class Brick extends Rectangle {
 		}
 	}
 
+	get length(): number {
+		return this.width
+	}
+	set length(newValue: number) {
+		this.width = newValue
+	}
+
+	get transformAngle(): number {
+		return this.transform.angle
+	}
+	set transformAngle(newValue: number) {
+		this.transform.angle = newValue
+	}
+
 	setup() {
 		super.setup()
 		this.anchorMarker.update({
-			midpoint: this.anchor
+			midpoint: [0, 0]
 		})
 		this.add(this.anchorMarker)
+	}
+
+	nbHeads(): number {
+		return this.nbFlips - this.nbTails
 	}
 
 	headsProbability(): number {
@@ -50,7 +63,7 @@ export class Brick extends Rectangle {
 	}
 
 	leftPartColor(): Color {
-		return this.headsColor.interpolate(this.tailsColor, this.nbTails / (this.nbFlips + 1))
+		return HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / (this.nbFlips + 1))
 	}
 
 	rightPartAnchor(): vertex {
@@ -58,15 +71,15 @@ export class Brick extends Rectangle {
 	}
 
 	leftPartWidth(): number {
-		return this.headsProbability() * this.getWidth()
+		return this.headsProbability() * this.width
 	}
 
 	rightPartWidth(): number {
-		return this.tailsProbability * this.getWidth()
+		return this.tailsProbability * this.width
 	}
 
 	rightPartColor(): Color {
-		return this.headsColor.interpolate(this.tailsColor, (this.nbTails + 1) / (this.nbFlips + 1))
+		return HEADS_COLOR.interpolate(TAILS_COLOR, (this.nbTails + 1) / (this.nbFlips + 1))
 	}
 
 	makeLeftPart(): Rectangle {
@@ -93,21 +106,36 @@ export class Brick extends Rectangle {
 	}
 
 	getFillColor(): Color {
-		return this.headsColor.interpolate(this.tailsColor, this.nbTails / this.nbFlips)
+		return HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / this.nbFlips)
 	}
 
 	combinations(): number {
 		return binomial(this.nbFlips, this.nbTails)
 	}
 
+	probability(): number {
+		return this.combinations() * this.tailsProbability ** this.nbTails * this.headsProbability() ** this.nbHeads()
+	}
+
 	getWidth(): number {
-		return this.combinations() * this.tailsProbability ** this.nbTails * (1 - this.tailsProbability) ** (this.nbFlips - this.nbTails) * this.widthScale
+		return this.probability() * BASE_ROW_LENGTH / this.scale
+	}
+
+	getHeight(): number {
+		return BASE_BRICK_HEIGHT // * this.scale
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+		if (args['width'] !== undefined) {
+			throw 'Cannot change width of Brick, use unscaledWidth or scale instead'
+		}
+		if (args['height'] !== undefined) {
+			throw 'Cannot change height of Brick, use unscaledHeight or scale instead'
+		}
 		super.update(args, false)
-		args['fillColor'] = this.getFillColor()
+		args['fillColor'] = args['fillColor'] ?? this.getFillColor()
 		args['width'] = this.getWidth()
+		args['height'] = this.getHeight()
 		super.update(args, redraw)
 		this.updateDependents()
 	}
