@@ -18,7 +18,7 @@ export const paper = new StartPaper()
 
 let p = new Partition({
 	anchor: [100, 300],
-	nbFlips: 4
+	nbFlips: 1
 })
 
 paper.addToContent(p)

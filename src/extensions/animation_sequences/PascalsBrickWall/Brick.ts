@@ -118,11 +118,11 @@ export class Brick extends Rectangle {
 	}
 
 	getWidth(): number {
-		return this.probability() * BASE_ROW_LENGTH / this.scale
+		return this.probability() * BASE_ROW_LENGTH // * this.scale
 	}
 
 	getHeight(): number {
-		return BASE_BRICK_HEIGHT // * this.scale
+		return BASE_BRICK_HEIGHT / this.scale
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

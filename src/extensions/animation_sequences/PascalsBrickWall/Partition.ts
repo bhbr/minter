@@ -687,45 +687,30 @@ export class Partition extends Linkable {
 	}
 
 	squishBricksForHistogram(completionHandler: Function = () => {}) {
-		// for (let i = 0; i <= this.nbFlips + 1; i++) {
-		// 	let b = this.bricks[i]
-		// 	let oldAnchor = b.anchor
-		// 	let f = (this.nbFlips + 1) / (this.nbFlips + 2)
-		// 	let newAnchor = [f * oldAnchor[0], oldAnchor[1]]
-		// 	b.animate({
-		// 		anchor: newAnchor,
-		// 		scale: this.nbFlips + 2
-		// 	}, this.animationDuration, false, (i == this.nbFlips + 1) ? completionHandler : () => {})
-		// }
-		completionHandler()
+		for (let i = 0; i <= this.nbFlips + 1; i++) {
+			let b = this.bricks[i]
+			let oldAnchor = b.anchor
+			let f = (this.nbFlips + 1) / (this.nbFlips + 2)
+			let newAnchor = [f * oldAnchor[0], oldAnchor[1]]
+			b.animate({
+				anchor: newAnchor,
+				scale: (this.nbFlips + 2) / 2
+			}, this.animationDuration, false, (i == this.nbFlips + 1) ? completionHandler : () => {})
+		}
 	}
 
 	squishBricksForCenteredHistogram(completionHandler: Function = () => {}) {
-		// for (let i = 0; i <= this.nbFlips + 1; i++) {
-		// 	let b = this.bricks[i]
-		// 	let oldAnchor = b.anchor
-		// 	let f = (this.nbFlips + 1) / (this.nbFlips + 2)
-		// 	let newAnchor = [f * oldAnchor[0], oldAnchor[1]]
-		// 	b.animate({
-		// 		anchor: newAnchor,
-		// 		scale: this.nbFlips + 2
-		// 	}, this.animationDuration, false, (i == this.nbFlips + 1) ? completionHandler : () => {})
-		// }
-		completionHandler()
+		for (let i = 0; i <= this.nbFlips + 1; i++) {
+			let b = this.bricks[i]
+			let oldAnchor = b.anchor
+			let f = (this.nbFlips + 1) / (this.nbFlips + 2)
+			let newAnchor = [f * oldAnchor[0], oldAnchor[1]]
+			b.animate({
+				anchor: newAnchor,
+				scale: (this.nbFlips + 2) / 2
+			}, this.animationDuration, false, (i == this.nbFlips + 1) ? completionHandler : () => {})
+		}
 	}
-
-	// squishBricks(completionHandler: Function = () => {}) {
-	// 	log('squish')
-	// 	this.brickWidth = this.nbFlips / (this.nbFlips + 1) * this.brickWidth
-	// 	for (var i = 0; i <= this.nbFlips; i++) {
-	// 		let b = this.bricks[i]
-	// 		let newAnchor = [i * this.brickWidth, b.anchor[1]]
-	// 		b.animate({
-	// 			anchor: newAnchor,
-	// 			height: this.brickWidth
-	// 		}, this.animationDuration / 2, false, (i == this.nbFlips) ? this.stretchBricks.bind(this, completionHandler) : () => {})
-	// 	}
-	// }
 
 	////////////////////////////////
 	// SUBSTEP 6 -> 0: STRETCHING //
