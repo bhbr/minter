@@ -17,18 +17,7 @@ export const TESTING = true
 
 export const paper = new StartPaper()
 
-let p = new Partition({
-	anchor: [100, 300],
-	nbFlips: 1
+let wall = new PascalsBrickWall({
+	anchor: [100, 500]
 })
-
-paper.addToContent(p)
-
-// let b = new Brick({
-// 	anchor: [100, 100],
-// 	nbFlips: 1,
-// 	nbTails: 0,
-// 	height: BASE_BRICK_HEIGHT
-// })
-
-// paper.add(b)
+paper.addToContent(wall)

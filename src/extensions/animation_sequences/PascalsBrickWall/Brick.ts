@@ -96,7 +96,7 @@ export class Brick extends Rectangle {
 			transform: this.transform.copy(),
 			height: this.height,
 			width: this.rightPartWidth(),
-			fillColor: this.getFillColor().brighten(0.8),
+			fillColor: this.getFillColor(),
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH
 		})

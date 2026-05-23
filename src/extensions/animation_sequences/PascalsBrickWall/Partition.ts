@@ -153,12 +153,13 @@ export class Partition extends Linkable {
 		})
 		this.nextSubstepButton.action = this.nextSubstep.bind(this)
 		this.nextStepButton.action = this.nextStep.bind(this)
-		this.fitButton.action = this.fitBricks.bind(this)
+		this.fitButton.action = this.fitBricks.bind(this, function() {
+			this.controls.remove(this.fitButton)
+		}.bind(this))
 
 		this.controls.add(this.presentationFormsList)
 		this.controls.add(this.nextSubstepButton)
 		this.controls.add(this.nextStepButton)
-		this.controls.add(this.fitButton)
 	}
 
 	positionBricks() {
@@ -191,11 +192,6 @@ export class Partition extends Linkable {
 
 	animateToForm(newForm: PresentationForm) {
 		let transformAngle = this.brickAngle(newForm)
-		log('==============================================================')
-		log(`animating to ${newForm} after substep: ${this.animationSubstep}`)
-		//this.scale = (this.presentationForm == 'row') ? 1 : (this.nbFlips + 2) / 2
-		log(`nbFlips = ${this.nbFlips}`)
-		log(`we have ${this.bricks.length} bricks`)
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].animate(
 				this.leftBrickPosition(newForm, this.animationSubstep == 0 ? this.nbFlips : (this.nbFlips + 1), i),
@@ -210,6 +206,9 @@ export class Partition extends Linkable {
 					this.rightBrickPosition(newForm, this.nbFlips, i),
 				this.animationDuration)
 			}
+		}
+		if (this.bricks.length * BASE_BRICK_HEIGHT > BASE_ROW_LENGTH) {
+			this.controls.add(this.fitButton)
 		}
 	}
 
@@ -289,8 +288,6 @@ export class Partition extends Linkable {
 	///////////////////////////////
 
 	splitBricks(completionHandler: Function = () => {}) {
-		log('===============================================')
-		log(`splitBricks with nbFlips = ${this.nbFlips}`)
 		this.animationSubstep += 1
 		this.animateBrickSplitting(function() {
 			this.actuallySplitBricks()
@@ -369,8 +366,6 @@ export class Partition extends Linkable {
 
 	moveBricks(completionHandler: Function = () => {}) {
 		this.animationSubstep += 1
-		log('===============================================')
-		log(`move with nbFlips = ${this.nbFlips}`)
 		if (this.presentationForm == 'row') {
 			this.moveBricksForRow(completionHandler)
 		} else if (this.presentationForm == 'histogram') {
@@ -399,8 +394,6 @@ export class Partition extends Linkable {
 
 	mergeBricks(completionHandler: Function = () => {}) {
 		this.animationSubstep += 1
-		log('===============================================')
-		log(`merge with nbFlips = ${this.nbFlips}`)
 		if (this.presentationForm == 'row') {
 			this.mergeBricksForRow(completionHandler)
 		} else if (this.presentationForm == 'histogram') {
@@ -472,8 +465,6 @@ export class Partition extends Linkable {
 
 	mixBricks(completionHandler: Function = () => {}) {
 		this.animationSubstep = 0
-		log('===============================================')
-		log(`mix with N = ${this.nbFlips} and substep = ${this.animationSubstep}`)
 		for (let i = 0; i <= this.nbFlips + 1; i++) {
 			let brick = this.bricks[i]
 			brick.animate({
@@ -497,6 +488,10 @@ export class Partition extends Linkable {
 		this.leftBricks = []
 		this.rightBricks = []
 		this.nbFlips += 1
+
+		if (this.bricks.length * BASE_BRICK_HEIGHT > BASE_ROW_LENGTH && this.presentationForm == 'histogram') {
+			this.controls.add(this.fitButton)
+		}
 	}
 
 
@@ -530,7 +525,7 @@ export class Partition extends Linkable {
 			b.animate({
 				anchor: newAnchor,
 				height: BASE_BRICK_HEIGHT / this.scale
-			}, this.animationDuration, false, (i == this.nbFlips + 1) ? completionHandler : () => {})
+			}, this.animationDuration, false, i == this.nbFlips ? completionHandler : () => {})
 		}
 	}
 
@@ -543,10 +538,8 @@ export class Partition extends Linkable {
 
 
 	nextStep() {
-		log('nextStep')
 		switch (this.animationSubstep) {
 		case 0:
-			log(`animationSubstep = 0`)
 			stackedFunction([
 				this.splitBricks,
 				this.moveBricks,
@@ -555,7 +548,6 @@ export class Partition extends Linkable {
 			], this)()
 			break
 		case 1:
-			log(`animationSubstep = 1`)
 			stackedFunction([
 				this.moveBricks,
 				this.mergeBricks,
@@ -563,26 +555,22 @@ export class Partition extends Linkable {
 			], this)()
 			break
 		case 2:
-			log(`animationSubstep = 2`)
 			stackedFunction([
 				this.mergeBricks,
 				this.mixBricks
 			], this)()
 			break
 		case 3:
-			log(`animationSubstep = 3`)
 			stackedFunction([
 				this.mixBricks
 			], this)()
 			break
 		default:
-			log(`???`)
 			break
 		}
 	}
 
 	nextSubstep() {
-		log('nextSubstep')
 		switch (this.animationSubstep) {
 		case 0:
 			this.splitBricks()
@@ -599,7 +587,6 @@ export class Partition extends Linkable {
 		default:
 			break
 		}
-		log(`updating animation substep to ${this.animationSubstep}`)
 	}
 
 

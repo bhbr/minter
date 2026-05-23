@@ -2,7 +2,7 @@
 import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
 import { Partition } from './Partition'
 import { Linkable } from 'core/linkables/Linkable'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, SLOW_ANIMATION_DURATION, FAST_ANIMATION_DURATION } from './constants'
 import { vertexTranslatedBy } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { Line } from 'core/shapes/Line'
@@ -59,8 +59,6 @@ export class PascalsBrickWall extends Linkable {
 		this.nextSubstepButton.action = this.animateNextSubstep.bind(this)
 		this.controls.add(this.nextStepButton)
 		this.nextStepButton.action = this.animateNextStep.bind(this)
-		//this.controls.add(this.histogramButton)
-		//this.histogramButton.action = this.wallToHistogram.bind(this)
 
 		for (var i = 0; i < this.nbFlips; i++) {
 			let row = new Partition({
@@ -95,7 +93,6 @@ export class PascalsBrickWall extends Linkable {
 	}
 
 	duplicateLastRow(duration: number = 1) {
-		log('duplicateLastRow')
 		this.duplicatedRow = new Partition({
 			nbFlips: this.nbFlips,
 			tailsProbability: this.tailsProbability,
@@ -115,19 +112,17 @@ export class PascalsBrickWall extends Linkable {
 		}
 		this.temporarilyDisableButtons()
 		this.animationSubstep += 1
-		log(this.animationSubstep)
 	}
 
 	splitBricks(duration: number = 1) {
-		log('splitBricks')
 		let splitLines: Array<Line> = []
 		for (var i = 0; i < this.duplicatedRow.bricks.length; i++) {
 			let x = this.duplicatedRow.bricks[i].anchor[0] + this.duplicatedRow.bricks[i].midX()
 			let line = new Line({
 				startPoint: [x, 0],
-				endPoint: [x, 0]
+				endPoint: [x, 0],
+				strokeWidth: BRICK_STROKE_WIDTH
 			})
-			line.view.div.style.strokeDasharray = "4"
 			splitLines.push(line)
 			this.duplicatedRow.add(line)
 			line.animate({
@@ -136,11 +131,9 @@ export class PascalsBrickWall extends Linkable {
 		}
 		this.temporarilyDisableButtons()
 		this.animationSubstep += 1
-		log(this.animationSubstep)
 	}
 
 	mergeBricks(duration: number = 1) {
-		log('mergeBricks')
 		this.nextRow = new Partition({
 			nbFlips: this.nbFlips + 1,
 			tailsProbability: this.tailsProbability,
@@ -157,13 +150,11 @@ export class PascalsBrickWall extends Linkable {
 		}
 		this.temporarilyDisableButtons()
 		this.animationSubstep += 1
-		log(this.animationSubstep)
 	}
 
 	fadeInNextRow(duration: number = 1) {
-		log('fadeInNextRow')
 		this.rows[this.rows.length - 1].animate({
-			opacity: 0.2
+			fillOpacity: 0.7
 		}, duration)
 		this.moveToTop(this.nextRow)
 		for (let brick of this.nextRow.bricks) {
@@ -177,7 +168,6 @@ export class PascalsBrickWall extends Linkable {
 		}.bind(this), 1000 * duration)
 		this.temporarilyDisableButtons()
 		this.animationSubstep = 0
-		log(this.animationSubstep)
 	}
 
 	animateNextSubstep() {
@@ -200,27 +190,24 @@ export class PascalsBrickWall extends Linkable {
 	}
 
 	animateNextStep() {
-		log('animateNextStep')
-		log(this.animationSubstep)
 		switch (this.animationSubstep) {
 			case 0:
-				log('should duplicate')
-				this.duplicateLastRow(FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.splitBricks(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.mergeBricks(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 3000 * FAST_ANIMATION_DURATION)
+				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.splitBricks(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(SLOW_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 3000 * SLOW_ANIMATION_DURATION)
 				break
 			case 1:
-				this.splitBricks(FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.mergeBricks(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 2000 * FAST_ANIMATION_DURATION)
+				this.splitBricks(SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_ANIMATION_DURATION)
 				break
 			case 2:
-				this.mergeBricks(FAST_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(FAST_ANIMATION_DURATION) }.bind(this), 1000 * FAST_ANIMATION_DURATION)
+				this.mergeBricks(SLOW_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
 				break
 			case 3:
-				this.fadeInNextRow(FAST_ANIMATION_DURATION)
+				this.fadeInNextRow(SLOW_ANIMATION_DURATION)
 				break
 			default:
 				break
@@ -254,7 +241,7 @@ export class PascalsBrickWall extends Linkable {
 		this.finishStep()
 		for (let row of this.rows) {
 			if (row == this.lastRow()) { break }
-			row.animate({ opacity: 0 }, FAST_ANIMATION_DURATION)
+			row.animate({ opacity: 0 }, SLOW_ANIMATION_DURATION)
 		}
 		//this.lastRow().toHistogram()
 	}
