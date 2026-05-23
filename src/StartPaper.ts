@@ -7,6 +7,7 @@ import { AllTests } from './_tests/allTests'
 import { Brick } from './extensions/animation_sequences/PascalsBrickWall/Brick'
 import { Partition } from './extensions/animation_sequences/PascalsBrickWall/Partition'
 import { PascalsBrickWall } from './extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
+import { BASE_BRICK_HEIGHT } from './extensions/animation_sequences/PascalsBrickWall/constants'
 
 export class StartPaper extends CoinFlipPaper { }
 
@@ -22,3 +23,12 @@ let p = new Partition({
 })
 
 paper.addToContent(p)
+
+// let b = new Brick({
+// 	anchor: [100, 100],
+// 	nbFlips: 1,
+// 	nbTails: 0,
+// 	height: BASE_BRICK_HEIGHT
+// })
+
+// paper.add(b)

@@ -14,14 +14,12 @@ export class Brick extends Rectangle {
 	nbTails: number
 	tailsProbability: number
 	anchorMarker: Circle
-	scale: number
 
 	defaults(): object {
 		return {
 			nbFlips: 1,
 			nbTails: 0,
 			tailsProbability: 0.5,
-			scale: 1,
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH,
 			anchorMarker: new Circle({
@@ -51,7 +49,7 @@ export class Brick extends Rectangle {
 		this.anchorMarker.update({
 			midpoint: [0, 0]
 		})
-		this.add(this.anchorMarker)
+		//this.add(this.anchorMarker)
 	}
 
 	nbHeads(): number {
@@ -118,24 +116,13 @@ export class Brick extends Rectangle {
 	}
 
 	getWidth(): number {
-		return this.probability() * BASE_ROW_LENGTH // * this.scale
-	}
-
-	getHeight(): number {
-		return BASE_BRICK_HEIGHT / this.scale
+		return this.probability() * BASE_ROW_LENGTH
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		if (args['width'] !== undefined) {
-			throw 'Cannot change width of Brick, use unscaledWidth or scale instead'
-		}
-		if (args['height'] !== undefined) {
-			throw 'Cannot change height of Brick, use unscaledHeight or scale instead'
-		}
 		super.update(args, false)
 		args['fillColor'] = args['fillColor'] ?? this.getFillColor()
 		args['width'] = this.getWidth()
-		args['height'] = this.getHeight()
 		super.update(args, redraw)
 		this.updateDependents()
 	}
