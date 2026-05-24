@@ -1,6 +1,7 @@
 
 import { Linkable } from 'core/linkables/Linkable'
-import { Brick } from './Brick'
+import { Brick, LabelShower } from './Brick'
+import { DetailedBrickLabel } from './DetailedBrickLabel'
 import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
@@ -13,6 +14,7 @@ import { MGroup } from 'core/mobjects/MGroup'
 import { binomial } from 'core/functions/math'
 import { SimpleButton } from 'core/ui/SimpleButton'
 import { Circle } from 'core/shapes/Circle'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 
 type PresentationForm = 'row' | 'histogram'
 
@@ -22,7 +24,7 @@ type BrickPosition = {
 	height?: number
 }
 
-export class Partition extends Linkable {
+export class Partition extends Linkable implements LabelShower {
 
 	nbFlips: number
 	bricks: Array<Brick>
@@ -41,6 +43,8 @@ export class Partition extends Linkable {
 	anchorMarker: Circle
 	fitButton: SimpleButton
 	scale: number
+	brickLabel: DetailedBrickLabel
+	labelledBrick: Brick | null
 	
 	defaults(): object {
 		return {
@@ -87,7 +91,10 @@ export class Partition extends Linkable {
 				fillColor: Color.white(),
 				fillOpacity: 1.0,
 				midpoint: [0, 0]
-			})
+			}),
+			screenEventHandler: ScreenEventHandler.Self,
+			brickLabel: new DetailedBrickLabel(),
+			labelledBrick: null
 		}
 	}
 
@@ -141,6 +148,7 @@ export class Partition extends Linkable {
 				nbTails: i,
 				height: BASE_BRICK_HEIGHT / this.scale,
 				tailsProbability: this.tailsProbability,
+				labelShower: this
 			})
 			this.bricks.push(brick)
 			this.addDependency('tailsProbability', brick, 'tailsProbability')
@@ -420,7 +428,8 @@ export class Partition extends Linkable {
 			fillOpacity: 0,
 			height: BASE_BRICK_HEIGHT / this.scale,
 			strokeWidth: BRICK_STROKE_WIDTH,
-			transformAngle: this.brickAngle('row')
+			transformAngle: this.brickAngle('row'),
+			labelShower: this
 		})
 		newBrick.update(
 			this.leftBrickPositionForRow(this.nbFlips + 1, this.nbFlips + 1)
@@ -448,7 +457,8 @@ export class Partition extends Linkable {
 			fillOpacity: 0,
 			strokeWidth: BRICK_STROKE_WIDTH,
 			height: BASE_BRICK_HEIGHT / this.scale,
-			transformAngle: this.brickAngle('histogram')
+			transformAngle: this.brickAngle('histogram'),
+			labelShower: this
 		})
 		newBrick.update(
 			this.leftBrickPositionForHistogram(this.nbFlips + 1, this.nbFlips + 1)
@@ -571,22 +581,91 @@ export class Partition extends Linkable {
 	}
 
 	nextSubstep() {
-		switch (this.animationSubstep) {
-		case 0:
-			this.splitBricks()
-			break
-		case 1:
-			this.moveBricks()
-			break
-		case 2:
-			this.mergeBricks()
-			break
-		case 3:
-			this.mixBricks()
-			break
-		default:
-			break
+		if (this.presentationForm == 'row') {
+			switch (this.animationSubstep) {
+			case 0:
+				this.splitBricks()
+				break
+			case 1:
+				this.moveBricks()
+				this.mergeBricks()
+				break
+			case 2:
+				this.mergeBricks()
+				break
+			case 3:
+				this.mixBricks()
+				break
+			default:
+				break
+			}
+		} else {
+			switch (this.animationSubstep) {
+			case 0:
+				this.splitBricks()
+				break
+			case 1:
+				this.moveBricks()
+				break
+			case 2:
+				this.mergeBricks()
+				break
+			case 3:
+				this.mixBricks()
+				break
+			default:
+				break
+			}
 		}
+	}
+
+	toggleLabelOnBrick(brick: Brick) {
+
+		let newAnchor = (this.presentationForm == 'row') ? [
+				brick.anchor[0] + brick.view.frame.midX() - this.brickLabel.frameWidth / 2,
+				brick.anchor[1] + brick.view.frame.midY() - this.brickLabel.frameHeight / 2
+			] : [
+				brick.anchor[0] + brick.view.frame.midY() - this.brickLabel.frameWidth / 2,
+				brick.anchor[1] - brick.view.frame.midX() - this.brickLabel.frameHeight / 2
+			]
+
+		if (this.labelledBrick) {
+			// we were highlighting some brick already
+			this.labelledBrick.update({
+				fillColor: this.labelledBrick.getFillColor()
+			})
+			if (brick == this.labelledBrick) {
+				// tapped on highlighted brick to make the label disappear
+				this.brickLabel.view.hide()
+				this.labelledBrick = null
+				return
+			}
+			// tapped on a new brick
+			this.brickLabel.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails,
+				anchor: newAnchor
+			})
+			brick.update({
+				fillColor: brick.getFillColor().brighten(0.65)
+			})
+			this.labelledBrick = brick
+		} else {
+			// no brick was previously highlighted
+			this.brickLabel.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails,
+				anchor: newAnchor
+			})
+			brick.update({
+				fillColor: brick.getFillColor().brighten(0.65)
+			})
+			this.brickLabel.view.show()
+			this.labelledBrick = brick
+		}
+
+		this.moveToTop(this.brickLabel)
+
 	}
 
 

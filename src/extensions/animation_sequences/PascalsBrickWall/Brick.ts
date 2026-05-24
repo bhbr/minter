@@ -7,6 +7,11 @@ import { binomial } from 'core/functions/math'
 import { vertex, vertexAdd } from 'core/functions/vertex'
 import { Line } from 'core/shapes/Line'
 import { Circle } from 'core/shapes/Circle'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+
+export interface LabelShower {
+	toggleLabelOnBrick: (Brick) => void
+}
 
 export class Brick extends Rectangle {
 	
@@ -14,6 +19,7 @@ export class Brick extends Rectangle {
 	nbTails: number
 	tailsProbability: number
 	anchorMarker: Circle
+	labelShower: LabelShower
 
 	defaults(): object {
 		return {
@@ -26,7 +32,8 @@ export class Brick extends Rectangle {
 				fillColor: Color.green(),
 				fillOpacity: 1,
 				radius: 5
-			})
+			}),
+			screenEventHandler: ScreenEventHandler.Self
 		}
 	}
 
@@ -50,6 +57,13 @@ export class Brick extends Rectangle {
 			midpoint: [0, 0]
 		})
 		//this.add(this.anchorMarker)
+		// this.label.update({
+		// 	nbHeads: this.nbHeads(),
+		// 	nbTails: this.nbTails,
+		// 	anchor: [this.width / 2 - this.label.width / 2, this.height / 2 - this.label.frameHeight / 2]
+		// })
+		// this.add(this.label)
+		// this.label.view.hide()
 	}
 
 	nbHeads(): number {
@@ -127,7 +141,9 @@ export class Brick extends Rectangle {
 		this.updateDependents()
 	}
 
-
+	onTap(e: ScreenEvent) {
+		this.labelShower.toggleLabelOnBrick(this)
+	}
 
 
 
