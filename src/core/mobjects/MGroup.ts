@@ -13,5 +13,4 @@ MGroup (a group of mobjects) is essentially a synonym for Mobject.
 			this.add(submob)
 		}
 	}
-
 }

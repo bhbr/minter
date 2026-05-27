@@ -59,8 +59,8 @@ The content children can also be dragged and panned.
 				anchor: vertexOrigin(),
 				cornerRadius: 25,
 				screenEventHandler: ScreenEventHandler.Parent,
-				fillColor: isTouchDevice ? Color.clear() : Color.black(),
-				fillOpacity: isTouchDevice ? 0.0 : 1.0,
+				fillColor: Color.black(), // isTouchDevice ? Color.clear() : Color.black(),
+				fillOpacity: 1.0, // isTouchDevice ? 0.0 : 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
 				drawShadow: true
