@@ -18,3 +18,8 @@ export class StartPaper extends CoinFlipPaper { }
 //AllTests.run()
 
 export const paper = new StartPaper()
+
+
+if (isTouchDevice && separateSidebar) {
+	paper.background.view.div.style.backgroundColor = 'rgba(0, 0, 0, 1)'
+}

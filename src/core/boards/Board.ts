@@ -13,7 +13,7 @@ import { LinkHook } from 'core/linkables/LinkHook'
 //import { EditableLinkHook } from './EditableLinkHook'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
-import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
@@ -59,8 +59,8 @@ The content children can also be dragged and panned.
 				anchor: vertexOrigin(),
 				cornerRadius: 25,
 				screenEventHandler: ScreenEventHandler.Parent,
-				fillColor: Color.black(), // isTouchDevice ? Color.clear() : Color.black(),
-				fillOpacity: 1.0, // isTouchDevice ? 0.0 : 1.0,
+				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
+				fillOpacity: (isTouchDevice && separateSidebar) ? 0.0 : 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
 				drawShadow: true
