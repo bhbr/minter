@@ -60,7 +60,7 @@ The content children can also be dragged and panned.
 				cornerRadius: 25,
 				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
-				fillOpacity: (isTouchDevice && separateSidebar) ? 0.0 : 1.0,
+				fillOpacity: 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
 				drawShadow: true
