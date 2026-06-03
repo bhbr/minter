@@ -48,6 +48,7 @@ export class Partition extends Linkable implements LabelShower {
 	
 	defaults(): object {
 		return {
+			frameWidth: BASE_ROW_LENGTH,
 			nbFlips: 1,
 			tailsProbability: 0.5,
 			headsColor: HEADS_COLOR,
@@ -157,7 +158,7 @@ export class Partition extends Linkable implements LabelShower {
 		this.positionBricks()
 		this.presentationFormsList.action = this.animateTo.bind(this)
 		this.presentationFormsList.update({
-			selectedButton: this.presentationFormsList.radioButtons[0]
+			selectedButton: this.presentationFormsList.radioButtons[(this.presentationForm == 'row') ? 0 : 1]
 		})
 		this.nextSubstepButton.action = this.nextSubstep.bind(this)
 		this.nextStepButton.action = this.nextStep.bind(this)
@@ -182,6 +183,19 @@ export class Partition extends Linkable implements LabelShower {
 	update(args: object = {}, redraw: boolean = false) {
 		super.update(args, redraw)
 		this.positionBricks()
+
+		if (this.animationSubstep >= 1) {
+			for (let i = 0; i < this.leftBricks.length; i++) {
+				let lp = this.leftBricks[i]
+				lp.update(
+					this.leftBrickPosition(this.presentationForm, this.nbFlips, i)
+				)
+				let rp = this.rightBricks[i]
+				rp.update(
+					this.rightBrickPosition(this.presentationForm, this.nbFlips, i)
+				)
+			}
+		}
 	}
 
 	//////////////////////////////////////////
@@ -202,7 +216,7 @@ export class Partition extends Linkable implements LabelShower {
 		let transformAngle = this.brickAngle(newForm)
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].animate(
-				this.leftBrickPosition(newForm, this.animationSubstep == 0 ? this.nbFlips : (this.nbFlips + 1), i),
+				this.leftBrickPosition(newForm, (this.animationSubstep < 3) ? this.nbFlips : this.nbFlips + 1, i),
 			this.animationDuration)
 			if (this.leftBricks[i] !== undefined) { // see above, possibly one too few leftBricks
 				this.leftBricks[i].animate(
@@ -268,7 +282,7 @@ export class Partition extends Linkable implements LabelShower {
 
 	rightBrickPositionForRow(nbFlips: number, i: number): BrickPosition {
 		return {
-			anchor: [this.cumulatedBrickLength(nbFlips, i) + this.brickLength(nbFlips, i) / 2, 0],
+			anchor: [this.cumulatedBrickLength(nbFlips, i) + this.brickLength(nbFlips, i) * this.headsProbability(), 0],
 			transformAngle: this.brickAngle('row'),
 			height: BASE_BRICK_HEIGHT
 		}
@@ -277,13 +291,13 @@ export class Partition extends Linkable implements LabelShower {
 	rightBrickPositionForHistogram(nbFlips: number, i: number): BrickPosition {
 		if (this.animationSubstep < 2) { // before moving
 			return {
-				anchor: [i * this.brickHeight(), -this.brickLength(nbFlips, i) / 2],
+				anchor: [i * this.brickHeight(), -this.brickLength(nbFlips, i) * this.headsProbability()],
 				transformAngle: this.brickAngle('histogram'),
 				height: BASE_BRICK_HEIGHT / this.scale
 			}
 		} else { // when moving and afterwards
 			return {
-				anchor: [(i + 1) * this.brickHeight(), -this.brickLength(nbFlips, i + 1) / 2],
+				anchor: [(i + 1) * this.brickHeight(), -this.brickLength(nbFlips, i + 1) * this.headsProbability()],
 				transformAngle: this.brickAngle('histogram'),
 				height: BASE_BRICK_HEIGHT / this.scale
 			}
@@ -306,8 +320,27 @@ export class Partition extends Linkable implements LabelShower {
 	animateBrickSplitting(completionHandler: Function = () => {}) {
 		for (let i = 0; i < this.bricks.length; i++) {
 			let brick = this.bricks[i]
-			let startPoint = this.presentationForm == 'row' ? brick.frame.topCenter(brick.parent.frame) : brick.frame.leftCenter(brick.parent.frame)
-			let endPoint = this.presentationForm == 'row' ? brick.frame.bottomCenter(brick.parent.frame) : brick.frame.rightCenter(brick.parent.frame)
+			let startPoint: Array<number>
+			let endPoint: Array<number>
+			if (this.presentationForm == 'row') {
+				startPoint = [
+					brick.frame.xMin(brick.parent.frame) + this.headsProbability() * brick.frame.width,
+					brick.frame.yMin(brick.parent.frame)
+				]
+				endPoint = [
+					brick.frame.xMin(brick.parent.frame) + this.headsProbability() * brick.frame.width,
+					brick.frame.yMax(brick.parent.frame)
+				]
+			} else {
+				startPoint = [
+					brick.frame.xMin(brick.parent.frame),
+					brick.frame.yMin(brick.parent.frame) - this.headsProbability() * brick.frame.width
+				]
+				endPoint = [
+					brick.frame.xMax(brick.parent.frame),
+					brick.frame.yMin(brick.parent.frame) - this.headsProbability() * brick.frame.width
+				]
+			}
 			let line = new Line({
 				startPoint: startPoint,
 				endPoint: startPoint,
@@ -366,7 +399,6 @@ export class Partition extends Linkable implements LabelShower {
 	}
 
 
-
 	////////////////////////////
 	// SUBSTEP 1 -> 2: MOVING //
 	////////////////////////////
@@ -419,18 +451,22 @@ export class Partition extends Linkable implements LabelShower {
 			let updateObject = this.leftBrickPositionForRow(this.nbFlips + 1, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
-			b.update(updateObject)
-		 	this.add(b)
+			b.removeDependency(b.getDependency('leftPartWidth', lp, 'width'))
+			b.removeDependency(b.getDependency('rightPartWidth', rp, 'width'))
+		 	b.update(updateObject)
+			this.add(b)
 		}
 		let newBrick = new Brick({
 			nbFlips: this.nbFlips + 1,
 			nbTails: this.nbFlips + 1,
+			tailsProbability: this.tailsProbability,
 			fillOpacity: 0,
 			height: BASE_BRICK_HEIGHT / this.scale,
 			strokeWidth: BRICK_STROKE_WIDTH,
 			transformAngle: this.brickAngle('row'),
 			labelShower: this
 		})
+		this.addDependency('tailsProbability', newBrick, 'tailsProbability')
 		newBrick.update(
 			this.leftBrickPositionForRow(this.nbFlips + 1, this.nbFlips + 1)
 		)
@@ -448,18 +484,26 @@ export class Partition extends Linkable implements LabelShower {
 			let updateObject = this.leftBrickPositionForHistogram(this.nbFlips + 1, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
-			b.update(updateObject)
-		 	this.add(b)
+			b.removeDependency(b.getDependency('leftPartWidth', lp, 'width'))
+			b.removeDependency(b.getDependency('rightPartWidth', rp, 'width'))
+			b.addDependency('leftPartWidthAfterMerge', lp, 'width')
+			b.addDependency('rightPartWidthAfterMerge', rp, 'width')
+		 	b.update(updateObject)
+			this.add(b)
 		}
 		let newBrick = new Brick({
 			nbFlips: this.nbFlips + 1,
 			nbTails: this.nbFlips + 1,
+			tailsProbability: this.tailsProbability,
 			fillOpacity: 0,
 			strokeWidth: BRICK_STROKE_WIDTH,
 			height: BASE_BRICK_HEIGHT / this.scale,
 			transformAngle: this.brickAngle('histogram'),
-			labelShower: this
+			labelShower: this,
+			scale: this.scale,
+			screenEventHandler: ScreenEventHandler.Self
 		})
+		this.addDependency('tailsProbability', newBrick, 'tailsProbability')
 		newBrick.update(
 			this.leftBrickPositionForHistogram(this.nbFlips + 1, this.nbFlips + 1)
 		)
@@ -489,15 +533,20 @@ export class Partition extends Linkable implements LabelShower {
 
 
 	cleanupAfterMixing() {
-		for (let lp of this.leftBricks) {
-			this.remove(lp)
+		this.nbFlips += 1
+		for (let b of this.bricks) {
+			this.add(b)
 		}
-		for (let rp of this.rightBricks) {
+
+		for (let i = 0; i < this.nbFlips; i++) {
+			let lp = this.leftBricks[i]
+			let rp = this.rightBricks[i]
+			let b = this.bricks[i]
+			this.remove(lp)
 			this.remove(rp)
 		}
 		this.leftBricks = []
 		this.rightBricks = []
-		this.nbFlips += 1
 
 		if (this.bricks.length * BASE_BRICK_HEIGHT > BASE_ROW_LENGTH && this.presentationForm == 'histogram') {
 			this.controls.add(this.fitButton)
@@ -506,9 +555,9 @@ export class Partition extends Linkable implements LabelShower {
 
 
 
-	///////////////
-	// SQUISHING //
-	///////////////
+	/////////////
+	// FITTING //
+	/////////////
 
 
 	fitBricks(completionHandler: Function = () => {}) {

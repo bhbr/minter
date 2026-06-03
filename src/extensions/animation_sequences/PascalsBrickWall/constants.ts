@@ -8,4 +8,4 @@ export const BASE_ROW_LENGTH: number = 500
 export const FAST_ANIMATION_DURATION: number = 0.25
 export const SLOW_ANIMATION_DURATION: number = 0.5
 export const BRICK_STROKE_WIDTH: number = 3
-export const BRICK_FILL_OPACITY: number = 1
+export const BRICK_FILL_OPACITY: number = 0.5

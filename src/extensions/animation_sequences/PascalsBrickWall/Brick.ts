@@ -78,6 +78,10 @@ export class Brick extends Rectangle {
 		return HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / (this.nbFlips + 1))
 	}
 
+	rightPartColor(): Color {
+		return HEADS_COLOR.interpolate(TAILS_COLOR, (this.nbTails + 1) / (this.nbFlips + 1))
+	}
+
 	rightPartAnchor(): vertex {
 		return [this.leftPartWidth(), 0]
 	}
@@ -90,12 +94,23 @@ export class Brick extends Rectangle {
 		return this.tailsProbability * this.width
 	}
 
-	rightPartColor(): Color {
-		return HEADS_COLOR.interpolate(TAILS_COLOR, (this.nbTails + 1) / (this.nbFlips + 1))
+	leftPartWidthAfterMerge(): number {
+		let N = this.nbFlips - 1
+		let T = this.nbTails
+		let H = N - T
+		return binomial(N, T) * this.tailsProbability ** T * this.headsProbability() ** H * BASE_ROW_LENGTH * this.headsProbability()
+	}
+
+	rightPartWidthAfterMerge(): number {
+		let N = this.nbFlips - 1
+		let T = this.nbTails
+		let H = N - T
+		return binomial(N, H) * this.tailsProbability ** T * this.headsProbability() ** H * BASE_ROW_LENGTH * this.tailsProbability
+
 	}
 
 	makeLeftPart(): Rectangle {
-		return new Rectangle({
+		let rect = new Rectangle({
 			transform: this.transform.copy(),
 			height: this.height,
 			width: this.leftPartWidth(),
@@ -103,10 +118,12 @@ export class Brick extends Rectangle {
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH
 		})
+		this.addDependency('leftPartWidth', rect, 'width')
+		return rect
 	}
 
 	makeRightPart(): Rectangle {
-		let b =  new Rectangle({
+		let rect = new Rectangle({
 			transform: this.transform.copy(),
 			height: this.height,
 			width: this.rightPartWidth(),
@@ -114,7 +131,8 @@ export class Brick extends Rectangle {
 			fillOpacity: BRICK_FILL_OPACITY,
 			strokeWidth: BRICK_STROKE_WIDTH
 		})
-		return b
+		this.addDependency('rightPartWidth', rect, 'width')
+		return rect
 	}
 
 	getFillColor(): Color {
