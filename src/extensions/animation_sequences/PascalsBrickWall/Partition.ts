@@ -548,6 +548,9 @@ export class Partition extends Linkable implements LabelShower {
 
 
 	nextStep() {
+		if (this.labelledBrick) {
+			this.toggleLabelOnBrick(this.labelledBrick)
+		}
 		switch (this.animationSubstep) {
 		case 0:
 			stackedFunction([
@@ -581,6 +584,9 @@ export class Partition extends Linkable implements LabelShower {
 	}
 
 	nextSubstep() {
+		if (this.labelledBrick) {
+			this.toggleLabelOnBrick(this.labelledBrick)
+		}
 		if (this.presentationForm == 'row') {
 			switch (this.animationSubstep) {
 			case 0:

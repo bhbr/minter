@@ -18,18 +18,18 @@ export const TESTING = true
 
 export const paper = new StartPaper()
 
-// let wall = new PascalsBrickWall({
-// 	anchor: [100, 500]
-// })
-
-// paper.addToContent(wall)
-
-let p = new Partition({
-	anchor: [100, 300],
-	nbFlips: 1
+let wall = new PascalsBrickWall({
+	anchor: [100, 500]
 })
 
-paper.addToContent(p)
+paper.addToContent(wall)
+
+// let p = new Partition({
+// 	anchor: [100, 300],
+// 	nbFlips: 1
+// })
+
+// paper.addToContent(p)
 
 // let b = new Brick({
 // 	anchor: [100, 100],

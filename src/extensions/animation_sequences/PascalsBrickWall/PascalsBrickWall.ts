@@ -185,6 +185,9 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 	}
 
 	animateNextSubstep() {
+		if (this.labelledBrick) {
+			this.toggleLabelOnBrick(this.labelledBrick)
+		}
 		switch (this.animationSubstep) {
 			case 0:
 				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
@@ -204,6 +207,9 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 	}
 
 	animateNextStep() {
+		if (this.labelledBrick) {
+			this.toggleLabelOnBrick(this.labelledBrick)
+		}
 		switch (this.animationSubstep) {
 			case 0:
 				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
