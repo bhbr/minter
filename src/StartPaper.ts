@@ -2,15 +2,8 @@
 import { log } from './core/functions/logging'
 //import { AllTests } from './_tests/allTests'
 import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper'
-import { Coin } from './extensions/creations/CoinFlipper/Coin'
-import { Transform } from './core/classes/Transform'
-import { MathExpressionField } from './extensions/creations/MathExpressionField/MathExpressionField'
 import { isTouchDevice, separateSidebar, ScreenEvent, ScreenEventHandler } from './core/mobjects/screen_events'
-import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
-import { NumberListBox } from './extensions/creations/math/boxes/NumberListBox'
-import { NumberBox } from './extensions/creations/math/boxes/NumberBox'
-import { AddBox } from './extensions/creations/math/boxes/BinaryOperatorBox'
 
 
 export class StartPaper extends CoinFlipPaper { }
@@ -23,3 +16,6 @@ export const paper = new StartPaper()
 if (isTouchDevice && separateSidebar) {
 	paper.background.view.div.style.backgroundColor = 'rgba(0, 0, 0, 1)'
 }
+
+
+

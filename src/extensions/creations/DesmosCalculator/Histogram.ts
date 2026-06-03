@@ -120,35 +120,35 @@ export class Histogram extends DesmosCalculator {
 		this.controls.add(this.nbBinsInputBox)
 
 		this.minInputBox.onReturn = function() {
+			this.board.removeInputLinkForPropertyAtMobject('min', this)
 			this.update({
 				min: this.minInputBox.value
 			})
 			this.minInputBox.deactivateKeyboard()
-			this.board.removeInputLinkForPropertyAtMobject('min', this)
 		}.bind(this)
 
 		this.maxInputBox.onReturn = function() {
+			this.board.removeInputLinkForPropertyAtMobject('max', this)
 			this.update({
 				max: this.maxInputBox.value
 			})
 			this.maxInputBox.deactivateKeyboard()
-			this.board.removeInputLinkForPropertyAtMobject('max', this)
 		}.bind(this)
 
 		this.binWidthInputBox.onReturn = function() {
+			this.board.removeInputLinkForPropertyAtMobject('binWidth', this)
 			this.update({
 				binWidth: this.binWidthInputBox.value
 			})
 			this.binWidthInputBox.deactivateKeyboard()
-			this.board.removeInputLinkForPropertyAtMobject('binWidth', this)
 		}.bind(this)
 
 		this.nbBinsInputBox.onReturn = function() {
+			this.board.removeInputLinkForPropertyAtMobject('nbBins', this)
 			this.update({
 				nbBins: this.nbBinsInputBox.value
 			})
 			this.nbBinsInputBox.deactivateKeyboard()
-			this.board.removeInputLinkForPropertyAtMobject('nbBins', this)
 		}.bind(this)
 
 		this.binWidthInputBox.update({
@@ -274,7 +274,9 @@ export class Histogram extends DesmosCalculator {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+		log(args)
 		super.update(args, redraw)
+		if (Object.keys(args).length == 0) { return }
 		if (this.binWidth == 0) {
 			this.binWidth = 1
 		}
@@ -288,7 +290,6 @@ export class Histogram extends DesmosCalculator {
 		let b = (newMax !== undefined)
 		let c = (newBinWidth !== undefined)
 		let d = (newNbBins !== undefined)
-
 
 		let shouldRebin = a || b || c || d
 
@@ -361,35 +362,72 @@ export class Histogram extends DesmosCalculator {
 			this.board.removeInputLinkForPropertyAtMobject(link.endHook.outlet.name, this)
 			return
 		}
-		if (link.endHook.outlet.name == 'min') {
-			this.minInputBox.inputElement.disabled = true
-		}
-		if (link.endHook.outlet.name == 'max') {
-			this.maxInputBox.inputElement.disabled = true
-		}
-		if (link.endHook.outlet.name == 'binWidth') {
-			this.binWidthInputBox.inputElement.disabled = true
-		}
-		if (link.endHook.outlet.name == 'nbBins') {
-			this.nbBinsInputBox.inputElement.disabled = true
+		if (link.startHook) {
+			if (link.startHook.outlet.ioList.mobject == this) {
+				if (link.startHook.outlet.name == 'min') {
+					this.minInputBox.disable()
+				}
+				if (link.startHook.outlet.name == 'max') {
+					this.maxInputBox.disable()
+				}
+				if (link.startHook.outlet.name == 'binWidth') {
+					this.binWidthInputBox.disable()
+				}
+				if (link.startHook.outlet.name == 'nbBins') {
+					this.nbBinsInputBox.disable()
+				}
+			}
+		} else if (link.endHook) {
+			if (link.endHook.outlet.ioList.mobject == this) {
+				if (link.endHook.outlet.name == 'min') {
+					this.minInputBox.disable()
+				}
+				if (link.endHook.outlet.name == 'max') {
+					this.maxInputBox.disable()
+				}
+				if (link.endHook.outlet.name == 'binWidth') {
+					this.binWidthInputBox.disable()
+				}
+				if (link.endHook.outlet.name == 'nbBins') {
+					this.nbBinsInputBox.disable()
+				}
+			}
 		}
 	}
 
 	removedInputLink(link: DependencyLink) {
 		super.removedInputLink(link)
-		if (link.endHook.outlet.name == 'min') {
-			this.minInputBox.inputElement.disabled = false
+		if (link.startHook) {
+			if (link.startHook.outlet.ioList.mobject == this) {
+				if (link.startHook.outlet.name == 'min') {
+					this.minInputBox.enable()
+				}
+				if (link.startHook.outlet.name == 'max') {
+					this.maxInputBox.enable()
+				}
+				if (link.startHook.outlet.name == 'binWidth') {
+					this.binWidthInputBox.enable()
+				}
+				if (link.startHook.outlet.name == 'nbBins') {
+					this.nbBinsInputBox.enable()
+				}
+			}
+		} else if (link.endHook) {
+			if (link.endHook.outlet.ioList.mobject == this) {
+				if (link.endHook.outlet.name == 'min') {
+					this.minInputBox.enable()
+				}
+				if (link.endHook.outlet.name == 'max') {
+					this.maxInputBox.enable()
+				}
+				if (link.endHook.outlet.name == 'binWidth') {
+					this.binWidthInputBox.enable()
+				}
+				if (link.endHook.outlet.name == 'nbBins') {
+					this.nbBinsInputBox.enable()
+				}
+			}
 		}
-		if (link.endHook.outlet.name == 'max') {
-			this.maxInputBox.inputElement.disabled = false
-		}
-		if (link.endHook.outlet.name == 'binWidth') {
-			this.binWidthInputBox.inputElement.disabled = false
-		}
-		if (link.endHook.outlet.name == 'nbBins') {
-			this.nbBinsInputBox.inputElement.disabled = false
-		}
-
 	}
 
 

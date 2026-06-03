@@ -89,10 +89,20 @@ export class InputBox extends Mobject {
 		this.updateOnReturn()
 	}
 
+	disable() {
+		this.inputElement.disabled = true
+		this.inputElement.style.color = 'rgb(100, 100, 100)'
+	}
+
+	enable() {
+		this.inputElement.disabled = false
+		this.inputElement.style.color = 'rgb(255, 255, 255)'
+	}
+
 	updateOnReturn() {
+		this.onReturn()
 		this.update()
 		this.updateDependents()
-		this.onReturn()
 	}
 
 	setup() {
