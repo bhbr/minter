@@ -66,10 +66,10 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 		this.controls.add(this.nextStepButton)
 		this.nextStepButton.action = this.animateNextStep.bind(this)
 
-		for (var i = 0; i < this.nbFlips; i++) {
+		for (var i = 1; i <= this.nbFlips; i++) {
 			let row = new Partition({
-				anchor: [0, -BASE_BRICK_HEIGHT * i],
-				nbFlips: i + 1,
+				anchor: [0, -BASE_BRICK_HEIGHT * (i - 1)],
+				nbFlips: i,
 				tailsProbability: this.tailsProbability,
 				headsColor: this.headsColor,
 				tailsColor: this.tailsColor

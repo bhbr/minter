@@ -49,6 +49,7 @@ export class Partition extends Linkable implements LabelShower {
 	defaults(): object {
 		return {
 			frameWidth: BASE_ROW_LENGTH,
+			frameHeight: BASE_BRICK_HEIGHT,
 			nbFlips: 1,
 			tailsProbability: 0.5,
 			headsColor: HEADS_COLOR,

@@ -18,20 +18,21 @@ export const TESTING = true
 
 export const paper = new StartPaper()
 
-// let wall = new PascalsBrickWall({
-// 	anchor: [100, 500]
-// })
-
-// paper.addToContent(wall)
-
-let p = new Partition({
-	presentationForm: 'histogram',
-	tailsProbability: 0.5,
-	anchor: [200, 500],
-	nbFlips: 1
+let wall = new PascalsBrickWall({
+	anchor: [100, 500],
+	nbFlips: 3
 })
 
-paper.addToContent(p)
+paper.addToContent(wall)
+
+// let p = new Partition({
+// 	presentationForm: 'histogram',
+// 	tailsProbability: 0.5,
+// 	anchor: [200, 500],
+// 	nbFlips: 1
+// })
+
+// paper.addToContent(p)
 
 // let b = new Brick({
 // 	anchor: [100, 100],
