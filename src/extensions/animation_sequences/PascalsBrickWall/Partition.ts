@@ -61,8 +61,7 @@ export class Partition extends Linkable implements LabelShower {
 			scale: 1,
 			inputProperties: [
 				{ name: 'tailsProbability', displayName: 'p(tails)', type: 'number' },
-				{ name: 'headsColor', displayName: 'heads color', type: 'Color' },
-				{ name: 'tailsColor', displayName: 'tails color', type: 'Color' },
+				{ name: 'nbFlips', displayName: '# flips', type: 'number' }
 			],
 			animationSubstep: 0,
 			animationDuration: SLOW_ANIMATION_DURATION,
@@ -143,18 +142,7 @@ export class Partition extends Linkable implements LabelShower {
 	setup() {
 		super.setup()
 		//this.add(this.anchorMarker)
-		for (let i = 0; i <= this.nbFlips; i++) {
-			let brick = new Brick({
-				nbFlips: this.nbFlips,
-				nbTails: i,
-				height: BASE_BRICK_HEIGHT / this.scale,
-				tailsProbability: this.tailsProbability,
-				labelShower: this
-			})
-			this.bricks.push(brick)
-			this.addDependency('tailsProbability', brick, 'tailsProbability')
-			this.add(brick)
-		}
+		this.createBricks()
 		this.positionBricks()
 		this.presentationFormsList.action = this.animateTo.bind(this)
 		this.presentationFormsList.update({
@@ -171,6 +159,21 @@ export class Partition extends Linkable implements LabelShower {
 		this.controls.add(this.nextStepButton)
 	}
 
+	createBricks() {
+		for (let i = 0; i <= this.nbFlips; i++) {
+			let brick = new Brick({
+				nbFlips: this.nbFlips,
+				nbTails: i,
+				height: BASE_BRICK_HEIGHT / this.scale,
+				tailsProbability: this.tailsProbability,
+				labelShower: this
+			})
+			this.bricks.push(brick)
+			this.addDependency('tailsProbability', brick, 'tailsProbability')
+			this.add(brick)
+		}
+	}
+
 	positionBricks() {
 		let transformAngle = this.brickAngle(this.presentationForm)
 		for (let i = 0; i <= this.nbFlips; i++) {
@@ -182,7 +185,11 @@ export class Partition extends Linkable implements LabelShower {
 
 	update(args: object = {}, redraw: boolean = false) {
 		super.update(args, redraw)
-		this.positionBricks()
+		if (args['nbFlips'] !== undefined) {
+			this.resetToNbFlips(args['nbFlips'])
+		} else {
+			this.positionBricks()
+		}
 
 		if (this.animationSubstep >= 1) {
 			for (let i = 0; i < this.leftBricks.length; i++) {
@@ -196,6 +203,25 @@ export class Partition extends Linkable implements LabelShower {
 				)
 			}
 		}
+	}
+
+	resetToNbFlips(nbFlips: number) {
+		this.nbFlips = nbFlips
+		this.animationSubstep = 0
+		for (let lp of this.leftBricks) {
+			this.remove(lp)
+		}
+		for (let rp of this.rightBricks) {
+			this.remove(rp)
+		}
+		for (let b of this.bricks) {
+			this.remove(b)
+		}
+		this.leftBricks = []
+		this.rightBricks = []
+		this.bricks = []
+		this.createBricks()
+		this.positionBricks()
 	}
 
 	//////////////////////////////////////////
