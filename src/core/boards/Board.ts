@@ -589,7 +589,7 @@ The content children can also be dragged and panned.
 
 	firstContentChildContaining(p: vertex): Mobject | null {
 		for (let child of this.contentChildren) {
-			if (child.frame.contains(p)) {
+			if (child.frame.contains(p, 5)) {
 				return child
 			}
 		}
@@ -1127,8 +1127,7 @@ The content children can also be dragged and panned.
 				}
 			}
 		}
-		let list = listOfLists[0]
-		if (list) {
+		for (let list of listOfLists) {
 			if (list.kind !== linkedHook.outlet.kind && list.mobject !== linkedHook.outlet.ioList.mobject && list.linkOutlets.length > 0) {
 				list.view.show()
 			}
@@ -1367,7 +1366,6 @@ The content children can also be dragged and panned.
 	}
 
 	createNewDependencyBetweenHooks(startHook: LinkHook, endHook: LinkHook) {
-		log('createNewDependency')
 		startHook.outlet.ioList.mobject.addDependency(
 			startHook.outlet.name,
 			endHook.outlet.ioList.mobject,
@@ -1393,7 +1391,6 @@ The content children can also be dragged and panned.
 		if (endHook == endHook.outlet.linkHooks[endHook.outlet.linkHooks.length - 1] && this.openLink.dependency.kind == 'action') {
 			endHook.outlet.addHook()
 		}
-		log('adding links')
 		startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
 		endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
 	}

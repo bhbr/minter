@@ -8,12 +8,14 @@ import { log } from 'core/functions/logging'
 export class Stepper extends Slider {
 
 	ticks: MGroup
+	tickSize: number
 
 	defaults(): object {
 		return {
 			min: 0,
 			max: 10,
 			value: 6,
+			tickSize: 1,
 			precision: 0,
 			ticks: new MGroup()
 		}
@@ -34,7 +36,7 @@ export class Stepper extends Slider {
 	createTicks() {
 		let N = this.max - this.min
 		let dy = this.height / N
-		for (let i = 1; i < N; i++) {
+		for (let i = 1; i < N; i += this.tickSize) {
 			let tick = new Line({
 				anchor: [0, i * dy],
 				endPoint: [8, 0],

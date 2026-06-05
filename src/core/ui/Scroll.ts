@@ -2,6 +2,7 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { prettyPrint } from 'core/functions/various'
+import { log } from 'core/functions/logging'
 
 export class Scroll extends Mobject {
 

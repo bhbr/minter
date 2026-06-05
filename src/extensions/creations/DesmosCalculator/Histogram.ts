@@ -274,7 +274,6 @@ export class Histogram extends DesmosCalculator {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
-		log(args)
 		super.update(args, redraw)
 		if (Object.keys(args).length == 0) { return }
 		if (this.binWidth == 0) {

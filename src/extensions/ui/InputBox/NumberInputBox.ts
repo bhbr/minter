@@ -3,7 +3,14 @@ import { InputBox } from './InputBox'
 
 export class NumberInputBox extends InputBox {
 
+	defaults(): object {
+		return {
+			value: 0
+		}
+	}
+
 	get value(): number {
+		//if (this.inputElement.value == '') { return NaN }
 		return Number(this.inputElement.value)
 	}
 	set value(newValue: number) {
