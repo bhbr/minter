@@ -233,11 +233,11 @@ export class CoinStack extends Linkable implements Playable {
 	}
 
 	headsBarHeight(): number {
-		return Math.round(this.nbHeads / this.nbCoins * this.height)
+		return Math.round(this.nbHeads / this.nbCoins * this.maxBarHeight)
 	}
 
 	tailsBarHeight(): number {
-		return this.height - this.headsBarHeight()
+		return this.maxBarHeight - this.headsBarHeight()
 	}
 
 	get height(): number {
@@ -297,14 +297,14 @@ export class CoinStack extends Linkable implements Playable {
 	addedInputLink(link: DependencyLink) {
 		super.addedInputLink(link)
 		if (link.endHook.outlet.name == 'nbCoins') {
-			this.nbCoinsInputBox.inputElement.disabled = true
+			this.nbCoinsInputBox.disable()
 		}
 	}
 
 	removedInputLink(link: DependencyLink) {
 		super.removedInputLink(link)
 		if (link.endHook.outlet.name == 'nbCoins') {
-			this.nbCoinsInputBox.inputElement.disabled = false
+			this.nbCoinsInputBox.enable()
 		}
 	}
 

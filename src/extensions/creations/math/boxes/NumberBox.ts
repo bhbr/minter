@@ -193,7 +193,7 @@ export class NumberBoxCreator extends DraggingCreator {
 	createMobject() {
 		return new NumberBox({
 			anchor: this.getStartPoint(),
-			value: null
+			value: NaN
 		})
 	}
 

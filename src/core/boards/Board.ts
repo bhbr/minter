@@ -13,7 +13,7 @@ import { LinkHook } from 'core/linkables/LinkHook'
 //import { EditableLinkHook } from './EditableLinkHook'
 import { Color } from 'core/classes/Color'
 import { Creator } from 'core/creators/Creator'
-import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
+import { ScreenEventDevice, screenEventDevice, screenEventDeviceAsString, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice, separateSidebar } from 'core/mobjects/screen_events'
 import { Mobject } from 'core/mobjects/Mobject'
 import { convertArrayToString } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
@@ -59,8 +59,8 @@ The content children can also be dragged and panned.
 				anchor: vertexOrigin(),
 				cornerRadius: 25,
 				screenEventHandler: ScreenEventHandler.Parent,
-				fillColor: isTouchDevice ? Color.clear() : Color.black(),
-				fillOpacity: isTouchDevice ? 0.0 : 1.0,
+				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
+				fillOpacity: 1.0,
 				strokeColor: Color.gray(0.2),
 				strokeWidth: 1.0,
 				drawShadow: true
@@ -589,7 +589,7 @@ The content children can also be dragged and panned.
 
 	firstContentChildContaining(p: vertex): Mobject | null {
 		for (let child of this.contentChildren) {
-			if (child.frame.contains(p)) {
+			if (child.frame.contains(p, 5)) {
 				return child
 			}
 		}
@@ -1127,8 +1127,7 @@ The content children can also be dragged and panned.
 				}
 			}
 		}
-		let list = listOfLists[0]
-		if (list) {
+		for (let list of listOfLists) {
 			if (list.kind !== linkedHook.outlet.kind && list.mobject !== linkedHook.outlet.ioList.mobject && list.linkOutlets.length > 0) {
 				list.view.show()
 			}
@@ -1178,26 +1177,53 @@ The content children can also be dragged and panned.
 		let h = this.freeCompatibleHookAtLocation(this.sensor.localEventVertex(e))
 		if (h === null || h === undefined) {
 			// TODO: remove the possibility of h being undefined
+			//log('aborted link creation or removed existing link')
 			if (this.openLink) {
 				this.remove(this.openLink)
 				if (this.openLink.startHook) {
+					//log('no end hook')
 					this.openLink.startHook.update({ linked: false })
 					if (this.openLink.previousHook) {
+						//log('we had an existing link')
+						if (this.openLink.previousHook == this.openLink.startHook) {
+							//log('previous hook is start hook')
+						}
+						if (this.openLink.previousHook == this.openLink.endHook) {
+							//log('previous hook is end hook')
+						}
+						//log('removing hook at link start')
 						this.openLink.startHook.outlet.removeHook()
 						if (this.openLink.dependency.kind == 'action') {
+							//log('removing previous hook (action)')
 							this.openLink.previousHook.outlet.removeHook()
 						}
+						//log('A')
+						//log('removing output link from mobject at start hook')
 						this.openLink.startHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+						//log('removing input link from mobject at previous hook')
 						this.openLink.previousHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 					}
 				} else if (this.openLink.endHook) {
+					//log('no start hook')
 					this.openLink.endHook.update({ linked: false })
 					if (this.openLink.previousHook) {
+						//log('we had an existing link')
+						// if (this.openLink.previousHook == this.openLink.startHook) {
+						// 	log('previous hook is start hook')
+						// }
+						// if (this.openLink.previousHook == this.openLink.endHook) {
+						// 	log('previous hook is end hook')
+						// }
+						//log('removing hook at previous hook')
 						this.openLink.previousHook.outlet.removeHook()
 						if (this.openLink.dependency.kind == 'action') {
+							//log('removing hook at link end (action)')
 							this.openLink.endHook.outlet.removeHook()
 						}
+						//log('B')
+						//log('removing output link from mobject at previous hook')
 						this.openLink.previousHook.outlet.ioList.mobject.removedOutputLink(this.openLink)
+						//log('removing output link from mobject at end hook')
 						this.openLink.endHook.outlet.ioList.mobject.removedInputLink(this.openLink)
 					}
 				}
@@ -1212,11 +1238,16 @@ The content children can also be dragged and panned.
 
 		let startHookWasNull = (this.openLink.startHook == null)
 		if (startHookWasNull) {
+			//log('we had no start hook')
 			this.openLink.update({ startHook: h })
-			this.openLink.previousHook = this.openLink.startHook
+			//log('start hook is new previous hook')
 		} else {
+			//log('we had a start hook')
+			// if (this.openLink.endHook == null) {
+			// 	log('end hook was null')
+			// }
 			this.openLink.update({ endHook: h })
-			this.openLink.previousHook = this.openLink.endHook
+			//log('end hook is new previous hook')
 		}
 		this.openLink.startHook.update({ linked: true })
 		this.openLink.endHook.update({ linked: true })
@@ -1226,11 +1257,22 @@ The content children can also be dragged and panned.
 		this.createNewDependency()
 
 		if (startHookWasNull) {
+			//log('C')
+			//log('start hook was null')
+			//log('removing output link at mobject of previous hook')
 			this.openLink.previousHook?.outlet.ioList.mobject.removedOutputLink(this.openLink)
-			this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)	
+			//this.openLink.startHook.outlet.ioList.mobject.addedOutputLink(this.openLink)
+			this.openLink.previousHook = this.openLink.startHook
 		} else {
+			//log('D')
+			//log('we had a start hook')
+			// if (this.openLink.endHook == null) {
+			// 	log('end hook was null')
+			// }
+			// log('removing input link at mobject of previous hook')
 			this.openLink.previousHook?.outlet.ioList.mobject.removedInputLink(this.openLink)
-			this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
+			//this.openLink.endHook.outlet.ioList.mobject.addedInputLink(this.openLink)
+			this.openLink.previousHook = this.openLink.endHook
 		}
 
 		this.openLink.previousHook = null

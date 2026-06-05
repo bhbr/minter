@@ -43,7 +43,7 @@ export class BinaryOperatorBox extends Linkable {
 				{ name: 'operand2', displayName: null, type: 'number|Array<number>' }
 			],
 			outputProperties: [
-				{ name: 'value', displayName: null, type: 'number|Array<number>' }
+				{ name: 'result', displayName: null, type: 'number|Array<number>' }
 			],
 			operand2InputBox: new NumberInputBox({
 				label: new TextLabel({

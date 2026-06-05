@@ -142,6 +142,10 @@ A property can have one of five mutability levels:
 		return this.prototypes().map((obj) => obj.constructor.name)
 	}
 
+	isInstanceOf(cls: string): boolean {
+		return this.ancestry().includes(cls)
+	}
+
 	private checkConstructorArgs(args: object) {
 	// Only properties with mutability 'always', 'on_update' or 'on_init' can be set in the constructor call
 		for (let [prop, value] of Object.entries(args)) {

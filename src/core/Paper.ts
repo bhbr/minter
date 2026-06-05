@@ -75,13 +75,14 @@ export class Paper extends Board {
 
 		if (isTouchDevice) {
 			if (separateSidebar) {
-				this.view.div.style.background = 'clear'
-				this.view.div.style.backgroundColor = 'clear'
+				this.view.div.style.background = 'transparent'
+				this.view.div.style.backgroundColor = 'transparent'
 				this.background.update({
-					fillColor: Color.clear()
+					fillColor: Color.black()
 				})
+				this.background.view.div.style.backgroundColor = 'rgba(0, 0, 0, 1)'
 			} else {
-				document.body.style.backgroundColor = 'black'
+				document.body.style.backgroundColor = 'rgba(0, 0, 0, 0)'
 			}
 		}
 
@@ -89,7 +90,7 @@ export class Paper extends Board {
 		let height = window.innerHeight
 		this.update({
 			frameWidth: width,
-			frameHeight: height 
+			frameHeight: height
 		})
 		this.background.update({
 			width: width,
@@ -100,8 +101,8 @@ export class Paper extends Board {
 			el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 		}
 		//window.addEventListener('resize', this.resize.bind(this))
-		this.resize()
 
+		this.resize()
 	}
 
 	resize() {

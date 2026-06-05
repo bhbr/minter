@@ -4,3 +4,4 @@
 **/*.js.map
 lib/
 assets/coinstack.png
+src/.DS_Store
