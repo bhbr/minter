@@ -20,10 +20,12 @@ function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 export class FormalLanguage extends ExtendedObject {
 
 	arities: Record<TerminalSymbol, number>
+	syntaxRules: Record<NonterminalSymbol, NonterminalSymbol | SentenceTree>
 
 	defaults(): object {
 		return {
-			arities: { }
+			arities: { },
+			syntaxRules: { }
 		}
 	}
 
@@ -31,8 +33,8 @@ export class FormalLanguage extends ExtendedObject {
 		return Object.keys(this.arities)
 	}
 
-	polishToSentence(str: string): Sentence {
-		return str.split(' ')
+	nonterminalSymbols(): Array<TerminalSymbol> {
+		return Object.keys(this.syntaxRules)
 	}
 
 	isTerminalSymbol(x: any): boolean {
@@ -40,11 +42,15 @@ export class FormalLanguage extends ExtendedObject {
 	}
 
 	isNonterminalSymbol(x: any): boolean {
-		return typeof x == 'string' && x[0] == '<' && x[x.length - 1] == '>'
+		return this.nonterminalSymbols().includes(x)
 	}
 
 	arity(str: TerminalSymbol): number {
 		return this.arities[str]
+	}
+
+	polishToSentence(str: string): Sentence {
+		return str.split(' ')
 	}
 
 	sentenceToTree(sentence: Sentence):  SentenceTree {

@@ -42,6 +42,7 @@ export class Algebra extends FormalSystem {
 }
 
 
+
 export class AlgebraVisualizer extends FormulaVisualizer {
 
 	declare system: Algebra
