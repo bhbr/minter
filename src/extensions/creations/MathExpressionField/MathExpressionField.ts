@@ -246,7 +246,7 @@ export class MathExpressionField extends Linkable {
 	}
 
 	outputPropertyName(): string {
-		return this.outputNames()[0]
+		return this.outputNames()[0] ?? 'value'
 	}
 
 	resultBoxText(): string {
