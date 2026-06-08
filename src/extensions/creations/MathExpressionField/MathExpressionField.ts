@@ -17,6 +17,7 @@ import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCa
 import { Mobject } from 'core/mobjects/Mobject'
 
 declare var MathQuill: any
+declare var Desmos: any
 
 export class MathExpressionField extends Linkable {
 
@@ -44,9 +45,11 @@ export class MathExpressionField extends Linkable {
 				anchor: [100, 0],
 				frameWidth: 100,
 				frameHeight: 50,
-				backgroundColor: Color.black()
+				backgroundColor: Color.black(),
+				horizontalAlign: 'left'
 			}),
 			grapher: new DesmosCalculator({
+				anchor: [0, 65],
 				frameWidth: 300,
 				frameHeight: 200,
 				options: {
@@ -67,6 +70,12 @@ export class MathExpressionField extends Linkable {
 		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
+
+		window.setTimeout( function() {
+			let buttonsToHide = this.grapher.view.div.querySelector('.dcg-overgraph-pillbox-elements')
+			buttonsToHide.style.visibility = 'hidden'
+		}.bind(this), 2000)
+
 	}
 
 	mathFieldWidth(): number {
@@ -259,10 +268,16 @@ export class MathExpressionField extends Linkable {
 			this.passVariableToCalculator(key, value)
 		}
 
-
 		this.grapher.calculator.setExpression({
 			id: `func`,
 			latex: this.mathField.latex(),
+		})
+
+		this.grapher.calculator.updateSettings({
+			xAxisLabel: this.freeVariables()[0],
+			yAxisLabel: this.outputPropertyName(),
+			xAxisArrowMode: Desmos.AxisArrowModes.POSITIVE,
+			yAxisArrowMode: Desmos.AxisArrowModes.POSITIVE
 		})
 
 		this.resultBox.view.hide()
@@ -280,9 +295,14 @@ export class MathExpressionField extends Linkable {
 	}
 
 	updateLayout() {
-		this.update({
-			frameWidth: this.span.clientWidth,
-			frameHeight: this.span.clientHeight + 30
+		if (this.span) {
+			this.update({
+				frameWidth: this.span.clientWidth,
+				frameHeight: this.span.clientHeight + 30
+			})
+		}
+		this.resultBox.update({
+			anchor: [this.frameWidth + 20, 0]
 		})
 		this.positionIOLists()
 	}
