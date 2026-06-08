@@ -24,10 +24,12 @@ export class MathExpressionField extends Linkable {
 	MQ: any
 	mathField: any
 	span: HTMLSpanElement | null
+	resultSpan: HTMLSpanElement | null
+	resultMathField: any
 	scope: object
 	parser: Parser
 	value: number | null
-	resultBox: TextLabel
+	resultBox: Mobject
 	grapher: DesmosCalculator
 
 	defaults(): object {
@@ -37,16 +39,17 @@ export class MathExpressionField extends Linkable {
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
 			mathField: null,
+			resultMathField: null,
 			span: null,
+			resultSpan: null,
 			scope: {},
 			parser: new Parser([]),
 			value: null,
-			resultBox: new TextLabel({
+			resultBox: new Mobject({
 				anchor: [100, 0],
 				frameWidth: 100,
 				frameHeight: 50,
 				backgroundColor: Color.black(),
-				horizontalAlign: 'left'
 			}),
 			grapher: new DesmosCalculator({
 				anchor: [0, 65],
@@ -67,6 +70,7 @@ export class MathExpressionField extends Linkable {
 			this.loadMathQuillAPI()
 		} else {
 			this.createMathField()
+			this.createResultBox()
 		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
@@ -100,7 +104,10 @@ export class MathExpressionField extends Linkable {
 				let mqScriptTag = document.createElement('script')
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
-				mqScriptTag.onload = this.createMathField.bind(this)
+				mqScriptTag.onload = function() {
+					this.createMathField()
+					this.createResultBox()
+				}.bind(this)
 				document.head.append(mqScriptTag)
 
 			}.bind(this)
@@ -142,6 +149,18 @@ export class MathExpressionField extends Linkable {
 			frameWidth: this.span.clientWidth,
 			frameHeight: this.span.clientHeight
 		})
+	}
+
+	createResultBox() {
+		let p = document.createElement('p')
+		this.resultSpan = document.createElement('span')
+		this.resultSpan.style.color = 'white'
+		this.resultSpan.style.fontSize = '28px'
+		this.resultSpan.style.backgroundColor = Color.gray(0.5).toCSS()
+		p.append(this.resultSpan)
+		this.resultBox.view.div.append(p)
+		this.resultMathField = this.MQ.StaticMath(this.resultSpan, { })
+		this.resultMathField.latex('')
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -256,9 +275,11 @@ export class MathExpressionField extends Linkable {
 
 	updateResultBox() {
 		this.resultBox.update({
-			anchor: this.resultBoxAnchor(),
-			text: this.resultBoxText()
+			anchor: this.resultBoxAnchor()
 		})
+		if (this.resultMathField) {
+			this.resultMathField.latex(this.resultBoxText())
+		}
 		this.resultBox.view.show()
 		this.grapher.view.hide()
 	}
