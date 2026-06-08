@@ -104,6 +104,8 @@ export class MathExpressionField extends Linkable {
 	createMathField() {
 		this.MQ = MathQuill.getInterface(2)
 		let mob = new Mobject()
+		this.addDependency('frameWidth', mob, 'frameWidth')
+		this.addDependency('frameHeight', mob, 'frameHeight')
 
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
@@ -111,6 +113,7 @@ export class MathExpressionField extends Linkable {
 		this.span.style.fontSize = '28px'
 		this.span.style.backgroundColor = Color.black().toCSS()
 		this.span.style.border = '2px solid white'
+		this.span.style.width = '200px'
 		p.append(this.span)
 		mob.view.div.append(p)
 		this.add(mob)
