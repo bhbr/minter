@@ -2,6 +2,7 @@
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { Token, TokenType, lexemeToType } from './Token'
 import { LexError } from './LexError'
+import { log } from 'core/functions/logging'
 
 // Port to own TS from tex-math-parser
 
@@ -121,7 +122,7 @@ export class Lexer extends ExtendedObject {
 				type = lexemeToType[identifier]
 			} else {
 				// unrecognized alphabetical lexeme: treat as variable
-				lexeme = identifier
+				lexeme = c
 				type = TokenType.Variable
 			}
 		} else {
@@ -134,8 +135,9 @@ export class Lexer extends ExtendedObject {
 		i += lexeme.length
 	}
 	tokens.push(new Token('EOF', TokenType.Eof, i))
-		return tokens
-	}
+
+	return tokens
+}
 
 
 
