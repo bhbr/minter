@@ -1,5 +1,6 @@
 
 import { log } from 'core/functions/logging'
+import { equalArrays } from 'core/functions/arrays'
 
 class Test {
 
@@ -86,7 +87,13 @@ export class ValueTest extends ConditionTest {
 	constructor(args) {
 		super(args)
 		this.value = args['value']
-		this.condition = (x: any) => (x === this.value)
+		this.condition = (x: any) => {
+			if (x instanceof Array) {
+				return equalArrays(x, this.value)
+			} else {
+				return x === this.value
+			}
+		}
 	}
 }
 
