@@ -15,6 +15,7 @@ import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
 import { Mobject } from 'core/mobjects/Mobject'
+import { roundedString } from 'core/functions/various'
 
 declare var MathQuill: any
 declare var Desmos: any
@@ -23,6 +24,7 @@ export class MathExpressionField extends Linkable {
 
 	MQ: any
 	mathField: any
+	mathFieldLoadingID: number | null
 	span: HTMLSpanElement | null
 	resultSpan: HTMLSpanElement | null
 	resultMathField: any
@@ -39,6 +41,7 @@ export class MathExpressionField extends Linkable {
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
 			mathField: null,
+			mathFieldLoadingID: null,
 			resultMathField: null,
 			span: null,
 			resultSpan: null,
@@ -46,15 +49,15 @@ export class MathExpressionField extends Linkable {
 			parser: new Parser([]),
 			value: null,
 			resultBox: new Mobject({
-				anchor: [100, 0],
+				anchor: [105, 0],
 				frameWidth: 100,
-				frameHeight: 50,
+				frameHeight: 60,
 				backgroundColor: Color.black(),
 			}),
 			grapher: new DesmosCalculator({
 				anchor: [0, 65],
 				frameWidth: 300,
-				frameHeight: 200,
+				frameHeight: 300,
 				options: {
 					expressions: false
 				}
@@ -74,11 +77,6 @@ export class MathExpressionField extends Linkable {
 		}
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
-
-		window.setTimeout( function() {
-			let buttonsToHide = this.grapher.view.div.querySelector('.dcg-overgraph-pillbox-elements')
-			buttonsToHide.style.visibility = 'hidden'
-		}.bind(this), 2000)
 
 	}
 
@@ -143,12 +141,25 @@ export class MathExpressionField extends Linkable {
 				}.bind(this)
 			}
 		})
-		this.mathField.write('')
+		this.mathFieldLoadingID = window.setInterval(this.checkIfMathFieldLoaded.bind(this), 100)
 		this.updateIOProperties()
 		this.update({
 			frameWidth: this.span.clientWidth,
 			frameHeight: this.span.clientHeight
 		})
+	}
+
+	checkIfMathFieldLoaded() {
+		if (this.mathField) {
+			window.clearInterval(this.mathFieldLoadingID)
+			this.mathFieldLoadingID = null
+			this.onMathFieldLoaded()
+		}
+	}
+
+	onMathFieldLoaded() {
+		this.mathField.write(' ')
+		this.focus()
 	}
 
 	createResultBox() {
@@ -160,7 +171,7 @@ export class MathExpressionField extends Linkable {
 		p.append(this.resultSpan)
 		this.resultBox.view.div.append(p)
 		this.resultMathField = this.MQ.StaticMath(this.resultSpan, { })
-		this.resultMathField.latex('')
+		this.resultMathField.latex(' ')
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -218,21 +229,24 @@ export class MathExpressionField extends Linkable {
 		}
 		try {
 			let node = this.parser.parseTokens(this.parser.tokens)
-			let variables = node.variables()
-			let inputNames = this.inputNames()
-			for (let v of variables) {
-				if (!inputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
+			let oldInputNames = this.inputNames()
+			let newInputNames = node.variables()
+			for (let v of newInputNames) {
+				if (!oldInputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
 					this.createInputVariable(v, NaN)
 				}
 			}
-			for (let v of inputNames) {
-				if (!variables.includes(v)) {
+			for (let v of oldInputNames) {
+				if (!newInputNames.includes(v)) {
 					this.removeInputVariable(v)
 				}
 			}
 			if (node instanceof AssignmentNode) {
-				if (this.outputNames()[0] !== node.name) {
+				let oldOutputName = this.outputNames()[0]
+				if (oldOutputName !== node.name) {
+					this.removeOutputVariable(oldOutputName)
 					this.createOutputVariable(node.name)
+					getPaper().globals[node.name] = this.computeValue()
 				}
 			}
 		} catch (ParseError) {
@@ -270,7 +284,7 @@ export class MathExpressionField extends Linkable {
 
 	resultBoxText(): string {
 		if (isNaN(this.value)) { return '' }
-		return `=${this.value}`
+		return `=${roundedString(this.value)}`
 	}
 
 	updateResultBox() {
@@ -296,7 +310,7 @@ export class MathExpressionField extends Linkable {
 
 		this.grapher.calculator.updateSettings({
 			xAxisLabel: this.freeVariables()[0],
-			yAxisLabel: this.outputPropertyName(),
+			yAxisLabel: (this.outputPropertyName() !== 'value') ? this.outputPropertyName() : '',
 			xAxisArrowMode: Desmos.AxisArrowModes.POSITIVE,
 			yAxisArrowMode: Desmos.AxisArrowModes.POSITIVE
 		})
