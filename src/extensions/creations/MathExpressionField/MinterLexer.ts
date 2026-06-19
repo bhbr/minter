@@ -4,7 +4,7 @@ function isWhitespace(c: string): boolean {
 	return c.trim() === ''
 }
 
-function isLetter(c: string): boolean {
+export function isLetter(c: string): boolean {
 	return /^[A-Za-z]{1,1}$/.test(c)
 }
 
@@ -14,6 +14,10 @@ function isControl(c: string): boolean {
 
 function isDigit(c: string): boolean {
 	return c >= '0' && c <= '9'
+}
+
+export function isNumber(c: string): boolean {
+	return (!isNaN(Number(c)) && c.length !== 0)
 }
 
 

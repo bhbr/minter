@@ -52,6 +52,6 @@ export const MinterLexerTest = new BundledTest({
 				return tokenizeTeXString('\\frac {\\sqrt[3] {5}} {\\log_2 ( x + 1 ) }')
 			},
 			value: ['\\frac', '{', '\\sqrt', '[', '3', ']', '{', '5', '}', '}', '{', '\\log', '_', '2', '(', 'x', '+', '1', ')', '}']
-		}),
+		})
 	]
 })
