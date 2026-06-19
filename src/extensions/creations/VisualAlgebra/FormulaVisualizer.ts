@@ -257,15 +257,10 @@ export class FormulaVisualizer extends Mobject {
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		log('pointer up')
 		let span = e.target as HTMLElement
-		log(span)
 		let subTree = this.elementToTree(span)
-		log(subTree)
-		log(this.system.rules)
 		for (let [key, rule] of Object.entries(this.system.rules)) {
 			let match = this.system.matchSentenceTreeForm(rule[0], subTree)
-			log(match)
 			if (match !== null) {
 				let newTree = this.system.applyRuleToTree(key, subTree)
 				let newElement = this.treeToMathQuill(newTree)
