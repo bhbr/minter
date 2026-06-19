@@ -1,6 +1,7 @@
 
-import { tokenizeTeXString, isLetter, isNumber } from './MinterLexer'
-import { MinterMathNode, MinterNumberNode, MinterVariableNode } from './MinterMathNode'
+import { log } from 'core/functions/logging'
+import { tokenizeTeXString, isLetter, isNumber, isFunctionToken } from './MinterLexer'
+import { MinterMathNode, MinterNumberNode, MinterVariableNode, MinterFunctionNode, MinterGroupNode } from './MinterMathNode'
 // import { Sentence, SentenceForm, NonterminalSymbol } from 'extensions/creations/VisualAlgebra/SentenceTypes'
 // import { concat } from 'core/functions/arrays'
 
@@ -141,6 +142,58 @@ import { MinterMathNode, MinterNumberNode, MinterVariableNode } from './MinterMa
 // 	return null
 // }
 
+let closingParens = {
+	'(': ')', '[': ']', '{': '}', '\\{': '\\}'
+}
+
+let openParens = Object.keys(closingParens)
+
+export function isOpenParen(token: string): boolean {
+	return openParens.includes(token)
+}
+
+export function closingParenIndex(tokens: Array<string>, parenType?: string): number {
+	if (tokens.length == 0) {
+		return 0
+	}
+	let openParen = parenType ?? tokens[0]
+	if (!isOpenParen(openParen)) {
+		return 0
+	}
+	let closeParen = closingParens[openParen]
+	if (tokens[0] !== openParen) {
+		return 0
+	}
+	var counter = 0
+	for (let index = 0; index < tokens.length; index++) {
+		let token = tokens[index]
+		if (token == openParen) {
+			counter++
+		} else if (token == closeParen) {
+			counter--
+		}
+		if (counter < 0) {
+			return NaN
+		} else if (counter == 0) {
+			return index
+		}
+	}
+	return NaN
+}
+
+export function leadingTokenGroup(tokens: Array<string>): Array<string> {
+	let i = closingParenIndex(tokens)
+	return tokens.slice(0, i + 1)
+}
+
+export function popLeadingTokenGroup(tokens: Array<string>): Array<string> {
+	let i = closingParenIndex(tokens)
+	return tokens.slice(i + 1)
+}
+
+export function isGroup(tokens: Array<string>): boolean {
+	return popLeadingTokenGroup(tokens).length == 0
+}
 
 export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 
@@ -154,9 +207,28 @@ export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 			return new MinterVariableNode({
 				name: token
 			})
+		} else {
+			return null
+		}
+	} else {
+		let firstToken = tokens[0]
+		if (isFunctionToken(firstToken)) {
+			let remainingTokens = tokens.slice(1)
+			let childNode = parseTokens(remainingTokens)
+			if (childNode == null) {
+				return null
+			}
+			return new MinterFunctionNode({
+				name: firstToken,
+				child: childNode
+			})
+		} else if (isGroup(tokens)) {
+			return new MinterGroupNode({
+				parenType: tokens[0],
+				child: parseTokens(tokens.slice(1, tokens.length - 1))
+			})
 		}
 	}
-
 	return null
 
 }

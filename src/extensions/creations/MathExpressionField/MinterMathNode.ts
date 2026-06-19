@@ -52,7 +52,9 @@ export class MinterFunctionNode extends MinterMathNode {
 			name: 'id',
 			functionDict: {
 				'id': (x) => x,
-				'sqrt': Math.sqrt
+				'\\sqrt': Math.sqrt,
+				'\\sin': Math.sin,
+				'\\cos': Math.cos
 			},
 			child: new MinterMathNode()
 		}
@@ -62,9 +64,41 @@ export class MinterFunctionNode extends MinterMathNode {
 		let f = this.functionDict[this.name]
 		return f(this.child.getValue())
 	}
-
-
 }
+
+export class MinterGroupNode extends MinterMathNode {
+
+	parenType: '(' | '[' | '{' | '\\{'
+	child: MinterMathNode
+
+	defaults(): object {
+		return {
+			parenType: '(',
+			child: new MinterMathNode()
+		}
+	}
+
+	getValue(): number {
+		return this.child.getValue()
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

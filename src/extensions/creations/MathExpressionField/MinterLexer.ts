@@ -20,6 +20,16 @@ export function isNumber(c: string): boolean {
 	return (!isNaN(Number(c)) && c.length !== 0)
 }
 
+let functionTokens = [
+	'\\sqrt',
+	'\\sin',
+	'\\cos'
+]
+
+export function isFunctionToken(token: string): boolean {
+	return functionTokens.includes(token)
+}
+
 
 export function tokenizeTeXString(texString: string): Array<string> {
 	let tokens: Array<string> = []

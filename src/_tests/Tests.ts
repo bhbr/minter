@@ -97,6 +97,22 @@ export class ValueTest extends ConditionTest {
 	}
 }
 
+export class NumberValueTest extends ValueTest {
+
+	declare value: number
+	precision: number
+
+	constructor(args) {
+		super(args)
+		this.value = args['value']
+		this.precision = args['precision'] ?? 1e-12
+		this.condition = (x: number) => {
+			return Math.abs(x - this.value) < this.precision
+		}
+	}
+}
+
+
 export class AssertionTest extends ValueTest {
 
 	declare value: boolean
