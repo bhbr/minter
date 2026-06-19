@@ -1,7 +1,7 @@
 
 import { log } from 'core/functions/logging'
 import { tokenizeTeXString, isLetter, isNumber, isFunctionToken } from './MinterLexer'
-import { MinterMathNode, MinterNumberNode, MinterVariableNode, MinterFunctionNode, MinterGroupNode, MinterFractionNode } from './MinterMathNode'
+import { MinterMathNode, MinterNumberNode, MinterVariableNode, MinterFunctionNode, MinterGroupNode, MinterOperatorNode, MinterFractionNode } from './MinterMathNode'
 // import { Sentence, SentenceForm, NonterminalSymbol } from 'extensions/creations/VisualAlgebra/SentenceTypes'
 // import { concat } from 'core/functions/arrays'
 
@@ -195,6 +195,55 @@ export function isGroup(tokens: Array<string>, parenType?: string): boolean {
 	return popLeadingTokenGroup(tokens, parenType).length == 0
 }
 
+export function isOperator(token: string): boolean {
+	return ['+', '-', '\\cdot', '*', '/', '^'].includes(token)
+}
+
+export function outermostOperatorsByIndex(tokens: Array<string>): Record<string, string> {
+	if (tokens.length == 0) {
+		return {}
+	}
+	let allOuterOperatorsByIndex: Record<string, string> = {}
+	let leftGroup = leadingTokenGroup(tokens)
+	let rest = popLeadingTokenGroup(tokens)
+	if (isOperator(rest[0])) {
+		allOuterOperatorsByIndex[`${leftGroup.length}`] = rest[0]
+		let newOps = outermostOperatorsByIndex(rest.slice(1))
+		for (let [index, op] of Object.entries(newOps)) {
+			allOuterOperatorsByIndex[`${leftGroup.length + Number(index) + 1}`] = op
+		}
+	}
+	return allOuterOperatorsByIndex
+}
+
+let precedence = {
+	'+': 0,
+	'-': 0,
+	'\\cdot': 1,
+	'*': 1,
+	'/': 1,
+	'^': 2
+}
+
+export function outermostOperatorIndex(tokens: Array<string>): number {
+	let allOps = outermostOperatorsByIndex(tokens)
+	let indices = Object.keys(allOps).map((x) => Number(x)).sort().reverse().map((x) => `${x}`)
+	var op: string | null = null
+	var index: number = NaN
+	for (let i of indices) {
+		if (op == null) {
+			op = allOps[i]
+			index = Number(i)
+			continue
+		}
+		if (precedence[allOps[i]] <= precedence[op]) {
+			op = allOps[i]
+			index = Number(i)
+		}
+	}
+	return index
+}
+
 export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 
 	if (tokens.length == 1) {
@@ -211,33 +260,50 @@ export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 			return null
 		}
 	} else {
-		// if cannot be split into infix groups
-		let firstToken = tokens[0]
-		if (isFunctionToken(firstToken)) {
-			let remainingTokens = tokens.slice(1)
-			let childNode = parseTokens(remainingTokens)
-			if (childNode == null) {
-				return null
+		let i = outermostOperatorIndex(tokens)
+		if (isNaN(i)) {
+
+			// if cannot be split into infix groups
+			let firstToken = tokens[0]
+			if (isFunctionToken(firstToken)) {
+				let remainingTokens = tokens.slice(1)
+				let childNode = parseTokens(remainingTokens)
+				if (childNode == null) {
+					return null
+				}
+				return new MinterFunctionNode({
+					name: firstToken,
+					child: childNode
+				})
+			} else if (isGroup(tokens)) {
+				return new MinterGroupNode({
+					parenType: tokens[0],
+					child: parseTokens(tokens.slice(1, tokens.length - 1))
+				})
+			} else if (firstToken == '\\frac') {
+				let remainingTokens = tokens.slice(1)
+				let numeratorGroup = leadingTokenGroup(remainingTokens, '{')
+				let denominatorGroup = popLeadingTokenGroup(remainingTokens, '{')
+				if (!isGroup(numeratorGroup) || !isGroup(denominatorGroup)) {
+					return null
+				}
+				return new MinterFractionNode({
+					numerator: parseTokens(numeratorGroup),
+					denominator: parseTokens(denominatorGroup)
+				})
 			}
-			return new MinterFunctionNode({
-				name: firstToken,
-				child: childNode
-			})
-		} else if (isGroup(tokens)) {
-			return new MinterGroupNode({
-				parenType: tokens[0],
-				child: parseTokens(tokens.slice(1, tokens.length - 1))
-			})
-		} else if (firstToken == '\\frac') {
-			let remainingTokens = tokens.slice(1)
-			let numeratorGroup = leadingTokenGroup(remainingTokens, '{')
-			let denominatorGroup = popLeadingTokenGroup(remainingTokens, '{')
-			if (!isGroup(numeratorGroup) || !isGroup(denominatorGroup)) {
-				return null
-			}
-			return new MinterFractionNode({
-				numerator: parseTokens(numeratorGroup),
-				denominator: parseTokens(denominatorGroup)
+
+		} else {
+
+			let leftGroup = tokens.slice(0, i)
+			let operator = tokens[i]
+			let rightGroup = tokens.slice(i + 1)
+			let child1 = parseTokens(leftGroup)
+			let child2 = parseTokens(rightGroup)
+			return new MinterOperatorNode({
+				operator: operator,
+				child1: child1,
+				child2: child2
 			})
 		}
 	}
@@ -247,7 +313,7 @@ export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 
 
 export function parseTeX(texString: string): MinterMathNode {
-	return parseTokens(tokenizeTeXString(texString))
+	return parseTokens(tokenizeTeXString(texString.replace('\\cdot', '*')))
 }
 
 

@@ -106,7 +106,9 @@ export class MinterOperatorNode extends MinterMathNode {
 		case '-':
 			return a - b
 		case '\\cdot':
-			return a + b
+			return a * b
+		case '*':
+			return a * b
 		case '/':
 			return a / b
 		case '^':
