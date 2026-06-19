@@ -17,7 +17,7 @@ export class MinterNumberNode extends MinterMathNode {
 
 	defaults(): object {
 		return {
-			_value: NaN
+			value: NaN
 		}
 	}
 
@@ -83,8 +83,69 @@ export class MinterGroupNode extends MinterMathNode {
 	}
 }
 
+export class MinterOperatorNode extends MinterMathNode {
 
+	operator: string
+	child1: MinterMathNode
+	child2: MinterMathNode
 
+	defaults(): object {
+		return {
+			operator: '+',
+			child1: new MinterMathNode(),
+			child2: new MinterMathNode()
+		}
+	}
+
+	getValue(): number {
+		let a = this.child1.getValue()
+		let b = this.child2.getValue()
+		switch (this.operator) {
+		case '+':
+			return a + b
+		case '-':
+			return a - b
+		case '\\cdot':
+			return a + b
+		case '/':
+			return a / b
+		case '^':
+			return a ** b
+		default:
+			return NaN
+		}
+	}
+}
+
+export class MinterFractionNode extends MinterOperatorNode {
+
+	defaults(): object {
+		return {
+			operator: '/'
+		}
+	}
+
+	mutabilities(): object {
+		return {
+			operator: 'never'
+		}
+	}
+
+	get numerator(): MinterMathNode {
+		return this.child1
+	}
+	set numerator(newValue: MinterMathNode) {
+		this.child1 = newValue
+	}
+
+	get denominator(): MinterMathNode {
+		return this.child2
+	}
+	set denominator(newValue: MinterMathNode) {
+		this.child2 = newValue
+	}
+
+}
 
 
 

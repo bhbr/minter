@@ -1,5 +1,5 @@
 
-import { MinterFunctionNode, MinterNumberNode, MinterGroupNode } from 'extensions/creations/MathExpressionField/MinterMathNode'
+import { MinterFunctionNode, MinterNumberNode, MinterGroupNode, MinterFractionNode } from 'extensions/creations/MathExpressionField/MinterMathNode'
 import { parseTeX, closingParenIndex, leadingTokenGroup, popLeadingTokenGroup, isGroup } from 'extensions/creations/MathExpressionField/MinterParser'
 import { ValueTest, NumberValueTest, ErrorTest, BundledTest } from '_tests/Tests'
 import { log } from 'core/functions/logging'
@@ -75,6 +75,22 @@ export const MinterParserTest = new BundledTest({
 				return node.getValue()
 			},
 			value: Math.sin(Math.cos(5))
+		}),
+		new NumberValueTest({
+			name: 'Simple MinterFractionNodes get parsed correctly',
+			function: function(): number {
+				let node = parseTeX('\\frac{3}{2}')
+				return node.getValue()
+			},
+			value: 1.5
+		}),
+		new NumberValueTest({
+			name: 'Composed MinterFractionNodes get parsed correctly',
+			function: function(): number {
+				let node = parseTeX('\\frac{\\sqrt{\\cos(1)}}{\\sqrt{\\sin(2)}}') as MinterFractionNode
+				return node.getValue()
+			},
+			value: Math.sqrt(Math.cos(1)) / Math.sqrt(Math.sin(2))
 		}),
 	]
 })

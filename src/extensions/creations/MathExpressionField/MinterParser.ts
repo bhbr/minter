@@ -1,7 +1,7 @@
 
 import { log } from 'core/functions/logging'
 import { tokenizeTeXString, isLetter, isNumber, isFunctionToken } from './MinterLexer'
-import { MinterMathNode, MinterNumberNode, MinterVariableNode, MinterFunctionNode, MinterGroupNode } from './MinterMathNode'
+import { MinterMathNode, MinterNumberNode, MinterVariableNode, MinterFunctionNode, MinterGroupNode, MinterFractionNode } from './MinterMathNode'
 // import { Sentence, SentenceForm, NonterminalSymbol } from 'extensions/creations/VisualAlgebra/SentenceTypes'
 // import { concat } from 'core/functions/arrays'
 
@@ -181,18 +181,18 @@ export function closingParenIndex(tokens: Array<string>, parenType?: string): nu
 	return NaN
 }
 
-export function leadingTokenGroup(tokens: Array<string>): Array<string> {
-	let i = closingParenIndex(tokens)
+export function leadingTokenGroup(tokens: Array<string>, parenType?: string): Array<string> {
+	let i = closingParenIndex(tokens, parenType)
 	return tokens.slice(0, i + 1)
 }
 
-export function popLeadingTokenGroup(tokens: Array<string>): Array<string> {
-	let i = closingParenIndex(tokens)
+export function popLeadingTokenGroup(tokens: Array<string>, parenType?: string): Array<string> {
+	let i = closingParenIndex(tokens, parenType)
 	return tokens.slice(i + 1)
 }
 
-export function isGroup(tokens: Array<string>): boolean {
-	return popLeadingTokenGroup(tokens).length == 0
+export function isGroup(tokens: Array<string>, parenType?: string): boolean {
+	return popLeadingTokenGroup(tokens, parenType).length == 0
 }
 
 export function parseTokens(tokens: Array<string>): MinterMathNode | null {
@@ -211,6 +211,7 @@ export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 			return null
 		}
 	} else {
+		// if cannot be split into infix groups
 		let firstToken = tokens[0]
 		if (isFunctionToken(firstToken)) {
 			let remainingTokens = tokens.slice(1)
@@ -226,6 +227,17 @@ export function parseTokens(tokens: Array<string>): MinterMathNode | null {
 			return new MinterGroupNode({
 				parenType: tokens[0],
 				child: parseTokens(tokens.slice(1, tokens.length - 1))
+			})
+		} else if (firstToken == '\\frac') {
+			let remainingTokens = tokens.slice(1)
+			let numeratorGroup = leadingTokenGroup(remainingTokens, '{')
+			let denominatorGroup = popLeadingTokenGroup(remainingTokens, '{')
+			if (!isGroup(numeratorGroup) || !isGroup(denominatorGroup)) {
+				return null
+			}
+			return new MinterFractionNode({
+				numerator: parseTokens(numeratorGroup),
+				denominator: parseTokens(denominatorGroup)
 			})
 		}
 	}
