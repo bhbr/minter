@@ -25,26 +25,26 @@ s.update({
 	texString: '\\cos'
 })
 
+let v = new VisualVariable({
+	name: 'a',
+	anchor: [300, 100]
+})
 
-window.setTimeout(function() {
-	let v = new VisualVariable({
-		name: 'a',
-		anchor: [300, 100]
-	})
+paper.add(v)
 
-	paper.add(v)
+v.update({
+	name: 'y'
+})
 
-	v.update({
-		name: 'y'
-	})
-	
-	let f = VisualFormula.texToVisual('a + b')
 
-	f.update({
-		anchor: [500, 100]
-	})
 
-	paper.add(f)
-}, 2000)
+let f = VisualFormula.texToVisual('(a + b) \\cdot c')
+
+f.update({
+	anchor: [500, 100]
+})
+
+paper.add(f)
+
 
 

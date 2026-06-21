@@ -10,6 +10,8 @@ import { Color } from 'core/classes/Color'
 
 declare var MathQuill: any
 
+const FORMULA_PADDING = 10
+
 export class VisualSymbol extends Mobject {
 
 	MQ: any
@@ -34,6 +36,7 @@ export class VisualSymbol extends Mobject {
  	}
 
 	loadMathQuillAPI() {
+		log('loading MathQuill...')
 		let cssLinkTag = document.createElement('link')
 		cssLinkTag.rel = 'stylesheet'
 		cssLinkTag.href = '../../mathquill-0.10.1/mathquill.css'
@@ -47,7 +50,7 @@ export class VisualSymbol extends Mobject {
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
 				mqScriptTag.onload = function() {
-					this.createMQObject()
+					this.onload()
 				}.bind(this)
 				document.head.append(mqScriptTag)
 
@@ -58,17 +61,21 @@ export class VisualSymbol extends Mobject {
 		document.head.append(cssLinkTag)
 	}
 
+	onload() {
+ 		log('...done.')
+ 		getPaper().loadedAPIs.push('mathquill')
+		this.createMQObject()
+	}
+
  	createMQObject() {
 		this.MQ = MathQuill.getInterface(2)
- 		let p = document.createElement('p')
 		let span = document.createElement('span')
 		span.style.color = 'white'
 		span.style.fontSize = '28px'
 		span.style.backgroundColor = Color.clear().toCSS()
 		span.style.border = 'none'
-		span.style.width = '200px'
-		p.append(span)
-		this.view.div.append(p)
+		span.style.width = 'fit-content'
+		this.view.div.append(span)
 		this.MQObject = this.MQ.StaticMath(span)
 		this.update()
  	}
@@ -77,18 +84,36 @@ export class VisualSymbol extends Mobject {
  		super.update(args, redraw)
  		if (this.MQObject) {
 			this.MQObject.latex(this.texString)
+			this.sizeToFit()
  		}
  	}
+
+ 	sizeToFit() {
+		super.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
+			})
+ 	}
+
+	getWidth(): number {
+		return this.MQObject.el().clientWidth
+	}
+
+	getHeight(): number {
+		return this.MQObject.el().clientHeight
+	}
 
 }
 
 export class VisualFormula extends Mobject {
 
-	MQ: any
+	mathQuillLoadingID: number | null
 
 	defaults(): object {
 		return {
-			MQ: null
+			borderColor: Color.white(),
+			borderWidth: 1,
+			mathQuillLoadingID: null
 		}
 	}
 
@@ -96,14 +121,22 @@ export class VisualFormula extends Mobject {
 		return NaN
 	}
 
-	setup() {
-		super.setup()
-		this.MQ = MathQuill.getInterface(2)
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (!getPaper().loadedAPIs.includes('mathquill')) {
+			this.mathQuillLoadingID = window.setInterval(function() {
+				if (getPaper().loadedAPIs.includes('mathquill')) {
+					this.updateContent()
+					window.clearInterval(this.mathQuillLoadingID)
+				}
+			}.bind(this), 100)
+		} else {
+			this.updateContent()
+		}
 	}
 
 	static treeToVisual(tree: SentenceTree): VisualFormula | null {
 		let symbol = tree[0]
-		log(tree)
 		if (TeXLexer.isNumber(symbol)) {
 			return new VisualNumber({
 				value: Number(symbol),
@@ -158,6 +191,17 @@ export class VisualFormula extends Mobject {
 	static texToVisual2(tex: string): VisualFormula {
 		return VisualFormula.sentenceToVisual(TeXLexer.texToSentence(tex))
 	}
+
+	getWidth(): number {
+		return 100
+	}
+
+	getHeight(): number {
+		return 50
+	}
+
+	updateContent() { }
+
 }
 
 export class VisualNumber extends VisualFormula {
@@ -181,11 +225,24 @@ export class VisualNumber extends VisualFormula {
 		return this.value
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
- 		super.update(args, redraw)
+
+	updateContent() {
 		this.symbol.update({
+			anchor: [FORMULA_PADDING, FORMULA_PADDING],
 			texString: `${this.value}`
 		})
+		this.view.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
+		})
+	}
+
+	getWidth(): number {
+		return this.symbol.getWidth() + 2 * FORMULA_PADDING
+	}
+
+	getHeight(): number {
+		return this.symbol.getHeight() + 2 * FORMULA_PADDING
 	}
 
 }
@@ -211,12 +268,25 @@ export class VisualVariable extends VisualFormula {
 		return getPaper().globals[this.name] ?? NaN
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
- 		super.update(args, redraw)
+	updateContent() {
 		this.symbol.update({
+			anchor: [FORMULA_PADDING, FORMULA_PADDING],
 			texString: this.name
 		})
+		this.view.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
+		})
 	}
+
+	getWidth(): number {
+		return this.symbol.getWidth() + 2 * FORMULA_PADDING
+	}
+
+	getHeight(): number {
+		return this.symbol.getHeight() + 2 * FORMULA_PADDING
+	}
+
 }
 
 export class VisualFunction extends VisualFormula {
@@ -269,16 +339,31 @@ export class VisualFunction extends VisualFormula {
 		this.add(this.child)
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
- 		super.update(args, redraw)
+	updateContent() {
 		this.symbol.update({
+			anchor: [FORMULA_PADDING, FORMULA_PADDING],
 			texString: this.name
 		})
 		this.child.update({
-			anchor: this.symbol.view.frame.urCorner()
+			anchor: [
+				this.symbol.view.frame.xMax() + FORMULA_PADDING,
+				FORMULA_PADDING
+			]
+		})
+		this.view.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
 		})
 	}
 
+
+	getWidth(): number {
+		return this.symbol.getWidth() + this.child.getWidth() + 3 * FORMULA_PADDING
+	}
+
+	getHeight(): number {
+		return Math.max(this.symbol.getHeight(), this.child.getHeight()) + 2 * FORMULA_PADDING
+	}
 
 }
 
@@ -309,18 +394,32 @@ export class VisualGroup extends VisualFormula {
 		this.add(this.closeParenSymbol)
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
- 		super.update(args, redraw)
+	updateContent() {
 		this.openParenSymbol.update({
+			anchor: [FORMULA_PADDING, FORMULA_PADDING],
 			texString: this.parenType
 		})
 		this.child.update({
-			anchor: this.openParenSymbol.view.frame.urCorner()
+			anchor: [
+				this.openParenSymbol.view.frame.xMax() + FORMULA_PADDING,
+				FORMULA_PADDING
+			]
 		})
 		this.closeParenSymbol.update({
 			texString: TeXParser.closingParens[this.parenType],
-			anchor: this.child.view.frame.urCorner()
+			anchor: [
+				this.openParenSymbol.view.frame.xMax() + this.child.getWidth() + 2 * FORMULA_PADDING,
+				FORMULA_PADDING
+			]
 		})
+ 	}
+
+ 	getWidth(): number {
+ 		return this.openParenSymbol.getWidth() + this.child.getWidth() + this.closeParenSymbol.getWidth() + 4 * FORMULA_PADDING
+ 	}
+
+ 	getHeight(): number {
+ 		return Math.max(this.openParenSymbol.getHeight(), this.child.getHeight(), this.closeParenSymbol.getHeight()) + 2 * FORMULA_PADDING
  	}
 }
 
@@ -368,15 +467,35 @@ export class VisualOperator extends VisualFormula {
 		this.add(this.child2)
 	}
 
-	update(args: object = {}, redraw: boolean = true) {
- 		super.update(args, redraw)
+	updateContent() {
+		this.child1.update({
+			anchor: [FORMULA_PADDING, FORMULA_PADDING]
+		})
 		this.operatorSymbol.update({
 			texString: this.operator,
-			anchor: this.child1.view.frame.urCorner()
+			anchor: [
+				this.child1.getWidth() + 2 * FORMULA_PADDING,
+				FORMULA_PADDING
+			]
 		})
 		this.child2.update({
-			anchor: this.operatorSymbol.view.frame.urCorner()
+			anchor: [
+				this.operatorSymbol.anchor[0] + this.operatorSymbol.getWidth() + FORMULA_PADDING,
+				FORMULA_PADDING
+			]
 		})
+		this.view.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
+		})
+ 	}
+
+ 	getWidth(): number {
+ 		return this.child1.getWidth() + this.operatorSymbol.getWidth() + this.child2.getWidth() + 4 * FORMULA_PADDING
+ 	}
+
+ 	getHeight(): number {
+ 		return Math.max(this.child1.getHeight(), this.operatorSymbol.getHeight(), this.child2.getHeight()) + 2 * FORMULA_PADDING
  	}
 
 }

@@ -129,7 +129,7 @@ export class Frame extends ExtendedObject {
 
 	/*
 	Equivalent (by default) versions without "view" in the name
-	These can be overriden in subclasses, e. g. in VFrame using
+	These can be overriden in subclasses, e. g. in VMobject using
 	its vertices.
 	*/
 
