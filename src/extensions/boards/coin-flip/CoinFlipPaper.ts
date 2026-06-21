@@ -17,7 +17,6 @@ import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/Scatte
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
-import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -41,7 +40,6 @@ export class CoinFlipPaper extends Paper {
 				'greater or equal': GreaterThanOrEqualBoxCreator,
 				'equal': EqualsBoxCreator,
 				'not equal': NotEqualsBoxCreator,
-				'expression': MathExpressionFieldCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
 				'plot': ScatterPlotCreator,
