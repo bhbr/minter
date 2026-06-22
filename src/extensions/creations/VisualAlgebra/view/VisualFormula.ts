@@ -9,6 +9,7 @@ import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
 import { Line } from 'core/shapes/Line'
 import { VisualFormulaSensor } from './VisualFormulaSensor'
+import { VisualCalculation } from './VisualCalculation'
 
 declare var MathQuill: any
 
@@ -114,6 +115,8 @@ export class VisualFormula extends Mobject {
 	declare sensor: VisualFormulaSensor
 	highlightedSubformula: VisualFormula | null
 	rootFormula: VisualFormula | null
+	formulaTree: SentenceTree
+	calculation: VisualCalculation | null
 
 	defaults(): object {
 		return {
@@ -123,7 +126,9 @@ export class VisualFormula extends Mobject {
 			screenEventHandler: ScreenEventHandler.Self,
  			sensor: new VisualFormulaSensor(),
  			highlightedSubformula: null,
- 			rootFormula: null
+ 			rootFormula: null,
+ 			formulaTree: [],
+ 			calculation: null
 		}
 	}
 
@@ -161,19 +166,22 @@ export class VisualFormula extends Mobject {
 		let symbol = tree[0]
 		if (TeXLexer.isNumber(symbol)) {
 			return new VisualNumber({
-				value: Number(symbol)
+				value: Number(symbol),
+				formulaTree: tree
 			})
 		}
 		if (TeXLexer.isLetter(symbol)) {
 			return new VisualVariable({
-				name: symbol
+				name: symbol,
+				formulaTree: tree
 			})
 		}
 		if (TeXLexer.isFunctionToken(symbol)) {
 			let child = tree[1][0]
 			return new VisualFunction({
 				name: symbol,
-				child: VisualFormula.treeToVisual(child)
+				child: VisualFormula.treeToVisual(child),
+				formulaTree: tree
 			})
 		}
 		if (symbol == '\\frac') {
@@ -181,7 +189,8 @@ export class VisualFormula extends Mobject {
 			let denominator = tree[1][1]
 			return new VisualFraction({
 				numerator: VisualFormula.treeToVisual(numerator),
-				denominator: VisualFormula.treeToVisual(denominator)
+				denominator: VisualFormula.treeToVisual(denominator),
+				formulaTree: tree
 			})
 		}
 		if (TeXParser.isOperator(symbol)) {
@@ -190,14 +199,16 @@ export class VisualFormula extends Mobject {
 			return new VisualOperator({
 				operator: symbol,
 				child1: VisualFormula.treeToVisual(child1),
-				child2: VisualFormula.treeToVisual(child2)
+				child2: VisualFormula.treeToVisual(child2),
+				formulaTree: tree
 			})
 		}
 		if (TeXParser.isOpenParen((symbol))) {
 			let child = tree[1][0]
 			return new VisualGroup({
 				parenType: symbol,
-				child: VisualFormula.treeToVisual(child)
+				child: VisualFormula.treeToVisual(child),
+				formulaTree: tree
 			})
 		}
 	}
@@ -244,6 +255,9 @@ export class VisualFormula extends Mobject {
 		f.update({
 			backgroundColor: Color.red()
 		})
+		if (this.calculation) {
+			this.calculation.showPossibleTransformations(this)
+		}
 	}
 
 	unhighlight(f: VisualFormula) {
@@ -251,7 +265,11 @@ export class VisualFormula extends Mobject {
 		f.update({
 			backgroundColor: Color.clear()
 		})
+		if (this.calculation) {
+			this.calculation.hidePossibleTransformations(this)
+		}
 	}
+
 
 }
 

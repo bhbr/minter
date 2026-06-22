@@ -1,21 +1,30 @@
 
 
-import { getPaper } from 'core/functions/getters'
+import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { TeXLexer } from '../model/TeXLexer'
 import { TeXParser } from '../model/TeXParser'
 import { Mobject } from 'core/mobjects/Mobject'
+import { MGroup } from 'core/mobjects/MGroup'
+import { Linkable } from 'core/linkables/Linkable'
 import { SentenceTree } from '../model/SentenceTypes'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
+import { VisualFormula } from './VisualFormula'
+import { ScreenEvent } from 'core/mobjects/screen_events'
+import { Algebra } from '../model/Algebra'
 
 declare var MathQuill: any
 
-export class VisualCalculation extends Mobject {
+export class VisualCalculation extends Linkable {
 
 	MQ: any
  	span: HTMLSpanElement | null
- 	mathInputField: any
+ 	inputField: any
+	inputFieldLoadingID: number | null
+ 	inputFieldWrapper: Mobject
+ 	formulas: MGroup
+ 	algebra: Algebra
 
  	defaults(): object {
 		return {
@@ -23,19 +32,25 @@ export class VisualCalculation extends Mobject {
 			frameHeight: 50,
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
-			mathInputField: null,
-			mathInputFieldLoadingID: null,
-			span: null
+			inputField: null,
+			inputFieldLoadingID: null,
+			inputFieldWrapper: new Mobject(),
+			span: null,
+			formulas: new MGroup(),
+			algebra: new Algebra()
 		}
 	}
 
 	setup() {
 		super.setup()
+		this.add(this.formulas)
 		if (!getPaper().loadedAPIs.includes('mathquill')) {
 			this.loadMathQuillAPI()
 		} else {
-			this.createMathInputField()
+			this.createInputField()
 		}
+		this.boundKeyPressed = this.keyPressed.bind(this)
+		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
 	}
 
 	loadMathQuillAPI() {
@@ -52,7 +67,7 @@ export class VisualCalculation extends Mobject {
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
 				mqScriptTag.onload = function() {
-					this.createMathInputField()
+					this.createInputField()
 				}.bind(this)
 				document.head.append(mqScriptTag)
 
@@ -63,11 +78,10 @@ export class VisualCalculation extends Mobject {
 		document.head.append(cssLinkTag)
 	}
 
-	createMathInputField() {
+	createInputField() {
 		this.MQ = MathQuill.getInterface(2)
-		let mob = new Mobject()
-		this.addDependency('frameWidth', mob, 'frameWidth')
-		this.addDependency('frameHeight', mob, 'frameHeight')
+		this.addDependency('frameWidth', this.inputFieldWrapper, 'frameWidth')
+		this.addDependency('frameHeight', this.inputFieldWrapper, 'frameHeight')
 
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
@@ -77,16 +91,97 @@ export class VisualCalculation extends Mobject {
 		this.span.style.border = '2px solid white'
 		this.span.style.width = '200px'
 		p.append(this.span)
-		mob.view.div.append(p)
-		this.add(mob)
-		this.mathInputField = this.MQ.MathField(this.span, {
-			handlers: {
-				edit: function() {
-					this.updateLayout()
-				}.bind(this)
-			}
+		this.inputFieldWrapper.view.div.append(p)
+		this.add(this.inputFieldWrapper)
+		this.inputField = this.MQ.MathField(this.span, {
+			handlers: { }
 		})
+		this.inputFieldLoadingID = window.setInterval(this.checkWhetherInputFieldLoaded.bind(this), 100)
+		
 	}
+
+	checkWhetherInputFieldLoaded() {
+		if (this.inputField) {
+			window.clearInterval(this.inputFieldLoadingID)
+			this.inputFieldLoadingID = null
+			this.onInputFieldLoaded()
+		}
+	}
+
+	onInputFieldLoaded() {
+		this.inputField.write(' ')
+		this.focus()
+	}
+
+	renderFirstFormula() {
+		let tex = this.inputField.latex()
+		let formula = VisualFormula.texToVisual(tex)
+		this.addFormula(formula)
+		this.remove(this.inputFieldWrapper)
+	}
+
+	addFormula(formula: VisualFormula) {
+		formula.update({
+			calculation: this,
+			anchor: [0, 100 * this.formulas.children.length]
+		})
+		this.formulas.add(formula)
+	}
+
+	focus() {
+		super.focus()
+		this.inputField.focus()
+		this.activateKeyboard()
+		getPaper().sensor.savedOnPointerUp = getPaper().sensor.onPointerUp
+		getPaper().sensor.onPointerUp = this.blur.bind(this)
+	}
+
+	blur() {
+		super.blur()
+		this.inputField.blur()
+		this.deactivateKeyboard()
+		getPaper().sensor.onPointerUp = getPaper().sensor.savedOnPointerUp
+		getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
+		this.renderFirstFormula()
+	}
+
+	activateKeyboard() {
+		getPaper().activeKeyboard = false
+		for (let button of getSidebar().buttons) {
+			button.activeKeyboard = false
+		}
+	}
+
+	boundActivateKeyboard() { }
+
+	deactivateKeyboard() {
+		getPaper().activeKeyboard = true
+		for (let button of getSidebar().buttons) {
+			button.activeKeyboard = true
+		}
+	}
+	boundDeactivateKeyboard() { }
+
+	boundKeyPressed(e: ScreenEvent) { }
+
+	keyPressed(e: KeyboardEvent) {
+		if (e.key == '13' || e.key == 'Enter' || e.key == 'Return') {
+			this.blur()
+		}
+	}
+
+	showPossibleTransformations(subformula: VisualFormula) {
+		let startTree = subformula.formulaTree
+		let applicableRules = this.algebra.applicableRules(startTree)
+		for (let [name, rule] of Object.entries(applicableRules)) {
+			let resultTree = this.algebra.applyRuleToTree(name, startTree)
+			let tex = this.algebra.treeToTex(resultTree)
+			let transformedFormula = VisualFormula.texToVisual(tex)
+			this.addFormula(transformedFormula)
+		}
+	}
+
+	hidePossibleTransformations(subformula: VisualFormula) { }
 
 }
 

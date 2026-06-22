@@ -1,7 +1,7 @@
 
 import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes'
-
+import { log } from 'core/functions/logging'
 
 function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 	if (arr1.length !== arr2.length) { return false }
@@ -20,7 +20,7 @@ function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 export class FormalLanguage extends ExtendedObject {
 
 	arities: Record<TerminalSymbol, number>
-	syntaxRules: Record<NonterminalSymbol, NonterminalSymbol | SentenceTree>
+	syntaxRules: Record<string, [NonterminalSymbol, NonterminalSymbol | SentenceTree]>
 
 	defaults(): object {
 		return {
@@ -33,16 +33,33 @@ export class FormalLanguage extends ExtendedObject {
 		return Object.keys(this.arities)
 	}
 
-	nonterminalSymbols(): Array<TerminalSymbol> {
-		return Object.keys(this.syntaxRules)
+	nonterminalSymbols(): Array<NonterminalSymbol> {
+		let symbols = Object.values(this.syntaxRules).map((x) => x[0])
+		return symbols
 	}
 
 	isTerminalSymbol(x: any): boolean {
-		return this.terminalSymbols().includes(x)
+		let flag = this.terminalSymbols().includes(x)
+		return flag
 	}
 
 	isNonterminalSymbol(x: any): boolean {
-		return this.nonterminalSymbols().includes(x)
+		let flag = this.nonterminalSymbols().includes(x)
+		return flag
+	}
+
+	isNonterminalVariableSymbol(x: any): boolean {
+		if (typeof x !== 'string') { return false }
+		let y = x as string
+		let leftPart = y.split('-')[0]
+		let rightPart = y.split('-')[1]
+		let expressionName = leftPart.slice(1)
+		let index = rightPart.slice(0, rightPart.length - 1)
+		if (`<${expressionName}-${index}>` !== y) {
+			return false
+		}
+		let flag = this.isNonterminalSymbol(`<${expressionName}>`)
+		return flag
 	}
 
 	arity(str: TerminalSymbol): number {
@@ -147,7 +164,7 @@ export class FormalLanguage extends ExtendedObject {
 		// a dictionary of what subtrees have been matched
 		// to the variables:
 		// { '<a>': subtree1, '<b>': subtree2, ... }
-		if (this.isNonterminalSymbol(form)) {
+		if (this.isNonterminalVariableSymbol(form)) {
 			let existingMatch = record[form as NonterminalSymbol]
 			if (existingMatch === undefined) {
 				record[form as NonterminalSymbol] = tree
@@ -165,19 +182,19 @@ export class FormalLanguage extends ExtendedObject {
 		}
 		let formArgs = (form as ComposedSentenceTreeForm)[1]
 		let treeArgs = tree[1]
-		for (var i = 0; i < tree.length; i++) {
+		for (let i = 0; i < tree.length; i++) {
 			record = this.matchSentenceTreeForm(formArgs[i], treeArgs[i], record)
 		}
 		return record
 	}
 
 	insert(values: Record<NonterminalSymbol, SentenceTree>, form: SentenceTreeForm): SentenceTreeForm {
-		if (this.isNonterminalSymbol(form)) {
+		if (this.isNonterminalVariableSymbol(form)) {
 			return values[form as NonterminalSymbol]
 		}
 		let sentenceArgs = (form as ComposedSentenceTreeForm)[1]
 		let newArgs: Array<SentenceTreeForm> = []
-		for (var i = 0; i < sentenceArgs.length; i++) {
+		for (let i = 0; i < sentenceArgs.length; i++) {
 			let node = sentenceArgs[i]
 			newArgs.push(this.insert(values, node))
 		}
@@ -215,22 +232,22 @@ export class FormalSystem extends FormalLanguage {
 		}
 	}
 
-	applyRuleToTree(ruleName: string, tree: SentenceTree): SentenceTree {
+	applyRuleToTree(ruleName: string, tree: SentenceTree): SentenceTree | null {
 		let rule = this.rules[ruleName]
 		if (rule === undefined) {
 			throw `Unknown inference rule ${ruleName}`;
 		}
 		let record = this.matchSentenceTreeForm(rule[0], tree)
+		if (record === null) { return null }
 		let newTree = this.insert(record, rule[1])
 		return newTree as SentenceTree
 	}
 
-	applyRuleToSentence(ruleName: string, sentence: Sentence): Sentence {
-		return this.treeToSentence(
-			this.applyRuleToTree(ruleName,
-				this.sentenceToTree(sentence)
-			)
-		)
+	applyRuleToSentence(ruleName: string, sentence: Sentence): Sentence | null {
+		let startTree = this.sentenceToTree(sentence)
+		let resultTree = this.applyRuleToTree(ruleName, startTree)
+		if (resultTree === null) { return null }
+		return this.treeToSentence(resultTree)
 	}
 
 	applyRuleToPolish(ruleName: string, str: string): string {
@@ -247,6 +264,20 @@ export class FormalSystem extends FormalLanguage {
 				this.polishToSentence(str)
 			)
 		)
+	}
+
+	applicableRules(tree: SentenceTree): Record<string, Rule> {
+		let result: Record<string, Rule> = {}
+		for (let [name, rule] of Object.entries(this.rules)) {
+			log(name)
+			log(rule)
+			let record = this.matchSentenceTreeForm(rule[0], tree)
+			log(record)
+			if (record !== null) {
+				result[name] = rule
+			}
+		}
+		return result
 	}
 }
 
