@@ -11,8 +11,10 @@ import { SentenceTree } from '../model/SentenceTypes'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
 import { VisualFormula } from './VisualFormula'
+import { VisualFormulaMaker } from './VisualFormulaMaker'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { Algebra } from '../model/Algebra'
+import { remove } from 'core/functions/arrays'
 
 declare var MathQuill: any
 
@@ -42,9 +44,10 @@ export class VisualCalculation extends Linkable {
 	}
 
 	setup() {
+		log('VisualCalculation.setup')
 		super.setup()
 		this.add(this.formulas)
-		if (!getPaper().loadedAPIs.includes('mathquill')) {
+		if (!getPaper().loadedAPIs.includes('mathquill') && !getPaper().loadingAPIs.includes('mathquill')) {
 			this.loadMathQuillAPI()
 		} else {
 			this.createInputField()
@@ -54,6 +57,8 @@ export class VisualCalculation extends Linkable {
 	}
 
 	loadMathQuillAPI() {
+		log('VisualCalculation.loadMathQuillAPI')
+		getPaper().loadingAPIs.push('mathquill')
 		let cssLinkTag = document.createElement('link')
 		cssLinkTag.rel = 'stylesheet'
 		cssLinkTag.href = '../../mathquill-0.10.1/mathquill.css'
@@ -67,6 +72,9 @@ export class VisualCalculation extends Linkable {
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
 				mqScriptTag.onload = function() {
+					getPaper().loadedAPIs.push('mathquill')
+					remove(getPaper().loadingAPIs, 'mathquill')
+					log('...done loading MathQuill API.')
 					this.createInputField()
 				}.bind(this)
 				document.head.append(mqScriptTag)
@@ -114,13 +122,16 @@ export class VisualCalculation extends Linkable {
 	}
 
 	renderFirstFormula() {
+		log('VisualCalculation.renderFirstFormula')
 		let tex = this.inputField.latex()
-		let formula = VisualFormula.texToVisual(tex)
+		let formula = VisualFormulaMaker.texToVisual(tex)
 		this.addFormula(formula)
 		this.remove(this.inputFieldWrapper)
 	}
 
 	addFormula(formula: VisualFormula) {
+		log('adding formula')
+		log(formula)
 		formula.update({
 			calculation: this,
 			anchor: [0, 100 * this.formulas.children.length]
@@ -171,12 +182,15 @@ export class VisualCalculation extends Linkable {
 	}
 
 	showPossibleTransformations(subformula: VisualFormula) {
+		log('VisualCalculation.showPossibleTransformations')
 		let startTree = subformula.formulaTree
+		log(startTree)
 		let applicableRules = this.algebra.applicableRules(startTree)
+		log(applicableRules)
 		for (let [name, rule] of Object.entries(applicableRules)) {
 			let resultTree = this.algebra.applyRuleToTree(name, startTree)
-			let tex = this.algebra.treeToTex(resultTree)
-			let transformedFormula = VisualFormula.texToVisual(tex)
+			let transformedFormula = VisualFormulaMaker.treeToVisual(resultTree)
+			log(transformedFormula)
 			this.addFormula(transformedFormula)
 		}
 	}

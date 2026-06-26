@@ -224,16 +224,16 @@ export class FormalLanguage extends ExtendedObject {
 
 export class FormalSystem extends FormalLanguage {
 
-	rules: Record<string, Rule>
+	inferenceRules: Record<string, Rule>
 
 	defaults(): object {
 		return {
-			rules: { }
+			inferenceRules: { }
 		}
 	}
 
 	applyRuleToTree(ruleName: string, tree: SentenceTree): SentenceTree | null {
-		let rule = this.rules[ruleName]
+		let rule = this.inferenceRules[ruleName]
 		if (rule === undefined) {
 			throw `Unknown inference rule ${ruleName}`;
 		}
@@ -267,12 +267,13 @@ export class FormalSystem extends FormalLanguage {
 	}
 
 	applicableRules(tree: SentenceTree): Record<string, Rule> {
+		log('applicableRules')
 		let result: Record<string, Rule> = {}
-		for (let [name, rule] of Object.entries(this.rules)) {
+		log(tree)
+		for (let [name, rule] of Object.entries(this.inferenceRules)) {
 			log(name)
 			log(rule)
 			let record = this.matchSentenceTreeForm(rule[0], tree)
-			log(record)
 			if (record !== null) {
 				result[name] = rule
 			}

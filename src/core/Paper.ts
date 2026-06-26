@@ -18,6 +18,7 @@ export class Paper extends Board {
 	expandedMobject: Board
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
+	loadingAPIs: Array<string>
 	loadedAPIs: Array<string>
 
 	defaults(): object {
@@ -31,6 +32,7 @@ export class Paper extends Board {
 			activeKeyboard: true,
 			currentColor: Color.white(),
 			drawShadow: false,
+			loadingAPIs: [],
 			loadedAPIs: [],
 			buttonNames: [
 				'DragButton',

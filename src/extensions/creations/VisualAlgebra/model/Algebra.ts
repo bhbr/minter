@@ -21,7 +21,7 @@ export class Algebra extends FormalSystem {
 					'<expression>', '<number>'
 				]
 			},
-			rules: {
+			inferenceRules: {
 				'multiplicative_commutativity': [
 					['*', ['<expression-1>', '<expression-2>']],
 					['*', ['<expression-2>', '<expression-1>']],
