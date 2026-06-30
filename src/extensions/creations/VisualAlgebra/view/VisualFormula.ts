@@ -6,13 +6,11 @@ import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
 import { SentenceTree } from '../model/SentenceTypes'
 import { VisualSymbol } from './VisualSymbol'
-import { VisualFormulaSensor } from './VisualFormulaSensor'
 import { VisualCalculation } from './VisualCalculation'
+import { conditionTrigger } from 'core/functions/various'
 
 export class VisualFormula extends Mobject {
 
-	mathQuillLoadingID: number | null
-	declare sensor: VisualFormulaSensor
 	highlightedSubformula: VisualFormula | null
 	rootFormula: VisualFormula | null
 	formulaTree: SentenceTree
@@ -22,9 +20,9 @@ export class VisualFormula extends Mobject {
 		return {
 			borderColor: Color.white(),
 			borderWidth: 1,
+			opacity: 0,
 			mathQuillLoadingID: null,
 			screenEventHandler: ScreenEventHandler.Self,
- 			sensor: new VisualFormulaSensor(),
  			highlightedSubformula: null,
  			rootFormula: null,
  			formulaTree: [],
@@ -33,11 +31,13 @@ export class VisualFormula extends Mobject {
 	}
 
 	setup() {
-		log('VisualSymbol.setup')
 		super.setup()
-		this.sensor.update({
-			mobject: this
-		})
+		conditionTrigger(this.fullyLoaded.bind(this), function() {
+			this.updateContent
+			this.update({
+				opacity: 1
+			})
+		}.bind(this))
 		if (!(this.parent instanceof VisualFormula)) {
 			this.update({
 				rootFormula: this
@@ -49,24 +49,13 @@ export class VisualFormula extends Mobject {
 		return NaN
 	}
 
+	fullyLoaded(): boolean {
+		return false
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
-		log('VisualSymbol.update')
 		super.update(args, redraw)
-		if (!getPaper().loadedAPIs.includes('mathquill') && this.mathQuillLoadingID === null) {
-			log('starting loop...')
-			this.mathQuillLoadingID = window.setInterval(function() {
-				log('in the loop')
-				log(getPaper().loadedAPIs)
-				if (getPaper().loadedAPIs.includes('mathquill')) {
-					this.updateContent()
-					log(this.mathQuillLoadingID)
-					window.clearInterval(this.mathQuillLoadingID)
-					log('...ended loop.')
-				}
-			}.bind(this), 100)
-		} else {
-			this.updateContent()
-		}
+		this.updateContent()
 	}
 
 	getWidth(): number {
@@ -78,7 +67,6 @@ export class VisualFormula extends Mobject {
 	}
 
 	updateContent() {
-		log('VisualFormula.updateContent (empty)')
 	}
 
 	onPointerUp(e: ScreenEvent) {
@@ -101,6 +89,7 @@ export class VisualFormula extends Mobject {
 		f.update({
 			backgroundColor: Color.red()
 		})
+		f.updateContent()
 		if (this.calculation) {
 			this.calculation.showPossibleTransformations(this)
 		}

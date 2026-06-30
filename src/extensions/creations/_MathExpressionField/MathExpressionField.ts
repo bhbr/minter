@@ -69,12 +69,9 @@ export class MathExpressionField extends Linkable {
 		super.setup()
 		this.add(this.grapher)
 		this.add(this.resultBox)
-		if (!getPaper().loadedAPIs.includes('mathquill')) {
-			this.loadMathQuillAPI()
-		} else {
-			this.createMathField()
-			this.createResultBox()
-		}
+		this.createMathField()
+		this.createResultBox()
+
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
 

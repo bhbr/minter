@@ -8,31 +8,36 @@ import { log } from 'core/functions/logging'
 export class VisualVariable extends VisualFormula {
 
 	name: string
-	symbol: VisualSymbol
+	symbol: VisualSymbol | null
 
 	defaults(): object {
 		return {
 			name: 'x',
-			symbol: new VisualSymbol()
+			symbol: null
 		}
 	}
 
 	setup() {
-		log('VisualVariable.setup')
-		super.setup()
+		this.symbol = new VisualSymbol({ texString: this.name })
 		this.add(this.symbol)
+		super.setup()
 	}
 
 	getValue(): number {
 		return getPaper().globals[this.name] ?? NaN
 	}
 
+	fullyLoaded(): boolean {
+		return this.symbol.fullyLoaded()
+	}
+
 	updateContent() {
-		log(`VisualVariable.updateContent to ${this.getWidth()} ${this.getHeight()}`)
-		this.symbol.update({
-			anchor: [FORMULA_PADDING, FORMULA_PADDING],
-			texString: this.name
-		})
+		if (this.symbol) {
+			this.symbol.update({
+				anchor: [FORMULA_PADDING, FORMULA_PADDING],
+				texString: this.name
+			})
+		}
 		this.view.update({
 			frameWidth: this.getWidth(),
 			frameHeight: this.getHeight()
@@ -40,11 +45,19 @@ export class VisualVariable extends VisualFormula {
 	}
 
 	getWidth(): number {
-		return this.symbol.getWidth() + 2 * FORMULA_PADDING
+		if (this.symbol) {
+			return this.symbol.getWidth() + 2 * FORMULA_PADDING
+		} else {
+			return 0
+		}
 	}
 
 	getHeight(): number {
-		return this.symbol.getHeight() + 2 * FORMULA_PADDING
+		if (this.symbol) {
+			return this.symbol.getHeight() + 2 * FORMULA_PADDING
+		} else {
+			return 0
+		}
 	}
 
 }

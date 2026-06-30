@@ -7,6 +7,7 @@ import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
 import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'core/constants'
 import { PaperView } from './PaperView'
+import { APILoader } from 'core/apis/APILoader'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
 import { StartPaper } from 'startPaper'
@@ -18,6 +19,7 @@ export class Paper extends Board {
 	expandedMobject: Board
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
+	apiLoaders: Array<APILoader>
 	loadingAPIs: Array<string>
 	loadedAPIs: Array<string>
 
@@ -32,8 +34,10 @@ export class Paper extends Board {
 			activeKeyboard: true,
 			currentColor: Color.white(),
 			drawShadow: false,
+			apiLoaders: [],
 			loadingAPIs: [],
 			loadedAPIs: [],
+			loadPromise: null,
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
@@ -60,7 +64,12 @@ export class Paper extends Board {
 	}
 	
 	setup() {
+		for (let loader of this.apiLoaders) {
+			loader.load()
+		}
+
 		super.setup()
+
 		this.expandedMobject = this
 		this.expandButton.view.hide()
 		this.expandedInputList.view.hide()
@@ -197,6 +206,20 @@ export class Paper extends Board {
 		for (let submob of this.linkableChildren()) {
 			submob.showLinks()
 		}
+	}
+
+	allAPIsLoaded(): boolean {
+		return this.apiLoaders.every(loader => (loader.status == 'loaded'))
+	}
+
+	loadedAPI(loader: APILoader) {
+		if (this.allAPIsLoaded()) {
+			this.loadContent()
+		}
+	}
+
+	loadContent() {
+
 	}
 
 }

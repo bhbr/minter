@@ -83,4 +83,8 @@ export class VisualGroup extends VisualFormula {
 	getHeight(): number {
 		return Math.max(this.openParenSymbol.getHeight(), this.child.getHeight(), this.closeParenSymbol.getHeight()) + 2 * FORMULA_PADDING
 	}
+
+	fullyLoaded(): boolean {
+		return this.child.fullyLoaded()
+	}
 }

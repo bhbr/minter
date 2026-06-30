@@ -16,7 +16,6 @@ import { log } from 'core/functions/logging'
 export class VisualFormulaMaker {
 
 	static treeToVisual(tree: SentenceTree): VisualFormula | null {
-		log('VisualFormula.treeToVisual')
 		let symbol = tree[0]
 		if (TeXLexer.isNumber(symbol)) {
 			return new VisualNumber({
@@ -67,15 +66,18 @@ export class VisualFormulaMaker {
 		}
 	}
 
-	static sentenceToVisual(sentence: Sentence): VisualFormula {
+	static sentenceToVisual(sentence: Sentence): VisualFormula | null {
+		if (sentence.length == 0) { return null }
 		return VisualFormulaMaker.treeToVisual(TeXParser.sentenceToTree(sentence))
 	}
 
-	static texToVisual(tex: string): VisualFormula {
+	static texToVisual(tex: string): VisualFormula | null {
+		if (tex.trim() == '') { return null }
 		return VisualFormulaMaker.treeToVisual(TeXParser.texToTree(tex))
 	}
 
-	static texToVisual2(tex: string): VisualFormula {
+	static texToVisual2(tex: string): VisualFormula | null {
+		if (tex.trim() == '') { return null }
 		return VisualFormulaMaker.sentenceToVisual(TeXLexer.texToSentence(tex))
 	}
 

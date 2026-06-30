@@ -46,7 +46,6 @@ export class VisualOperator extends VisualFormula {
 	}
 
 	setup() {
-		log('VisualOperator.setup')
 		super.setup()
 		this.add(this.operatorSymbol)
 		this.add(this.child1)
@@ -57,11 +56,10 @@ export class VisualOperator extends VisualFormula {
 		this.child2.update({
 			rootFormula: this.rootFormula
 		})
+		this.updateContent()
 	}
 
 	updateContent() {
-
-		log('VisualOperator.updateContent')
 
 		let maxHeight = Math.max(this.child1.getHeight(), this.operatorSymbol.getHeight(), this.child2.getHeight())
 
@@ -101,6 +99,10 @@ export class VisualOperator extends VisualFormula {
 
 	getHeight(): number {
 		return Math.max(this.child1.getHeight(), this.operatorSymbol.getHeight(), this.child2.getHeight()) + 2 * FORMULA_PADDING
+	}
+
+	fullyLoaded(): boolean {
+		return this.child1.fullyLoaded() && this.child2.fullyLoaded()
 	}
 
 }

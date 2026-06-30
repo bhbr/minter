@@ -63,7 +63,16 @@ export function prettyPrint(value: any, precision: number =  4): string {
 	}
 }
 
-
+export function conditionTrigger(condition: () => boolean, handler: () => void, period: number = 0.1) {
+	let id = `timeoutID_${Date.now()}`
+	window[id] = window.setInterval(function() {
+		if (condition()) {
+			window.clearInterval(window[id])
+			delete window[id]
+			handler()
+		}
+	}, period * 1000)
+}
 
 
 

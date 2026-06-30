@@ -267,12 +267,8 @@ export class FormalSystem extends FormalLanguage {
 	}
 
 	applicableRules(tree: SentenceTree): Record<string, Rule> {
-		log('applicableRules')
 		let result: Record<string, Rule> = {}
-		log(tree)
 		for (let [name, rule] of Object.entries(this.inferenceRules)) {
-			log(name)
-			log(rule)
 			let record = this.matchSentenceTreeForm(rule[0], tree)
 			if (record !== null) {
 				result[name] = rule

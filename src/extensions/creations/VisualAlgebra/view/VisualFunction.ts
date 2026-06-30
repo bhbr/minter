@@ -89,4 +89,7 @@ export class VisualFunction extends VisualFormula {
 		return Math.max(this.symbol.getHeight(), this.child.getHeight()) + 2 * FORMULA_PADDING
 	}
 
+	fullyLoaded(): boolean {
+		return this.symbol.fullyLoaded() && this.child.fullyLoaded()
+	}
 }
