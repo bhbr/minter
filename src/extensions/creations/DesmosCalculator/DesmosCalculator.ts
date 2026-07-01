@@ -49,23 +49,16 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	setup() {
-		//log('DesmosCalculator.setup')
 		super.setup()
 		this.setupCanvases()
 		this.setupOuterFrame()
 		this.boundFocus = this.focus.bind(this)
 		this.ensureMinimumFrameSize()
 		this.layoutFrames()
-		if (!getPaper().loadedAPIs.includes('desmos-calc')) {
-			this.loadDesmosAPI()
-		} else {
-			this.createCalculator()
-		}
+		this.createCalculator()
 	}
 
 	setupCanvases() {
-		//log('DesmosCalculator.setupCanvases')
-		this.clippingCanvas.view.div.id = 'clippingCanvas'
 		this.innerCanvas.update({
 			screenEventHandler: ScreenEventHandler.Auto
 		})
@@ -74,14 +67,12 @@ export class DesmosCalculator extends Linkable {
 
 		this.clippingCanvas.view.div.style.overflow = 'hidden'
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
-		this.innerCanvas.view.div.id = 'desmos-calc'
 		window.setTimeout(function() {
 			this.innerCanvas.view.div.addEventListener('click', this.boundFocus)
 		}.bind(this), 100)
 	}
 
 	setupOuterFrame() {
-		//log('DesmosCalculator.setupOuterFrame')
 		this.add(this.outerFrame)
 		this.outerFrame.update({
 			screenEventHandler: ScreenEventHandler.Below
@@ -90,15 +81,12 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	ensureMinimumFrameSize() {
-		//log('DesmosCalculator.ensureMinimumFrameSize')
 		var changedFrame: boolean = false
 		if (this.frameWidth < this.minWidth) {
-			//log('padding to min width')
 			this.update({ frameWidth: this.minWidth })
 			changedFrame = true
 		}
 		if (this.frameHeight < this.minHeight) {
-			//log('padding to min height')
 			this.update({ frameHeight: this.minHeight })
 			changedFrame = true
 		}
@@ -108,8 +96,6 @@ export class DesmosCalculator extends Linkable {
 	}
 
 	layoutFrames() {
-		//log('DesmosCalculator.layoutFrames')
-		//log(`${this.frameWidth} ${this.frameHeight}`)
 		this.clippingCanvas.update({
 			frameWidth: this.frameWidth,
 			frameHeight: this.frameHeight
@@ -128,27 +114,13 @@ export class DesmosCalculator extends Linkable {
 
 	layoutContent() { }
 
-	loadDesmosAPI() {
-		let scriptTag = document.createElement('script')
-		scriptTag.type = 'text/javascript'
-		scriptTag.src = 'https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6'
-		scriptTag.onload = this.createCalculator.bind(this, this.options)
-		document.head.append(scriptTag)
-	}
-
 	createCalculator() {
-		//log('createCalculator')
-		let apis = getPaper().loadedAPIs
-		if (!apis.includes('desmos-calc')) {
-			apis.push('desmos-calc')
-		}
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, this.options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
 		window.setTimeout(this.layoutContent.bind(this), 50)
 	}
 
 	focus() {
-		//log('DesmosCalculator.focus')
 		super.focus()
 		this.calculator.openKeypad()
 		this.innerCanvas.view.div.removeEventListener('click', this.boundFocus)
@@ -163,7 +135,6 @@ export class DesmosCalculator extends Linkable {
 	boundFocus() { }
 
 	blur() {
-		//log('DesmosCalculator.blur')
 		super.blur()
 		let area = this.view.div.querySelector('.dcg-mq-textarea').querySelector('textarea')
 		area.blur()
@@ -187,20 +158,9 @@ export class DesmosCalculator extends Linkable {
 
 	showKeypad() {
 		this.calculator.openKeypad()
-		window.setTimeout(function() {
-			// let keypad = this.innerCanvas.view.div.querySelector('.dcg-keypad') as HTMLElement
-			// var ancestor = keypad
-			// while (ancestor !== this.innerCanvas.view.div) {
-			// 	ancestor.style.visibility = 'visible'
-			// 	ancestor = ancestor.parentNode as HTMLDivElement
-			// }
-			// this.clippingCanvas.view.div.style.overflow = 'visible'
-		}.bind(this), 500)
 	}
 
-	hideKeypad() {
-		//log('hideKeypad')
-	}
+	hideKeypad() { }
 
 
 

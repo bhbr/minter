@@ -10,40 +10,33 @@ import { VisualSymbol} from './extensions/creations/VisualAlgebra/view/VisualSym
 import { VisualVariable} from './extensions/creations/VisualAlgebra/view/VisualVariable'
 import { VisualCalculation } from './extensions/creations/VisualAlgebra/view/VisualCalculation'
 import { TeXParser } from './extensions/creations/VisualAlgebra/model/TeXParser'
-import { MathExpressionField } from './extensions/creations/_MathExpressionField/MathExpressionField'
-import { MathQuillLoader } from './extensions/apis/MathQuillLoader'
-import { conditionTrigger } from './core/functions/various'
+import { Wavy } from './extensions/creations/Wavy/Wavy'
+import { CindyLoader } from './extensions/apis/CindyLoader'
+import { DemoPaper } from './extensions/boards/demo/DemoPaper'
 
-export class StartPaper extends CoinFlipPaper {
+
+export class StartPaper extends DemoPaper {
 
 	defaults(): object {
 		return {
 			apiLoaders: [
-				new MathQuillLoader()
+				new CindyLoader()
 			]
 		}
 	}
 
 	loadContent() {
-	// 	TeXParserTest.run()
 
-	// 	let calc = new VisualCalculation({
-	// 		anchor: [100, 100]
-	// 	})
-	// 	paper.addToContent(calc)
+		let w = new Wavy({
+			anchor: [100, 100],
+			frameWidth: 200,
+			frameHeight: 200,
+			nbSources: 2
+		})
 
-	// 	let a = new VisualVariable({ name: 'a' })
-	// 	a.update({
-	// 		anchor: [500, 100]
-	// 	})
-	// 	paper.add(a)
+		this.addToContent(w)
 
-	// 	let f = new VisualSymbol({ texString: 's'})
-	// 	f.update({
-	// 		anchor: [300, 300]
-	// 	})
-	// 	paper.add(f)
-
+		w.play()
 
 	}
 

@@ -213,6 +213,9 @@ export class Paper extends Board {
 	}
 
 	loadedAPI(loader: APILoader) {
+		loader.update({
+			status: 'loaded'
+		})
 		if (this.allAPIsLoaded()) {
 			this.loadContent()
 		}

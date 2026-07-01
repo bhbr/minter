@@ -22,9 +22,6 @@ export class MathQuillLoader extends APILoader {
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
 				mqScriptTag.onload = function() {
-					this.update({
-						status: 'loaded'
-					})
 					getPaper().loadedAPI(this)
 				}.bind(this)
 				document.head.append(mqScriptTag)

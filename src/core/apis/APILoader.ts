@@ -20,4 +20,8 @@ export class APILoader extends ExtendedObject {
 		})
 		getPaper().loadedAPI(this)
 	}
+
+	onload() {
+		
+	}
 }

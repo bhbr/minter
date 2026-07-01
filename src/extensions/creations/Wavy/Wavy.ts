@@ -1,6 +1,7 @@
 
 import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class Wavy extends CindyCanvas {
 
@@ -94,12 +95,17 @@ export class Wavy extends CindyCanvas {
 		super.update(args, false)
 		this.nbSources = Math.floor(this.nbSources)
 
-		if (this.core == undefined || this.sourcePositions().length == 0) { return }
+		log('update')
+		log(this.core)
+
+		if (this.core == null || this.sourcePositions().length == 0) { return }
 		if (args['nbSources'] != undefined) {
 			this.reload(args)
 		}
 		let code = `drawcmd() := ( colorplot((${this.codeRed()}, ${this.codeGreen()}, ${this.codeBlue()})););`
-		this.core.evokeCS(code)
+		window.setTimeout(function() {
+			this.core.evokeCS(code)
+		}.bind(this), 1000)
 		if (redraw) { this.view.redraw() }
 	}
 

@@ -11,4 +11,4 @@ import { DragButton } from './core/sidebar_buttons/DragButton'
 export class StartSidebar extends CoinFlipSidebar { }
 
 
-export const sidebar = new StartSidebar()
+export const sidebar = new DemoSidebar()

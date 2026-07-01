@@ -17,6 +17,7 @@ import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/Scatte
 import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
+import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -60,6 +61,9 @@ export class CoinFlipPaper extends Paper {
 				'PlotButton',
 				//'ColorSampleButton',
 				'EraseButton'
+			],
+			apiLoaders: [
+				new DesmosLoader()
 			]
 		}
 	}
