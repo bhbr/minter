@@ -7,8 +7,8 @@ import { SidebarButton } from './core/sidebar_buttons/SidebarButton'
 import { CoinButton } from './extensions/boards/coin-flip/CoinButton'
 import { DragButton } from './core/sidebar_buttons/DragButton'
 
-
 export class StartSidebar extends CoinFlipSidebar { }
 
 
 export const sidebar = new DemoSidebar()
+

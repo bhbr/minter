@@ -38,14 +38,12 @@ export class VisualVariable extends VisualFormula {
 				texString: this.name
 			})
 		}
-		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
-		})
+		super.updateContent()
 	}
 
 	getWidth(): number {
 		if (this.symbol) {
+			log(`variable: ${this.symbol.getWidth() + 2 * FORMULA_PADDING}`)
 			return this.symbol.getWidth() + 2 * FORMULA_PADDING
 		} else {
 			return 0

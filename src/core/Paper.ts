@@ -113,6 +113,10 @@ export class Paper extends Board {
 		//window.addEventListener('resize', this.resize.bind(this))
 		this.resize()
 
+		if (this.apiLoaders.length == 0) {
+			this.loadContent()
+		}
+
 	}
 
 	resize() {

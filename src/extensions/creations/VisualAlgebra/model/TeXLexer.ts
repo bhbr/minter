@@ -1,5 +1,7 @@
 
 import { Sentence } from './SentenceTypes'
+import { log } from 'core/functions/logging'
+import { removeAll } from 'core/functions/arrays'
 
 export class TeXLexer {
 	
@@ -44,11 +46,17 @@ export class TeXLexer {
 		'\\arctanh'
 	]
 
+	static tokensToIgnore = [
+		'\\left',
+		'\\right'
+]
+
 	static isFunctionToken(token: string): boolean {
 		return TeXLexer.functionTokens.includes(token)
 	}
 
 	static texToSentence(texString: string): Sentence {
+		log(texString)
 		let sentence: Array<string> = []
 		var currentToken = ''
 		var currentTokenType: string | null = null
@@ -116,6 +124,9 @@ export class TeXLexer {
 		}
 		if (currentToken !== '') {
 			sentence.push(currentToken)
+		}
+		for (let token of TeXLexer.tokensToIgnore) {
+			removeAll(sentence, token)
 		}
 		return sentence
 

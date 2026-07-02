@@ -13,17 +13,12 @@ export class VisualSymbol extends Mobject {
 	MQ: any
  	texString: string
  	MQObject: any
- 	mqObjectFullyLoadedTimeoutID: number | null
-
- 	mathQuillLoadingID: number | null
 
  	defaults(): object {
  		return {
  			MQ: null,
  			MQObject: null,
- 			mqObjectFullyLoadedTimeoutID: false,
- 			texString: '',
- 			mathQuillLoadingID: null
+ 			texString: ''
  		}
  	}
 
@@ -42,11 +37,11 @@ export class VisualSymbol extends Mobject {
 		span.style.width = 'fit-content'
 		span.style.cursor = 'inherit'
 		this.MQObject = this.MQ.StaticMath(span)
-		this.update({ opacity: 0 })
+		//this.update({ opacity: 0 })
 		this.view.div.append(span)
-		conditionTrigger(this.fullyLoaded.bind(this), function() {
-			this.update({ opacity: 1 })
-		}.bind(this))
+		// conditionTrigger(this.fullyLoaded.bind(this), function() {
+		// 	this.update({ opacity: 1 })
+		// }.bind(this))
 		this.update()
  	}
 
@@ -63,18 +58,21 @@ export class VisualSymbol extends Mobject {
  	}
 
  	sizeToFit() {
+ 		this.frameWidth = this.getWidth()
+ 		this.frameHeight = this.getHeight()
 		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
 		})
  	}
 
 	getWidth(): number {
-		return this.MQObject.el().clientWidth
+		log(`symbol: ${this.MQObject.el().clientWidth}`)
+		return Math.max(this.MQObject.el().clientWidth, 20)
 	}
 
 	getHeight(): number {
-		return this.MQObject.el().clientHeight
+		return Math.max(this.MQObject.el().clientHeight, 20)
 	}
 
 }

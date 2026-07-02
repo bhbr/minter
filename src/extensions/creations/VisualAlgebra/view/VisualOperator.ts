@@ -87,13 +87,11 @@ export class VisualOperator extends VisualFormula {
 			]
 		})
 
-		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
-		})
+		super.updateContent()
 	}
 
 	getWidth(): number {
+		log(`operator: ${this.child1.getWidth() + this.operatorSymbol.getWidth() + this.child2.getWidth() + 4 * FORMULA_PADDING}`)
 		return this.child1.getWidth() + this.operatorSymbol.getWidth() + this.child2.getWidth() + 4 * FORMULA_PADDING
 	}
 

@@ -74,10 +74,7 @@ export class VisualFunction extends VisualFormula {
 			]
 		})
 
-		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
-		})
+		super.updateContent()
 	}
 
 

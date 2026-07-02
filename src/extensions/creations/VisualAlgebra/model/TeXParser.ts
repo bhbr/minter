@@ -1,6 +1,7 @@
 
 import { TeXLexer } from './TeXLexer'
 import { SentenceTree } from './SentenceTypes'
+import { log } from 'core/functions/logging'
 
 export class TeXParser {
 
@@ -109,7 +110,6 @@ export class TeXParser {
 	}
 
 	static sentenceToTree(sentence: Array<string>): SentenceTree | null {
-
 		if (sentence.length == 1) {
 			let token = sentence[0]
 			if (TeXLexer.isNumber(token)) {
@@ -165,7 +165,7 @@ export class TeXParser {
 	}
 
 	static texToTree(texString: string): SentenceTree {
-		return TeXParser.sentenceToTree(TeXLexer.texToSentence(texString.replace('\\cdot', '*')))
+		return TeXParser.sentenceToTree(TeXLexer.texToSentence(texString.replaceAll('\\cdot', '*')))
 	}
 
 }

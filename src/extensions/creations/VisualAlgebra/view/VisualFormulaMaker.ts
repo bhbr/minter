@@ -16,6 +16,7 @@ import { log } from 'core/functions/logging'
 export class VisualFormulaMaker {
 
 	static treeToVisual(tree: SentenceTree): VisualFormula | null {
+		log(tree)
 		let symbol = tree[0]
 		if (TeXLexer.isNumber(symbol)) {
 			return new VisualNumber({

@@ -20,7 +20,6 @@ export class VisualFormula extends Mobject {
 		return {
 			borderColor: Color.white(),
 			borderWidth: 1,
-			opacity: 0,
 			mathQuillLoadingID: null,
 			screenEventHandler: ScreenEventHandler.Self,
  			highlightedSubformula: null,
@@ -32,12 +31,10 @@ export class VisualFormula extends Mobject {
 
 	setup() {
 		super.setup()
-		conditionTrigger(this.fullyLoaded.bind(this), function() {
-			this.updateContent
-			this.update({
-				opacity: 1
-			})
-		}.bind(this))
+		conditionTrigger(
+			this.fullyLoaded.bind(this),
+			this.updateContent.bind(this)
+		)
 		if (!(this.parent instanceof VisualFormula)) {
 			this.update({
 				rootFormula: this
@@ -55,7 +52,9 @@ export class VisualFormula extends Mobject {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		this.updateContent()
+		if (args['formulaTree'] !== undefined) {
+			this.updateContent()
+		}
 	}
 
 	getWidth(): number {
@@ -67,6 +66,10 @@ export class VisualFormula extends Mobject {
 	}
 
 	updateContent() {
+		this.update({
+			frameWidth: this.getWidth(),
+			frameHeight: this.getHeight()
+		})
 	}
 
 	onPointerUp(e: ScreenEvent) {
@@ -91,7 +94,7 @@ export class VisualFormula extends Mobject {
 		})
 		f.updateContent()
 		if (this.calculation) {
-			this.calculation.showPossibleTransformations(this)
+			this.calculation.showPossibleTransformations(f)
 		}
 	}
 
@@ -101,8 +104,13 @@ export class VisualFormula extends Mobject {
 			backgroundColor: Color.clear()
 		})
 		if (this.calculation) {
-			this.calculation.hidePossibleTransformations(this)
+			this.calculation.hidePossibleTransformations(f)
 		}
+	}
+
+	handlePopoverMessage(message: object) {
+		let i = message['pick'] as number
+		this.calculation.addFormula(this.calculation.popover.formulas[i])
 	}
 
 

@@ -69,14 +69,11 @@ export class VisualGroup extends VisualFormula {
 			]
 		})
 
-		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
-		})
-
+		super.updateContent()
 	}
 
 	getWidth(): number {
+		log(`group: ${this.openParenSymbol.getWidth() + this.child.getWidth() + this.closeParenSymbol.getWidth() + 4 * FORMULA_PADDING}`)
 		return this.openParenSymbol.getWidth() + this.child.getWidth() + this.closeParenSymbol.getWidth() + 4 * FORMULA_PADDING
 	}
 

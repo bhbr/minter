@@ -16,6 +16,7 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 import { Algebra } from '../model/Algebra'
 import { remove } from 'core/functions/arrays'
 import { conditionTrigger } from 'core/functions/various'
+import { VisualFormulaPopover } from './VisualFormulaPopover'
 
 declare var MathQuill: any
 
@@ -27,6 +28,7 @@ export class VisualCalculation extends Linkable {
  	inputFieldWrapper: Mobject
  	formulas: MGroup
  	algebra: Algebra
+ 	popover: VisualFormulaPopover | null
 
  	defaults(): object {
 		return {
@@ -38,7 +40,8 @@ export class VisualCalculation extends Linkable {
 			inputFieldWrapper: new Mobject(),
 			span: null,
 			formulas: new MGroup(),
-			algebra: new Algebra()
+			algebra: new Algebra(),
+			popover: null
 		}
 	}
 
@@ -80,6 +83,7 @@ export class VisualCalculation extends Linkable {
 	renderFirstFormula() {
 		let tex = this.inputField.latex()
 		let formula = VisualFormulaMaker.texToVisual(tex)
+		log(formula)
 		if (formula) {
 			this.addFormula(formula)
 			this.remove(this.inputFieldWrapper)
@@ -138,13 +142,28 @@ export class VisualCalculation extends Linkable {
 
 	showPossibleTransformations(subformula: VisualFormula) {
 		let startTree = subformula.formulaTree
+		log(startTree)
 		let applicableRules = this.algebra.applicableRules(startTree)
+
+		this.update({
+			popover: new VisualFormulaPopover({
+				rootMobject: subformula,
+				direction: 'bottom'
+			})
+		})
+		let possibleFormulas: Array<VisualFormula> = []
 		for (let [name, rule] of Object.entries(applicableRules)) {
 			let resultTree = this.algebra.applyRuleToTree(name, startTree)
 			let transformedFormula = VisualFormulaMaker.treeToVisual(resultTree)
-			this.addFormula(transformedFormula)
+			possibleFormulas.push(transformedFormula)
 		}
+		this.popover.update({
+			formulas: possibleFormulas
+		})
+		subformula.add(this.popover)
 	}
+
+	
 
 	hidePossibleTransformations(subformula: VisualFormula) { }
 

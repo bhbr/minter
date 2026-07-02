@@ -164,6 +164,7 @@ export class FormalLanguage extends ExtendedObject {
 		// a dictionary of what subtrees have been matched
 		// to the variables:
 		// { '<a>': subtree1, '<b>': subtree2, ... }
+		if (record === null) { return null }
 		if (this.isNonterminalVariableSymbol(form)) {
 			let existingMatch = record[form as NonterminalSymbol]
 			if (existingMatch === undefined) {
@@ -174,6 +175,7 @@ export class FormalLanguage extends ExtendedObject {
 			} else {
 				return null
 			}
+			
 		}
 		let formTopSymbol = (form as ComposedSentenceTreeForm)[0]
 		let treeTopSymbol = tree[0]

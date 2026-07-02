@@ -62,10 +62,8 @@ export class VisualFraction extends VisualOperator {
 		})
 		this.numerator.updateContent()
 		this.denominator.updateContent()
-		this.view.update({
-			frameWidth: this.getWidth(),
-			frameHeight: this.getHeight()
-		})
+		
+		super.updateContent()
 	}
 
 	getWidth(): number {

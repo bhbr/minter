@@ -22,26 +22,114 @@ export class Algebra extends FormalSystem {
 				]
 			},
 			inferenceRules: {
+				'additive_commutativity': [
+					['+', ['<expression-1>', '<expression-2>']],
+					['+', ['<expression-2>', '<expression-1>']],
+				] as Rule,
 				'multiplicative_commutativity': [
 					['*', ['<expression-1>', '<expression-2>']],
 					['*', ['<expression-2>', '<expression-1>']],
-				] as Rule,
-				'left_develop_subtraction_bracket': [
-					['-', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]],
-					['-', [['-', ['<expression-1>', '<expression-2>']], '<expression-3>']]
 				] as Rule,
 				'left_develop_addition_bracket': [
 					['*', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]],
 					['+', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]]
 				] as Rule,
+				'left_develop_subtraction_bracket': [
+					['-', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]],
+					['-', [['-', ['<expression-1>', '<expression-2>']], '<expression-3>']]
+				] as Rule,
 				'left_factor_addition_bracket': [
 					['+', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]],
-					['*', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]]
+					['*', ['<expression-1>', ['(', [['+', ['<expression-2>', '<expression-3>']]]]]]
 				] as Rule,
 				'left_factor_subtraction_bracket': [
 					['-', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]],
-					['*', ['<expression-1>', ['-', ['<expression-2>', '<expression-3>']]]]
-				] as Rule
+					['*', ['<expression-1>', ['(', [['-', ['<expression-2>', '<expression-3>']]]]]]
+				] as Rule,
+				'right_factor_addition_bracket': [
+					['+', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]],
+					['*', [
+						['(', [
+							['+', [
+								'<expression-1>',
+								'<expression-3>'
+							]]
+						]],
+						'<expression-2>'
+					]]
+				] as Rule,
+				'right_factor_subtraction_bracket': [
+					['-', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]],
+					['*', [
+						['(', [
+							['-', [
+								'<expression-1>',
+								'<expression-3>'
+							]]
+						]],
+						'<expression-2>'
+					]]
+				] as Rule,
+				'right_develop_addition_bracket': [
+					['*', [
+						['(', [
+							['+', [
+								'<expression-1>',
+								'<expression-3>'
+							]]
+						]],
+						'<expression-2>'
+					]],
+					['+', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+				'right_develop_subtraction_bracket': [
+					['*', [
+						['(', [
+							['-', [
+								'<expression-1>',
+								'<expression-3>'
+							]]
+						]],
+						'<expression-2>'
+					]],
+					['-', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
 			}
 		}
 	}
