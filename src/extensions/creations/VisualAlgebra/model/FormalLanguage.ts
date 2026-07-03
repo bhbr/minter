@@ -5,7 +5,7 @@ import { equalArrays } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { Lexer } from './Lexer'
 import { Parser } from './Parser'
-
+import { deepCopy } from 'core/functions/copying'
 
 export class FormalLanguage extends ExtendedObject {
 
@@ -159,6 +159,34 @@ export class FormalLanguage extends ExtendedObject {
 		}
 		let ret: SentenceTreeForm = [(form as ComposedSentenceTreeForm)[0], (form as ComposedSentenceTreeForm)[1]]
 		return ret
+	}
+
+	treeContainsSubtree(tree: SentenceTree, subtree: SentenceTree): boolean {
+		// array identity is relevant
+		if (tree === subtree) {
+			return true
+		}
+		for (let child of tree[1]) {
+			if (this.treeContainsSubtree(child, subtree)) {
+				return true
+			}
+		}
+		return false
+	}
+
+	replaceSubtreeInTree(tree: SentenceTree, subtree: SentenceTree, newSubtree: SentenceTree): SentenceTree {
+		if (tree === subtree) {
+			return this.clone(newSubtree) as SentenceTree
+		}
+		for (let i = 0; i < tree[1].length; i++) {
+			let child = tree[1][i]
+			if (child === subtree) {
+				return [tree[0], tree[1].with(i, newSubtree)]
+			}
+			if (this.treeContainsSubtree(child, subtree)) {
+				return [tree[0], tree[1].with(i, this.replaceSubtreeInTree(child, subtree, newSubtree))]
+			}
+		}
 	}
 
 }

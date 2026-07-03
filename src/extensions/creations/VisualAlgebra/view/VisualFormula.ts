@@ -4,7 +4,7 @@ import { log } from 'core/functions/logging'
 import { Mobject } from 'core/mobjects/Mobject'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
-import { SentenceTree } from '../model/SentenceTypes'
+import { SentenceTree, SubtreeLocation } from '../model/SentenceTypes'
 import { VisualSymbol } from './VisualSymbol'
 import { VisualCalculation } from './VisualCalculation'
 import { conditionTrigger } from 'core/functions/various'
@@ -15,16 +15,17 @@ export class VisualFormula extends Mobject {
 	rootFormula: VisualFormula | null
 	formulaTree: SentenceTree
 	calculation: VisualCalculation | null
+	location: SubtreeLocation
 
 	defaults(): object {
 		return {
 			borderColor: Color.white(),
 			borderWidth: 1,
-			mathQuillLoadingID: null,
 			screenEventHandler: ScreenEventHandler.Self,
  			highlightedSubformula: null,
  			rootFormula: null,
  			formulaTree: [],
+ 			location: [],
  			calculation: null
 		}
 	}
@@ -73,6 +74,9 @@ export class VisualFormula extends Mobject {
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		if (this.rootFormula.highlightedSubformula) {
+			this.rootFormula.unhighlight(this.rootFormula.highlightedSubformula)
+		}
 		this.rootFormula.toggleHighlight(this)
 	}
 
@@ -94,7 +98,7 @@ export class VisualFormula extends Mobject {
 		})
 		f.updateContent()
 		if (this.calculation) {
-			this.calculation.showPossibleTransformations(f)
+			this.calculation.showPopover(f)
 		}
 	}
 
@@ -104,13 +108,24 @@ export class VisualFormula extends Mobject {
 			backgroundColor: Color.clear()
 		})
 		if (this.calculation) {
-			this.calculation.hidePossibleTransformations(f)
+			if (this.calculation.popover) {
+				f.remove(this.calculation.popover)
+			}
 		}
 	}
 
 	handlePopoverMessage(message: object) {
 		let i = message['pick'] as number
-		this.calculation.addFormula(this.calculation.popover.formulas[i])
+		let newTree = this.rootFormula.calculation.algebra.replaceSubtreeInTree(
+			this.rootFormula.formulaTree,
+			this.rootFormula.highlightedSubformula.formulaTree,
+			this.rootFormula.calculation.popover.formulas[i].formulaTree
+		)
+		let newFormula = this.rootFormula.calculation.maker.treeToVisual(newTree)
+		this.rootFormula.calculation.addFormula(newFormula)
+		this.rootFormula.calculation.update({
+			popover: null
+		})
 	}
 
 

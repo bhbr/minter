@@ -3,7 +3,6 @@
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
 import { Mobject } from 'core/mobjects/Mobject'
-import { MGroup } from 'core/mobjects/MGroup'
 import { Linkable } from 'core/linkables/Linkable'
 import { SentenceTree } from '../model/SentenceTypes'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
@@ -24,7 +23,7 @@ export class VisualCalculation extends Linkable {
  	span: HTMLSpanElement | null
  	inputField: any
  	inputFieldWrapper: Mobject
- 	formulas: MGroup
+ 	formulas: Array<VisualFormula>
  	algebra: Algebra
  	popover: VisualFormulaPopover | null
  	maker: VisualFormulaMaker
@@ -38,7 +37,7 @@ export class VisualCalculation extends Linkable {
 			inputField: null,
 			inputFieldWrapper: new Mobject(),
 			span: null,
-			formulas: new MGroup(),
+			formulas: [],
 			algebra: new Algebra(),
 			popover: null,
 			maker: new VisualFormulaMaker()
@@ -47,7 +46,9 @@ export class VisualCalculation extends Linkable {
 
 	setup() {
 		super.setup()
-		this.add(this.formulas)
+		for (let formula of this.formulas) {
+			this.add(formula)
+		}
 		this.createInputField()
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
@@ -90,11 +91,12 @@ export class VisualCalculation extends Linkable {
 	}
 
 	addFormula(formula: VisualFormula) {
+		this.formulas.push(formula)
 		formula.update({
 			calculation: this,
-			anchor: [0, 100 * this.formulas.children.length]
+			anchor: [0, 100 * this.formulas.length]
 		})
-		this.formulas.add(formula)
+		this.add(formula)
 	}
 
 	focus() {
@@ -109,6 +111,7 @@ export class VisualCalculation extends Linkable {
 		super.blur()
 		this.inputField.blur()
 		this.deactivateKeyboard()
+
 		getPaper().sensor.onPointerUp = getPaper().sensor.savedOnPointerUp
 		getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
 		this.renderFirstFormula()
@@ -139,7 +142,8 @@ export class VisualCalculation extends Linkable {
 		}
 	}
 
-	showPossibleTransformations(subformula: VisualFormula) {
+	showPopover(subformula: VisualFormula) {
+
 		let startTree = subformula.formulaTree
 		let applicableRules = this.algebra.applicableRules(startTree)
 
@@ -159,11 +163,13 @@ export class VisualCalculation extends Linkable {
 			formulas: possibleFormulas
 		})
 		subformula.add(this.popover)
+		log(subformula)
+		log(subformula.location)
+		log(this.popover)
+		log(this)
 	}
 
 
-
-	hidePossibleTransformations(subformula: VisualFormula) { }
 
 }
 

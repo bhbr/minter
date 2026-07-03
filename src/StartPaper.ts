@@ -16,6 +16,7 @@ import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
 import { Algebra } from './extensions/creations/VisualAlgebra/model/Algebra'
 import { SentenceTree } from './extensions/creations/VisualAlgebra/model/SentenceTypes'
+import { MGroup } from './core/mobjects/MGroup'
 
 export class StartPaper extends DemoPaper {
 
@@ -28,14 +29,11 @@ export class StartPaper extends DemoPaper {
 	}
 
 	loadContent() {
-
 		let calc = new VisualCalculation({
 			anchor: [100, 100]
 		})
-		this.addToContent(calc)
-
-
-
+		this.add(calc)
+		log(calc)
 	}
 
 }
@@ -43,18 +41,4 @@ export class StartPaper extends DemoPaper {
 //AllTests.run()
 
 export const paper = new StartPaper()
-
-let a = new Algebra()
-let tex = 'a * b + 2 * b'
-log(tex)
-let sentence = a.lexer.stringToSentence(tex)
-log(sentence)
-let tree = a.parser.sentenceToTree(sentence)
-log(tree)
-let rules = a.applicableRules(tree)
-log(rules)
-let tree2 = a.applyRuleToTree('right_factor_addition_bracket', tree)
-log(tree2)
-let sentence2 = a.parser.treeToSentence(tree2)
-log(sentence2)
 

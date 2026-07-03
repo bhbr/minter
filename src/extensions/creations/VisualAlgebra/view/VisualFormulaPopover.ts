@@ -53,4 +53,10 @@ export class VisualFormulaPopover extends Popover {
 		}
 	}
 
+	dismiss(message: object) {
+		log('dismiss')
+		this.rootMobject.handlePopoverMessage(message)
+		this.rootMobject.remove(this)
+	}
+
 }
