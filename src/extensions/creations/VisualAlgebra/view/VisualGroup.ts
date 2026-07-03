@@ -3,7 +3,7 @@ import { VisualSymbol } from './VisualSymbol'
 import { VisualFormula } from './VisualFormula'
 import { FORMULA_PADDING } from './constants'
 import { log } from 'core/functions/logging'
-import { TeXParser } from '../model/TeXParser'
+import { AlgebraParser } from '../model/AlgebraParser'
 
 export class VisualGroup extends VisualFormula {
 
@@ -11,6 +11,7 @@ export class VisualGroup extends VisualFormula {
 	child: VisualFormula
 	openParenSymbol: VisualSymbol
 	closeParenSymbol: VisualSymbol
+	parser: AlgebraParser
 
 	defaults(): object {
 		return {
@@ -19,7 +20,8 @@ export class VisualGroup extends VisualFormula {
 			closeParenSymbol: new VisualSymbol(),
 			child: new VisualFormula({
 				rootFormula: this.rootFormula
-			})
+			}),
+			parser: new AlgebraParser()
 		}
 	}
 
@@ -28,7 +30,6 @@ export class VisualGroup extends VisualFormula {
 	}
 
 	setup() {
-		log('VisualGroup.setup')
 		super.setup()
 		this.add(this.openParenSymbol)
 		this.add(this.child)
@@ -44,8 +45,6 @@ export class VisualGroup extends VisualFormula {
 	}
 
 	updateContent() {
-		log('VisualGroup.updateContent')
-
 		let maxHeight = Math.max(this.openParenSymbol.getHeight(), this.child.getHeight(), this.openParenSymbol.getHeight())
 
 		this.openParenSymbol.update({
@@ -62,7 +61,7 @@ export class VisualGroup extends VisualFormula {
 			]
 		})
 		this.closeParenSymbol.update({
-			texString: TeXParser.closingParens[this.parenType],
+			texString: this.parser.closingParens[this.parenType],
 			anchor: [
 				this.openParenSymbol.getWidth() + this.child.getWidth() + 3 * FORMULA_PADDING,
 				FORMULA_PADDING + 0.5 * (maxHeight - this.closeParenSymbol.getHeight())
@@ -73,7 +72,6 @@ export class VisualGroup extends VisualFormula {
 	}
 
 	getWidth(): number {
-		log(`group: ${this.openParenSymbol.getWidth() + this.child.getWidth() + this.closeParenSymbol.getWidth() + 4 * FORMULA_PADDING}`)
 		return this.openParenSymbol.getWidth() + this.child.getWidth() + this.closeParenSymbol.getWidth() + 4 * FORMULA_PADDING
 	}
 

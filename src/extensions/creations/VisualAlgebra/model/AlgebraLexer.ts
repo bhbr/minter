@@ -2,70 +2,77 @@
 import { Sentence } from './SentenceTypes'
 import { log } from 'core/functions/logging'
 import { removeAll } from 'core/functions/arrays'
+import { Lexer } from './Lexer'
 
-export class TeXLexer {
+export class AlgebraLexer extends Lexer {
+
+	functionTokens: Array<string>
+	tokensToIgnore: Array<string>
+
+	defaults(): object {
+		return {
+			functionTokens: [
+				'\\sqrt',
+				'\\log',
+				'\\ln',
+				'\\exp',
+				'\\sin',
+				'\\cos',
+				'\\tan',
+				'\\cot',
+				'\\sec',
+				'\\csc',
+				'\\arcsin',
+				'\\arccos',
+				'\\arctan',
+				'\\arccot',
+				'\\arcsec',
+				'\\arccsc',
+				'\\sinh',
+				'\\cosh',
+				'\\tanh',
+				'\\arcsinh',
+				'\\arccosh',
+				'\\arctanh'
+			],
+			tokensToIgnore: [
+				'\\left',
+				'\\right'
+			]
+		}
+	}
+
 	
-	static isWhitespace(c: string): boolean {
+	isWhitespace(c: string): boolean {
 		return c.trim() === ''
 	}
 
-	static isLetter(c: string): boolean {
+	isLetter(c: string): boolean {
 		return /^[A-Za-z]{1,1}$/.test(c)
 	}
 
-	static isDigit(c: string): boolean {
+	isDigit(c: string): boolean {
 		return c >= '0' && c <= '9'
 	}
 
-	static isNumber(c: string): boolean {
+	isNumber(c: string): boolean {
 		return (!isNaN(Number(c)) && c.length !== 0)
 	}
 
-	static functionTokens = [
-		'\\sqrt',
-		'\\log',
-		'\\ln',
-		'\\exp',
-		'\\sin',
-		'\\cos',
-		'\\tan',
-		'\\cot',
-		'\\sec',
-		'\\csc',
-		'\\arcsin',
-		'\\arccos',
-		'\\arctan',
-		'\\arccot',
-		'\\arcsec',
-		'\\arccsc',
-		'\\sinh',
-		'\\cosh',
-		'\\tanh',
-		'\\arcsinh',
-		'\\arccosh',
-		'\\arctanh'
-	]
-
-	static tokensToIgnore = [
-		'\\left',
-		'\\right'
-]
-
-	static isFunctionToken(token: string): boolean {
-		return TeXLexer.functionTokens.includes(token)
+	isFunctionToken(token: string): boolean {
+		return this.functionTokens.includes(token)
 	}
 
-	static texToSentence(texString: string): Sentence {
-		log(texString)
+	stringToSentence(texString: string): Sentence {
 		let sentence: Array<string> = []
 		var currentToken = ''
 		var currentTokenType: string | null = null
 		for (let char of texString) {
 			if (currentTokenType == null) {
 				currentToken = char
-				if (TeXLexer.isDigit(char)) {
+				if (this.isDigit(char)) {
 					currentTokenType = 'number'
-				} else if (TeXLexer.isWhitespace(char)) {
+				} else if (this.isWhitespace(char)) {
 					continue
 				} else if (char == '\\') {
 					currentTokenType = 'command'
@@ -77,7 +84,7 @@ export class TeXLexer {
 					continue
 				}
 			} else if (currentTokenType == 'number') {
-				if (TeXLexer.isDigit(char) || char == '.') {
+				if (this.isDigit(char) || char == '.') {
 					if (!isNaN(Number(currentToken + char))) {
 						currentToken += char
 					} else if (char == '.') {
@@ -88,7 +95,7 @@ export class TeXLexer {
 						currentToken = ''
 						continue
 					}
-				} else if (TeXLexer.isWhitespace(char)) {
+				} else if (this.isWhitespace(char)) {
 					currentTokenType = null
 					sentence.push(currentToken)
 					currentToken = ''
@@ -101,14 +108,14 @@ export class TeXLexer {
 					continue
 				}
 			} else if (currentTokenType == 'command') {
-					if (TeXLexer.isLetter(char) || TeXLexer.isDigit(char)) {
+					if (this.isLetter(char) || this.isDigit(char)) {
 						currentToken += char
 					} else if (char == '\\') {
 						currentTokenType = 'command'
 						sentence.push(currentToken)
 						currentToken = char
 						continue
-					} else if (TeXLexer.isWhitespace(char)) {
+					} else if (this.isWhitespace(char)) {
 						currentTokenType = null
 						sentence.push(currentToken)
 						currentToken = ''
@@ -125,11 +132,15 @@ export class TeXLexer {
 		if (currentToken !== '') {
 			sentence.push(currentToken)
 		}
-		for (let token of TeXLexer.tokensToIgnore) {
+		for (let token of this.tokensToIgnore) {
 			removeAll(sentence, token)
 		}
 		return sentence
 
+	}
+
+	sentenceToString(sent: Sentence): string {
+		return '' // TODO: turn back into TeX
 	}
 	
 }

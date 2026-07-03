@@ -2,8 +2,6 @@
 
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
-import { TeXLexer } from '../model/TeXLexer'
-import { TeXParser } from '../model/TeXParser'
 import { Mobject } from 'core/mobjects/Mobject'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Linkable } from 'core/linkables/Linkable'
@@ -29,6 +27,7 @@ export class VisualCalculation extends Linkable {
  	formulas: MGroup
  	algebra: Algebra
  	popover: VisualFormulaPopover | null
+ 	maker: VisualFormulaMaker
 
  	defaults(): object {
 		return {
@@ -41,7 +40,8 @@ export class VisualCalculation extends Linkable {
 			span: null,
 			formulas: new MGroup(),
 			algebra: new Algebra(),
-			popover: null
+			popover: null,
+			maker: new VisualFormulaMaker()
 		}
 	}
 
@@ -82,8 +82,7 @@ export class VisualCalculation extends Linkable {
 
 	renderFirstFormula() {
 		let tex = this.inputField.latex()
-		let formula = VisualFormulaMaker.texToVisual(tex)
-		log(formula)
+		let formula = this.maker.texToVisual(tex)
 		if (formula) {
 			this.addFormula(formula)
 			this.remove(this.inputFieldWrapper)
@@ -142,7 +141,6 @@ export class VisualCalculation extends Linkable {
 
 	showPossibleTransformations(subformula: VisualFormula) {
 		let startTree = subformula.formulaTree
-		log(startTree)
 		let applicableRules = this.algebra.applicableRules(startTree)
 
 		this.update({
@@ -154,7 +152,7 @@ export class VisualCalculation extends Linkable {
 		let possibleFormulas: Array<VisualFormula> = []
 		for (let [name, rule] of Object.entries(applicableRules)) {
 			let resultTree = this.algebra.applyRuleToTree(name, startTree)
-			let transformedFormula = VisualFormulaMaker.treeToVisual(resultTree)
+			let transformedFormula = this.maker.treeToVisual(resultTree)
 			possibleFormulas.push(transformedFormula)
 		}
 		this.popover.update({
@@ -163,7 +161,7 @@ export class VisualCalculation extends Linkable {
 		subformula.add(this.popover)
 	}
 
-	
+
 
 	hidePossibleTransformations(subformula: VisualFormula) { }
 

@@ -9,13 +9,13 @@ import { VisualFormulaMaker } from './extensions/creations/VisualAlgebra/view/Vi
 import { VisualSymbol} from './extensions/creations/VisualAlgebra/view/VisualSymbol'
 import { VisualVariable} from './extensions/creations/VisualAlgebra/view/VisualVariable'
 import { VisualCalculation } from './extensions/creations/VisualAlgebra/view/VisualCalculation'
-import { TeXParser } from './extensions/creations/VisualAlgebra/model/TeXParser'
 import { MathQuillLoader } from './extensions/apis/MathQuillLoader'
 import { DemoPaper } from './extensions/boards/demo/DemoPaper'
 import { Popover } from './core/ui/Popover'
 import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
 import { Algebra } from './extensions/creations/VisualAlgebra/model/Algebra'
+import { SentenceTree } from './extensions/creations/VisualAlgebra/model/SentenceTypes'
 
 export class StartPaper extends DemoPaper {
 
@@ -45,9 +45,16 @@ export class StartPaper extends DemoPaper {
 export const paper = new StartPaper()
 
 let a = new Algebra()
-let form = ['+', ['<expression-1>', '<expression-2>']]
-
-let f = a.isNonterminalVariableSymbol(form)
-log(f)
-
+let tex = 'a * b + 2 * b'
+log(tex)
+let sentence = a.lexer.stringToSentence(tex)
+log(sentence)
+let tree = a.parser.sentenceToTree(sentence)
+log(tree)
+let rules = a.applicableRules(tree)
+log(rules)
+let tree2 = a.applyRuleToTree('right_factor_addition_bracket', tree)
+log(tree2)
+let sentence2 = a.parser.treeToSentence(tree2)
+log(sentence2)
 

@@ -1,6 +1,5 @@
 
-import { TeXLexer } from '../model/TeXLexer'
-import { TeXParser } from '../model/TeXParser'
+import { Algebra } from '../model/Algebra'
 import { VisualFormula } from './VisualFormula'
 import { VisualNumber } from './VisualNumber'
 import { VisualVariable } from './VisualVariable'
@@ -11,30 +10,38 @@ import { VisualFraction } from './VisualFraction'
 import { VisualPower } from './VisualPower'
 import { VisualRoot } from './VisualRoot'
 import { Sentence, SentenceTree } from '../model/SentenceTypes'
+import { ExtendedObject } from 'core/classes/ExtendedObject'
 import { log } from 'core/functions/logging'
 
-export class VisualFormulaMaker {
+export class VisualFormulaMaker extends ExtendedObject {
 
-	static treeToVisual(tree: SentenceTree): VisualFormula | null {
-		log(tree)
+	algebra: Algebra
+
+	defaults(): object {
+		return {
+			algebra: new Algebra()
+		}
+	}
+
+	treeToVisual(tree: SentenceTree): VisualFormula | null {
 		let symbol = tree[0]
-		if (TeXLexer.isNumber(symbol)) {
+		if (this.algebra.lexer.isNumber(symbol)) {
 			return new VisualNumber({
 				value: Number(symbol),
 				formulaTree: tree
 			})
 		}
-		if (TeXLexer.isLetter(symbol)) {
+		if (this.algebra.lexer.isLetter(symbol)) {
 			return new VisualVariable({
 				name: symbol,
 				formulaTree: tree
 			})
 		}
-		if (TeXLexer.isFunctionToken(symbol)) {
+		if (this.algebra.lexer.isFunctionToken(symbol)) {
 			let child = tree[1][0]
 			return new VisualFunction({
 				name: symbol,
-				child: VisualFormulaMaker.treeToVisual(child),
+				child: this.treeToVisual(child),
 				formulaTree: tree
 			})
 		}
@@ -42,44 +49,45 @@ export class VisualFormulaMaker {
 			let numerator = tree[1][0]
 			let denominator = tree[1][1]
 			return new VisualFraction({
-				numerator: VisualFormulaMaker.treeToVisual(numerator),
-				denominator: VisualFormulaMaker.treeToVisual(denominator),
+				numerator: this.treeToVisual(numerator),
+				denominator: this.treeToVisual(denominator),
 				formulaTree: tree
 			})
 		}
-		if (TeXParser.isOperator(symbol)) {
+		if (this.algebra.parser.isOperator(symbol)) {
 			let child1 = tree[1][0]
 			let child2 = tree[1][1]
 			return new VisualOperator({
 				operator: symbol,
-				child1: VisualFormulaMaker.treeToVisual(child1),
-				child2: VisualFormulaMaker.treeToVisual(child2),
+				child1: this.treeToVisual(child1),
+				child2: this.treeToVisual(child2),
 				formulaTree: tree
 			})
 		}
-		if (TeXParser.isOpenParen((symbol))) {
+		if (this.algebra.parser.isOpenParen((symbol))) {
 			let child = tree[1][0]
 			return new VisualGroup({
 				parenType: symbol,
-				child: VisualFormulaMaker.treeToVisual(child),
-				formulaTree: tree
+				child: this.treeToVisual(child),
+				formulaTree: tree,
+				parser: this.algebra.parser
 			})
 		}
 	}
 
-	static sentenceToVisual(sentence: Sentence): VisualFormula | null {
+	sentenceToVisual(sentence: Sentence): VisualFormula | null {
 		if (sentence.length == 0) { return null }
-		return VisualFormulaMaker.treeToVisual(TeXParser.sentenceToTree(sentence))
+		return this.treeToVisual(this.algebra.parser.sentenceToTree(sentence))
 	}
 
-	static texToVisual(tex: string): VisualFormula | null {
+	texToVisual(tex: string): VisualFormula | null {
 		if (tex.trim() == '') { return null }
-		return VisualFormulaMaker.treeToVisual(TeXParser.texToTree(tex))
+		return this.treeToVisual(this.algebra.parser.stringToTree(tex))
 	}
 
-	static texToVisual2(tex: string): VisualFormula | null {
+	texToVisual2(tex: string): VisualFormula | null {
 		if (tex.trim() == '') { return null }
-		return VisualFormulaMaker.sentenceToVisual(TeXLexer.texToSentence(tex))
+		return this.sentenceToVisual(this.algebra.lexer.stringToSentence(tex))
 	}
 
 }

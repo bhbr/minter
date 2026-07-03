@@ -80,11 +80,17 @@ export function removeDuplicates(arr: Array<any>): Array<any> {
 export function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 	if (arr1.length !== arr2.length) { return false }
 	for (var i = 0; i < arr1.length; i++) {
-		if (arr1[i] !== arr2[i]) { return false }
+		if (arr1[i].constructor.name == 'Array'
+		&& arr2[i].constructor.name == 'Array') {
+			if (!equalArrays(arr1[i] as Array<any>, arr2[i] as Array<any>)) {
+				return false
+			}
+		} else if (arr1[i] !== arr2[i]) {
+			return false
+		}
 	}
 	return true
 }
-
 
 
 

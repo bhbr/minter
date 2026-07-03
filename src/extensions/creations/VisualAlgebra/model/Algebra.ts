@@ -1,11 +1,18 @@
 
 import { FormalSystem } from './FormalSystem'
 import { Rule } from './SentenceTypes'
+import { AlgebraLexer } from './AlgebraLexer'
+import { AlgebraParser } from './AlgebraParser'
 
 export class Algebra extends FormalSystem {
 
+	declare lexer: AlgebraLexer
+	declare parser: AlgebraParser
+
 	defaults(): object {
 		return {
+			lexer: new AlgebraLexer(),
+			parser: new AlgebraParser(),
 			arities: { '+': 2, '-': 2, '\\cos': 1, '*': 2, '^': 2, '\\frac': 2, '\\sqrt': 1, '\\pi': 0 },
 			syntaxRules: {
 				equation: [
@@ -23,28 +30,101 @@ export class Algebra extends FormalSystem {
 			},
 			inferenceRules: {
 				'additive_commutativity': [
-					['+', ['<expression-1>', '<expression-2>']],
-					['+', ['<expression-2>', '<expression-1>']],
+					['+', [
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['+', [
+						'<expression-2>',
+						'<expression-1>'
+					]],
 				] as Rule,
 				'multiplicative_commutativity': [
-					['*', ['<expression-1>', '<expression-2>']],
-					['*', ['<expression-2>', '<expression-1>']],
+					['*', [
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['*', [
+						'<expression-2>',
+						'<expression-1>'
+					]],
 				] as Rule,
 				'left_develop_addition_bracket': [
-					['*', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]],
-					['+', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]]
+					['*', [
+						'<expression-1>', [
+							'+', [
+								'<expression-2>',
+								'<expression-3>'
+							]]
+						]],
+					['+', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*', [
+							'<expression-1>',
+							'<expression-3>'
+						]]
+					]]
 				] as Rule,
 				'left_develop_subtraction_bracket': [
-					['-', ['<expression-1>', ['+', ['<expression-2>', '<expression-3>']]]],
-					['-', [['-', ['<expression-1>', '<expression-2>']], '<expression-3>']]
+					['-', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['-', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
 				] as Rule,
 				'left_factor_addition_bracket': [
-					['+', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]],
-					['*', ['<expression-1>', ['(', [['+', ['<expression-2>', '<expression-3>']]]]]]
+					['+', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*', [
+							'<expression-1>',
+							'<expression-3>'
+						]]
+					]],
+					['*', [
+						'<expression-1>',
+						['(', [
+							['+', [
+								'<expression-2>',
+								'<expression-3>'
+							]]
+						]]
+					]]
 				] as Rule,
 				'left_factor_subtraction_bracket': [
-					['-', [['*', ['<expression-1>', '<expression-2>']], ['*', ['<expression-1>', '<expression-3>']]]],
-					['*', ['<expression-1>', ['(', [['-', ['<expression-2>', '<expression-3>']]]]]]
+					['-', [
+						['*', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['*', [
+							'<expression-1>',
+							'<expression-3>'
+						]]
+					]],
+					['*', [
+						'<expression-1>',
+						['(', [
+							['-', [
+								'<expression-2>',
+								'<expression-3>'
+							]]
+						]]
+					]]
 				] as Rule,
 				'right_factor_addition_bracket': [
 					['+', [
@@ -132,6 +212,14 @@ export class Algebra extends FormalSystem {
 				] as Rule,
 			}
 		}
+	}
+
+	isNumber(str: string): boolean {
+		return str !== '' && isFinite(Number(str))
+	}
+
+	isVariable(str: string): boolean {
+		return !this.isNumber(str) && str.length == 1
 	}
 	
 	isTerminalSymbol(str: string): boolean {
