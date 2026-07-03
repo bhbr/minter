@@ -95,9 +95,6 @@ export class Wavy extends CindyCanvas {
 		super.update(args, false)
 		this.nbSources = Math.floor(this.nbSources)
 
-		log('update')
-		log(this.core)
-
 		if (this.core == null || this.sourcePositions().length == 0) { return }
 		if (args['nbSources'] != undefined) {
 			this.reload(args)

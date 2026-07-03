@@ -67,7 +67,6 @@ export class VisualSymbol extends Mobject {
  	}
 
 	getWidth(): number {
-		log(`symbol: ${this.MQObject.el().clientWidth}`)
 		return Math.max(this.MQObject.el().clientWidth, 20)
 	}
 

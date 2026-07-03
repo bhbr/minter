@@ -17,12 +17,10 @@ export class CindyLoader extends APILoader {
 		scriptTag2.type = 'text/javascript'
 		scriptTag2.src = '../../../CindyJS/build/js/CindyGL.js'
 		scriptTag2.onload = function() {
-			log('loaded script 2')
 			getPaper().loadedAPI(this)
 		}.bind(this)
 
 		scriptTag1.onload = function() {
-			log('loaded script 1')
 			document.head.append(scriptTag2)
 		}.bind(this)
 

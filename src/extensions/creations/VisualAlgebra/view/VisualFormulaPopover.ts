@@ -31,16 +31,12 @@ export class VisualFormulaPopover extends Popover {
 	addFormulas() {
 		var newWidth = 30
 		var newHeight = 0
-		log('==============================')
 		for (let f of this.formulas) {
-			log(f.getWidth())
-			log('is the total width')
 			newWidth = Math.max(newWidth, f.getWidth())
 			newHeight += f.getHeight()
 		}
 		newWidth += 2 * this.cornerRadius
 		newHeight += 2 * this.cornerRadius
-		log(`${newWidth} ${newHeight}`)
 		this.update({
 			frameWidth: newWidth,
 			frameHeight: newHeight

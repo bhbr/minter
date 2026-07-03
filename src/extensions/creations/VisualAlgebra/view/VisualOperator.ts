@@ -91,7 +91,6 @@ export class VisualOperator extends VisualFormula {
 	}
 
 	getWidth(): number {
-		log(`operator: ${this.child1.getWidth() + this.operatorSymbol.getWidth() + this.child2.getWidth() + 4 * FORMULA_PADDING}`)
 		return this.child1.getWidth() + this.operatorSymbol.getWidth() + this.child2.getWidth() + 4 * FORMULA_PADDING
 	}
 

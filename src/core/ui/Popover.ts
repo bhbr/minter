@@ -57,7 +57,6 @@ export class Popover extends CurvedShape {
 	}
 
 	updateBezierPoints() {
-		log('updateBezierPoints')
 		switch (this.direction) {
 		case 'top':
 			this.bezierPoints = this.topBezierPoints()
@@ -86,7 +85,7 @@ export class Popover extends CurvedShape {
 		let r = this.cornerRadius
 		let w = this.frameWidth
 		let h = this.frameHeight
-		
+
 		return [
 			[0, 0], [0, 0], // 0
 			[s, s], [s, s], [s, s], // 1 

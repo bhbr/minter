@@ -61,7 +61,6 @@ export class CindyCanvas extends Linkable implements Playable {
 	}
 
 	setup() {
-		log('cindy setup')
 		super.setup()
 
 		this.innerCanvas.view.frame.update({
@@ -96,7 +95,6 @@ export class CindyCanvas extends Linkable implements Playable {
 		})
 		this.createScripts()
 		this.startCore()
-		log('setup done')
 	}
 
 
@@ -144,9 +142,7 @@ export class CindyCanvas extends Linkable implements Playable {
 	}
 
 	play() {
-		log('play')
 		if (!this.core.started) {
-			log('not yet started')
 			this.core.startup()
 			this.core.started = true
 		}
@@ -197,15 +193,12 @@ export class CindyCanvas extends Linkable implements Playable {
 	}
 
 	startCore() {
-		log('startCore')
-		log(CindyJS)
 		this.core = CindyJS.newInstance({
 			scripts: `${this.id}*`,
 			animation: { autoplay: false },
 			ports: [this.port],
 			geometry: this.geometry()
 		})
-		log(this.core)
 	}
 
 	reload(args: object = {}) {
