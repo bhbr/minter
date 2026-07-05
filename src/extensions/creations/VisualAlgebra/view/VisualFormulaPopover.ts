@@ -34,6 +34,9 @@ export class VisualFormulaPopover extends Popover {
 		for (let f of this.formulas) {
 			newWidth = Math.max(newWidth, f.getWidth())
 			newHeight += f.getHeight()
+			for (let submob of f.submobs) {
+				submob.disable()
+			}
 		}
 		newWidth += 2 * this.cornerRadius
 		newHeight += 2 * this.cornerRadius
@@ -54,7 +57,6 @@ export class VisualFormulaPopover extends Popover {
 	}
 
 	dismiss(message: object) {
-		log('dismiss')
 		this.rootMobject.handlePopoverMessage(message)
 		this.rootMobject.remove(this)
 	}

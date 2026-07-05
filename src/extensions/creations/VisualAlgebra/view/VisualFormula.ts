@@ -8,6 +8,7 @@ import { SentenceTree, SubtreeLocation } from '../model/SentenceTypes'
 import { VisualSymbol } from './VisualSymbol'
 import { VisualCalculation } from './VisualCalculation'
 import { conditionTrigger } from 'core/functions/various'
+import { FORMULA_BACKGROUND_COLOR, FORMULA_BORDER_COLOR, FORMULA_HIGHLIGHT_BACKGROUND_COLOR, FORMULA_HIGHLIGHT_BORDER_COLOR } from './constants'
 
 export class VisualFormula extends Mobject {
 
@@ -19,8 +20,10 @@ export class VisualFormula extends Mobject {
 
 	defaults(): object {
 		return {
-			borderColor: Color.white(),
 			borderWidth: 1,
+			borderColor: FORMULA_BORDER_COLOR,
+			borderRadius: 15,
+			backgroundColor: FORMULA_BACKGROUND_COLOR,
 			screenEventHandler: ScreenEventHandler.Self,
  			highlightedSubformula: null,
  			rootFormula: null,
@@ -94,7 +97,8 @@ export class VisualFormula extends Mobject {
 	highlight(f: VisualFormula) {
 		this.highlightedSubformula = f
 		f.update({
-			backgroundColor: Color.red()
+			backgroundColor: FORMULA_HIGHLIGHT_BACKGROUND_COLOR,
+			borderColor: FORMULA_HIGHLIGHT_BORDER_COLOR
 		})
 		f.updateContent()
 		if (this.calculation) {
@@ -105,7 +109,8 @@ export class VisualFormula extends Mobject {
 	unhighlight(f: VisualFormula) {
 		this.highlightedSubformula = null
 		f.update({
-			backgroundColor: Color.clear()
+			backgroundColor: FORMULA_BACKGROUND_COLOR,
+			borderColor: FORMULA_BORDER_COLOR
 		})
 		if (this.calculation) {
 			if (this.calculation.popover) {
@@ -121,6 +126,7 @@ export class VisualFormula extends Mobject {
 			this.rootFormula.highlightedSubformula.formulaTree,
 			this.rootFormula.calculation.popover.formulas[i].formulaTree
 		)
+		this.rootFormula.unhighlight(this.rootFormula.highlightedSubformula)
 		let newFormula = this.rootFormula.calculation.maker.treeToVisual(newTree)
 		this.rootFormula.calculation.addFormula(newFormula)
 		this.rootFormula.calculation.update({
