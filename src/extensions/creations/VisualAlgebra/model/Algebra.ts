@@ -47,6 +47,8 @@ export class Algebra extends FormalSystem {
 				]
 			},
 			inferenceRules: {
+
+				// a + b = b + a
 				'additive_commutativity': [
 					['+', [
 						'<expression-1>',
@@ -55,9 +57,11 @@ export class Algebra extends FormalSystem {
 					['+', [
 						'<expression-2>',
 						'<expression-1>'
-					]],
+					]]
 				] as Rule,
-				'additive_associativity': [
+
+				// (a + b) + c = a + (b + c)
+				'additive_associativity_1': [
 					['+', [
 						['+', [
 							'<expression-1>',
@@ -71,8 +75,137 @@ export class Algebra extends FormalSystem {
 							'<expression-2>',
 							'<expression-3>'
 						]]
-					]],
+					]]
 				] as Rule,
+
+				// a + (b + c) = (a + b) + c
+				'additive_associativity_2': [
+					['+', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['+', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
+				] as Rule,
+
+				// a + (b - c) = (a + b) - c
+				'develop_plus_minus_brackets_1': [
+					['+', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['-', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
+				] as Rule,
+
+				// a - (b + c) = (a - b) - c
+				'develop_plus_minus_brackets_2': [
+					['-', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['-', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
+				] as Rule,
+
+				// a - (b - c) = (a - b) + c
+				'develop_plus_minus_brackets_3': [
+					['-', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['+', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
+				] as Rule,
+
+
+				// a + (b - c) = (a + b) - c
+				'form_plus_minus_brackets_1': [
+					['-', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['+', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]]
+				] as Rule,
+
+				// a - (b + c) = (a - b) - c
+				'form_plus_minus_brackets_2': [
+					['-', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['-', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]]
+				] as Rule,
+
+				// a - (b - c) = (a - b) + c
+				'form_plus_minus_brackets_3': [
+					['+', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['-', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]]
+				] as Rule,
+
+				// a * b = b * a
 				'multiplicative_commutativity': [
 					['\\cdot', [
 						'<expression-1>',
@@ -83,6 +216,44 @@ export class Algebra extends FormalSystem {
 						'<expression-1>'
 					]],
 				] as Rule,
+
+				// (a * b) * c = a * (b * c)
+				'multiplicative_associativity_1': [
+					['\\cdot', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['\\cdot', [
+						'<expression-1>',
+						['\\cdot', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]]
+				] as Rule,
+
+				// a * (b * c) = (a * b) * c
+				'multiplicative_associativity_2': [
+					['\\cdot', [
+						'<expression-1>',
+						['\\cdot', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+					['\\cdot', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]]
+				] as Rule,
+
+				// a * (b + c) = a * b + a * c
 				'left_develop_addition_bracket': [
 					['\\cdot', [
 						'<expression-1>', [
@@ -102,6 +273,8 @@ export class Algebra extends FormalSystem {
 						]]
 					]]
 				] as Rule,
+
+				// a * (b - c) = a * b - a * c
 				'left_develop_subtraction_bracket': [
 					['-', [
 						'<expression-1>',
@@ -118,6 +291,8 @@ export class Algebra extends FormalSystem {
 						'<expression-3>'
 					]]
 				] as Rule,
+
+				// a * b + a * c = a * (b + c)
 				'left_factor_addition_bracket': [
 					['+', [
 						['\\cdot', [
@@ -139,6 +314,8 @@ export class Algebra extends FormalSystem {
 						]]
 					]]
 				] as Rule,
+
+				// a * b - a * c = a * (b - c)
 				'left_factor_subtraction_bracket': [
 					['-', [
 						['\\cdot', [
@@ -158,6 +335,50 @@ export class Algebra extends FormalSystem {
 						]]
 					]]
 				] as Rule,
+
+				// (a + b) * c = a * c + b * c
+				'right_develop_addition_bracket': [
+					['\\cdot', [
+						['+', [
+							'<expression-1>',
+							'<expression-3>'
+						]],
+						'<expression-2>'
+					]],
+					['+', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['\\cdot',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// (a - b) * c = a * c - b * c
+				'right_develop_subtraction_bracket': [
+					['\\cdot', [
+						['-', [
+							'<expression-1>',
+							'<expression-3>'
+						]],
+						'<expression-2>'
+					]],
+					['-', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['\\cdot',
+							['<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// a * b + c * b = (a + c) * b
 				'right_factor_addition_bracket': [
 					['+', [
 						['\\cdot', [
@@ -177,6 +398,8 @@ export class Algebra extends FormalSystem {
 						'<expression-2>'
 					]]
 				] as Rule,
+
+				// a * b - c * b = (a - c) * b
 				'right_factor_subtraction_bracket': [
 					['-', [
 						['\\cdot', [
@@ -198,44 +421,104 @@ export class Algebra extends FormalSystem {
 						'<expression-2>'
 					]]
 				] as Rule,
-				'right_develop_addition_bracket': [
-					['\\cdot', [
+
+				// a + b - b = a
+				'cancel_plus_and_minus_in_sum': [
+					['-', [
 						['+', [
 							'<expression-1>',
-							'<expression-3>'
+							'<expression-2>'
 						]],
 						'<expression-2>'
 					]],
-					['+', [
-						['\\cdot', [
-							'<expression-1>',
-							'<expression-2>'
-						]],
-						['\\cdot',
-							['<expression-3>',
-							'<expression-2>'
-						]]
-					]]
+					'<expression-1>'
 				] as Rule,
-				'right_develop_subtraction_bracket': [
-					['\\cdot', [
+
+				// a - b + b = a
+				'cancel_minus_and_plus_in_sum': [
+					['+', [
 						['-', [
 							'<expression-1>',
-							'<expression-3>'
+							'<expression-2>'
 						]],
 						'<expression-2>'
 					]],
-					['-', [
-						['\\cdot', [
-							'<expression-1>',
-							'<expression-2>'
-						]],
-						['\\cdot',
-							['<expression-3>',
-							'<expression-2>'
-						]]
-					]]
+					'<expression-1>'
 				] as Rule,
+
+				// 0 + a = a
+				'cancel_left_added_zero': [
+					['+', [
+						['0', []],
+						'<expression-1>'
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// a + 0 = a
+				'cancel_right_added_zero': [
+					['+', [
+						'<expression-1>',
+						['0', []]
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// a - 0 = a
+				'cancel_subtracted_zero': [
+					['-', [
+						'<expression-1>',
+						['0', []]
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// 1 * a = a
+				'cancel_left_multiplied_one': [
+					['\\cdot', [
+						['1', []],
+						'<expression-1>'
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// a * 1 = a
+				'cancel_right_multiplied_one': [
+					['\\cdot', [
+						'<expression-1>',
+						['1', []]
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// 0 * a = 0
+				'cancel_left_multiplied_zero': [
+					['\\cdot', [
+						['0', []],
+						'<expression-1>'
+					]],
+					['1', []]
+				] as Rule,
+
+				// a * 0 = 0
+				'cancel_right_multiplied_zero': [
+					['\\cdot', [
+						'<expression-1>',
+						['0', []]
+					]],
+					['0', []]
+				] as Rule,
+				
+				// a / a = 1
+				'cancel_fraction_to_one': [
+					['\\frac', [
+						'<expression-1>',
+						'<expression-1>'
+					]],
+					['1', []]
+				] as Rule,
+
+				// a = b => b = a
 				'swap_equation_sides': [
 					['=', [
 						'<expression-1>',
@@ -246,6 +529,8 @@ export class Algebra extends FormalSystem {
 						'<expression-1>'
 					]]
 				] as Rule,
+
+				// a + b = c => a = c - b
 				'move_addition_to_rhs': [
 					['=', [
 						['+', [
@@ -262,15 +547,59 @@ export class Algebra extends FormalSystem {
 						]]
 					]]
 				] as Rule,
-				'cancel_plus_and_minus_in_sum': [
-					['-', [
+
+				// a = b + c => a - c = b
+				'move_addition_to_lhs': [
+					['=', [
+						'<expression-1>',
 						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]],
+					]],
+					['=', [
+						['-', [
+							'<expression-1>',
+							'<expression-3>'
+						]],
+						'<expression-2>',
+					]]
+				] as Rule,
+
+				// a - b = c => a = c + b
+				'move_subtraction_to_rhs': [
+					['=', [
+						['-', [
 							'<expression-1>',
 							'<expression-2>'
 						]],
-						'<expression-2>'
+						'<expression-3>'
 					]],
-					'<expression-1>'
+					['=', [
+						'<expression-1>',
+						['+', [
+							'<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// a = b - c => a + c = b
+				'move_subtraction_to_lhs': [
+					['=', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]],
+					]],
+					['=', [
+						['+', [
+							'<expression-1>',
+							'<expression-3>'
+						]],
+						'<expression-2>',
+					]]
 				] as Rule,
 				
 			}
