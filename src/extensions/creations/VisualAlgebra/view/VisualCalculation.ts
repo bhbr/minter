@@ -7,6 +7,7 @@ import { Linkable } from 'core/linkables/Linkable'
 import { SentenceTree } from '../model/SentenceTypes'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { Color } from 'core/classes/Color'
+import { VisualNumber } from './VisualNumber'
 import { VisualFormula } from './VisualFormula'
 import { VisualFormulaMaker } from './VisualFormulaMaker'
 import { ScreenEvent } from 'core/mobjects/screen_events'
@@ -154,6 +155,12 @@ export class VisualCalculation extends Linkable {
 			})
 		})
 		let possibleFormulas: Array<VisualFormula> = []
+
+		if (!isNaN(subformula.getValue())) {
+			let result = this.maker.treeToVisual([`${subformula.getValue()}`, []])
+			possibleFormulas.push(result)
+		}
+
 		for (let [name, rule] of Object.entries(applicableRules)) {
 			let resultTree = this.algebra.applyRuleToTree(name, startTree)
 			let transformedFormula = this.maker.treeToVisual(resultTree)

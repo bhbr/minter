@@ -31,7 +31,7 @@ export class Algebra extends FormalSystem {
 		return {
 			lexer: new AlgebraLexer(),
 			parser: new AlgebraParser(),
-			arities: { '+': 2, '-': 2, '\\cos': 1, '*': 2, '^': 2, '\\frac': 2, '\\sqrt': 1, '\\pi': 0 },
+			arities: { '+': 2, '-': 2, '\\cos': 1, '*': 2, '^': 2, '\\frac': 2, '\\sqrt': 1, '\\pi': 0, '=': 2 },
 			syntaxRules: {
 				equation: [
 					'<equation>', ['=', '<expression>', '<expression>']
@@ -220,6 +220,32 @@ export class Algebra extends FormalSystem {
 						]]
 					]]
 				] as Rule,
+				'swap_equation_sides': [
+					['=', [
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['=', [
+						'<expression-2>',
+						'<expression-1>'
+					]]
+				] as Rule,
+				'move_addition_to_rhs': [
+					['=', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['=', [
+						'<expression-1>',
+						['-', [
+							'<expression-3>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule
 			}
 		}
 	}

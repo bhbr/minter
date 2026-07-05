@@ -6,6 +6,7 @@ import { VisualVariable } from './VisualVariable'
 import { VisualGroup } from './VisualGroup'
 import { VisualFunction } from './VisualFunction'
 import { VisualOperator } from './VisualOperator'
+import { VisualEquation } from './VisualEquation'
 import { VisualFraction } from './VisualFraction'
 import { VisualPower } from './VisualPower'
 import { VisualRoot } from './VisualRoot'
@@ -62,13 +63,22 @@ export class VisualFormulaMaker extends ExtendedObject {
 		if (this.algebra.parser.isOperator(symbol)) {
 			let child1 = tree[1][0]
 			let child2 = tree[1][1]
-			return new VisualOperator({
-				operator: symbol,
-				child1: this.treeToVisual(child1, location.concat([0])),
-				child2: this.treeToVisual(child2, location.concat([1])),
-				formulaTree: tree,
-				location: deepCopy(location)
-			})
+			if (symbol == '=') {
+				return new VisualEquation({
+					child1: this.treeToVisual(child1, location.concat([0])),
+					child2: this.treeToVisual(child2, location.concat([1])),
+					formulaTree: tree,
+					location: deepCopy(location)
+				})
+			} else {
+				return new VisualOperator({
+					operator: symbol,
+					child1: this.treeToVisual(child1, location.concat([0])),
+					child2: this.treeToVisual(child2, location.concat([1])),
+					formulaTree: tree,
+					location: deepCopy(location)
+				})
+			}
 		}
 		if (this.algebra.parser.isOpenParen((symbol))) {
 			let child = tree[1][0]

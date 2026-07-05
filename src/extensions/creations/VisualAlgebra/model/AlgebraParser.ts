@@ -29,13 +29,15 @@ export class AlgebraParser extends Parser {
 				'\\{': '\\}'
 			},
 			precedence: {
-				'+': 0,
-				'-': 0,
-				'\\cdot': 1,
-				'/': 1,
-				'^': 2
+				'=': 0,
+				'+': 1,
+				'-': 2,
+				'\\cdot': 2,
+				'/': 2,
+				'^': 4
 			},
 			operators: [
+				'=',
 				'+',
 				'-',
 				'\\cdot',
@@ -195,6 +197,7 @@ export class AlgebraParser extends Parser {
 
 	stringToTree(texString: string): SentenceTree | null {
 		let tree = this.sentenceToTree(this.language.lexer.stringToSentence(texString))
+		log(tree)
 		return tree
 	}
 
