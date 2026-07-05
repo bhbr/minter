@@ -8,11 +8,20 @@ import { SentenceTree, SubtreeLocation } from '../model/SentenceTypes'
 import { VisualSymbol } from './VisualSymbol'
 import { VisualCalculation } from './VisualCalculation'
 import { conditionTrigger } from 'core/functions/various'
-import { FORMULA_BACKGROUND_COLOR, FORMULA_BORDER_COLOR, FORMULA_HIGHLIGHT_BACKGROUND_COLOR, FORMULA_HIGHLIGHT_BORDER_COLOR } from './constants'
+import {
+	FORMULA_BACKGROUND_COLOR,
+	FORMULA_BORDER_COLOR,
+	FORMULA_BORDER_WIDTH,
+	FORMULA_BORDER_RADIUS,
+	FORMULA_HIGHLIGHT_BACKGROUND_COLORS,
+	FORMULA_HIGHLIGHT_BORDER_COLORS,
+	FORMULA_HIGHLIGHT_BORDER_WIDTH,
+} from './constants'
 
 export class VisualFormula extends Mobject {
 
-	highlightedSubformula: VisualFormula | null
+	subformulas: Array<VisualFormula>
+	selectedSubformula: VisualFormula | null
 	rootFormula: VisualFormula | null
 	formulaTree: SentenceTree
 	calculation: VisualCalculation | null
@@ -20,12 +29,13 @@ export class VisualFormula extends Mobject {
 
 	defaults(): object {
 		return {
-			borderWidth: 1,
+			subformulas: [],
+			borderWidth: FORMULA_BORDER_WIDTH,
 			borderColor: FORMULA_BORDER_COLOR,
-			borderRadius: 15,
+			borderRadius: FORMULA_BORDER_RADIUS,
 			backgroundColor: FORMULA_BACKGROUND_COLOR,
 			screenEventHandler: ScreenEventHandler.Self,
- 			highlightedSubformula: null,
+ 			selectedSubformula: null,
  			rootFormula: null,
  			formulaTree: [],
  			location: [],
@@ -76,42 +86,60 @@ export class VisualFormula extends Mobject {
 		})
 	}
 
-	onPointerUp(e: ScreenEvent) {
-		if (this.rootFormula.highlightedSubformula) {
-			this.rootFormula.unhighlight(this.rootFormula.highlightedSubformula)
+	onTap(e: ScreenEvent) {
+		if (this.rootFormula.selectedSubformula == this) {
+			this.rootFormula.deselect(this.rootFormula.selectedSubformula)
+			return
 		}
-		this.rootFormula.toggleHighlight(this)
+		if (this.rootFormula.selectedSubformula) {
+			this.rootFormula.deselect(this.rootFormula.selectedSubformula)
+		}
+		this.rootFormula.toggleSelection(this)
 	}
 
-	toggleHighlight(f: VisualFormula) {
-		if (this.highlightedSubformula === null) {
-			this.highlight(f)
-		} else if (this.highlightedSubformula === f) {
-			this.unhighlight(f)
+	toggleSelection(f: VisualFormula) {
+		if (this.rootFormula.selectedSubformula === null) {
+			this.select(f)
+		} else if (this.rootFormula.selectedSubformula === f) {
+			this.deselect(f)
 		} else {
-			this.unhighlight(this.highlightedSubformula)
-			this.highlight(f)
+			this.deselect(this.rootFormula.selectedSubformula)
+			this.select(f)
 		}
 	}
 
-	highlight(f: VisualFormula) {
-		this.highlightedSubformula = f
-		f.update({
-			backgroundColor: FORMULA_HIGHLIGHT_BACKGROUND_COLOR,
-			borderColor: FORMULA_HIGHLIGHT_BORDER_COLOR
+	highlightBackgroundColor(): Color {
+		if (this.calculation) {
+			return this.calculation.highlightBackgroundColor()
+		} else {
+			return FORMULA_HIGHLIGHT_BACKGROUND_COLORS[0]
+		}
+	}
+
+	highlightBorderColor(): Color {
+		if (this.calculation) {
+			return this.calculation.highlightBorderColor()
+		} else {
+			return FORMULA_HIGHLIGHT_BORDER_COLORS[0]
+		}
+	}
+
+	select(f: VisualFormula) {
+		this.update({
+			selectedSubformula: f
 		})
+		f.highlightBackground()
 		f.updateContent()
 		if (this.calculation) {
 			this.calculation.showPopover(f)
 		}
 	}
 
-	unhighlight(f: VisualFormula) {
-		this.highlightedSubformula = null
-		f.update({
-			backgroundColor: FORMULA_BACKGROUND_COLOR,
-			borderColor: FORMULA_BORDER_COLOR
+	deselect(f: VisualFormula) {
+		this.update({
+			selectedSubformula: null
 		})
+		f.unhighlightBackground()
 		if (this.calculation) {
 			if (this.calculation.popover) {
 				f.remove(this.calculation.popover)
@@ -123,16 +151,64 @@ export class VisualFormula extends Mobject {
 		let i = message['pick'] as number
 		let newTree = this.rootFormula.calculation.algebra.replaceSubtreeInTree(
 			this.rootFormula.formulaTree,
-			this.rootFormula.highlightedSubformula.formulaTree,
+			this.rootFormula.selectedSubformula.formulaTree,
 			this.rootFormula.calculation.popover.formulas[i].formulaTree
 		)
-		this.rootFormula.unhighlight(this.rootFormula.highlightedSubformula)
+
+		this.rootFormula.selectedSubformula.highlightBackground()
+
 		let newFormula = this.rootFormula.calculation.maker.treeToVisual(newTree)
 		this.rootFormula.calculation.addFormula(newFormula)
 		this.rootFormula.calculation.update({
 			popover: null
 		})
+
+		let transformedSubformula = newFormula.subformulaAtLocation(this.location)
+		transformedSubformula.highlightBorder()
+
+		if (this.rootFormula.calculation) {
+			this.rootFormula.calculation.update({
+				highlightColorIndex: (this.rootFormula.calculation.highlightColorIndex + 1) % 4
+			})
+		}
 	}
+
+	subformulaAtLocation(location: Array<number>): VisualFormula {
+		var f = this as VisualFormula
+		for (let index of location) {
+			f = f.subformulas[index]
+		}
+		return f
+	}
+
+	highlightBorder() {
+		this.update({
+			borderColor: FORMULA_HIGHLIGHT_BORDER_COLORS[this.rootFormula.calculation.highlightColorIndex],
+			borderWidth: FORMULA_HIGHLIGHT_BORDER_WIDTH
+		})
+	}
+
+	unhighlightBorder() {
+		this.update({
+			borderColor: FORMULA_BORDER_COLOR,
+			borderWidth: FORMULA_BORDER_WIDTH,
+		})
+	}
+
+	highlightBackground() {
+		this.update({
+			backgroundColor: FORMULA_HIGHLIGHT_BACKGROUND_COLORS[this.rootFormula.calculation.highlightColorIndex]
+		})
+	}
+
+	unhighlightBackground() {
+		this.update({
+			backgroundColor: FORMULA_BACKGROUND_COLOR
+		})
+	}
+
+
+
 
 
 }

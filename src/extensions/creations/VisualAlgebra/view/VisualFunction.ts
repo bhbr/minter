@@ -54,6 +54,9 @@ export class VisualFunction extends VisualFormula {
 		super.setup()
 		this.add(this.symbol)
 		this.add(this.child)
+		this.update({
+			subformulas: [this.child]
+		})
 	}
 
 	updateContent() {

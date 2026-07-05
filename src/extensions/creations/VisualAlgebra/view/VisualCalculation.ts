@@ -15,6 +15,7 @@ import { Algebra } from '../model/Algebra'
 import { remove } from 'core/functions/arrays'
 import { conditionTrigger } from 'core/functions/various'
 import { VisualFormulaPopover } from './VisualFormulaPopover'
+import { FORMULA_BACKGROUND_COLOR, FORMULA_BORDER_COLOR, FORMULA_HIGHLIGHT_BACKGROUND_COLORS, FORMULA_HIGHLIGHT_BORDER_COLORS } from './constants'
 
 declare var MathQuill: any
 
@@ -28,6 +29,7 @@ export class VisualCalculation extends Linkable {
  	algebra: Algebra
  	popover: VisualFormulaPopover | null
  	maker: VisualFormulaMaker
+ 	highlightColorIndex: number
 
  	defaults(): object {
 		return {
@@ -41,7 +43,8 @@ export class VisualCalculation extends Linkable {
 			formulas: [],
 			algebra: new Algebra(),
 			popover: null,
-			maker: new VisualFormulaMaker()
+			maker: new VisualFormulaMaker(),
+			highlightColorIndex: 0
 		}
 	}
 
@@ -88,10 +91,23 @@ export class VisualCalculation extends Linkable {
 		if (formula) {
 			this.addFormula(formula)
 			this.remove(this.inputFieldWrapper)
+		} else {
+			this.inputField.focus()
 		}
 	}
 
+	lastFormula(): VisualFormula | null {
+		if (this.formulas.length == 0) {
+			return null
+		}
+		return this.formulas[this.formulas.length - 1]
+	}
+
 	addFormula(formula: VisualFormula) {
+		if (this.lastFormula()) {
+			this.lastFormula().disable()
+			this.lastFormula().disableSubmobs()
+		}
 		this.formulas.push(formula)
 		formula.update({
 			calculation: this,
@@ -172,6 +188,13 @@ export class VisualCalculation extends Linkable {
 		subformula.add(this.popover)
 	}
 
+	highlightBackgroundColor(): Color {
+		return FORMULA_HIGHLIGHT_BACKGROUND_COLORS[this.highlightColorIndex]
+	}
+
+	highlightBorderColor(): Color {
+		return FORMULA_HIGHLIGHT_BORDER_COLORS[this.highlightColorIndex]
+	}
 
 
 }

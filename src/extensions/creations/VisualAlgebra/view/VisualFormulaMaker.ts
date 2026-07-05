@@ -90,6 +90,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 				parser: this.algebra.parser
 			})
 		}
+		return null
 	}
 
 	sentenceToVisual(sentence: Sentence): VisualFormula | null {

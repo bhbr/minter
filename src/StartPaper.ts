@@ -36,7 +36,7 @@ export class StartPaper extends DemoPaper {
 		let calc = new VisualCalculation({
 			anchor: [100, 100]
 		})
-		this.addToContent(calc)
+		this.add(calc)
 	}
 
 }

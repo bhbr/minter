@@ -50,6 +50,9 @@ export class VisualOperator extends VisualFormula {
 		this.add(this.operatorSymbol)
 		this.add(this.child1)
 		this.add(this.child2)
+		this.update({
+			subformulas: [this.child1, this.child2]
+		})
 		this.child1.update({
 			rootFormula: this.rootFormula
 		})

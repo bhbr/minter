@@ -4,6 +4,7 @@ import { VisualFormula } from './VisualFormula'
 import { FORMULA_PADDING } from './constants'
 import { getPaper } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
+import { Color } from 'core/classes/Color'
 
 export class VisualVariable extends VisualFormula {
 
@@ -13,13 +14,16 @@ export class VisualVariable extends VisualFormula {
 	defaults(): object {
 		return {
 			name: 'x',
-			symbol: null
+			symbol: null,
+			borderWidth: 0,
+			backgroundColor: Color.clear()
 		}
 	}
 
 	setup() {
 		this.symbol = new VisualSymbol({ texString: this.name })
 		this.add(this.symbol)
+		this.disable()
 		super.setup()
 	}
 

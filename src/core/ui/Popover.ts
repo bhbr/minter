@@ -22,7 +22,7 @@ export class Popover extends CurvedShape {
 		return {
 			rootMobject: null,
 			direction: 'bottom',
-			anchorOffset: -5,
+			anchorOffset: 0,
 			chevronSize: 10,
 			cornerRadius: 40,
 			fillColor: Color.black()
