@@ -57,6 +57,22 @@ export class Algebra extends FormalSystem {
 						'<expression-1>'
 					]],
 				] as Rule,
+				'additive_associativity': [
+					['+', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['+', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]]
+					]],
+				] as Rule,
 				'multiplicative_commutativity': [
 					['\\cdot', [
 						'<expression-1>',
@@ -245,7 +261,18 @@ export class Algebra extends FormalSystem {
 							'<expression-2>'
 						]]
 					]]
-				] as Rule
+				] as Rule,
+				'cancel_plus_and_minus_in_sum': [
+					['-', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-2>'
+					]],
+					'<expression-1>'
+				] as Rule,
+				
 			}
 		}
 	}

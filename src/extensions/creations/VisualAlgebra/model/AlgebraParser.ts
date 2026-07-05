@@ -29,12 +29,12 @@ export class AlgebraParser extends Parser {
 				'\\{': '\\}'
 			},
 			precedence: {
-				'=': 0,
-				'+': 1,
-				'-': 2,
-				'\\cdot': 2,
-				'/': 2,
-				'^': 4
+				'^': 0,
+				'-': 1,
+				'\\cdot': 1,
+				'/': 1,
+				'+': 2,
+				'=': 3,
 			},
 			operators: [
 				'=',
@@ -117,7 +117,7 @@ export class AlgebraParser extends Parser {
 
 	outermostOperatorIndex(tokens: Array<string>): number {
 		let allOps = this.outermostOperatorsByIndex(tokens)
-		let indices = Object.keys(allOps).map((x) => Number(x)).sort().reverse().map((x) => `${x}`)
+		let indices = Object.keys(allOps).map((x) => Number(x)).sort().map((x) => `${x}`)
 		var op: string | null = null
 		var index: number = NaN
 		for (let i of indices) {
