@@ -43,27 +43,28 @@ export class VisualFraction extends VisualOperator {
 	}
 
 	updateContent() {
+		super.updateContent()
+
 		let barWidth = Math.max(this.numerator.getWidth(), this.denominator.getWidth()) + 2 * FORMULA_PADDING
 		this.numerator.update({
 			anchor: [
-				0.5 * (barWidth - this.numerator.getWidth()) + FORMULA_PADDING,
+				0.5 * (barWidth - this.numerator.getWidth()),
 				FORMULA_PADDING
 			]
 		})
 		this.fractionBar.update({
-			startPoint: [FORMULA_PADDING, this.numerator.getHeight() + FORMULA_PADDING],
-			endPoint: [this.getWidth() - FORMULA_PADDING, this.numerator.getHeight() + FORMULA_PADDING]
+			startPoint: [FORMULA_PADDING, this.numerator.getHeight() + 2 * FORMULA_PADDING],
+			endPoint: [this.getWidth() - FORMULA_PADDING, this.numerator.getHeight() + 2 * FORMULA_PADDING]
 		})
 		this.denominator.update({
 			anchor: [
-				0.5 * (barWidth - this.denominator.getWidth()) + FORMULA_PADDING,
-				this.numerator.getHeight() + 2 * FORMULA_PADDING
+				0.5 * (barWidth - this.denominator.getWidth()),
+				this.numerator.getHeight() + 3 * FORMULA_PADDING
 			]
 		})
 		this.numerator.updateContent()
 		this.denominator.updateContent()
 		
-		super.updateContent()
 	}
 
 	getWidth(): number {
