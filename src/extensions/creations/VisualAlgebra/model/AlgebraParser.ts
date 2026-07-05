@@ -1,7 +1,7 @@
 
 import { Parser } from './Parser'
 import { AlgebraLexer } from './AlgebraLexer'
-import { SentenceTree, TerminalSymbol } from './SentenceTypes'
+import { Sentence, SentenceTree, TerminalSymbol } from './SentenceTypes'
 import { log } from 'core/functions/logging'
 import { Algebra } from './Algebra'
 
@@ -132,7 +132,10 @@ export class AlgebraParser extends Parser {
 		return index
 	}
 
-	sentenceToTree(sentence: Array<string>): SentenceTree | null {
+	sentenceToTree(sentence: Sentence | null): SentenceTree | null {
+		if (sentence === null) {
+			return null
+		}
 		if (sentence.length == 1) {
 			let token = sentence[0]
 			if (this.language.lexer.isNumber(token)

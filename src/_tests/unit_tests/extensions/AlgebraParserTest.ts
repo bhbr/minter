@@ -126,14 +126,14 @@ export const AlgebraParserTest = new BundledTest({
 			function: function(): SentenceTree {
 				return algebra.parser.parse('\\sin\\sqrt{1+2}')
 			},
-			value: ['\\sin', [['\\sqrt', [['+', [[['1', []], ['2', []]]]]]]]]
+			value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
 		}),
 		new ValueTest({
 			name: 'Parsing \\sin \\sqrt{1 + 2}',
 			function: function(): SentenceTree {
 				return algebra.parser.parse('\\sin \\sqrt{1 + 2}')
 			},
-			value: ['\\sin', [['\\sqrt', [['+', [[['1', []], ['2', []]]]]]]]]
+			value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
 		}),
 		// new ValueTest({
 		// 	name: 'Parsing \\frac {\\sqrt[3] {5}} {\\log_2 ( x + 1 ) }',
