@@ -163,10 +163,6 @@ export class VisualCalculation extends Linkable {
 			formulas: possibleFormulas
 		})
 		subformula.add(this.popover)
-		log(subformula)
-		log(subformula.location)
-		log(this.popover)
-		log(this)
 	}
 
 

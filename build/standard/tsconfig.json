@@ -14,14 +14,12 @@
         "paths": {
             "core/*": ["./core/*"],
             "extensions/*": ["./extensions/*"],
-            "_tests/*": ["./_tests/*"],
-            "mathjs/*": ["./mathjs/*"]
+            "_tests/*": ["./_tests/*"]
         }
     },
     "include": [
         "../../src/core/*",
         "../../src/extensions/*",
-        "../../src/_tests/*",
-        "../../src/mathjs/*",
+        "../../src/_tests/*"
     ]
 }

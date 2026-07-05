@@ -92,7 +92,20 @@ export function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 	return true
 }
 
-
+export function replaceAll(arr: Array<any>, oldValue: any, newValue: any) {
+	for (let i = 0; i < arr.length; i++) {
+		let entry = arr[i]
+		if (entry === oldValue) {
+			arr[i] = newValue
+			continue
+		}
+		if (entry instanceof Array && oldValue instanceof Array) {
+			if (equalArrays(entry, oldValue)) {
+				arr[i] = newValue
+			}
+		}
+	}
+}
 
 
 

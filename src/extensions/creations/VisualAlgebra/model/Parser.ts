@@ -13,11 +13,18 @@ export class Parser extends ExtendedObject {
 		}
 	}
 
-	parse(sent: Sentence): SentenceTree | null {
-		return this.sentenceToTree(sent)
+	parse(s: Sentence | string): SentenceTree | null {
+		if (typeof s == 'string') {
+			let sentence = this.language.lexer.lex(s)
+			let tree = this.sentenceToTree(sentence)
+			return tree
+		} else {
+			let tree = this.sentenceToTree(s)
+			return tree
+		}
 	}
 
-	sentenceToTree(sent: Sentence): SentenceTree {
+	sentenceToTree(sent: Sentence): SentenceTree | null {
 		// default implementation: Polish notation
 		return this.polishToTree(sent)
 	}
@@ -27,7 +34,7 @@ export class Parser extends ExtendedObject {
 		return this.treeToPolish(tree)
 	}
 
-	polishToTree(sentence: Sentence): SentenceTree {
+	polishToTree(sentence: Sentence): SentenceTree | null {
 		if (sentence.length == 0) {
 			throw `Parsing failed because of empty lexed string`;
 		}

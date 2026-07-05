@@ -1,7 +1,7 @@
 
 import { Parser } from './Parser'
 import { AlgebraLexer } from './AlgebraLexer'
-import { SentenceTree } from './SentenceTypes'
+import { SentenceTree, TerminalSymbol } from './SentenceTypes'
 import { log } from 'core/functions/logging'
 import { Algebra } from './Algebra'
 
@@ -32,7 +32,6 @@ export class AlgebraParser extends Parser {
 				'+': 0,
 				'-': 0,
 				'\\cdot': 1,
-				'*': 1,
 				'/': 1,
 				'^': 2
 			},
@@ -40,10 +39,9 @@ export class AlgebraParser extends Parser {
 				'+',
 				'-',
 				'\\cdot',
-				'*',
 				'/',
 				'^'
-		]
+			]
 		}
 	}
 	
@@ -137,10 +135,10 @@ export class AlgebraParser extends Parser {
 	sentenceToTree(sentence: Array<string>): SentenceTree | null {
 		if (sentence.length == 1) {
 			let token = sentence[0]
-			if (this.language.isNumber(token)) {
-				return [token, []]
-			} else if (this.language.lexer.isLetter(token)) {
-				return [token, []]
+			if (this.language.lexer.isNumber(token)
+				|| this.language.lexer.isLetter(token)) {
+				let tree = [token as TerminalSymbol, [] as Array<SentenceTree>] as SentenceTree
+				return tree
 			} else {
 				return null
 			}
@@ -148,7 +146,7 @@ export class AlgebraParser extends Parser {
 			let i = this.outermostOperatorIndex(sentence)
 			if (isNaN(i)) {
 
-				// if cannot be split into infix groups
+				// if sentence cannot be split into infix groups
 				let firstToken = sentence[0]
 				if (this.language.lexer.isFunctionToken(firstToken)) {
 					let remainingTokens = sentence.slice(1)
@@ -156,9 +154,10 @@ export class AlgebraParser extends Parser {
 					if (childNode == null) {
 						return null
 					}
-					return [firstToken, [childNode]]
+					let tree = [firstToken, [childNode]] as SentenceTree
+					return tree
 				} else if (this.isGroup(sentence)) {
-					return [sentence[0], [this.sentenceToTree(sentence.slice(1, sentence.length - 1))]]
+					return this.sentenceToTree(sentence.slice(1, sentence.length - 1))
 				} else if (firstToken == '\\frac') {
 					let remainingTokens = sentence.slice(1)
 					let numeratorGroup = this.leadingTokenGroup(remainingTokens, '{')
@@ -166,10 +165,11 @@ export class AlgebraParser extends Parser {
 					if (!this.isGroup(numeratorGroup) || !this.isGroup(denominatorGroup)) {
 						return null
 					}
-					return ['\\frac', [
+					let tree = ['\\frac', [
 						this.sentenceToTree(numeratorGroup),
 						this.sentenceToTree(denominatorGroup)
-					]]
+					]] as SentenceTree
+					return tree
 				}
 
 			} else {
@@ -179,18 +179,20 @@ export class AlgebraParser extends Parser {
 				let rightGroup = sentence.slice(i + 1)
 				let child1 = this.sentenceToTree(leftGroup)
 				let child2 = this.sentenceToTree(rightGroup)
-				return [operator, [
+				let tree = [operator, [
 					child1,
 					child2
-				]]
+				]] as SentenceTree
+				return tree
 			}
 		}
 		return null
 
 	}
 
-	stringToTree(texString: string): SentenceTree {
-		return this.sentenceToTree(this.language.lexer.stringToSentence(texString.replaceAll('\\cdot', '*')))
+	stringToTree(texString: string): SentenceTree | null {
+		let tree = this.sentenceToTree(this.language.lexer.stringToSentence(texString))
+		return tree
 	}
 
 }

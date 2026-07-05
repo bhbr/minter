@@ -1,7 +1,7 @@
 
 import { Sentence } from './SentenceTypes'
 import { log } from 'core/functions/logging'
-import { removeAll } from 'core/functions/arrays'
+import { removeAll, replaceAll } from 'core/functions/arrays'
 import { Lexer } from './Lexer'
 
 export class AlgebraLexer extends Lexer {
@@ -63,7 +63,14 @@ export class AlgebraLexer extends Lexer {
 		return this.functionTokens.includes(token)
 	}
 
-	stringToSentence(texString: string): Sentence {
+	isCommand(token: string): boolean {
+		return this.functionTokens.includes(token)
+			|| this.tokensToIgnore.includes(token)
+			|| token == '\\frac'
+			|| token == '\\cdot'
+	}
+
+	stringToSentence(texString: string): Sentence | null {
 		let sentence: Array<string> = []
 		var currentToken = ''
 		var currentTokenType: string | null = null
@@ -88,7 +95,7 @@ export class AlgebraLexer extends Lexer {
 					if (!isNaN(Number(currentToken + char))) {
 						currentToken += char
 					} else if (char == '.') {
-						throw 'lexing error'
+						return null
 					} else {
 						sentence.push(currentToken)
 						currentTokenType = null
@@ -99,6 +106,11 @@ export class AlgebraLexer extends Lexer {
 					currentTokenType = null
 					sentence.push(currentToken)
 					currentToken = ''
+					continue
+				} else if (char == '\\') {
+					currentTokenType = 'command'
+					sentence.push(currentToken)
+					currentToken = char
 					continue
 				} else {
 					currentTokenType = null
@@ -135,6 +147,14 @@ export class AlgebraLexer extends Lexer {
 		for (let token of this.tokensToIgnore) {
 			removeAll(sentence, token)
 		}
+		for (let token of sentence) {
+			if (token[0] == '\\') {
+				if (!this.isCommand(token)) {
+					return null
+				}
+			}
+		}
+		replaceAll(sentence, '*', '\\cdot')
 		return sentence
 
 	}
