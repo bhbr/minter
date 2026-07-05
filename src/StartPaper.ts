@@ -18,8 +18,9 @@ import { Color } from './core/classes/Color'
 import { Algebra } from './extensions/creations/VisualAlgebra/model/Algebra'
 import { SentenceTree } from './extensions/creations/VisualAlgebra/model/SentenceTypes'
 import { MGroup } from './core/mobjects/MGroup'
-import { ArrayTest } from './_tests/unit_tests/core/functions/ArrayTest'
+import { EqualityTest } from './_tests/unit_tests/core/functions/EqualityTest'
 import { TestTest } from './_tests/TestTests'
+import { AlgebraTest } from './_tests/unit_tests/extensions/AlgebraTest'
 
 export class StartPaper extends DemoPaper {
 
@@ -41,9 +42,10 @@ export class StartPaper extends DemoPaper {
 }
 
 //TestTest.run()
-AlgebraLexerTest.run()
-AlgebraParserTest.run()
-//ArrayTest.run()
+//EqualityTest.run()
+//AlgebraLexerTest.run()
+//AlgebraParserTest.run()
+AlgebraTest.run()
 
 export const paper = new StartPaper()
 

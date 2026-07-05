@@ -1,6 +1,7 @@
 
 import { log } from 'core/functions/logging'
 import { equalArrays } from 'core/functions/arrays'
+import { equalObjects } from 'core/functions/copying'
 
 class Test {
 
@@ -95,8 +96,10 @@ export class ValueTest extends ConditionTest {
 		super(args)
 		this.expectedResult = args['value']
 		this.condition = (x: any) => {
-			if (x instanceof Array) {
+			if (x instanceof Array && this.expectedResult instanceof Array) {
 				return equalArrays(x, this.expectedResult)
+			} else if (typeof x == 'object' && typeof this.expectedResult == 'object') {
+				return equalObjects(x, this.expectedResult)
 			} else {
 				return x === this.expectedResult
 			}

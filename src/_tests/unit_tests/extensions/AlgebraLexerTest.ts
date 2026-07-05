@@ -127,6 +127,13 @@ export const AlgebraLexerTest = new BundledTest({
 			value: null
 		}),
 		new ValueTest({
+			name: 'Lexing \\sin2 (=> null)',
+			function: function(): Array<string> {
+				return lexer.lex('\\sin2')
+			},
+			value: null
+		}),
+		new ValueTest({
 			name: 'Lexing \\sin\\sqrt{1+2}',
 			function: function(): Array<string> {
 				return lexer.lex('\\sin\\sqrt{1+2}')

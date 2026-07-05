@@ -70,11 +70,20 @@ export class AlgebraLexer extends Lexer {
 			|| token == '\\cdot'
 	}
 
+	cleanTeXString(texString: string): string {
+		// MathQuill does not properly separate digits from preceding commands, e. g. "\\cdot2"
+		// This method inserts spaces
+		var cleanedString = texString
+		cleanedString = cleanedString.replaceAll('\\cdot', '\\cdot ')
+		return cleanedString
+	}
+
 	stringToSentence(texString: string): Sentence | null {
+		let cleanedTeXString = this.cleanTeXString(texString)
 		let sentence: Array<string> = []
 		var currentToken = ''
 		var currentTokenType: string | null = null
-		for (let char of texString) {
+		for (let char of cleanedTeXString) {
 			if (currentTokenType == null) {
 				currentToken = char
 				if (this.isDigit(char)) {
