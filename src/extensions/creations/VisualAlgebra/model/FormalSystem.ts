@@ -26,12 +26,6 @@ export class FormalSystem extends FormalLanguage {
 		return newTree as SentenceTree
 	}
 
-	applyRuleToSubtreeInTree(ruleName: string, subtree: SentenceTree, tree: SentenceTree): SentenceTree | null {
-		if (subtree === tree) {
-			return this.applyRuleToTree(ruleName, tree)
-		}
-	}
-
 	applicableRules(tree: SentenceTree): Record<string, Rule> {
 		let result: Record<string, Rule> = {}
 		for (let [name, rule] of Object.entries(this.inferenceRules)) {

@@ -16,7 +16,7 @@ import { Popover } from './core/ui/Popover'
 import { Rectangle } from './core/shapes/Rectangle'
 import { Color } from './core/classes/Color'
 import { Algebra } from './extensions/creations/VisualAlgebra/model/Algebra'
-import { SentenceTree } from './extensions/creations/VisualAlgebra/model/SentenceTypes'
+import { SentenceTree, SentenceTreeForm } from './extensions/creations/VisualAlgebra/model/SentenceTypes'
 import { MGroup } from './core/mobjects/MGroup'
 import { EqualityTest } from './_tests/unit_tests/core/functions/EqualityTest'
 import { TestTest } from './_tests/TestTests'
@@ -37,6 +37,15 @@ export class StartPaper extends DemoPaper {
 			anchor: [100, 100]
 		})
 		this.addToContent(calc)
+
+		let tree = ['=', [['x', []], ['y', []]]] as SentenceTree
+		log(calc.algebra.nonterminal(tree))
+		let form = '<equation-1>' as SentenceTreeForm
+		log(calc.algebra.nonterminal(form))
+		let rec = calc.algebra.matchSentenceTreeForm(form, tree)
+		log(rec)
+		let tree2 = calc.algebra.applyRuleToTree('swap_equation_sides', tree)
+		log(tree2)
 	}
 
 }
@@ -45,7 +54,7 @@ export class StartPaper extends DemoPaper {
 //EqualityTest.run()
 //AlgebraLexerTest.run()
 //AlgebraParserTest.run()
-AlgebraTest.run()
+//AlgebraTest.run()
 
 export const paper = new StartPaper()
 

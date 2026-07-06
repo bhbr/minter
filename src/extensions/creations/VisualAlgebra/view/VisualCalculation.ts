@@ -111,7 +111,7 @@ export class VisualCalculation extends Linkable {
 		this.formulas.push(formula)
 		formula.update({
 			calculation: this,
-			anchor: [0, 100 * this.formulas.length]
+			anchor: [0, 125 * this.formulas.length]
 		})
 		this.add(formula)
 	}

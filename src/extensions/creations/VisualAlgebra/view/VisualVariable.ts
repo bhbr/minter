@@ -23,7 +23,7 @@ export class VisualVariable extends VisualFormula {
 	setup() {
 		this.symbol = new VisualSymbol({ texString: this.name })
 		this.add(this.symbol)
-		this.disable()
+		//this.disable()
 		super.setup()
 	}
 

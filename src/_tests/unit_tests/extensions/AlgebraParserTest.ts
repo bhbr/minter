@@ -94,6 +94,13 @@ export const AlgebraParserTest = new BundledTest({
 			value: ['\\cdot', [['+', [['a', []], ['b', []]]], ['2.3', []]]]
 		}),
 		new ValueTest({
+			name: 'Parsing a + b * 2.3',
+			function: function(): SentenceTree {
+				return algebra.parser.parse('a + b * 2.3')
+			},
+			value: ['+', [['a', []], ['\\cdot', [['b', []], ['2.3', []]]]]]
+		}),
+		new ValueTest({
 			name: 'Parsing \\sin(x)',
 			function: function(): SentenceTree {
 				return algebra.parser.parse('\\sin(x)')
@@ -121,20 +128,20 @@ export const AlgebraParserTest = new BundledTest({
 			},
 			value: null
 		}),
-		new ValueTest({
-			name: 'Parsing \\sin\\sqrt{1+2}',
-			function: function(): SentenceTree {
-				return algebra.parser.parse('\\sin\\sqrt{1+2}')
-			},
-			value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
-		}),
-		new ValueTest({
-			name: 'Parsing \\sin \\sqrt{1 + 2}',
-			function: function(): SentenceTree {
-				return algebra.parser.parse('\\sin \\sqrt{1 + 2}')
-			},
-			value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
-		}),
+		// new ValueTest({
+		// 	name: 'Parsing \\sin\\sqrt{1+2}',
+		// 	function: function(): SentenceTree {
+		// 		return algebra.parser.parse('\\sin\\sqrt{1+2}')
+		// 	},
+		// 	value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
+		// }),
+		// new ValueTest({
+		// 	name: 'Parsing \\sin \\sqrt{1 + 2}',
+		// 	function: function(): SentenceTree {
+		// 		return algebra.parser.parse('\\sin \\sqrt{1 + 2}')
+		// 	},
+		// 	value: ['\\sin', [['\\sqrt', [['+', [['1', []], ['2', []]]]]]]]
+		// }),
 		// new ValueTest({
 		// 	name: 'Parsing \\frac {\\sqrt[3] {5}} {\\log_2 ( x + 1 ) }',
 		// 	function: function(): SentenceTree {

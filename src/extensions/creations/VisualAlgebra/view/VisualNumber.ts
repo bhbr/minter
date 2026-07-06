@@ -22,7 +22,7 @@ export class VisualNumber extends VisualFormula {
 	setup() {
 		this.symbol = new VisualSymbol({ texString: `${this.value}` })
 		this.add(this.symbol)
-		this.disable()
+		//this.disable()
 		super.setup()
 	}
 

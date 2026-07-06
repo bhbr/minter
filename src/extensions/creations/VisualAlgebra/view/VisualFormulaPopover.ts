@@ -33,7 +33,7 @@ export class VisualFormulaPopover extends Popover {
 		var newHeight = 0
 		for (let f of this.formulas) {
 			newWidth = Math.max(newWidth, f.getWidth())
-			newHeight += f.getHeight()
+			newHeight += f.getHeight() + 20
 			for (let submob of f.submobs) {
 				submob.disable()
 			}
@@ -52,7 +52,7 @@ export class VisualFormulaPopover extends Popover {
 				anchor: [anchorX, anchorY]
 			})
 			this.add(f)
-			anchorY += f.frameHeight + 50
+			anchorY += f.frameHeight + 20
 		}
 	}
 

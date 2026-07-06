@@ -49,6 +49,15 @@ export class FormalLanguage extends ExtendedObject {
 		return flag
 	}
 
+	isSubsetNonterminal(symbol1: NonterminalSymbol, symbol2: NonterminalSymbol): boolean {
+		for (let rule of Object.values(this.syntaxRules)) {
+			if (rule[0] == symbol2 && rule[1] == symbol1) {
+				return true
+			}
+		}
+		return false
+	}
+
 	isNonterminalVariableSymbol(x: any): boolean {
 		if (typeof x !== 'string') { return false }
 		let y = x as string
@@ -104,6 +113,19 @@ export class FormalLanguage extends ExtendedObject {
 	// 	}
 	// }
 
+	nonterminal(form: SentenceTreeForm): NonterminalSymbol | null {
+		if (typeof form == 'string') {
+			let leftPart = form.split('-')[0]
+			return (leftPart + '>') as NonterminalSymbol
+		}
+		for (let [name, content] of Object.values(this.syntaxRules)) {
+			if (form[0] == content[0]) {
+				return name
+			}
+		}
+		return null
+	}
+
 	matchSentenceTreeForm(
 		form: SentenceTreeForm,
 		tree: SentenceTree,
@@ -114,7 +136,17 @@ export class FormalLanguage extends ExtendedObject {
 		// a dictionary of what subtrees have been matched
 		// to the variables:
 		// { '<a>': subtree1, '<b>': subtree2, ... }
+		if (equalArrays(tree, form as Array<any>)) {
+			return record
+		}
 		if (record === null) { return null }
+
+		let name1 = this.nonterminal(form)
+		let name2 = this.nonterminal(tree)
+		if (name1 !== name2 && !this.isSubsetNonterminal(name2, name1)) {
+			return null
+		}
+
 		if (this.isNonterminalVariableSymbol(form)) {
 			let existingMatch = record[form as NonterminalSymbol]
 			if (existingMatch === undefined) {
@@ -126,7 +158,8 @@ export class FormalLanguage extends ExtendedObject {
 				return null
 			}
 		}
-		
+
+
 		let formTopSymbol = (form as ComposedSentenceTreeForm)[0]
 		let treeTopSymbol = tree[0]
 		if (formTopSymbol !== treeTopSymbol) {

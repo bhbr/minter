@@ -69,6 +69,13 @@ export class VisualFormula extends Mobject {
 		if (args['formulaTree'] !== undefined) {
 			this.updateContent()
 		}
+		if (args['rootFormula'] !== undefined) {
+			for (let child of this.subformulas) {
+				child.update({
+					rootFormula: this.rootFormula
+				})
+			}
+		}
 	}
 
 	getWidth(): number {
@@ -109,16 +116,16 @@ export class VisualFormula extends Mobject {
 	}
 
 	highlightBackgroundColor(): Color {
-		if (this.calculation) {
-			return this.calculation.highlightBackgroundColor()
+		if (this.rootFormula.calculation) {
+			return this.rootFormula.calculation.highlightBackgroundColor()
 		} else {
 			return FORMULA_HIGHLIGHT_BACKGROUND_COLORS[0]
 		}
 	}
 
 	highlightBorderColor(): Color {
-		if (this.calculation) {
-			return this.calculation.highlightBorderColor()
+		if (this.rootFormula.calculation) {
+			return this.rootFormula.calculation.highlightBorderColor()
 		} else {
 			return FORMULA_HIGHLIGHT_BORDER_COLORS[0]
 		}
@@ -130,8 +137,8 @@ export class VisualFormula extends Mobject {
 		})
 		f.highlightBackground()
 		f.updateContent()
-		if (this.calculation) {
-			this.calculation.showPopover(f)
+		if (this.rootFormula.calculation) {
+			this.rootFormula.calculation.showPopover(f)
 		}
 	}
 
@@ -140,9 +147,9 @@ export class VisualFormula extends Mobject {
 			selectedSubformula: null
 		})
 		f.unhighlightBackground()
-		if (this.calculation) {
-			if (this.calculation.popover) {
-				f.remove(this.calculation.popover)
+		if (this.rootFormula.calculation) {
+			if (this.rootFormula.calculation.popover) {
+				f.remove(this.rootFormula.calculation.popover)
 			}
 		}
 	}
