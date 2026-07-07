@@ -167,7 +167,7 @@ export class FormalLanguage extends ExtendedObject {
 		}
 		let formArgs = (form as ComposedSentenceTreeForm)[1]
 		let treeArgs = tree[1]
-		for (let i = 0; i < tree.length; i++) {
+		for (let i = 0; i < treeArgs.length; i++) {
 			record = this.matchSentenceTreeForm(formArgs[i], treeArgs[i], record)
 		}
 		return record
