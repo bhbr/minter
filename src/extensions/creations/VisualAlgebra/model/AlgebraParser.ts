@@ -105,7 +105,7 @@ export class AlgebraParser extends Parser {
 		let allOuterOperatorsByIndex: Record<string, string> = {}
 		let leftGroup = this.leadingTokenGroup(tokens)
 		let rest = this.popLeadingTokenGroup(tokens)
-		if (this.isOperator(rest[0])) {
+		if (this.isOperator(rest[0]) && rest[0] !== '\\frac') {
 			allOuterOperatorsByIndex[`${leftGroup.length}`] = rest[0]
 			let newOps = this.outermostOperatorsByIndex(rest.slice(1))
 			for (let [index, op] of Object.entries(newOps)) {
@@ -160,6 +160,14 @@ export class AlgebraParser extends Parser {
 						return null
 					}
 					let tree = [firstToken, [childNode]] as SentenceTree
+					return tree
+				} else if (firstToken == '-') {
+					let remainingTokens = sentence.slice(1)
+					let childNode = this.sentenceToTree(remainingTokens)
+					if (childNode == null) {
+						return null
+					}
+					let tree = ['opp', [childNode]] as SentenceTree
 					return tree
 				} else if (this.isGroup(sentence)) {
 					return this.sentenceToTree(sentence.slice(1, sentence.length - 1))

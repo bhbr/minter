@@ -38,14 +38,11 @@ export class StartPaper extends DemoPaper {
 		})
 		this.addToContent(calc)
 
-		let tree = ['=', [['x', []], ['y', []]]] as SentenceTree
-		log(calc.algebra.nonterminal(tree))
-		let form = '<equation-1>' as SentenceTreeForm
-		log(calc.algebra.nonterminal(form))
-		let rec = calc.algebra.matchSentenceTreeForm(form, tree)
-		log(rec)
-		let tree2 = calc.algebra.applyRuleToTree('swap_equation_sides', tree)
-		log(tree2)
+		let texString = '\\sin\\frac{1}{4}'
+		let sentence = calc.algebra.lexer.lex(texString)
+		log(sentence)
+		let ops = calc.algebra.parser.outermostOperatorsByIndex(sentence)
+		log(ops)
 	}
 
 }

@@ -11,6 +11,7 @@ export class VisualFunction extends VisualFormula {
 	child: VisualFormula
 	static functionDict: Record<string, (number) => number> = {
 		'id': (x) => x,
+		'opp': (x) => -x,
 		'\\sqrt': Math.sqrt,
 		'\\log': Math.log,
 		'\\ln': Math.log,
@@ -68,7 +69,7 @@ export class VisualFunction extends VisualFormula {
 				FORMULA_PADDING,
 				FORMULA_PADDING + 0.5 * (maxHeight - this.symbol.getHeight())
 			],
-			texString: this.name
+			texString: (this.name == 'opp') ? '-' : this.name
 		})
 		this.child.update({
 			anchor: [

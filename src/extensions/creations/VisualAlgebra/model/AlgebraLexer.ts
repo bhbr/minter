@@ -12,6 +12,8 @@ export class AlgebraLexer extends Lexer {
 	defaults(): object {
 		return {
 			functionTokens: [
+				'opp',
+				'\\sqrt',
 				'\\sqrt',
 				'\\log',
 				'\\ln',

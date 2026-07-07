@@ -9,14 +9,14 @@ export const AlgebraLexerTest = new BundledTest({
 	subtests: [
 		new ValueTest({
 			name: 'Lexing 1.23',
-			function: function(): Array<string> {
+			function: function(): Array<string> | null {
 				return lexer.lex('1.23')
 			},
 			value: ['1.23']
 		}),
 		new ValueTest({
 			name: 'Lexing 1.2.3 (=> null)',
-			function: function(): Array<string> {
+			function: function(): Array<string> | null {
 				return lexer.lex('1.2.3')
 			},
 			value: null

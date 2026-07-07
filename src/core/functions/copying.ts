@@ -139,6 +139,9 @@ export function isInstance(obj: object, className: string): boolean {
 }
 
 export function equalObjects(obj1: object, obj2: object) {
+	if (obj1 === null && obj2 === null) {
+		return true
+	}
 	if (obj1 instanceof Array && obj2 instanceof Array) {
 		return equalArrays(obj1, obj2)
 	}

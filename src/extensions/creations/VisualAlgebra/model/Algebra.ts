@@ -41,7 +41,7 @@ export class Algebra extends FormalSystem {
 		return {
 			lexer: new AlgebraLexer(),
 			parser: new AlgebraParser(),
-			arities: { '+': 2, '-': 2, '\\cos': 1, '*': 2, '^': 2, '\\frac': 2, '\\sqrt': 1, '\\pi': 0, '=': 2 },
+			arities: { '+': 2, '-': 2, '\\cos': 1, '*': 2, '^': 2, '\\frac': 2, 'opp': 1, '\\sqrt': 1, '\\pi': 0, '=': 2 },
 			syntaxRules: {
 				equation: [
 					'<equation>', ['=', ['<expression>', '<expression>']]
@@ -60,6 +60,9 @@ export class Algebra extends FormalSystem {
 				],
 				power: [
 					'<expression>', ['^', ['<expression>', '<expression>']]
+				],
+				opposite: [
+					'<expression>', ['opp', ['<expression>']]
 				],
 				variable: [
 					'<expression>', '<variable>'
@@ -442,6 +445,307 @@ export class Algebra extends FormalSystem {
 								'<expression-3>'
 							]],
 						'<expression-2>'
+					]]
+				] as Rule,
+
+				// -(-a) = a
+				'cancel_double_opposites': [
+					['opp', [
+						['opp', [
+							'<expression-1>'
+						]]
+					]],
+					'<expression-1>'
+				] as Rule,
+
+				// -0 = 0
+				'zero_is_its_own_opposite': [
+					['opp', [
+						['0', []]
+					]],
+					['0', []]
+				] as Rule,
+
+				// -a = b => a = -b
+				'swap_sign_in_equation_1': [
+					['=',[
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>'
+					]],
+					['=',[
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// a = -b => -a = b
+				'swap_sign_in_equation_2': [
+					['=',[
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]],
+					]],
+					['=',[
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>',
+					]]
+				] as Rule,
+
+				// -a = -b => a = b
+				'cancel_signs_in_equation': [
+					['=', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
+					]],
+					['=',[
+						'<expression-1>',
+						'<expression-2>'
+					]]
+				] as Rule,
+
+				// a = b => -a = -b
+				'insert_signs_in_equation': [
+					['=',[
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['=', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// (-1) * a = -a
+				'multiplying_by_minus_one_is_opposite': [
+					['\\cdot', [
+						['opp', [
+							['1', []]
+						]],
+						'<expression-1>'
+					]],
+					['opp', [
+						'<expression-1>'
+					]]
+				] as Rule,
+
+				// (-1) * a = -a
+				'opposite_is_multiplying_by_minus_one': [
+					['opp', [
+						'<expression-1>'
+					]],
+					['\\cdot', [
+						['opp', [
+							['1', []]
+						]],
+						'<expression-1>'
+					]]
+				] as Rule,
+
+				// (-a) * b = -(a * b)
+				'sign_product_rule_1': [
+					['\\cdot', [
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>'
+					]],
+					['opp', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// -(a * b) = (-a) * b
+				'sign_product_rule_2': [
+					['opp', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]],
+					['\\cdot', [
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>'
+					]]
+				] as Rule,
+
+				// a * (-b) = -(a * b)
+				'sign_product_rule_3': [
+					['\\cdot', [
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]],
+					]],
+					['opp', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// -(a * b) = a * (-b)
+				'sign_product_rule_4': [
+					['opp', [
+						['\\cdot', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]],
+					['\\cdot', [
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]],
+					]]
+				] as Rule,
+
+				// (-a) * (-b) = a * b
+				'sign_product_rule_5': [
+					['\\cdot', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
+					]],
+					['\\cdot', [
+						'<expression-1>',
+						'<expression-2>'
+					]]
+				] as Rule,
+
+				// a * b = (-a) * (-b)
+				'sign_product_rule_6': [
+					['\\cdot', [
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['\\cdot', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+
+				// (-a) / b = -(a / b)
+				'sign_fraction_rule_1': [
+					['\\frac', [
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>'
+					]],
+					['opp', [
+						['\\frac', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// -(a / b) = (-a) / b
+				'sign_fraction_rule_2': [
+					['opp', [
+						['\\frac', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]],
+					['\\frac', [
+						['opp', [
+							'<expression-1>'
+						]],
+						'<expression-2>'
+					]]
+				] as Rule,
+
+				// a / (-b) = -(a / b)
+				'sign_fraction_rule_3': [
+					['\\frac', [
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]],
+					]],
+					['opp', [
+						['\\sign_fraction_rule_4', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]]
+				] as Rule,
+
+				// -(a / b) = a / (-b)
+				'sign_fraction_rule_4': [
+					['opp', [
+						['\\frac', [
+							'<expression-1>',
+							'<expression-2>'
+						]]
+					]],
+					['\\frac', [
+						'<expression-1>',
+						['opp', [
+							'<expression-2>'
+						]],
+					]]
+				] as Rule,
+
+				// (-a) / (-b) = a / b
+				'sign_fraction_rule_5': [
+					['\\frac', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
+					]],
+					['\\frac', [
+						'<expression-1>',
+						'<expression-2>'
+					]]
+				] as Rule,
+
+				// a / b = (-a) / (-b)
+				'sign_fraction_rule_6': [
+					['\\frac', [
+						'<expression-1>',
+						'<expression-2>'
+					]],
+					['\\frac', [
+						['opp', [
+							'<expression-1>'
+						]],
+						['opp', [
+							'<expression-2>'
+						]]
 					]]
 				] as Rule,
 
