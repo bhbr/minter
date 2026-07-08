@@ -4,29 +4,34 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { ScreenEventHandler, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
-import { Lexer } from './Lexer'
-import { Parser } from './Parser'
-import { createMathNode } from './createMathNode'
+//import { Lexer } from './Lexer'
+//import { Parser } from './Parser'
+//import { createMathNode } from './createMathNode'
 import { equalArrays, remove } from 'core/functions/arrays'
 import { IOProperty } from 'core/linkables/Linkable'
-import { AssignmentNode } from './MathNode'
+//import { AssignmentNode } from './MathNode'
 import { vertex } from 'core/functions/vertex'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
 import { Mobject } from 'core/mobjects/Mobject'
+import { roundedString } from 'core/functions/various'
 
 declare var MathQuill: any
+declare var Desmos: any
 
 export class MathExpressionField extends Linkable {
 
 	MQ: any
 	mathField: any
+	mathFieldLoadingID: number | null
 	span: HTMLSpanElement | null
+	resultSpan: HTMLSpanElement | null
+	resultMathField: any
 	scope: object
-	parser: Parser
+	//parser: Parser
 	value: number | null
-	resultBox: TextLabel
+	resultBox: Mobject
 	grapher: DesmosCalculator
 
 	defaults(): object {
@@ -36,19 +41,23 @@ export class MathExpressionField extends Linkable {
 			screenEventHandler: ScreenEventHandler.Self,
 			MQ: null,
 			mathField: null,
+			mathFieldLoadingID: null,
+			resultMathField: null,
 			span: null,
+			resultSpan: null,
 			scope: {},
-			parser: new Parser([]),
+			//parser: new Parser([]),
 			value: null,
-			resultBox: new TextLabel({
-				anchor: [100, 0],
+			resultBox: new Mobject({
+				anchor: [105, 0],
 				frameWidth: 100,
-				frameHeight: 50,
-				backgroundColor: Color.black()
+				frameHeight: 60,
+				backgroundColor: Color.black(),
 			}),
 			grapher: new DesmosCalculator({
+				anchor: [0, 65],
 				frameWidth: 300,
-				frameHeight: 200,
+				frameHeight: 300,
 				options: {
 					expressions: false
 				}
@@ -60,13 +69,12 @@ export class MathExpressionField extends Linkable {
 		super.setup()
 		this.add(this.grapher)
 		this.add(this.resultBox)
-		if (!getPaper().loadedAPIs.includes('mathquill')) {
-			this.loadMathQuillAPI()
-		} else {
-			this.createMathField()
-		}
+		this.createMathField()
+		this.createResultBox()
+
 		this.boundKeyPressed = this.keyPressed.bind(this)
 		this.view.div.addEventListener('keydown', this.boundKeyPressed.bind(this))
+
 	}
 
 	mathFieldWidth(): number {
@@ -91,7 +99,10 @@ export class MathExpressionField extends Linkable {
 				let mqScriptTag = document.createElement('script')
 				mqScriptTag.type = 'text/javascript'
 				mqScriptTag.src = '../../mathquill-0.10.1/mathquill.js'
-				mqScriptTag.onload = this.createMathField.bind(this)
+				mqScriptTag.onload = function() {
+					this.createMathField()
+					this.createResultBox()
+				}.bind(this)
 				document.head.append(mqScriptTag)
 
 			}.bind(this)
@@ -104,6 +115,8 @@ export class MathExpressionField extends Linkable {
 	createMathField() {
 		this.MQ = MathQuill.getInterface(2)
 		let mob = new Mobject()
+		this.addDependency('frameWidth', mob, 'frameWidth')
+		this.addDependency('frameHeight', mob, 'frameHeight')
 
 		let p = document.createElement('p')
 		this.span = document.createElement('span')
@@ -111,6 +124,7 @@ export class MathExpressionField extends Linkable {
 		this.span.style.fontSize = '28px'
 		this.span.style.backgroundColor = Color.black().toCSS()
 		this.span.style.border = '2px solid white'
+		this.span.style.width = '200px'
 		p.append(this.span)
 		mob.view.div.append(p)
 		this.add(mob)
@@ -124,12 +138,37 @@ export class MathExpressionField extends Linkable {
 				}.bind(this)
 			}
 		})
-		this.mathField.write('')
+		this.mathFieldLoadingID = window.setInterval(this.checkIfMathFieldLoaded.bind(this), 100)
 		this.updateIOProperties()
 		this.update({
 			frameWidth: this.span.clientWidth,
 			frameHeight: this.span.clientHeight
 		})
+	}
+
+	checkIfMathFieldLoaded() {
+		if (this.mathField) {
+			window.clearInterval(this.mathFieldLoadingID)
+			this.mathFieldLoadingID = null
+			this.onMathFieldLoaded()
+		}
+	}
+
+	onMathFieldLoaded() {
+		this.mathField.write(' ')
+		this.focus()
+	}
+
+	createResultBox() {
+		let p = document.createElement('p')
+		this.resultSpan = document.createElement('span')
+		this.resultSpan.style.color = 'white'
+		this.resultSpan.style.fontSize = '28px'
+		this.resultSpan.style.backgroundColor = Color.gray(0.5).toCSS()
+		p.append(this.resultSpan)
+		this.resultBox.view.div.append(p)
+		this.resultMathField = this.MQ.StaticMath(this.resultSpan, { })
+		this.resultMathField.latex(' ')
 	}
 
 	onPointerDown(e: ScreenEvent) {
@@ -151,7 +190,7 @@ export class MathExpressionField extends Linkable {
 			button.activeKeyboard = true
 		}
 	}
-	boundDectivateKeyboard() { }
+	boundDeactivateKeyboard() { }
 
 	boundKeyPressed(e: ScreenEvent) { }
 
@@ -179,48 +218,52 @@ export class MathExpressionField extends Linkable {
 	}
 
 	updateIOProperties() {
-		try {
-			let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
-			this.parser.tokens = tokens
-		} catch (ParseError) {
-			return
-		}
-		try {
-			let node = this.parser.parseTokens(this.parser.tokens)
-			let variables = node.variables()
-			let inputNames = this.inputNames()
-			for (let v of variables) {
-				if (!inputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
-					this.createInputVariable(v, NaN)
-				}
-			}
-			for (let v of inputNames) {
-				if (!variables.includes(v)) {
-					this.removeInputVariable(v)
-				}
-			}
-			if (node instanceof AssignmentNode) {
-				if (this.outputNames()[0] !== node.name) {
-					this.createOutputVariable(node.name)
-				}
-			}
-		} catch (ParseError) {
-			return
-		}
+		// try {
+		// 	let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
+		// 	this.parser.tokens = tokens
+		// } catch (ParseError) {
+		// 	return
+		// }
+		// try {
+		// 	let node = this.parser.parseTokens(this.parser.tokens)
+		// 	let oldInputNames = this.inputNames()
+		// 	let newInputNames = node.variables()
+		// 	for (let v of newInputNames) {
+		// 		if (!oldInputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
+		// 			this.createInputVariable(v, NaN)
+		// 		}
+		// 	}
+		// 	for (let v of oldInputNames) {
+		// 		if (!newInputNames.includes(v)) {
+		// 			this.removeInputVariable(v)
+		// 		}
+		// 	}
+		// 	if (node instanceof AssignmentNode) {
+		// 		let oldOutputName = this.outputNames()[0]
+		// 		if (oldOutputName !== node.name) {
+		// 			this.removeOutputVariable(oldOutputName)
+		// 			this.createOutputVariable(node.name)
+		// 			getPaper().globals[node.name] = this.computeValue()
+		// 		}
+		// 	}
+		// } catch (ParseError) {
+		// 	return
+		// }
 	}
 
 	computeValue(): number {
-		if (!this.mathField) { return NaN }
-		let latex = this.mathField.latex()
-		let lexer = new Lexer()
-		let tokens = lexer.tokenizeTex(latex)
-		try {
-			let node = this.parser.parseTokens(tokens)
-			let result = this.parser.evaluateTex(latex, this.scope)
-			return result
-		} catch (ParseError) {
-			return NaN
-		}
+		// if (!this.mathField) { return NaN }
+		// let latex = this.mathField.latex()
+		// let lexer = new Lexer()
+		// let tokens = lexer.tokenizeTex(latex)
+		// try {
+		// 	let node = this.parser.parseTokens(tokens)
+		// 	let result = this.parser.evaluateTex(latex, this.scope)
+		// 	return result
+		// } catch (ParseError) {
+		// 	return NaN
+		// }
+		return NaN
 	}
 
 	updateValue() {
@@ -234,19 +277,21 @@ export class MathExpressionField extends Linkable {
 	}
 
 	outputPropertyName(): string {
-		return this.outputNames()[0]
+		return this.outputNames()[0] ?? 'value'
 	}
 
 	resultBoxText(): string {
 		if (isNaN(this.value)) { return '' }
-		return `=${this.value}`
+		return `=${roundedString(this.value)}`
 	}
 
 	updateResultBox() {
 		this.resultBox.update({
-			anchor: this.resultBoxAnchor(),
-			text: this.resultBoxText()
+			anchor: this.resultBoxAnchor()
 		})
+		if (this.resultMathField) {
+			this.resultMathField.latex(this.resultBoxText())
+		}
 		this.resultBox.view.show()
 		this.grapher.view.hide()
 	}
@@ -256,10 +301,16 @@ export class MathExpressionField extends Linkable {
 			this.passVariableToCalculator(key, value)
 		}
 
-
 		this.grapher.calculator.setExpression({
 			id: `func`,
 			latex: this.mathField.latex(),
+		})
+
+		this.grapher.calculator.updateSettings({
+			xAxisLabel: this.freeVariables()[0],
+			yAxisLabel: (this.outputPropertyName() !== 'value') ? this.outputPropertyName() : '',
+			xAxisArrowMode: Desmos.AxisArrowModes.POSITIVE,
+			yAxisArrowMode: Desmos.AxisArrowModes.POSITIVE
 		})
 
 		this.resultBox.view.hide()
@@ -277,9 +328,14 @@ export class MathExpressionField extends Linkable {
 	}
 
 	updateLayout() {
-		this.update({
-			frameWidth: this.span.clientWidth,
-			frameHeight: this.span.clientHeight + 30
+		if (this.span) {
+			this.update({
+				frameWidth: this.span.clientWidth,
+				frameHeight: this.span.clientHeight + 30
+			})
+		}
+		this.resultBox.update({
+			anchor: [this.frameWidth + 20, 0]
 		})
 		this.positionIOLists()
 	}

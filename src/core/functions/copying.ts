@@ -1,5 +1,6 @@
 
 import { log } from './logging'
+import { equalArrays } from './arrays'
 
 export function copy(obj: any): any {
 	// shallow copy
@@ -138,6 +139,12 @@ export function isInstance(obj: object, className: string): boolean {
 }
 
 export function equalObjects(obj1: object, obj2: object) {
+	if (obj1 === null && obj2 === null) {
+		return true
+	}
+	if (obj1 instanceof Array && obj2 instanceof Array) {
+		return equalArrays(obj1, obj2)
+	}
 	let a = Object.keys(obj1)
 	let b = Object.keys(obj2)
 	for (let key of a) {
@@ -150,6 +157,11 @@ export function equalObjects(obj1: object, obj2: object) {
 		let value1 = obj1[prop]
 		let value2 = obj2[prop]
 		if (typeof value1 == 'object' && typeof value2 == 'object') {
+			if (value1 instanceof Array && value2 instanceof Array) {
+				if (!equalArrays(value1, value2)) {
+					return false
+				}
+			}
 			if (!equalObjects(value1, value2)) {
 				return false
 			}

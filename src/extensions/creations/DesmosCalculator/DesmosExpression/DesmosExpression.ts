@@ -35,7 +35,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 
 
 	layoutContent() {
-		//log('DesmosExpression.layoutContent')
 		super.layoutContent()
 		let container = this.innerCanvas.view.div.querySelector('.dcg-exppanel-container') as HTMLElement
 		container.style.overflow = 'hidden'
@@ -83,7 +82,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	}
 
 	blur() {
-		//log('DesmosExpression.blur')
 		super.blur()
 		this.contract()
 		document.removeEventListener('keydown', this.boundButtonDownByKey)
@@ -101,7 +99,6 @@ export class DesmosExpression extends DesmosExpressionSheet {
 	}
 
 	setup() {
-		//log('DesmosExpression.setup')
 		super.setup()
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 	}

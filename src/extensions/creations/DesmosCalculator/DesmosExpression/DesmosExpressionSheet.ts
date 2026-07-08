@@ -25,7 +25,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	ensureMinimumFrameSize() {
-		//log('DesmosExpressionSheet.ensureMinimumFrameSize')
 		this.update({
 			compactWidth: Math.max(this.compactWidth, this.minWidth),
 			compactHeight: Math.max(this.compactHeight, this.minHeight),
@@ -270,7 +269,6 @@ export class DesmosExpressionSheet extends DesmosCalculator {
 	}
 
 	createInputVariable(name: string, value: number) {
-		//log(`input ${name} ${value}`)
 		this.createProperty(name, value)
 		this.inputProperties.push({
 			name: name,
