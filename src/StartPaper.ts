@@ -11,6 +11,7 @@ import { VisualSymbol} from './extensions/creations/VisualAlgebra/view/VisualSym
 import { VisualVariable} from './extensions/creations/VisualAlgebra/view/VisualVariable'
 import { VisualCalculation } from './extensions/creations/VisualAlgebra/view/VisualCalculation'
 import { MathQuillLoader } from './extensions/apis/MathQuillLoader'
+import { DesmosLoader } from './extensions/apis/DesmosLoader'
 import { DemoPaper } from './extensions/boards/demo/DemoPaper'
 import { Popover } from './core/ui/Popover'
 import { Rectangle } from './core/shapes/Rectangle'
@@ -22,27 +23,22 @@ import { EqualityTest } from './_tests/unit_tests/core/functions/EqualityTest'
 import { TestTest } from './_tests/TestTests'
 import { AlgebraTest } from './_tests/unit_tests/extensions/AlgebraTest'
 
-export class StartPaper extends DemoPaper {
+export class StartPaper extends CoinFlipPaper {
 
 	defaults(): object {
 		return {
 			apiLoaders: [
-				new MathQuillLoader()
+				new MathQuillLoader(),
+				new DesmosLoader()
 			]
 		}
 	}
 
 	loadContent() {
-		let calc = new VisualCalculation({
-			anchor: [100, 100]
-		})
-		this.addToContent(calc)
-
-		let texString = '\\sin\\frac{1}{4}'
-		let sentence = calc.algebra.lexer.lex(texString)
-		log(sentence)
-		let ops = calc.algebra.parser.outermostOperatorsByIndex(sentence)
-		log(ops)
+		// let calc = new VisualCalculation({
+		// 	anchor: [100, 100]
+		// })
+		// this.addToContent(calc)
 	}
 
 }
