@@ -4,8 +4,8 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { ScreenEventHandler, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
-import { Lexer } from './Lexer'
-import { Parser } from './Parser'
+import { OldLexer } from './OldLexer'
+import { OldParser } from './OldParser'
 import { createMathNode } from './createMathNode'
 import { equalArrays, remove } from 'core/functions/arrays'
 import { IOProperty } from 'core/linkables/Linkable'
@@ -29,7 +29,7 @@ export class MathExpressionField extends Linkable {
 	resultSpan: HTMLSpanElement | null
 	resultMathField: any
 	scope: object
-	parser: Parser
+	parser: OldParser
 	value: number | null
 	resultBox: Mobject
 	grapher: DesmosCalculator
@@ -46,7 +46,7 @@ export class MathExpressionField extends Linkable {
 			span: null,
 			resultSpan: null,
 			scope: {},
-			parser: new Parser([]),
+			parser: new OldParser([]),
 			value: null,
 			resultBox: new Mobject({
 				anchor: [105, 0],
@@ -228,7 +228,7 @@ export class MathExpressionField extends Linkable {
 	computeValue(): number {
 		if (!this.mathField) { return NaN }
 		let latex = this.mathField.latex()
-		let lexer = new Lexer()
+		let lexer = new OldLexer()
 		let tokens = lexer.tokenizeTex(latex)
 		try {
 			let node = this.parser.parseTokens(tokens)

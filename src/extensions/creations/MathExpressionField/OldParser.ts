@@ -1,15 +1,15 @@
 
 import { ParseError } from './ParseError'
 import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
-import { Lexer } from './Lexer'
+import { OldLexer } from './OldLexer'
 import { createMathNode, rightGrouping, primaryTypes } from './createMathNode'
 import { MathNode } from './MathNode'
 
 // scope used by evaluateTex to resolve identifiers
 export type Scope = { [key: string]: any }
 
-export class Parser {
-	lexer: Lexer
+export class OldParser {
+	lexer: OldLexer
 	tokens: Array<Token>
 	pos: number
 
@@ -55,7 +55,7 @@ export class Parser {
 	* @param tokens A list of Tokens to be parsed.
 	*/
 	constructor(tokens: Array<Token> = []) {
-		this.lexer = new Lexer()
+		this.lexer = new OldLexer()
 		this.tokens = tokens
 		this.pos = 0
 	}
@@ -501,7 +501,7 @@ export class Parser {
 	*/
 	parseTokens(tokens: Array<Token>): MathNode {
 		//return this.nextExpression() as MathNode
-		return (new Parser(tokens)).nextExpression()
+		return (new OldParser(tokens)).nextExpression()
 	}
 
 	/**

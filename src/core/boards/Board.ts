@@ -160,7 +160,7 @@ The content children can also be dragged and panned.
 		this.add(this.content)
 		this.moveToTop(this.inputList)
 		this.moveToTop(this.outputList)
-		//this.add(this.expandButton)
+		this.add(this.expandButton)
 
 		// this.expandedInputList.update({
 		// 	height: EXPANDED_IO_LIST_HEIGHT,

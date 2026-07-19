@@ -37,6 +37,9 @@ import { PolypadLoader } from 'extensions/apis/PolypadLoader'
 import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
 import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
 import { EquationCreator } from 'extensions/creations/VisualAlgebra/view/EquationCreator'
+import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCoinCreator'
+import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
+import { CoinStackCreator } from 'extensions/creations/CoinFlipper/CoinStackCreator'
 
 export class DemoPaper extends Paper {
 
@@ -61,7 +64,10 @@ export class DemoPaper extends Paper {
 				'segment': ConSegmentConstructor,
 				'circle': ConCircleConstructor,
 				'expression': MathExpressionFieldCreator,
-				'equation': EquationCreator
+				'equation': EquationCreator,
+				'coin': PlayableCoinCreator,
+				'coin row': CoinRowCreator,
+				'coin stack': CoinStackCreator
 			},
 			buttonNames: [
 				'DragButton',
@@ -70,7 +76,8 @@ export class DemoPaper extends Paper {
 				'NumberButton',
 				'ArithmeticButton',
 				'AlgebraButton',
-				'ConButton',
+//				'ConButton',
+				'CoinButton',
 				'PolypadButton',
 				'WavyButton',
 				'SwingButton',
@@ -93,6 +100,8 @@ export class DemoPaper extends Paper {
 	}
 
 	loadContent() {
+
+
 	}
 
 

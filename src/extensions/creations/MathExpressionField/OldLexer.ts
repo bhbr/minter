@@ -5,7 +5,7 @@ import { LexError } from './LexError'
 
 // Port to own TS from tex-math-parser
 
-export class Lexer extends ExtendedObject {
+export class OldLexer extends ExtendedObject {
 	
 	isWhitespace(c: string): boolean {
 		return c.trim() === ''

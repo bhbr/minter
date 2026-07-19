@@ -1,6 +1,6 @@
 
 import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { Parser } from './Parser'
+import { OldParser } from './OldParser'
 import { AssignmentNode } from './MathNode'
 import { remove } from 'core/functions/arrays'
 import { getPaper } from 'core/functions/getters'
@@ -9,7 +9,7 @@ export class MathExpression extends ExtendedObject {
 	
 	latex: string
 	scope: object
-	parser: Parser | null
+	parser: OldParser | null
 
 	defaults(): object {
 		return {
