@@ -81,7 +81,6 @@ export class VisualFunction extends VisualFormula {
 		super.updateContent()
 	}
 
-
 	getWidth(): number {
 		return this.symbol.getWidth() + this.child.getWidth() + 3 * FORMULA_PADDING
 	}
@@ -93,4 +92,20 @@ export class VisualFunction extends VisualFormula {
 	fullyLoaded(): boolean {
 		return this.symbol.fullyLoaded() && this.child.fullyLoaded()
 	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['fontSize'] !== undefined) {
+			this.symbol.update({
+				fontSize: this.fontSize
+			})
+			this.child.update({
+				fontSize: this.fontSize
+			})
+		}
+	}
+
+
+
+
 }

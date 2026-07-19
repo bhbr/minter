@@ -10,6 +10,7 @@ import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
+import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 import { Stepper } from 'extensions/creations/math/Stepper/Stepper'
 import { Swing } from 'extensions/creations/Swing/Swing'
 import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
@@ -29,6 +30,7 @@ import { Slider } from 'extensions/creations/math/Slider/Slider'
 import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { CindyLoader } from 'extensions/apis/CindyLoader'
 
 export class DemoPaper extends Paper {
 
@@ -36,7 +38,6 @@ export class DemoPaper extends Paper {
 		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
-				'desmos': DesmosCalculatorCreator,
 				'slider': SliderCreator,
 				'stepper': StepperCreator,
 				'number': NumberBoxCreator,
@@ -44,9 +45,9 @@ export class DemoPaper extends Paper {
 				'subtract': SubtractBoxCreator,
 				'multiply': MultiplyBoxCreator,
 				'divide': DivideBoxCreator,
-				'board': BoardCreator,
 				'swing': SwingCreator,
-				'color': RGBAColorSampleCreator,
+				'color-rgba': RGBAColorSampleCreator,
+				'color-wheel': WheelColorSampleCreator,
 				'construction': ConstructionCreator,
 				'line': ConLineConstructor,
 				'ray': ConRayConstructor,
@@ -57,12 +58,15 @@ export class DemoPaper extends Paper {
 				'DragButton',
 				'LinkButton',
 				'ControlsButton',
-				'ExtendedBoardButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'ConButton',
 				'WavyButton',
 				'SwingButton',
 				'ColorSampleButton'
+			],
+			apiLoaders: [
+				new CindyLoader()
 			]
 		}
 	}
@@ -76,7 +80,7 @@ export class DemoPaper extends Paper {
 
 }
 
-
+let d = new DemoPaper()
 
 
 

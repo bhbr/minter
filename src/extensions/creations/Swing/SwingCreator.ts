@@ -5,11 +5,11 @@ import { vertex, vertexSubtract, vertexNorm } from 'core/functions/vertex'
 
 export class SwingCreator extends Creator {
 
-	swing: Swing
-
 	defaults(): object {
 		return {
-			swing: new Swing()
+			creation: new Swing({
+				length: 0
+			})
 		}
 	}
 
@@ -19,40 +19,38 @@ export class SwingCreator extends Creator {
 		}
 	}
 
+	declare creation?: Swing
+
 	setup() {
 		super.setup()
-		this.add(this.swing)
-		this.swing.update({
-			anchor: this.getStartPoint()
-		}, false)
-		this.swing.hideLinks()
+		this.add(this.creation)
+		this.creation.hideLinks()
 	}
 
 	createMobject(): Swing {
-		return this.swing
+		return this.creation
 	}
 
 	updateFromTip(q: vertex, redraw: boolean = true) {
 		super.updateFromTip(q, redraw)
 		var dr: vertex = vertexSubtract(q, this.getStartPoint())
-		dr = vertexSubtract(dr, [this.view.frame.width/2, this.swing.fixtureHeight])
 		let length: number = vertexNorm(dr)
 		let angle: number = -Math.atan2(dr[0], dr[1])
-		this.swing.update({
+		this.creation.update({
 			maxLength: length,
 			length: 1,
 			initialAngle: angle
 		}, redraw)
-		this.swing.hideLinks()
+		this.creation.hideLinks()
 	}
 
 	dissolve() {
 		super.dissolve()
-		this.swing.update({
+		this.creation.update({
 			initialTime: Date.now()
 		})
-		this.swing.outputList.update()
-		this.swing.run()
+		this.creation.outputList.update()
+		this.creation.run()
 	}
 
 

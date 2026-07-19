@@ -5,7 +5,7 @@ export class WavyButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['wavy', 'desmos']
+			creations: ['wavy']
 		}
 	}
 

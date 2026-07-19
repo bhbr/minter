@@ -30,6 +30,7 @@ export class VisualCalculation extends Linkable {
  	popover: VisualFormulaPopover | null
  	maker: VisualFormulaMaker
  	highlightColorIndex: number
+ 	fontSize: number
 
  	defaults(): object {
 		return {
@@ -44,13 +45,17 @@ export class VisualCalculation extends Linkable {
 			algebra: new Algebra(),
 			popover: null,
 			maker: new VisualFormulaMaker(),
-			highlightColorIndex: 0
+			highlightColorIndex: 0,
+			fontSize: 28
 		}
 	}
 
 	setup() {
 		super.setup()
 		for (let formula of this.formulas) {
+			formula.update({
+				fontSize: this.fontSize
+			})
 			this.add(formula)
 		}
 		this.createInputField()
@@ -111,7 +116,8 @@ export class VisualCalculation extends Linkable {
 		this.formulas.push(formula)
 		formula.update({
 			calculation: this,
-			anchor: [0, 125 * this.formulas.length]
+			anchor: [0, 125 * this.formulas.length],
+			fontSize: this.fontSize
 		})
 		this.add(formula)
 	}
@@ -180,6 +186,9 @@ export class VisualCalculation extends Linkable {
 		for (let [name, rule] of Object.entries(applicableRules)) {
 			let resultTree = this.algebra.applyRuleToTree(name, startTree)
 			let transformedFormula = this.maker.treeToVisual(resultTree)
+			transformedFormula.update({
+				fontSize: 20
+			})
 			possibleFormulas.push(transformedFormula)
 		}
 		this.popover.update({

@@ -105,4 +105,19 @@ export class VisualOperator extends VisualFormula {
 		return this.child1.fullyLoaded() && this.child2.fullyLoaded()
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['fontSize'] !== undefined) {
+			this.operatorSymbol.update({
+				fontSize: this.fontSize
+			})
+			this.child1.update({
+				fontSize: this.fontSize
+			})
+			this.child2.update({
+				fontSize: this.fontSize
+			})
+		}
+	}
+
 }

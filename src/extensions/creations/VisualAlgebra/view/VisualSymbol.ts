@@ -13,12 +13,16 @@ export class VisualSymbol extends Mobject {
 	MQ: any
  	texString: string
  	MQObject: any
+ 	fontSize: number
+ 	span: HTMLSpanElement
 
  	defaults(): object {
  		return {
  			MQ: null,
  			MQObject: null,
- 			texString: ''
+ 			texString: '',
+ 			fontSize: 28,
+ 			span: document.createElement('span')
  		}
  	}
 
@@ -29,16 +33,15 @@ export class VisualSymbol extends Mobject {
 
  	createMQObject(){
 		this.MQ = MathQuill.getInterface(2)
-		let span = document.createElement('span')
-		span.style.color = 'white'
-		span.style.fontSize = '28px'
-		span.style.backgroundColor = Color.clear().toCSS()
-		span.style.border = 'none'
-		span.style.width = 'fit-content'
-		span.style.cursor = 'inherit'
-		this.MQObject = this.MQ.StaticMath(span)
+		this.span.style.color = 'white'
+		this.span.style.fontSize = `${this.fontSize}px`
+		this.span.style.backgroundColor = Color.clear().toCSS()
+		this.span.style.border = 'none'
+		this.span.style.width = 'fit-content'
+		this.span.style.cursor = 'inherit'
+		this.MQObject = this.MQ.StaticMath(this.span)
 		//this.update({ opacity: 0 })
-		this.view.div.append(span)
+		this.view.div.append(this.span)
 		// conditionTrigger(this.fullyLoaded.bind(this), function() {
 		// 	this.update({ opacity: 1 })
 		// }.bind(this))
@@ -47,6 +50,9 @@ export class VisualSymbol extends Mobject {
 
  	update(args: object = {}, redraw: boolean = true) {
  		super.update(args, redraw)
+ 		if (args['fontSize'] !== undefined) {
+			this.span.style.fontSize = `${this.fontSize}px`
+ 		}
  		if (this.MQObject) {
 			this.MQObject.latex(this.texString)
 			this.sizeToFit()

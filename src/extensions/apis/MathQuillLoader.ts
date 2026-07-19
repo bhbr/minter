@@ -15,7 +15,8 @@ export class MathQuillLoader extends APILoader {
 		cssLinkTag.onload = function() {
 
 			let jQueryScriptTag = document.createElement('script')
-			jQueryScriptTag.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'
+			//jQueryScriptTag.src = 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js'
+			jQueryScriptTag.src = '../../jQuery/jquery.min.js'
 			jQueryScriptTag.onload = function() {
 
 				let mqScriptTag = document.createElement('script')

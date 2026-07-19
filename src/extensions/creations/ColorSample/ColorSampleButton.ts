@@ -6,9 +6,9 @@ export class ColorSampleButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['color wheel', 'rgb color'],
+			creations: ['color-wheel', 'color-rgba'],
 			icon: new ImageView({
-				imageLocation: '../../assets/color_wheel.png',
+				imageLocation: '../../assets/color-wheel.png',
 				frameWidth: 32,
 				frameHeight: 32
 			}),

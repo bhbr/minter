@@ -204,7 +204,8 @@ export class AlgebraParser extends Parser {
 	}
 
 	stringToTree(texString: string): SentenceTree | null {
-		let tree = this.sentenceToTree(this.language.lexer.stringToSentence(texString))
+		let sentence = this.language.lexer.stringToSentence(texString)
+		let tree = this.sentenceToTree(sentence)
 		return tree
 	}
 

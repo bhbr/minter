@@ -60,4 +60,12 @@ export class VisualNumber extends VisualFormula {
 		}
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['fontSize'] !== undefined) {
+			this.symbol.update({
+				fontSize: this.fontSize
+			})
+		}
+	}
 }

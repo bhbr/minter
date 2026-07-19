@@ -26,6 +26,7 @@ export class VisualFormula extends Mobject {
 	formulaTree: SentenceTree
 	calculation: VisualCalculation | null
 	location: SubtreeLocation
+	fontSize: number
 
 	defaults(): object {
 		return {
@@ -39,7 +40,8 @@ export class VisualFormula extends Mobject {
  			rootFormula: null,
  			formulaTree: [],
  			location: [],
- 			calculation: null
+ 			calculation: null,
+ 			fontSize: 28
 		}
 	}
 
@@ -73,6 +75,13 @@ export class VisualFormula extends Mobject {
 			for (let child of this.subformulas) {
 				child.update({
 					rootFormula: this.rootFormula
+				})
+			}
+		}
+		if (args['fontSize'] !== undefined) {
+			for (let f of this.subformulas) {
+				f.update({
+					fontSize: this.fontSize
 				})
 			}
 		}

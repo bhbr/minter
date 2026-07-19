@@ -21,7 +21,8 @@ export class VisualGroup extends VisualFormula {
 			child: new VisualFormula({
 				rootFormula: this.rootFormula
 			}),
-			parser: new AlgebraParser()
+			parser: new AlgebraParser(),
+			fontSize: 28
 		}
 	}
 
@@ -82,4 +83,15 @@ export class VisualGroup extends VisualFormula {
 	fullyLoaded(): boolean {
 		return this.child.fullyLoaded()
 	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['fontSize'] !== undefined) {
+			this.child.update({
+				fontSize: this.fontSize
+			})
+		}
+	}
+
+
 }

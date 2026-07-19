@@ -3,9 +3,8 @@ import { Sidebar } from 'core/Sidebar'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { ControlsButton } from 'core/sidebar_buttons/ControlsButton'
-import { ExtendedBoardButton } from 'extensions/sidebar_buttons/ExtendedBoardButton'
-import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { ConButton } from 'extensions/boards/construction/ConButton'
+import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { StraitButton } from 'extensions/boards/construction/straits/StraitButton'
 import { ConCircleButton } from 'extensions/boards/construction/ConCircle/ConCircleButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
@@ -22,8 +21,7 @@ export class DemoSidebar extends Sidebar {
 				DragButton,
 				LinkButton,
 				ControlsButton,
-				BoardButton,
-				ExtendedBoardButton,
+				ConButton,
 				ConCircleButton,
 				StraitButton,
 				NumberButton,
@@ -36,7 +34,7 @@ export class DemoSidebar extends Sidebar {
 				new DragButton(),
 				new LinkButton(),
 				new ControlsButton(),
-				new ExtendedBoardButton(),
+				new ConButton(),
 				new NumberButton(),
 				new ArithmeticButton(),
 				new WavyButton(),
@@ -52,3 +50,5 @@ export class DemoSidebar extends Sidebar {
 		}
 	}
 }
+
+let s = new DemoSidebar()

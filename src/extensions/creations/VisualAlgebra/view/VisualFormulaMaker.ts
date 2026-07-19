@@ -95,17 +95,23 @@ export class VisualFormulaMaker extends ExtendedObject {
 
 	sentenceToVisual(sentence: Sentence): VisualFormula | null {
 		if (sentence.length == 0) { return null }
-		return this.treeToVisual(this.algebra.parser.sentenceToTree(sentence))
+		let tree = this.algebra.parser.sentenceToTree(sentence)
+		let formula = this.treeToVisual(tree)
+		return formula
 	}
 
 	texToVisual(tex: string): VisualFormula | null {
 		if (tex.trim() == '') { return null }
-		return this.treeToVisual(this.algebra.parser.stringToTree(tex))
+		let tree = this.algebra.parser.stringToTree(tex)
+		let formula = this.treeToVisual(tree)
+		return formula
 	}
 
 	texToVisual2(tex: string): VisualFormula | null {
 		if (tex.trim() == '') { return null }
-		return this.sentenceToVisual(this.algebra.lexer.stringToSentence(tex))
+		let sentence = this.algebra.lexer.stringToSentence(tex)
+		let tree = this.sentenceToVisual(sentence)
+		return tree
 	}
 
 }

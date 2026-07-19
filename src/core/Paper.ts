@@ -10,7 +10,8 @@ import { PaperView } from './PaperView'
 import { APILoader } from 'core/apis/APILoader'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
-import { StartPaper } from 'startPaper'
+import { DemoPaper } from '../extensions/boards/demo/DemoPaper'
+import { CoinFlipPaper } from '../extensions/papers/coin-flip/CoinFlipPaper'
 
 export class Paper extends Board {
 
