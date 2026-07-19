@@ -84,7 +84,7 @@ export class Swing extends Linkable {
 
 	angle(): number {
 		let dt: number = (Date.now() - this.initialTime) % this.period()
-		let value = this.initialAngle * Math.cos(2 * Math.PI * dt/this.period())
+		let value = this.initialAngle * Math.cos(2 * Math.PI * dt / this.period())
 		return value
 	}
 
@@ -101,6 +101,7 @@ export class Swing extends Linkable {
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
+
 
 		args['frameHeight'] = this.fixtureHeight + this.pixelLength() + this.weightRadius()
 		if (args['frameHeight'] !== undefined) {
@@ -124,7 +125,10 @@ export class Swing extends Linkable {
 	}
 
 	run() {
-		window.setInterval(function() { this.update() }.bind(this), 10)
+		window.setInterval(function() {
+			this.update()
+			this.updateDependents()
+		}.bind(this), 10)
 	}
 
 }

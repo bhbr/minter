@@ -495,6 +495,20 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	disable() { this.sensor.disable() }
 	enable() { this.sensor.enable() }
 
+	disableSubmobs() {
+		for (let submob of this.submobs) {
+			submob.disable()
+			submob.disableSubmobs()
+		}
+	}
+
+	enableSubmobs() {
+		for (let submob of this.submobs) {
+			submob.enable()
+			submob.enableSubmobs()
+		}
+	}
+
 	get screenEventHandler(): ScreenEventHandler { return this.sensor.screenEventHandler }
 	set screenEventHandler(newValue: ScreenEventHandler) { this.sensor.screenEventHandler = newValue }
 

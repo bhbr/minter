@@ -1,6 +1,7 @@
 
 import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
 
 export class Wavy extends CindyCanvas {
 
@@ -94,7 +95,7 @@ export class Wavy extends CindyCanvas {
 		super.update(args, false)
 		this.nbSources = Math.floor(this.nbSources)
 
-		if (this.core == undefined || this.sourcePositions().length == 0) { return }
+		if (this.core == null || this.sourcePositions().length == 0) { return }
 		if (args['nbSources'] != undefined) {
 			this.reload(args)
 		}

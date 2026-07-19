@@ -7,6 +7,7 @@ import { Playable } from 'extensions/ui/PlayButton/Playable'
 import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { getPaper } from 'core/functions/getters'
+import { log } from 'core/functions/logging'
 
 declare var CindyJS: any
 
@@ -30,10 +31,10 @@ export class CindyCanvas extends Linkable implements Playable {
 			innerCanvas: new Mobject(),
 			outerFrame: new Rectangle(),
 			playButton: new PlayButton({
-				anchor: [5, 5]
+				anchor: [5, -50]
 			}),
 
-			id: undefined,
+			id: `Cindy-${Date.now()}`,
 
 			screenEventHandler: ScreenEventHandler.Self,
 			playedOnce: false,
@@ -62,10 +63,6 @@ export class CindyCanvas extends Linkable implements Playable {
 	setup() {
 		super.setup()
 
-		if (!getPaper().loadedAPIs.includes('cindy')) {
-			this.loadCindyAPI()
-		}
-
 		this.innerCanvas.view.frame.update({
 			width: this.view.frame.width,
 			height: this.view.frame.height
@@ -74,6 +71,7 @@ export class CindyCanvas extends Linkable implements Playable {
 			screenEventHandler: ScreenEventHandler.Auto
 		})
 		this.innerCanvas.view.div.style['pointer-events'] = 'auto'
+		
 		this.innerCanvas.view.div.id = this.id
 		this.add(this.innerCanvas)
 
@@ -91,33 +89,14 @@ export class CindyCanvas extends Linkable implements Playable {
 			started: false
 		})
 
-		this.add(this.playButton)
 		this.controls.add(this.playButton)
 		this.playButton.update({
 			mobject: this
 		})
 		this.createScripts()
-
-		window.setTimeout(this.startCore.bind(this), 2000)
-		// todo: async/await
-
-		
+		this.startCore()
 	}
 
-	loadCindyAPI() {
-		let paper = getPaper()
-
-		let scriptTag1 = document.createElement('script')
-		scriptTag1.type = 'text/javascript'
-		scriptTag1.src = '../../../CindyJS/build/js/Cindy.js'
-		let scriptTag2 = document.createElement('script')
-		scriptTag2.type = 'text/javascript'
-		scriptTag2.src = '../../../CindyJS/build/js/CindyGL.js'
-		document.head.append(scriptTag1)
-		document.head.append(scriptTag2)
-
-		paper.loadedAPIs.push('cindy')
-	}
 
 	createScripts() {
 		this.createInitScript()

@@ -10,6 +10,7 @@ import { BoardCreator } from 'core/boards/BoardCreator'
 import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
 import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
+import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 import { Stepper } from 'extensions/creations/math/Stepper/Stepper'
 import { Swing } from 'extensions/creations/Swing/Swing'
 import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
@@ -29,6 +30,13 @@ import { Slider } from 'extensions/creations/math/Slider/Slider'
 import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { CindyLoader } from 'extensions/apis/CindyLoader'
+import { DesmosLoader } from 'extensions/apis/DesmosLoader'
+import { MathQuillLoader } from 'extensions/apis/MathQuillLoader'
+import { PolypadLoader } from 'extensions/apis/PolypadLoader'
+import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
+import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
+import { EquationCreator } from 'extensions/creations/VisualAlgebra/view/EquationCreator'
 
 export class DemoPaper extends Paper {
 
@@ -36,7 +44,6 @@ export class DemoPaper extends Paper {
 		return {
 			creationConstructors: {
 				'wavy': WavyCreator,
-				'desmos': DesmosCalculatorCreator,
 				'slider': SliderCreator,
 				'stepper': StepperCreator,
 				'number': NumberBoxCreator,
@@ -44,24 +51,36 @@ export class DemoPaper extends Paper {
 				'subtract': SubtractBoxCreator,
 				'multiply': MultiplyBoxCreator,
 				'divide': DivideBoxCreator,
-				'board': BoardCreator,
 				'swing': SwingCreator,
-				'color': RGBAColorSampleCreator,
+				'color-rgba': RGBAColorSampleCreator,
+				'color-wheel': WheelColorSampleCreator,
+				'polypad': PolypadCreator,
 				'construction': ConstructionCreator,
 				'line': ConLineConstructor,
 				'ray': ConRayConstructor,
 				'segment': ConSegmentConstructor,
-				'circle': ConCircleConstructor
+				'circle': ConCircleConstructor,
+				'expression': MathExpressionFieldCreator,
+				'equation': EquationCreator
 			},
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
-				'ExtendedBoardButton',
+				'ControlsButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'AlgebraButton',
+				'ConButton',
+				'PolypadButton',
 				'WavyButton',
 				'SwingButton',
 				'ColorSampleButton'
+			],
+			apiLoaders: [
+				new CindyLoader(),
+				new DesmosLoader(),
+				new MathQuillLoader(),
+				new PolypadLoader()
 			]
 		}
 	}
@@ -73,11 +92,14 @@ export class DemoPaper extends Paper {
 		}
 	}
 
+	loadContent() {
+	}
+
+
+
 }
 
-
-
-
+let d = new DemoPaper()
 
 
 

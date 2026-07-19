@@ -54,3 +54,5 @@ export class CoinFlipSidebar extends Sidebar {
 		}
 	}
 }
+
+let s = new CoinFlipSidebar()

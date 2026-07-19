@@ -1,4 +1,6 @@
 
+import { equalObjects } from './copying'
+
 export function removeOne(arr: Array<any>, value: any): boolean {
 	// remove the first encountered matching entry of an object or value from an Array
 	for (let i = 0; i < arr.length; i++) {
@@ -80,13 +82,36 @@ export function removeDuplicates(arr: Array<any>): Array<any> {
 export function equalArrays(arr1: Array<any>, arr2: Array<any>): boolean {
 	if (arr1.length !== arr2.length) { return false }
 	for (var i = 0; i < arr1.length; i++) {
-		if (arr1[i] !== arr2[i]) { return false }
+		if (arr1[i].constructor.name == 'Array'
+		&& arr2[i].constructor.name == 'Array') {
+			if (!equalArrays(arr1[i] as Array<any>, arr2[i] as Array<any>)) {
+				return false
+			}
+		} else if (typeof arr1[i] == 'object' && typeof arr2[i] == 'object') {
+			if (!equalObjects(arr1[i], arr2[i])) {
+				return false
+			}
+		} else if (arr1[i] !== arr2[i]) {
+			return false
+		}
 	}
 	return true
 }
 
-
-
+export function replaceAll(arr: Array<any>, oldValue: any, newValue: any) {
+	for (let i = 0; i < arr.length; i++) {
+		let entry = arr[i]
+		if (entry === oldValue) {
+			arr[i] = newValue
+			continue
+		}
+		if (entry instanceof Array && oldValue instanceof Array) {
+			if (equalArrays(entry, oldValue)) {
+				arr[i] = newValue
+			}
+		}
+	}
+}
 
 
 
