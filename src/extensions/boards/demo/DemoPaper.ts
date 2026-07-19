@@ -31,8 +31,12 @@ import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { CindyLoader } from 'extensions/apis/CindyLoader'
+import { DesmosLoader } from 'extensions/apis/DesmosLoader'
+import { MathQuillLoader } from 'extensions/apis/MathQuillLoader'
 import { PolypadLoader } from 'extensions/apis/PolypadLoader'
 import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
+import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
+import { EquationCreator } from 'extensions/creations/VisualAlgebra/view/EquationCreator'
 
 export class DemoPaper extends Paper {
 
@@ -55,7 +59,9 @@ export class DemoPaper extends Paper {
 				'line': ConLineConstructor,
 				'ray': ConRayConstructor,
 				'segment': ConSegmentConstructor,
-				'circle': ConCircleConstructor
+				'circle': ConCircleConstructor,
+				'expression': MathExpressionFieldCreator,
+				'equation': EquationCreator
 			},
 			buttonNames: [
 				'DragButton',
@@ -63,6 +69,7 @@ export class DemoPaper extends Paper {
 				'ControlsButton',
 				'NumberButton',
 				'ArithmeticButton',
+				'AlgebraButton',
 				'ConButton',
 				'PolypadButton',
 				'WavyButton',
@@ -71,6 +78,8 @@ export class DemoPaper extends Paper {
 			],
 			apiLoaders: [
 				new CindyLoader(),
+				new DesmosLoader(),
+				new MathQuillLoader(),
 				new PolypadLoader()
 			]
 		}
@@ -81,6 +90,9 @@ export class DemoPaper extends Paper {
 			creationConstructors: 'never',
 			buttonNames: 'never'
 		}
+	}
+
+	loadContent() {
 	}
 
 

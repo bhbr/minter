@@ -9,10 +9,12 @@ import { StraitButton } from 'extensions/boards/construction/straits/StraitButto
 import { ConCircleButton } from 'extensions/boards/construction/ConCircle/ConCircleButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
+import { ComparisonButton } from 'extensions/sidebar_buttons/ComparisonButton'
 import { WavyButton } from 'extensions/creations/Wavy/WavyButton'
 import { SwingButton } from 'extensions/creations/Swing/SwingButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
 import { PolypadButton } from 'extensions/creations/Polypad/PolypadButton'
+import { AlgebraButton } from 'extensions/sidebar_buttons/AlgebraButton'
 
 export class DemoSidebar extends Sidebar {
 	
@@ -22,8 +24,10 @@ export class DemoSidebar extends Sidebar {
 				DragButton,
 				LinkButton,
 				ControlsButton,
+				AlgebraButton,
 				ConButton,
 				ConCircleButton,
+				ComparisonButton,
 				PolypadButton,
 				StraitButton,
 				NumberButton,
@@ -39,6 +43,8 @@ export class DemoSidebar extends Sidebar {
 				new ConButton(),
 				new NumberButton(),
 				new ArithmeticButton(),
+				new AlgebraButton(),
+				new ComparisonButton(),
 				new PolypadButton(),
 				new WavyButton(),
 				new SwingButton(),

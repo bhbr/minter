@@ -4,12 +4,12 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { ScreenEventHandler, ScreenEvent, isTouchDevice } from 'core/mobjects/screen_events'
 import { getPaper, getSidebar } from 'core/functions/getters'
 import { log } from 'core/functions/logging'
-//import { Lexer } from './Lexer'
-//import { Parser } from './Parser'
-//import { createMathNode } from './createMathNode'
+import { Lexer } from './Lexer'
+import { Parser } from './Parser'
+import { createMathNode } from './createMathNode'
 import { equalArrays, remove } from 'core/functions/arrays'
 import { IOProperty } from 'core/linkables/Linkable'
-//import { AssignmentNode } from './MathNode'
+import { AssignmentNode } from './MathNode'
 import { vertex } from 'core/functions/vertex'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
@@ -29,7 +29,7 @@ export class MathExpressionField extends Linkable {
 	resultSpan: HTMLSpanElement | null
 	resultMathField: any
 	scope: object
-	//parser: Parser
+	parser: Parser
 	value: number | null
 	resultBox: Mobject
 	grapher: DesmosCalculator
@@ -46,7 +46,7 @@ export class MathExpressionField extends Linkable {
 			span: null,
 			resultSpan: null,
 			scope: {},
-			//parser: new Parser([]),
+			parser: new Parser([]),
 			value: null,
 			resultBox: new Mobject({
 				anchor: [105, 0],
@@ -85,6 +85,7 @@ export class MathExpressionField extends Linkable {
 	resultBoxAnchor(): vertex {
 		return [this.mathFieldWidth(), 0]
 	}
+
 
 	createMathField() {
 		this.MQ = MathQuill.getInterface(2)
@@ -130,7 +131,6 @@ export class MathExpressionField extends Linkable {
 
 	onMathFieldLoaded() {
 		this.mathField.write(' ')
-		this.focus()
 	}
 
 	createResultBox() {
@@ -192,51 +192,51 @@ export class MathExpressionField extends Linkable {
 	}
 
 	updateIOProperties() {
-		// try {
-		// 	let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
-		// 	this.parser.tokens = tokens
-		// } catch (ParseError) {
-		// 	return
-		// }
-		// try {
-		// 	let node = this.parser.parseTokens(this.parser.tokens)
-		// 	let oldInputNames = this.inputNames()
-		// 	let newInputNames = node.variables()
-		// 	for (let v of newInputNames) {
-		// 		if (!oldInputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
-		// 			this.createInputVariable(v, NaN)
-		// 		}
-		// 	}
-		// 	for (let v of oldInputNames) {
-		// 		if (!newInputNames.includes(v)) {
-		// 			this.removeInputVariable(v)
-		// 		}
-		// 	}
-		// 	if (node instanceof AssignmentNode) {
-		// 		let oldOutputName = this.outputNames()[0]
-		// 		if (oldOutputName !== node.name) {
-		// 			this.removeOutputVariable(oldOutputName)
-		// 			this.createOutputVariable(node.name)
-		// 			getPaper().globals[node.name] = this.computeValue()
-		// 		}
-		// 	}
-		// } catch (ParseError) {
-		// 	return
-		// }
+		try {
+			let tokens = this.parser.lexer.tokenizeTex(this.mathField.latex())
+			this.parser.tokens = tokens
+		} catch (ParseError) {
+			return
+		}
+		try {
+			let node = this.parser.parseTokens(this.parser.tokens)
+			let oldInputNames = this.inputNames()
+			let newInputNames = node.variables()
+			for (let v of newInputNames) {
+				if (!oldInputNames.includes(v) && !Object.keys(getPaper().globals).includes(v)) {
+					this.createInputVariable(v, NaN)
+				}
+			}
+			for (let v of oldInputNames) {
+				if (!newInputNames.includes(v)) {
+					this.removeInputVariable(v)
+				}
+			}
+			if (node instanceof AssignmentNode) {
+				let oldOutputName = this.outputNames()[0]
+				if (oldOutputName !== node.name) {
+					this.removeOutputVariable(oldOutputName)
+					this.createOutputVariable(node.name)
+					getPaper().globals[node.name] = this.computeValue()
+				}
+			}
+		} catch (ParseError) {
+			return
+		}
 	}
 
 	computeValue(): number {
-		// if (!this.mathField) { return NaN }
-		// let latex = this.mathField.latex()
-		// let lexer = new Lexer()
-		// let tokens = lexer.tokenizeTex(latex)
-		// try {
-		// 	let node = this.parser.parseTokens(tokens)
-		// 	let result = this.parser.evaluateTex(latex, this.scope)
-		// 	return result
-		// } catch (ParseError) {
-		// 	return NaN
-		// }
+		if (!this.mathField) { return NaN }
+		let latex = this.mathField.latex()
+		let lexer = new Lexer()
+		let tokens = lexer.tokenizeTex(latex)
+		try {
+			let node = this.parser.parseTokens(tokens)
+			let result = this.parser.evaluateTex(latex, this.scope)
+			return result
+		} catch (ParseError) {
+			return NaN
+		}
 		return NaN
 	}
 
@@ -319,6 +319,9 @@ export class MathExpressionField extends Linkable {
 	}
 
 	freeVariables(): Array<string> {
+		if (this.mathField.latex() == '') {
+			return []
+		}
 		let ret: Array<string> = []
 		for (let outlet of this.inputList.linkOutlets) {
 			for (let hook of outlet.linkHooks) {
@@ -338,12 +341,13 @@ export class MathExpressionField extends Linkable {
 		}
 		Object.assign(this.scope, getPaper().globals)
 		this.updateValue()
+		super.update(args, redraw)
+
 		if (this.nbFreeVariables() == 0) {
 			this.updateResultBox()
 		} else if (this.nbFreeVariables() == 1) {
 			this.updateGrapher()
 		}
-		super.update(args, redraw)
 	}
 
 }

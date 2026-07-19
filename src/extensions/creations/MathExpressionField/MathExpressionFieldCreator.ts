@@ -18,4 +18,5 @@ export class MathExpressionFieldCreator extends DraggingCreator {
 			anchor: this.getStartPoint()
 		})
 	}
+
 }

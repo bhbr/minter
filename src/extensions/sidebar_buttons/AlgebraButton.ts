@@ -6,7 +6,7 @@ export class AlgebraButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['expression'],
+			creations: ['expression', 'equation'],
 			iconSize: 35
 		}
 	}
