@@ -12,6 +12,7 @@ import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
 import { WavyButton } from 'extensions/creations/Wavy/WavyButton'
 import { SwingButton } from 'extensions/creations/Swing/SwingButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
+import { PolypadButton } from 'extensions/creations/Polypad/PolypadButton'
 
 export class DemoSidebar extends Sidebar {
 	
@@ -23,6 +24,7 @@ export class DemoSidebar extends Sidebar {
 				ControlsButton,
 				ConButton,
 				ConCircleButton,
+				PolypadButton,
 				StraitButton,
 				NumberButton,
 				ArithmeticButton,
@@ -37,6 +39,7 @@ export class DemoSidebar extends Sidebar {
 				new ConButton(),
 				new NumberButton(),
 				new ArithmeticButton(),
+				new PolypadButton(),
 				new WavyButton(),
 				new SwingButton(),
 				new ColorSampleButton()

@@ -31,6 +31,8 @@ import { Dependency } from 'core/mobjects/Dependency'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { CindyLoader } from 'extensions/apis/CindyLoader'
+import { PolypadLoader } from 'extensions/apis/PolypadLoader'
+import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
 
 export class DemoPaper extends Paper {
 
@@ -48,6 +50,7 @@ export class DemoPaper extends Paper {
 				'swing': SwingCreator,
 				'color-rgba': RGBAColorSampleCreator,
 				'color-wheel': WheelColorSampleCreator,
+				'polypad': PolypadCreator,
 				'construction': ConstructionCreator,
 				'line': ConLineConstructor,
 				'ray': ConRayConstructor,
@@ -61,12 +64,14 @@ export class DemoPaper extends Paper {
 				'NumberButton',
 				'ArithmeticButton',
 				'ConButton',
+				'PolypadButton',
 				'WavyButton',
 				'SwingButton',
 				'ColorSampleButton'
 			],
 			apiLoaders: [
-				new CindyLoader()
+				new CindyLoader(),
+				new PolypadLoader()
 			]
 		}
 	}
@@ -78,11 +83,11 @@ export class DemoPaper extends Paper {
 		}
 	}
 
+
+
 }
 
 let d = new DemoPaper()
-
-
 
 
 
