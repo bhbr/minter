@@ -11,7 +11,7 @@ import { APILoader } from 'core/apis/APILoader'
 
 // StartPaper needs to be imported *somewhere* for TS to compile it
 import { DemoPaper } from '../extensions/boards/demo/DemoPaper'
-import { CoinFlipPaper } from '../extensions/papers/coin-flip/CoinFlipPaper'
+import { CoinFlipPaper } from '../extensions/boards/coin-flip/CoinFlipPaper'
 import { ConstructionPaper } from '../extensions/boards/construction/ConstructionPaper'
 
 export class Paper extends Board {

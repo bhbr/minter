@@ -24,7 +24,6 @@ export class Color {
 		return new Color(1 - factor * (1 - this.red), 1 - factor * (1 - this.green), 1 - factor * (1 - this.blue), this.alpha)
 	}
 
-
 	// Conversion methods
 
 	toHex(): string {

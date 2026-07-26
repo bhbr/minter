@@ -12,6 +12,7 @@ import { PlotButton } from 'extensions/sidebar_buttons/PlotButton'
 import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
 import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
 import { EraseButton } from 'core/sidebar_buttons/EraseButton'
+import { PartitionButton } from 'extensions/sidebar_buttons/PartitionButton'
 
 export class CoinFlipSidebar extends Sidebar {
 	
@@ -28,6 +29,7 @@ export class CoinFlipSidebar extends Sidebar {
 				AlgebraButton,
 				ListFunctionsButton,
 				PlotButton,
+				PartitionButton,
 				//ColorSampleButton,
 				EraseButton
 			],
@@ -42,6 +44,7 @@ export class CoinFlipSidebar extends Sidebar {
 				//new AlgebraButton(),
 				new ListFunctionsButton(),
 				new PlotButton(),
+				new PartitionButton(),
 				//new ColorSampleButton(),
 				new EraseButton()
 			],

@@ -5,6 +5,7 @@ import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { copy } from 'core/functions/copying'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
+import { log } from 'core/functions/logging'
 
 export class Motor extends ExtendedObject {
 
@@ -28,7 +29,10 @@ export class Motor extends ExtendedObject {
 	animationStopArgs: object
 
 	mobject?: Mobject
+	animating: boolean
 	showShadow?: boolean
+
+	completionHandler: Function
 
 	defaults(): object {
 		return {
@@ -37,7 +41,9 @@ export class Motor extends ExtendedObject {
 			animationInterval: null,
 			animationStartArgs: {},
 			animationStopArgs: {},
-			showShadow: null
+			animating: false,
+			showShadow: null,
+			completionHandler: () => {}
 		}
 	}
 
@@ -58,18 +64,19 @@ export class Motor extends ExtendedObject {
 		return true
 	}
 
-	animate(args: object = {}, seconds: number, showShadow: boolean = false) {
+	animate(args: object = {}, seconds: number, showShadow: boolean = false, completionHandler: Function = () => {}) {
 	// Calling this method launches an animation
 		if (!Motor.isAnimatable(args)) {
 			return
 		}
-
+		this.animating = true
 		for (let key of Object.keys(args)) {
 			let a = this.mobject[key]
 			let b = copy(a)
 			this.animationStartArgs[key] = b
 		}
 		this.animationStopArgs = args
+		this.completionHandler = completionHandler
 
 		// all times in ms bc that is what setInterval and setTimeout expect
 		let dt = 10
@@ -130,7 +137,9 @@ export class Motor extends ExtendedObject {
 		this.animationInterval = null
 		this.animationStartArgs = {}
 		this.animationStopArgs = {}
+		this.animating = false
 		this.showShadow = null
+		this.completionHandler()
 	}
 
 

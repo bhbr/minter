@@ -121,7 +121,7 @@ export class Construction extends Board {
 	startCreating(e: ScreenEvent) {
 		let v = this.sensor.localEventVertex(e)
 		let p: ConPoint | null = this.snappedPointForVertex(v)
-		if (this.creationMode == 'freehand') {
+		if (this.creationMode == 'draw') {
 			if (p === null) { // starting a freehand drawing
 				log('start creating freehand')
 				super.startCreating(e)
@@ -137,7 +137,7 @@ export class Construction extends Board {
 	}
 
 	creating(e: ScreenEvent) {
-		if (this.creationMode == 'freehand') {
+		if (this.creationMode == 'draw') {
 			super.creating(e)
 			return
 		}
@@ -150,6 +150,7 @@ export class Construction extends Board {
 			}
 		}
 		this.creator.updateFromTip(p)
+		log(this.creator)
 	}
 
 	addToContent(mob: Mobject) {
@@ -216,7 +217,7 @@ export class Construction extends Board {
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		if (this.creationMode != 'freehand') {
+		if (this.creationMode != 'draw') {
 			super.onPointerDown(e)
 			return
 		}

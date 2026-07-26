@@ -6,6 +6,7 @@ import { SpanningCreator } from 'core/creators/SpanningCreator'
 
 export class PolypadCreator extends SpanningCreator {
 
+	declare creation?: PolypadMobject
 
 	createMobject(): PolypadMobject {
 		let p = this.getStartPoint()
@@ -15,11 +16,5 @@ export class PolypadCreator extends SpanningCreator {
 			frameHeight: this.view.frame.height
 		})
 	}
-
-	// dissolve() {
-	// 	let cm = this.createMobject()
-	// 	this.parent.addToContent(cm)
-	// 	this.parent.remove(this)
-	// }
 
 }

@@ -3,7 +3,8 @@ import { Sidebar } from 'core/Sidebar'
 import { DragButton } from 'core/sidebar_buttons/DragButton'
 import { LinkButton } from 'core/sidebar_buttons/LinkButton'
 import { ControlsButton } from 'core/sidebar_buttons/ControlsButton'
-import { ConButton } from 'extensions/boards/construction/ConButton'
+import { CoinButton } from 'extensions/boards/coin-flip/CoinButton'
+//import { ConButton } from 'extensions/boards/construction/ConButton'
 import { BoardButton } from 'core/sidebar_buttons/BoardButton'
 import { StraitButton } from 'extensions/boards/construction/straits/StraitButton'
 import { ConCircleButton } from 'extensions/boards/construction/ConCircle/ConCircleButton'
@@ -25,8 +26,9 @@ export class DemoSidebar extends Sidebar {
 				LinkButton,
 				ControlsButton,
 				AlgebraButton,
-				ConButton,
-				ConCircleButton,
+				CoinButton,
+//				ConButton,
+//				ConCircleButton,
 				ComparisonButton,
 				PolypadButton,
 				StraitButton,
@@ -40,7 +42,8 @@ export class DemoSidebar extends Sidebar {
 				new DragButton(),
 				new LinkButton(),
 				new ControlsButton(),
-				new ConButton(),
+				//new ConButton(),
+				new CoinButton(),
 				new NumberButton(),
 				new ArithmeticButton(),
 				new AlgebraButton(),

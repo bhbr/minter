@@ -4,6 +4,7 @@ import { FreePoint } from '../FreePoint'
 import { Construction } from '../Construction'
 import { Constructor } from '../Constructor'
 import { ConPoint } from '../ConPoint'
+import { log } from 'core/functions/logging'
 
 export class ConStraitConstructor extends Constructor {
 
@@ -25,7 +26,9 @@ export class ConStraitConstructor extends Constructor {
 	}
 
 	setup() {
+		log('setup')
 		super.setup()
+		log(`${this.getStartPoint()} ${this.getEndPoint()}`)
 		let sp = this.construction.snappedPointForVertex(this.getStartPoint())
 		let sp1 = (sp === null) ? this.getStartPoint() : sp.midpoint
 		

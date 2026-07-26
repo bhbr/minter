@@ -18,6 +18,8 @@ import { HistogramCreator } from 'extensions/creations/DesmosCalculator/Histogra
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 import { DesmosLoader } from 'extensions/apis/DesmosLoader'
+import { PartitionCreator } from 'extensions/animation_sequences/PascalsBrickWall/PartitionCreator'
+import { BrickWallCreator } from 'extensions/animation_sequences/PascalsBrickWall/BrickWallCreator'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -47,6 +49,8 @@ export class CoinFlipPaper extends Paper {
 				'histogram': HistogramCreator,
 				'rgb color': RGBAColorSampleCreator,
 				'color wheel': WheelColorSampleCreator,
+				'partition': PartitionCreator,
+				'wall': BrickWallCreator
 			},
 			buttonNames: [
 				'DragButton',
@@ -59,6 +63,7 @@ export class CoinFlipPaper extends Paper {
 				//'AlgebraButton',
 				'ListFunctionsButton',
 				'PlotButton',
+				'PartitionButton',
 				//'ColorSampleButton',
 				'EraseButton'
 			],
@@ -66,6 +71,9 @@ export class CoinFlipPaper extends Paper {
 				new DesmosLoader()
 			]
 		}
+	}
+
+	loadContent() {
 	}
 
 }

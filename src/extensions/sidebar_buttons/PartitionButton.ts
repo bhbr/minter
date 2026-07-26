@@ -1,11 +1,13 @@
 
 import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
+import { ImageView } from 'core/mobjects/ImageView'
 
-export class GeoButton extends CreativeButton {
+export class PartitionButton extends CreativeButton {
 
 	defaults(): object {
 		return {
-			creations: ['geo']
+			creations: ['partition', 'wall'],
+			iconSize: 35
 		}
 	}
 
@@ -14,4 +16,5 @@ export class GeoButton extends CreativeButton {
 			creations: 'never'
 		}
 	}
+
 }
