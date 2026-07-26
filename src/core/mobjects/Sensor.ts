@@ -25,6 +25,8 @@ export class Sensor extends ExtendedObject {
 	eventStartTime: number
 	eventStartLocation: vertex | null
 
+	screenEventsBlocked: boolean // this needs a cleaner solution
+
 	defaults(): object {
 		return {
 			mobject: null,
@@ -34,7 +36,8 @@ export class Sensor extends ExtendedObject {
 			screenEventHistory: [],
 			screenEventDevice: null,
 			eventStartTime: 0,
-			eventStartLocation: null
+			eventStartLocation: null,
+			screenEventsBlocked: false
 		}
 	}
 
@@ -720,5 +723,75 @@ export class Sensor extends ExtendedObject {
 		this.savedOnLongPress = (e: ScreenEvent) => { }
 	}
 
+	blockPointerMethods() {
+		this.setPointerMethodsTo(
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { }
+		)
+	}
 
+	unblockPointerMethods() {
+		this.restorePointerMethods()
+	}
+
+	blockTouchMethods() {
+		this.setTouchMethodsTo(
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { }
+		)
+	}
+
+	unblockTouchMethods() {
+		this.restoreTouchMethods()
+	}
+
+	blockPenMethods() {
+		this.setPenMethodsTo(
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { }
+		)
+	}
+
+	unblockPenMethods() {
+		this.restorePenMethods()
+	}
+
+	blockMouseMethods() {
+		this.setMouseMethodsTo(
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { },
+			(e: ScreenEvent) => { }
+		)
+	}
+
+	unblockMouseMethods() {
+		this.restoreMouseMethods()
+	}
+
+	blockScreenEvents() {
+		log('blocking')
+		log(this.mobject.constructor.name)
+		if (this.screenEventsBlocked) { return }
+		log('for real')
+		this.screenEventsBlocked = true
+		this.blockPointerMethods()
+		this.blockTouchMethods()
+		this.blockPenMethods()
+		this.blockMouseMethods()
+	}
+
+	unblockScreenEvents() {
+		log('unblocking')
+		log(this.mobject.constructor.name)
+		if (!this.screenEventsBlocked) { return }
+		log('for real')
+		this.screenEventsBlocked = false
+		this.unblockPointerMethods()
+		this.unblockTouchMethods()
+		this.unblockPenMethods()
+		this.unblockMouseMethods()
+	}
 }

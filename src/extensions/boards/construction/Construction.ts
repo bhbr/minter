@@ -123,6 +123,7 @@ export class Construction extends Board {
 		let p: ConPoint | null = this.snappedPointForVertex(v)
 		if (this.creationMode == 'freehand') {
 			if (p === null) { // starting a freehand drawing
+				log('start creating freehand')
 				super.startCreating(e)
 			} else if (p instanceof FreePoint) { // dragging a free point
 				this.sensor.eventTarget = p

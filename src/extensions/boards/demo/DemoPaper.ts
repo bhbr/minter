@@ -93,6 +93,7 @@ export class DemoPaper extends Paper {
 	}
 
 	loadContent() {
+		
 	}
 
 

@@ -99,7 +99,7 @@ The content children can also be dragged and panned.
 				horizontalAlign: 'center'
 			}),
 			helpTexts: {
-				'drag': 'Drag objects or pan the board. Slide this button to the right to lock.',
+				'drag': 'Tap and hold this button to drag objects or pan the board. Tap this button to lock.',
 			},
 			// zoomStartCenter: [0, 0],
 			// zoomStartScale: 1,
@@ -160,7 +160,7 @@ The content children can also be dragged and panned.
 		this.add(this.content)
 		this.moveToTop(this.inputList)
 		this.moveToTop(this.outputList)
-		//this.add(this.expandButton)
+		this.add(this.expandButton)
 
 		// this.expandedInputList.update({
 		// 	height: EXPANDED_IO_LIST_HEIGHT,
@@ -181,12 +181,14 @@ The content children can also be dragged and panned.
 		// this.add(this.expandedOutputList)
 
 		if (this.contracted) {
+			log('contracted')
 			this.contractStateChange()
 			this.inputList.view.show()
 			this.outputList.view.show()
 			this.expandedInputList.view.hide()
 			this.expandedOutputList.view.hide()
 		} else {
+			log('expanded')
 			this.expandStateChange()
 			this.inputList.view.hide()
 			this.outputList.view.hide()
@@ -264,8 +266,14 @@ The content children can also be dragged and panned.
 	}
 
 	expandStateChange() {
+		log(this.constructor.name)
 		if (!this.expanded) { this.update({ expanded: true }) }
 		getPaper().expandedMobject = this
+		if (this.sensor.screenEventsBlocked) {
+			this.unblockScreenEvents()
+		}
+		log(this.sensor.screenEventsBlocked)
+		log(this.sensor.onMouseDown)
 		this.enableContent()
 		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
@@ -305,7 +313,9 @@ The content children can also be dragged and panned.
 
 	contractStateChange() {
 		this.expanded = false
+		this.blockScreenEvents()
 		this.disableContent()
+		this.expandButton.enable()
 		if (this.parent) {
 			getPaper().expandedMobject = this.board
 		}
@@ -360,7 +370,6 @@ The content children can also be dragged and panned.
 			}
 		}
 	}
-
 
 	showShadow() {
 		super.showShadow()
@@ -710,9 +719,12 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerDown(e: ScreenEvent) {
+		//log('down')
+		//log(this.content.screenEventHandler)
 		if (this.focusedChild) {
 			this.focusedChild.blur()
 		}
+		//log(this.creationMode)
 		if (this.creationMode !== 'erase') {
 			this.startCreating(e)
 		}
@@ -748,6 +760,8 @@ The content children can also be dragged and panned.
 	}
 
 	startCreating(e: ScreenEvent) {
+		log(this.constructor.name)
+		log('startCreating')
 		this.creationTool = screenEventDevice(e)
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
@@ -758,6 +772,7 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerMove(e: ScreenEvent) {
+		//log('move')
 		if (this.contracted) { return }
 		if (this.creationStroke.length == 0) { return }
 		this.creating(e)
@@ -776,15 +791,18 @@ The content children can also be dragged and panned.
 	}
 
 	onPointerUp(e: ScreenEvent) {
+		//log('up')
 		if (this.contracted) { return }
 		this.endCreating(e)
 	}
 
 	endCreating(e: ScreenEvent) {
+		log('endCreating')
 		this.creationStroke = []
 		this.creationTool = null
 		this.creationMode = 'draw'
 		if (this.creator !== null) {
+			log(this.creator)
 			this.creator.dissolve()
 			this.helpTextLabel.view.hide()
 		}

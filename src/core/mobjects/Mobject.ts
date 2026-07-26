@@ -62,6 +62,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			_parent: null,
 			children: [], // i. e. submobjects
 
+			name: '',
+
 			view: new View(),
 			motor: new Motor(),
 			sensor: new Sensor(),
@@ -95,6 +97,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 
+	name: string
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -578,6 +581,14 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	blur() {
 		getPaper().blurFocusedChild()
+	}
+
+	blockScreenEvents() {
+		this.sensor.blockScreenEvents()
+	}
+
+	unblockScreenEvents() {
+		this.sensor.unblockScreenEvents()
 	}
 
 }

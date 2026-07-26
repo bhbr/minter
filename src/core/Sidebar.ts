@@ -17,6 +17,7 @@ import { ScreenEvent, isTouchDevice, separateSidebar } from 'core/mobjects/scree
 // StartSidebar needs to be imported *somewhere* for TS to compile it
 import { DemoSidebar } from '../extensions/boards/demo/DemoSidebar'
 import { CoinFlipSidebar} from '../extensions/papers/coin-flip/CoinFlipSidebar'
+import { ConstructionSidebar } from '../extensions/boards/construction/ConstructionSidebar'
 
 interface Window { webkit?: any }
 
