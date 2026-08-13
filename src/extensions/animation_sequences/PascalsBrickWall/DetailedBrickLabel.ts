@@ -31,19 +31,19 @@ export class DetailedBrickLabel extends Popover {
 			nbHeads: 0,
 			nbTails: 0,
 			headsStack: new MGroup({
-				anchor: [-25, 40],
+				anchor: [10, 10],
 				frameWidth: 20,
 				frameHeight: 30,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsStack: new MGroup({
-				anchor: [5, 40],
+				anchor: [40, 10],
 				frameWidth: 20,
 				frameHeight: 30,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			headsLabel: new TextLabel({
-				anchor: [-25, 80],
+				anchor: [10, 50],
 				frameWidth: 20,
 				frameHeight: 10,
 				textColor: HEADS_COLOR,
@@ -51,7 +51,7 @@ export class DetailedBrickLabel extends Popover {
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsLabel: new TextLabel({
-				anchor: [5, 80],
+				anchor: [40, 50],
 				frameWidth: 20,
 				frameHeight: 10,
 				textColor: TAILS_COLOR,

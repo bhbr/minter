@@ -2,9 +2,11 @@
 import { Mobject } from 'core/mobjects/Mobject'
 import { VMobject } from 'core/vmobjects/VMobject'
 import { CurvedShape } from 'core/vmobjects/CurvedShape'
-import { vertex, vertexArray } from 'core/functions/vertex'
+import { vertex, vertexArray, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
+import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
+import { TAU } from 'core/constants'
 
 interface PopoverRoot extends Mobject {
 	handlePopoverMessage(message: object)
@@ -14,7 +16,8 @@ export class Popover extends CurvedShape {
 	
 	rootMobject: PopoverRoot | null
 	direction: 'top' | 'bottom' | 'left' | 'right'
-	anchorOffset: number
+	tipOffset: number
+	chevronTip: vertex
 	chevronSize: number
 	cornerRadius: number
 
@@ -22,19 +25,23 @@ export class Popover extends CurvedShape {
 		return {
 			rootMobject: null,
 			direction: 'bottom',
-			anchorOffset: 0,
+			chevronTip: vertexOrigin(),
+			tipOffset: 0,
 			chevronSize: 10,
 			cornerRadius: 40,
 			fillColor: Color.black()
 		}
 	}
 
+	get width(): number { return this.frameWidth }
+	set width(newValue: number) { this.frameWidth = newValue }
+
+	get height(): number { return this.frameHeight }
+	set height(newValue: number) { this.frameHeight = newValue }
+
 	setup() {
 		super.setup()
 		if (!this.rootMobject) { return }
-		this.update({
-			anchor: this.computeAnchor()
-		})
 	}
 
 	dismiss(message: object) {
@@ -42,18 +49,18 @@ export class Popover extends CurvedShape {
 		this.rootMobject.remove(this)
 	}
 
-	computeAnchor(): vertex {
+	defaultTipPosition(): vertex {
 		switch (this.direction) {
 		case 'top':
-			return [this.rootMobject.frameWidth / 2, - this.anchorOffset]
+			return [this.rootMobject.frameWidth / 2, - this.tipOffset]
 		case 'bottom':
-			return [this.rootMobject.frameWidth / 2, this.rootMobject.frameHeight + this.anchorOffset]
+			return [this.rootMobject.frameWidth / 2, this.rootMobject.frameHeight + this.tipOffset]
 		case 'left':
-			return [- this.anchorOffset, this.rootMobject.frameHeight / 2]
+			return [- this.tipOffset, this.rootMobject.frameHeight / 2]
 		case 'right':
-			return [this.frameWidth + this.anchorOffset, this.rootMobject.frameHeight / 2]
+			return [this.frameWidth + this.tipOffset, this.rootMobject.frameHeight / 2]
 		default:
-			return [this.rootMobject.frameWidth / 2, this.rootMobject.frameHeight + this.anchorOffset]
+			return [this.rootMobject.frameWidth / 2, this.rootMobject.frameHeight + this.tipOffset]
 		}
 	}
 
@@ -77,15 +84,12 @@ export class Popover extends CurvedShape {
 		}
 	}
 
-	topBezierPoints(): vertexArray {
-		return []
-	}
-
-	bottomBezierPoints(): vertexArray {
+	anchorCenteredBottomBezierPoints(): vertexArray {
 		let s = this.chevronSize
 		let r = this.cornerRadius
-		let w = this.frameWidth
-		let h = this.frameHeight
+		let isVerticallyOrientated = (this.direction == 'top' || this.direction == 'bottom')
+		let w = isVerticallyOrientated ? this.width : this.height
+		let h = isVerticallyOrientated ? this.height : this.width
 
 		return [
 			[0, 0], [0, 0], // 0
@@ -103,18 +107,86 @@ export class Popover extends CurvedShape {
 		]
 	}
 
+	bottomBezierPoints(): vertexArray {
+		let t = new Transform({
+			shift: [this.width / 2, - this.chevronSize]
+		})
+		return t.appliedToVertices(this.anchorCenteredBottomBezierPoints())
+	}
+
+	topBezierPoints():  vertexArray {
+		let r = new Transform({
+			angle: TAU / 2
+		})
+		let t = new Transform({
+			shift: [this.width / 2, this.height + this.chevronSize]
+		})
+		return t.appliedToVertices(
+			r.appliedToVertices(this.anchorCenteredBottomBezierPoints())
+		)
+	}
+
+
 	leftBezierPoints(): vertexArray {
-		return []
+		let r = new Transform({
+			angle: - TAU / 4
+		})
+		let t = new Transform({
+			shift: [this.width + this.chevronSize, this.height / 2]
+		})
+		return t.appliedToVertices(
+			r.appliedToVertices(this.anchorCenteredBottomBezierPoints())
+		)
 	}
 
 	rightBezierPoints(): vertexArray {
-		return []
+		let r = new Transform({
+			angle: TAU / 4
+		})
+		let t = new Transform({
+			shift: [- this.chevronSize, this.height / 2]
+		})
+		return t.appliedToVertices(
+			r.appliedToVertices(this.anchorCenteredBottomBezierPoints())
+		)
+	}
+
+	position() {
+		let newAnchor: vertex
+		switch (this.direction) {
+		case 'top':
+			newAnchor = [
+				this.chevronTip[0] - this.width / 2, this.chevronTip[1] - this.height - this.chevronSize
+			]
+			break
+		case 'bottom':
+			newAnchor = [
+				this.chevronTip[0] - this.width / 2, this.chevronTip[1] + this.chevronSize
+			]
+			break
+		case 'left':
+			newAnchor = [
+				this.chevronTip[0] - this.width - this.chevronSize, this.chevronTip[1] - this.height / 2
+			]
+			break
+		case 'right':
+			newAnchor = [
+				this.chevronTip[0] + this.chevronSize, this.chevronTip[1] - this.height / 2
+			]
+			break
+		default:
+			newAnchor = [
+				- this.width / 2, this.chevronSize
+			]
+			break
+		}
+		this.update({ anchor: newAnchor })
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		if (args['rootMobject'] !== undefined) {
-			this.update({ anchor: this.computeAnchor() })
+		if (args['chevronTip'] !== undefined) {
+			this.position()
 		}
 	}
 

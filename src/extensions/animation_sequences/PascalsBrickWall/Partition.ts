@@ -94,7 +94,7 @@ export class Partition extends Linkable implements LabelShower {
 				midpoint: [0, 0]
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
-			brickLabel: new DetailedBrickLabel(),
+			brickLabel: new DetailedBrickLabel({ direction: 'top' }),
 			labelledBrick: null
 		}
 	}
@@ -707,12 +707,12 @@ export class Partition extends Linkable implements LabelShower {
 
 	toggleLabelOnBrick(brick: Brick) {
 
-		let newAnchor = (this.presentationForm == 'row') ? [
-				brick.anchor[0] + brick.view.frame.midX() - this.brickLabel.frameWidth / 2,
-				brick.anchor[1] + brick.view.frame.midY() - this.brickLabel.frameHeight / 2
+		let newTip = (this.presentationForm == 'row') ? [
+				brick.anchor[0] + brick.view.frame.midX(),
+				brick.anchor[1] + brick.view.frame.midY()
 			] : [
-				brick.anchor[0] + brick.view.frame.midY() - this.brickLabel.frameWidth / 2,
-				brick.anchor[1] - brick.view.frame.midX() - this.brickLabel.frameHeight / 2
+				brick.anchor[0] + brick.view.frame.midY(),
+				brick.anchor[1] - brick.view.frame.midX()
 			]
 
 		if (this.labelledBrick) {
@@ -730,7 +730,7 @@ export class Partition extends Linkable implements LabelShower {
 			this.brickLabel.update({
 				nbHeads: brick.nbHeads(),
 				nbTails: brick.nbTails,
-				anchor: newAnchor
+				chevronTip: newTip
 			})
 			brick.update({
 				fillColor: brick.getFillColor().brighten(0.65)
@@ -741,7 +741,7 @@ export class Partition extends Linkable implements LabelShower {
 			this.brickLabel.update({
 				nbHeads: brick.nbHeads(),
 				nbTails: brick.nbTails,
-				anchor: newAnchor
+				chevronTip: newTip
 			})
 			brick.update({
 				fillColor: brick.getFillColor().brighten(0.65)
