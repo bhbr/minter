@@ -31,6 +31,7 @@ export class Popover extends CurvedShape {
 
 	setup() {
 		super.setup()
+		if (!this.rootMobject) { return }
 		this.update({
 			anchor: this.computeAnchor()
 		})
@@ -110,5 +111,11 @@ export class Popover extends CurvedShape {
 		return []
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['rootMobject'] !== undefined) {
+			this.update({ anchor: this.computeAnchor() })
+		}
+	}
 
 }

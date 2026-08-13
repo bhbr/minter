@@ -1,5 +1,5 @@
 
-import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { Popover } from 'core/ui/Popover'
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
@@ -8,7 +8,7 @@ import { HEADS_COLOR, TAILS_COLOR } from './constants'
 import { log } from 'core/functions/logging'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
-export class DetailedBrickLabel extends RoundedRectangle {
+export class DetailedBrickLabel extends Popover {
 	
 	nbHeads: number
 	nbTails: number
@@ -31,19 +31,19 @@ export class DetailedBrickLabel extends RoundedRectangle {
 			nbHeads: 0,
 			nbTails: 0,
 			headsStack: new MGroup({
-				anchor: [10, 10],
+				anchor: [-25, 40],
 				frameWidth: 20,
 				frameHeight: 30,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsStack: new MGroup({
-				anchor: [40, 10],
+				anchor: [5, 40],
 				frameWidth: 20,
 				frameHeight: 30,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			headsLabel: new TextLabel({
-				anchor: [10, 50],
+				anchor: [-25, 80],
 				frameWidth: 20,
 				frameHeight: 10,
 				textColor: HEADS_COLOR,
@@ -51,7 +51,7 @@ export class DetailedBrickLabel extends RoundedRectangle {
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsLabel: new TextLabel({
-				anchor: [40, 50],
+				anchor: [5, 80],
 				frameWidth: 20,
 				frameHeight: 10,
 				textColor: TAILS_COLOR,

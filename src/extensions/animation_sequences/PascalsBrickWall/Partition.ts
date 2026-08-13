@@ -142,6 +142,9 @@ export class Partition extends Linkable implements LabelShower {
 
 	setup() {
 		super.setup()
+		this.brickLabel.update({
+			rootMobject: this
+		})
 		//this.add(this.anchorMarker)
 		this.createBricks()
 		this.positionBricks()
@@ -158,6 +161,7 @@ export class Partition extends Linkable implements LabelShower {
 		this.controls.add(this.presentationFormsList)
 		this.controls.add(this.nextSubstepButton)
 		this.controls.add(this.nextStepButton)
+
 	}
 
 	createBricks() {

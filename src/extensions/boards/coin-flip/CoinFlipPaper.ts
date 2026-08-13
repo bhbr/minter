@@ -19,6 +19,7 @@ import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBACol
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
 import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
+import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -76,4 +77,10 @@ export class CoinFlipPaper extends Paper {
 
 
 let p = new CoinFlipPaper()
+
+let part = new Partition({
+	anchor: [100, 500]
+})
+
+p.addToContent(part)
 
