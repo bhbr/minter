@@ -191,7 +191,6 @@ export class Popover extends CurvedShape {
 
 	defaultChevronTip() {
 		if (this.tipLocation == 'center') {
-			log('center')
 			return this.rootMobject.frame.center()
 		} else {
 			switch (this.direction) {
@@ -211,8 +210,6 @@ export class Popover extends CurvedShape {
 
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
-		log('update')
-		log(args)
 		if (args['chevronTip'] !== undefined) {
 			this.position()
 		} else if (args['tipLocation'] !== undefined) {

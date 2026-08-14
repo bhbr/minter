@@ -4,7 +4,7 @@ import { TextLabel } from 'core/ui/TextLabel'
 import { Color } from 'core/classes/Color'
 import { HEADS_COLOR, TAILS_COLOR } from './constants'
 
-export class BrickLabel extends Pill {
+export class PillBrickLabel extends Pill {
 	
 	nbHeads: number
 	nbTails: number

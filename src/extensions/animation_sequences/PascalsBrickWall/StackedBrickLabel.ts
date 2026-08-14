@@ -1,6 +1,6 @@
 
-import { Popover } from 'core/ui/Popover'
 import { Rectangle } from 'core/shapes/Rectangle'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
@@ -8,7 +8,7 @@ import { HEADS_COLOR, TAILS_COLOR } from './constants'
 import { log } from 'core/functions/logging'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 
-export class DetailedBrickLabel extends Popover {
+export class StackedBrickLabel extends RoundedRectangle {
 	
 	nbHeads: number
 	nbTails: number

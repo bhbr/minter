@@ -1,7 +1,7 @@
 
 import { Linkable } from 'core/linkables/Linkable'
 import { Brick, LabelShower } from './Brick'
-import { DetailedBrickLabel } from './DetailedBrickLabel'
+import { BrickLabelPopover } from './BrickLabelPopover'
 import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
@@ -43,7 +43,7 @@ export class Partition extends Linkable implements LabelShower {
 	anchorMarker: Circle
 	fitButton: SimpleButton
 	scale: number
-	brickLabel: DetailedBrickLabel
+	popover: BrickLabelPopover
 	labelledBrick: Brick | null
 	
 	defaults(): object {
@@ -94,7 +94,7 @@ export class Partition extends Linkable implements LabelShower {
 				midpoint: [0, 0]
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
-			brickLabel: new DetailedBrickLabel({
+			popover: new BrickLabelPopover({
 				direction: 'top',
 				tipOffset: -5
 			}),
@@ -145,7 +145,7 @@ export class Partition extends Linkable implements LabelShower {
 
 	setup() {
 		super.setup()
-		this.brickLabel.update({
+		this.popover.update({
 			rootMobject: this
 		})
 		//this.add(this.anchorMarker)
@@ -712,10 +712,10 @@ export class Partition extends Linkable implements LabelShower {
 
 		let newTip = (this.presentationForm == 'row') ? [
 				brick.anchor[0] + brick.view.frame.midX(),
-				brick.anchor[1] - this.brickLabel.tipOffset
+				brick.anchor[1] - this.popover.tipOffset
 			] : [
 				brick.anchor[0] + brick.view.frame.midY(),
-				brick.anchor[1] - brick.view.frame.xMax() - this.brickLabel.tipOffset
+				brick.anchor[1] - brick.view.frame.xMax() - this.popover.tipOffset
 			]
 
 		if (this.labelledBrick) {
@@ -725,15 +725,17 @@ export class Partition extends Linkable implements LabelShower {
 			})
 			if (brick == this.labelledBrick) {
 				// tapped on highlighted brick to make the label disappear
-				this.brickLabel.view.hide()
+				this.popover.view.hide()
 				this.labelledBrick = null
 				return
 			}
 			// tapped on a new brick
-			this.brickLabel.update({
-				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
+			this.popover.update({
 				chevronTip: newTip
+			})
+			this.popover.label.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails
 			})
 			brick.update({
 				fillColor: brick.getFillColor().brighten(0.65)
@@ -741,19 +743,21 @@ export class Partition extends Linkable implements LabelShower {
 			this.labelledBrick = brick
 		} else {
 			// no brick was previously highlighted
-			this.brickLabel.update({
-				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
+			this.popover.update({
 				chevronTip: newTip
+			})
+			this.popover.label.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails
 			})
 			brick.update({
 				fillColor: brick.getFillColor().brighten(0.65)
 			})
-			this.brickLabel.view.show()
+			this.popover.view.show()
 			this.labelledBrick = brick
 		}
 
-		this.moveToTop(this.brickLabel)
+		this.moveToTop(this.popover)
 
 	}
 
