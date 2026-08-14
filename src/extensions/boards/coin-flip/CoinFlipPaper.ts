@@ -20,6 +20,8 @@ import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelC
 import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
 import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
+import { PascalsTriangle } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangle'
+import { Color } from 'core/classes/Color'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -78,11 +80,13 @@ export class CoinFlipPaper extends Paper {
 
 let p = new CoinFlipPaper()
 
-let part = new Partition({
-	anchor: [100, 500]
+let c = new PascalsTriangle({
+	anchor: [500, 100]
 })
 
-p.addToContent(part)
+p.addToContent(c)
+
+
 
 
 
