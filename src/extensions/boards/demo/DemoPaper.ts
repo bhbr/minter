@@ -38,6 +38,9 @@ import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
 import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
 import { EquationCreator } from 'extensions/creations/VisualAlgebra/view/EquationCreator'
 
+import { log } from 'core/functions/logging'
+import { Popover } from 'core/ui/Popover'
+
 export class DemoPaper extends Paper {
 
 	defaults(): object {
@@ -100,9 +103,6 @@ export class DemoPaper extends Paper {
 }
 
 let d = new DemoPaper()
-
-
-
 
 
 

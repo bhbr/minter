@@ -18,6 +18,7 @@ export class Popover extends CurvedShape {
 	direction: 'top' | 'bottom' | 'left' | 'right'
 	tipOffset: number
 	chevronTip: vertex
+	tipLocation: 'center' | 'edge'
 	chevronSize: number
 	cornerRadius: number
 
@@ -26,6 +27,7 @@ export class Popover extends CurvedShape {
 			rootMobject: null,
 			direction: 'bottom',
 			chevronTip: vertexOrigin(),
+			tipLocation: 'center',
 			tipOffset: 0,
 			chevronSize: 10,
 			cornerRadius: 40,
@@ -42,6 +44,10 @@ export class Popover extends CurvedShape {
 	setup() {
 		super.setup()
 		if (!this.rootMobject) { return }
+		this.update({
+			chevronTip: this.defaultChevronTip()
+		})
+		this.position()
 	}
 
 	dismiss(message: object) {
@@ -183,10 +189,37 @@ export class Popover extends CurvedShape {
 		this.update({ anchor: newAnchor })
 	}
 
+	defaultChevronTip() {
+		if (this.tipLocation == 'center') {
+			log('center')
+			return this.rootMobject.frame.center()
+		} else {
+			switch (this.direction) {
+			case 'top':
+				return [this.rootMobject.frame.midX(), this.rootMobject.frame.yMin() - this.tipOffset]
+			case 'bottom':
+				return [this.rootMobject.frame.midX(), this.rootMobject.frame.yMax() + this.tipOffset]
+			case 'left':
+				return [this.rootMobject.frame.xMin() - this.tipOffset, this.rootMobject.frame.midY()]
+			case 'right':
+				return [this.rootMobject.frame.xMax() + this.tipOffset, this.rootMobject.frame.midY()]
+			default:
+				return [this.rootMobject.frame.midX(), this.rootMobject.frame.yMax() + this.tipOffset]
+			}
+		}
+	}
+
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
+		log('update')
+		log(args)
 		if (args['chevronTip'] !== undefined) {
 			this.position()
+		} else if (args['tipLocation'] !== undefined) {
+			log('tipLocation')
+			this.update({
+				chevronTip: this.defaultChevronTip()
+			})
 		}
 	}
 

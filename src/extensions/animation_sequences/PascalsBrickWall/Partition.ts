@@ -94,7 +94,10 @@ export class Partition extends Linkable implements LabelShower {
 				midpoint: [0, 0]
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
-			brickLabel: new DetailedBrickLabel({ direction: 'top' }),
+			brickLabel: new DetailedBrickLabel({
+				direction: 'top',
+				tipOffset: -5
+			}),
 			labelledBrick: null
 		}
 	}
@@ -709,10 +712,10 @@ export class Partition extends Linkable implements LabelShower {
 
 		let newTip = (this.presentationForm == 'row') ? [
 				brick.anchor[0] + brick.view.frame.midX(),
-				brick.anchor[1] + brick.view.frame.midY()
+				brick.anchor[1] - this.brickLabel.tipOffset
 			] : [
 				brick.anchor[0] + brick.view.frame.midY(),
-				brick.anchor[1] - brick.view.frame.midX()
+				brick.anchor[1] - brick.view.frame.xMax() - this.brickLabel.tipOffset
 			]
 
 		if (this.labelledBrick) {
