@@ -133,6 +133,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	set frameWidth(newValue: number) { this.frame.width = newValue }
 	get frameHeight(): number { return this.frame.height ?? 0 }
 	set frameHeight(newValue: number) { this.frame.height = newValue }
+	frameCenter(): vertex { return this.frame.center() }
 
 	get visible(): boolean { return this.view.visible }
 	set visible(newValue: boolean) { this.view.visible = newValue }

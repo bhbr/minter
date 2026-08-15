@@ -22,6 +22,8 @@ import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWal
 import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
 import { PascalsTriangle } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangle'
 import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
+import { binomial } from 'core/functions/math'
 
 export class CoinFlipPaper extends Paper {
 	

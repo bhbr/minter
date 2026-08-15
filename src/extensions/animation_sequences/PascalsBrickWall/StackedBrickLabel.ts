@@ -4,9 +4,10 @@ import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT, COMB_LABEL_WIDTH, COMB_LABEL_HEIGHT, COMB_LABEL_PADDING } from './constants'
 import { log } from 'core/functions/logging'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { binomial } from 'core/functions/math'
 
 export class StackedBrickLabel extends RoundedRectangle {
 	
@@ -16,45 +17,55 @@ export class StackedBrickLabel extends RoundedRectangle {
 	tailsStack: MGroup
 	headsLabel: TextLabel
 	tailsLabel: TextLabel
+	nbCombinationsLabel: TextLabel
 	stackWidth: number
 	coinHeight: number
 
 	defaults(): object {
 		return {
-			width: 70,
-			height: 70,
+			width: CELL_SIZE,
+			height: CELL_SIZE,
 			cornerRadius: 20,
-			stackWidth: 20,
-			coinHeight: 4,
+			stackWidth: COIN_WIDTH,
+			coinHeight: COIN_HEIGHT,
 			fillColor: Color.gray(0.1),
 			fillOpacity: 0.9,
 			nbHeads: 0,
 			nbTails: 0,
 			headsStack: new MGroup({
-				anchor: [10, 10],
-				frameWidth: 20,
-				frameHeight: 30,
+				anchor: [COIN_PADDING, COIN_PADDING],
+				frameWidth: COIN_WIDTH,
+				frameHeight: STACK_MAX_HEIGHT,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsStack: new MGroup({
-				anchor: [40, 10],
-				frameWidth: 20,
-				frameHeight: 30,
+				anchor: [CELL_SIZE - COIN_WIDTH - COIN_PADDING, COIN_PADDING],
+				frameWidth: COIN_WIDTH,
+				frameHeight: STACK_MAX_HEIGHT,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			headsLabel: new TextLabel({
-				anchor: [10, 50],
-				frameWidth: 20,
-				frameHeight: 10,
+				anchor: [COIN_PADDING, CELL_SIZE - HT_LABEL_PADDING - HT_LABEL_HEIGHT],
+				frameWidth: COIN_WIDTH,
+				frameHeight: HT_LABEL_HEIGHT,
 				textColor: HEADS_COLOR,
 				fontSize: 20,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsLabel: new TextLabel({
-				anchor: [40, 50],
-				frameWidth: 20,
-				frameHeight: 10,
+				anchor: [CELL_SIZE - COIN_WIDTH - COIN_PADDING, CELL_SIZE - HT_LABEL_PADDING - HT_LABEL_HEIGHT],
+				frameWidth: COIN_WIDTH,
+				frameHeight: HT_LABEL_HEIGHT,
 				textColor: TAILS_COLOR,
+				fontSize: 20,
+				screenEventHandler: ScreenEventHandler.Below
+			}),
+			nbCombinationsLabel: new TextLabel({
+				anchor: [(CELL_SIZE - COMB_LABEL_WIDTH) / 2, CELL_SIZE - COMB_LABEL_PADDING - COMB_LABEL_HEIGHT],
+				frameWidth: COMB_LABEL_WIDTH,
+				frameHeight: COMB_LABEL_HEIGHT,
+				textColor: Color.white(),
+				backgroundColor: Color.gray(0.6),
 				fontSize: 20,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
@@ -66,14 +77,46 @@ export class StackedBrickLabel extends RoundedRectangle {
 		super.setup()
 		this.add(this.headsStack)
 		this.add(this.tailsStack)
-		this.add(this.headsLabel)
-		this.add(this.tailsLabel)
 		this.buildHeadsStack()
 		this.buildTailsStack()
+		this.showHTLabel()
+	}
+
+	updateHeadsLabel() {
+		this.headsLabel.update({
+			text: this.nbHeads.toString()
+		})
+	}
+
+	updateTailsLabel() {
+		this.tailsLabel.update({
+			text: this.nbTails.toString()
+		})
+	}
+
+	updateCombinationsLabel() {
+		this.nbCombinationsLabel.update({
+			text: binomial(this.nbFlips(), this.nbTails).toString()
+		})
+	}
+
+	showHTLabel() {
+		this.remove(this.nbCombinationsLabel)
+		this.updateHeadsLabel()
+		this.updateTailsLabel()
+		this.add(this.headsLabel)
+		this.add(this.tailsLabel)
+	}
+
+	showCombinationsLabel() {
+		this.add(this.nbCombinationsLabel)
+		this.updateCombinationsLabel()
+		this.remove(this.headsLabel)
+		this.remove(this.tailsLabel)
 	}
 
 	nbFlips(): number {
-		return this.nbHeads + this.nbHeads
+		return this.nbHeads + this.nbTails
 	}
 
 	buildHeadsStack() {
@@ -138,9 +181,8 @@ export class StackedBrickLabel extends RoundedRectangle {
 		let coin = this.makeHeadsCoin()
 		this.headsStack.add(coin)
 		this.nbHeads += 1
-		this.headsLabel.update({
-			text: this.nbHeads.toString()
-		})
+		this.updateHeadsLabel()
+		this.updateCombinationsLabel()
 	}
 
 	addHeadsCoins(n: number) {
@@ -153,9 +195,8 @@ export class StackedBrickLabel extends RoundedRectangle {
 		let coin = this.makeTailsCoin()
 		this.tailsStack.add(coin)
 		this.nbTails += 1
-		this.tailsLabel.update({
-			text: this.nbTails.toString()
-		})
+		this.updateTailsLabel()
+		this.updateCombinationsLabel()
 	}
 
 	addTailsCoins(n: number) {
@@ -168,9 +209,8 @@ export class StackedBrickLabel extends RoundedRectangle {
 		let coin = this.headsStack.submobjects.pop()
 		this.headsStack.remove(coin)
 		this.nbHeads -= 1
-		this.headsLabel.update({
-			text: this.nbHeads.toString()
-		})
+		this.updateHeadsLabel()
+		this.updateCombinationsLabel()
 	}
 
 	removeHeadsCoins(n: number) {
@@ -183,9 +223,8 @@ export class StackedBrickLabel extends RoundedRectangle {
 		let coin = this.tailsStack.submobjects.pop()
 		this.tailsStack.remove(coin)
 		this.nbTails -= 1
-		this.tailsLabel.update({
-			text: this.nbTails.toString()
-		})
+		this.updateTailsLabel()
+		this.updateCombinationsLabel()
 	}
 
 	removeTailsCoins(n: number) {
