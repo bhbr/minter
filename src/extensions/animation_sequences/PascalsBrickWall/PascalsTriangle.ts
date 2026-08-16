@@ -4,16 +4,20 @@ import { Line } from 'core/shapes/Line'
 import { Linkable } from 'core/linkables/Linkable'
 import { PascalsTriangleCell } from './PascalsTriangleCell'
 import { SimpleButton } from 'core/ui/SimpleButton'
-import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING } from './constants'
+import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION } from './constants'
 import { vertexAdd } from 'core/functions/vertex'
+import { RadioButtonList } from 'core/ui/RadioButtonList'
+import { log } from 'core/functions/logging'
 
 export class PascalsTriangle extends Linkable {
 	
 	cells: Array<Array<PascalsTriangleCell>>
-	nbFlips: 0
+	nbFlips: number
 	splitButton: SimpleButton
 	isSplitting: boolean
 	edges: MGroup
+	presentationFormsList: RadioButtonList
+	presentation: 'stacks' | 'combinations'
 
 	defaults(): object {
 		return {
@@ -23,8 +27,16 @@ export class PascalsTriangle extends Linkable {
 				anchor: [-25, CELL_SIZE + CELL_PADDING],
 				text: 'flip'
 			}),
+			presentation: 'stacks',
 			isSplitting: false,
-			edges: new MGroup()
+			edges: new MGroup(),
+			presentationFormsList: new RadioButtonList({
+				anchor: [-100, CELL_SIZE + CELL_PADDING + 50],
+				options: [
+					'# heads/tails',
+					'# possibilities'
+				]
+			})
 		}
 	}
 
@@ -32,7 +44,8 @@ export class PascalsTriangle extends Linkable {
 		super.setup()
 		let baseCell = new PascalsTriangleCell({
 			nbHeads: 0,
-			nbTails: 0
+			nbTails: 0,
+			presentation: this.presentation
 		})
 		baseCell.update({
 			anchor: [-baseCell.width / 2, 0]
@@ -42,6 +55,11 @@ export class PascalsTriangle extends Linkable {
 		this.moveToBack(this.edges)
 		this.splitButton.action = this.splitCells.bind(this)
 		this.controls.add(this.splitButton)
+		this.presentationFormsList.action = this.switchPresentation.bind(this)
+		this.presentationFormsList.update({
+			selectedButton: this.presentationFormsList.radioButtons[0]
+		})
+		this.controls.add(this.presentationFormsList)
 	}
 
 	splitCells() {
@@ -54,13 +72,15 @@ export class PascalsTriangle extends Linkable {
 				nbHeads: cell.nbHeads,
 				nbTails: cell.nbTails,
 				anchor: cell.anchor,
-				opacity: CELL_START_OPACITY
+				opacity: CELL_START_OPACITY,
+				presentation: this.presentation
 			})
 			let rightCopy = new PascalsTriangleCell({
 				nbHeads: cell.nbHeads,
 				nbTails: cell.nbTails,
 				anchor: cell.anchor,
-				opacity: CELL_START_OPACITY
+				opacity: CELL_START_OPACITY,
+				presentation: this.presentation
 			})
 			this.add(leftCopy)
 			this.add(rightCopy)
@@ -78,13 +98,13 @@ export class PascalsTriangle extends Linkable {
 			this.edges.add(rightEdge)
 
 			leftCopy.animatedAddHeadsCoin(i != 0 ? function() { this.remove(leftCopy) }.bind(this) : () => {})
+			rightCopy.animatedAddTailsCoin(i == this.nbFlips ? this.endSplitting.bind(this): () => {})
 			leftEdge.animate({
 				endPoint: [cell.anchor[0] - 5, cell.anchor[1] + 1.5 * cell.height + 10]
-			}, 1)
-			rightCopy.animatedAddTailsCoin(i == this.nbFlips ? this.endSplitting.bind(this): () => {})
+			}, SLOW_CELL_ANIMATION_DURATION)
 			rightEdge.animate({
 				endPoint: [cell.anchor[0] + cell.width + 5, cell.anchor[1] + 1.5 * cell.height + 10]
-			}, 1)
+			}, SLOW_CELL_ANIMATION_DURATION)
 			if (i == 0) {
 				this.cells[this.nbFlips + 1].push(leftCopy)
 			}
@@ -92,6 +112,9 @@ export class PascalsTriangle extends Linkable {
 		}
 		this.splitButton.animate({
 			anchor: vertexAdd(this.splitButton.anchor, [0, CELL_SIZE + CELL_PADDING])
+		}, 1)
+		this.presentationFormsList.animate({
+			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, 1)
 
 	}
@@ -101,8 +124,42 @@ export class PascalsTriangle extends Linkable {
 			isSplitting: false,
 			nbFlips: this.nbFlips + 1
 		})
-
 	}
+
+	switchPresentation() {
+		let i = this.presentationFormsList.radioButtons.indexOf(this.presentationFormsList.selectedButton)
+		let newPresentation = (i == 0) ? 'stacks' : 'combinations'
+		if (newPresentation == this.presentation) { return }
+		if (newPresentation == 'stacks') {
+			this.showHTLabels(FAST_CELL_ANIMATION_DURATION)
+		} else if (newPresentation == 'combinations') {
+			this.showCombinationsLabels(FAST_CELL_ANIMATION_DURATION)
+		}
+		this.update({
+			presentation: newPresentation
+		})
+	}
+
+	showHTLabels(duration: number = 0) {
+		for (let i = 0; i <= this.nbFlips; i++) {
+			for (let j = 0; j <= i; j++) {
+				let cell = this.cells[i][j]
+				cell.showHTLabel(duration)
+			}
+		}
+	}
+
+	showCombinationsLabels(duration: number = 0) {
+		for (let i = 0; i <= this.nbFlips; i++) {
+			for (let j = 0; j <= i; j++) {
+				let cell = this.cells[i][j]
+				cell.showCombinationsLabel(duration)
+			}
+		}
+	}
+
+
+
 
 
 }

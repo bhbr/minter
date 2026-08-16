@@ -5,7 +5,7 @@ import { BrickLabelPopover } from './BrickLabelPopover'
 import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION, BRICK_FILL_OPACITY } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, FAST_PARTITION_ANIMATION_DURATION, SLOW_PARTITION_ANIMATION_DURATION, BRICK_FILL_OPACITY } from './constants'
 import { Color } from 'core/classes/Color'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { Rectangle } from 'core/shapes/Rectangle'
@@ -65,7 +65,7 @@ export class Partition extends Linkable implements LabelShower {
 				{ name: 'nbFlips', displayName: '# flips', type: 'number' }
 			],
 			animationSubstep: 0,
-			animationDuration: SLOW_ANIMATION_DURATION,
+			animationDuration: SLOW_PARTITION_ANIMATION_DURATION,
 			presentationFormsList: new RadioButtonList({
 				anchor: [0, BASE_BRICK_HEIGHT + 15],
 				options: [
