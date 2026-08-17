@@ -7,7 +7,7 @@
 //         // conflicts with the z hierarchy
 
 //         let tipSize = 10
-//         let cornerRadius = 30
+//         let cornerRadius = 10
 //         this.fillColor = 'white'
 //         this.strokeColor = 'black'
 //         this.strokeWidth = 1

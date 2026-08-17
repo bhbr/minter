@@ -13,7 +13,7 @@ export class SimpleButton extends RoundedRectangle {
 		return {
 			width: 50,
 			height: 25,
-			cornerRadius: 20,
+			cornerRadius: 5,
 			label: new TextLabel({
 				textColor: Color.white()
 			}),

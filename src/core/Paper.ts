@@ -81,7 +81,7 @@ export class Paper extends Board {
 		this.background.update({
 			cornerRadius: 0,
 			strokeColor: Color.clear(),
-			strokeWidth: 0.0
+			strokeWidth: 0
 		})
 		this.background.view.hideShadow()
 

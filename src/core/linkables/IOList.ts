@@ -29,7 +29,7 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 			linkOutlets: [],
 			mobject: null,
 			outletProperties: [],
-			cornerRadius: 20,
+			cornerRadius: 10,
 			width: IO_LIST_WIDTH,
 			frameWidth: IO_LIST_WIDTH,
 			fillColor: Color.gray(0.2),

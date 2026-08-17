@@ -17,7 +17,7 @@ export class BrickLabelPopover extends Popover {
 		return {
 			width: 70,
 			height: 70,
-			cornerRadius: 20,
+			cornerRadius: 10,
 			screenEventHandler: ScreenEventHandler.Below,
 			label: new StackedBrickLabel()
 		}

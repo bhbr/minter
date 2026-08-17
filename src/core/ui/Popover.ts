@@ -30,7 +30,7 @@ export class Popover extends CurvedShape {
 			tipLocation: 'center',
 			tipOffset: 0,
 			chevronSize: 10,
-			cornerRadius: 40,
+			cornerRadius: 10,
 			fillColor: Color.black()
 		}
 	}

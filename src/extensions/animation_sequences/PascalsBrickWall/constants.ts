@@ -11,6 +11,7 @@ export const BRICK_STROKE_WIDTH: number = 3
 export const BRICK_FILL_OPACITY: number = 1.0
 export const CELL_SIZE: number = 70
 export const CELL_PADDING: number = 10
+export const CELL_CORNER_RADIUS: number = 10
 export const COIN_WIDTH: number = 20
 export const COIN_HEIGHT: number = 4
 export const COIN_PADDING: number = 10

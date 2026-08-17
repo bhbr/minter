@@ -3,12 +3,10 @@ import { Rectangle } from 'core/shapes/Rectangle'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, CELL_CORNER_RADIUS, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT } from './constants'
 import { log } from 'core/functions/logging'
 import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { binomial } from 'core/functions/math'
-
 export class StackedBrickLabel extends RoundedRectangle {
 	
 	nbHeads: number
@@ -17,7 +15,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 	tailsStack: MGroup
 	headsLabel: TextLabel
 	tailsLabel: TextLabel
-	nbCombinationsLabel: TextLabel
 	stackWidth: number
 	coinHeight: number
 
@@ -25,7 +22,7 @@ export class StackedBrickLabel extends RoundedRectangle {
 		return {
 			width: CELL_SIZE,
 			height: CELL_SIZE,
-			cornerRadius: 40,
+			cornerRadius: CELL_CORNER_RADIUS,
 			stackWidth: COIN_WIDTH,
 			coinHeight: COIN_HEIGHT,
 			nbHeads: 0,
@@ -84,11 +81,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 		})
 	}
 
-	updateCombinationsLabel() {
-		this.nbCombinationsLabel.update({
-			text: binomial(this.nbFlips(), this.nbTails).toString()
-		})
-	}
 	nbFlips(): number {
 		return this.nbHeads + this.nbTails
 	}
@@ -156,7 +148,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 		this.headsStack.add(coin)
 		this.nbHeads += 1
 		this.updateHeadsLabel()
-		this.updateCombinationsLabel()
 	}
 
 	addHeadsCoins(n: number) {
@@ -170,7 +161,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 		this.tailsStack.add(coin)
 		this.nbTails += 1
 		this.updateTailsLabel()
-		this.updateCombinationsLabel()
 	}
 
 	addTailsCoins(n: number) {
@@ -184,7 +174,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 		this.headsStack.remove(coin)
 		this.nbHeads -= 1
 		this.updateHeadsLabel()
-		this.updateCombinationsLabel()
 	}
 
 	removeHeadsCoins(n: number) {
@@ -198,7 +187,6 @@ export class StackedBrickLabel extends RoundedRectangle {
 		this.tailsStack.remove(coin)
 		this.nbTails -= 1
 		this.updateTailsLabel()
-		this.updateCombinationsLabel()
 	}
 
 	removeTailsCoins(n: number) {

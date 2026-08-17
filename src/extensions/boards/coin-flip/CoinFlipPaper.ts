@@ -25,6 +25,7 @@ import { PascalsTriangleCell } from 'extensions/animation_sequences/PascalsBrick
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -87,20 +88,10 @@ let c = new PascalsTriangle({
 	anchor: [500, 100]
 })
 
-// let c = new PascalsTriangleCell({
-// 	anchor: [500, 100],
-// 	nbHeads: 3,
-// 	nbTails: 2,
-// 	presentation: 'combinations',
-// 	opacity: 0.5
-// })
-
 
 
 
 p.addToContent(c)
 
-
-//window.setTimeout(c.animatedAddHeadsCoin.bind(c), 1000)
 
 

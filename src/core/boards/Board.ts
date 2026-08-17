@@ -57,7 +57,7 @@ The content children can also be dragged and panned.
 			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
-				cornerRadius: 25,
+				cornerRadius: 15,
 				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
 				fillOpacity: 1.0,
