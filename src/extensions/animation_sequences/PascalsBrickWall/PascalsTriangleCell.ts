@@ -44,6 +44,7 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 
 	setup() {
 		super.setup()
+		this.probabilityIndicator.view.svg.style.overflow = 'hidden'
 		this.add(this.probabilityIndicator)
 		this.add(this.nbCombinationsLabel)
 		if (this.presentation == 'stacks') {
@@ -179,6 +180,8 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 			anchor: [0, this.height * (1 - p)],
 			height: this.height * p
 		})
+		this.probabilityIndicator.view.svg.style.overflow = 'hidden' // for when height or width < a corner radius
+		// this is here not in the setup bc something keeps overwriting this property
 	}
 
 }
