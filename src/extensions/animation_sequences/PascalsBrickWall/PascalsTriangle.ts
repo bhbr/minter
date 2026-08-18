@@ -8,6 +8,9 @@ import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATI
 import { vertexAdd } from 'core/functions/vertex'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { log } from 'core/functions/logging'
+import { TextLabel } from 'core/ui/TextLabel'
+import { Transform } from 'core/classes/Transform'
+import { TAU } from 'core/constants'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -18,6 +21,10 @@ export class PascalsTriangle extends Linkable {
 	edges: MGroup
 	presentationFormsList: RadioButtonList
 	presentation: 'stacks' | 'combinations'
+	nbFlipsLabels: MGroup
+	nbFlipsText: TextLabel
+	nbPossibilitiesLabels: MGroup
+	nbPossibilitiesText: TextLabel
 
 	defaults(): object {
 		return {
@@ -33,9 +40,29 @@ export class PascalsTriangle extends Linkable {
 			presentationFormsList: new RadioButtonList({
 				anchor: [-100, CELL_SIZE + CELL_PADDING + 50],
 				options: [
-					'# heads/tails',
+					'# flips',
 					'# possibilities'
 				]
+			}),
+			nbFlipsLabels: new MGroup(),
+			nbFlipsText: new TextLabel({
+				text: '# flips',
+				frameWidth: 50,
+				frameHeight: 25,
+				transform: new Transform({
+					anchor: [-2 * CELL_SIZE, 0.75 * CELL_SIZE],
+					angle: TAU / 6
+				})
+			}),
+			nbPossibilitiesLabels: new MGroup(),
+			nbPossibilitiesText: new TextLabel({
+				text: '# possibilities',
+				frameWidth: 100,
+				frameHeight: 25,
+				transform: new Transform({
+					anchor: [1.7 * CELL_SIZE, 0.2 * CELL_SIZE],
+					angle: -TAU / 6
+				})
 			})
 		}
 	}
@@ -60,6 +87,13 @@ export class PascalsTriangle extends Linkable {
 			selectedButton: this.presentationFormsList.radioButtons[0]
 		})
 		this.controls.add(this.presentationFormsList)
+
+		this.nbFlipsLabels.add(this.nbFlipsText)
+		this.createNewNbFlipsLabel()
+		this.add(this.nbFlipsLabels)
+
+		this.nbPossibilitiesLabels.add(this.nbPossibilitiesText)
+		this.createNewNbPossibilitiesLabel()
 	}
 
 	splitCells() {
@@ -116,14 +150,44 @@ export class PascalsTriangle extends Linkable {
 		this.presentationFormsList.animate({
 			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, 1)
-
 	}
+
+	createNewNbFlipsLabel() {
+		let labelAnchor = vertexAdd(
+			this.cells[this.nbFlips][0].anchor,
+			[-CELL_SIZE, 0]
+		)
+		let newNbFlipsLabel = new TextLabel({
+			frameWidth: CELL_SIZE,
+			frameHeight: CELL_SIZE,
+			text: `${this.nbFlips}`,
+			anchor: labelAnchor
+		})
+		this.nbFlipsLabels.add(newNbFlipsLabel)
+	}
+
+	createNewNbPossibilitiesLabel() {
+		let labelAnchor = vertexAdd(
+			this.cells[this.nbFlips][this.nbFlips].anchor,
+			[CELL_SIZE, 0]
+		)
+		let newNbPossibilitiesLabel = new TextLabel({
+			frameWidth: CELL_SIZE,
+			frameHeight: CELL_SIZE,
+			text: `${2 ** this.nbFlips}`,
+			anchor: labelAnchor
+		})
+		this.nbPossibilitiesLabels.add(newNbPossibilitiesLabel)
+	}
+
 
 	endSplitting() {
 		this.update({
 			isSplitting: false,
 			nbFlips: this.nbFlips + 1
 		})
+		this.createNewNbFlipsLabel()
+		this.createNewNbPossibilitiesLabel()
 	}
 
 	switchPresentation() {
@@ -132,8 +196,12 @@ export class PascalsTriangle extends Linkable {
 		if (newPresentation == this.presentation) { return }
 		if (newPresentation == 'stacks') {
 			this.showHTLabels(FAST_CELL_ANIMATION_DURATION)
+			this.remove(this.nbPossibilitiesLabels)
+			this.add(this.nbFlipsLabels)
 		} else if (newPresentation == 'combinations') {
 			this.showCombinationsLabels(FAST_CELL_ANIMATION_DURATION)
+			this.remove(this.nbFlipsLabels)
+			this.add(this.nbPossibilitiesLabels)
 		}
 		this.update({
 			presentation: newPresentation

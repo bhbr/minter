@@ -175,6 +175,9 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 		})
 		if (this.nbFlips() == 0) { return }
 		let p = binomial(this.nbFlips(), this.nbTails) / (2 ** this.nbFlips())
+		this.update({
+			fillColor: this.computeFillColor().darken(0.25)
+		})
 		this.probabilityIndicator.update({
 			fillColor: this.computeFillColor(),
 			anchor: [0, this.height * (1 - p)],
