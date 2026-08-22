@@ -181,14 +181,12 @@ The content children can also be dragged and panned.
 		// this.add(this.expandedOutputList)
 
 		if (this.contracted) {
-			log('contracted')
 			this.contractStateChange()
 			this.inputList.view.show()
 			this.outputList.view.show()
 			this.expandedInputList.view.hide()
 			this.expandedOutputList.view.hide()
 		} else {
-			log('expanded')
 			this.expandStateChange()
 			this.inputList.view.hide()
 			this.outputList.view.hide()
@@ -205,6 +203,61 @@ The content children can also be dragged and panned.
 		})
 		this.add(this.helpTextLabel)
 		this.helpTextLabel.view.hide()
+
+		this.setupLinkMethods()
+		this.setupEraserMethods()
+		this.setupPanMethods()
+	}
+
+	setupLinkMethods() {
+		this.sensor.screenEventMethods['link'] = {
+			onPointerDown: this.startLinking.bind(this),
+			onTouchDown: this.startLinking.bind(this),
+			onPenDown: this.startLinking.bind(this),
+			onMouseDown: this.startLinking.bind(this),
+			onPointerMove: this.linking.bind(this),
+			onTouchMove: this.linking.bind(this),
+			onPenMove: this.linking.bind(this),
+			onMouseMove: this.linking.bind(this), // will only actually drag if mouse is pressed down
+			onPointerUp: this.endLinking.bind(this),
+			onTouchUp: this.endLinking.bind(this),
+			onPenUp: this.endLinking.bind(this),
+			onMouseUp: this.endLinking.bind(this)
+		}
+	}
+
+	setupEraserMethods() {
+		this.sensor.screenEventMethods['erase'] = {
+			onPointerDown: this.startErasing.bind(this),
+			onTouchDown: this.startErasing.bind(this),
+			onPenDown: this.startErasing.bind(this),
+			onMouseDown: this.startErasing.bind(this),
+			onPointerMove: this.erasing.bind(this),
+			onTouchMove: this.erasing.bind(this),
+			onPenMove: this.erasing.bind(this),
+			onMouseMove: this.erasing.bind(this), // will only actually drag if mouse is pressed down
+			onPointerUp: this.endErasing.bind(this),
+			onTouchUp: this.endErasing.bind(this),
+			onPenUp: this.endErasing.bind(this),
+			onMouseUp: this.endErasing.bind(this)
+		}
+	}
+
+	setupPanMethods() {
+		this.sensor.screenEventMethods['pan'] = {
+			onPointerDown: this.startPanning.bind(this),
+			onTouchDown: this.startPanning.bind(this),
+			onPenDown: this.startPanning.bind(this),
+			onMouseDown: this.startPanning.bind(this),
+			onPointerMove: this.panning.bind(this),
+			onTouchMove: this.panning.bind(this),
+			onPenMove: this.panning.bind(this),
+			onMouseMove: this.panning.bind(this), // will only actually drag if mouse is pressed down
+			onPointerUp: this.endPanning.bind(this),
+			onTouchUp: this.endPanning.bind(this),
+			onPenUp: this.endPanning.bind(this),
+			onMouseUp: this.endPanning.bind(this)
+		}
 	}
 
 	update(args: object = {}, redraw: boolean = true) {
@@ -266,14 +319,17 @@ The content children can also be dragged and panned.
 	}
 
 	expandStateChange() {
-		log(this.constructor.name)
 		if (!this.expanded) { this.update({ expanded: true }) }
 		getPaper().expandedMobject = this
-		if (this.sensor.screenEventsBlocked) {
-			this.unblockScreenEvents()
+		if (this.sensor.screenEventState == 'blocked') {
+			this.sensor.update({
+				screenEventState: 'default'
+			})
+		} else {
+			this.sensor.update({
+				screenEventState: 'blocked'
+			})
 		}
-		log(this.sensor.screenEventsBlocked)
-		log(this.sensor.onMouseDown)
 		this.enableContent()
 		if (this.parent != undefined) {
 			this.parent.moveToTop(this)
@@ -557,31 +613,22 @@ The content children can also be dragged and panned.
 
 	setEraser(erasing: boolean) {
 		if (erasing && this.creationMode !== 'erase') {
-			this.sensor.setMouseMethodsTo(
-				this.startErasing.bind(this),
-				this.erasing.bind(this),
-				this.endErasing.bind(this)
-			)
-			this.sensor.setPenMethodsTo(
-				this.startErasing.bind(this),
-				this.erasing.bind(this),
-				this.endErasing.bind(this)
-			)
-			this.sensor.setTouchMethodsTo(
-				this.startErasing.bind(this),
-				this.erasing.bind(this),
-				this.endErasing.bind(this)
-			)
-			this.sensor.onMouseClick = this.onTap.bind(this)
-			this.sensor.onPenTap = this.onTap.bind(this)
-			this.sensor.onTouchTap = this.onTap.bind(this)
+			this.sensor.update({
+				screenEventState: 'erase'
+			})
+
+			// ? what to do with these?
+			//this.sensor.onMouseClick = this.onTap.bind(this)
+			//this.sensor.onPenTap = this.onTap.bind(this)
+			//this.sensor.onTouchTap = this.onTap.bind(this)
+
 			this.update({
 				creationMode: 'erase'
 			})
 		} else if (!erasing && this.creationMode == 'erase') {
-			this.sensor.restoreMouseMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreTouchMethods()
+			this.sensor.update({
+				screenEventState: 'default'
+			})
 			this.handleMessage('create', 'draw')
 		}
 	}
@@ -735,9 +782,9 @@ The content children can also be dragged and panned.
 			this.messageSidebar({ 'buttonUp': 'erase' })
 			this.setEraser(false)
 			this.update({ creationMode: 'draw' })
-			this.sensor.onMouseClick = this.sensor.savedOnMouseClick
-			this.sensor.onPenTap = this.sensor.savedOnPenTap
-			this.sensor.onTouchTap = this.sensor.savedOnTouchTap
+			//this.sensor.onMouseClick = this.sensor.savedOnMouseClick
+			//this.sensor.onPenTap = this.sensor.savedOnPenTap
+			//this.sensor.onTouchTap = this.sensor.savedOnTouchTap
 		}
 	}
 
@@ -868,15 +915,9 @@ The content children can also be dragged and panned.
 	}
 
 	setPanning(flag: boolean) {
-		if (flag) {
-			this.sensor.setTouchMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
-			this.sensor.setPenMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
-			this.sensor.setMouseMethodsTo(this.startPanning.bind(this), this.panning.bind(this), this.endPanning.bind(this))
-		} else {
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
-		}
+		this.sensor.update({
+			screenEventState: flag ? 'pan' : 'default'
+		})
 	}
 
 	// startZooming(e: TouchEvent) {
@@ -981,17 +1022,9 @@ The content children can also be dragged and panned.
 			//this.enableContent()
 		}
 		this.isShowingLinks = flag
-		if (flag) {
-			//this.disableContent()
-			this.sensor.setTouchMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setPenMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-			this.sensor.setMouseMethodsTo(this.startLinking.bind(this), this.linking.bind(this), this.endLinking.bind(this))
-		} else {
-			//this.enableContent()
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
-		}
+		this.sensor.update({
+			screenEventState: flag ? 'link' : 'default'
+		})
 	}
 
 	startLinking(e: ScreenEvent) {

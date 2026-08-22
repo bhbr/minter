@@ -22,7 +22,7 @@ export type ScreenEvent = MouseEvent | TouchEvent
 // this includes PointerEvent (subclass of MouseEvent)
 export enum ScreenEventDevice { Mouse, Finger, Pen, Unknown }
 export enum ScreenEventType { Down, Move, Up, Cancel, Unknown }
-(window as any).emulatedDevice = ScreenEventDevice.Pen
+(window as any).emulatedDevice = ScreenEventDevice.Mouse
 
 export enum ScreenEventHandler {
 	Auto, // don't interfere with event capturing

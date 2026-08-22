@@ -179,16 +179,16 @@ export class MathExpressionField extends Linkable {
 		super.focus()
 		this.mathField.focus()
 		this.activateKeyboard()
-		getPaper().sensor.savedOnPointerUp = getPaper().sensor.onPointerUp
-		getPaper().sensor.onPointerUp = this.blur.bind(this)
+		//getPaper().sensor.savedOnPointerUp = getPaper().sensor.onPointerUp
+		//getPaper().sensor.onPointerUp = this.blur.bind(this)
 	}
 
 	blur() {
 		super.blur()
 		this.mathField.blur()
 		this.deactivateKeyboard()
-		getPaper().sensor.onPointerUp = getPaper().sensor.savedOnPointerUp
-		getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
+		//getPaper().sensor.onPointerUp = getPaper().sensor.savedOnPointerUp
+		//getPaper().sensor.savedOnPointerUp = function(e: ScreenEvent) { }
 	}
 
 	updateIOProperties() {

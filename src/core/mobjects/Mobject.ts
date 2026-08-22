@@ -2,7 +2,7 @@
 import { remove, clear } from 'core/functions/arrays'
 import { log } from 'core/functions/logging'
 import { copy } from 'core/functions/copying'
-import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events'
+import { ScreenEventHandler, eventVertex, ScreenEvent, screenEventType, ScreenEventType } from './screen_events'
 import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform'
 import { ExtendedObject } from 'core/classes/ExtendedObject'
@@ -89,13 +89,26 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.view.setup()
 		this.motor.mobject = this
 		this.sensor.mobject = this
+		this.sensor.setup()
 
-		// put into sensor setup?
-		addPointerDown(this.view.div, this.sensor.capturedOnPointerDown.bind(this.sensor))
-		addPointerMove(this.view.div, this.sensor.capturedOnPointerMove.bind(this.sensor))
-		addPointerUp(this.view.div, this.sensor.capturedOnPointerUp.bind(this.sensor))
-		addPointerOut(this.view.div, this.sensor.capturedOnPointerOut.bind(this.sensor))
+		this.setupDragMethods()
+	}
 
+	setupDragMethods() {
+		// this.sensor.screenEventMethods['drag'] = {
+		// 	onPointerDown: this.startDragging.bind(this),
+		// 	onTouchDown: this.startDragging.bind(this),
+		// 	onPenDown: this.startDragging.bind(this),
+		// 	onMouseDown: this.startDragging.bind(this),
+		// 	onPointerMove: this.dragging.bind(this),
+		// 	onTouchMove: this.dragging.bind(this),
+		// 	onPenMove: this.dragging.bind(this),
+		// 	onMouseMove: this.dragging.bind(this), // will only actually drag if mouse is pressed down
+		// 	onPointerUp: this.endDragging.bind(this),
+		// 	onTouchUp: this.endDragging.bind(this),
+		// 	onPenUp: this.endDragging.bind(this),
+		// 	onMouseUp: this.endDragging.bind(this)
+		// }
 	}
 
 
@@ -515,6 +528,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	get screenEventHandler(): ScreenEventHandler { return this.sensor.screenEventHandler }
 	set screenEventHandler(newValue: ScreenEventHandler) { this.sensor.screenEventHandler = newValue }
 
+	get screenEventState(): string { return this.sensor.screenEventState }
+	set screenEventState(newValue: string) { this.sensor.screenEventState = newValue }
 
 	/*
 	The following empty methods need to be declared here
@@ -555,17 +570,18 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	draggingEnabled: boolean
 
+
 	setDragging(flag: boolean) {
 		if (flag) {
 			if (this.draggingEnabled) { return }
-			this.sensor.setTouchMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
-			this.sensor.setPenMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
-			this.sensor.setMouseMethodsTo(this.startDragging.bind(this), this.dragging.bind(this), this.endDragging.bind(this))
+			this.update({
+				screenEventState: 'drag'
+			})
 		} else {
 			if (!this.draggingEnabled) { return }
-			this.sensor.restoreTouchMethods()
-			this.sensor.restorePenMethods()
-			this.sensor.restoreMouseMethods()
+			this.update({
+				screenEventState: 'default'
+			})
 		}
 		this.draggingEnabled = flag
 	}
@@ -598,11 +614,15 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	blockScreenEvents() {
-		this.sensor.blockScreenEvents()
+		this.update({
+			screenEventState: 'blocked'
+		})
 	}
 
 	unblockScreenEvents() {
-		this.sensor.unblockScreenEvents()
+		this.update({
+			screenEventState: 'default'
+		})
 	}
 
 }
