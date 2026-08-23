@@ -45,7 +45,6 @@ export class Creator extends Mobject {
 	}
 
 	dissolve() {
-		log('Creator.dissolve')
 		this.remove(this.creation)
 		this.creation = this.createMobject()
 		this.creation.update({

@@ -43,6 +43,8 @@ import { SimpleButton } from 'core/ui/SimpleButton'
 // import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
 // import { CoinStackCreator } from 'extensions/creations/CoinFlipper/CoinStackCreator'
 
+import { Expandable } from 'core/boards/Expandable'
+
 import { log } from 'core/functions/logging'
 
 export class DemoPaper extends Paper {
@@ -112,135 +114,20 @@ export class DemoPaper extends Paper {
 
 let d = new DemoPaper()
 
-let m = new TextLabel({
-	anchor: [100, 100],
-	frameWidth: 300,
-	frameHeight: 200,
-	backgroundColor: Color.red(),
-//	fillOpacity: 1,
-	screenEventHandler: ScreenEventHandler.Self,
-	text: 'text'
+let exp = new Expandable({
+	compactWidth: 200,
+	compactHeight: 100,
+	compactAnchor: [100, 100]
 })
 
-m.onPenDown = function(e) {
-	m.update({
-		text: 'default pen down'
-	})
-}
-
-m.onTouchDown = function(e) {
-	m.update({
-		text: 'default touch down'
-	})
-}
-
-m.onMouseDown = function(e) {
-	m.update({
-		text: 'default mouse down'
-	})
-}
-
-m.onPenMove = function(e) {
-	m.update({
-		text: 'default pen move'
-	})
-}
-
-m.onTouchMove = function(e) {
-	m.update({
-		text: 'default touch move'
-	})
-}
-
-m.onMouseMove = function(e) {
-	m.update({
-		text: 'default mouse move'
-	})
-}
-
-m.onPenUp = function(e) {
-	m.update({
-		text: 'default pen up'
-	})
-}
-
-m.onTouchUp = function(e) {
-	m.update({
-		text: 'default touch up'
-	})
-}
-
-m.onMouseUp = function(e) {
-	m.update({
-		text: 'default mouse up'
-	})
-}
-
-m.sensor.screenEventMethods['bla'] = {
-	onPenDown: function(e) {
-		m.update({
-			text: 'bla pen down'
-		})
-	},
-	onTouchDown: function(e) {
-		m.update({
-			text: 'bla touch down'
-		})
-	},
-	onMouseDown: function(e) {
-		m.update({
-			text: 'bla mouse down'
-		})
-	},
-	onPenMove: function(e) {
-		m.update({
-			text: 'bla pen move'
-		})
-	},
-	onTouchMove: function(e) {
-		m.update({
-			text: 'bla touch move'
-		})
-	},
-	onMouseMove: function(e) {
-		m.update({
-			text: 'bla mouse move'
-		})
-	},
-	onPenUp: function(e) {
-		m.update({
-			text: 'bla pen up'
-		})
-	},
-	onTouchUp: function(e) {
-		m.update({
-			text: 'bla touch up'
-		})
-	},
-	onMouseUp: function(e) {
-		m.update({
-			text: 'bla mouse up'
-		})
-	},
-}
-
-let b = new SimpleButton({
-	anchor: [500, 100],
-	text: 'default'
+exp.background.update({
+	fillColor: Color.red()
 })
 
-b.action = function() {
-	if (b.text == 'default') {
-		b.update({ text: 'bla' })
-		m.sensor.update({ screenEventState: 'bla' })
-	} else if (b.text == 'bla') {
-		b.update({ text: 'default' })
-		m.sensor.update({ screenEventState: 'default' })
-	}
-}
+d.addToContent(exp)
 
-d.addToContent(m)
-d.add(b)
+
+
 
 
 

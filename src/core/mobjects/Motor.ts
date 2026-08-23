@@ -64,7 +64,7 @@ export class Motor extends ExtendedObject {
 		return true
 	}
 
-	animate(args: object = {}, seconds: number, showShadow: boolean = false, completionHandler: Function = () => {}) {
+	animate(args: object = {}, seconds: number, withDependents: boolean = true, completionHandler: Function = () => {}) {
 	// Calling this method launches an animation
 		if (!Motor.isAnimatable(args)) {
 			return
@@ -82,14 +82,9 @@ export class Motor extends ExtendedObject {
 		let dt = 10
 		this.animationTimeStart = Date.now()
 		this.animationDuration = seconds * 1000
-		this.showShadow = showShadow
-		if (!this.showShadow) { this.mobject.hideShadow() }
 
 		this.animationInterval = window.setInterval(
-			function() {
-				this.updateAnimation(Object.keys(args))
-			}
-			.bind(this), dt)
+			this.updateAnimation.bind(this, Object.keys(args), withDependents), dt)
 		// this.animationInterval is a reference number
 		// that we need to remember to stop the animation
 		window.setTimeout(
@@ -97,11 +92,15 @@ export class Motor extends ExtendedObject {
 		.bind(this), this.animationDuration)
 	}
 
-	updateAnimation(keys: Array<string>) {
+	updateAnimation(keys: Array<string>, withDependents: boolean = true) {
 	// This method gets called at regular intervals during the animation
 		let weight = (Date.now() - this.animationTimeStart) / this.animationDuration
 		let newArgs = this.interpolatedAnimationArgs(keys, weight)
 		this.mobject?.update(newArgs, true)
+		if (withDependents) {
+			this.mobject?.updateDependents()
+		}
+
 	}
 
 	interpolatedAnimationArgs(keys: Array<string>, weight: number): object {

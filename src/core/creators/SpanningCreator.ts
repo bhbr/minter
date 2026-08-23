@@ -56,7 +56,6 @@ export class SpanningCreator extends Creator {
 	}
 
 	dissolve() {
-		log('SpanningCreator.dissolve')
 		let w = this.getWidth()
 		let h = this.getHeight()
 		if (this.creation) {

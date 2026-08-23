@@ -313,49 +313,44 @@ export class Sensor extends ExtendedObject {
 	}
 
 	decideEventAction(e: ScreenEvent) {
-		//log(e)
 		let device = screenEventDevice(e)
 		let type = screenEventType(e)
-		log(`device: ${ScreenEventDevice[device]}`)
-		//log(`type: ${ScreenEventType[type]}`)
-
-		//log('decide')
 
 		if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
-			log('case 1')
+			//log('case 1')
 			this.eventTarget.sensor.rawOnPenDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 			this.screenEventDevice = ScreenEventDevice.Pen
 		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
-			log('case 2')
+			//log('case 2')
 			this.eventTarget.sensor.rawOnPenUp(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 			this.resetPointer()
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
-			log('case 3')
+			//log('case 3')
 			// ignore
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
-			log('case 4')
+			//log('case 4')
 			this.eventTarget.sensor.rawOnTouchDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 			this.screenEventDevice = ScreenEventDevice.Finger
 		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
-			log('case 5')
+			//log('case 5')
 			this.eventTarget.sensor.rawOnTouchUp(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 			this.resetPointer()
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Up) {
-			log('case 6')
+			//log('case 6')
 			// ignore
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Down) {
 			if (this.screenEventDevice == ScreenEventDevice.Finger) {
-				log('case 7a')
+				//log('case 7a')
 				// ignore
 			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
-				log('case 7b')
+				//log('case 7b')
 				// ignore
 			} else {
-				log('case 7c')
+				//log('case 7c')
 				this.eventTarget.sensor.rawOnMouseDown(e)
 				this.eventTarget.sensor.registerScreenEvent(e)
 				this.screenEventDevice = ScreenEventDevice.Mouse
@@ -363,45 +358,45 @@ export class Sensor extends ExtendedObject {
 		} else if (e instanceof PointerEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
 			if (this.screenEventDevice == ScreenEventDevice.Finger) {
 				if (isTouchDevice) {
-					log('case 8a1')
+					//log('case 8a1')
 					this.eventTarget.sensor.rawOnTouchUp(e)
 					this.eventTarget.sensor.registerScreenEvent(e)
 					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 				} else {
-					log('case 8a2')
+					//log('case 8a2')
 					// ignore
 				}
 			} else if (this.screenEventDevice == ScreenEventDevice.Pen) {
 				if (isTouchDevice) {
-					log('case 8b1')
+					//log('case 8b1')
 					this.eventTarget.sensor.rawOnPenUp(e)
 					this.eventTarget.sensor.registerScreenEvent(e)
 					this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 				} else {
-					log('case 8b2')
+					//log('case 8b2')
 					// ignore
 				}
 			} else {
-				log('case 8c')
+				//log('case 8c')
 				this.eventTarget.sensor.rawOnMouseUp(e)
 				this.eventTarget.sensor.registerScreenEvent(e)
 				this.resetPointerTimeoutID = window.setTimeout(this.resetPointer.bind(this), 250)
 			}
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Mouse && type == ScreenEventType.Up) {
-			log('case 9')
+			//log('case 9')
 			// ignore
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
-			log('case 10')
+			//log('case 10')
 			this.screenEventDevice = ScreenEventDevice.Finger
 			this.eventTarget.sensor.rawOnTouchDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 		} else if (e instanceof TouchEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Down) {
-			log('case 11')
+			//log('case 11')
 			this.eventTarget.sensor.rawOnPenDown(e)
 			this.eventTarget.sensor.registerScreenEvent(e)
 			this.screenEventDevice = ScreenEventDevice.Pen
 		} else {
-			log('case 12')
+			//log('case 12')
 			// ignore
 		}
 	}
@@ -478,7 +473,6 @@ export class Sensor extends ExtendedObject {
 	}
 
 	rawOnMouseDown(e: ScreenEvent) {
-		log('rawOnMouseDown')
 		this.longPressTimeoutID = window.setTimeout(this.callScreenEventMethod.bind(this, 'onLongMouseDown', e), LONG_PRESS_DURATION)
 		this.callScreenEventMethod('onMouseDown', e)
 	}

@@ -95,20 +95,20 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	setupDragMethods() {
-		// this.sensor.screenEventMethods['drag'] = {
-		// 	onPointerDown: this.startDragging.bind(this),
-		// 	onTouchDown: this.startDragging.bind(this),
-		// 	onPenDown: this.startDragging.bind(this),
-		// 	onMouseDown: this.startDragging.bind(this),
-		// 	onPointerMove: this.dragging.bind(this),
-		// 	onTouchMove: this.dragging.bind(this),
-		// 	onPenMove: this.dragging.bind(this),
-		// 	onMouseMove: this.dragging.bind(this), // will only actually drag if mouse is pressed down
-		// 	onPointerUp: this.endDragging.bind(this),
-		// 	onTouchUp: this.endDragging.bind(this),
-		// 	onPenUp: this.endDragging.bind(this),
-		// 	onMouseUp: this.endDragging.bind(this)
-		// }
+		this.sensor.screenEventMethods['drag'] = {
+			onPointerDown: this.startDragging.bind(this),
+			onTouchDown: this.startDragging.bind(this),
+			onPenDown: this.startDragging.bind(this),
+			onMouseDown: this.startDragging.bind(this),
+			onPointerMove: this.dragging.bind(this),
+			onTouchMove: this.dragging.bind(this),
+			onPenMove: this.dragging.bind(this),
+			onMouseMove: this.dragging.bind(this), // will only actually drag if mouse is pressed down
+			onPointerUp: this.endDragging.bind(this),
+			onTouchUp: this.endDragging.bind(this),
+			onPenUp: this.endDragging.bind(this),
+			onMouseUp: this.endDragging.bind(this)
+		}
 	}
 
 
@@ -194,8 +194,8 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	motor: Motor
 
-	animate(args: object = {}, seconds: number, showShadow: boolean = false, completionHandler: Function = () => {}) {
-		this.motor.animate(args, seconds, showShadow, completionHandler)
+	animate(args: object = {}, seconds: number, withDependents: boolean = true, completionHandler: Function = () => {}) {
+		this.motor.animate(args, seconds, withDependents, completionHandler)
 	}
 
 
@@ -587,6 +587,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	startDragging(e: ScreenEvent) {
+		log('start dragging')
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
 		this.hideShadow()
 		this.parent.update()
