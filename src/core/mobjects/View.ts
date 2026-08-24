@@ -21,8 +21,6 @@ export class View extends ExtendedObject {
 	borderColor: Color
 	borderWidth: number
 	borderRadius: number
-	drawShadow: boolean
-	savedDrawShadow: boolean | null
 	drawBorder: boolean
 
 	defaults(): object {
@@ -36,9 +34,8 @@ export class View extends ExtendedObject {
 			borderWidth: 0,
 			borderRadius: 0,
 			drawBorder: DRAW_BORDERS,
-			drawShadow: false,
-			savedDrawShadow: null,
-			mobject: null
+			mobject: null,
+			overflow: 'visible' // by default, the mobject can draw outside its view's borders
 		}
 	}
 
@@ -76,6 +73,13 @@ export class View extends ExtendedObject {
 		this.frame.height = newValue
 	}
 
+	get overflow(): string {
+		return this.div.style.overflow
+	}
+
+	set overflow(newValue: string) {
+		this.div.style.overflow = newValue
+	}
 
 	// parent view = view of the mobject's parent
 	// (not settable because that is the mobject's responsibility)
@@ -92,8 +96,6 @@ export class View extends ExtendedObject {
 		this.div.style.transformOrigin = 'top left'
 		this.div.style.position = 'absolute'
 		// 'absolute' positions this mobject relative (sic) to its parent
-		this.div.style.overflow = 'visible'
-		// by default, the mobject can draw outside its view's borders
 		
 		this.div.style.borderColor = this.borderColor.toCSS()
 		this.div.style.borderWidth = `${this.borderWidth}px`
@@ -106,9 +108,6 @@ export class View extends ExtendedObject {
 		this.div['mobject'] = this.mobject
 		this.frame.view = this
 		this.redraw()
-		if (this.drawShadow) {
-			this.showShadow()
-		}
 	}
 
 	// called by mobject.add
@@ -153,22 +152,6 @@ export class View extends ExtendedObject {
 	setVisibility(visibility: boolean) {
 		this.update({ visible: visibility })
 		this.setCSSVisibility(this.shouldBeDrawn())
-	}
-
-	showShadow() {
-		if (this.savedDrawShadow !== null) {
-			this.drawShadow = this.savedDrawShadow
-		}
-		this.savedDrawShadow = null
-		if (this.drawShadow) {
-			this.div.style.filter = 'drop-shadow(2px 2px 5px)'
-		}
-	}
-
-	hideShadow() {
-		this.savedDrawShadow = this.drawShadow
-		this.drawShadow = false
-		this.div.style.filter = ''
 	}
 
 	shouldBeDrawn(): boolean {

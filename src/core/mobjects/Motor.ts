@@ -30,7 +30,6 @@ export class Motor extends ExtendedObject {
 
 	mobject?: Mobject
 	animating: boolean
-	showShadow?: boolean
 
 	completionHandler: Function
 
@@ -42,7 +41,6 @@ export class Motor extends ExtendedObject {
 			animationStartArgs: {},
 			animationStopArgs: {},
 			animating: false,
-			showShadow: null,
 			completionHandler: () => {}
 		}
 	}
@@ -132,12 +130,10 @@ export class Motor extends ExtendedObject {
 	// This method gets called at the end of the animation
 		window.clearInterval(this.animationInterval)
 		this.mobject.update(this.animationStopArgs)
-		if (!this.showShadow) { this.mobject.showShadow() }
 		this.animationInterval = null
 		this.animationStartArgs = {}
 		this.animationStopArgs = {}
 		this.animating = false
-		this.showShadow = null
 		this.completionHandler()
 	}
 

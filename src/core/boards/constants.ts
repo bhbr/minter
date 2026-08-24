@@ -4,3 +4,5 @@ export const EXPANDED_IO_LIST_HEIGHT: number = 50
 export const EXPANDED_IO_LIST_INSET: number = 10
 export const HELP_TEXT_LABEL_WIDTH: number = 500
 export const HELP_TEXT_LABEL_HEIGHT: number = 50
+export const EXPANDABLE_CORNER_RADIUS: number = 15
+export const EXPAND_BUTTON_RADIUS: number = 12

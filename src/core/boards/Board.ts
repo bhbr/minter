@@ -62,8 +62,7 @@ The content children can also be dragged and panned.
 				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
 				fillOpacity: 1.0,
 				strokeColor: Color.gray(0.2),
-				strokeWidth: 1.0,
-				drawShadow: true
+				strokeWidth: 1.0
 			}),
 			expandedPadding: 20,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -425,16 +424,6 @@ The content children can also be dragged and panned.
 				mob.enable()
 			}
 		}
-	}
-
-	showShadow() {
-		super.showShadow()
-		this.background.showShadow()
-	}
-
-	hideShadow() {
-		super.hideShadow()
-		this.background.hideShadow()
 	}
 
 	//////////////////////////////////////////////////////////
@@ -868,7 +857,6 @@ The content children can also be dragged and panned.
 		this.panPointStart = this.sensor.localEventVertex(e)
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = vertexCopy(mob.view.frame.anchor)
-			mob.hideShadow()
 		}
 	}
 
@@ -901,7 +889,6 @@ The content children can also be dragged and panned.
 		this.panPointStart = null
 		for (let mob of this.contentChildren) {
 			mob.dragAnchorStart = null
-			mob.showShadow()
 		}
 	}
 

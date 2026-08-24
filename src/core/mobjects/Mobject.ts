@@ -162,17 +162,12 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	set borderWidth(newValue: number) { this.view.borderWidth = newValue }
 	get drawBorder(): boolean { return this.view.drawBorder }
 	set drawBorder(newValue: boolean) { this.view.drawBorder = newValue }
-	get drawShadow(): boolean { return this.view.drawShadow }
-	set drawShadow(newValue: boolean) { this.view.drawShadow = newValue }
 	get borderRadius(): number { return this.view.borderRadius }
 	set borderRadius(newValue: number) { this.view.borderRadius = newValue }
 
 	redraw() { this.view.redraw() }
 
 	//////////// Showing and hiding ////////////
-
-	hideShadow() { this.view.hideShadow() }
-	showShadow() { this.view.showShadow() }
 
 	showDependents() {
 		for (let depmob of this.allDependents()) {
@@ -589,7 +584,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	startDragging(e: ScreenEvent) {
 		log('start dragging')
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
-		this.hideShadow()
 		this.parent.update()
 	}
 
@@ -603,7 +597,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 
 	endDragging(e: ScreenEvent) {
 		this.dragAnchorStart = null
-		this.showShadow()
 	}
 
 	focus() {

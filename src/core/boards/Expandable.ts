@@ -10,6 +10,7 @@ import { convertArrayToString } from 'core/functions/arrays'
 import { View } from 'core/mobjects/View'
 import { IO_LIST_OFFSET } from 'core/linkables/constants'
 import { log } from 'core/functions/logging'
+import { EXPANDABLE_CORNER_RADIUS } from './constants'
 
 interface Window { webkit?: any }
 
@@ -30,18 +31,28 @@ export class Expandable extends Linkable {
 	// by creating buttons named this:
 	buttonNames: Array<string>
 
+	constructor(args: object = {}) {
+		if (args['anchor'] !== undefined && args['compactAnchor'] === undefined) {
+			console.warn('Are you sure you do not want to set compactAnchor instead of anchor on Expandable?')
+		}
+		super(args)
+	}
+
 	defaults(): object {
 		return {
-			expandButton: new ExpandButton(),
+			expandButton: new ExpandButton({
+				midpoint: [EXPANDABLE_CORNER_RADIUS, EXPANDABLE_CORNER_RADIUS]
+			}),
 			expandedPadding: 20,
 			screenEventHandler: ScreenEventHandler.Self,
 			expanded: false,
 			compactWidth: 400, // defined below in the section 'expand and contract'
 			compactHeight: 300, // idem
 			compactAnchor: vertexOrigin(),
+			borderRadius: EXPANDABLE_CORNER_RADIUS,
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
-				cornerRadius: 25,
+				cornerRadius: EXPANDABLE_CORNER_RADIUS,
 				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
 				fillOpacity: 1.0,
@@ -49,7 +60,6 @@ export class Expandable extends Linkable {
 				strokeWidth: 1.0,
 			}),
 			buttonNames: [],
-			
 		}
 	}
 
@@ -74,8 +84,12 @@ export class Expandable extends Linkable {
 		this.addDependency('frameWidth', this.background, 'width')
 		this.addDependency('frameHeight', this.background, 'height')
 
+
 		this.add(this.background)
 		this.add(this.expandButton)
+		this.expandButton.update({
+			midpoint: [EXPANDABLE_CORNER_RADIUS, EXPANDABLE_CORNER_RADIUS]
+		})
 
 		if (this.contracted) {
 			this.contractStateChange()
@@ -86,6 +100,8 @@ export class Expandable extends Linkable {
 			this.inputList.view.hide()
 			this.outputList.view.hide()
 		}
+
+		this.view.overflow = 'hidden'
 	}
 
 
@@ -200,5 +216,8 @@ export class Expandable extends Linkable {
 			this.sidebar.getMessage(message)
 		}
 	}
+
+
+
 
 }

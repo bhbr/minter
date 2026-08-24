@@ -1,15 +1,24 @@
 
 import { View } from 'core/mobjects/View'
+import { log } from 'core/functions/logging'
 
 export class ImageView extends View {
 	
-	imageLocation?: string
 	imageElement: HTMLImageElement
+
+	get imageLocation(): string | null {
+		return (this.imageElement.src == '') ? null : this.imageElement.src
+	}
+
+	set imageLocation(newValue: string | null) {
+		this.imageElement.src = newValue ?? ''
+	}
 
 	defaults(): object {
 		return {
 			imageLocation: null,
-			imageElement: document.createElement('img')
+			imageElement: document.createElement('img'),
+			overflow: 'hidden'
 		}
 	}
 
@@ -17,7 +26,6 @@ export class ImageView extends View {
 		super.setup()
 		this.div.appendChild(this.imageElement)
 		this.div.style['pointer-events'] = 'none'
-		this.imageElement.src = this.imageLocation
 	}
 
 	redraw() {
@@ -28,10 +36,6 @@ export class ImageView extends View {
 
 	update(args: object = {}) {
 		super.update(args)
-		let newImageLocation = args['imageLocation']
-		if (newImageLocation) {
-			this.imageElement.src = newImageLocation
-		}
 	}
 
 }

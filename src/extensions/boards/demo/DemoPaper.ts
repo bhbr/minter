@@ -1,22 +1,5 @@
 
 import { Paper } from 'core/Paper'
-// import { WavyCreator } from 'extensions/creations/Wavy/WavyCreator'
-// import { DesmosCalculatorCreator } from 'extensions/creations/DesmosCalculator/DesmosCalculatorCreator'
-// import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
-// import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
-// import { NumberBoxCreator } from 'extensions/creations/math/boxes/NumberBox'
-// import { AddBoxCreator, SubtractBoxCreator, MultiplyBoxCreator, DivideBoxCreator } from 'extensions/creations/math/boxes/BinaryOperatorBoxCreator'
-// import { BoardCreator } from 'core/boards/BoardCreator'
-// import { ConstructionCreator } from 'extensions/boards/construction/ConstructionCreator'
-// import { SwingCreator } from 'extensions/creations/Swing/SwingCreator'
-// import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
-// import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
-// import { Stepper } from 'extensions/creations/math/Stepper/Stepper'
-// import { Swing } from 'extensions/creations/Swing/Swing'
-// import { ConLineConstructor } from 'extensions/boards/construction/straits/ConLine/ConLineConstructor'
-// import { ConRayConstructor } from 'extensions/boards/construction/straits/ConRay/ConRayConstructor'
-// import { ConSegmentConstructor } from 'extensions/boards/construction/straits/ConSegment/ConSegmentConstructor'
-// import { ConCircleConstructor } from 'extensions/boards/construction/ConCircle/ConCircleConstructor'
 
 // import { vertex } from 'core/functions/vertex'
 import { Color } from 'core/classes/Color'
@@ -24,24 +7,7 @@ import { ScreenEvent, ScreenEventHandler, screenEventTypeAsString, screenEventDe
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { SimpleButton } from 'core/ui/SimpleButton'
-// import { Circle } from 'core/shapes/Circle'
-// import { Board } from 'core/boards/Board'
-// import { Construction } from 'extensions/boards/construction/Construction'
-// import { Wavy } from 'extensions/creations/Wavy/Wavy'
-// import { Slider } from 'extensions/creations/math/Slider/Slider'
-// import { Dependency } from 'core/mobjects/Dependency'
-// import { DependencyLink } from 'core/linkables/DependencyLink'
-// import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-// import { CindyLoader } from 'extensions/apis/CindyLoader'
-// import { DesmosLoader } from 'extensions/apis/DesmosLoader'
-// import { MathQuillLoader } from 'extensions/apis/MathQuillLoader'
-// import { PolypadLoader } from 'extensions/apis/PolypadLoader'
-// import { PolypadCreator } from 'extensions/creations/Polypad/PolypadCreator'
-// import { MathExpressionFieldCreator } from 'extensions/creations/MathExpressionField/MathExpressionFieldCreator'
-// import { EquationCreator } from 'extensions/creations/VisualAlgebra/view/EquationCreator'
-// import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCoinCreator'
-// import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
-// import { CoinStackCreator } from 'extensions/creations/CoinFlipper/CoinStackCreator'
+import { ExpandableImage } from 'core/boards/ExpandableImage'
 
 import { Expandable } from 'core/boards/Expandable'
 
@@ -52,48 +18,13 @@ export class DemoPaper extends Paper {
 	defaults(): object {
 		return {
 			creationConstructors: {
-				// 'wavy': WavyCreator,
-				// 'slider': SliderCreator,
-				// 'stepper': StepperCreator,
-				// 'number': NumberBoxCreator,
-				// 'add': AddBoxCreator,
-				// 'subtract': SubtractBoxCreator,
-				// 'multiply': MultiplyBoxCreator,
-				// 'divide': DivideBoxCreator,
-				// 'swing': SwingCreator,
-				// 'color-rgba': RGBAColorSampleCreator,
-				// 'color-wheel': WheelColorSampleCreator,
-				// 'polypad': PolypadCreator,
-				// 'construction': ConstructionCreator,
-				// 'line': ConLineConstructor,
-				// 'ray': ConRayConstructor,
-				// 'segment': ConSegmentConstructor,
-				// 'circle': ConCircleConstructor,
-				// 'expression': MathExpressionFieldCreator,
-				// 'equation': EquationCreator,
-				// 'coin': PlayableCoinCreator,
-				// 'coin row': CoinRowCreator,
-				// 'coin stack': CoinStackCreator
 			},
 			buttonNames: [
 				'DragButton',
 				'LinkButton',
-				'ControlsButton',
-// 				'NumberButton',
-// 				'ArithmeticButton',
-// 				'AlgebraButton',
-// //				'ConButton',
-// 				'CoinButton',
-// 				'PolypadButton',
-// 				'WavyButton',
-// 				'SwingButton',
-// 				'ColorSampleButton'
+				'ControlsButton'
 			],
 			apiLoaders: [
-				// new CindyLoader(),
-				// new DesmosLoader(),
-				// new MathQuillLoader(),
-				// new PolypadLoader()
 			]
 		}
 	}
@@ -114,21 +45,14 @@ export class DemoPaper extends Paper {
 
 let d = new DemoPaper()
 
-let exp = new Expandable({
-	compactWidth: 200,
-	compactHeight: 100,
+let im = new ExpandableImage({
+	location: `../../assets/test_image.jpg`,
+	frameWidth: 300,
+	frameHeight: 500,
 	compactAnchor: [100, 100]
 })
 
-exp.background.update({
-	fillColor: Color.red()
-})
-
-d.addToContent(exp)
-
-
-
-
+d.addToContent(im)
 
 
 

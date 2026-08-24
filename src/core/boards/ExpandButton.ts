@@ -6,6 +6,7 @@ import { vertex, vertexOrigin, vertexSubtract } from 'core/functions/vertex'
 import { Transform } from 'core/classes/Transform'
 import { Color } from 'core/classes/Color'
 import { Circle } from 'core/shapes/Circle'
+import { EXPANDABLE_CORNER_RADIUS, EXPAND_BUTTON_RADIUS } from './constants'
 
 export class ExpandButton extends Circle {
 
@@ -14,9 +15,8 @@ export class ExpandButton extends Circle {
 	defaults(): object {
 		return {
 			transform: Transform.identity(),
-			midpoint: [15, 15],
 			screenEventHandler: ScreenEventHandler.Self,
-			radius: 12,
+			radius: EXPAND_BUTTON_RADIUS,
 			backgroundColor: Color.clear(),
 			fillColor: Color.gray(0.25),
 			fillOpacity: 1,
@@ -30,7 +30,6 @@ export class ExpandButton extends Circle {
 	mutabilities(): object {
 		return {
 			transform: 'never',
-			midpoint: 'never',
 			radius: 'never',
 			screenEventHandler: 'never',
 			backgroundColor: 'never',
