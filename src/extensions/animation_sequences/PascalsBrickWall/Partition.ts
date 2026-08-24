@@ -377,7 +377,7 @@ export class Partition extends Linkable implements LabelShower {
 			this.add(line)
 			line.animate({
 				endPoint: endPoint
-			}, this.animationDuration, false, (i == this.bricks.length - 1) ? completionHandler : () => {})
+			}, this.animationDuration, true, (i == this.bricks.length - 1) ? completionHandler : () => {})
 		}
 		//this.temporarilyDisableButtons()
 	}
@@ -474,7 +474,7 @@ export class Partition extends Linkable implements LabelShower {
 			let rp = this.rightBricks[i]
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
-			rp.animate({ strokeWidth: 0 }, this.animationDuration, false, (i == this.nbFlips) ? completionHandler : () => {})
+			rp.animate({ strokeWidth: 0 }, this.animationDuration, true, (i == this.nbFlips) ? completionHandler : () => {})
 			let updateObject = this.leftBrickPositionForRow(this.nbFlips + 1, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
@@ -507,7 +507,7 @@ export class Partition extends Linkable implements LabelShower {
 			let rp = this.rightBricks[i]
 			let b = this.bricks[i]
 			lp.animate({ strokeWidth: 0 }, this.animationDuration)
-			rp.animate({ strokeWidth: 0 }, this.animationDuration, false, (i == this.nbFlips) ? completionHandler : () => {})
+			rp.animate({ strokeWidth: 0 }, this.animationDuration, true, (i == this.nbFlips) ? completionHandler : () => {})
 			let updateObject = this.leftBrickPositionForHistogram(this.nbFlips + 1, i) as object
 			updateObject['fillOpacity'] = 0
 			updateObject['nbFlips'] = this.nbFlips + 1
@@ -551,7 +551,7 @@ export class Partition extends Linkable implements LabelShower {
 			brick.animate({
 				fillOpacity: BRICK_FILL_OPACITY,
 				strokeWidth: BRICK_STROKE_WIDTH
-			}, this.animationDuration, false, (i == this.nbFlips + 1) ? function() {
+			}, this.animationDuration, true, (i == this.nbFlips + 1) ? function() {
 				this.cleanupAfterMixing()
 				completionHandler()
 			}.bind(this) : () => {})
@@ -611,7 +611,7 @@ export class Partition extends Linkable implements LabelShower {
 			b.animate({
 				anchor: newAnchor,
 				height: BASE_BRICK_HEIGHT / this.scale
-			}, this.animationDuration, false, i == this.nbFlips ? completionHandler : () => {})
+			}, this.animationDuration, true, i == this.nbFlips ? completionHandler : () => {})
 		}
 	}
 
