@@ -35,6 +35,12 @@ export class Expandable extends Linkable {
 		if (args['anchor'] !== undefined && args['compactAnchor'] === undefined) {
 			console.warn('Are you sure you do not want to set compactAnchor instead of anchor on Expandable?')
 		}
+		if (args['frameWidth'] !== undefined && args['compactWidth'] === undefined) {
+			console.warn('Are you sure you do not want to set compactWidth instead of frameWidth on Expandable?')
+		}
+		if (args['frameHeight'] !== undefined && args['compactHeight'] === undefined) {
+			console.warn('Are you sure you do not want to set compactHeight instead of frameHeight on Expandable?')
+		}
 		super(args)
 	}
 

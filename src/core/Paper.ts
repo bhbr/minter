@@ -41,10 +41,10 @@ export class Paper extends Board {
 			loadedAPIs: [],
 			loadPromise: null,
 			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'ControlsButton',
-				'EraseButton'
+			//	'DragButton',
+			//	'LinkButton',
+			//	'ControlsButton',
+			//	'EraseButton'
 			],
 			helpTexts: {
 				'drag': 'Drag objects or pan the board. Tap this button to lock.',

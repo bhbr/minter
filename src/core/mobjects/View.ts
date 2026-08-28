@@ -135,7 +135,7 @@ export class View extends ExtendedObject {
 		this.div.style.borderWidth = `${this.borderWidth}px`
 		this.div.style.borderRadius = `${this.borderRadius}px`
 		if (this.drawBorder) {
-			this.div.style.border = '1px dashed green'
+			this.div.style.border = '3px dashed red'
 		}
 		this.div.style.opacity = this.opacity.toString()
 

@@ -7,9 +7,9 @@ import { ScreenEvent, ScreenEventHandler, screenEventTypeAsString, screenEventDe
 import { Rectangle } from 'core/shapes/Rectangle'
 import { TextLabel } from 'core/ui/TextLabel'
 import { SimpleButton } from 'core/ui/SimpleButton'
-import { ExpandableImage } from 'core/boards/ExpandableImage'
 
 import { Expandable } from 'core/boards/Expandable'
+import { ImageView } from 'core/mobjects/ImageView'
 
 import { log } from 'core/functions/logging'
 
@@ -20,9 +20,9 @@ export class DemoPaper extends Paper {
 			creationConstructors: {
 			},
 			buttonNames: [
-				'DragButton',
-				'LinkButton',
-				'ControlsButton'
+				//'DragButton',
+				//'LinkButton',
+				//'ControlsButton'
 			],
 			apiLoaders: [
 			]
@@ -39,20 +39,32 @@ export class DemoPaper extends Paper {
 	loadContent() {
 	}
 
-
-
 }
 
 let d = new DemoPaper()
 
-let im = new ExpandableImage({
-	location: `../../assets/test_image.jpg`,
-	frameWidth: 300,
-	frameHeight: 500,
-	compactAnchor: [100, 100]
+let im = new ImageView({
+	imageLocation: '../../assets/test_image.jpg',
+	anchor: [100, 100],
+	frameWidth: 500,
+	frameHeight: 200,
+	drawBorder: true
 })
 
-d.addToContent(im)
+
+d.view.add(im)
+
+//im.fitHorizontally()
+//im.alignVertically()
+
+im.fitVertically()
+im.alignHorizontally()
+
+
+
+
+
+
 
 
 

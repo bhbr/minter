@@ -22,9 +22,9 @@ export class DemoSidebar extends Sidebar {
 	defaults(): object {
 		return {
 			availableButtonClasses: [
-				DragButton,
-				LinkButton,
-				ControlsButton,
+				//DragButton,
+				//LinkButton,
+				//ControlsButton,
 // 				AlgebraButton,
 // 				CoinButton,
 // //				ConButton,
@@ -39,9 +39,9 @@ export class DemoSidebar extends Sidebar {
 // 				ColorSampleButton
 			],
 			buttons: [
-				new DragButton(),
-				new LinkButton(),
-				new ControlsButton(),
+				//new DragButton(),
+				//new LinkButton(),
+				//new ControlsButton(),
 				// //new ConButton(),
 				// new CoinButton(),
 				// new NumberButton(),

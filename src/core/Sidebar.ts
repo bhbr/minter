@@ -43,10 +43,10 @@ export class Sidebar extends Mobject {
 				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
 			availableButtonClasses: [
-				DragButton
+			//	DragButton
 			],
 			buttons: [
-				new DragButton()
+			//	new DragButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
