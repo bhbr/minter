@@ -8,9 +8,11 @@ export type ImageAlignment = 'start' | 'center' | 'end'
 
 export class ImageView extends View {
 	
+	aligningDiv: HTMLDivElement
 	imageElement: HTMLImageElement
 	scalingMethod: ImageScalingMethod
 	alignment: ImageAlignment
+	scaleFactor: number
 
 	get imageLocation(): string | null {
 		return (this.imageElement.src == '') ? null : this.imageElement.src
@@ -18,78 +20,125 @@ export class ImageView extends View {
 
 	set imageLocation(newValue: string | null) {
 		this.imageElement.src = newValue ?? ''
-		//this.fitHorizontally() //this.fitIntoFrame()
-		//this.alignVertically()
+		this.frameImage()
 	}
 
 	defaults(): object {
 		return {
 			imageLocation: null,
+			aligningDiv: document.createElement('div'),
 			imageElement: document.createElement('img'),
 			scalingMethod: 'fill',
+			scaleFactor: 1,
 			alignment: 'center',
-			overflow: 'visible'
+			overflow: 'hidden'
 		}
 	}
 
 	setup() {
-		log(`setup for image with location ${this.imageLocation}`)
 		super.setup()
-		this.div.appendChild(this.imageElement)
+		this.scaleFactor = this.getScaleFactor()
+		this.div.appendChild(this.aligningDiv)
+		this.aligningDiv.appendChild(this.imageElement)
 		this.div.style['pointer-events'] = 'none'
-		//this.fitHorizontally() //this.fitIntoFrame()
-		//this.alignVertically()
-
+		this.aligningDiv.style.position = 'absolute'
+		this.frameImage()
 	}
 
-	redraw() {
-		super.redraw()
+	imageWidthToHeightRatio(): number {
+		return this.imageElement.naturalWidth / this.imageElement.naturalHeight
 	}
 
-	fitHorizontally() {
-		this.imageElement.style.width = `${this.frameWidth}px`
-		this.imageElement.style.height = ''
+	frameWidthToHeightRatio(): number {
+		return this.frameWidth / this.frameHeight
 	}
 
-	fitVertically() {
-		log(this.imageElement.style.width)
-		this.imageElement.style.width = ''
-		this.imageElement.style.height = `${this.frameHeight}px`	
-		log(this.imageElement.style.width)
-	}
-
-
-	alignVertically() {
-		let scaleFactor = this.frameWidth / this.imageElement.naturalWidth
-		let H = this.imageElement.naturalHeight * scaleFactor
-		let h = this.frameHeight
-
-		var yOffset = 0
-		if (this.alignment == 'center') {
-			yOffset = (h - H) / 2
-		} else if (this.alignment == 'end') {
-			yOffset = h - H
+	getScaleFactor(): number {
+		let imageWiderThanFrame = (this.imageWidthToHeightRatio() > this.frameWidthToHeightRatio())
+		if (imageWiderThanFrame && this.scalingMethod == 'fit'
+			|| !imageWiderThanFrame && this.scalingMethod == 'fill') {
+			return this.frameWidth / this.imageElement.naturalWidth
+		} else if (imageWiderThanFrame && this.scalingMethod == 'fill'
+			|| !imageWiderThanFrame && this.scalingMethod == 'fit') {
+			return this.frameHeight / this.imageElement.naturalHeight
 		}
-		this.imageElement.style.objectPosition = `0px ${yOffset}px`
+	}
+
+	resizeImage() {
+		this.aligningDiv.style.width = `${this.scaleFactor * this.imageElement.naturalWidth}px`
+		this.aligningDiv.style.height = `${this.scaleFactor * this.imageElement.naturalHeight}px`
+		this.imageElement.style.width = `${this.scaleFactor * this.imageElement.naturalWidth}px`
+		this.imageElement.style.height = `${this.scaleFactor * this.imageElement.naturalHeight}px`
 	}
 
 	alignHorizontally() {
-		log(`this.frameHeight = ${this.frameHeight}`)
-		let scaleFactor = this.frameHeight / this.imageElement.naturalHeight
-		log(`scaleFactor = ${scaleFactor}`)
-		let W = this.imageElement.naturalWidth * scaleFactor
-		log(`W = ${W}`)
+		let W = this.imageElement.width * this.scaleFactor
 		let w = this.frameWidth
-		log(`w = ${w}`)
 		
-		var xOffset = 0
-		if (this.alignment == 'center') {
+		let xOffset: number
+		switch (this.alignment) {
+		case 'start':
+			xOffset = 0
+			break
+		case 'center':
 			xOffset = (w - W) / 2
-		} else if (this.alignment == 'end') {
+			break
+		case 'end':
 			xOffset = w - W
+			break
+		default:
+			throw 'Unknown image alignment (must be start, center or end)'
 		}
-		log(`xOffset = ${xOffset}`)
-		this.imageElement.style.objectPosition = `${xOffset}px 0px`
+
+		this.aligningDiv.style.left = `${xOffset}px`
+		this.aligningDiv.style.top = `0px`
 	}
+
+	alignVertically() {
+		let H = this.imageElement.height * this.scaleFactor
+		let h = this.frameHeight
+
+		let yOffset: number
+		switch (this.alignment) {
+		case 'start':
+			yOffset = 0
+			break
+		case 'center':
+			yOffset = (h - H) / 2
+			break
+		case 'end':
+			yOffset = h - H
+			break
+		default:
+			throw 'Unknown image alignment (must be start, center or end)'
+		}
+
+		this.aligningDiv.style.left = `0px`
+		this.aligningDiv.style.top = `${yOffset}px`
+	}
+
+	frameImage() {
+		this.resizeImage()
+		let imageWiderThanFrame = (this.imageWidthToHeightRatio() > this.frameWidthToHeightRatio())
+		if (imageWiderThanFrame && this.scalingMethod == 'fit'
+			|| !imageWiderThanFrame && this.scalingMethod == 'fill') {
+			this.alignVertically()
+		} else if (imageWiderThanFrame && this.scalingMethod == 'fill'
+			|| !imageWiderThanFrame && this.scalingMethod == 'fit') {
+			this.alignHorizontally()
+		}
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['imageLocation'] !== undefined) {
+			this.scaleFactor = this.getScaleFactor()
+			this.frameImage()
+		}
+	}
+
+
+
+
 
 }

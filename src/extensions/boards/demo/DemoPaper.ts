@@ -45,20 +45,16 @@ let d = new DemoPaper()
 
 let im = new ImageView({
 	imageLocation: '../../assets/test_image.jpg',
-	anchor: [100, 100],
+	anchor: [300, 300],
 	frameWidth: 500,
 	frameHeight: 200,
-	drawBorder: true
+	scalingMethod: 'fill',
+	alignment: 'center'
 })
 
 
 d.view.add(im)
 
-//im.fitHorizontally()
-//im.alignVertically()
-
-im.fitVertically()
-im.alignHorizontally()
 
 
 
