@@ -93,16 +93,8 @@ export class View extends ExtendedObject {
 		} else {
 			this.div.setAttribute('class', 'mobject-div ' + this.constructor.name)
 		}
-		this.div.style.transformOrigin = 'top left'
 		this.div.style.position = 'absolute'
 		// 'absolute' positions this mobject relative (sic) to its parent
-		
-		this.div.style.borderColor = this.borderColor.toCSS()
-		this.div.style.borderWidth = `${this.borderWidth}px`
-		this.div.style.borderRadius = `${this.borderRadius}px`
-		if (this.drawBorder) {
-			this.div.style.border = '1px dashed red'
-		}
 
 		this.div['view'] = this
 		this.div['mobject'] = this.mobject
