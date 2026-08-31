@@ -65,6 +65,7 @@ export class ImageView extends View {
 	}
 
 	resizeImage() {
+		this.scaleFactor = this.getScaleFactor()
 		this.aligningDiv.style.width = `${this.scaleFactor * this.imageElement.naturalWidth}px`
 		this.aligningDiv.style.height = `${this.scaleFactor * this.imageElement.naturalHeight}px`
 		this.imageElement.style.width = `${this.scaleFactor * this.imageElement.naturalWidth}px`
@@ -72,7 +73,7 @@ export class ImageView extends View {
 	}
 
 	alignHorizontally() {
-		let W = this.imageElement.width * this.scaleFactor
+		let W = this.imageElement.naturalWidth * this.scaleFactor
 		let w = this.frameWidth
 		
 		let xOffset: number
@@ -95,8 +96,12 @@ export class ImageView extends View {
 	}
 
 	alignVertically() {
-		let H = this.imageElement.height * this.scaleFactor
+		log(`scale factor: ${this.scaleFactor}`)
+		let H = this.imageElement.naturalHeight * this.scaleFactor
 		let h = this.frameHeight
+
+		log(`scaled image height: ${H}`)
+		log(`frame height: ${h}`)
 
 		let yOffset: number
 		switch (this.alignment) {
@@ -132,7 +137,6 @@ export class ImageView extends View {
 	update(args: object = {}, redraw: boolean = true) {
 		super.update(args, redraw)
 		if (args['imageLocation'] !== undefined) {
-			this.scaleFactor = this.getScaleFactor()
 			this.frameImage()
 		}
 	}

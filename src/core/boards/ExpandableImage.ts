@@ -1,35 +1,52 @@
 
-// import { Image } from 'core/mobjects/Image'
-// import { Expandable } from 'core/boards/Expandable'
-// import { log } from 'core/functions/logging'
+import { ImageMobject} from 'core/mobjects/ImageMobject'
+import { Expandable } from 'core/boards/Expandable'
+import { log } from 'core/functions/logging'
+import { EXPANDABLE_CORNER_RADIUS } from './constants'
 
-// export class ExpandableImage extends Expandable {
+export class ExpandableImage extends Expandable {
 
-// 	internalImage: Image
+	imageMobject: ImageMobject
 
-// 	defaults(): object {
-// 		return {
-// 			internalImage: new Image()
-// 		}
-// 	}
+	defaults(): object {
+		return {
+			imageMobject: new ImageMobject()
+		}
+	}
 
-// 	get location(): string | null {
-// 		return this.internalImage.location
-// 	}
+	get imageLocation(): string | null {
+		return this.imageMobject.imageLocation
+	}
 
-// 	set location(newValue: string | null) {
-// 		this.internalImage.update({
-// 			location: newValue ?? ''
-// 		})
-// 	}
+	set imageLocation(newValue: string | null) {
+		this.imageMobject.imageLocation = newValue ?? ''
+	}
 
-// 	setup() {
-// 		super.setup()
-// 		this.internalImage.view.div.style.overflow = 'hidden'
-// 		this.addDependency('frameWidth', this.internalImage, 'frameWidth')
-// 		this.addDependency('frameHeight', this.internalImage, 'frameHeight')
-// 		this.add(this.internalImage)
-// 		this.moveToTop(this.expandButton)
-// 	}
+	setup() {
+		super.setup()
+		this.add(this.imageMobject)
+		this.imageMobject.update({
+			borderRadius: EXPANDABLE_CORNER_RADIUS
+		})
+		this.syncFrames()
+		this.moveToTop(this.expandButton)
+		this.addDependency('frameWidth', this.imageMobject, 'frameWidth')
+		this.addDependency('frameHeight', this.imageMobject, 'frameHeight')
+	}
 
-// }
+	syncFrames() {
+		this.imageMobject.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.imageMobject.view.frameImage()
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['imageLocation'] !== undefined || args['frameWidth'] !== undefined || args['frameWidth'] !== undefined) {
+			this.syncFrames()
+		}
+	}
+
+}

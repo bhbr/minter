@@ -23,7 +23,6 @@ export class Expandable extends Linkable {
 	expanded: boolean
 
 	// Window chrome
-	background: RoundedRectangle
 	expandButton: ExpandButton
 
 	// a reference to the sidebar so we can change it
@@ -56,16 +55,8 @@ export class Expandable extends Linkable {
 			compactHeight: 300, // idem
 			compactAnchor: vertexOrigin(),
 			borderRadius: EXPANDABLE_CORNER_RADIUS,
-			background: new RoundedRectangle({
-				anchor: vertexOrigin(),
-				cornerRadius: EXPANDABLE_CORNER_RADIUS,
-				screenEventHandler: ScreenEventHandler.Parent,
-				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
-				fillOpacity: 1.0,
-				strokeColor: Color.gray(0.2),
-				strokeWidth: 1.0,
-			}),
-			buttonNames: [],
+			backgroundColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
+			buttonNames: []
 		}
 	}
 
@@ -80,18 +71,13 @@ export class Expandable extends Linkable {
 	setup() {
 		super.setup()
 		let w = window as Window
-		
+		log(this.children)
 		this.update({
 			frameWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
 			frameHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
 			anchor: this.expanded ? this.expandedAnchor() : vertexCopy(this.compactAnchor)
 		})
 
-		this.addDependency('frameWidth', this.background, 'width')
-		this.addDependency('frameHeight', this.background, 'height')
-
-
-		this.add(this.background)
 		this.add(this.expandButton)
 		this.expandButton.update({
 			midpoint: [EXPANDABLE_CORNER_RADIUS, EXPANDABLE_CORNER_RADIUS]
@@ -107,7 +93,6 @@ export class Expandable extends Linkable {
 			this.outputList.view.hide()
 		}
 
-		this.view.overflow = 'hidden'
 	}
 
 

@@ -22,7 +22,7 @@ export class DemoSidebar extends Sidebar {
 	defaults(): object {
 		return {
 			availableButtonClasses: [
-				//DragButton,
+				DragButton,
 				//LinkButton,
 				//ControlsButton,
 // 				AlgebraButton,
@@ -39,7 +39,7 @@ export class DemoSidebar extends Sidebar {
 // 				ColorSampleButton
 			],
 			buttons: [
-				//new DragButton(),
+				new DragButton(),
 				//new LinkButton(),
 				//new ControlsButton(),
 				// //new ConButton(),
