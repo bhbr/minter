@@ -5,7 +5,7 @@ import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, is
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Board } from 'core/boards/Board'
 import { Color } from 'core/classes/Color'
-import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'core/constants'
+import { SIDEBAR_WIDTH, SHOW_HTML_CONSOLE } from 'core/constants'
 import { PaperView } from './PaperView'
 import { APILoader } from 'core/apis/APILoader'
 
@@ -13,21 +13,37 @@ import { APILoader } from 'core/apis/APILoader'
 import { DemoPaper } from '../extensions/boards/demo/DemoPaper'
 import { CoinFlipPaper } from '../extensions/boards/coin-flip/CoinFlipPaper'
 import { ConstructionPaper } from '../extensions/boards/construction/ConstructionPaper'
+import { NewBoard } from 'core/boards/NewBoard'
 
-export class Paper extends Board {
+const COLOR_PALETTE: object = {
+	'white': Color.white(),
+	'red': Color.red(),
+	'orange': Color.orange(),
+	'yellow': Color.yellow(),
+	'green': Color.green(),
+	'blue': Color.blue(),
+	'indigo': Color.indigo(),
+	'purple': Color.purple()
+}
+
+export class Paper extends NewBoard {
 
 	declare view: PaperView
 	currentColor: Color
-	expandedMobject: Board
+	expandedMobject: NewBoard
 	pressedKeys: Array<string>
 	activeKeyboard: boolean
 	apiLoaders: Array<APILoader>
 	loadingAPIs: Array<string>
 	loadedAPIs: Array<string>
+	globals: object // to be moved later to LinkBoard
 
 	defaults(): object {
 		return {
 			view: new PaperView(),
+			borderColor: Color.clear(),
+			borderWidth: 0,
+			backgroundColor: Color.black(),
 			expandedPadding: 0,
 			expanded: true,
 			screenEventHandler: ScreenEventHandler.Self,
@@ -35,7 +51,6 @@ export class Paper extends Board {
 			pressedKeys: [],
 			activeKeyboard: true,
 			currentColor: Color.white(),
-			drawShadow: false,
 			apiLoaders: [],
 			loadingAPIs: [],
 			loadedAPIs: [],
@@ -52,7 +67,8 @@ export class Paper extends Board {
 				'show controls': 'Show control elements on objects. Tap this button to lock.',
 				'erase': 'Erase objects or drawings by swiping over them.',
 				'restart': 'Clear the board.',
-			}
+			},
+			globals: {}
 		}
 	}
 
@@ -74,13 +90,13 @@ export class Paper extends Board {
 
 		this.expandedMobject = this
 		this.expandButton.view.hide()
-		this.expandedInputList.view.hide()
+		//this.expandedInputList.view.hide()
 		this.boundButtonUpByKey = this.buttonUpByKey.bind(this)
 		this.boundButtonDownByKey = this.buttonDownByKey.bind(this)
 		document.addEventListener('keydown', this.boundButtonDownByKey)
 		document.addEventListener('keyup', this.boundButtonUpByKey)
-		this.background.update({
-			cornerRadius: 0,
+		this.update({
+			borderRadius: 0,
 			strokeColor: Color.clear(),
 			strokeWidth: 0.0
 		})
@@ -89,8 +105,8 @@ export class Paper extends Board {
 			if (separateSidebar) {
 				this.view.div.style.background = 'clear'
 				this.view.div.style.backgroundColor = 'clear'
-				this.background.update({
-					fillColor: Color.clear()
+				this.update({
+					backgroundColor: Color.clear()
 				})
 			} else {
 				document.body.style.backgroundColor = 'black'
@@ -103,10 +119,10 @@ export class Paper extends Board {
 			frameWidth: width,
 			frameHeight: height 
 		})
-		this.background.update({
-			width: width,
-			height: height
-		})
+		// this.background.update({
+		// 	width: width,
+		// 	height: height
+		// })
 		let el = document.querySelector('#htmlConsole') as HTMLElement
 		if (el) {
 			el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
@@ -205,12 +221,12 @@ export class Paper extends Board {
 
 	showLinksOfContent() {
 	// toggled by 'link' button in sidebar
-		for (let link of this.links) {
-			this.add(link)
-		}
-		for (let submob of this.linkableChildren()) {
-			submob.showLinks()
-		}
+		// for (let link of this.links) {
+		// 	this.add(link)
+		// }
+		// for (let submob of this.linkableChildren()) {
+		// 	submob.showLinks()
+		// }
 	}
 
 	allAPIsLoaded(): boolean {

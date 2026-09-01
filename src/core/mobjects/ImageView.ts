@@ -96,12 +96,8 @@ export class ImageView extends View {
 	}
 
 	alignVertically() {
-		log(`scale factor: ${this.scaleFactor}`)
 		let H = this.imageElement.naturalHeight * this.scaleFactor
 		let h = this.frameHeight
-
-		log(`scaled image height: ${H}`)
-		log(`frame height: ${h}`)
 
 		let yOffset: number
 		switch (this.alignment) {

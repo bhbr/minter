@@ -102,6 +102,7 @@ The content children can also be dragged and panned.
 			},
 			// zoomStartCenter: [0, 0],
 			// zoomStartScale: 1,
+			backgroundColor: Color.gray(0.2)
 		}
 	}
 
@@ -494,109 +495,109 @@ The content children can also be dragged and panned.
 		if (value === '0') { value = false }
 		if (value === '1') { value = true }
 		switch (key) {
-			case 'drag':
-				this.setInternalDragging(value as boolean)
+		case 'drag':
+			this.setInternalDragging(value as boolean)
+			this.helpTextLabel.update({
+				text: this.helpTexts['drag']
+			})
+			if (value) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		case 'link':
+			if ((value as boolean) === this.isShowingLinks) {
+				break
+			}
+			this.setLinking(value as boolean)
+			this.helpTextLabel.update({
+				text: this.helpTexts['link']
+			})
+			if (value as boolean) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		case 'show controls':
+			if ((value as boolean) === this.isShowingControls) { return }
+			this.helpTextLabel.update({
+				text: this.helpTexts['show controls']
+			})
+			if (value as boolean) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			this.setControlsVisibility(value as boolean)
+			this.isShowingControls = value
+			break
+		case 'show help':
+			if (value as boolean) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		case 'create':
+			this.enableContent()
+			this.creationMode = value
+			if (this.creator == null) {
+				// create a dummy creator just to display the help text
+				// little hack, I know
+				let dummyCreator = this.createCreator(this.creationMode)
 				this.helpTextLabel.update({
-					text: this.helpTexts['drag']
+					text: dummyCreator.helpText
 				})
 				if (value) {
 					this.helpTextLabel.view.show()
 				} else {
 					this.helpTextLabel.view.hide()
 				}
-				break
-			case 'link':
-				if ((value as boolean) === this.isShowingLinks) {
-					break
-				}
-				this.setLinking(value as boolean)
-				this.helpTextLabel.update({
-					text: this.helpTexts['link']
-				})
-				if (value as boolean) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				break
-			case 'show controls':
-				if ((value as boolean) === this.isShowingControls) { return }
-				this.helpTextLabel.update({
-					text: this.helpTexts['show controls']
-				})
-				if (value as boolean) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				this.setControlsVisibility(value as boolean)
-				this.isShowingControls = value
-				break
-			case 'show help':
-				if (value as boolean) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				break
-			case 'create':
-				this.enableContent()
-				this.creationMode = value
-				if (this.creator == null) {
-					// create a dummy creator just to display the help text
-					// little hack, I know
-					let dummyCreator = this.createCreator(this.creationMode)
-					this.helpTextLabel.update({
-						text: dummyCreator.helpText
-					})
-					if (value) {
-						this.helpTextLabel.view.show()
-					} else {
-						this.helpTextLabel.view.hide()
-					}
-					return
-				}
-				this.remove(this.creator)
-				this.creator = this.createCreator(this.creationMode)
-				this.creator.update({
-					anchor: (this.creationMode == 'draw') ? [0, 0] : this.creationStroke[0]
-				})
-				//this.add(this.creator)
-				this.helpTextLabel.update({
-					text: this.creator.helpText
-				})
-				if (value) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				break
-			case 'erase':
-				this.setEraser(value as boolean)
-				this.helpTextLabel.update({
-					text: this.helpTexts['erase']
-				})
-				if (value) {
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				break
-			case 'restart':
-				if (value) {
-					this.restart()
-				}
-				this.helpTextLabel.update({
-					text: this.helpTexts['restart']
-				})
-				if (!value) { // merely touch down
-					this.helpTextLabel.view.show()
-				} else {
-					this.helpTextLabel.view.hide()
-				}
-				break
-			default:
-				break
+				return
+			}
+			this.remove(this.creator)
+			this.creator = this.createCreator(this.creationMode)
+			this.creator.update({
+				anchor: (this.creationMode == 'draw') ? [0, 0] : this.creationStroke[0]
+			})
+			//this.add(this.creator)
+			this.helpTextLabel.update({
+				text: this.creator.helpText
+			})
+			if (value) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		case 'erase':
+			this.setEraser(value as boolean)
+			this.helpTextLabel.update({
+				text: this.helpTexts['erase']
+			})
+			if (value) {
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		case 'restart':
+			if (value) {
+				this.restart()
+			}
+			this.helpTextLabel.update({
+				text: this.helpTexts['restart']
+			})
+			if (!value) { // merely touch down
+				this.helpTextLabel.view.show()
+			} else {
+				this.helpTextLabel.view.hide()
+			}
+			break
+		default:
+			break
 		}
 	}
 

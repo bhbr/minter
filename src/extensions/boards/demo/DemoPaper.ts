@@ -10,6 +10,7 @@ import { SimpleButton } from 'core/ui/SimpleButton'
 import { ExpandableImage } from 'core/boards/ExpandableImage'
 import { ImageView } from 'core/mobjects/ImageView'
 import { ImageMobject } from 'core/mobjects/ImageMobject'
+import { NewBoard } from 'core/boards/NewBoard'
 
 import { log } from 'core/functions/logging'
 
@@ -43,26 +44,23 @@ export class DemoPaper extends Paper {
 
 let d = new DemoPaper()
 
-let im = new ExpandableImage({
-	imageLocation: '../../assets/test_image.jpg',
+let nb = new NewBoard({
 	compactAnchor: [300, 300],
-	compactWidth: 200,
-	compactHeight: 500
+	compactWidth: 300,
+	compactHeight: 200
 })
 
-// let im = new ImageMobject({
-// 	imageLocation: '../../assets/test_image.jpg',
-// 	anchor: [300, 300],
-// 	frameWidth: 500,
-// 	frameHeight: 200,
-// 	scalingMethod: 'fit',
-// 	alignment: 'center',
-// 	drawBorder: true
-// })
+let im = new ImageMobject({
+	imageLocation: '../../assets/test_image.jpg',
+	anchor: [50, 50],
+	frameWidth: 150,
+	frameHeight: 100
+})
 
 //im.view.div.style.overflow = 'visible'
 
-d.addToContent(im)
+nb.addToContent(im)
+d.addToContent(nb)
 
 
 

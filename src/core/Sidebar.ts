@@ -70,7 +70,7 @@ export class Sidebar extends Mobject {
 			let paper = maybePaper as Paper
 			paper.sidebar = this
 			this.background.update({
-				fillColor: paper.background.view.fillColor
+				fillColor: paper.backgroundColor
 			})
 		}
 		// initialize with the buttons it needs itself

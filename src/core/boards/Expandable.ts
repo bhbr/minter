@@ -11,6 +11,9 @@ import { View } from 'core/mobjects/View'
 import { IO_LIST_OFFSET } from 'core/linkables/constants'
 import { log } from 'core/functions/logging'
 import { EXPANDABLE_CORNER_RADIUS } from './constants'
+import { TextLabel } from 'core/ui/TextLabel'
+import { HELP_TEXT_LABEL_WIDTH, HELP_TEXT_LABEL_HEIGHT } from './constants'
+import { SIDEBAR_WIDTH } from 'core/constants'
 
 interface Window { webkit?: any }
 
@@ -24,6 +27,9 @@ export class Expandable extends Linkable {
 
 	// Window chrome
 	expandButton: ExpandButton
+
+	helpTextLabel: TextLabel
+	helpTexts: object
 
 	// a reference to the sidebar so we can change it
 	sidebar?: any
@@ -56,7 +62,18 @@ export class Expandable extends Linkable {
 			compactAnchor: vertexOrigin(),
 			borderRadius: EXPANDABLE_CORNER_RADIUS,
 			backgroundColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
-			buttonNames: []
+			strokeWidth: 1,
+			strokeColor: Color.gray(0.25),
+			buttonNames: [],
+			helpTextLabel: new TextLabel({
+				frameHeight: HELP_TEXT_LABEL_HEIGHT,
+				frameWidth: HELP_TEXT_LABEL_WIDTH,
+				text: '',
+				horizontalAlign: 'center'
+			}),
+			helpTexts: {
+				'drag': 'Tap and hold this button to drag objects or pan the board. Tap this button to lock.',
+			},
 		}
 	}
 
@@ -71,7 +88,6 @@ export class Expandable extends Linkable {
 	setup() {
 		super.setup()
 		let w = window as Window
-		log(this.children)
 		this.update({
 			frameWidth: this.expanded ? this.expandedWidth() : this.compactWidth,
 			frameHeight: this.expanded ? this.expandedHeight() : this.compactHeight,
@@ -101,7 +117,7 @@ export class Expandable extends Linkable {
 	}
 
 	expandedWidth(): number {
-		return window.innerWidth - 2 * this.expandedPadding
+		return window.innerWidth - 2 * this.expandedPadding - ((isTouchDevice && separateSidebar) ? 0 : SIDEBAR_WIDTH)
 	}
 
 	expandedHeight(): number {
@@ -208,6 +224,9 @@ export class Expandable extends Linkable {
 		}
 	}
 
+	handleMessage(key: string, value: any) {
+		// implemented in subclasses
+	}
 
 
 
