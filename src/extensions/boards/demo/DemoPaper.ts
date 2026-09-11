@@ -50,17 +50,17 @@ let nb = new NewBoard({
 	compactHeight: 200
 })
 
-let im = new ImageMobject({
+let im = new ExpandableImage({
 	imageLocation: '../../assets/test_image.jpg',
-	anchor: [50, 50],
-	frameWidth: 150,
-	frameHeight: 100
+	compactAnchor: [50, 50],
+	compactWidth: 150,
+	compactHeight: 100
 })
 
 //im.view.div.style.overflow = 'visible'
 
-nb.addToContent(im)
-d.addToContent(nb)
+//nb.addToContent(im)
+d.addToContent(im)
 
 
 

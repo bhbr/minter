@@ -209,7 +209,6 @@ It is displayed on top of or below the mobject when the 'link' toggle button is 
 	}
 
 	onPointerDown(e: ScreenEvent) {
-		
 		let t = this.sensor.eventTargetMobject(e)
 		this.mobject.board.startLinking(e)
 	}

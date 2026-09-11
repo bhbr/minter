@@ -18,6 +18,7 @@ export class ImageMobject extends Mobject {
 
 	set imageLocation(newValue: string) {
 		this.view.imageLocation = newValue
+		this.view.frameImage()
 	}
 
 	get scalingMethod(): ImageScalingMethod {
@@ -26,6 +27,7 @@ export class ImageMobject extends Mobject {
 
 	set scalingMethod(newValue: ImageScalingMethod) {
 		this.view.scalingMethod = newValue
+		this.view.frameImage()
 	}
 
 	get alignment(): ImageAlignment {
@@ -34,6 +36,7 @@ export class ImageMobject extends Mobject {
 
 	set alignment(newValue: ImageAlignment) {
 		this.view.alignment = newValue
+		this.view.frameImage()
 	}
 
 	update(args: object = {}, redraw: boolean = true) {

@@ -177,6 +177,10 @@ export class View extends ExtendedObject {
 	// Show and hide //
 
 	show() {
+		if (this.mobject.constructor.name == 'InputList') {
+			log('showing input list')
+			console.trace()
+		}
 		this.setVisibility(true)
 	}
 

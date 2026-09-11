@@ -101,12 +101,8 @@ export class Expandable extends Linkable {
 
 		if (this.contracted) {
 			this.contractStateChange()
-			this.inputList.view.show()
-			this.outputList.view.show()
 		} else {
 			this.expandStateChange()
-			this.inputList.view.hide()
-			this.outputList.view.hide()
 		}
 
 	}
