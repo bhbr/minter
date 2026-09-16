@@ -59,8 +59,8 @@ let im = new ExpandableImage({
 
 //im.view.div.style.overflow = 'visible'
 
-//nb.addToContent(im)
-d.addToContent(im)
+nb.addToContent(im)
+d.addToContent(nb)
 
 
 

@@ -13,6 +13,7 @@ import { SimpleButton } from 'core/ui/SimpleButton'
 import { Checkbox } from 'core/ui/Checkbox'
 import { HOOK_HORIZONTAL_SPACING } from './constants'
 import { remove } from 'core/functions/arrays'
+import { NewBoard } from 'core/boards/NewBoard'
 
 export interface IOProperty {
 	name: string
@@ -52,21 +53,6 @@ which can be linked to such-exposed variables of other mobjects.
 			outputList: 'never',
 			linksEditable: 'in_subclass'
 		}
-	}
-
-	get board(): Board | null {
-		let p = super.parent
-		if (p) {
-			let pp = (p as Mobject).parent
-			if (pp) {
-				return pp as Board
-			}
-		}
-		return null
-	}
-
-	set board(newValue: Board) {
-		super.parent = newValue.content
 	}
 
 	setup() {

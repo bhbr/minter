@@ -9,8 +9,7 @@ import { ScreenEvent } from 'core/mobjects/screen_events'
 import { SIDEBAR_WIDTH } from 'core/constants'
 import { Color } from 'core/classes/Color'
 import { getPaper } from 'core/functions/getters'
-
-export class BoardContent extends MGroup { }
+import { Linkable } from 'core/linkables/Linkable'
 
 export class NewBoard extends Expandable {
 
@@ -19,12 +18,11 @@ export class NewBoard extends Expandable {
 	defaults(): object {
 		return {
 			contentChildren: [],
-			content: new BoardContent(),
 			buttonNames: [
 				'DragButton'
 			],
 			panPointStart: null,
-			backgroundColor: Color.gray(0.15),
+			backgroundColor: Color.gray(0.85),
 			borderColor: Color.gray(0.3),
 			borderWidth: 1,
 			focusedChild: null
@@ -40,12 +38,10 @@ export class NewBoard extends Expandable {
 
 	// the submobs that will pan along (not e. g. the window chrome)
 	contentChildren: Array<Mobject>
-	content: MGroup
-
+	
 	setup() {
 		super.setup()
-		this.content.view.div.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
-		this.add(this.content)
+		this.view.div.style['clip-path'] = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
 		this.moveToTop(this.expandButton)
 		let newAnchor = [0.5 * (this.frameWidth - HELP_TEXT_LABEL_WIDTH - SIDEBAR_WIDTH), 20]
 		this.helpTextLabel.update({
@@ -55,14 +51,12 @@ export class NewBoard extends Expandable {
 		this.add(this.helpTextLabel)
 		this.helpTextLabel.view.hide()
 		this.setupPanMethods()
-
-		this.addDependency('frameWidth', this.content, 'frameWidth')
-		this.addDependency('frameHeight', this.content, 'frameHeight')
 	}
 
 	addToContent(mob: Mobject) {
-		this.content.add(mob)
+		this.add(mob)
 		this.contentChildren.push(mob)
+		mob.board = this
 		if (this.contracted) {
 			mob.disable()
 		}
@@ -72,14 +66,14 @@ export class NewBoard extends Expandable {
 		}
 		if (mob instanceof NewBoard) {
 			mob.update({
-				backgroundColor: this.backgroundColor.brighten(0.5)
+				backgroundColor: this.backgroundColor.brighten(0.8)
 			})
 		}
 	}
 
 	removeFromContent(mob: Mobject) {
 		remove(this.contentChildren, mob)
-		this.content.remove(mob)
+		this.remove(mob)
 	}
 
 	contentChildrenContaining(p: vertex): Array<Mobject> {
@@ -185,11 +179,17 @@ export class NewBoard extends Expandable {
 	expandStateChange() {
 		super.expandStateChange()
 		this.setInternalDragging(true)
+		if (this.board) { // if this not a Paper
+			remove(this.board.contentChildren, this)
+		}
 	}
 
 	contractStateChange() {
 		super.contractStateChange()
 		this.setInternalDragging(false)
+		if (this.board) { // if this not a Paper
+			this.board.contentChildren.push(this)
+		}
 	}
 
 	focusOn(child: Mobject) {
@@ -209,6 +209,21 @@ export class NewBoard extends Expandable {
 			button.activeKeyboard = true
 		}
 	}
+
+
+	// placeholder methods to silence error messages while dragging
+	// to be deleted once LinkBoard has been implemented
+	// (set Linkable.board's type to LinkBoard
+	// and implement updateLinks only there)
+
+	updateLinks() { }
+	removeDependencyAtHook(hook: any) { }
+	removeInputLinkForPropertyAtMobject(name: string, mob: any) { }
+	startLinking(e: any) { }
+	linking(e: any) { }
+	endLinking(e: any) { }
+
+
 
 
 

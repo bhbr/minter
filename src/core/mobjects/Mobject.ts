@@ -15,6 +15,7 @@ import { Sensor } from './Sensor'
 import { getPaper } from 'core/functions/getters'
 import { UpdateCall, UpdateCalls } from './UpdateCall'
 import { Linkable } from 'core/linkables/Linkable'
+import { NewBoard } from 'core/boards/NewBoard'
 
 export class Mobject extends ExtendedObject {
 
@@ -73,7 +74,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			draggingEnabled: false,
 
 			// dependencies
-			dependencies: []
+			dependencies: [],
 		}
 	}
 
@@ -582,7 +583,6 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	}
 
 	startDragging(e: ScreenEvent) {
-		log('start dragging')
 		this.dragAnchorStart = vertexSubtract(this.view.frame.anchor, eventVertex(e))
 		this.parent.update()
 	}
@@ -617,6 +617,17 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		this.update({
 			screenEventState: 'default'
 		})
+	}
+
+	get board(): NewBoard | null {
+		if (this.parent instanceof NewBoard) {
+			return this.parent
+		} else {
+			return null
+		}
+	}
+	set board(newValue: NewBoard | null) {
+		this.parent = newValue
 	}
 
 }

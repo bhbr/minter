@@ -82,7 +82,7 @@ export class Toggle extends Mobject {
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		let p = this.localEventVertex(e)
+		let p = this.sensor.localEventVertex(e)
 		if (vertexNorm(p) <= this.circle.radius) {
 			this.setState(!this.value())
 		} else {
