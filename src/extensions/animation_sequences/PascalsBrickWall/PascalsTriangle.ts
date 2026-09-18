@@ -11,6 +11,8 @@ import { log } from 'core/functions/logging'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Transform } from 'core/classes/Transform'
 import { TAU } from 'core/constants'
+import { ScreenEvent } from 'core/mobjects/screen_events'
+import { vertex } from 'core/functions/vertex'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -25,6 +27,8 @@ export class PascalsTriangle extends Linkable {
 	nbFlipsText: TextLabel
 	nbPossibilitiesLabels: MGroup
 	nbPossibilitiesText: TextLabel
+	selectedPath: Array<vertex>
+	selectedCells: Array<PascalsTriangleCell>
 
 	defaults(): object {
 		return {
@@ -63,7 +67,9 @@ export class PascalsTriangle extends Linkable {
 					anchor: [1.7 * CELL_SIZE, 0.2 * CELL_SIZE],
 					angle: -TAU / 6
 				})
-			})
+			}),
+			selectedPath: [],
+			selectedCells: []
 		}
 	}
 
@@ -226,8 +232,58 @@ export class PascalsTriangle extends Linkable {
 		}
 	}
 
+	onPointerDown(e: ScreenEvent) {
+		let p = this.sensor.localEventVertex(e)
+		let [n, k] = this.triangleIndex(p)
+		if (n == 0 && k == 0) {
+			this.selectCellAtIndex(n, k)
+		}
+	}
 
+	onPointerMove(e: ScreenEvent) {
+		let L = this.selectedPath.length
+		if (L == 0) { return }
+		let p = this.sensor.localEventVertex(e)
+		let [n, k] = this.triangleIndex(p)
+		if (L == 1) {
+			if (n == 1) {
+				this.selectCellAtIndex(n, k)
+			}
+			return
+		}
+		let [n_1, k_1] = this.selectedPath[this.selectedPath.length - 1]
+		let [n_2, k_2] = this.selectedPath[this.selectedPath.length - 2]
+		if (n == n_1 + 1 && (k == k_1 || k == k_1 + 1)) {
+			this.selectCellAtIndex(n, k)
+		} else if (n == n_2 && k == k_2) {
+			this.deselectCellAtIndex(n, k)
+		} else if (n == n_1 && ((k == k_2 && k == k_1 - 1) || (k_1 == k_2 && k == k_1 + 1))) {
+			this.deselectCellAtIndex(n_1, k_1)
+			this.selectCellAtIndex(n, k)
+		}
+	}
 
+	selectCellAtIndex(n: number, k: number) {
+		if (n >= this.cells.length) { return }
+		let cell = this.cells[n][k]
+		this.selectedCells.push(cell)
+		this.selectedPath.push([n, k])
+		cell.highlight()	
+	}
 
+	deselectCellAtIndex(n: number, k: number) {
+		if (n >= this.cells.length) { return }
+		let cell = this.selectedCells.pop()
+		this.selectedPath.pop()
+		cell.unhighlight()
+	}
+
+	triangleIndex(p: vertex): vertex {
+		let x = p[0]
+		let y = p[1]
+		let n = Math.max(Math.floor(y / (CELL_SIZE + CELL_PADDING)), 0)
+		let k = Math.min(Math.max(Math.round((x / (CELL_SIZE + CELL_PADDING) + n / 2)), 0), n)
+		return [n, k]
+	}
 
 }
