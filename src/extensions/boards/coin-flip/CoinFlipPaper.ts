@@ -85,7 +85,8 @@ export class CoinFlipPaper extends Paper {
 let p = new CoinFlipPaper()
 
 let c = new PascalsTriangle({
-	anchor: [500, 100]
+	anchor: [500, 100],
+	nbFlips: 3
 })
 
 

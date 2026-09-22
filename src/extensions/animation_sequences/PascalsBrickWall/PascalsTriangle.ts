@@ -4,7 +4,7 @@ import { Line } from 'core/shapes/Line'
 import { Linkable } from 'core/linkables/Linkable'
 import { PascalsTriangleCell } from './PascalsTriangleCell'
 import { SimpleButton } from 'core/ui/SimpleButton'
-import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION } from './constants'
+import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR } from './constants'
 import { vertexAdd } from 'core/functions/vertex'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { log } from 'core/functions/logging'
@@ -20,19 +20,22 @@ export class PascalsTriangle extends Linkable {
 	nbFlips: number
 	splitButton: SimpleButton
 	isSplitting: boolean
-	edges: MGroup
+	leftEdges: Array<Array<Line>>
+	rightEdges: Array<Array<Line>>
 	presentationFormsList: RadioButtonList
 	presentation: 'stacks' | 'combinations'
 	nbFlipsLabels: MGroup
 	nbFlipsText: TextLabel
 	nbPossibilitiesLabels: MGroup
 	nbPossibilitiesText: TextLabel
-	selectedPath: Array<vertex>
+	selectedIndices: Array<vertex>
 	selectedCells: Array<PascalsTriangleCell>
+	selectedEdges: Array<Line>
+	animationDuration: number
 
 	defaults(): object {
 		return {
-			cells: [[]],
+			cells: [],
 			nbFlips: 0,
 			splitButton: new SimpleButton({
 				anchor: [-25, CELL_SIZE + CELL_PADDING],
@@ -40,7 +43,8 @@ export class PascalsTriangle extends Linkable {
 			}),
 			presentation: 'stacks',
 			isSplitting: false,
-			edges: new MGroup(),
+			leftEdges: [],
+			rightEdges: [],
 			presentationFormsList: new RadioButtonList({
 				anchor: [-100, CELL_SIZE + CELL_PADDING + 50],
 				options: [
@@ -68,13 +72,17 @@ export class PascalsTriangle extends Linkable {
 					angle: -TAU / 6
 				})
 			}),
-			selectedPath: [],
-			selectedCells: []
+			selectedIndices: [],
+			selectedCells: [],
+			selectedEdges: []
 		}
 	}
 
 	setup() {
 		super.setup()
+		let N = this.nbFlips
+		this.nbFlips = 0
+
 		let baseCell = new PascalsTriangleCell({
 			nbHeads: 0,
 			nbTails: 0,
@@ -83,10 +91,9 @@ export class PascalsTriangle extends Linkable {
 		baseCell.update({
 			anchor: [-baseCell.width / 2, 0]
 		})
-		this.cells[0] = [baseCell]
+		this.cells.push([baseCell])
 		this.add(baseCell)
-		this.moveToBack(this.edges)
-		this.splitButton.action = this.splitCells.bind(this)
+		this.splitButton.action = this.splitCells.bind(this, SLOW_CELL_ANIMATION_DURATION)
 		this.controls.add(this.splitButton)
 		this.presentationFormsList.action = this.switchPresentation.bind(this)
 		this.presentationFormsList.update({
@@ -100,12 +107,18 @@ export class PascalsTriangle extends Linkable {
 
 		this.nbPossibilitiesLabels.add(this.nbPossibilitiesText)
 		this.createNewNbPossibilitiesLabel()
+
+		for (let i = 0; i < N; i++) {
+			this.splitCells()
+		}
 	}
 
-	splitCells() {
+	splitCells(animationDuration: number = 0) {
 		if (this.isSplitting) { return }
 		this.update({ isSplitting: true })
 		this.cells.push([])
+		this.leftEdges.push([])
+		this.rightEdges.push([])
 		for (let i = 0; i <= this.nbFlips; i++) {
 			let cell = this.cells[this.nbFlips][i]
 			let leftCopy = new PascalsTriangleCell({
@@ -128,34 +141,47 @@ export class PascalsTriangle extends Linkable {
 			let leftEdge = new Line({
 				startPoint: [cell.anchor[0] + cell.width / 2, cell.anchor[1] + cell.height / 2],
 				endPoint: [cell.anchor[0] + cell.width / 2, cell.anchor[1] + cell.height / 2],
+				color: EDGE_COLOR
 			})
-			this.edges.add(leftEdge)
+			this.add(leftEdge)
+			log(this.leftEdges.length)
+			this.leftEdges[this.nbFlips].push(leftEdge)
+			this.moveToBack(leftEdge)
 
 			let rightEdge = new Line({
 				startPoint: [cell.anchor[0] + cell.width / 2, cell.anchor[1] + cell.height / 2],
-				endPoint: [rightCopy.anchor[0] + rightCopy.width / 2, rightCopy.anchor[1] + rightCopy.height / 2]
+				endPoint: [rightCopy.anchor[0] + rightCopy.width / 2, rightCopy.anchor[1] + rightCopy.height / 2],
+				color: EDGE_COLOR
 			})
-			this.edges.add(rightEdge)
+			this.add(rightEdge)
+			this.rightEdges[this.nbFlips].push(rightEdge)
+			this.moveToBack(rightEdge)
 
-			leftCopy.animatedAddHeadsCoin(i != 0 ? function() { this.remove(leftCopy) }.bind(this) : () => {})
-			rightCopy.animatedAddTailsCoin(i == this.nbFlips ? this.endSplitting.bind(this): () => {})
-			leftEdge.animate({
-				endPoint: [cell.anchor[0] - 5, cell.anchor[1] + 1.5 * cell.height + 10]
-			}, SLOW_CELL_ANIMATION_DURATION)
-			rightEdge.animate({
-				endPoint: [cell.anchor[0] + cell.width + 5, cell.anchor[1] + 1.5 * cell.height + 10]
-			}, SLOW_CELL_ANIMATION_DURATION)
 			if (i == 0) {
 				this.cells[this.nbFlips + 1].push(leftCopy)
 			}
+			leftCopy.animatedAddHeadsCoin(animationDuration, i != 0 ? function() { this.remove(leftCopy) }.bind(this) : () => {})
+
 			this.cells[this.nbFlips + 1].push(rightCopy)
+			rightCopy.animatedAddTailsCoin(animationDuration, i == this.nbFlips && animationDuration > 0 ? this.endSplitting.bind(this) : () => {})
+
+			leftEdge.animate({
+				endPoint: [cell.anchor[0] - 5, cell.anchor[1] + 1.5 * cell.height + 10]
+			}, animationDuration)
+			rightEdge.animate({
+				endPoint: [cell.anchor[0] + cell.width + 5, cell.anchor[1] + 1.5 * cell.height + 10]
+			}, animationDuration)
 		}
+
 		this.splitButton.animate({
 			anchor: vertexAdd(this.splitButton.anchor, [0, CELL_SIZE + CELL_PADDING])
-		}, 1)
+		}, animationDuration)
 		this.presentationFormsList.animate({
 			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
-		}, 1)
+		}, animationDuration)
+		if (animationDuration == 0) {
+			this.endSplitting()
+		}
 	}
 
 	createNewNbFlipsLabel() {
@@ -185,7 +211,6 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.nbPossibilitiesLabels.add(newNbPossibilitiesLabel)
 	}
-
 
 	endSplitting() {
 		this.update({
@@ -241,7 +266,7 @@ export class PascalsTriangle extends Linkable {
 	}
 
 	onPointerMove(e: ScreenEvent) {
-		let L = this.selectedPath.length
+		let L = this.selectedIndices.length
 		if (L == 0) { return }
 		let p = this.sensor.localEventVertex(e)
 		let [n, k] = this.triangleIndex(p)
@@ -251,8 +276,9 @@ export class PascalsTriangle extends Linkable {
 			}
 			return
 		}
-		let [n_1, k_1] = this.selectedPath[this.selectedPath.length - 1]
-		let [n_2, k_2] = this.selectedPath[this.selectedPath.length - 2]
+		let [n_1, k_1] = this.selectedIndices[this.selectedIndices.length - 1]
+		let [n_2, k_2] = this.selectedIndices[this.selectedIndices.length - 2]
+		if (n == n_1) { return }
 		if (n == n_1 + 1 && (k == k_1 || k == k_1 + 1)) {
 			this.selectCellAtIndex(n, k)
 		} else if (n == n_2 && k == k_2) {
@@ -267,16 +293,45 @@ export class PascalsTriangle extends Linkable {
 		if (n >= this.cells.length) { return }
 		let cell = this.cells[n][k]
 		this.selectedCells.push(cell)
-		this.selectedPath.push([n, k])
-		cell.highlight()	
+		cell.highlight()
+		if (n == 0) {
+			this.selectedIndices.push([n, k])
+			return
+		}
+		let k_1 = this.selectedIndices[this.selectedIndices.length - 1][1]
+		this.selectedIndices.push([n, k])
+		if (k == k_1) {
+			this.leftEdges[n - 1][k].update({
+				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
+				strokeColor: EDGE_HIGHLIGHT_COLOR
+			})
+		} else {
+			this.rightEdges[n - 1][k - 1].update({
+				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
+				strokeColor: EDGE_HIGHLIGHT_COLOR
+			})
+		}
 	}
 
 	deselectCellAtIndex(n: number, k: number) {
 		if (n >= this.cells.length) { return }
 		let cell = this.selectedCells.pop()
-		this.selectedPath.pop()
 		cell.unhighlight()
+		let k_1 = this.selectedIndices[this.selectedIndices.length - 1][1]
+		this.selectedIndices.pop()
+		if (k == k_1) {
+			this.leftEdges[n][k].update({
+				strokeWidth: EDGE_WIDTH,
+				strokeColor: EDGE_COLOR
+			})
+		} else {
+			this.rightEdges[n][k].update({
+				strokeWidth: EDGE_WIDTH,
+				strokeColor: EDGE_COLOR
+			})
+		}
 	}
+
 
 	triangleIndex(p: vertex): vertex {
 		let x = p[0]

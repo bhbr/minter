@@ -2,7 +2,7 @@
 import { StackedBrickLabel } from './StackedBrickLabel'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
-import { CELL_SIZE, CELL_PADDING, CELL_CORNER_RADIUS, COMB_LABEL_WIDTH, COMB_LABEL_HEIGHT, HEADS_COLOR, TAILS_COLOR, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION } from './constants'
+import { CELL_SIZE, CELL_PADDING, CELL_CORNER_RADIUS, COMB_LABEL_WIDTH, COMB_LABEL_HEIGHT, HEADS_COLOR, TAILS_COLOR, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, CELL_STROKE_COLOR, CELL_HIGHLIGHT_STROKE_COLOR, CELL_STROKE_WIDTH, CELL_HIGHLIGHT_STROKE_WIDTH } from './constants'
 import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
 import { binomial } from 'core/functions/math'
@@ -74,12 +74,12 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 		this.updateCombinationsLabel()
 	}
 
-	animatedAddHeadsCoin(completionHandler: () => void = () => {}) {
+	animatedAddHeadsCoin(animationDuration: number = 0, completionHandler: () => void = () => {}) {
 		if (this.presentation == 'stacks') {
 			this.animate({
 				anchor: [this.anchor[0] - this.width / 2 - CELL_PADDING / 2, this.anchor[1] + this.height + CELL_PADDING],
 				opacity: 1
-			}, SLOW_CELL_ANIMATION_DURATION, false, function() {
+			}, animationDuration, false, function() {
 				this.addHeadsCoin()
 				completionHandler()
 			}.bind(this))
@@ -87,19 +87,19 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 			this.animate({
 				anchor: [this.anchor[0] - this.width / 2 - CELL_PADDING / 2, this.anchor[1] + this.height + CELL_PADDING],
 				opacity: 1,
-			}, SLOW_CELL_ANIMATION_DURATION, false, function() {
+			}, animationDuration, false, function() {
 				this.addHeadsCoin()
 				completionHandler()
 			}.bind(this))
 		}
 	}
 
-	animatedAddTailsCoin(completionHandler: () => void = () => {}) {
+	animatedAddTailsCoin(animationDuration: number = 0, completionHandler: () => void = () => {}) {
 		if (this.presentation == 'stacks') {
 			this.animate({
 				anchor: [this.anchor[0] + this.width / 2 + CELL_PADDING / 2, this.anchor[1] + this.height + CELL_PADDING],
 				opacity: 1
-			}, SLOW_CELL_ANIMATION_DURATION, false, function() {
+			}, animationDuration, false, function() {
 				this.addTailsCoin()
 				completionHandler()
 			}.bind(this))
@@ -107,7 +107,7 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 			this.animate({
 				anchor: [this.anchor[0] + this.width / 2 + CELL_PADDING / 2, this.anchor[1] + this.height + CELL_PADDING],
 				opacity: 1,
-			}, SLOW_CELL_ANIMATION_DURATION, false, function() {
+			}, animationDuration, false, function() {
 				this.addTailsCoin()
 				completionHandler()
 			}.bind(this))
@@ -187,13 +187,17 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 
 	highlight() {
 		this.update({
-			fillColor: (this.nbFlips() != 0) ? this.computeFillColor().darken(0.65) : Color.gray(0.25)
+			fillColor: (this.nbFlips() != 0) ? this.computeFillColor().darken(0.65) : Color.gray(0.25),
+			strokeWidth: CELL_HIGHLIGHT_STROKE_WIDTH,
+			strokeColor: CELL_HIGHLIGHT_STROKE_COLOR
 		})
 	}
 
 	unhighlight() {
 		this.update({
-			fillColor: this.computeFillColor().darken(0.25)
+			fillColor: this.computeFillColor().darken(0.25),
+			strokeWidth: CELL_STROKE_WIDTH,
+			strokeColor: CELL_STROKE_COLOR
 		})
 	}
 
