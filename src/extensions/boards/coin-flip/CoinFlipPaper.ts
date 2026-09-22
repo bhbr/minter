@@ -26,6 +26,8 @@ import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { PathCoin } from 'extensions/animation_sequences/PascalsBrickWall/PathCoin'
+import { PathCoinRow } from 'extensions/animation_sequences/PascalsBrickWall/PathCoinRow'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -84,15 +86,12 @@ export class CoinFlipPaper extends Paper {
 
 let p = new CoinFlipPaper()
 
-let c = new PascalsTriangle({
+let t = new PascalsTriangle({
 	anchor: [500, 100],
-	nbFlips: 3
+	//nbFlips: 3
 })
 
-
-
-
-p.addToContent(c)
+p.addToContent(t)
 
 
 

@@ -31,3 +31,5 @@ export const COMB_LABEL_HEIGHT: number = 20
 export const CELL_START_OPACITY: number = 0.5
 export const FAST_CELL_ANIMATION_DURATION: number = 0.5
 export const SLOW_CELL_ANIMATION_DURATION: number = 1
+export const PATH_LABEL_SIZE: number = 35
+export const PATH_LABEL_FONT_SIZE: number = 24

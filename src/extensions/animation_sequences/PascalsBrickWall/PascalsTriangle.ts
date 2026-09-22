@@ -13,6 +13,7 @@ import { Transform } from 'core/classes/Transform'
 import { TAU } from 'core/constants'
 import { ScreenEvent } from 'core/mobjects/screen_events'
 import { vertex } from 'core/functions/vertex'
+import { PathCoinRow } from './PathCoinRow'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -32,6 +33,7 @@ export class PascalsTriangle extends Linkable {
 	selectedCells: Array<PascalsTriangleCell>
 	selectedEdges: Array<Line>
 	animationDuration: number
+	pathCoinRow: PathCoinRow
 
 	defaults(): object {
 		return {
@@ -74,7 +76,8 @@ export class PascalsTriangle extends Linkable {
 			}),
 			selectedIndices: [],
 			selectedCells: [],
-			selectedEdges: []
+			selectedEdges: [],
+			pathCoinRow: new PathCoinRow()
 		}
 	}
 
@@ -111,6 +114,12 @@ export class PascalsTriangle extends Linkable {
 		for (let i = 0; i < N; i++) {
 			this.splitCells()
 		}
+
+		this.pathCoinRow.update({
+			triangle: this,
+			anchor: [300, 0]
+		})
+		this.add(this.pathCoinRow)
 	}
 
 	splitCells(animationDuration: number = 0) {
@@ -144,7 +153,6 @@ export class PascalsTriangle extends Linkable {
 				color: EDGE_COLOR
 			})
 			this.add(leftEdge)
-			log(this.leftEdges.length)
 			this.leftEdges[this.nbFlips].push(leftEdge)
 			this.moveToBack(leftEdge)
 
@@ -305,11 +313,13 @@ export class PascalsTriangle extends Linkable {
 				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
 				strokeColor: EDGE_HIGHLIGHT_COLOR
 			})
+			this.pathCoinRow.push('heads')
 		} else {
 			this.rightEdges[n - 1][k - 1].update({
 				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
 				strokeColor: EDGE_HIGHLIGHT_COLOR
 			})
+			this.pathCoinRow.push('tails')
 		}
 	}
 
@@ -330,8 +340,8 @@ export class PascalsTriangle extends Linkable {
 				strokeColor: EDGE_COLOR
 			})
 		}
+		this.pathCoinRow.pop()
 	}
-
 
 	triangleIndex(p: vertex): vertex {
 		let x = p[0]
@@ -340,5 +350,18 @@ export class PascalsTriangle extends Linkable {
 		let k = Math.min(Math.max(Math.round((x / (CELL_SIZE + CELL_PADDING) + n / 2)), 0), n)
 		return [n, k]
 	}
+
+	flipPathAtPosition(n: number) {
+		log('flip')
+	}
+
+
+
+
+
+
+
+
+
 
 }
