@@ -34,7 +34,7 @@ export class PathCoinRow extends MGroup {
 	}
 
 	flipPathAtPosition(n: number) {
-		this.triangle.flipPathAtPosition(n)
+		this.triangle.flipPathAtLevel(n)
 	}
 
 }

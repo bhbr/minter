@@ -21,7 +21,7 @@ import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
 import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
 import { PascalsTriangle } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangle'
-import { PascalsTriangleCell } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangleCell'
+import { TriangleCell } from 'extensions/animation_sequences/PascalsBrickWall/TriangleCell'
 import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
@@ -88,10 +88,15 @@ let p = new CoinFlipPaper()
 
 let t = new PascalsTriangle({
 	anchor: [500, 100],
-	//nbFlips: 3
+	nbFlips: 3
 })
 
 p.addToContent(t)
 
+t.selectTopCell()
+t.addToPath('L')
+t.addToPath('R')
+t.addToPath('R')
 
+t.popFromPath()
 

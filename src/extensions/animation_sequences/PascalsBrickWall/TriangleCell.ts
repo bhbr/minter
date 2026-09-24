@@ -9,11 +9,12 @@ import { binomial } from 'core/functions/math'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 
 
-export class PascalsTriangleCell extends StackedBrickLabel {
+export class TriangleCell extends StackedBrickLabel {
 
 	presentation: 'stacks' | 'combinations'
 	nbCombinationsLabel: TextLabel
 	probabilityIndicator: RoundedRectangle
+	highlighted: boolean
 
 	defaults(): object {
 		return {
@@ -22,6 +23,7 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 			strokeColor: Color.gray(0.4),
 			strokeWidth: 1,
 			presentation: 'stacks',
+			highlighted: false,
 			nbCombinationsLabel: new TextLabel({
 				anchor: [(CELL_SIZE - COMB_LABEL_WIDTH) / 2, (CELL_SIZE - COMB_LABEL_HEIGHT) / 2],
 				frameWidth: COMB_LABEL_WIDTH,
@@ -189,7 +191,8 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 		this.update({
 			fillColor: (this.nbFlips() != 0) ? this.computeFillColor().darken(0.65) : Color.gray(0.25),
 			strokeWidth: CELL_HIGHLIGHT_STROKE_WIDTH,
-			strokeColor: CELL_HIGHLIGHT_STROKE_COLOR
+			strokeColor: CELL_HIGHLIGHT_STROKE_COLOR,
+			highlighted: true
 		})
 	}
 
@@ -197,7 +200,8 @@ export class PascalsTriangleCell extends StackedBrickLabel {
 		this.update({
 			fillColor: this.computeFillColor().darken(0.25),
 			strokeWidth: CELL_STROKE_WIDTH,
-			strokeColor: CELL_STROKE_COLOR
+			strokeColor: CELL_STROKE_COLOR,
+			highlighted: false
 		})
 	}
 
