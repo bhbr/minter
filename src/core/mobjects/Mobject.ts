@@ -171,6 +171,9 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 		}
 	}
 
+	show() { this.view.show() }
+	hide() { this.view.hide() }
+
 	//////////////////////////////////////////////////////////
 	//                                                      //
 	//                       ANIMATION                      //

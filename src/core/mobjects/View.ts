@@ -200,7 +200,6 @@ export class View extends ExtendedObject {
 	}
 
 	// Show and hide //
-
 	show() {
 		this.setVisibility(true)
 	}

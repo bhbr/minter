@@ -3,7 +3,7 @@ import { MGroup } from 'core/mobjects/MGroup'
 import { Linkable } from 'core/linkables/Linkable'
 import { TriangleCell } from './TriangleCell'
 import { SimpleButton } from 'core/ui/SimpleButton'
-import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR } from './constants'
+import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR, PATH_COIN_ROW_HORIZONTAL_OFFSET } from './constants'
 import { vertexAdd } from 'core/functions/vertex'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { log } from 'core/functions/logging'
@@ -188,7 +188,7 @@ export class PascalsTriangle extends Linkable {
 			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
 		this.pathCoinRow.animate({
-			anchor: [120 + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5, 10]
+			anchor: [PATH_COIN_ROW_HORIZONTAL_OFFSET + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5, 10]
 		}, animationDuration)
 
 		if (animationDuration == 0) {

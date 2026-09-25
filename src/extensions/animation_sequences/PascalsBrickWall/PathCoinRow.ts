@@ -1,7 +1,7 @@
 
 import { MGroup } from 'core/mobjects/MGroup'
 import { PathCoin } from './PathCoin'
-import { CELL_SIZE, CELL_PADDING, EDGE_HIGHLIGHT_COLOR, EDGE_HIGHLIGHT_WIDTH, PATH_COIN_ROW_OFFSET_FACTOR } from './constants'
+import { CELL_SIZE, CELL_PADDING, EDGE_HIGHLIGHT_COLOR, EDGE_HIGHLIGHT_WIDTH, PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR } from './constants'
 import { PascalsTriangle } from './PascalsTriangle'
 import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin'
 import { log } from 'core/functions/logging'
@@ -22,8 +22,8 @@ export class PathCoinRow extends MGroup {
 			line: new Line({
 				color: EDGE_HIGHLIGHT_COLOR,
 				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
-				startPoint: [0, PATH_COIN_ROW_OFFSET_FACTOR * (CELL_SIZE + CELL_PADDING)],
-				endPoint: [0, PATH_COIN_ROW_OFFSET_FACTOR * (CELL_SIZE + CELL_PADDING)]
+				startPoint: [0, PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR * (CELL_SIZE + CELL_PADDING)],
+				endPoint: [0, PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR * (CELL_SIZE + CELL_PADDING)]
 			})
 		}
 	}
@@ -45,7 +45,7 @@ export class PathCoinRow extends MGroup {
 		let coin = new PathCoin({
 			row: this,
 			state: state,
-			midpoint: [0, (this.coins.length + PATH_COIN_ROW_OFFSET_FACTOR) * (CELL_SIZE + CELL_PADDING)],
+			midpoint: [0, (this.coins.length + PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR) * (CELL_SIZE + CELL_PADDING)],
 			position: this.coins.length
 		})
 		this.add(coin)

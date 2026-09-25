@@ -33,4 +33,5 @@ export const FAST_CELL_ANIMATION_DURATION: number = 0.5
 export const SLOW_CELL_ANIMATION_DURATION: number = 1
 export const PATH_LABEL_SIZE: number = 35
 export const PATH_LABEL_FONT_SIZE: number = 24
-export const PATH_COIN_ROW_OFFSET_FACTOR: number = 0.85
+export const PATH_COIN_ROW_HORIZONTAL_OFFSET: number = 150
+export const PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR: number =0.85
