@@ -93,10 +93,13 @@ let t = new PascalsTriangle({
 
 p.addToContent(t)
 
-t.selectTopCell()
-t.addToPath('L')
-t.addToPath('R')
-t.addToPath('R')
+// let r = new PathCoinRow({
+// 	states: ['heads', 'tails'],
+// 	anchor: [500, 100]
+// })
 
-t.popFromPath()
+// p.add(r)
 
+// r.update({
+// 	states: ['tails', 'heads', 'tails'],
+// })

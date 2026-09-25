@@ -15,7 +15,7 @@ import { vertex } from 'core/functions/vertex'
 import { PathCoinRow } from './PathCoinRow'
 import { TrianglePath, PathDirection } from './TrianglePath'
 import { TriangleEdge } from './TriangleEdge'
-import { equalArrays } from 'core/functions/arrays'
+import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -119,8 +119,7 @@ export class PascalsTriangle extends Linkable {
 		}
 
 		this.pathCoinRow.update({
-			triangle: this,
-			anchor: [300, 0]
+			triangle: this
 		})
 		this.add(this.pathCoinRow)
 	}
@@ -188,6 +187,10 @@ export class PascalsTriangle extends Linkable {
 		this.presentationFormsList.animate({
 			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
+		this.pathCoinRow.animate({
+			anchor: [120 + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5, 10]
+		}, animationDuration)
+
 		if (animationDuration == 0) {
 			this.endSplitting()
 		}
@@ -356,6 +359,12 @@ export class PascalsTriangle extends Linkable {
 			}
 		}
 		this.selectedEdges = newSelectedEdges
+
+		let newStates = arrayWithReplacements(this.selectedPath, {'L': 'heads', 'R': 'tails'})
+		this.pathCoinRow.update({
+			states: newStates
+		})
+
 	}
 
 	selectedIndices(): Array<[number, number]> {
