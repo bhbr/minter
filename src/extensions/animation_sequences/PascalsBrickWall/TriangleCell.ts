@@ -22,18 +22,16 @@ export class TriangleCell extends StackedBrickLabel {
 			screenEventHandler: ScreenEventHandler.Parent,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1,
-			strokeColor: Color.gray(0.4),
-			strokeWidth: 1,
+			strokeWidth: 0,
 			presentation: 'stacks',
 			highlighted: false,
 			highlightBorder: new RoundedRectangle({
 				width: CELL_SIZE,
 				height: CELL_SIZE,
 				cornerRadius: CELL_CORNER_RADIUS,
-				color: CELL_HIGHLIGHT_STROKE_COLOR,
-				strokeWidth: CELL_HIGHLIGHT_STROKE_WIDTH,
-				fillOpacity: 0,
-				visible: false
+				color: CELL_STROKE_COLOR,
+				strokeWidth: CELL_STROKE_WIDTH,
+				fillOpacity: 0
 			}),
 			nbCombinationsLabel: new TextLabel({
 				anchor: [(CELL_SIZE - COMB_LABEL_WIDTH) / 2, (CELL_SIZE - COMB_LABEL_HEIGHT) / 2],
@@ -60,7 +58,6 @@ export class TriangleCell extends StackedBrickLabel {
 		this.probabilityIndicator.view.svg.style.overflow = 'hidden'
 		this.add(this.probabilityIndicator)
 		this.add(this.nbCombinationsLabel)
-		this.highlightBorder.hide()
 		this.add(this.highlightBorder)
 		if (this.highlighted) {
 			this.highlight()
@@ -160,10 +157,10 @@ export class TriangleCell extends StackedBrickLabel {
 		}, duration)
 	}
 
-	computeFillColor(highlighted: boolean = false): Color {
+	computeFillColor(darkeningFactor: number = 0): Color {
 		let interpolatedColor = HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / this.nbFlips())
 		let baseColor = (this.nbFlips() != 0) ? interpolatedColor : Color.gray(0.25)
-		return baseColor.darken(highlighted ? 0.35 : 0.65)
+		return baseColor.darken(darkeningFactor)
 	}
 
 	showCombinationsLabel(duration: number = 0) {
@@ -198,11 +195,11 @@ export class TriangleCell extends StackedBrickLabel {
 		})
 		if (this.nbFlips() == 0) { return }
 		this.update({
-			fillColor: this.computeFillColor()
+			fillColor: this.computeFillColor(0.6)
 		})
 		let p = binomial(this.nbFlips(), this.nbTails) / (2 ** this.nbFlips())
 		this.probabilityIndicator.update({
-			fillColor: this.computeFillColor(),
+			fillColor: this.computeFillColor(0),
 			anchor: [0, this.height * (1 - p)],
 			height: this.height * p
 		})
@@ -212,18 +209,24 @@ export class TriangleCell extends StackedBrickLabel {
 
 	highlight() {
 		this.update({
-			fillColor: this.computeFillColor(true),
+			//fillColor: this.computeFillColor(0.2),
 			highlighted: true
 		})
-		this.highlightBorder.show()
+		this.highlightBorder.update({
+			strokeColor: CELL_HIGHLIGHT_STROKE_COLOR,
+			strokeWidth: CELL_HIGHLIGHT_STROKE_WIDTH
+		})
 	}
 
 	unhighlight() {
 		this.update({
-			fillColor: this.computeFillColor(false),
+			//fillColor: this.computeFillColor(0.6),
 			highlighted: false
 		})
-		this.highlightBorder.hide()
+		this.highlightBorder.update({
+			strokeColor: CELL_STROKE_COLOR,
+			strokeWidth: CELL_STROKE_WIDTH
+		})
 	}
 
 }
