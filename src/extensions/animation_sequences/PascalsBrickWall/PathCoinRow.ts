@@ -6,19 +6,22 @@ import { PascalsTriangle } from './PascalsTriangle'
 import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin'
 import { log } from 'core/functions/logging'
 import { Line } from 'core/shapes/Line'
+import { CurvedArrow } from 'core/shapes/CurvedArrow'
+import { TAU } from 'core/constants'
 
 export class PathCoinRow extends MGroup {
 
 	states: Array<CoinState>
 	coins: Array<PathCoin>
 	triangle?: PascalsTriangle
-	line: Line
+	arrows: Array<CurvedArrow>
 
 	defaults(): object {
 		return {
 			states: [],
 			coins: [],
 			triangle: null,
+			arrows: [],
 			line: new Line({
 				color: EDGE_HIGHLIGHT_COLOR,
 				strokeWidth: EDGE_HIGHLIGHT_WIDTH,
@@ -30,7 +33,6 @@ export class PathCoinRow extends MGroup {
 
 	setup() {
 		super.setup()
-		this.add(this.line)
 		for (let state of this.states) {
 			this.addCoin(state)
 		}
@@ -42,28 +44,33 @@ export class PathCoinRow extends MGroup {
 	}
 
 	addCoin(state: CoinState) {
+		let arrowRadius = CELL_SIZE / Math.sqrt(2)
+		let arrowAngle = TAU / 4
 		let coin = new PathCoin({
 			row: this,
 			state: state,
-			midpoint: [0, (this.coins.length + PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR) * (CELL_SIZE + CELL_PADDING)],
+			midpoint: [50, (this.coins.length + PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR) * (CELL_SIZE + CELL_PADDING)],
 			position: this.coins.length
 		})
-		this.add(coin)
+		let arrow = new CurvedArrow({
+			midpoint: [coin.midpoint[0] - 70, coin.midpoint[1] + (CELL_SIZE + CELL_PADDING) / 2 + 10],
+			tipStyle: 'dart',
+			tipSize: 15,
+			radius: arrowRadius,
+			angle: arrowAngle,
+			transformAngle: 0.5 * arrowAngle
+		})
+		this.arrows.push(arrow)
+		this.add(arrow)
 		this.coins.push(coin)
-		this.updateLine()
+		this.add(coin)
 	}
 
 	removeCoin() {
 		this.remove(this.coins[this.coins.length - 1])
-		this.updateLine()
+		this.remove(this.arrows[this.arrows.length - 1])
 		this.coins.pop()
-	}
-
-	updateLine() {
-		let lastCoin = this.coins[this.coins.length - 1]
-		this.line.update({
-			endPoint: lastCoin.midpoint
-		})
+		this.arrows.pop()
 	}
 
 	pop() {
@@ -96,6 +103,14 @@ export class PathCoinRow extends MGroup {
 				}
 			} else {
 				this.addCoin(this.states[i])
+			}
+		}
+
+		if (args['arrowTransformAngle'] !== undefined) {
+			for (let arrow of this.arrows) {
+				arrow.update({
+					'transformAngle': args['arrowTransformAngle']
+				})
 			}
 		}
 

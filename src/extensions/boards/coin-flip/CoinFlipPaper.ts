@@ -31,6 +31,7 @@ import { CircularArc } from 'core/shapes/CircularArc'
 import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
 import { CurvedLine } from 'core/vmobjects/CurvedLine'
 import { TAU } from 'core/constants'
+import { Slider } from 'extensions/creations/math/Slider/Slider'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -89,30 +90,24 @@ export class CoinFlipPaper extends Paper {
 
 let p = new CoinFlipPaper()
 
-// let t = new PascalsTriangle({
-// 	anchor: [500, 100],
-// 	nbFlips: 3
-// })
-
-// p.addToContent(t)
-
-let a = new CurvedArrow({
-	midpoint: [300, 300],
-	radius: 100,
-	angle: TAU / 6,
-	tipStyle: 'v'
+let t = new PascalsTriangle({
+	anchor: [500, 100],
+	nbFlips: 3
 })
 
-p.add(a)
-
-log(a.closed)
+p.addToContent(t)
 
 
 
 
+let s = new Slider({
+	anchor: [100, 100],
+	max: TAU
+})
 
+s.addDependency('value', t.pathCoinRow, 'arrowTransformAngle')
 
-
+p.addToContent(s)
 
 
 
