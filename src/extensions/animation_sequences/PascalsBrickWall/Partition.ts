@@ -738,7 +738,7 @@ export class Partition extends Linkable implements LabelShower {
 				nbTails: brick.nbTails
 			})
 			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+				fillColor: brick.getFillColor().brighten(0.35)
 			})
 			this.labelledBrick = brick
 		} else {
@@ -751,7 +751,7 @@ export class Partition extends Linkable implements LabelShower {
 				nbTails: brick.nbTails
 			})
 			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+				fillColor: brick.getFillColor().brighten(0.35)
 			})
 			this.popover.view.show()
 			this.labelledBrick = brick

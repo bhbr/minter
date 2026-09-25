@@ -9,7 +9,7 @@ export class EraseButton extends SidebarButton {
 	
 	defaults(): object {
 		return {
-			baseColor: Color.red().darken(0.7),
+			baseColor: Color.red().darken(0.3),
 			messageKey: 'erase',
 			selectMessages: [
 				{ 'erase': true },

@@ -412,7 +412,7 @@ The content children can also be dragged and panned.
 		if (mob instanceof Board) {
 			if (mob.constructor.name == 'Construction') { return }
 			mob.background.update({
-				fillColor: this.background.view.fillColor.brighten(1.1)
+				fillColor: this.background.view.fillColor.brighten(0.1)
 			})
 		}
 	}

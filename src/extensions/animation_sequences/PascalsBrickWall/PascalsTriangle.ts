@@ -17,6 +17,7 @@ import { TrianglePath, PathDirection } from './TrianglePath'
 import { TriangleEdge } from './TriangleEdge'
 import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
 
+
 export class PascalsTriangle extends Linkable {
 	
 	cells: Array<Array<TriangleCell>>
@@ -31,6 +32,8 @@ export class PascalsTriangle extends Linkable {
 	nbFlipsText: TextLabel
 	nbPossibilitiesLabels: MGroup
 	nbPossibilitiesText: TextLabel
+	nbTailsLabels: MGroup
+	nbTailsText: TextLabel
 
 	selectedPath: TrianglePath
 	selectedCells: Array<TriangleCell>
@@ -43,7 +46,7 @@ export class PascalsTriangle extends Linkable {
 			cells: [],
 			nbFlips: 0,
 			splitButton: new SimpleButton({
-				anchor: [-25, CELL_SIZE + CELL_PADDING],
+				anchor: [-150, CELL_SIZE + CELL_PADDING + 50],
 				text: 'flip'
 			}),
 			presentation: 'stacks',
@@ -51,11 +54,13 @@ export class PascalsTriangle extends Linkable {
 			leftEdges: [],
 			rightEdges: [],
 			presentationFormsList: new RadioButtonList({
-				anchor: [-100, CELL_SIZE + CELL_PADDING + 50],
+				anchor: [-75, CELL_SIZE + CELL_PADDING + 55],
 				options: [
 					'# flips',
 					'# possibilities'
-				]
+				],
+				orientation: 'horizontal',
+				optionSpacing: 100
 			}),
 			nbFlipsLabels: new MGroup(),
 			nbFlipsText: new TextLabel({
@@ -76,6 +81,15 @@ export class PascalsTriangle extends Linkable {
 					anchor: [1.7 * CELL_SIZE, 0.2 * CELL_SIZE],
 					angle: -TAU / 6
 				})
+			}),
+			nbTailsLabels: new MGroup({
+				anchor: [-120, CELL_SIZE + CELL_PADDING + 10],
+				frameWidth: 25
+			}),
+			nbTailsText: new TextLabel({
+				text: '# tails',
+				frameWidth: 100,
+				frameHeight: 25,
 			}),
 			selectedPath: new TrianglePath(),
 			selectedCells: [],
@@ -110,6 +124,9 @@ export class PascalsTriangle extends Linkable {
 		this.nbFlipsLabels.add(this.nbFlipsText)
 		this.createNewNbFlipsLabel()
 		this.add(this.nbFlipsLabels)
+
+		this.nbTailsLabels.add(this.nbTailsText)
+		this.createNewNbTailsLabel()
 
 		this.nbPossibilitiesLabels.add(this.nbPossibilitiesText)
 		this.createNewNbPossibilitiesLabel()
@@ -191,6 +208,10 @@ export class PascalsTriangle extends Linkable {
 			anchor: [PATH_COIN_ROW_HORIZONTAL_OFFSET + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5, 10]
 		}, animationDuration)
 
+		this.nbTailsLabels.animate({
+			anchor: [this.nbTailsLabels.anchor[0] - 0.5 * (CELL_SIZE + CELL_PADDING), this.nbTailsLabels.anchor[1] + CELL_SIZE + CELL_PADDING]
+		}, animationDuration)
+
 		if (animationDuration == 0) {
 			this.endSplitting()
 		}
@@ -208,6 +229,17 @@ export class PascalsTriangle extends Linkable {
 			anchor: labelAnchor
 		})
 		this.nbFlipsLabels.add(newNbFlipsLabel)
+	}
+
+	createNewNbTailsLabel() {
+		let labelAnchor = [this.nbFlips * (CELL_SIZE + CELL_PADDING) + 85, 0]
+		let newNbTailsLabel = new TextLabel({
+			frameWidth: CELL_SIZE,
+			frameHeight: 25,
+			text: `${this.nbFlips}`,
+			anchor: labelAnchor
+		})
+		this.nbTailsLabels.add(newNbTailsLabel)
 	}
 
 	createNewNbPossibilitiesLabel() {
@@ -230,6 +262,7 @@ export class PascalsTriangle extends Linkable {
 			nbFlips: this.nbFlips + 1
 		})
 		this.createNewNbFlipsLabel()
+		this.createNewNbTailsLabel()
 		this.createNewNbPossibilitiesLabel()
 	}
 
@@ -240,11 +273,11 @@ export class PascalsTriangle extends Linkable {
 		if (newPresentation == 'stacks') {
 			this.showHTLabels(FAST_CELL_ANIMATION_DURATION)
 			this.remove(this.nbPossibilitiesLabels)
-			this.add(this.nbFlipsLabels)
+			this.remove(this.nbTailsLabels)
 		} else if (newPresentation == 'combinations') {
 			this.showCombinationsLabels(FAST_CELL_ANIMATION_DURATION)
-			this.remove(this.nbFlipsLabels)
 			this.add(this.nbPossibilitiesLabels)
+			this.add(this.nbTailsLabels)
 		}
 		this.update({
 			presentation: newPresentation
@@ -305,6 +338,12 @@ export class PascalsTriangle extends Linkable {
 	flipPathAtLevel(n: number) {
 		this.selectedPath.flipAtLevel(n)
 		this.updateSelection()
+	}
+
+	clearPath() {
+		this.clipPathToLevel(0)
+		this.selectedCells.pop()
+		this.cells[0][0].unhighlight()
 	}
 
 	getSelectedCells(): Array<TriangleCell> {
@@ -405,6 +444,8 @@ export class PascalsTriangle extends Linkable {
 		} else if (this.indexIsSelected([n - 1, k - 1])) {
 			this.clipPathToLevel(n - 1)
 			this.addToPath('R')
+		} else {
+			this.clearPath()
 		}
 	}
 
@@ -453,10 +494,6 @@ export class PascalsTriangle extends Linkable {
 			}
 		}
 	}
-
-
-
-
 
 
 

@@ -16,12 +16,12 @@ export class Color {
 		this.alpha = a
 	}
 
-	darken(factor: number): Color {
-		return new Color(factor * this.red, factor * this.green, factor * this.blue, this.alpha)
+	darken(factor: number): Color { // factor = 0: original, factor = 1: black
+		return new Color((1 - factor) * this.red, (1 - factor) * this.green, (1 - factor) * this.blue, this.alpha)
 	}
 
-	brighten(factor: number): Color {
-		return new Color(1 - factor * (1 - this.red), 1 - factor * (1 - this.green), 1 - factor * (1 - this.blue), this.alpha)
+	brighten(factor: number): Color { // factor = 0: original, factor = 1: white
+		return new Color((1 - factor) * this.red + factor, (1 - factor) * this.green + factor, (1 - factor) * this.blue + factor, this.alpha)
 	}
 
 	// Conversion methods

@@ -19,6 +19,7 @@ export class TriangleCell extends StackedBrickLabel {
 
 	defaults(): object {
 		return {
+			screenEventHandler: ScreenEventHandler.Parent,
 			fillColor: Color.gray(0.2),
 			fillOpacity: 1,
 			strokeColor: Color.gray(0.4),
@@ -61,6 +62,11 @@ export class TriangleCell extends StackedBrickLabel {
 		this.add(this.nbCombinationsLabel)
 		this.highlightBorder.hide()
 		this.add(this.highlightBorder)
+		if (this.highlighted) {
+			this.highlight()
+		} else {
+			this.unhighlight()
+		}
 		if (this.presentation == 'stacks') {
 			this.showHTLabel()
 		} else if (this.presentation == 'combinations') {
@@ -154,8 +160,10 @@ export class TriangleCell extends StackedBrickLabel {
 		}, duration)
 	}
 
-	computeFillColor(): Color {
-		return (this.nbFlips() != 0) ? HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / this.nbFlips()) : Color.black()
+	computeFillColor(highlighted: boolean = false): Color {
+		let interpolatedColor = HEADS_COLOR.interpolate(TAILS_COLOR, this.nbTails / this.nbFlips())
+		let baseColor = (this.nbFlips() != 0) ? interpolatedColor : Color.gray(0.25)
+		return baseColor.darken(highlighted ? 0.35 : 0.65)
 	}
 
 	showCombinationsLabel(duration: number = 0) {
@@ -190,7 +198,7 @@ export class TriangleCell extends StackedBrickLabel {
 		})
 		if (this.nbFlips() == 0) { return }
 		this.update({
-			fillColor: this.computeFillColor().darken(0.25)
+			fillColor: this.computeFillColor()
 		})
 		let p = binomial(this.nbFlips(), this.nbTails) / (2 ** this.nbFlips())
 		this.probabilityIndicator.update({
@@ -204,7 +212,7 @@ export class TriangleCell extends StackedBrickLabel {
 
 	highlight() {
 		this.update({
-			fillColor: (this.nbFlips() != 0) ? this.computeFillColor().darken(0.65) : Color.gray(0.25),
+			fillColor: this.computeFillColor(true),
 			highlighted: true
 		})
 		this.highlightBorder.show()
@@ -212,9 +220,7 @@ export class TriangleCell extends StackedBrickLabel {
 
 	unhighlight() {
 		this.update({
-			fillColor: this.computeFillColor().darken(0.25),
-			strokeWidth: CELL_STROKE_WIDTH,
-			strokeColor: CELL_STROKE_COLOR,
+			fillColor: this.computeFillColor(false),
 			highlighted: false
 		})
 		this.highlightBorder.hide()

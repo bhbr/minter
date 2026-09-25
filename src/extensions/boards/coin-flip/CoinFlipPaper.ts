@@ -13,11 +13,11 @@ import { SumBoxCreator } from 'extensions/creations/math/boxes/SumBox'
 import { AverageBoxCreator } from 'extensions/creations/math/boxes/AverageBox'
 import { CumSumBoxCreator } from 'extensions/creations/math/boxes/CumSumBox'
 import { CumAverageBoxCreator } from 'extensions/creations/math/boxes/CumAverageBox'
-import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
-import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
+//import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
+//import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
-import { DesmosLoader } from 'extensions/apis/DesmosLoader'
+//import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
 import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
 import { PascalsTriangle } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangle'
@@ -57,8 +57,8 @@ export class CoinFlipPaper extends Paper {
 				'not equal': NotEqualsBoxCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
-				'plot': ScatterPlotCreator,
-				'histogram': HistogramCreator,
+				//'plot': ScatterPlotCreator,
+				//'histogram': HistogramCreator,
 				'rgb color': RGBAColorSampleCreator,
 				'color wheel': WheelColorSampleCreator,
 			},
@@ -72,12 +72,12 @@ export class CoinFlipPaper extends Paper {
 				'ComparisonButton',
 				//'AlgebraButton',
 				'ListFunctionsButton',
-				'PlotButton',
+				//'PlotButton',
 				//'ColorSampleButton',
 				'EraseButton'
 			],
 			apiLoaders: [
-				new DesmosLoader()
+				//new DesmosLoader()
 			]
 		}
 	}
@@ -97,17 +97,6 @@ let t = new PascalsTriangle({
 
 p.addToContent(t)
 
-
-
-
-let s = new Slider({
-	anchor: [100, 100],
-	max: TAU
-})
-
-s.addDependency('value', t.pathCoinRow, 'arrowTransformAngle')
-
-p.addToContent(s)
 
 
 
