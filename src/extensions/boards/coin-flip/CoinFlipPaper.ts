@@ -26,8 +26,11 @@ import { Color } from 'core/classes/Color'
 import { log } from 'core/functions/logging'
 import { binomial } from 'core/functions/math'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { PathCoin } from 'extensions/animation_sequences/PascalsBrickWall/PathCoin'
-import { PathCoinRow } from 'extensions/animation_sequences/PascalsBrickWall/PathCoinRow'
+import { CurvedArrow } from 'core/shapes/CurvedArrow'
+import { CircularArc } from 'core/shapes/CircularArc'
+import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
+import { CurvedLine } from 'core/vmobjects/CurvedLine'
+import { TAU } from 'core/constants'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -86,20 +89,30 @@ export class CoinFlipPaper extends Paper {
 
 let p = new CoinFlipPaper()
 
-let t = new PascalsTriangle({
-	anchor: [500, 100],
-	nbFlips: 3
+// let t = new PascalsTriangle({
+// 	anchor: [500, 100],
+// 	nbFlips: 3
+// })
+
+// p.addToContent(t)
+
+let a = new CurvedArrow({
+	midpoint: [300, 300],
+	radius: 100,
+	angle: TAU / 6,
+	tipStyle: 'v'
 })
 
-p.addToContent(t)
+p.add(a)
 
-// let r = new PathCoinRow({
-// 	states: ['heads', 'tails'],
-// 	anchor: [500, 100]
-// })
+log(a.closed)
 
-// p.add(r)
 
-// r.update({
-// 	states: ['tails', 'heads', 'tails'],
-// })
+
+
+
+
+
+
+
+
