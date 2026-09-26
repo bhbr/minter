@@ -556,7 +556,22 @@ export class PascalsTriangle extends Linkable {
 		this.nbTailsLabels.view.setVisibility(visible)
 	}
 
+	update(args: object = {}, redraw: boolean = true) {
+		if (args['nbFlips'] !== undefined) {
+			let newNbFlips = args['nbFlips']
+			if (newNbFlips > this.nbFlips) {
+				for (let n = this.nbFlips; n < newNbFlips; n++) {
+					this.splitCells()
+				}
+			} else {
+				for (let n = this.nbFlips; n > newNbFlips; n--) {
+					this.unsplit()
+				}
+			}
+		}
+		super.update(args, redraw)
 
+	}
 
 
 
