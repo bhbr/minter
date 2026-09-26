@@ -16,12 +16,12 @@ import { TrianglePath, PathDirection } from './TrianglePath'
 import { TriangleEdge } from './TriangleEdge'
 import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
 import { Checkbox } from 'core/ui/Checkbox'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
 
 export class PascalsTriangle extends Linkable {
 	
 	cells: Array<Array<TriangleCell>>
 	nbFlips: number
-	splitButton: SimpleButton
 	isSplitting: boolean
 	leftEdges: Array<Array<TriangleEdge>>
 	rightEdges: Array<Array<TriangleEdge>>
@@ -34,6 +34,9 @@ export class PascalsTriangle extends Linkable {
 	nbTailsLabels: MGroup
 	nbTailsText: TextLabel
 	labelsCheckbox: Checkbox
+	nbFlipsBox: NumberInputBox
+	splitButton: SimpleButton
+	unsplitButton: SimpleButton
 
 	selectedPath: TrianglePath
 	selectedCells: Array<TriangleCell>
@@ -45,10 +48,6 @@ export class PascalsTriangle extends Linkable {
 		return {
 			cells: [],
 			nbFlips: 0,
-			splitButton: new SimpleButton({
-				anchor: [-150, CELL_SIZE + CELL_PADDING + 50],
-				text: 'flip'
-			}),
 			presentation: 'stacks',
 			isSplitting: false,
 			leftEdges: [],
@@ -99,7 +98,24 @@ export class PascalsTriangle extends Linkable {
 			selectedPath: new TrianglePath(),
 			selectedCells: [],
 			selectedEdges: [],
-			pathCoinRow: new PathCoinRow()
+			pathCoinRow: new PathCoinRow(),
+			inputProperties: [
+				{
+					name: 'nbFlips',
+					displayName: '# flips',
+					type: 'number'
+				}
+			],
+			nbFlipsBox: new NumberInputBox({
+				labelText: '# flips:'
+			}),
+			splitButton: new SimpleButton({
+				text: '>'
+			}),
+			unsplitButton: new SimpleButton({
+				text: '<'
+			}),
+
 		}
 	}
 
@@ -118,8 +134,6 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.cells.push([baseCell])
 		this.add(baseCell)
-		this.splitButton.action = this.splitCells.bind(this, SLOW_CELL_ANIMATION_DURATION)
-		this.controls.add(this.splitButton)
 		this.presentationFormsList.action = this.switchPresentation.bind(this)
 		this.presentationFormsList.update({
 			selectedButton: this.presentationFormsList.radioButtons[0]
@@ -142,7 +156,7 @@ export class PascalsTriangle extends Linkable {
 		this.nbPossibilitiesLabels.hide()
 
 		for (let i = 0; i < N; i++) {
-			this.splitCells()
+			this.split()
 		}
 
 		this.pathCoinRow.update({
@@ -153,14 +167,39 @@ export class PascalsTriangle extends Linkable {
 		this.controls.add(this.labelsCheckbox)
 		this.labelsCheckbox.onToggle = this.toggleLabels.bind(this)
 
+		this.nbFlipsBox.update({
+			anchor: [-150, -50],
+			value: this.nbFlips
+		})
+		this.nbFlipsBox.addDependency('value', this, 'nbFlips')
+		this.controls.add(this.nbFlipsBox)
+
+		this.splitButton.update({
+			anchor: [0, -50]
+		})
+		this.splitButton.action = this.splitFromButton.bind(this)
+		this.controls.add(this.splitButton)
+
+		this.unsplitButton.update({
+			anchor: [-200, -50]
+		})
+		this.unsplitButton.action = this.unsplitFromButton.bind(this)
+		this.controls.add(this.unsplitButton)
+
 	}
 
-	splitCells(animationDuration: number = 0) {
+	splitFromButton() {
+		this.nbFlipsBox.inputElement.value = (this.nbFlips + 1).toString()
+		this.split(SLOW_CELL_ANIMATION_DURATION)
+	}
+
+	split(animationDuration: number = 0) {
 		if (this.isSplitting) { return }
 		this.update({ isSplitting: true })
 		this.cells.push([])
 		this.leftEdges.push([])
 		this.rightEdges.push([])
+
 		for (let i = 0; i <= this.nbFlips; i++) {
 			let cell = this.cells[this.nbFlips][i]
 			let leftCopy = new TriangleCell({
@@ -212,9 +251,6 @@ export class PascalsTriangle extends Linkable {
 			}, animationDuration)
 		}
 
-		this.splitButton.animate({
-			anchor: vertexAdd(this.splitButton.anchor, [0, CELL_SIZE + CELL_PADDING])
-		}, animationDuration)
 		this.presentationFormsList.animate({
 			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
@@ -234,6 +270,11 @@ export class PascalsTriangle extends Linkable {
 		}
 	}
 
+	unsplitFromButton() {
+		this.nbFlipsBox.inputElement.value = (this.nbFlips - 1).toString()
+		this.unsplit()
+	}
+
 	unsplit() {
 		for (let cell of this.cells[this.nbFlips]) {
 			this.remove(cell)
@@ -250,9 +291,6 @@ export class PascalsTriangle extends Linkable {
 		}
 		this.rightEdges.pop()
 
-		this.splitButton.update({
-			anchor: vertexSubtract(this.splitButton.anchor, [0, CELL_SIZE + CELL_PADDING])
-		})
 		this.presentationFormsList.update({
 			anchor: vertexSubtract(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
 		})
@@ -270,7 +308,6 @@ export class PascalsTriangle extends Linkable {
 		if (this.selectedPath.length > this.nbFlips) {
 			this.popFromPath()
 		}
-
 	}
 
 	createNewNbFlipsLabel() {
@@ -561,7 +598,7 @@ export class PascalsTriangle extends Linkable {
 			let newNbFlips = args['nbFlips']
 			if (newNbFlips > this.nbFlips) {
 				for (let n = this.nbFlips; n < newNbFlips; n++) {
-					this.splitCells()
+					this.split()
 				}
 			} else {
 				for (let n = this.nbFlips; n > newNbFlips; n--) {
