@@ -96,7 +96,7 @@ let p = new CoinFlipPaper()
 
 let t = new PascalsTriangle({
 	anchor: [500, 100],
-	nbFlips: 1
+	nbFlips: 3
 })
 
 p.addToContent(t)

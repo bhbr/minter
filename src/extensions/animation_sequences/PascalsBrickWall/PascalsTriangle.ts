@@ -18,6 +18,8 @@ import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
 import { Checkbox } from 'core/ui/Checkbox'
 import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox'
 import { Polygon } from 'core/vmobjects/Polygon'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { Color } from 'core/classes/Color'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -30,8 +32,8 @@ export class PascalsTriangle extends Linkable {
 	presentation: 'stacks' | 'combinations'
 	nbFlipsLabels: MGroup
 	nbFlipsText: TextLabel
-	nboutcomesLabels: MGroup
-	nboutcomesText: TextLabel
+	nbOutcomesLabels: MGroup
+	nbOutcomesText: TextLabel
 	nbTailsLabels: MGroup
 	nbTailsText: TextLabel
 	labelsCheckbox: Checkbox
@@ -43,6 +45,7 @@ export class PascalsTriangle extends Linkable {
 	selectedEdges: Array<TriangleEdge>
 	animationDuration: number
 	pathCoinRow: PathCoinRow
+	background: RoundedRectangle
 
 	defaults(): object {
 		return {
@@ -117,8 +120,8 @@ export class PascalsTriangle extends Linkable {
 				})
 			}),
 
-			nboutcomesLabels: new MGroup(),
-			nboutcomesText: new TextLabel({
+			nbOutcomesLabels: new MGroup(),
+			nbOutcomesText: new TextLabel({
 				text: '# outcomes',
 				frameWidth: 100,
 				frameHeight: 25,
@@ -138,6 +141,10 @@ export class PascalsTriangle extends Linkable {
 				frameHeight: 25,
 			}),
 
+			background: new RoundedRectangle({
+				fillColor: Color.black(),
+				strokeWidth: 0,
+			})
 		}
 	}
 
@@ -145,6 +152,13 @@ export class PascalsTriangle extends Linkable {
 		super.setup()
 		let N = this.nbFlips
 		this.nbFlips = 0
+
+		this.background.update({
+			width: CONTROLS_WIDTH,
+			height: CONTROLS_HEIGHT + CELL_SIZE + 50
+		})
+		this.add(this.background)
+		this.moveToBack(this.background)
 
 		let baseCell = new TriangleCell({
 			nbHeads: 0,
@@ -172,10 +186,10 @@ export class PascalsTriangle extends Linkable {
 		this.add(this.nbTailsLabels)
 		this.nbTailsLabels.hide()
 
-		this.nboutcomesLabels.add(this.nboutcomesText)
-		this.createNewNboutcomesLabel()
-		this.add(this.nboutcomesLabels)
-		this.nboutcomesLabels.hide()
+		this.nbOutcomesLabels.add(this.nbOutcomesText)
+		this.createNewnbOutcomesLabel()
+		this.add(this.nbOutcomesLabels)
+		this.nbOutcomesLabels.hide()
 
 		for (let i = 0; i < N; i++) {
 			this.split()
@@ -277,6 +291,13 @@ export class PascalsTriangle extends Linkable {
 			anchor: vertexAdd(this.nbTailsLabels.anchor, [-0.5 * (CELL_SIZE + CELL_PADDING), CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
 
+		let newBGWidth =  Math.max(CONTROLS_WIDTH, (this.nbFlips + 2) * (CELL_SIZE + CELL_PADDING) + 20) + 150
+		this.background.animate({
+			width: newBGWidth,
+			height: CONTROLS_HEIGHT + (this.nbFlips + 2) * (CELL_SIZE + CELL_PADDING) + 50,
+			anchor: [(CONTROLS_WIDTH - newBGWidth) / 2, 0]
+		}, animationDuration)
+
 		if (animationDuration == 0) {
 			this.endSplitting()
 		}
@@ -314,7 +335,7 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.nbTailsLabels.remove(this.nbTailsLabels.children[this.nbTailsLabels.children.length - 1])
 		this.nbFlipsLabels.remove(this.nbFlipsLabels.children[this.nbFlipsLabels.children.length - 1])
-		this.nboutcomesLabels.remove(this.nboutcomesLabels.children[this.nboutcomesLabels.children.length - 1])
+		this.nbOutcomesLabels.remove(this.nbOutcomesLabels.children[this.nbOutcomesLabels.children.length - 1])
 		this.nbFlips--
 
 		if (this.selectedPath.length > this.nbFlips) {
@@ -347,18 +368,18 @@ export class PascalsTriangle extends Linkable {
 		this.nbTailsLabels.add(newNbTailsLabel)
 	}
 
-	createNewNboutcomesLabel() {
+	createNewnbOutcomesLabel() {
 		let labelAnchor = vertexAdd(
 			this.cells[this.nbFlips][this.nbFlips].anchor,
 			[CELL_SIZE, 0]
 		)
-		let newNboutcomesLabel = new TextLabel({
+		let newnbOutcomesLabel = new TextLabel({
 			frameWidth: CELL_SIZE,
 			frameHeight: CELL_SIZE,
 			text: `${2 ** this.nbFlips}`,
 			anchor: labelAnchor
 		})
-		this.nboutcomesLabels.add(newNboutcomesLabel)
+		this.nbOutcomesLabels.add(newnbOutcomesLabel)
 	}
 
 	endSplitting() {
@@ -368,7 +389,7 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.createNewNbFlipsLabel()
 		this.createNewNbTailsLabel()
-		this.createNewNboutcomesLabel()
+		this.createNewnbOutcomesLabel()
 	}
 
 	switchPresentation() {
@@ -406,8 +427,8 @@ export class PascalsTriangle extends Linkable {
 	triangleIndex(p: vertex): vertex {
 		let x = p[0] - this.cells[0][0].anchor[0] - CELL_SIZE / 2
 		let y = p[1] - this.cells[0][0].anchor[1]
-		let n = Math.max(Math.floor(y / (CELL_SIZE + CELL_PADDING)), 0)
-		let k = Math.min(Math.max(Math.round((x / (CELL_SIZE + CELL_PADDING) + n / 2)), 0), n)
+		let n = Math.floor(y / (CELL_SIZE + CELL_PADDING))
+		let k = Math.round((x / (CELL_SIZE + CELL_PADDING) + n / 2))
 		return [n, k]
 	}
 
@@ -532,6 +553,8 @@ export class PascalsTriangle extends Linkable {
 	onPointerDown(e: ScreenEvent) {
 		let p = this.sensor.localEventVertex(e)
 		let [n, k] = this.triangleIndex(p)
+		if (n < 0) { return }
+		if (k < 0 || k > n) { return }
 		if (n == 0) {
 			if (this.selectedPath.length == 0) {
 				this.selectTopCell()
@@ -555,6 +578,8 @@ export class PascalsTriangle extends Linkable {
 	onPointerMove(e: ScreenEvent) {
 		let p = this.sensor.localEventVertex(e)
 		let [n, k] = this.triangleIndex(p)
+		if (n < 0) { return }
+		if (k < 0 || k > n) { return }
 		if (this.indexIsSelected([n, k])) {
 			let [n_1, k_1] = this.selectedIndices()[this.selectedPath.length]
 			if (n == n_1 - 1) {
@@ -601,7 +626,7 @@ export class PascalsTriangle extends Linkable {
 	toggleLabels() {
 		let visible = this.labelsCheckbox.state
 		this.nbFlipsLabels.view.setVisibility(visible)
-		this.nboutcomesLabels.view.setVisibility(visible)
+		this.nbOutcomesLabels.view.setVisibility(visible)
 		this.nbTailsLabels.view.setVisibility(visible)
 	}
 
