@@ -11,10 +11,12 @@ import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
 import { DependencyLink } from 'core/linkables/DependencyLink'
 import { DraggingCreator } from 'core/creators/DraggingCreator'
 
+const BOX_HEIGHT: number = 30
 
 export class InputBox extends Mobject {
 
 	label: TextLabel
+	labelPlacement: 'top' | 'left'
 	inputElement: HTMLInputElement
 	inputWidth: number
 	background: Rectangle
@@ -24,14 +26,12 @@ export class InputBox extends Mobject {
 		return {
 			label: new TextLabel({
 				text: 'label',
-				verticalAlign: 'middle',
-				horizontalAlign: 'right',
 				frameWidth: 60,
-				frameHeight: 30,
+				frameHeight: BOX_HEIGHT,
 			}),
 			background: new Rectangle({
 				width: 60,
-				height: 30,
+				height: BOX_HEIGHT,
 				anchor: [60, 0],
 				fillColor: Color.black(),
 				strokeWidth: 0
@@ -39,10 +39,11 @@ export class InputBox extends Mobject {
 			inputElement: document.createElement('input'),
 			inputWidth: 60,
 			frameWidth: 120,
-			frameHeight: 30,
-			strokeWidth: 0.0,
-			labelGap: 10.0,
-			screenEventHandler: ScreenEventHandler.Self
+			frameHeight: BOX_HEIGHT,
+			strokeWidth: 0,
+			labelGap: 5,
+			screenEventHandler: ScreenEventHandler.Self,
+			labelPlacement: 'left'
 		}
 	}
 
@@ -64,6 +65,16 @@ export class InputBox extends Mobject {
 	set labelWidth(newValue: number) {
 		this.label.update({
 			frameWidth: newValue
+		})
+	}
+
+	get labelHeight(): number {
+		return this.label.frameHeight
+	}
+
+	set labelHeight(newValue: number) {
+		this.label.update({
+			frameHeight: newValue
 		})
 	}
 
@@ -110,10 +121,11 @@ export class InputBox extends Mobject {
 		this.add(this.background)
 		this.add(this.label)
 		this.inputElement.setAttribute('type', 'text')
-		this.inputElement.style.left = `${this.labelWidth + this.labelGap}px`
+		this.inputElement.value = this.inputElement.value.toString()
+
 		this.inputElement.style.width = `${this.inputWidth}px`
 		this.inputElement.style.position = 'absolute'
-		this.inputElement.style.height = '70%'
+		this.inputElement.style.height = '100%'
 		this.inputElement.style.padding = '0px 0px'
 		this.inputElement.style.color = 'white'
 		this.inputElement.style.backgroundColor = 'rgba(50, 50, 50, 1)'
@@ -122,8 +134,27 @@ export class InputBox extends Mobject {
 		this.inputElement.style.fontSize = '16px'
 		this.inputElement.style.border = 'none'
 		this.inputElement.style.outline = 'none'
-		this.inputElement.value = this.inputElement.value.toString()
+
+		switch (this.labelPlacement) {
+		case 'left':
+			this.inputElement.style.left = `${this.labelWidth + this.labelGap}px`
+			this.label.update({
+				verticalAlign: 'center',
+				horizontalAlign: 'right',
+			})
+			break
+		case 'top':
+			this.inputElement.style.top = `${this.labelHeight + this.labelGap}px`
+			this.label.update({
+				anchor: [(this.inputWidth - this.labelWidth) / 2, 0],
+				verticalAlign: 'center',
+				horizontalAlign: 'center',
+			})
+			break
+		}
+
 		this.view.div.appendChild(this.inputElement)
+
 		this.background.update({
 			width: this.inputWidth,
 			height: this.frameHeight,
@@ -176,6 +207,7 @@ export class InputBox extends Mobject {
 	onReturn() { }
 
 	update(args: object = {}, redraw: boolean = true) {
+
 		let newLabelWidth = args['labelWidth']
 		let newInputWidth = args['inputWidth']
 		if (newLabelWidth !== undefined) {

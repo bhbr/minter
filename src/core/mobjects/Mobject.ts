@@ -438,7 +438,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			this.view.div.setAttribute('comment', this.divComment)
 		}
 
-
+		this.updateDependents()
 		if (redraw) { this.view.redraw() }
 
 	}

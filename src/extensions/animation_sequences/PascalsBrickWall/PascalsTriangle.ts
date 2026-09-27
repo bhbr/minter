@@ -3,20 +3,21 @@ import { MGroup } from 'core/mobjects/MGroup'
 import { Linkable } from 'core/linkables/Linkable'
 import { TriangleCell } from './TriangleCell'
 import { SimpleButton } from 'core/ui/SimpleButton'
-import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR, PATH_COIN_ROW_HORIZONTAL_OFFSET } from './constants'
+import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR, PATH_COIN_ROW_HORIZONTAL_OFFSET, SPLIT_BUTTON_SIZE, CONTROLS_HEIGHT, CONTROLS_WIDTH } from './constants'
 import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { log } from 'core/functions/logging'
 import { TextLabel } from 'core/ui/TextLabel'
 import { Transform } from 'core/classes/Transform'
 import { TAU } from 'core/constants'
-import { ScreenEvent } from 'core/mobjects/screen_events'
+import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
 import { PathCoinRow } from './PathCoinRow'
 import { TrianglePath, PathDirection } from './TrianglePath'
 import { TriangleEdge } from './TriangleEdge'
 import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
 import { Checkbox } from 'core/ui/Checkbox'
-import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
+import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox'
+import { Polygon } from 'core/vmobjects/Polygon'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -29,14 +30,13 @@ export class PascalsTriangle extends Linkable {
 	presentation: 'stacks' | 'combinations'
 	nbFlipsLabels: MGroup
 	nbFlipsText: TextLabel
-	nbPossibilitiesLabels: MGroup
-	nbPossibilitiesText: TextLabel
+	nboutcomesLabels: MGroup
+	nboutcomesText: TextLabel
 	nbTailsLabels: MGroup
 	nbTailsText: TextLabel
 	labelsCheckbox: Checkbox
-	nbFlipsBox: NumberInputBox
-	splitButton: SimpleButton
-	unsplitButton: SimpleButton
+	nbFlipsBox: IntegerInputBox
+	splitButton: Polygon
 
 	selectedPath: TrianglePath
 	selectedCells: Array<TriangleCell>
@@ -52,53 +52,7 @@ export class PascalsTriangle extends Linkable {
 			isSplitting: false,
 			leftEdges: [],
 			rightEdges: [],
-			presentationFormsList: new RadioButtonList({
-				anchor: [-75, CELL_SIZE + CELL_PADDING + 55],
-				options: [
-					'tallies',
-					'possibilities'
-				],
-				orientation: 'vertical',
-				optionSpacing: 25
-			}),
-			labelsCheckbox: new Checkbox({
-				text: 'show scales',
-				state: false,
-				anchor: [50, CELL_SIZE + CELL_PADDING + 55]
-			}),
-			nbFlipsLabels: new MGroup(),
-			nbFlipsText: new TextLabel({
-				text: '# flips',
-				frameWidth: 50,
-				frameHeight: 25,
-				transform: new Transform({
-					anchor: [-2 * CELL_SIZE, 0.75 * CELL_SIZE],
-					angle: TAU / 6
-				})
-			}),
-			nbPossibilitiesLabels: new MGroup(),
-			nbPossibilitiesText: new TextLabel({
-				text: '# possibilities',
-				frameWidth: 100,
-				frameHeight: 25,
-				transform: new Transform({
-					anchor: [1.7 * CELL_SIZE, 0.2 * CELL_SIZE],
-					angle: -TAU / 6
-				})
-			}),
-			nbTailsLabels: new MGroup({
-				anchor: [-120, CELL_SIZE + CELL_PADDING + 10],
-				frameWidth: 25
-			}),
-			nbTailsText: new TextLabel({
-				text: '# tails',
-				frameWidth: 100,
-				frameHeight: 25,
-			}),
-			selectedPath: new TrianglePath(),
-			selectedCells: [],
-			selectedEdges: [],
-			pathCoinRow: new PathCoinRow(),
+
 			inputProperties: [
 				{
 					name: 'nbFlips',
@@ -106,14 +60,82 @@ export class PascalsTriangle extends Linkable {
 					type: 'number'
 				}
 			],
-			nbFlipsBox: new NumberInputBox({
-				labelText: '# flips:'
+
+			frameWidth: CONTROLS_WIDTH,
+			frameHeight: CONTROLS_HEIGHT + CELL_SIZE,
+
+			nbFlipsBox: new IntegerInputBox({
+				anchor: [0, 0],
+				labelText: '# flips:',
+				labelWidth: 48,
+				labelGap: 10,
+				labelPlacement: 'left',
+				inputWidth: 40
 			}),
-			splitButton: new SimpleButton({
-				text: '>'
+
+			presentationFormsList: new RadioButtonList({
+				anchor: [0, 45],
+				options: [
+					'tallies',
+					'outcomes'
+				],
+				orientation: 'horizontal',
+				optionSpacing: 80
 			}),
-			unsplitButton: new SimpleButton({
-				text: '<'
+
+			labelsCheckbox: new Checkbox({
+				anchor: [0, 80],
+				text: 'show scales',
+				state: false
+			}),
+			
+			splitButton: new Polygon({
+				anchor: [(CONTROLS_WIDTH - SPLIT_BUTTON_SIZE) / 2, CONTROLS_HEIGHT + CELL_SIZE + CELL_PADDING],
+				vertices: [
+					[0, 0],
+					[SPLIT_BUTTON_SIZE, 0],
+					[SPLIT_BUTTON_SIZE / 2, SPLIT_BUTTON_SIZE / 4]
+				],
+				strokeWidth: 0,
+				fillOpacity: 0.35,
+				screenEventHandler: ScreenEventHandler.Self
+			}),
+
+			selectedPath: new TrianglePath(),
+			selectedCells: [],
+			selectedEdges: [],
+			pathCoinRow: new PathCoinRow(),
+
+			nbFlipsLabels: new MGroup(),
+			nbFlipsText: new TextLabel({
+				text: '# flips',
+				frameWidth: 50,
+				frameHeight: 25,
+				transform: new Transform({
+					angle: TAU / 6,
+					shift: [-CELL_SIZE / 2, CONTROLS_HEIGHT + CELL_SIZE]
+				})
+			}),
+
+			nboutcomesLabels: new MGroup(),
+			nboutcomesText: new TextLabel({
+				text: '# outcomes',
+				frameWidth: 100,
+				frameHeight: 25,
+				transform: new Transform({
+					angle: -TAU / 6,
+					shift: [3 * CELL_SIZE, CONTROLS_HEIGHT]
+				})
+			}),
+
+			nbTailsLabels: new MGroup({
+				anchor: [-20, CONTROLS_HEIGHT + CELL_SIZE + CELL_PADDING + 20],
+				frameWidth: 25
+			}),
+			nbTailsText: new TextLabel({
+				text: '# tails',
+				frameWidth: 100,
+				frameHeight: 25,
 			}),
 
 		}
@@ -130,7 +152,7 @@ export class PascalsTriangle extends Linkable {
 			presentation: this.presentation
 		})
 		baseCell.update({
-			anchor: [-baseCell.width / 2, 0]
+			anchor: [(CONTROLS_WIDTH - CELL_SIZE) / 2, CONTROLS_HEIGHT]
 		})
 		this.cells.push([baseCell])
 		this.add(baseCell)
@@ -150,10 +172,10 @@ export class PascalsTriangle extends Linkable {
 		this.add(this.nbTailsLabels)
 		this.nbTailsLabels.hide()
 
-		this.nbPossibilitiesLabels.add(this.nbPossibilitiesText)
-		this.createNewNbPossibilitiesLabel()
-		this.add(this.nbPossibilitiesLabels)
-		this.nbPossibilitiesLabels.hide()
+		this.nboutcomesLabels.add(this.nboutcomesText)
+		this.createNewNboutcomesLabel()
+		this.add(this.nboutcomesLabels)
+		this.nboutcomesLabels.hide()
 
 		for (let i = 0; i < N; i++) {
 			this.split()
@@ -168,24 +190,16 @@ export class PascalsTriangle extends Linkable {
 		this.labelsCheckbox.onToggle = this.toggleLabels.bind(this)
 
 		this.nbFlipsBox.update({
-			anchor: [-150, -50],
 			value: this.nbFlips
 		})
 		this.nbFlipsBox.addDependency('value', this, 'nbFlips')
 		this.controls.add(this.nbFlipsBox)
 
+		this.splitButton.onTap = this.splitFromButton.bind(this)
 		this.splitButton.update({
-			anchor: [0, -50]
+			anchor: [(CONTROLS_WIDTH - SPLIT_BUTTON_SIZE) / 2, CONTROLS_HEIGHT + (this.nbFlips + 1) * (CELL_SIZE + CELL_PADDING)],
 		})
-		this.splitButton.action = this.splitFromButton.bind(this)
-		this.controls.add(this.splitButton)
-
-		this.unsplitButton.update({
-			anchor: [-200, -50]
-		})
-		this.unsplitButton.action = this.unsplitFromButton.bind(this)
-		this.controls.add(this.unsplitButton)
-
+		this.add(this.splitButton)
 	}
 
 	splitFromButton() {
@@ -251,18 +265,16 @@ export class PascalsTriangle extends Linkable {
 			}, animationDuration)
 		}
 
-		this.presentationFormsList.animate({
-			anchor: vertexAdd(this.presentationFormsList.anchor, [0, CELL_SIZE + CELL_PADDING])
-		}, animationDuration)
-		this.labelsCheckbox.animate({
-			anchor: vertexAdd(this.labelsCheckbox.anchor, [0, CELL_SIZE + CELL_PADDING])
-		}, animationDuration)
 		this.pathCoinRow.animate({
-			anchor: [PATH_COIN_ROW_HORIZONTAL_OFFSET + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5, 10]
+			anchor: [PATH_COIN_ROW_HORIZONTAL_OFFSET + (CELL_SIZE + CELL_PADDING) * this.nbFlips * 0.5 + 40, CONTROLS_HEIGHT + 10]
+		}, animationDuration)
+
+		this.splitButton.animate({
+			anchor: vertexAdd(this.splitButton.anchor, [0, CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
 
 		this.nbTailsLabels.animate({
-			anchor: [this.nbTailsLabels.anchor[0] - 0.5 * (CELL_SIZE + CELL_PADDING), this.nbTailsLabels.anchor[1] + CELL_SIZE + CELL_PADDING]
+			anchor: vertexAdd(this.nbTailsLabels.anchor, [-0.5 * (CELL_SIZE + CELL_PADDING), CELL_SIZE + CELL_PADDING])
 		}, animationDuration)
 
 		if (animationDuration == 0) {
@@ -270,7 +282,7 @@ export class PascalsTriangle extends Linkable {
 		}
 	}
 
-	unsplitFromButton() {
+	unsplitFromInputBox() {
 		this.nbFlipsBox.inputElement.value = (this.nbFlips - 1).toString()
 		this.unsplit()
 	}
@@ -302,7 +314,7 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.nbTailsLabels.remove(this.nbTailsLabels.children[this.nbTailsLabels.children.length - 1])
 		this.nbFlipsLabels.remove(this.nbFlipsLabels.children[this.nbFlipsLabels.children.length - 1])
-		this.nbPossibilitiesLabels.remove(this.nbPossibilitiesLabels.children[this.nbPossibilitiesLabels.children.length - 1])
+		this.nboutcomesLabels.remove(this.nboutcomesLabels.children[this.nboutcomesLabels.children.length - 1])
 		this.nbFlips--
 
 		if (this.selectedPath.length > this.nbFlips) {
@@ -335,18 +347,18 @@ export class PascalsTriangle extends Linkable {
 		this.nbTailsLabels.add(newNbTailsLabel)
 	}
 
-	createNewNbPossibilitiesLabel() {
+	createNewNboutcomesLabel() {
 		let labelAnchor = vertexAdd(
 			this.cells[this.nbFlips][this.nbFlips].anchor,
 			[CELL_SIZE, 0]
 		)
-		let newNbPossibilitiesLabel = new TextLabel({
+		let newNboutcomesLabel = new TextLabel({
 			frameWidth: CELL_SIZE,
 			frameHeight: CELL_SIZE,
 			text: `${2 ** this.nbFlips}`,
 			anchor: labelAnchor
 		})
-		this.nbPossibilitiesLabels.add(newNbPossibilitiesLabel)
+		this.nboutcomesLabels.add(newNboutcomesLabel)
 	}
 
 	endSplitting() {
@@ -356,7 +368,7 @@ export class PascalsTriangle extends Linkable {
 		})
 		this.createNewNbFlipsLabel()
 		this.createNewNbTailsLabel()
-		this.createNewNbPossibilitiesLabel()
+		this.createNewNboutcomesLabel()
 	}
 
 	switchPresentation() {
@@ -392,8 +404,8 @@ export class PascalsTriangle extends Linkable {
 	}
 
 	triangleIndex(p: vertex): vertex {
-		let x = p[0]
-		let y = p[1]
+		let x = p[0] - this.cells[0][0].anchor[0] - CELL_SIZE / 2
+		let y = p[1] - this.cells[0][0].anchor[1]
 		let n = Math.max(Math.floor(y / (CELL_SIZE + CELL_PADDING)), 0)
 		let k = Math.min(Math.max(Math.round((x / (CELL_SIZE + CELL_PADDING) + n / 2)), 0), n)
 		return [n, k]
@@ -589,7 +601,7 @@ export class PascalsTriangle extends Linkable {
 	toggleLabels() {
 		let visible = this.labelsCheckbox.state
 		this.nbFlipsLabels.view.setVisibility(visible)
-		this.nbPossibilitiesLabels.view.setVisibility(visible)
+		this.nboutcomesLabels.view.setVisibility(visible)
 		this.nbTailsLabels.view.setVisibility(visible)
 	}
 
@@ -609,8 +621,6 @@ export class PascalsTriangle extends Linkable {
 		super.update(args, redraw)
 
 	}
-
-
 
 
 

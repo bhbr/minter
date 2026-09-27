@@ -32,7 +32,10 @@ import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
 import { CurvedLine } from 'core/vmobjects/CurvedLine'
 import { TAU } from 'core/constants'
 import { Slider } from 'extensions/creations/math/Slider/Slider'
-import { Stepper } from 'extensions/creations/math/Stepper/Stepper'
+import { InputBox } from 'extensions/ui/InputBox/InputBox'
+import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox'
+import { SimpleButton } from 'core/ui/SimpleButton'
+import { Mobject } from 'core/mobjects/Mobject'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -93,20 +96,20 @@ let p = new CoinFlipPaper()
 
 let t = new PascalsTriangle({
 	anchor: [500, 100],
-	nbFlips: 3
+	nbFlips: 1
 })
 
 p.addToContent(t)
 
-let s = new Stepper({
-	min: 0,
-	max: 10,
-	value: 3,
-	anchor: [100, 100]
-})
 
-s.addDependency('value', t, 'nbFlips')
 
-p.addToContent(s)
+
+
+
+
+
+
+
+
 
 

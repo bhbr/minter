@@ -456,6 +456,7 @@ The content children can also be dragged and panned.
 					break
 				}
 				this.setLinking(value as boolean)
+				this.setControlsVisibility(!(value as boolean))
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
@@ -942,6 +943,7 @@ The content children can also be dragged and panned.
 
 		//this.expandedInputList.view.hide()
 		//this.expandedOutputList.view.hide()
+		this.setControlsVisibility(this.isShowingControls)
 	}
 
 	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {

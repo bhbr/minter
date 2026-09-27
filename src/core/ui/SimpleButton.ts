@@ -4,6 +4,7 @@ import { TextLabel } from './TextLabel'
 import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { Color } from 'core/classes/Color'
 import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { log } from 'core/functions/logging'
 
 export class SimpleButton extends RoundedRectangle {
 
@@ -27,10 +28,8 @@ export class SimpleButton extends RoundedRectangle {
 	setup() {
 		super.setup()
 		this.add(this.label)
-		this.label.update({
-			frameWidth: this.width,
-			frameHeight: this.height
-		})
+		this.addDependency('width', this.label, 'frameWidth')
+		this.addDependency('height', this.label, 'frameHeight')
 	}
 
 	get text(): string {
@@ -40,6 +39,16 @@ export class SimpleButton extends RoundedRectangle {
 	set text(newValue: string) {
 		this.label.update({
 			text: newValue
+		})
+	}
+
+	get fontSize(): number {
+		return this.label.fontSize
+	}
+
+	set fontSize(newValue: number) {
+		this.label.update({
+			fontSize: newValue
 		})
 	}
 

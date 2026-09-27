@@ -38,3 +38,6 @@ export const PATH_COIN_ROW_HORIZONTAL_OFFSET: number = 150
 export const PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR: number = 0.85
 export const PATH_COIN_RADIUS: number = 16
 export const PATH_COIN_FONT_SIZE: number = 18
+export const SPLIT_BUTTON_SIZE: number = 50
+export const CONTROLS_HEIGHT: number = 120
+export const CONTROLS_WIDTH: number = 200
