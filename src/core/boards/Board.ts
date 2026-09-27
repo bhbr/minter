@@ -456,7 +456,7 @@ The content children can also be dragged and panned.
 					break
 				}
 				this.setLinking(value as boolean)
-				this.setControlsVisibility(!(value as boolean))
+				this.setControlsVisibility(!(value as boolean) && this.isShowingControls)
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
