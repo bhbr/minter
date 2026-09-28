@@ -57,7 +57,7 @@ The content children can also be dragged and panned.
 			links: [],
 			background: new RoundedRectangle({
 				anchor: vertexOrigin(),
-				cornerRadius: 25,
+				cornerRadius: 15,
 				screenEventHandler: ScreenEventHandler.Parent,
 				fillColor: (isTouchDevice && separateSidebar) ? Color.clear() : Color.black(),
 				fillOpacity: 1.0,
@@ -412,7 +412,7 @@ The content children can also be dragged and panned.
 		if (mob instanceof Board) {
 			if (mob.constructor.name == 'Construction') { return }
 			mob.background.update({
-				fillColor: this.background.view.fillColor.brighten(1.1)
+				fillColor: this.background.view.fillColor.brighten(0.1)
 			})
 		}
 	}
@@ -456,6 +456,7 @@ The content children can also be dragged and panned.
 					break
 				}
 				this.setLinking(value as boolean)
+				this.setControlsVisibility(!(value as boolean) && this.isShowingControls)
 				this.helpTextLabel.update({
 					text: this.helpTexts['link']
 				})
@@ -942,6 +943,7 @@ The content children can also be dragged and panned.
 
 		//this.expandedInputList.view.hide()
 		//this.expandedOutputList.view.hide()
+		this.setControlsVisibility(this.isShowingControls)
 	}
 
 	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {

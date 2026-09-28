@@ -133,6 +133,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	set frameWidth(newValue: number) { this.frame.width = newValue }
 	get frameHeight(): number { return this.frame.height ?? 0 }
 	set frameHeight(newValue: number) { this.frame.height = newValue }
+	frameCenter(): vertex { return this.frame.center() }
 
 	get visible(): boolean { return this.view.visible }
 	set visible(newValue: boolean) { this.view.visible = newValue }
@@ -169,6 +170,9 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			depmob.view.hide()
 		}
 	}
+
+	show() { this.view.show() }
+	hide() { this.view.hide() }
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -434,7 +438,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 			this.view.div.setAttribute('comment', this.divComment)
 		}
 
-
+		this.updateDependents()
 		if (redraw) { this.view.redraw() }
 
 	}

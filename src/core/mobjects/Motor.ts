@@ -69,6 +69,11 @@ export class Motor extends ExtendedObject {
 		if (!Motor.isAnimatable(args)) {
 			return
 		}
+		if (seconds == 0) {
+			this.mobject.update(args)
+			completionHandler()
+			return
+		}
 		this.animating = true
 		for (let key of Object.keys(args)) {
 			let a = this.mobject[key]

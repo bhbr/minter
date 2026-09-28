@@ -1,11 +1,11 @@
 
 import { Linkable } from 'core/linkables/Linkable'
 import { Brick, LabelShower } from './Brick'
-import { DetailedBrickLabel } from './DetailedBrickLabel'
+import { BrickLabelPopover } from './BrickLabelPopover'
 import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { TAU } from 'core/constants'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, FAST_ANIMATION_DURATION, SLOW_ANIMATION_DURATION, BRICK_FILL_OPACITY } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, FAST_PARTITION_ANIMATION_DURATION, SLOW_PARTITION_ANIMATION_DURATION, BRICK_FILL_OPACITY } from './constants'
 import { Color } from 'core/classes/Color'
 import { RadioButtonList } from 'core/ui/RadioButtonList'
 import { Rectangle } from 'core/shapes/Rectangle'
@@ -43,7 +43,7 @@ export class Partition extends Linkable implements LabelShower {
 	anchorMarker: Circle
 	fitButton: SimpleButton
 	scale: number
-	brickLabel: DetailedBrickLabel
+	popover: BrickLabelPopover
 	labelledBrick: Brick | null
 	
 	defaults(): object {
@@ -65,7 +65,7 @@ export class Partition extends Linkable implements LabelShower {
 				{ name: 'nbFlips', displayName: '# flips', type: 'number' }
 			],
 			animationSubstep: 0,
-			animationDuration: SLOW_ANIMATION_DURATION,
+			animationDuration: SLOW_PARTITION_ANIMATION_DURATION,
 			presentationFormsList: new RadioButtonList({
 				anchor: [0, BASE_BRICK_HEIGHT + 15],
 				options: [
@@ -94,7 +94,10 @@ export class Partition extends Linkable implements LabelShower {
 				midpoint: [0, 0]
 			}),
 			screenEventHandler: ScreenEventHandler.Self,
-			brickLabel: new DetailedBrickLabel(),
+			popover: new BrickLabelPopover({
+				direction: 'top',
+				tipOffset: -5
+			}),
 			labelledBrick: null
 		}
 	}
@@ -142,6 +145,9 @@ export class Partition extends Linkable implements LabelShower {
 
 	setup() {
 		super.setup()
+		this.popover.update({
+			rootMobject: this
+		})
 		//this.add(this.anchorMarker)
 		this.createBricks()
 		this.positionBricks()
@@ -158,6 +164,7 @@ export class Partition extends Linkable implements LabelShower {
 		this.controls.add(this.presentationFormsList)
 		this.controls.add(this.nextSubstepButton)
 		this.controls.add(this.nextStepButton)
+
 	}
 
 	createBricks() {
@@ -703,12 +710,12 @@ export class Partition extends Linkable implements LabelShower {
 
 	toggleLabelOnBrick(brick: Brick) {
 
-		let newAnchor = (this.presentationForm == 'row') ? [
-				brick.anchor[0] + brick.view.frame.midX() - this.brickLabel.frameWidth / 2,
-				brick.anchor[1] + brick.view.frame.midY() - this.brickLabel.frameHeight / 2
+		let newTip = (this.presentationForm == 'row') ? [
+				brick.anchor[0] + brick.view.frame.midX(),
+				brick.anchor[1] - this.popover.tipOffset
 			] : [
-				brick.anchor[0] + brick.view.frame.midY() - this.brickLabel.frameWidth / 2,
-				brick.anchor[1] - brick.view.frame.midX() - this.brickLabel.frameHeight / 2
+				brick.anchor[0] + brick.view.frame.midY(),
+				brick.anchor[1] - brick.view.frame.xMax() - this.popover.tipOffset
 			]
 
 		if (this.labelledBrick) {
@@ -718,35 +725,39 @@ export class Partition extends Linkable implements LabelShower {
 			})
 			if (brick == this.labelledBrick) {
 				// tapped on highlighted brick to make the label disappear
-				this.brickLabel.view.hide()
+				this.popover.view.hide()
 				this.labelledBrick = null
 				return
 			}
 			// tapped on a new brick
-			this.brickLabel.update({
+			this.popover.update({
+				chevronTip: newTip
+			})
+			this.popover.label.update({
 				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
-				anchor: newAnchor
+				nbTails: brick.nbTails
 			})
 			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+				fillColor: brick.getFillColor().brighten(0.35)
 			})
 			this.labelledBrick = brick
 		} else {
 			// no brick was previously highlighted
-			this.brickLabel.update({
+			this.popover.update({
+				chevronTip: newTip
+			})
+			this.popover.label.update({
 				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
-				anchor: newAnchor
+				nbTails: brick.nbTails
 			})
 			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+				fillColor: brick.getFillColor().brighten(0.35)
 			})
-			this.brickLabel.view.show()
+			this.popover.view.show()
 			this.labelledBrick = brick
 		}
 
-		this.moveToTop(this.brickLabel)
+		this.moveToTop(this.popover)
 
 	}
 

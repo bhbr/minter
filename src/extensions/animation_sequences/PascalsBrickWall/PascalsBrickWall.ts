@@ -2,9 +2,9 @@
 import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
 import { Partition } from './Partition'
 import { Brick, LabelShower } from './Brick'
-import { DetailedBrickLabel } from './DetailedBrickLabel'
+import { BrickLabelPopover } from './BrickLabelPopover'
 import { Linkable } from 'core/linkables/Linkable'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, SLOW_ANIMATION_DURATION, FAST_ANIMATION_DURATION } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, SLOW_PARTITION_ANIMATION_DURATION, FAST_PARTITION_ANIMATION_DURATION } from './constants'
 import { vertexTranslatedBy } from 'core/functions/vertex'
 import { log } from 'core/functions/logging'
 import { Line } from 'core/shapes/Line'
@@ -24,7 +24,7 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 	nextStepButton: SimpleButton
 	histogramButton: SimpleButton
 	nextRow: Partition | null
-	brickLabel: DetailedBrickLabel
+	popover: BrickLabelPopover
 	labelledBrick: Brick | null
 
 	defaults(): object {
@@ -54,7 +54,7 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 				text: "H"
 			}),
 			nextRow: null,
-			brickLabel: new DetailedBrickLabel(),
+			popover: new BrickLabelPopover(),
 			labelledBrick: null
 		}
 	}
@@ -83,8 +83,8 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 			this.addDependency('tailsColor', row, 'tailsColor')
 			this.add(row)
 			this.rows.push(row)
-			this.brickLabel.view.hide()
-			this.add(this.brickLabel)
+			this.popover.view.hide()
+			this.add(this.popover)
 		}
 	}
 
@@ -190,16 +190,16 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 		}
 		switch (this.animationSubstep) {
 			case 0:
-				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
+				this.duplicateLastRow(SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 1:
-				this.splitBricks(SLOW_ANIMATION_DURATION)
+				this.splitBricks(SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 2:
-				this.mergeBricks(SLOW_ANIMATION_DURATION)
+				this.mergeBricks(SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 3:
-				this.fadeInNextRow(SLOW_ANIMATION_DURATION)
+				this.fadeInNextRow(SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			default:
 				break
@@ -212,22 +212,22 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 		}
 		switch (this.animationSubstep) {
 			case 0:
-				this.duplicateLastRow(SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.splitBricks(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.mergeBricks(SLOW_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 3000 * SLOW_ANIMATION_DURATION)
+				this.duplicateLastRow(SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.splitBricks(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 3000 * SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 1:
-				this.splitBricks(SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.mergeBricks(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_ANIMATION_DURATION)
+				this.splitBricks(SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.mergeBricks(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 2000 * SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 2:
-				this.mergeBricks(SLOW_ANIMATION_DURATION)
-				window.setTimeout(function() { this.fadeInNextRow(SLOW_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_ANIMATION_DURATION)
+				this.mergeBricks(SLOW_PARTITION_ANIMATION_DURATION)
+				window.setTimeout(function() { this.fadeInNextRow(SLOW_PARTITION_ANIMATION_DURATION) }.bind(this), 1000 * SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			case 3:
-				this.fadeInNextRow(SLOW_ANIMATION_DURATION)
+				this.fadeInNextRow(SLOW_PARTITION_ANIMATION_DURATION)
 				break
 			default:
 				break
@@ -261,7 +261,7 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 		this.finishStep()
 		for (let row of this.rows) {
 			if (row == this.lastRow()) { break }
-			row.animate({ opacity: 0 }, SLOW_ANIMATION_DURATION)
+			row.animate({ opacity: 0 }, SLOW_PARTITION_ANIMATION_DURATION)
 		}
 		//this.lastRow().toHistogram()
 	}
@@ -289,41 +289,45 @@ export class PascalsBrickWall extends Linkable implements LabelShower {
 			})
 			if (brick == this.labelledBrick) {
 				// tapped on highlighted brick to make the label disappear
-				this.brickLabel.view.hide()
+				this.popover.view.hide()
 				this.labelledBrick = null
 				return
 			}
 			// tapped on a new brick
-			this.brickLabel.update({
-				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
+			this.popover.update({
 				anchor: [
-					row.anchor[0] + brick.anchor[0] + brick.view.frame.midX() - this.brickLabel.frameWidth / 2,
-					row.anchor[1] + brick.anchor[1] + brick.view.frame.midY() - this.brickLabel.frameHeight / 2
+					row.anchor[0] + brick.anchor[0] + brick.view.frame.midX() - this.popover.frameWidth / 2,
+					row.anchor[1] + brick.anchor[1] + brick.view.frame.midY() - this.popover.frameHeight / 2
 				]
 			})
+			this.popover.label.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails
+			})
 			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+				fillColor: brick.getFillColor().brighten(0.35)
 			})
 			this.labelledBrick = brick
 		} else {
 			// no brick was previously highlighted
-			this.brickLabel.update({
-				nbHeads: brick.nbHeads(),
-				nbTails: brick.nbTails,
+			this.popover.update({
 				anchor: [
-					row.anchor[0] + brick.anchor[0] + brick.view.frame.midX() - this.brickLabel.frameWidth / 2,
-					row.anchor[1] + brick.anchor[1] + brick.view.frame.midY() - this.brickLabel.frameHeight / 2
+					row.anchor[0] + brick.anchor[0] + brick.view.frame.midX() - this.popover.frameWidth / 2,
+					row.anchor[1] + brick.anchor[1] + brick.view.frame.midY() - this.popover.frameHeight / 2
 				]
 			})
-			brick.update({
-				fillColor: brick.getFillColor().brighten(0.65)
+			this.popover.label.update({
+				nbHeads: brick.nbHeads(),
+				nbTails: brick.nbTails
 			})
-			this.brickLabel.view.show()
+			brick.update({
+				fillColor: brick.getFillColor().brighten(0.35)
+			})
+			this.popover.view.show()
 			this.labelledBrick = brick
 		}
 
-		this.moveToTop(this.brickLabel)
+		this.moveToTop(this.popover)
 
 	}
 

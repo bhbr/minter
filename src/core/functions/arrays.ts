@@ -1,5 +1,5 @@
 
-import { equalObjects } from './copying'
+import { equalObjects, copy } from './copying'
 
 export function removeOne(arr: Array<any>, value: any): boolean {
 	// remove the first encountered matching entry of an object or value from an Array
@@ -113,7 +113,13 @@ export function replaceAll(arr: Array<any>, oldValue: any, newValue: any) {
 	}
 }
 
-
+export function arrayWithReplacements(oldArr: Array<string>, replacements: Record<string, string>): Array<string> {
+	let newArr: Array<string> = copy(oldArr)
+	for (let [key, value] of Object.entries(replacements)) {
+		replaceAll(newArr, key, value)
+	}
+	return newArr
+}
 
 
 

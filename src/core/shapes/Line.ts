@@ -1,6 +1,7 @@
 
 import { vertex, vertexOrigin } from 'core/functions/vertex'
 import { Polygon } from 'core/vmobjects/Polygon'
+import { Color } from 'core/classes/Color'
 
 export class Line extends Polygon {
 
@@ -13,6 +14,9 @@ export class Line extends Polygon {
 			endPoint: vertexOrigin()
 		}
 	}
+
+	get color(): Color { return this.strokeColor }
+	set color(newValue: Color) { this.strokeColor = newValue }
 
 	/*
 	Subclasses might want to draw not right from start to end,

@@ -1,14 +1,13 @@
 
-import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/ui/TextLabel'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
 import { MGroup } from 'core/mobjects/MGroup'
 import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR } from './constants'
+import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, CELL_CORNER_RADIUS, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT } from './constants'
 import { log } from 'core/functions/logging'
+import { TextLabel } from 'core/ui/TextLabel'
 import { ScreenEventHandler } from 'core/mobjects/screen_events'
-
-export class DetailedBrickLabel extends RoundedRectangle {
+export class StackedBrickLabel extends RoundedRectangle {
 	
 	nbHeads: number
 	nbTails: number
@@ -21,39 +20,37 @@ export class DetailedBrickLabel extends RoundedRectangle {
 
 	defaults(): object {
 		return {
-			width: 70,
-			height: 70,
-			cornerRadius: 20,
-			stackWidth: 20,
-			coinHeight: 4,
-			fillColor: Color.gray(0.1),
-			fillOpacity: 0.9,
+			width: CELL_SIZE,
+			height: CELL_SIZE,
+			cornerRadius: CELL_CORNER_RADIUS,
+			stackWidth: COIN_WIDTH,
+			coinHeight: COIN_HEIGHT,
 			nbHeads: 0,
 			nbTails: 0,
 			headsStack: new MGroup({
-				anchor: [10, 10],
-				frameWidth: 20,
-				frameHeight: 30,
+				anchor: [COIN_PADDING, COIN_PADDING],
+				frameWidth: COIN_WIDTH,
+				frameHeight: STACK_MAX_HEIGHT,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsStack: new MGroup({
-				anchor: [40, 10],
-				frameWidth: 20,
-				frameHeight: 30,
+				anchor: [CELL_SIZE - COIN_WIDTH - COIN_PADDING, COIN_PADDING],
+				frameWidth: COIN_WIDTH,
+				frameHeight: STACK_MAX_HEIGHT,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			headsLabel: new TextLabel({
-				anchor: [10, 50],
-				frameWidth: 20,
-				frameHeight: 10,
+				anchor: [COIN_PADDING, CELL_SIZE - HT_LABEL_PADDING - HT_LABEL_HEIGHT],
+				frameWidth: COIN_WIDTH,
+				frameHeight: HT_LABEL_HEIGHT,
 				textColor: HEADS_COLOR,
 				fontSize: 20,
 				screenEventHandler: ScreenEventHandler.Below
 			}),
 			tailsLabel: new TextLabel({
-				anchor: [40, 50],
-				frameWidth: 20,
-				frameHeight: 10,
+				anchor: [CELL_SIZE - COIN_WIDTH - COIN_PADDING, CELL_SIZE - HT_LABEL_PADDING - HT_LABEL_HEIGHT],
+				frameWidth: COIN_WIDTH,
+				frameHeight: HT_LABEL_HEIGHT,
 				textColor: TAILS_COLOR,
 				fontSize: 20,
 				screenEventHandler: ScreenEventHandler.Below
@@ -72,8 +69,20 @@ export class DetailedBrickLabel extends RoundedRectangle {
 		this.buildTailsStack()
 	}
 
+	updateHeadsLabel() {
+		this.headsLabel.update({
+			text: this.nbHeads.toString()
+		})
+	}
+
+	updateTailsLabel() {
+		this.tailsLabel.update({
+			text: this.nbTails.toString()
+		})
+	}
+
 	nbFlips(): number {
-		return this.nbHeads + this.nbHeads
+		return this.nbHeads + this.nbTails
 	}
 
 	buildHeadsStack() {
@@ -138,9 +147,7 @@ export class DetailedBrickLabel extends RoundedRectangle {
 		let coin = this.makeHeadsCoin()
 		this.headsStack.add(coin)
 		this.nbHeads += 1
-		this.headsLabel.update({
-			text: this.nbHeads.toString()
-		})
+		this.updateHeadsLabel()
 	}
 
 	addHeadsCoins(n: number) {
@@ -153,9 +160,7 @@ export class DetailedBrickLabel extends RoundedRectangle {
 		let coin = this.makeTailsCoin()
 		this.tailsStack.add(coin)
 		this.nbTails += 1
-		this.tailsLabel.update({
-			text: this.nbTails.toString()
-		})
+		this.updateTailsLabel()
 	}
 
 	addTailsCoins(n: number) {
@@ -168,9 +173,7 @@ export class DetailedBrickLabel extends RoundedRectangle {
 		let coin = this.headsStack.submobjects.pop()
 		this.headsStack.remove(coin)
 		this.nbHeads -= 1
-		this.headsLabel.update({
-			text: this.nbHeads.toString()
-		})
+		this.updateHeadsLabel()
 	}
 
 	removeHeadsCoins(n: number) {
@@ -183,9 +186,7 @@ export class DetailedBrickLabel extends RoundedRectangle {
 		let coin = this.tailsStack.submobjects.pop()
 		this.tailsStack.remove(coin)
 		this.nbTails -= 1
-		this.tailsLabel.update({
-			text: this.nbTails.toString()
-		})
+		this.updateTailsLabel()
 	}
 
 	removeTailsCoins(n: number) {

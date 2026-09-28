@@ -41,6 +41,9 @@ import { PlayableCoinCreator } from 'extensions/creations/CoinFlipper/PlayableCo
 import { CoinRowCreator } from 'extensions/creations/CoinFlipper/CoinRowCreator'
 import { CoinStackCreator } from 'extensions/creations/CoinFlipper/CoinStackCreator'
 
+import { log } from 'core/functions/logging'
+import { Popover } from 'core/ui/Popover'
+
 export class DemoPaper extends Paper {
 
 	defaults(): object {
@@ -109,9 +112,6 @@ export class DemoPaper extends Paper {
 }
 
 let d = new DemoPaper()
-
-
-
 
 
 

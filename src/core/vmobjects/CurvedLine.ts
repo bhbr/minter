@@ -13,13 +13,8 @@ export class CurvedLine extends VMobject {
 
 	defaults(): object {
 		return {
-			closed: true
-		}
-	}
-
-	mutabilities(): object {
-		return {
-			closed: 'on_init'
+			closed: true,
+			bezierPoints: []
 		}
 	}
 

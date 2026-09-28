@@ -13,13 +13,31 @@ import { SumBoxCreator } from 'extensions/creations/math/boxes/SumBox'
 import { AverageBoxCreator } from 'extensions/creations/math/boxes/AverageBox'
 import { CumSumBoxCreator } from 'extensions/creations/math/boxes/CumSumBox'
 import { CumAverageBoxCreator } from 'extensions/creations/math/boxes/CumAverageBox'
-import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
-import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
+//import { ScatterPlotCreator } from 'extensions/creations/DesmosCalculator/ScatterPlotCreator'
+//import { HistogramCreator } from 'extensions/creations/DesmosCalculator/HistogramCreator'
 import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
 import { WheelColorSampleCreator } from 'extensions/creations/ColorSample/WheelColorSampleCreator'
-import { DesmosLoader } from 'extensions/apis/DesmosLoader'
 import { PartitionCreator } from 'extensions/animation_sequences/PascalsBrickWall/PartitionCreator'
 import { BrickWallCreator } from 'extensions/animation_sequences/PascalsBrickWall/BrickWallCreator'
+//import { DesmosLoader } from 'extensions/apis/DesmosLoader'
+import { PascalsBrickWall } from 'extensions/animation_sequences/PascalsBrickWall/PascalsBrickWall'
+import { Partition } from 'extensions/animation_sequences/PascalsBrickWall/Partition'
+import { PascalsTriangle } from 'extensions/animation_sequences/PascalsBrickWall/PascalsTriangle'
+import { TriangleCell } from 'extensions/animation_sequences/PascalsBrickWall/TriangleCell'
+import { Color } from 'core/classes/Color'
+import { log } from 'core/functions/logging'
+import { binomial } from 'core/functions/math'
+import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { CurvedArrow } from 'core/shapes/CurvedArrow'
+import { CircularArc } from 'core/shapes/CircularArc'
+import { PolygonalLine } from 'core/vmobjects/PolygonalLine'
+import { CurvedLine } from 'core/vmobjects/CurvedLine'
+import { TAU } from 'core/constants'
+import { Slider } from 'extensions/creations/math/Slider/Slider'
+import { InputBox } from 'extensions/ui/InputBox/InputBox'
+import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox'
+import { SimpleButton } from 'core/ui/SimpleButton'
+import { Mobject } from 'core/mobjects/Mobject'
 
 export class CoinFlipPaper extends Paper {
 	
@@ -45,8 +63,8 @@ export class CoinFlipPaper extends Paper {
 				'not equal': NotEqualsBoxCreator,
 				'sum': SumBoxCreator,
 				'mean': AverageBoxCreator,
-				'plot': ScatterPlotCreator,
-				'histogram': HistogramCreator,
+				//'plot': ScatterPlotCreator,
+				//'histogram': HistogramCreator,
 				'rgb color': RGBAColorSampleCreator,
 				'color wheel': WheelColorSampleCreator,
 				'partition': PartitionCreator,
@@ -62,13 +80,13 @@ export class CoinFlipPaper extends Paper {
 				'ComparisonButton',
 				//'AlgebraButton',
 				'ListFunctionsButton',
-				'PlotButton',
-				'PartitionButton',
+				//'PartitionButton',
+				//'PlotButton',
 				//'ColorSampleButton',
 				'EraseButton'
 			],
 			apiLoaders: [
-				new DesmosLoader()
+				//new DesmosLoader()
 			]
 		}
 	}
@@ -80,4 +98,23 @@ export class CoinFlipPaper extends Paper {
 
 
 let p = new CoinFlipPaper()
+
+let t = new PascalsTriangle({
+	anchor: [500, 100],
+	nbFlips: 3
+})
+
+p.addToContent(t)
+
+
+
+
+
+
+
+
+
+
+
+
 

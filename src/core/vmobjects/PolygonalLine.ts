@@ -16,12 +16,6 @@ export class PolygonalLine extends VMobject {
 		}
 	}
 
-	mutabilities(): object {
-		return {
-			closed: 'on_init'
-		}
-	}
-
 	static makePathString(vertices: vertexArray, closed: boolean): string {
 		let pathString: string = ''
 		let v = vertices
