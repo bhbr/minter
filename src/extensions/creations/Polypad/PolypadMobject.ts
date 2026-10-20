@@ -1,5 +1,5 @@
 
-import { Linkable } from 'core/linkables/Linkable'
+import { Linkable } from 'linkables/Linkable.js'
 
 declare var Polypad: any
 

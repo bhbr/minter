@@ -1,5 +1,5 @@
 
-import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
+import { CreativeButton } from 'sidebar_buttons/CreativeButton.js'
 
 export class PolypadButton extends CreativeButton {
 

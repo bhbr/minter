@@ -1,8 +1,8 @@
 
-import { SpanningCreator } from 'core/creators/SpanningCreator'
-import { vertex } from 'core/functions/vertex'
-import { Board } from 'core/boards/Board'
-import { Construction } from 'extensions/boards/construction/Construction'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
+import { vertex } from '@bhbr/affr2'
+import { Board } from 'boards/Board.js'
+import { Construction } from 'extensions/boards/construction/Construction.js'
 
 export class ConstructionCreator extends SpanningCreator {
 

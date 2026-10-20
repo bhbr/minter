@@ -1,6 +1,6 @@
 
-import { AlgebraLexer } from 'extensions/creations/VisualAlgebra/model/AlgebraLexer'
-import { ValueTest, ErrorTest, BundledTest } from '_tests/Tests'
+import { AlgebraLexer } from 'extensions/creations/VisualAlgebra/model/AlgebraLexer.js'
+import { ValueTest, ErrorTest, BundledTest } from '@bhbr/tsts'
 
 let lexer = new AlgebraLexer()
 

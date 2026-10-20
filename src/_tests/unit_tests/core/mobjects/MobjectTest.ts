@@ -1,8 +1,11 @@
-import { Mobject } from 'core/mobjects/Mobject'
-import { vertexAdd, vertexEquals } from 'core/functions/vertex'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { AssertionTest, ValueTest, BundledTest } from '_tests/Tests'
+import { Mobject } from 'mobjects/Mobject.js'
+import { BetterObject } from '@bhbr/better-things'
+import { View } from 'mobjects/View.js'
+import { Frame } from 'mobjects/Frame.js'
+import { vertexAdd, vertexEquals, Transform } from '@bhbr/affr2'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const MobjectTest = new BundledTest({
 	name: 'Mobject test',
@@ -26,7 +29,7 @@ export const MobjectTest = new BundledTest({
 		}),
 
 		new ValueTest({
-			name: 'A mobject has_a fill color',
+			name: 'A mobject has a fill color',
 			function: function(): string {
 				let mob = new Mobject({ backgroundColor: Color.green() })
 				return mob.view.div.style.backgroundColor

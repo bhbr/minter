@@ -1,9 +1,9 @@
 
-import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin'
-import { HEADS_COLOR, TAILS_COLOR, PATH_LABEL_SIZE, PATH_LABEL_FONT_SIZE, PATH_COIN_RADIUS, PATH_COIN_FONT_SIZE } from './constants'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { PathCoinRow } from './PathCoinRow'
-import { log } from 'core/functions/logging'
+import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin.js'
+import { HEADS_COLOR, TAILS_COLOR, PATH_LABEL_SIZE, PATH_LABEL_FONT_SIZE, PATH_COIN_RADIUS, PATH_COIN_FONT_SIZE } from './constants.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { PathCoinRow } from './PathCoinRow.js'
+import { log } from 'functions/logging.js'
 
 export class PathCoin extends Coin {
 

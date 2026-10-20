@@ -1,13 +1,13 @@
 
-import { MGroup } from 'core/mobjects/MGroup'
-import { PathCoin } from './PathCoin'
-import { CELL_SIZE, CELL_PADDING, EDGE_HIGHLIGHT_COLOR, EDGE_HIGHLIGHT_WIDTH, PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR } from './constants'
-import { PascalsTriangle } from './PascalsTriangle'
-import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin'
-import { log } from 'core/functions/logging'
-import { Line } from 'core/shapes/Line'
-import { CurvedArrow } from 'core/shapes/CurvedArrow'
-import { TAU } from 'core/constants'
+import { MGroup } from 'mobjects/MGroup.js'
+import { PathCoin } from './PathCoin.js'
+import { CELL_SIZE, CELL_PADDING, EDGE_HIGHLIGHT_COLOR, EDGE_HIGHLIGHT_WIDTH, PATH_COIN_ROW_VERTICAL_OFFSET_FACTOR } from './constants.js'
+import { PascalsTriangle } from './PascalsTriangle.js'
+import { Coin, CoinState } from 'extensions/creations/CoinFlipper/Coin.js'
+import { log } from 'functions/logging.js'
+import { Line } from 'shapes/Line.js'
+import { CurvedArrow } from 'shapes/CurvedArrow.js'
+import { TAU } from 'constants.js'
 
 export class PathCoinRow extends MGroup {
 

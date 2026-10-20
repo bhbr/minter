@@ -1,10 +1,10 @@
 
-import { vertex, vertexAdd, vertexCentrallyRotatedBy, vertexCentrallyScaledBy } from 'core/functions/vertex'
-import { Color } from 'core/classes/Color'
-import { Linkable } from 'core/linkables/Linkable'
-import { Line } from 'core/shapes/Line'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { Circle } from 'core/shapes/Circle'
+import { vertex, vertexAdd, vertexCentrallyRotatedBy, vertexCentrallyScaledBy } from '@bhbr/affr2'
+import { Color } from 'classes/Color.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { Line } from 'shapes/Line.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { Circle } from 'shapes/Circle.js'
 
 export class Swing extends Linkable {
 

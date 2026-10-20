@@ -1,10 +1,10 @@
 
-import { vertex } from 'core/functions/vertex'
-import { ConCircle } from './ConCircle'
-import { Constructor } from '../Constructor'
-import { FreePoint } from '../FreePoint'
-import { Construction } from '../Construction'
-import { log } from 'core/functions/logging'
+import { vertex } from '@bhbr/affr2'
+import { ConCircle } from './ConCircle.js'
+import { Constructor } from '../Constructor.js'
+import { FreePoint } from '../FreePoint.js'
+import { Construction } from '../Construction.js'
+import { log } from 'functions/logging.js'
 
 export class ConCircleConstructor extends Constructor {
 

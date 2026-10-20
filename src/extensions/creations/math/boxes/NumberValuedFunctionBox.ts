@@ -1,11 +1,11 @@
 
-import { NumberBox } from './NumberBox'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Color } from 'core/classes/Color'
-import { numberArraySum } from 'core/functions/numberArray'
-import { log } from 'core/functions/logging'
-import { prettyPrint } from 'core/functions/various'
+import { NumberBox } from './NumberBox.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { Color } from 'classes/Color.js'
+import { numberArraySum } from 'functions/numberArray.js'
+import { log } from 'functions/logging.js'
+import { prettyPrint } from 'functions/various.js'
 
 export class NumberValuedFunctionBox extends NumberBox {
 	

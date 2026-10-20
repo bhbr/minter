@@ -1,7 +1,7 @@
 
-import { Circle } from 'core/shapes/Circle'
-import { vertex, vertexIsNaN, vertexOrigin } from 'core/functions/vertex'
-import { Color } from 'core/classes/Color'
+import { Circle } from 'shapes/Circle.js'
+import { vertex, vertexIsNaN, vertexOrigin } from '@bhbr/affr2'
+import { Color } from 'classes/Color.js'
 
 export class ConPoint extends Circle {
 

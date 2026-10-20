@@ -1,13 +1,13 @@
 
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { vertex } from 'core/functions/vertex'
-import { Mobject } from 'core/mobjects/Mobject'
-import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/ui/PlayButton/Playable'
-import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { getPaper } from 'core/functions/getters'
-import { log } from 'core/functions/logging'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { vertex } from '@bhbr/affr2'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { Playable } from 'extensions/ui/PlayButton/Playable.js'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { getPaper } from 'functions/getters.js'
+import { log } from 'functions/logging.js'
 
 declare var CindyJS: any
 

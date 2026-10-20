@@ -1,8 +1,8 @@
 
-import { MathWrapper } from './customMath'
-import { ParseError } from './ParseError'
-import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
-import { MathNode, SymbolNode, ConstantNode, FunctionNode, OperatorNode, AssignmentNode } from './MathNode'
+import { MathWrapper } from './customMath.js'
+import { ParseError } from './ParseError.js'
+import { Token, TokenType, typeToOperation, lexemeToType } from './Token.js'
+import { MathNode, SymbolNode, ConstantNode, FunctionNode, OperatorNode, AssignmentNode } from './MathNode.js'
 
 /**
 * Create the corresponding MathJS node of a Token and its children.

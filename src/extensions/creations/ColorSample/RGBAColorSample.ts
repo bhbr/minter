@@ -1,5 +1,5 @@
 
-import { ColorSample } from 'extensions/creations/ColorSample/ColorSample'
+import { ColorSample } from 'extensions/creations/ColorSample/ColorSample.js'
 
 export class RGBAColorSample extends ColorSample {
 

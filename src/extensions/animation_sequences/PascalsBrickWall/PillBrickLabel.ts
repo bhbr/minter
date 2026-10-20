@@ -1,8 +1,8 @@
 
-import { Pill } from 'core/shapes/Pill'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR } from './constants'
+import { Pill } from 'shapes/Pill.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { Color } from 'classes/Color.js'
+import { HEADS_COLOR, TAILS_COLOR } from './constants.js'
 
 export class PillBrickLabel extends Pill {
 	

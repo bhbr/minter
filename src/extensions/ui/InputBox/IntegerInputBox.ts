@@ -1,7 +1,7 @@
 
-import { NumberInputBox } from './NumberInputBox'
-import { SimpleButton } from 'core/ui/SimpleButton'
-import { log } from 'core/functions/logging'
+import { NumberInputBox } from './NumberInputBox.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { log } from 'functions/logging.js'
 
 const BUTTON_WIDTH: number = 20
 const BUTTON_INSET: number = 5

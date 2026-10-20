@@ -1,9 +1,9 @@
 
-import { NumberListBox } from './NumberListBox'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Color } from 'core/classes/Color'
-import { numberArraySum } from 'core/functions/numberArray'
+import { NumberListBox } from './NumberListBox.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { Color } from 'classes/Color.js'
+import { numberArraySum } from 'functions/numberArray.js'
 
 export class NumberListValuedFunctionBox extends NumberListBox {
 	

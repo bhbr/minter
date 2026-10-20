@@ -1,12 +1,12 @@
 
-import { Rectangle } from 'core/shapes/Rectangle'
-import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { MGroup } from 'core/mobjects/MGroup'
-import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, CELL_CORNER_RADIUS, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT } from './constants'
-import { log } from 'core/functions/logging'
-import { TextLabel } from 'core/ui/TextLabel'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { RoundedRectangle } from 'shapes/RoundedRectangle.js'
+import { MGroup } from 'mobjects/MGroup.js'
+import { Color } from 'classes/Color.js'
+import { HEADS_COLOR, TAILS_COLOR, CELL_SIZE, CELL_CORNER_RADIUS, COIN_WIDTH, COIN_HEIGHT, COIN_PADDING, STACK_MAX_HEIGHT, HT_LABEL_PADDING, HT_LABEL_HEIGHT } from './constants.js'
+import { log } from 'functions/logging.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
 export class StackedBrickLabel extends RoundedRectangle {
 	
 	nbHeads: number

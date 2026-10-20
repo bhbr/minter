@@ -1,8 +1,8 @@
 
-import { Mobject } from 'core/mobjects/Mobject'
-import { Board } from 'core/boards/Board'
-import { Partition } from './Partition'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Board } from 'boards/Board.js'
+import { Partition } from './Partition.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class PartitionCreator extends DraggingCreator {
 

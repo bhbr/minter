@@ -1,0 +1,332 @@
+
+import { Board } from 'boards/Board.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { MGroup } from 'mobjects/MGroup.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { IOList } from './IOList.js'
+import { InputList } from './InputList.js'
+import { OutputList } from './OutputList.js'
+import { LinkHook } from './LinkHook.js'
+import { DependencyLink } from './DependencyLink.js'
+import { log } from 'functions/logging.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { Checkbox } from 'ui/Checkbox.js'
+import { HOOK_HORIZONTAL_SPACING } from './constants.js'
+import { remove } from '@bhbr/betray'
+
+export interface IOProperty {
+	name: string
+	type: string
+	displayName: string | null
+	kind?: 'value' | 'action'
+}
+
+export class Linkable extends Mobject {
+/*
+A mobject with input and output variables exposed to the UI,
+which can be linked to such-exposed variables of other mobjects.
+*/
+
+	inputProperties: Array<IOProperty>
+	outputProperties: Array<IOProperty>
+	inputList: InputList
+	outputList: OutputList
+	linksEditable: boolean
+	controls: MGroup
+
+	defaults(): object {
+		return {
+			inputList: new InputList(),
+			outputList: new OutputList(),
+			inputProperties: [],
+			outputProperties: [],
+			linksEditable: false,
+			screenEventHandler: ScreenEventHandler.Self,
+			controls: new MGroup()
+		}
+	}
+
+	mutabilities(): object {
+		return {
+			inputList: 'never',
+			outputList: 'never',
+			linksEditable: 'in_subclass'
+		}
+	}
+
+	get board(): Board | null {
+		let p = super.parent
+		if (p) {
+			let pp = (p as Mobject).parent
+			if (pp) {
+				return pp as Board
+			}
+		}
+		return null
+	}
+
+	set board(newValue: Board) {
+		super.parent = newValue.content
+	}
+
+	setup() {
+		super.setup()
+		this.controls.update({
+			frameWidth: this.frameWidth,
+			frameHeight: this.frameHeight
+		})
+		this.add(this.controls)
+		this.inputList.update({
+			mobject: this,
+			outletProperties: this.inputProperties,
+			editable: this.linksEditable
+		})
+		this.add(this.inputList)
+		this.inputList.view.hide()
+		this.outputList.update({
+			mobject: this,
+			outletProperties: this.outputProperties,
+			editable: this.linksEditable
+		})
+		this.add(this.outputList)
+		this.outputList.view.hide()
+	}
+
+	showLinks() {
+		if (this.inputList.height != 0) {
+			this.inputList.view.show()
+		}
+		if (this.outputList.height != 0) {
+			this.outputList.view.show()
+		}
+		//this.disable()
+	}
+
+	hideLinks() {
+		this.inputList.view.hide()
+		this.outputList.view.hide()
+		//this.enable()
+	}
+
+	inputHooks(): Array<LinkHook> {
+	// the hooks (with name and position) of available input variables
+		let arr: Array<LinkHook> = []
+		for (let ip of this.inputProperties) {
+			arr.push(this.inputList.hookNamed(ip.name))
+		}
+		return arr
+	}
+
+	outputHooks(): Array<LinkHook> {
+	// the hooks (with name and position) of available output variables
+		let arr: Array<LinkHook> = []
+		for (let op of this.outputProperties) {
+			arr.push(this.outputList.hookNamed(op.name))
+		}
+		return arr
+	}
+
+	renameLinkableProperty(kind: 'input' | 'output', oldName: string, newName: string) {
+		let list: IOList = (kind == 'input') ? this.inputList : this.outputList
+		list.renameProperty(oldName, newName)
+		// TODO: update dependencies
+	}
+
+	// The following two methods are used only for positioning IOLists, rework/rename this
+
+	getCompactWidth(): number {
+		return this.view.frame.width
+	}
+
+	getCompactHeight(): number {
+		return this.view.frame.height
+	}
+
+	dragging(e: ScreenEvent) {
+	// so we can drag while showing the links
+	// (doesn't work at present)
+		super.dragging(e)
+		this.board.updateLinks()
+	}
+
+	setControlsVisibility(visible: boolean) {
+		this.controls.view.setVisibility(visible)
+	// 	for (let mob of this.controls.children) {
+	// 		mob.view.setVisibility(visible)
+	// 	}
+	}
+
+	setLinksVisibility(visible: boolean) {
+		if (visible) {
+			this.showLinks()
+		} else {
+			this.hideLinks()
+		}
+	}
+
+	allHooks(): Array<LinkHook> {
+		return this.inputList.allHooks().concat(this.outputList.allHooks())
+	}
+
+	update(args: object = {}, redraw: boolean = true) {
+		super.update(args, redraw)
+		if (args['inputProperties'] !== undefined) {
+			this.inputList.update({
+				outletProperties: args['inputProperties']
+			}, true)
+		}
+		if (args['outputProperties'] !== undefined) {
+			this.outputList.update({
+				outletProperties: args['outputProperties']
+			}, true)
+		}
+	}
+
+	addedInputLink(link: DependencyLink) {
+		link.startHook.outlet.ioList.mobject.updateDependents(true)
+	}
+
+	addedOutputLink(link: DependencyLink) {
+		this.update()
+		this.updateDependents(true)
+	}
+
+	removedInputLink(link: DependencyLink) {
+		this.update()
+	}
+
+	removedOutputLink(link: DependencyLink) {
+		this.update()
+		if (!link.startHook) { return }
+		//link.startHook.outlet.removeUnlinkedHook()
+	}
+
+	inputNames(): Array<string> {
+		return this.inputProperties.map((prop) => prop.name)
+	}
+
+	outputNames(): Array<string> {
+		return this.outputProperties.map((prop) => prop.name)
+	}
+
+	positionIOLists() {
+		this.inputList.positionOutlets()
+		this.outputList.positionOutlets()
+		this.inputList.positionSelf()
+		this.outputList.positionSelf()
+	}
+
+	isLinked(prop: string, kind: 'input' | 'output'): boolean {
+		let ioList = (kind == 'input') ? this.inputList : this.outputList
+		let outlet = ioList.outletNamed(prop)
+		return outlet.linkHooks[0].linked
+	}
+
+	linkedInputProperties(): Array<string> {
+		return this.inputNames().filter((x) => this.isLinked(x, 'input'))
+	}
+
+	linkedOutputProperties(): Array<string> {
+		return this.outputNames().filter((x) => this.isLinked(x, 'output'))
+	}
+
+	createInputVariable(name: string, value: number) {
+		this.createProperty(name, value)
+		this.inputProperties.push({
+			name: name,
+			type: 'number',
+			displayName: name
+		})
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+
+		this.positionIOLists()
+		this.inputList.view.hide()
+	}
+
+	removeInputVariable(name: string) {
+		if (name == null) { return }
+		this.removeProperty(name)
+		for (let prop of this.inputProperties) {
+			if (prop['name'] == name) {
+				remove(this.inputProperties, prop)
+				break
+			}
+		}
+		this.inputList.update({
+			outletProperties: this.inputProperties
+		})
+		this.positionIOLists()
+		this.inputList.view.hide()
+		this.update()
+	}
+
+	createOutputVariable(name: string) {
+		if (name == null) { return }
+		if (this[name] === undefined) {
+			this.createProperty(name, 0)
+		}
+		this.outputProperties.push({
+			name: name,
+			type: 'number',
+			displayName: name
+		})
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
+	}
+
+	removeOutputVariable(name: string) {
+		if (name == null) { return }
+		//this.removeProperty(name)
+		for (let prop of this.outputProperties) {
+			if (prop['name'] == name) {
+				remove(this.outputProperties, prop)
+				break
+			}
+		}
+		this.outputList.update({
+			outletProperties: this.outputProperties // should not be necessary
+		})
+		this.positionIOLists()
+		this.outputList.view.hide()
+	}
+
+	addDependency(outputName: string | null, target: Mobject, inputName: string | null, kind: 'value' | 'action' = 'value', refresh: boolean = true) {
+		var newKind: 'value' | 'action' = 'value'
+		if (target instanceof Linkable) {
+			for (let prop of (target as Linkable).inputProperties) {
+				if (prop['name'] == inputName) {
+					newKind = prop['kind'] ?? 'value'
+					break
+				}
+			}
+		}
+		super.addDependency(outputName, target, inputName, newKind, refresh)
+	}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

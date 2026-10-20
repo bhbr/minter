@@ -1,10 +1,11 @@
-import { Line } from 'core/shapes/Line'
-import { Polygon } from 'core/vmobjects/Polygon'
-import { Circle } from 'core/shapes/Circle'
-import { DEGREES } from 'core/constants'
-import { vertex, vertexSubtract, vertexTranslatedBy, vertexScaledBy, vertexRotatedBy } from 'core/functions/vertex'
-import { Color } from 'core/classes/Color'
-import { ConStrait } from 'extensions/boards/construction/straits/ConStrait'
+
+import { Line } from 'shapes/Line.js'
+import { Polygon } from 'vmobjects/Polygon.js'
+import { Circle } from 'shapes/Circle.js'
+import { DEGREES } from 'constants.js'
+import { vertex, vertexSubtract, vertexTranslatedBy, vertexScaledBy, vertexRotatedBy } from '@bhbr/affr2'
+import { Color } from 'classes/Color.js'
+import { ConStrait } from 'extensions/boards/construction/straits/ConStrait.js'
 
 export class ForceVector extends ConStrait {
 
@@ -16,7 +17,6 @@ export class ForceVector extends ConStrait {
 	tipOpeningAngle: number
 	tipSize: number
 	footRadius: number
-	color: Color
 
 	defaults(): object {
 		return {

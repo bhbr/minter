@@ -1,6 +1,6 @@
 
-import { Grid } from './Grid'
-import { Linkable } from 'core/linkables/Linkable'
+import { Grid } from './Grid.js'
+import { Linkable } from 'linkables/Linkable.js'
 
 export type CAState = Array<Array<number>>
 

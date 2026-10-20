@@ -1,7 +1,7 @@
 
-import { Polygon } from 'core/vmobjects/Polygon'
-import { vertex, vertexCopyFrom, vertexTranslatedBy } from 'core/functions/vertex'
-import { Color } from 'core/classes/Color'
+import { Polygon } from 'vmobjects/Polygon.js'
+import { vertex, vertexCopyFrom, vertexTranslatedBy } from '@bhbr/affr2'
+import { Color } from 'classes/Color.js'
 
 export class InclinedPlane extends Polygon {
 	

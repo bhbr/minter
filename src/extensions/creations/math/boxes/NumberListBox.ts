@@ -1,15 +1,15 @@
 
-import { Linkable } from 'core/linkables/Linkable'
-import { Scroll } from 'core/ui/Scroll'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { Color } from 'core/classes/Color'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { vertex } from 'core/functions/vertex'
-import { log } from 'core/functions/logging'
-import { ScreenEvent } from 'core/mobjects/screen_events'
-import { SimpleButton } from 'core/ui/SimpleButton'
-import { DependencyLink } from 'core/linkables/DependencyLink'
-import { TextLabel } from 'core/ui/TextLabel'
+import { Linkable } from 'linkables/Linkable.js'
+import { Scroll } from 'ui/Scroll.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { Color } from 'classes/Color.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { vertex } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
+import { ScreenEvent } from 'mobjects/screen_events.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
+import { TextLabel } from 'ui/TextLabel.js'
 
 export class NumberListBox extends Linkable {
 	

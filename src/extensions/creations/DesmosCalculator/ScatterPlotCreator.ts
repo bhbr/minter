@@ -1,6 +1,6 @@
 
-import { ScatterPlot } from './ScatterPlot'
-import { SpanningCreator } from 'core/creators/SpanningCreator'
+import { ScatterPlot } from './ScatterPlot.js'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
 
 export class ScatterPlotCreator extends SpanningCreator {
 

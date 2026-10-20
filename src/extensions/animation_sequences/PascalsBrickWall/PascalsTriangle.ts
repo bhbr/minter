@@ -1,25 +1,25 @@
 
-import { MGroup } from 'core/mobjects/MGroup'
-import { Linkable } from 'core/linkables/Linkable'
-import { TriangleCell } from './TriangleCell'
-import { SimpleButton } from 'core/ui/SimpleButton'
-import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR, PATH_COIN_ROW_HORIZONTAL_OFFSET, SPLIT_BUTTON_SIZE, CONTROLS_HEIGHT, CONTROLS_WIDTH } from './constants'
-import { vertex, vertexAdd, vertexSubtract } from 'core/functions/vertex'
-import { RadioButtonList } from 'core/ui/RadioButtonList'
-import { log } from 'core/functions/logging'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Transform } from 'core/classes/Transform'
-import { TAU } from 'core/constants'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { PathCoinRow } from './PathCoinRow'
-import { TrianglePath, PathDirection } from './TrianglePath'
-import { TriangleEdge } from './TriangleEdge'
-import { equalArrays, arrayWithReplacements } from 'core/functions/arrays'
-import { Checkbox } from 'core/ui/Checkbox'
-import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox'
-import { Polygon } from 'core/vmobjects/Polygon'
-import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
-import { Color } from 'core/classes/Color'
+import { MGroup } from 'mobjects/MGroup.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { TriangleCell } from './TriangleCell.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { CELL_START_OPACITY, CELL_SIZE, CELL_PADDING, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, EDGE_WIDTH, EDGE_HIGHLIGHT_WIDTH, EDGE_COLOR, EDGE_HIGHLIGHT_COLOR, PATH_COIN_ROW_HORIZONTAL_OFFSET, SPLIT_BUTTON_SIZE, CONTROLS_HEIGHT, CONTROLS_WIDTH } from './constants.js'
+import { vertex, vertexAdd, vertexSubtract, Transform } from '@bhbr/affr2'
+import { RadioButtonList } from 'ui/RadioButtonList.js'
+import { log } from 'functions/logging.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { TAU } from 'constants.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { PathCoinRow } from './PathCoinRow.js'
+import { TrianglePath, PathDirection } from './TrianglePath.js'
+import { TriangleEdge } from './TriangleEdge.js'
+import { arrayWithReplacements } from '@bhbr/betray'
+import { equal } from '@bhbr/egalite'
+import { Checkbox } from 'ui/Checkbox.js'
+import { IntegerInputBox } from 'extensions/ui/InputBox/IntegerInputBox.js'
+import { Polygon } from 'vmobjects/Polygon.js'
+import { RoundedRectangle } from 'shapes/RoundedRectangle.js'
+import { Color } from 'classes/Color.js'
 
 export class PascalsTriangle extends Linkable {
 	
@@ -543,7 +543,7 @@ export class PascalsTriangle extends Linkable {
 
 	indexIsSelected(index: [number, number]): boolean {
 		for (let index2 of this.selectedIndices()) {
-			if (equalArrays(index, index2)) {
+			if (equal(index, index2)) {
 				return true
 			}
 		}

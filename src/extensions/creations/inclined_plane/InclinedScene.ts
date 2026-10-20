@@ -1,19 +1,18 @@
 
-import { InclinedBox } from './InclinedBox'
-import { InclinedPlane } from './InclinedPlane'
-import { Linkable } from 'core/linkables/Linkable'
-import { DEGREES, TAU } from 'core/constants'
-import { vertex, vertexAdd, vertexSubtract, vertexScaledBy, vertexRotatedBy, vertexTranslatedBy } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform'
-import { log } from 'core/functions/logging'
-import { ForceVector } from './ForceVector'
-import { Torque } from './Torque'
-import { Color } from 'core/classes/Color'
-import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
-import { Playable } from 'extensions/ui/PlayButton/Playable'
-import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
-import { Toggle } from 'extensions/ui/Toggle'
-import { MGroup } from 'core/mobjects/MGroup'
+import { InclinedBox } from './InclinedBox.js'
+import { InclinedPlane } from './InclinedPlane.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { DEGREES, TAU } from 'constants.js'
+import { vertex, vertexCopy, vertexAdd, vertexSubtract, vertexScaledBy, vertexRotatedBy, vertexTranslatedBy, Transform } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
+import { ForceVector } from './ForceVector.js'
+import { Torque } from './Torque.js'
+import { Color } from 'classes/Color.js'
+import { ScreenEventHandler, ScreenEvent } from 'mobjects/screen_events.js'
+import { Playable } from 'extensions/ui/PlayButton/Playable.js'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton.js'
+import { Toggle } from 'extensions/ui/Toggle.js'
+import { MGroup } from 'mobjects/MGroup.js'
 
 const FORCE_SCALE: number = 50
 
@@ -118,7 +117,7 @@ export class InclinedScene extends Linkable implements Playable {
 		this.add(this.torques)
 		this.add(this.playButton)
 		this.add(this.showTorquesToggle)
-		this.push(this.playButton)
+		this.controls.add(this.playButton)
 
 		this.plane.update({
 			midpoint: this.view.frame.localCenter(),
@@ -221,7 +220,7 @@ export class InclinedScene extends Linkable implements Playable {
 
 	play() {
 		this.simulationStartTime = Date.now()
-		this.boxStartCOM = this.box.centerOfMass.copy()
+		this.boxStartCOM = vertexCopy(this.box.centerOfMass)
 		this.glidingStarted = false
 		this.simulationInterval = window.setInterval(
 			this.run.bind(this), 100

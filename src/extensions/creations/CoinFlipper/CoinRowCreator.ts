@@ -1,8 +1,8 @@
 
-import { Creator } from 'core/creators/Creator'
-import { CoinRow } from './CoinRow'
-import { vertex, vertexAdd } from 'core/functions/vertex'
-import { log } from 'core/functions/logging'
+import { Creator } from 'creators/Creator.js'
+import { CoinRow } from './CoinRow.js'
+import { vertex, vertexAdd } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
 
 export class CoinRowCreator extends Creator {
 

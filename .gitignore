@@ -1,7 +1,5 @@
-**/.DS_Store
 .DS_Store
-**/*.js
-**/*.js.map
-lib/
-assets/coinstack.png
-src/.DS_Store
+*.tgz
+dist/*
+node_modules/*
+tsconfig.tsbuildinfo

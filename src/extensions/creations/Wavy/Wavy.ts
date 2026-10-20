@@ -1,7 +1,7 @@
 
-import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
+import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
 
 export class Wavy extends CindyCanvas {
 

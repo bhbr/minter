@@ -1,6 +1,6 @@
 
-import { ConStraitConstructor } from '../ConStraitConstructor'
-import { ConRay } from './ConRay'
+import { ConStraitConstructor } from '../ConStraitConstructor.js'
+import { ConRay } from './ConRay.js'
 
 export class ConRayConstructor extends ConStraitConstructor {
 

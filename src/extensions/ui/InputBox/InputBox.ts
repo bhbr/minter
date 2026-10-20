@@ -1,15 +1,15 @@
 
-import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Color } from 'core/classes/Color'
-import { Mobject } from 'core/mobjects/Mobject'
-import { log } from 'core/functions/logging'
-import { vertex } from 'core/functions/vertex'
-import { getPaper, getSidebar } from 'core/functions/getters'
-import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
-import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
-import { DependencyLink } from 'core/linkables/DependencyLink'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { Color } from 'classes/Color.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { log } from 'functions/logging.js'
+import { vertex } from '@bhbr/affr2'
+import { getPaper, getSidebar } from 'functions/getters.js'
+import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'mobjects/screen_events.js'
+import { SidebarButton } from 'sidebar_buttons/SidebarButton.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 const BOX_HEIGHT: number = 30
 

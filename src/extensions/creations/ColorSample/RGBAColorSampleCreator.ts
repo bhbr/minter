@@ -1,7 +1,7 @@
 
-import { RGBAColorSample } from './RGBAColorSample'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { vertex, vertexAdd, vertexTranslatedBy } from 'core/functions/vertex'
+import { RGBAColorSample } from './RGBAColorSample.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { vertex, vertexAdd, vertexTranslatedBy } from '@bhbr/affr2'
 
 export class RGBAColorSampleCreator extends DraggingCreator {
 	

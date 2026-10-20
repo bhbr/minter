@@ -1,9 +1,9 @@
 
-import { Parser } from './Parser'
-import { AlgebraLexer } from './AlgebraLexer'
-import { Sentence, SentenceTree, TerminalSymbol } from './SentenceTypes'
-import { log } from 'core/functions/logging'
-import { Algebra } from './Algebra'
+import { Parser } from './Parser.js'
+import { AlgebraLexer } from './AlgebraLexer.js'
+import { Sentence, SentenceTree, TerminalSymbol } from './SentenceTypes.js'
+import { log } from 'functions/logging.js'
+import { Algebra } from './Algebra.js'
 
 export class AlgebraParser extends Parser {
 

@@ -1,6 +1,6 @@
 
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { ComparisonBox, LessThanBox, LessThanOrEqualBox, GreaterThanBox, GreaterThanOrEqualBox, EqualsBox, NotEqualsBox } from './ComparisonBox'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { ComparisonBox, LessThanBox, LessThanOrEqualBox, GreaterThanBox, GreaterThanOrEqualBox, EqualsBox, NotEqualsBox } from './ComparisonBox.js'
 
 export class ComparisonBoxCreator extends DraggingCreator {
 	declare creation: ComparisonBox

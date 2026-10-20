@@ -1,6 +1,6 @@
 
-import { VisualCalculation } from './VisualCalculation'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { VisualCalculation } from './VisualCalculation.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class EquationCreator extends DraggingCreator {
 

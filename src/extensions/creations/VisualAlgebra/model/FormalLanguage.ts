@@ -1,13 +1,13 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes'
-import { equalArrays } from 'core/functions/arrays'
-import { log } from 'core/functions/logging'
-import { Lexer } from './Lexer'
-import { Parser } from './Parser'
-import { deepCopy } from 'core/functions/copying'
+import { BetterObject } from '@bhbr/better-things'
+import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes.js'
+import { equal } from '@bhbr/egalite'
+import { deepCopy } from '@bhbr/copycat'
+import { log } from 'functions/logging.js'
+import { Lexer } from './Lexer.js'
+import { Parser } from './Parser.js'
 
-export class FormalLanguage extends ExtendedObject {
+export class FormalLanguage extends BetterObject {
 
 	arities: Record<TerminalSymbol, number>
 	syntaxRules: Record<string, [NonterminalSymbol, NonterminalSymbol | SentenceTreeForm]>
@@ -136,7 +136,7 @@ export class FormalLanguage extends ExtendedObject {
 		// a dictionary of what subtrees have been matched
 		// to the variables:
 		// { '<a>': subtree1, '<b>': subtree2, ... }
-		if (equalArrays(tree, form as Array<any>)) {
+		if (equal(tree, form as Array<any>)) {
 			return record
 		}
 		if (record === null) { return null }
@@ -152,7 +152,7 @@ export class FormalLanguage extends ExtendedObject {
 			if (existingMatch === undefined) {
 				record[form as NonterminalSymbol] = tree
 				return record
-			} else if (equalArrays(existingMatch, tree)) {
+			} else if (equal(existingMatch, tree)) {
 				return record
 			} else {
 				return null
@@ -214,10 +214,14 @@ export class FormalLanguage extends ExtendedObject {
 		for (let i = 0; i < tree[1].length; i++) {
 			let child = tree[1][i]
 			if (child === subtree) {
-				return [tree[0], tree[1].with(i, newSubtree)]
+				let newLeaf = deepCopy(tree[1])
+				newLeaf[i] = newSubtree
+				return [tree[0], newLeaf]
 			}
 			if (this.treeContainsSubtree(child, subtree)) {
-				return [tree[0], tree[1].with(i, this.replaceSubtreeInTree(child, subtree, newSubtree))]
+				let newLeaf = deepCopy(tree[1])
+				newLeaf[i] = this.replaceSubtreeInTree(child, subtree, newSubtree)
+				return [tree[0], newLeaf]
 			}
 		}
 	}

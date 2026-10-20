@@ -1,0 +1,42 @@
+{
+  "name": "@bhbr/minter",
+  "version": "1.0.0",
+  "description": "INTERactive Math objects",
+  "type": "module",
+  "main": "./dist/minter.js",
+  "types": "./dist/minter.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/minter.d.ts",
+      "import": "./dist/minter.js"
+    }
+  },
+  "files": [
+    "dist/",
+    "!dist/_tests",
+    "!dist/_to_migrate"
+  ],
+  "scripts": {
+    "build": "cd build && ./build.sh",
+    "test": "node dist/_tests/minter_tests.js",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bhbr/minter"
+  },
+  "bugs": {
+    "url": "https://github.com/bhbr/minter/issues"
+  },
+  "homepage": "https://github.com/bhbr/minter#readme",
+  "keywords": [],
+  "author": "Ben Hambrecht",
+  "license": "ISC",
+  "devDependencies": {
+    "@bhbr/tsts": "^1.1.3"
+  },
+  "dependencies": {
+    "@bhbr/affr2": "^1.0.0",
+    "@bhbr/betray": "^1.0.0"
+  }
+}

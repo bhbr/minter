@@ -1,11 +1,11 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { Token, TokenType, lexemeToType } from './Token'
-import { LexError } from './LexError'
+import { BetterObject } from '@bhbr/better-things'
+import { Token, TokenType, lexemeToType } from './Token.js'
+import { LexError } from './LexError.js'
 
 // Port to own TS from tex-math-parser
 
-export class OldLexer extends ExtendedObject {
+export class OldLexer extends BetterObject {
 	
 	isWhitespace(c: string): boolean {
 		return c.trim() === ''

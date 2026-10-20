@@ -1,5 +1,5 @@
 
-import { Color } from 'core/classes/Color'
+import { Color } from 'classes/Color.js'
 
 export const FORMULA_PADDING = 5
 

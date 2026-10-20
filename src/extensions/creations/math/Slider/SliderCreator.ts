@@ -1,9 +1,9 @@
 
-import { vertex, vertexOrigin } from 'core/functions/vertex'
-import { Creator } from 'core/creators/Creator'
-import { Slider } from './Slider'
-import { Linkable } from 'core/linkables/Linkable'
-import { Color } from 'core/classes/Color'
+import { vertex, vertexOrigin } from '@bhbr/affr2'
+import { Creator } from 'creators/Creator.js'
+import { Slider } from './Slider.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { Color } from 'classes/Color.js'
 
 
 export class SliderCreator extends Creator {

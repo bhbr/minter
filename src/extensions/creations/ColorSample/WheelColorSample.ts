@@ -1,11 +1,11 @@
 
-import { ColorSample } from 'extensions/creations/ColorSample/ColorSample'
-import { vertex, vertexSubtract, vertexNorm } from 'core/functions/vertex'
-import { ScreenEvent } from 'core/mobjects/screen_events'
-import { TAU, DEGREES } from 'core/constants'
-import { Color } from 'core/classes/Color'
-import { Circle } from 'core/shapes/Circle'
-import { COLOR_SAMPLE_RADIUS } from './ColorSample'
+import { ColorSample } from 'extensions/creations/ColorSample/ColorSample.js'
+import { vertex, vertexSubtract, vertexNorm } from '@bhbr/affr2'
+import { ScreenEvent } from 'mobjects/screen_events.js'
+import { TAU, DEGREES } from 'constants.js'
+import { Color } from 'classes/Color.js'
+import { Circle } from 'shapes/Circle.js'
+import { COLOR_SAMPLE_RADIUS } from './ColorSample.js'
 
 export class WheelColorSample extends ColorSample {
 

@@ -1,6 +1,6 @@
 
-import { ConStraitConstructor } from '../ConStraitConstructor'
-import { ConSegment } from './ConSegment'
+import { ConStraitConstructor } from '../ConStraitConstructor.js'
+import { ConSegment } from './ConSegment.js'
 
 export class ConSegmentConstructor extends ConStraitConstructor {
 

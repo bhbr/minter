@@ -1,15 +1,15 @@
 
-import { Linkable } from 'core/linkables/Linkable'
-import { vertex, vertexSubtract } from 'core/functions/vertex'
-import { getPaper, getSidebar } from 'core/functions/getters'
-import { log } from 'core/functions/logging'
-import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/ui/TextLabel'
-import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'core/mobjects/screen_events'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
-import { VariableNameBox } from './VariableNameBox'
-import { DependencyLink } from 'core/linkables/DependencyLink'
+import { Linkable } from 'linkables/Linkable.js'
+import { vertex, vertexSubtract } from '@bhbr/affr2'
+import { getPaper, getSidebar } from 'functions/getters.js'
+import { log } from 'functions/logging.js'
+import { Color } from 'classes/Color.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { eventVertex, ScreenEvent, ScreenEventHandler, isTouchDevice } from 'mobjects/screen_events.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox.js'
+import { VariableNameBox } from './VariableNameBox.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
 
 export class Slider extends Linkable {
 /*

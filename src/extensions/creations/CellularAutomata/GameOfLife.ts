@@ -1,9 +1,8 @@
 
-import { CellularAutomaton } from './CellularAutomaton'
-import { Color } from 'core/classes/Color'
-import { CAState } from './CellularAutomaton'
-import { log } from 'core/functions/logging'
-import { deepCopy } from 'core/functions/copying'
+import { CellularAutomaton } from './CellularAutomaton.js'
+import { Color } from 'classes/Color.js'
+import { CAState } from './CellularAutomaton.js'
+import { log } from 'functions/logging.js'
 
 export class GameOfLife extends CellularAutomaton {
 

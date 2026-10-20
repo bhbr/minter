@@ -1,21 +1,21 @@
 
-import { Algebra } from '../model/Algebra'
-import { VisualFormula } from './VisualFormula'
-import { VisualNumber } from './VisualNumber'
-import { VisualVariable } from './VisualVariable'
-import { VisualGroup } from './VisualGroup'
-import { VisualFunction } from './VisualFunction'
-import { VisualOperator } from './VisualOperator'
-import { VisualEquation } from './VisualEquation'
-import { VisualFraction } from './VisualFraction'
-import { VisualPower } from './VisualPower'
-import { VisualRoot } from './VisualRoot'
-import { Sentence, SentenceTree, SubtreeLocation } from '../model/SentenceTypes'
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { log } from 'core/functions/logging'
-import { deepCopy } from 'core/functions/copying'
+import { Algebra } from '../model/Algebra.js'
+import { VisualFormula } from './VisualFormula.js'
+import { VisualNumber } from './VisualNumber.js'
+import { VisualVariable } from './VisualVariable.js'
+import { VisualGroup } from './VisualGroup.js'
+import { VisualFunction } from './VisualFunction.js'
+import { VisualOperator } from './VisualOperator.js'
+import { VisualEquation } from './VisualEquation.js'
+import { VisualFraction } from './VisualFraction.js'
+import { VisualPower } from './VisualPower.js'
+import { VisualRoot } from './VisualRoot.js'
+import { Sentence, SentenceTree, SubtreeLocation } from '../model/SentenceTypes.js'
+import { BetterObject } from '@bhbr/better-things'
+import { log } from 'functions/logging.js'
+import { copy } from '@bhbr/copycat'
 
-export class VisualFormulaMaker extends ExtendedObject {
+export class VisualFormulaMaker extends BetterObject {
 
 	algebra: Algebra
 
@@ -31,14 +31,14 @@ export class VisualFormulaMaker extends ExtendedObject {
 			return new VisualNumber({
 				value: Number(symbol),
 				formulaTree: tree,
-				location: deepCopy(location)
+				location: copy(location)
 			})
 		}
 		if (this.algebra.lexer.isLetter(symbol)) {
 			return new VisualVariable({
 				name: symbol,
 				formulaTree: tree,
-				location: deepCopy(location)
+				location: copy(location)
 			})
 		}
 		if (this.algebra.lexer.isFunctionToken(symbol)) {
@@ -47,7 +47,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 				name: symbol,
 				child: this.treeToVisual(child, location.concat([0])),
 				formulaTree: tree,
-				location: deepCopy(location)
+				location: copy(location)
 			})
 		}
 		if (symbol == '\\frac') {
@@ -57,7 +57,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 				numerator: this.treeToVisual(numerator, location.concat([0])),
 				denominator: this.treeToVisual(denominator, location.concat([1])),
 				formulaTree: tree,
-				location: deepCopy(location)
+				location: copy(location)
 			})
 		}
 		if (this.algebra.parser.isOperator(symbol)) {
@@ -68,7 +68,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 					child1: this.treeToVisual(child1, location.concat([0])),
 					child2: this.treeToVisual(child2, location.concat([1])),
 					formulaTree: tree,
-					location: deepCopy(location)
+					location: copy(location)
 				})
 			} else {
 				return new VisualOperator({
@@ -76,7 +76,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 					child1: this.treeToVisual(child1, location.concat([0])),
 					child2: this.treeToVisual(child2, location.concat([1])),
 					formulaTree: tree,
-					location: deepCopy(location)
+					location: copy(location)
 				})
 			}
 		}
@@ -86,7 +86,7 @@ export class VisualFormulaMaker extends ExtendedObject {
 				parenType: symbol,
 				child: this.treeToVisual(child, location.concat([0])),
 				formulaTree: tree,
-				location: deepCopy(location),
+				location: copy(location),
 				parser: this.algebra.parser
 			})
 		}

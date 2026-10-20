@@ -1,5 +1,5 @@
 
-import { InputBox } from './InputBox'
+import { InputBox } from './InputBox.js'
 
 export class TextInputBox extends InputBox {
 	

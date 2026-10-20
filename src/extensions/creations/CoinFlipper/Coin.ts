@@ -1,9 +1,9 @@
 
-import { Circle } from 'core/shapes/Circle'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { TextLabel } from 'core/ui/TextLabel'
-import { HEADS_COLOR, TAILS_COLOR, COIN_RADIUS, COIN_FONT_SIZE } from './constants'
+import { Circle } from 'shapes/Circle.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { HEADS_COLOR, TAILS_COLOR, COIN_RADIUS, COIN_FONT_SIZE } from './constants.js'
 
 export type CoinState = 'heads' | 'tails'
 

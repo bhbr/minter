@@ -1,5 +1,5 @@
 
-import { CurvedShape } from 'core/vmobjects/CurvedShape'
+import { CurvedShape } from 'vmobjects/CurvedShape.js'
 
 export class Ellipse extends CurvedShape {
 

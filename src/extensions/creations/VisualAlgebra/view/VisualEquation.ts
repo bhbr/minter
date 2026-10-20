@@ -1,5 +1,5 @@
 
-import { VisualOperator } from './VisualOperator'
+import { VisualOperator } from './VisualOperator.js'
 
 export class VisualEquation extends VisualOperator {
 

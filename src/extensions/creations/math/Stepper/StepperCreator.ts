@@ -1,6 +1,6 @@
 
-import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
-import { Stepper } from './Stepper'
+import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator.js'
+import { Stepper } from './Stepper.js'
 
 export class StepperCreator extends SliderCreator {
 

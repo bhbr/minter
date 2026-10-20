@@ -1,8 +1,8 @@
 
-import { Mobject } from 'core/mobjects/Mobject'
-import { Board } from 'core/boards/Board'
-import { PascalsBrickWall } from './PascalsBrickWall'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Board } from 'boards/Board.js'
+import { PascalsBrickWall } from './PascalsBrickWall.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class BrickWallCreator extends DraggingCreator {
 

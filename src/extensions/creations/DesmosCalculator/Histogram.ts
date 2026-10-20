@@ -1,12 +1,12 @@
 
-import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { RadioButtonList } from 'core/ui/RadioButtonList'
-import { TextLabel } from 'core/ui/TextLabel'
-import { Checkbox } from 'core/ui/Checkbox'
-import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox'
-import { DependencyLink } from 'core/linkables/DependencyLink'
+import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { RadioButtonList } from 'ui/RadioButtonList.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { Checkbox } from 'ui/Checkbox.js'
+import { NumberInputBox } from 'extensions/ui/InputBox/NumberInputBox.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
 
 export class Histogram extends DesmosCalculator {
 

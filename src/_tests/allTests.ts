@@ -1,23 +1,17 @@
 
-import { BundledTest } from './Tests'
-import { ColorTest } from './unit_tests/core/classes/ColorTest'
-import { CopyingTest } from './unit_tests/core/functions/CopyingTest'
-import { ExtendedObjectTest } from './unit_tests/core/classes/ExtendedObjectTest'
-import { MobjectTest } from './unit_tests/core/mobjects/MobjectTest'
-import { TransformTest } from './unit_tests/core/classes/TransformTest'
-import { VertexTest } from './unit_tests/core/functions/VertexTest'
-import { FrameTest } from './unit_tests/core/mobjects/FrameTest'
+import { BundledTest } from '@bhbr/tsts'
+import { ColorTest } from './unit_tests/core/classes/ColorTest.js'
+import { MobjectTest } from './unit_tests/core/mobjects/MobjectTest.js'
+import { FrameTest } from './unit_tests/core/mobjects/FrameTest.js'
 
 export const AllTests = new BundledTest({
 	name: 'all tests',
 	subtests: [
 		ColorTest,
-		CopyingTest,
-		ExtendedObjectTest,
-		MobjectTest,
-		TransformTest,
-		VertexTest,
-		FrameTest
+		FrameTest,
+		MobjectTest
 	],
 	silenceSubtests: false
 })
+
+AllTests.run()

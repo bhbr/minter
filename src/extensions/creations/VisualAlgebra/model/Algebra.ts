@@ -1,8 +1,8 @@
 
-import { FormalSystem } from './FormalSystem'
-import { Rule, SentenceTreeForm, NonterminalSymbol } from './SentenceTypes'
-import { AlgebraLexer } from './AlgebraLexer'
-import { AlgebraParser } from './AlgebraParser'
+import { FormalSystem } from './FormalSystem.js'
+import { Rule, SentenceTreeForm, NonterminalSymbol } from './SentenceTypes.js'
+import { AlgebraLexer } from './AlgebraLexer.js'
+import { AlgebraParser } from './AlgebraParser.js'
 
 export class Algebra extends FormalSystem {
 
@@ -1115,7 +1115,7 @@ export class Algebra extends FormalSystem {
 				] as Rule,
 
 				// a + b = c => a = c - b
-				'move_addition_to_rhs': [
+				'move_right_addition_to_rhs': [
 					['=', [
 						['+', [
 							'<expression-1>',
@@ -1133,7 +1133,7 @@ export class Algebra extends FormalSystem {
 				] as Rule,
 
 				// a = b + c => a - c = b
-				'move_addition_to_lhs': [
+				'move_right_addition_to_lhs': [
 					['=', [
 						'<expression-1>',
 						['+', [
@@ -1151,7 +1151,7 @@ export class Algebra extends FormalSystem {
 				] as Rule,
 
 				// a - b = c => a = c + b
-				'move_subtraction_to_rhs': [
+				'move_right_subtraction_to_rhs': [
 					['=', [
 						['-', [
 							'<expression-1>',
@@ -1169,7 +1169,7 @@ export class Algebra extends FormalSystem {
 				] as Rule,
 
 				// a = b - c => a + c = b
-				'move_subtraction_to_lhs': [
+				'move_right_subtraction_to_lhs': [
 					['=', [
 						'<expression-1>',
 						['-', [
@@ -1183,6 +1183,82 @@ export class Algebra extends FormalSystem {
 							'<expression-3>'
 						]],
 						'<expression-2>',
+					]]
+				] as Rule,
+
+				// a + b = c => b = c - a
+				'move_left_addition_to_rhs': [
+					['=', [
+						['+', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['=', [
+						'<expression-2>',
+						['-', [
+							'<expression-3>',
+							'<expression-1>'
+						]]
+					]]
+				] as Rule,
+
+				// a = b + c => a - b = c
+				'move_left_addition_to_lhs': [
+					['=', [
+						'<expression-1>',
+						['+', [
+							'<expression-2>',
+							'<expression-3>'
+						]],
+					]],
+					['=', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>',
+					]]
+				] as Rule,
+
+				// a - b = c => -b = c - a
+				'move_left_subtraction_to_rhs': [
+					['=', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						'<expression-3>'
+					]],
+					['=', [
+						['opp', [
+							'<expression-2>'
+						]],
+						['-', [
+							'<expression-3>',
+							'<expression-1>'
+						]]
+					]]
+				] as Rule,
+
+				// a = b - c => a - b = -c
+				'move_left_subtraction_to_lhs': [
+					['=', [
+						'<expression-1>',
+						['-', [
+							'<expression-2>',
+							'<expression-3>'
+						]],
+					]],
+					['=', [
+						['-', [
+							'<expression-1>',
+							'<expression-2>'
+						]],
+						['opp', [
+							'<expression-3>'
+						]]
 					]]
 				] as Rule,
 

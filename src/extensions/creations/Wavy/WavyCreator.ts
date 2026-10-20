@@ -1,8 +1,8 @@
 
-import { Mobject } from 'core/mobjects/Mobject'
-import { Board } from 'core/boards/Board'
-import { Wavy } from './Wavy'
-import { SpanningCreator } from 'core/creators/SpanningCreator'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Board } from 'boards/Board.js'
+import { Wavy } from './Wavy.js'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
 
 export class WavyCreator extends SpanningCreator {
 

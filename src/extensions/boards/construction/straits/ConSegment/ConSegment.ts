@@ -1,6 +1,6 @@
 
-import { vertex, vertexArray, vertexSubtract, vertexNorm2 } from 'core/functions/vertex'
-import { ConStrait } from '../ConStrait'
+import { vertex, vertexArray, vertexSubtract, vertexNorm2 } from '@bhbr/affr2'
+import { ConStrait } from '../ConStrait.js'
 
 export class ConSegment extends ConStrait {
 

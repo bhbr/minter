@@ -1,7 +1,7 @@
 
-import { ValueTest, NumberValueTest, ErrorTest, BundledTest } from '_tests/Tests'
-import { Algebra } from 'extensions/creations/VisualAlgebra/model/Algebra'
-import { SentenceTree } from 'extensions/creations/VisualAlgebra/model/SentenceTypes'
+import { ValueTest, NumberValueTest, ErrorTest, BundledTest } from '@bhbr/tsts'
+import { Algebra } from 'extensions/creations/VisualAlgebra/model/Algebra.js'
+import { SentenceTree } from 'extensions/creations/VisualAlgebra/model/SentenceTypes.js'
 
 let algebra = new Algebra()
 

@@ -1,8 +1,8 @@
 
-import { DesmosExpression } from './DesmosExpression'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { vertex } from 'core/functions/vertex'
-import { log } from 'core/functions/logging'
+import { DesmosExpression } from './DesmosExpression.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { vertex } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
 
 export class DesmosExpressionCreator extends DraggingCreator {
 

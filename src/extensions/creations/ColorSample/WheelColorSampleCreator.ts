@@ -1,7 +1,7 @@
 
-import { WheelColorSample } from './WheelColorSample'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { vertex, vertexAdd, vertexTranslatedBy } from 'core/functions/vertex'
+import { WheelColorSample } from './WheelColorSample.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { vertex, vertexAdd, vertexTranslatedBy } from '@bhbr/affr2'
 
 export class WheelColorSampleCreator extends DraggingCreator {
 	

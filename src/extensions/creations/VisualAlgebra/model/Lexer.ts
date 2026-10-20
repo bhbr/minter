@@ -1,9 +1,9 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { Sentence } from './SentenceTypes'
-import { log } from 'core/functions/logging'
+import { BetterObject } from '@bhbr/better-things'
+import { Sentence } from './SentenceTypes.js'
+import { log } from 'functions/logging.js'
 
-export class Lexer extends ExtendedObject {
+export class Lexer extends BetterObject {
 	
 	lex(str: string): Sentence | null {
 		return this.stringToSentence(str)

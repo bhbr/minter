@@ -1,6 +1,6 @@
 
-import { Color } from 'core/classes/Color'
-import { TAU } from 'core/constants'
+import { Color } from 'classes/Color.js'
+import { TAU } from 'constants.js'
 
 export const HEADS_COLOR: Color = Color.blue()
 export const TAILS_COLOR: Color = Color.red()

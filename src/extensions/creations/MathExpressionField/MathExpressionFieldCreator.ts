@@ -1,6 +1,6 @@
 
-import { MathExpressionField } from './MathExpressionField'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { MathExpressionField } from './MathExpressionField.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class MathExpressionFieldCreator extends DraggingCreator {
 

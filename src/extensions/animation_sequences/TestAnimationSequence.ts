@@ -1,9 +1,9 @@
 
-import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
-import { Circle } from 'core/shapes/Circle'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { AnimationSequence } from 'animation_sequence/AnimationSequence.js'
+import { Circle } from 'shapes/Circle.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
 
 export class TestAnimationSequence extends AnimationSequence {
 	

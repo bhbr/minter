@@ -1,30 +1,29 @@
 
-// imports for Construction
-import { ConPoint } from './ConPoint'
-import { FreePoint } from './FreePoint'
-import { Constructor } from './Constructor'
-import { ConLineConstructor } from './straits/ConLine/ConLineConstructor'
-import { ConRayConstructor } from './straits/ConRay/ConRayConstructor'
-import { ConSegmentConstructor } from './straits/ConSegment/ConSegmentConstructor'
-import { ConStraitConstructor } from './straits/ConStraitConstructor'
-import { ConCircleConstructor } from './ConCircle/ConCircleConstructor'
-import { ConStrait } from './straits/ConStrait'
-import { ConLine } from './straits/ConLine/ConLine'
-import { ConRay } from './straits/ConRay/ConRay'
-import { ConSegment } from './straits/ConSegment/ConSegment'
-import { ConCircle } from './ConCircle/ConCircle'
-import { Circle } from 'core/shapes/Circle'
-import { IntersectionPoint } from './IntersectionPoint'
-import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator'
-import { Board } from 'core/boards/Board'
-import { Color } from 'core/classes/Color'
-import { vertex, vertexCloseTo } from 'core/functions/vertex'
-import { Creator } from 'core/creators/Creator'
-import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'core/mobjects/screen_events'
-import { Mobject } from 'core/mobjects/Mobject'
-import { convertArrayToString } from 'core/functions/arrays'
-import { getPaper } from 'core/functions/getters'
-import { log } from 'core/functions/logging'
+import { ConPoint } from './ConPoint.js'
+import { FreePoint } from './FreePoint.js'
+import { Constructor } from './Constructor.js'
+import { ConLineConstructor } from './straits/ConLine/ConLineConstructor.js'
+import { ConRayConstructor } from './straits/ConRay/ConRayConstructor.js'
+import { ConSegmentConstructor } from './straits/ConSegment/ConSegmentConstructor.js'
+import { ConStraitConstructor } from './straits/ConStraitConstructor.js'
+import { ConCircleConstructor } from './ConCircle/ConCircleConstructor.js'
+import { ConStrait } from './straits/ConStrait.js'
+import { ConLine } from './straits/ConLine/ConLine.js'
+import { ConRay } from './straits/ConRay/ConRay.js'
+import { ConSegment } from './straits/ConSegment/ConSegment.js'
+import { ConCircle } from './ConCircle/ConCircle.js'
+import { Circle } from 'shapes/Circle.js'
+import { IntersectionPoint } from './IntersectionPoint.js'
+import { RGBAColorSampleCreator } from 'extensions/creations/ColorSample/RGBAColorSampleCreator.js'
+import { Board } from 'boards/Board.js'
+import { Color } from 'classes/Color.js'
+import { vertex, vertexIsCloseTo } from '@bhbr/affr2'
+import { Creator } from 'creators/Creator.js'
+import { ScreenEventDevice, screenEventDevice, ScreenEventHandler, ScreenEvent, eventVertex, isTouchDevice } from 'mobjects/screen_events.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { convertArrayToString } from '@bhbr/betray'
+import { getPaper } from 'functions/getters.js'
+import { log } from 'functions/logging.js'
 
 export type ConMobject = ConStrait | ConCircle
 
@@ -62,7 +61,7 @@ export class Construction extends Board {
 	}
 
 	snapped(v1: vertex, v2: vertex): boolean {
-		return vertexCloseTo(v1, v2, 10)
+		return vertexIsCloseTo(v1, v2, 10)
 	}
 
 	snappedPointForVertex(v: vertex): ConPoint | null {

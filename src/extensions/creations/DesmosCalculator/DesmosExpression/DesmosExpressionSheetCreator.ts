@@ -1,8 +1,8 @@
 
-import { DesmosExpressionSheet } from './DesmosExpressionSheet'
-import { SpanningCreator } from 'core/creators/SpanningCreator'
-import { vertex } from 'core/functions/vertex'
-import { log } from 'core/functions/logging'
+import { DesmosExpressionSheet } from './DesmosExpressionSheet.js'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
+import { vertex } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
 
 export class DesmosExpressionSheetCreator extends SpanningCreator {
 

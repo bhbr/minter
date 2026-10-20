@@ -1,8 +1,8 @@
 
-import { MGroup } from 'core/mobjects/MGroup'
-import { Line } from 'core/shapes/Line'
-import { log } from 'core/functions/logging'
-import { GridCell } from './GridCell'
+import { MGroup } from 'mobjects/MGroup.js'
+import { Line } from 'shapes/Line.js'
+import { log } from 'functions/logging.js'
+import { GridCell } from './GridCell.js'
 
 export class Grid extends MGroup {
 	

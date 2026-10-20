@@ -1,11 +1,11 @@
 
-import { Mobject } from 'core/mobjects/Mobject'
-import { Circle } from 'core/shapes/Circle'
-import { Color } from 'core/classes/Color'
-import { TextLabel } from 'core/ui/TextLabel'
-import { ScreenEvent, ScreenEventHandler, eventVertex } from 'core/mobjects/screen_events'
-import { getPaper } from 'core/functions/getters'
-import { vertex, vertexNorm, vertexTranslatedBy } from 'core/functions/vertex'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Circle } from 'shapes/Circle.js'
+import { Color } from 'classes/Color.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { ScreenEvent, ScreenEventHandler, eventVertex } from 'mobjects/screen_events.js'
+import { getPaper } from 'functions/getters.js'
+import { vertex, vertexNorm, vertexTranslatedBy } from '@bhbr/affr2'
 
 export class Toggle extends Mobject {
 
@@ -82,7 +82,7 @@ export class Toggle extends Mobject {
 	}
 
 	onPointerUp(e: ScreenEvent) {
-		let p = this.localEventVertex(e)
+		let p = this.sensor.localEventVertex(e)
 		if (vertexNorm(p) <= this.circle.radius) {
 			this.setState(!this.value())
 		} else {

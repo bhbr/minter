@@ -1,5 +1,5 @@
 
-import { BinaryOperatorBox } from './BinaryOperatorBox'
+import { BinaryOperatorBox } from './BinaryOperatorBox.js'
 
 export class ComparisonBox extends BinaryOperatorBox {
 	defaults(): object {

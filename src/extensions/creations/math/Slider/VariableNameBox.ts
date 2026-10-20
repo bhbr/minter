@@ -1,6 +1,6 @@
 
-import { TextInputBox } from 'extensions/ui/InputBox/TextInputBox'
-import { getPaper } from 'core/functions/getters'
+import { TextInputBox } from 'extensions/ui/InputBox/TextInputBox.js'
+import { getPaper } from 'functions/getters.js'
 
 export class VariableNameBox extends TextInputBox {
 

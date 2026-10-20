@@ -1,15 +1,15 @@
 
-import { AnimationSequence } from 'core/animation_sequence/AnimationSequence'
-import { Partition } from './Partition'
-import { Brick, LabelShower } from './Brick'
-import { BrickLabelPopover } from './BrickLabelPopover'
-import { Linkable } from 'core/linkables/Linkable'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, SLOW_PARTITION_ANIMATION_DURATION, FAST_PARTITION_ANIMATION_DURATION } from './constants'
-import { vertexTranslatedBy } from 'core/functions/vertex'
-import { log } from 'core/functions/logging'
-import { Line } from 'core/shapes/Line'
-import { Color } from 'core/classes/Color'
-import { SimpleButton } from 'core/ui/SimpleButton'
+import { AnimationSequence } from 'animation_sequence/AnimationSequence.js'
+import { Partition } from './Partition.js'
+import { Brick, LabelShower } from './Brick.js'
+import { BrickLabelPopover } from './BrickLabelPopover.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, SLOW_PARTITION_ANIMATION_DURATION, FAST_PARTITION_ANIMATION_DURATION } from './constants.js'
+import { vertexTranslatedBy } from '@bhbr/affr2'
+import { log } from 'functions/logging.js'
+import { Line } from 'shapes/Line.js'
+import { Color } from 'classes/Color.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
 
 export class PascalsBrickWall extends Linkable implements LabelShower {
 

@@ -1,13 +1,13 @@
 
-import { Rectangle } from 'core/shapes/Rectangle'
-import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { binomial } from 'core/functions/math'
-import { vertex, vertexAdd } from 'core/functions/vertex'
-import { Line } from 'core/shapes/Line'
-import { Circle } from 'core/shapes/Circle'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { HEADS_COLOR, TAILS_COLOR, BASE_BRICK_HEIGHT, BASE_ROW_LENGTH, BRICK_STROKE_WIDTH, BRICK_FILL_OPACITY } from './constants.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { binomial } from 'functions/math.js'
+import { vertex, vertexAdd } from '@bhbr/affr2'
+import { Line } from 'shapes/Line.js'
+import { Circle } from 'shapes/Circle.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
 
 export interface LabelShower {
 	toggleLabelOnBrick: (Brick) => void

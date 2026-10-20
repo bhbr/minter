@@ -1,11 +1,11 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { OldParser } from './OldParser'
-import { AssignmentNode } from './MathNode'
-import { remove } from 'core/functions/arrays'
-import { getPaper } from 'core/functions/getters'
+import { BetterObject } from '@bhbr/better-things'
+import { OldParser } from './OldParser.js'
+import { AssignmentNode } from './MathNode.js'
+import { remove } from '@bhbr/betray'
+import { getPaper } from 'functions/getters.js'
 
-export class MathExpression extends ExtendedObject {
+export class MathExpression extends BetterObject {
 	
 	latex: string
 	scope: object

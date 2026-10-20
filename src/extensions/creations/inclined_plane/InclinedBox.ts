@@ -1,9 +1,8 @@
 
-import { vertex } from 'core/functions/vertex'
-import { Transform } from 'core/classes/Transform'
-import { Polygon } from 'core/vmobjects/Polygon'
-import { log } from 'core/functions/logging'
-import { TAU } from 'core/constants'
+import { vertex, Transform } from '@bhbr/affr2'
+import { Polygon } from 'vmobjects/Polygon.js'
+import { log } from 'functions/logging.js'
+import { TAU } from 'constants.js'
 
 export class InclinedBox extends Polygon {
 	

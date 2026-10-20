@@ -1,5 +1,5 @@
 
-import { Token } from './Token'
+import { Token } from './Token.js'
 
 export class ParseError extends Error {
 	constructor(message: string, token: Token, ...args: Array<any>) {

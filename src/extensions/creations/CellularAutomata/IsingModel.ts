@@ -1,6 +1,6 @@
 
-import { CellularAutomaton, CAState } from './CellularAutomaton'
-import { Color } from 'core/classes/Color'
+import { CellularAutomaton, CAState } from './CellularAutomaton.js'
+import { Color } from 'classes/Color.js'
 
 export class IsingModel extends CellularAutomaton {
 

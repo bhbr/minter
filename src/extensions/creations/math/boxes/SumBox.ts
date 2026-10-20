@@ -1,7 +1,7 @@
 
-import { NumberValuedFunctionBox } from './NumberValuedFunctionBox'
-import { numberArraySum } from 'core/functions/numberArray'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { NumberValuedFunctionBox } from './NumberValuedFunctionBox.js'
+import { numberArraySum } from 'functions/numberArray.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class SumBox extends NumberValuedFunctionBox {
 	

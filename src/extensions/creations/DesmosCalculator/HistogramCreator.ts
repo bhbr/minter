@@ -1,6 +1,6 @@
 
-import { Histogram } from './Histogram'
-import { SpanningCreator } from 'core/creators/SpanningCreator'
+import { Histogram } from './Histogram.js'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
 
 export class HistogramCreator extends SpanningCreator {
 

@@ -1,6 +1,6 @@
 
-import { Line } from 'core/shapes/Line'
-import { vertex, vertexArray } from 'core/functions/vertex'
+import { Line } from 'shapes/Line.js'
+import { vertex, vertexArray } from '@bhbr/affr2'
 
 export class ConStrait extends Line {
 

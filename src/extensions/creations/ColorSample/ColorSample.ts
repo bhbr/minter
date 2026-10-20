@@ -1,9 +1,9 @@
 
-import { Color } from 'core/classes/Color'
-import { Circle } from 'core/shapes/Circle'
-import { Linkable } from 'core/linkables/Linkable'
-import { vertex } from 'core/functions/vertex'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { Color } from 'classes/Color.js'
+import { Circle } from 'shapes/Circle.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { vertex } from '@bhbr/affr2'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
 
 export const COLOR_SAMPLE_RADIUS = 30
 

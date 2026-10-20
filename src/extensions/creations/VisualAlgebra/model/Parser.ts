@@ -1,9 +1,9 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { Sentence, SentenceTree } from './SentenceTypes'
-import { FormalLanguage } from './FormalLanguage'
+import { BetterObject } from '@bhbr/better-things'
+import { Sentence, SentenceTree } from './SentenceTypes.js'
+import { FormalLanguage } from './FormalLanguage.js'
 
-export class Parser extends ExtendedObject {
+export class Parser extends BetterObject {
 
 	language: FormalLanguage | null
 

@@ -1,18 +1,18 @@
 
-import { Sidebar } from 'core/Sidebar'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
-import { ControlsButton } from 'core/sidebar_buttons/ControlsButton'
-import { CoinButton } from './CoinButton'
-import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton'
-import { ComparisonButton } from 'extensions/sidebar_buttons/ComparisonButton'
-import { AlgebraButton } from 'extensions/sidebar_buttons/AlgebraButton'
-import { ListFunctionsButton } from 'extensions/sidebar_buttons/ListFunctionsButton'
-//import { PlotButton } from 'extensions/sidebar_buttons/PlotButton'
-import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
-import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton'
-import { EraseButton } from 'core/sidebar_buttons/EraseButton'
-import { PartitionButton } from 'extensions/sidebar_buttons/PartitionButton'
+import { Sidebar } from 'Sidebar.js'
+import { DragButton } from 'sidebar_buttons/DragButton.js'
+import { LinkButton } from 'sidebar_buttons/LinkButton.js'
+import { ControlsButton } from 'sidebar_buttons/ControlsButton.js'
+import { CoinButton } from './CoinButton.js'
+import { ArithmeticButton } from 'extensions/sidebar_buttons/ArithmeticButton.js'
+import { ComparisonButton } from 'extensions/sidebar_buttons/ComparisonButton.js'
+import { AlgebraButton } from 'extensions/sidebar_buttons/AlgebraButton.js'
+import { ListFunctionsButton } from 'extensions/sidebar_buttons/ListFunctionsButton.js'
+//import { PlotButton } from 'extensions/sidebar_buttons/PlotButton.js'
+import { NumberButton } from 'extensions/sidebar_buttons/NumberButton.js'
+import { ColorSampleButton } from 'extensions/creations/ColorSample/ColorSampleButton.js'
+import { EraseButton } from 'sidebar_buttons/EraseButton.js'
+import { PartitionButton } from 'extensions/sidebar_buttons/PartitionButton.js'
 
 export class CoinFlipSidebar extends Sidebar {
 	
@@ -28,7 +28,7 @@ export class CoinFlipSidebar extends Sidebar {
 				ComparisonButton,
 				AlgebraButton,
 				ListFunctionsButton,
-				PlotButton,
+				//PlotButton,
 				PartitionButton,
 				//ColorSampleButton,
 				EraseButton

@@ -1,8 +1,8 @@
 
-import { Sentence } from './SentenceTypes'
-import { log } from 'core/functions/logging'
-import { removeAll, replaceAll } from 'core/functions/arrays'
-import { Lexer } from './Lexer'
+import { Sentence } from './SentenceTypes.js'
+import { log } from 'functions/logging.js'
+import { removeAll, replaceAll } from '@bhbr/betray'
+import { Lexer } from './Lexer.js'
 
 export class AlgebraLexer extends Lexer {
 

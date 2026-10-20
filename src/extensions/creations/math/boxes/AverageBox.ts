@@ -1,8 +1,8 @@
 
-import { NumberValuedFunctionBox } from './NumberValuedFunctionBox'
-import { numberArraySum } from 'core/functions/numberArray'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { log } from 'core/functions/logging'
+import { NumberValuedFunctionBox } from './NumberValuedFunctionBox.js'
+import { numberArraySum } from 'functions/numberArray.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { log } from 'functions/logging.js'
 
 export class AverageBox extends NumberValuedFunctionBox {
 	

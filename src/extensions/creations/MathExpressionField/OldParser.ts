@@ -1,9 +1,9 @@
 
-import { ParseError } from './ParseError'
-import { Token, TokenType, typeToOperation, lexemeToType } from './Token'
-import { OldLexer } from './OldLexer'
-import { createMathNode, rightGrouping, primaryTypes } from './createMathNode'
-import { MathNode } from './MathNode'
+import { ParseError } from './ParseError.js'
+import { Token, TokenType, typeToOperation, lexemeToType } from './Token.js'
+import { OldLexer } from './OldLexer.js'
+import { createMathNode, rightGrouping, primaryTypes } from './createMathNode.js'
+import { MathNode } from './MathNode.js'
 
 // scope used by evaluateTex to resolve identifiers
 export type Scope = { [key: string]: any }

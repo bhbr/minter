@@ -1,7 +1,7 @@
 
-import { APILoader } from 'core/apis/APILoader'
-import { log } from 'core/functions/logging'
-import { getPaper } from 'core/functions/getters'
+import { APILoader } from 'apis/APILoader.js'
+import { log } from 'functions/logging.js'
+import { getPaper } from 'functions/getters.js'
 
 export class CindyLoader extends APILoader {
 	

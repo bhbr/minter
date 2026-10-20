@@ -1,10 +1,10 @@
 
-import { SimpleButton } from 'core/ui/SimpleButton'
-import { Playable } from './Playable'
-import { Color } from 'core/classes/Color'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas'
-import { log } from 'core/functions/logging'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { Playable } from './Playable.js'
+import { Color } from 'classes/Color.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { CindyCanvas } from 'extensions/creations/CindyCanvas/CindyCanvas.js'
+import { log } from 'functions/logging.js'
 
 export class PlayButton extends SimpleButton {
 

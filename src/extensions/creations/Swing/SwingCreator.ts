@@ -1,7 +1,7 @@
 
-import { Creator } from 'core/creators/Creator'
-import { Swing } from './Swing'
-import { vertex, vertexSubtract, vertexNorm } from 'core/functions/vertex'
+import { Creator } from 'creators/Creator.js'
+import { Swing } from './Swing.js'
+import { vertex, vertexSubtract, vertexNorm } from '@bhbr/affr2'
 
 export class SwingCreator extends Creator {
 

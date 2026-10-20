@@ -1,10 +1,10 @@
 
-import { vertex, vertexCopy } from 'core/functions/vertex'
-import { FreePoint } from '../FreePoint'
-import { Construction } from '../Construction'
-import { Constructor } from '../Constructor'
-import { ConPoint } from '../ConPoint'
-import { log } from 'core/functions/logging'
+import { vertex, vertexCopy } from '@bhbr/affr2'
+import { FreePoint } from '../FreePoint.js'
+import { Construction } from '../Construction.js'
+import { Constructor } from '../Constructor.js'
+import { ConPoint } from '../ConPoint.js'
+import { log } from 'functions/logging.js'
 
 export class ConStraitConstructor extends Constructor {
 

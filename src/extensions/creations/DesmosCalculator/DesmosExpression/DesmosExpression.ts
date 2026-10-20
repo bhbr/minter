@@ -1,11 +1,11 @@
 
-import { DesmosExpressionSheet } from './DesmosExpressionSheet'
-import { log } from 'core/functions/logging'
-import { removeAll, removeDuplicates } from 'core/functions/arrays'
-import { View } from 'core/mobjects/View'
-import { DependencyLink } from 'core/linkables/DependencyLink'
-import { getPaper } from 'core/functions/getters'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
+import { DesmosExpressionSheet } from './DesmosExpressionSheet.js'
+import { log } from 'functions/logging.js'
+import { removeAll, removeDuplicates } from '@bhbr/betray'
+import { View } from 'mobjects/View.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
+import { getPaper } from 'functions/getters.js'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
 
 export class DesmosExpression extends DesmosExpressionSheet {
 

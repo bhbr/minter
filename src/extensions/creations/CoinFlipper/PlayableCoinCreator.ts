@@ -1,7 +1,7 @@
 
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { PlayableCoin } from './PlayableCoin'
-import { vertexSubtract } from 'core/functions/vertex'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { PlayableCoin } from './PlayableCoin.js'
+import { vertexSubtract } from '@bhbr/affr2'
 
 export class PlayableCoinCreator extends DraggingCreator {
 

@@ -1,11 +1,11 @@
 
-import { Sidebar } from 'core/Sidebar'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { LinkButton } from 'core/sidebar_buttons/LinkButton'
-import { NumberButton } from 'extensions/sidebar_buttons/NumberButton'
-import { WavyButton } from 'extensions/creations/Wavy/WavyButton'
-import { SwingButton } from 'extensions/creations/Swing/SwingButton'
-import { buttonDict } from 'core/sidebar_buttons/SidebarButton'
+import { Sidebar } from 'Sidebar.js'
+import { DragButton } from 'sidebar_buttons/DragButton.js'
+import { LinkButton } from 'sidebar_buttons/LinkButton.js'
+import { NumberButton } from 'extensions/sidebar_buttons/NumberButton.js'
+import { WavyButton } from 'extensions/creations/Wavy/WavyButton.js'
+import { SwingButton } from 'extensions/creations/Swing/SwingButton.js'
+import { buttonDict } from 'sidebar_buttons/SidebarButton.js'
 
 export class PhysicsSidebar extends Sidebar {
 	

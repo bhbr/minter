@@ -1,7 +1,7 @@
 
-import { Square } from 'core/shapes/Square'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
+import { Square } from 'shapes/Square.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
 
 export class GridCell extends Square {
 

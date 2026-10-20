@@ -1,14 +1,14 @@
 
-import { Coin, CoinState } from './Coin'
-import { Linkable } from 'core/linkables/Linkable'
-import { Playable } from 'extensions/ui/PlayButton/Playable'
-import { PlayButton } from 'extensions/ui/PlayButton/PlayButton'
-import { SimpleButton } from 'core/ui/SimpleButton'
-import { ScreenEvent } from 'core/mobjects/screen_events'
-import { log } from 'core/functions/logging'
-import { Color } from 'core/classes/Color'
-import { MERE_TAP_DELAY } from 'core/constants'
-import { Checkbox } from 'core/ui/Checkbox'
+import { Coin, CoinState } from './Coin.js'
+import { Linkable } from 'linkables/Linkable.js'
+import { Playable } from 'extensions/ui/PlayButton/Playable.js'
+import { PlayButton } from 'extensions/ui/PlayButton/PlayButton.js'
+import { SimpleButton } from 'ui/SimpleButton.js'
+import { ScreenEvent } from 'mobjects/screen_events.js'
+import { log } from 'functions/logging.js'
+import { Color } from 'classes/Color.js'
+import { MERE_TAP_DELAY } from 'constants.js'
+import { Checkbox } from 'ui/Checkbox.js'
 
 export class PlayableCoin extends Linkable implements Playable {
 

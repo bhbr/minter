@@ -1,10 +1,10 @@
 
-import { getPaper } from 'core/functions/getters'
-import { log } from 'core/functions/logging'
-import { Mobject } from 'core/mobjects/Mobject'
-import { Color } from 'core/classes/Color'
-import { remove } from 'core/functions/arrays'
-import { conditionTrigger } from 'core/functions/various'
+import { getPaper } from 'functions/getters.js'
+import { log } from 'functions/logging.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Color } from 'classes/Color.js'
+import { remove } from '@bhbr/betray'
+import { conditionTrigger } from 'functions/various.js'
 
 declare var MathQuill: any
 

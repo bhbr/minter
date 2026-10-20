@@ -1,5 +1,5 @@
 
-import { getPaper } from 'core/functions/getters'
+import { getPaper } from 'functions/getters.js'
 
 export class MathNode {
 	globals: object

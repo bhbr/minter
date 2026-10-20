@@ -1,9 +1,9 @@
 
-import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { Checkbox } from 'core/ui/Checkbox'
-import { DependencyLink } from 'core/linkables/DependencyLink'
+import { DesmosCalculator } from 'extensions/creations/DesmosCalculator/DesmosCalculator.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { Checkbox } from 'ui/Checkbox.js'
+import { DependencyLink } from 'linkables/DependencyLink.js'
 
 export class ScatterPlot extends DesmosCalculator {
 

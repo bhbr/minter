@@ -1,6 +1,6 @@
 
-import { CreativeButton } from 'core/sidebar_buttons/CreativeButton'
-import { ImageView } from 'core/mobjects/ImageView'
+import { CreativeButton } from 'sidebar_buttons/CreativeButton.js'
+import { ImageView } from 'mobjects/ImageView.js'
 
 export class AlgebraButton extends CreativeButton {
 

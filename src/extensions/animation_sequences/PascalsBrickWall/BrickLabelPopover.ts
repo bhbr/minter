@@ -1,13 +1,13 @@
 
-import { Popover } from 'core/ui/Popover'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { TextLabel } from 'core/ui/TextLabel'
-import { MGroup } from 'core/mobjects/MGroup'
-import { Color } from 'core/classes/Color'
-import { HEADS_COLOR, TAILS_COLOR } from './constants'
-import { log } from 'core/functions/logging'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { StackedBrickLabel } from './StackedBrickLabel'
+import { Popover } from 'ui/Popover.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { MGroup } from 'mobjects/MGroup.js'
+import { Color } from 'classes/Color.js'
+import { HEADS_COLOR, TAILS_COLOR } from './constants.js'
+import { log } from 'functions/logging.js'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { StackedBrickLabel } from './StackedBrickLabel.js'
 
 export class BrickLabelPopover extends Popover {
 	

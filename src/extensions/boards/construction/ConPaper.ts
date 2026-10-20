@@ -1,5 +1,5 @@
 
-import { Construction } from './Construction'
+import { Construction } from './Construction.js'
 
 export class ConPaper extends Construction {
 

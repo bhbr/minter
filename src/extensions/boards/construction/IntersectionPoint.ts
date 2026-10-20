@@ -1,10 +1,10 @@
 
-import { ConPoint } from './ConPoint'
-import { ConMobject } from './Construction'
-import { vertex, vertexIsNaN, vertexEquals, vertexAdd, vertexSubtract, vertexMultiply, vertexNorm2, vertexDot } from 'core/functions/vertex'
-import { ConStrait } from './straits/ConStrait'
-import { ConCircle } from './ConCircle/ConCircle'
-import { Color } from 'core/classes/Color'
+import { ConPoint } from './ConPoint.js'
+import { ConMobject } from './Construction.js'
+import { vertex, vertexIsNaN, vertexEquals, vertexAdd, vertexSubtract, vertexMultiply, vertexNorm2, vertexDot } from '@bhbr/affr2'
+import { ConStrait } from './straits/ConStrait.js'
+import { ConCircle } from './ConCircle/ConCircle.js'
+import { Color } from 'classes/Color.js'
 
 export class IntersectionPoint extends ConPoint {
 

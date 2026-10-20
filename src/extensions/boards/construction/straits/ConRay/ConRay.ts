@@ -1,6 +1,6 @@
 
-import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from 'core/functions/vertex'
-import { ConStrait } from '../ConStrait'
+import { vertex, vertexAdd, vertexSubtract, vertexMultiply } from '@bhbr/affr2'
+import { ConStrait } from '../ConStrait.js'
 
 export class ConRay extends ConStrait {
 

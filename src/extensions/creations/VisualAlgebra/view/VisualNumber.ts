@@ -1,9 +1,9 @@
 
-import { VisualSymbol } from './VisualSymbol'
-import { VisualFormula } from './VisualFormula'
-import { FORMULA_PADDING } from './constants'
-import { log } from 'core/functions/logging'
-import { Color } from 'core/classes/Color'
+import { VisualSymbol } from './VisualSymbol.js'
+import { VisualFormula } from './VisualFormula.js'
+import { FORMULA_PADDING } from './constants.js'
+import { log } from 'functions/logging.js'
+import { Color } from 'classes/Color.js'
 
 export class VisualNumber extends VisualFormula {
 	

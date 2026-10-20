@@ -1,8 +1,8 @@
 
-import { vertex, vertexAdd, vertexSubtract, vertexOuterProduct } from 'core/functions/vertex'
-import { Polygon } from 'core/vmobjects/Polygon'
-import { ForceVector } from 'ForceVector'
-import { Color } from 'core/classes/Color'
+import { vertex, vertexAdd, vertexSubtract, vertexOuterProduct } from '@bhbr/affr2'
+import { Polygon } from 'vmobjects/Polygon.js'
+import { ForceVector } from './ForceVector.js'
+import { Color } from 'classes/Color.js'
 
 export class Torque extends Polygon {
 	

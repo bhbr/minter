@@ -1,12 +1,12 @@
 
-import { StackedBrickLabel } from './StackedBrickLabel'
-import { Color } from 'core/classes/Color'
-import { log } from 'core/functions/logging'
-import { CELL_SIZE, CELL_PADDING, CELL_CORNER_RADIUS, COMB_LABEL_WIDTH, COMB_LABEL_HEIGHT, HEADS_COLOR, TAILS_COLOR, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, CELL_STROKE_COLOR, CELL_HIGHLIGHT_STROKE_COLOR, CELL_STROKE_WIDTH, CELL_HIGHLIGHT_STROKE_WIDTH } from './constants'
-import { TextLabel } from 'core/ui/TextLabel'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { binomial } from 'core/functions/math'
-import { RoundedRectangle } from 'core/shapes/RoundedRectangle'
+import { StackedBrickLabel } from './StackedBrickLabel.js'
+import { Color } from 'classes/Color.js'
+import { log } from 'functions/logging.js'
+import { CELL_SIZE, CELL_PADDING, CELL_CORNER_RADIUS, COMB_LABEL_WIDTH, COMB_LABEL_HEIGHT, HEADS_COLOR, TAILS_COLOR, SLOW_CELL_ANIMATION_DURATION, FAST_CELL_ANIMATION_DURATION, CELL_STROKE_COLOR, CELL_HIGHLIGHT_STROKE_COLOR, CELL_STROKE_WIDTH, CELL_HIGHLIGHT_STROKE_WIDTH } from './constants.js'
+import { TextLabel } from 'ui/TextLabel.js'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { binomial } from 'functions/math.js'
+import { RoundedRectangle } from 'shapes/RoundedRectangle.js'
 
 
 export class TriangleCell extends StackedBrickLabel {

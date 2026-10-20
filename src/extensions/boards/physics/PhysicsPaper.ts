@@ -1,17 +1,13 @@
 
-import { Paper } from 'core/Paper'
-import { InclinedScene } from 'extensions/creations/inclined_plane/InclinedScene'
-import { Vertex } from 'core/classes/vertex/Vertex'
-import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator'
-import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator'
-import { ValueBoxCreator } from 'extensions/creations/math/ValueBox/ValueBoxCreator'
-import { InputValueBoxCreator } from 'extensions/creations/math/InputValueBox/InputValueBoxCreator'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { Transform } from 'core/classes/vertex/Transform'
-import { DEGREES } from 'core/constants'
-import { Color } from 'core/classes/Color'
-import { Circle } from 'core/shapes/Circle'
-import { Slider } from 'extensions/creations/math/Slider/Slider'
+import { Paper } from 'Paper.js'
+import { InclinedScene } from 'extensions/creations/inclined_plane/InclinedScene.js'
+import { SliderCreator } from 'extensions/creations/math/Slider/SliderCreator.js'
+import { StepperCreator } from 'extensions/creations/math/Stepper/StepperCreator.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { DEGREES } from 'constants.js'
+import { Color } from 'classes/Color.js'
+import { Circle } from 'shapes/Circle.js'
+import { Slider } from 'extensions/creations/math/Slider/Slider.js'
 
 export class PhysicsPaper extends Paper {
 
@@ -20,18 +16,15 @@ export class PhysicsPaper extends Paper {
 	defaults(): object {
 		return {
 			scene: new InclinedScene({
-				anchor: new Vertex(100, 100)
+				anchor: [100, 100]
 			}),
 			creationConstructors: {
 				'slider': SliderCreator,
 				'stepper': StepperCreator,
-				'value': ValueBoxCreator,
-				'input': InputValueBoxCreator
 			},
 			buttonNames: [
 				'DragButton',
-				'LinkButton',
-				'NumberButton'
+				'LinkButton'
 			]
 		}
 	}

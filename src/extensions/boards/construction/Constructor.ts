@@ -1,8 +1,8 @@
 
-import { Creator } from 'core/creators/Creator'
-import { Color } from 'core/classes/Color'
-import { Construction } from 'extensions/boards/construction/Construction'
-import { vertex } from 'core/functions/vertex'
+import { Creator } from 'creators/Creator.js'
+import { Color } from 'classes/Color.js'
+import { Construction } from 'extensions/boards/construction/Construction.js'
+import { vertex } from '@bhbr/affr2'
 
 export class Constructor extends Creator {
 

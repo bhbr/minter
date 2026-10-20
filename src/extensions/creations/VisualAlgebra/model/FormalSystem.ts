@@ -1,8 +1,8 @@
 
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes'
-import { FormalLanguage } from './FormalLanguage'
-import { log } from 'core/functions/logging'
+import { BetterObject } from '@bhbr/better-things'
+import { NonterminalSymbol, TerminalSymbol, Sentence, SentenceTree, SentenceTreeForm, ComposedSentenceTreeForm, Rule } from './SentenceTypes.js'
+import { FormalLanguage } from './FormalLanguage.js'
+import { log } from 'functions/logging.js'
 
 
 export class FormalSystem extends FormalLanguage {

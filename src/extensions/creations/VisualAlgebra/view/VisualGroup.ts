@@ -1,9 +1,9 @@
 
-import { VisualSymbol } from './VisualSymbol'
-import { VisualFormula } from './VisualFormula'
-import { FORMULA_PADDING } from './constants'
-import { log } from 'core/functions/logging'
-import { AlgebraParser } from '../model/AlgebraParser'
+import { VisualSymbol } from './VisualSymbol.js'
+import { VisualFormula } from './VisualFormula.js'
+import { FORMULA_PADDING } from './constants.js'
+import { log } from 'functions/logging.js'
+import { AlgebraParser } from '../model/AlgebraParser.js'
 
 export class VisualGroup extends VisualFormula {
 

@@ -1,8 +1,8 @@
 
-import { DesmosCalculator } from './DesmosCalculator'
-import { remove } from 'core/functions/arrays'
-import { DependencyLink } from 'core/linkables/DependencyLink'
-import { log } from 'core/functions/logging'
+import { DesmosCalculator } from '../DesmosCalculator.js'
+import { remove } from '@bhbr/betray'
+import { DependencyLink } from 'linkables/DependencyLink.js'
+import { log } from 'functions/logging.js'
 
 export class DesmosExpressionSheet extends DesmosCalculator {
 

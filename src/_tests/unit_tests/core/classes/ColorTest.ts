@@ -1,6 +1,6 @@
 
-import { Color } from 'core/classes/Color'
-import { ValueTest, BundledTest } from '_tests/Tests'
+import { Color } from 'classes/Color.js'
+import { ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const ColorTest = new BundledTest({
 	name: 'Color test',

@@ -1,13 +1,13 @@
 
-import { getPaper } from 'core/functions/getters'
-import { log } from 'core/functions/logging'
-import { Mobject } from 'core/mobjects/Mobject'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Color } from 'core/classes/Color'
-import { SentenceTree, SubtreeLocation } from '../model/SentenceTypes'
-import { VisualSymbol } from './VisualSymbol'
-import { VisualCalculation } from './VisualCalculation'
-import { conditionTrigger } from 'core/functions/various'
+import { getPaper } from 'functions/getters.js'
+import { log } from 'functions/logging.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Color } from 'classes/Color.js'
+import { SentenceTree, SubtreeLocation } from '../model/SentenceTypes.js'
+import { VisualSymbol } from './VisualSymbol.js'
+import { VisualCalculation } from './VisualCalculation.js'
+import { conditionTrigger } from 'functions/various.js'
 import {
 	FORMULA_BACKGROUND_COLOR,
 	FORMULA_BORDER_COLOR,
@@ -16,7 +16,7 @@ import {
 	FORMULA_HIGHLIGHT_BACKGROUND_COLORS,
 	FORMULA_HIGHLIGHT_BORDER_COLORS,
 	FORMULA_HIGHLIGHT_BORDER_WIDTH,
-} from './constants'
+} from './constants.js'
 
 export class VisualFormula extends Mobject {
 
@@ -100,6 +100,30 @@ export class VisualFormula extends Mobject {
 			frameWidth: this.getWidth(),
 			frameHeight: this.getHeight()
 		})
+	}
+
+	onPointerDown(e: ScreenEvent) {
+		this.onPointerMove(e)
+	}
+
+	onPointerMove(e: ScreenEvent) {
+		if (e.target === undefined) { return }
+		let mob = (e.target as any).mobject
+		if (mob === undefined) { return }
+		if (mob instanceof VisualFormula) {
+			if (this.selectedSubformula === mob) { return }
+			if (this.selectedSubformula) {
+				this.selectedSubformula.unhighlightBackground()
+			}
+			this.update({
+				selectedSubformula: mob
+			})
+			mob.highlightBackground()
+		}
+	}
+
+	onPointerUp(e: ScreenEvent) {
+		this.onTap(e)
 	}
 
 	onTap(e: ScreenEvent) {
@@ -218,9 +242,15 @@ export class VisualFormula extends Mobject {
 	}
 
 	unhighlightBackground() {
-		this.update({
-			backgroundColor: FORMULA_BACKGROUND_COLOR
-		})
+		if (this.constructor.name == 'VisualNumber' || this.constructor.name == 'VisualVariable') {
+			this.update({
+				backgroundColor: Color.clear()
+			})
+		} else {
+			this.update({
+				backgroundColor: FORMULA_BACKGROUND_COLOR
+			})
+		}
 	}
 
 

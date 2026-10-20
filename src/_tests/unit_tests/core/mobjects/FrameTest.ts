@@ -1,8 +1,8 @@
 
-import { Frame } from 'core/mobjects/Frame'
-import { vertex, vertexEquals } from 'core/functions/vertex'
-import { DEGREES } from 'core/constants'
-import { AssertionTest, ValueTest, BundledTest } from '_tests/Tests'
+import { Frame } from 'mobjects/Frame.js'
+import { vertex, vertexEquals } from '@bhbr/affr2'
+import { DEGREES } from 'constants.js'
+import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const FrameTest = new BundledTest({
 	name: 'Frame test',

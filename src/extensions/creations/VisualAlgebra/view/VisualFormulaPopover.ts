@@ -1,7 +1,7 @@
 
-import { Popover } from 'core/ui/Popover'
-import { VisualFormula } from 'extensions/creations/VisualAlgebra/view/VisualFormula'
-import { log} from 'core/functions/logging'
+import { Popover } from 'ui/Popover.js'
+import { VisualFormula } from 'extensions/creations/VisualAlgebra/view/VisualFormula.js'
+import { log} from 'functions/logging.js'
 
 export class VisualFormulaPopover extends Popover {
 

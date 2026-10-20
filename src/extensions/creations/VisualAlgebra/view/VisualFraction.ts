@@ -1,9 +1,9 @@
 
-import { VisualFormula } from './VisualFormula'
-import { VisualOperator } from './VisualOperator'
-import { FORMULA_PADDING } from './constants'
-import { Line } from 'core/shapes/Line'
-import { log } from 'core/functions/logging'
+import { VisualFormula } from './VisualFormula.js'
+import { VisualOperator } from './VisualOperator.js'
+import { FORMULA_PADDING } from './constants.js'
+import { Line } from 'shapes/Line.js'
+import { log } from 'functions/logging.js'
 
 export class VisualFraction extends VisualOperator {
 

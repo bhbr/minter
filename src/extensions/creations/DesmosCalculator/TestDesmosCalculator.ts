@@ -1,12 +1,12 @@
 
-import { Linkable } from 'core/linkables/Linkable'
-import { getPaper } from 'core/functions/getters'
-import { View } from 'core/mobjects/View'
-import { Mobject } from 'core/mobjects/Mobject'
-import { ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { log } from 'core/functions/logging'
-import { DesmosCalculator } from './DesmosCalculator'
+import { Linkable } from 'linkables/Linkable.js'
+import { getPaper } from 'functions/getters.js'
+import { View } from 'mobjects/View.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { log } from 'functions/logging.js'
+import { DesmosCalculator } from './DesmosCalculator.js'
 
 declare var Desmos: any
 

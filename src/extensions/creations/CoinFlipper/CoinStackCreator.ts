@@ -1,6 +1,6 @@
 
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { CoinStack } from './CoinStack'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { CoinStack } from './CoinStack.js'
 
 export class CoinStackCreator extends DraggingCreator {
 

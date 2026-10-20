@@ -1,6 +1,6 @@
 
-import { ConStraitConstructor } from '../ConStraitConstructor'
-import { ConLine } from './ConLine'
+import { ConStraitConstructor } from '../ConStraitConstructor.js'
+import { ConLine } from './ConLine.js'
 
 export class ConLineConstructor extends ConStraitConstructor {
 

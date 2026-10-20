@@ -1,8 +1,8 @@
 
-import { Mobject } from 'core/mobjects/Mobject'
-import { Board } from 'core/boards/Board'
-import { PolypadMobject } from './PolypadMobject'
-import { SpanningCreator } from 'core/creators/SpanningCreator'
+import { Mobject } from 'mobjects/Mobject.js'
+import { Board } from 'boards/Board.js'
+import { PolypadMobject } from './PolypadMobject.js'
+import { SpanningCreator } from 'creators/SpanningCreator.js'
 
 export class PolypadCreator extends SpanningCreator {
 

@@ -1,14 +1,13 @@
 
-import { Linkable } from 'core/linkables/Linkable'
-import { getPaper } from 'core/functions/getters'
-import { View } from 'core/mobjects/View'
-import { Mobject } from 'core/mobjects/Mobject'
-import { ScreenEvent, ScreenEventHandler } from 'core/mobjects/screen_events'
-import { Rectangle } from 'core/shapes/Rectangle'
-import { log } from 'core/functions/logging'
-import { ExtendedObject } from 'core/classes/ExtendedObject'
-import { deepCopy } from 'core/functions/copying'
-import { Color } from 'core/classes/Color'
+import { Linkable } from 'linkables/Linkable.js'
+import { getPaper } from 'functions/getters.js'
+import { View } from 'mobjects/View.js'
+import { Mobject } from 'mobjects/Mobject.js'
+import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Rectangle } from 'shapes/Rectangle.js'
+import { log } from 'functions/logging.js'
+import { BetterObject } from '@bhbr/better-things'
+import { Color } from 'classes/Color.js'
 
 declare var Desmos: any
 
@@ -114,7 +113,7 @@ export class DesmosCalculator extends Linkable {
 
 	layoutContent() { }
 
-	createCalculator() {
+	createCalculator(options: object = {}) {
 		this.calculator = Desmos.GraphingCalculator(this.innerCanvas.view.div, this.options)
 		this.calculator.observeEvent('change', this.onChange.bind(this))
 		window.setTimeout(this.layoutContent.bind(this), 50)

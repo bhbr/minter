@@ -1,7 +1,7 @@
 
-import { NumberListValuedFunctionBox } from './NumberListValuedFunctionBox'
-import { numberArrayCumAverage } from 'core/functions/numberArray'
-import { DraggingCreator } from 'core/creators/DraggingCreator'
+import { NumberListValuedFunctionBox } from './NumberListValuedFunctionBox.js'
+import { numberArrayCumAverage } from 'functions/numberArray.js'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
 
 export class CumAverageBox extends NumberListValuedFunctionBox {
 	

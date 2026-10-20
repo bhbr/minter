@@ -1,7 +1,7 @@
 
-import { DraggingCreator } from 'core/creators/DraggingCreator'
-import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox } from './BinaryOperatorBox'
-import { LessThanBox } from './ComparisonBox'
+import { DraggingCreator } from 'creators/DraggingCreator.js'
+import { BinaryOperatorBox, AddBox, SubtractBox, MultiplyBox, DivideBox } from './BinaryOperatorBox.js'
+import { LessThanBox } from './ComparisonBox.js'
 
 export class BinaryOperatorBoxCreator extends DraggingCreator {
 	declare creation: BinaryOperatorBox

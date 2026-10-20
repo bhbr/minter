@@ -1,6 +1,6 @@
 
-import { ConPoint } from './ConPoint'
-import { ScreenEventHandler, ScreenEvent } from 'core/mobjects/screen_events'
+import { ConPoint } from './ConPoint.js'
+import { ScreenEventHandler, ScreenEvent } from 'mobjects/screen_events.js'
 
 export class FreePoint extends ConPoint {
 

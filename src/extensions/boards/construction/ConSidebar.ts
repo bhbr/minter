@@ -1,9 +1,9 @@
 
-import { Sidebar } from 'core/Sidebar'
-import { SidebarButton } from 'core/sidebar_buttons/SidebarButton'
-import { DragButton } from 'core/sidebar_buttons/DragButton'
-import { StraitButton } from './straits/StraitButton'
-import { ConCircleButton } from './ConCircle/ConCircleButton'
+import { Sidebar } from 'Sidebar.js'
+import { SidebarButton } from 'sidebar_buttons/SidebarButton.js'
+import { DragButton } from 'sidebar_buttons/DragButton.js'
+import { StraitButton } from './straits/StraitButton.js'
+import { ConCircleButton } from './ConCircle/ConCircleButton.js'
 
 export class ConSidebar extends Sidebar {
 
