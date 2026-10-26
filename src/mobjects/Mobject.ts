@@ -77,7 +77,7 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	mutabilities(): object {
 		return {
 			view: 'on_init',
-			children: 'never'
+			children: 'on_update' // never?
 		}
 	}
 
@@ -240,9 +240,9 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	get superMobject(): this { return this.parent as this }
 	set superMobject(newValue: this) { this.parent = newValue }
 	get submobjects(): Array<Mobject> { return this.children }
-	set submobjects(newValue: Array<Mobject>) { this.children = newValue }
+	set submobjects(newValue: Array<Mobject>) { this.update({ children: newValue }) }
 	get submobs(): Array<Mobject> { return this.submobjects }
-	set submobs(newValue: Array<Mobject>) { this.submobs = newValue }
+	set submobs(newValue: Array<Mobject>) { this.update({ submobs: newValue }) }
 
 	add(submob: Mobject) {
 		// Set this as the submob's parent

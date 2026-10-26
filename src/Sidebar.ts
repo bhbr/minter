@@ -10,13 +10,15 @@ import { Paper } from 'Paper.js'
 import { Mobject } from 'mobjects/Mobject.js'
 import { SidebarButton } from 'sidebar_buttons/SidebarButton.js'
 import { DragButton } from 'sidebar_buttons/DragButton.js'
+import { LinkButton } from 'sidebar_buttons/LinkButton.js'
+import { ControlsButton } from 'sidebar_buttons/ControlsButton.js'
+import { EraseButton } from 'sidebar_buttons/EraseButton.js'
 import { log } from 'functions/logging.js'
 import { SidebarView } from './SidebarView.js'
 import { ScreenEvent, isTouchDevice, separateSidebar } from 'mobjects/screen_events.js'
 
-// StartSidebar needs to be imported *somewhere* for TS to compile it
-import { DemoSidebar } from './extensions/boards/demo/DemoSidebar.js'
-import { CoinFlipSidebar} from './extensions/boards/coin-flip/CoinFlipSidebar.js'
+// TestSidebar needs to be imported *somewhere* for TS to compile it
+//import { TestSidebar } from './extensions/boards/demo/DemoSidebar.js'
 
 interface Window { webkit?: any }
 
@@ -42,10 +44,16 @@ export class Sidebar extends Mobject {
 				height: Math.max(window.screen.width, window.screen.height) + 500
 			}),
 			availableButtonClasses: [
-				DragButton
+				DragButton,
+				LinkButton,
+				ControlsButton,
+				EraseButton
 			],
 			buttons: [
-				new DragButton()
+				new DragButton(),
+				new LinkButton(),
+				new ControlsButton(),
+				new EraseButton()
 			],
 			frameWidth: SIDEBAR_WIDTH,
 			frameHeight: Math.max(window.screen.width, window.screen.height) + 500,
@@ -56,8 +64,8 @@ export class Sidebar extends Mobject {
 
 	mutabilities(): object {
 		return {
-			view: 'never',
-			background: 'never'
+			view: 'in_subclass',
+			background: 'in_subclass'
 		}
 	}
 

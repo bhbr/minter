@@ -9,9 +9,8 @@ import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'constants.js'
 import { PaperView } from './PaperView.js'
 import { APILoader } from 'apis/APILoader.js'
 
-// StartPaper needs to be imported *somewhere* for TS to compile it
-import { DemoPaper } from './extensions/boards/demo/DemoPaper.js'
-import { CoinFlipPaper } from './extensions/boards/coin-flip/CoinFlipPaper.js'
+// TestPaper needs to be imported *somewhere* for TS to compile it
+//import { TestPaper } from './TestPaper.js'
 
 export class Paper extends Board {
 

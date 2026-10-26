@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" charset="utf-8"/>
+        <link rel="stylesheet" href="./minter.css">
+       
+       <script type="importmap">
+         {
+           "imports": {
+             "minter.js": "../dist/minter.js",
+             "TestPaper.js": "../dist/TestPaper.js",
+             "TestSidebar.js": "../dist/TestSidebar.js",
+             "Paper.js": "../dist/Paper.js",
+             "Sidebar.js": "../dist/Sidebar.js",
+             "PaperView.js": "../dist/PaperView.js",
+             "SidebarView.js": "../dist/SidebarView.js",
+             "constants.js": "../dist/constants.js",
+             "_tests/": "../dist/_tests/",
+             "animation_sequences/": "../dist/animation_sequences/",
+             "apis/": "../dist/apis/",
+             "boards/": "../dist/boards/",
+             "classes/": "../dist/classes/",
+             "creators/": "../dist/creators/",
+             "extensions/": "../dist/extensions/",
+             "functions/": "../dist/functions/",
+             "linkables/": "../dist/linkables/",
+             "mobjects/": "../dist/mobjects/",
+             "shapes/": "../dist/shapes/",
+             "sidebar_buttons/": "../dist/sidebar_buttons/",
+             "ui/": "../dist/ui/",
+             "vmobjects/": "../dist/vmobjects/",
+             "@bhbr/tsts": "../node_modules/@bhbr/tsts/dist/tsts.js",
+             "@bhbr/egalite": "../node_modules/@bhbr/egalite/dist/egalite.js",
+             "@bhbr/copycat": "../node_modules/@bhbr/copycat/dist/copycat.js",
+             "@bhbr/betray": "../node_modules/@bhbr/betray/dist/betray.js",
+             "@bhbr/upper-class": "../node_modules/@bhbr/upper-class/dist/upper-class.js",
+             "@bhbr/better-things": "../node_modules/@bhbr/better-things/dist/index.js",
+             "@bhbr/affr2": "../node_modules/@bhbr/affr2/dist/index.js"
+           }
+         }
+       </script>
+
+    </head>
+    
+    <body class="ipad" style="overflow: hidden;">
+        <div id="paper_id" width="100%" style="background-color: black;">
+        </div>
+        <div id="htmlConsole" hidden style="width: 1200px; height: 300px; position: fixed; bottom: 50px; background-color: green; color: white; white-space: pre; opacity: 0.5; font-size: 14px; font-family: Helvetica; overflow: auto;"></div>
+
+        <script type='module' src='../dist/TestPaper.js'></script>
+
+    </body>
+</html>

@@ -37,6 +37,7 @@ export class RoundedRectangle extends CurvedShape {
 	}
 	set cornerRadius(newValue: number) {
 		this.cornerRadii = [newValue, newValue, newValue, newValue]
+		this.view.svg.style.borderRadius = `${Math.min(...this.cornerRadii)}px`
 	}
 
 	allCornerRadiiEqual(): boolean {

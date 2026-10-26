@@ -190,7 +190,7 @@ export class SidebarButton extends Pill {
 
 	setupBaseIcon() {
 		let baseIcon = new ImageView({
-				imageLocation: `../../assets/${this.baseIconName()}.png`,
+				imageLocation: `../assets/${this.baseIconName()}.png`,
 				frameWidth: this.iconSize,
 				frameHeight: this.iconSize
 			})
@@ -209,7 +209,7 @@ export class SidebarButton extends Pill {
 		for (let i = 1; i < this.nbOptions(); i++) {
 			let iconName = this.imageNameForIndex(i).replaceAll(' ', '_')
 			let icon = new ImageView({
-				imageLocation: `../../assets/${iconName}.png`,
+				imageLocation: `../assets/${iconName}.png`,
 				frameWidth: this.iconSize,
 				frameHeight: this.iconSize,
 				anchor: [this.icons[0].anchor[0] + i * this.optionSpacing, this.icons[0].anchor[1]]
