@@ -1,7 +1,7 @@
 
-import { Circle } from 'shapes/Circle.js'
+import { Circle } from 'minter/shapes/Circle.js'
 import { BULLET_RADIUS } from './constants.js'
-import { Color } from 'classes/Color.js'
+import { Color } from 'minter/classes/Color.js'
 import { vertex } from '@bhbr/affr2'
 import { DependencyLink } from './DependencyLink.js'
 

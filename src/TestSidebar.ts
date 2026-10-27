@@ -1,5 +1,5 @@
 
-import { Sidebar } from 'Sidebar.js'
+import { Sidebar } from './Sidebar.js'
 
 export class TestSidebar extends Sidebar {}
 

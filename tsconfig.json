@@ -19,9 +19,12 @@
             "ES2021",
             "DOM",
             "DOM.Iterable"
-        ]
+        ],
+        "paths": {
+            "minter/*": ["./*"]
+            }
     },
     "include": [
-        "./src/**/*.ts"
+        "./**/*.ts"
     ]
 }

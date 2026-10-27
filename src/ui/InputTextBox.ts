@@ -1,13 +1,13 @@
 
-import { Rectangle } from 'shapes/Rectangle.js'
+import { Rectangle } from 'minter/shapes/Rectangle.js'
 import { TextLabel } from './TextLabel.js'
-import { Color } from 'classes/Color.js'
-import { Linkable } from 'linkables/Linkable.js'
-import { log  } from 'functions/logging.js'
-import { getPaper, getSidebar } from 'functions/getters.js'
-import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'mobjects/screen_events.js'
-import { SidebarButton } from 'sidebar_buttons/SidebarButton.js'
-import { Mobject } from 'mobjects/Mobject.js'
+import { Color } from 'minter/classes/Color.js'
+import { Linkable } from 'minter/linkables/Linkable.js'
+import { log  } from 'minter/functions/logging.js'
+import { getPaper, getSidebar } from 'minter/functions/getters.js'
+import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'minter/mobjects/screen_events.js'
+import { SidebarButton } from 'minter/sidebar_buttons/SidebarButton.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
 
 
 export class InputTextBox extends Mobject {

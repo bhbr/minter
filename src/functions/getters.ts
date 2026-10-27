@@ -1,6 +1,6 @@
 
-import { Paper } from 'Paper.js'
-import { Sidebar } from 'Sidebar.js'
+import { Paper } from 'minter/Paper.js'
+import { Sidebar } from 'minter/Sidebar.js'
 
 export function getPaper(): Paper {
 	let paperDiv = document.querySelector('#paper_id')

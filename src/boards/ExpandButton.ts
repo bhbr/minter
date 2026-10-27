@@ -1,11 +1,11 @@
 
 import { Board } from './Board.js'
-import { TextLabel } from 'ui/TextLabel.js'
-import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { TextLabel } from 'minter/ui/TextLabel.js'
+import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { vertex, vertexOrigin, vertexSubtract } from '@bhbr/affr2'
 import { Transform } from '@bhbr/affr2'
-import { Color } from 'classes/Color.js'
-import { Circle } from 'shapes/Circle.js'
+import { Color } from 'minter/classes/Color.js'
+import { Circle } from 'minter/shapes/Circle.js'
 
 export class ExpandButton extends Circle {
 

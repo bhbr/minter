@@ -1,13 +1,13 @@
 
-import { Dependency } from 'mobjects/Dependency.js'
-import { Line } from 'shapes/Line.js'
-import { Mobject } from 'mobjects/Mobject.js'
-import { Board } from 'boards/Board.js'
+import { Dependency } from 'minter/mobjects/Dependency.js'
+import { Line } from 'minter/shapes/Line.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
+import { Board } from 'minter/boards/Board.js'
 import { LinkBullet } from './LinkBullet.js'
 import { LINK_LINE_WIDTH } from './constants.js'
-import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { LinkHook } from './LinkHook.js'
-import { Color } from 'classes/Color.js'
+import { Color } from 'minter/classes/Color.js'
 
 export class DependencyLink extends Mobject {
 /*

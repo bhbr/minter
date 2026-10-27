@@ -1,5 +1,5 @@
 
-import { CurvedLine } from 'vmobjects/CurvedLine.js'
+import { CurvedLine } from 'minter/vmobjects/CurvedLine.js'
 import { vertex, vertexArray, vertexCentrallyScaledBy, vertexTranslatedBy } from '@bhbr/affr2'
 
 export class Pill extends CurvedLine {

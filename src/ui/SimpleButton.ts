@@ -1,10 +1,10 @@
 
-import { Mobject } from 'mobjects/Mobject.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
 import { TextLabel } from './TextLabel.js'
-import { RoundedRectangle } from 'shapes/RoundedRectangle.js'
-import { Color } from 'classes/Color.js'
-import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
-import { log } from 'functions/logging.js'
+import { RoundedRectangle } from 'minter/shapes/RoundedRectangle.js'
+import { Color } from 'minter/classes/Color.js'
+import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
+import { log } from 'minter/functions/logging.js'
 
 export class SimpleButton extends RoundedRectangle {
 

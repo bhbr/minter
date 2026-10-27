@@ -1,7 +1,7 @@
 
 import { Transform, vertex, vertexArray, vertexOrigin, vertexTranslatedBy, vertexAdd, vertexDivide, vertexCentrallyScaledBy, vertexArrayImageUnder } from '@bhbr/affr2'
-import { CurvedShape } from 'vmobjects/CurvedShape.js'
-import { TAU } from 'constants.js'
+import { CurvedShape } from 'minter/vmobjects/CurvedShape.js'
+import { TAU } from 'minter/constants.js'
 
 export class RoundedRectangle extends CurvedShape {
 

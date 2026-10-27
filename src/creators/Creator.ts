@@ -1,9 +1,9 @@
 
-import { Mobject } from 'mobjects/Mobject.js'
-import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
+import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { vertex, vertexArray, vertexAdd, vertexSubtract } from '@bhbr/affr2'
-import { Board } from 'boards/Board.js'
-import { log } from 'functions/logging.js'
+import { Board } from 'minter/boards/Board.js'
+import { log } from 'minter/functions/logging.js'
 
 export class Creator extends Mobject {
 

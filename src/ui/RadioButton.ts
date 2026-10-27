@@ -1,9 +1,9 @@
 
-import { Circle } from 'shapes/Circle.js'
+import { Circle } from 'minter/shapes/Circle.js'
 import { TextLabel } from './TextLabel.js'
 import { RadioButtonList } from './RadioButtonList.js'
-import { Color } from 'classes/Color.js'
-import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Color } from 'minter/classes/Color.js'
+import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 
 export class RadioButton extends Circle {
 

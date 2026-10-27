@@ -1,6 +1,6 @@
 
-import { isTouchDevice, separateSidebar } from 'mobjects/screen_events.js'
-import { SHOW_HTML_CONSOLE } from 'constants.js'
+import { isTouchDevice, separateSidebar } from 'minter/mobjects/screen_events.js'
+import { SHOW_HTML_CONSOLE } from 'minter/constants.js'
 
 let debugging = true
 let logTimestamps = false

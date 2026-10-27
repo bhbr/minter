@@ -1,16 +1,16 @@
 
 import { vertex, vertexTranslatedBy, vertexOrigin } from '@bhbr/affr2'
-import { Color } from 'classes/Color.js'
+import { Color } from 'minter/classes/Color.js'
 import { Linkable } from './Linkable.js'
-import { RoundedRectangle } from 'shapes/RoundedRectangle.js'
+import { RoundedRectangle } from 'minter/shapes/RoundedRectangle.js'
 import { LinkHook } from './LinkHook.js'
 import { LinkOutlet } from './LinkOutlet.js'
-import { TextLabel } from 'ui/TextLabel.js'
+import { TextLabel } from 'minter/ui/TextLabel.js'
 import { IO_LIST_WIDTH, HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from './constants.js'
-import { log } from 'functions/logging.js'
+import { log } from 'minter/functions/logging.js'
 import { clear, remove } from '@bhbr/betray'
 import { IOProperty } from './Linkable.js'
-import { ScreenEvent, ScreenEventHandler } from 'mobjects/screen_events.js'
+import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 
 export class IOList extends RoundedRectangle {
 /*

@@ -1,9 +1,9 @@
 
-import { CircularArc } from 'shapes/CircularArc.js'
-import { TAU } from 'constants.js'
+import { CircularArc } from 'minter/shapes/CircularArc.js'
+import { TAU } from 'minter/constants.js'
 import { vertex } from '@bhbr/affr2'
-import { PolygonalLine } from 'vmobjects/PolygonalLine.js'
-import { log } from 'functions/logging.js'
+import { PolygonalLine } from 'minter/vmobjects/PolygonalLine.js'
+import { log } from 'minter/functions/logging.js'
 
 export type ArrowTipStyle = 'v' | 'triangle' | 'dart'
 

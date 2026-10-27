@@ -1,5 +1,5 @@
 
-import { Linkable } from 'linkables/Linkable.js'
+import { Linkable } from 'minter/linkables/Linkable.js'
 import { InputTextBox } from './InputTextBox.js'
 
 export class LinkableInputTextBox extends Linkable {

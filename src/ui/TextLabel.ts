@@ -1,7 +1,7 @@
 
-import { Mobject } from 'mobjects/Mobject.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
 import { TextLabelView } from './TextLabelView.js'
-import { Color } from 'classes/Color.js'
+import { Color } from 'minter/classes/Color.js'
 
 export type HorizontalAlignment = 'left' | 'center' | 'right'
 export type VerticalAlignment = 'top' | 'center' | 'bottom'

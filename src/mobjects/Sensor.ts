@@ -3,9 +3,9 @@ import { Mobject } from './Mobject.js'
 import { BetterObject } from '@bhbr/better-things'
 import { ScreenEventHandler, ScreenEventDevice, ScreenEvent, ScreenEventType, screenEventDevice, screenEventType, eventVertex, isTouchDevice } from './screen_events.js'
 import { vertex, Transform } from '@bhbr/affr2'
-import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'constants.js'
-import { log, logString } from 'functions/logging.js'
-import { getPaper, getSidebar } from 'functions/getters.js'
+import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'minter/constants.js'
+import { log, logString } from 'minter/functions/logging.js'
+import { getPaper, getSidebar } from 'minter/functions/getters.js'
 
 export class Sensor extends BetterObject {
 	
