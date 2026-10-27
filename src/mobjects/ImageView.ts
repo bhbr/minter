@@ -1,5 +1,5 @@
 
-import { View } from 'mobjects/View.js'
+import { View } from './View.js'
 
 export class ImageView extends View {
 	

@@ -1,7 +1,5 @@
 
-//import { TAU } from 'constants.js'
-
-let TAU = 2 * Math.PI
+let TAU: number = 2 * Math.PI
 
 export class Color {
 // Color objects handle conversion to HTML and CSS formats and have a few other convenient methods

@@ -1,5 +1,5 @@
 
-import { Color } from 'classes/Color.js'
+import { Color } from 'minter/classes/Color.js'
 import { vertex } from '@bhbr/affr2'
 
 export const SIDEBAR_WIDTH: number = 100

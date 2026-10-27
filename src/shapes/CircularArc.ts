@@ -1,7 +1,7 @@
 
-import { CurvedLine } from 'vmobjects/CurvedLine.js'
+import { CurvedLine } from 'minter/vmobjects/CurvedLine.js'
 import { vertex, vertexArray, vertexTranslatedBy, vertexCentrallyScaledBy } from '@bhbr/affr2'
-import { TAU } from 'constants.js'
+import { TAU } from 'minter/constants.js'
 
 const DEFAULT_RADIUS = 10
 

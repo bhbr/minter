@@ -2,7 +2,7 @@
 import { IOList } from './IOList.js'
 import { vertex } from '@bhbr/affr2'
 import { IO_LIST_OFFSET, IO_LIST_WIDTH } from './constants.js'
-import { log } from 'functions/logging.js'
+import { log } from 'minter/functions/logging.js'
 
 export class InputList extends IOList {
 

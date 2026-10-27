@@ -1,8 +1,8 @@
 
-import { View } from 'mobjects/View.js'
+import { View } from 'minter/mobjects/View.js'
 import { VMobject } from './VMobject.js'
-import { Color } from 'classes/Color.js'
-import { log } from 'functions/logging.js'
+import { Color } from 'minter/classes/Color.js'
+import { log } from 'minter/functions/logging.js'
 import { deepCopy } from '@bhbr/copycat'
 
 export class VView extends View {

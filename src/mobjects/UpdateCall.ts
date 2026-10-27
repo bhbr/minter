@@ -1,7 +1,7 @@
 
 import { Mobject } from './Mobject.js'
 import { remove } from '@bhbr/betray'
-import { log } from 'functions/logging.js'
+import { log } from 'minter/functions/logging.js'
 
 export class UpdateCall {
 	

@@ -1,9 +1,9 @@
 
 import { Creator } from './Creator.js'
-import { Rectangle } from 'shapes/Rectangle.js'
+import { Rectangle } from 'minter/shapes/Rectangle.js'
 import { vertex, vertexAdd } from '@bhbr/affr2'
-import { Color } from 'classes/Color.js'
-import { log } from 'functions/logging.js'
+import { Color } from 'minter/classes/Color.js'
+import { log } from 'minter/functions/logging.js'
 
 export class SpanningCreator extends Creator {
 	

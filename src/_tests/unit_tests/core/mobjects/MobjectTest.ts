@@ -1,10 +1,10 @@
-import { Mobject } from 'mobjects/Mobject.js'
+import { Mobject } from 'minter/mobjects/Mobject.js'
 import { BetterObject } from '@bhbr/better-things'
-import { View } from 'mobjects/View.js'
-import { Frame } from 'mobjects/Frame.js'
+import { View } from 'minter/mobjects/View.js'
+import { Frame } from 'minter/mobjects/Frame.js'
 import { vertexAdd, vertexEquals, Transform } from '@bhbr/affr2'
-import { Color } from 'classes/Color.js'
-import { log } from 'functions/logging.js'
+import { Color } from 'minter/classes/Color.js'
+import { log } from 'minter/functions/logging.js'
 import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const MobjectTest = new BundledTest({

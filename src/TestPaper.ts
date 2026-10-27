@@ -1,5 +1,5 @@
 
-import { Paper } from 'Paper.js'
+import { Paper } from './Paper.js'
 
 export class TestPaper extends Paper {}
 

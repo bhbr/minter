@@ -1,6 +1,6 @@
 
 import { vertex } from '@bhbr/affr2'
-import { log } from 'functions/logging.js'
+import { log } from 'minter/functions/logging.js'
 
 export const isTouchDevice: boolean = (window.navigator.maxTouchPoints > 0)
 export const separateSidebar: boolean = (document.querySelector('#paper_id') === null || document.querySelector('#sidebar_id') === null)

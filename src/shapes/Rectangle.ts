@@ -1,6 +1,6 @@
 
 import { vertex, vertexOrigin } from '@bhbr/affr2'
-import { Polygon } from 'vmobjects/Polygon.js'
+import { Polygon } from 'minter/vmobjects/Polygon.js'
 
 export class Rectangle extends Polygon {
 

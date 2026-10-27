@@ -1,12 +1,12 @@
 
-import { Creator } from 'creators/Creator.js'
-import { PolygonalLine } from 'vmobjects/PolygonalLine.js'
+import { Creator } from 'minter/creators/Creator.js'
+import { PolygonalLine } from 'minter/vmobjects/PolygonalLine.js'
 import { vertex, vertexSubtract } from '@bhbr/affr2'
-import { Color } from 'classes/Color.js'
-import { ScreenEventHandler } from 'mobjects/screen_events.js'
+import { Color } from 'minter/classes/Color.js'
+import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { Transform } from '@bhbr/affr2'
-import { log } from  'functions/logging.js'
-import { Board } from 'boards/Board.js'
+import { log } from  'minter/functions/logging.js'
+import { Board } from 'minter/boards/Board.js'
 
 export class Freehand extends Creator {
 
