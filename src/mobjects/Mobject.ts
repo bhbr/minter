@@ -5,22 +5,21 @@ import { copy } from '@bhbr/copycat'
 import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events.js'
 import { vertex, vertexAdd, vertexSubtract, Transform } from '@bhbr/affr2'
 import { BetterObject } from '@bhbr/better-things'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { Dependency } from './Dependency.js'
-import { Frame } from './Frame.js'
-import { View } from './View.js'
+import { Frame } from 'minter/views/Frame.js'
+import { View } from 'minter/views/View.js'
 import { Motor } from './Motor.js'
 import { Sensor } from './Sensor.js'
-import { getPaper } from 'minter/functions/getters.js'
+import { getPaper } from 'minter/paper/getPaper.js'
 import { UpdateCall, UpdateCalls } from './UpdateCall.js'
 import { Linkable } from 'minter/linkables/Linkable.js'
 
 export class Mobject extends BetterObject {
 
-/*
-A mobject (math object) has a view with an underlying state and logic
-for drawing (View), animation (Motor) and user interaction (Sensor).
- */
+	/*
+	A mobject (math object) has a view with an underlying state and logic for drawing (View), animation (Motor) and user interaction (Sensor).
+	*/
 
 	//////////////////////////////////////////////////////////
 	//                                                      //
@@ -29,26 +28,17 @@ for drawing (View), animation (Motor) and user interaction (Sensor).
 	//////////////////////////////////////////////////////////
 
 	/*
-	Subclasses dot NOT get their own explicit constructor.
-	The state is completely set by fullDefaults().
-	Any additional actions are performed afterwards in setup().
+	Subclasses dot NOT get their own explicit constructor. The state is completely set by fullDefaults(). Any additional actions are performed afterwards in setup().
 	
-	Subclasses may also have quite a different setup
-	than their superclass, and would otherwise have to undo
-	a lot of the superclass's constructor setup.
-	(E. g. a Circle's anchor should not be set, instead
-	its midpoint should. A Circle's anchor acts like
-	a computed property.)
+	Subclasses may also have quite a different setup than their superclass, and would otherwise have to undo a lot of the superclass's constructor setup. (E. g. a Circle's anchor should not be set, instead its midpoint should. A Circle's anchor acts like a computed property.)
 	
-	It also allows to control the setting of default
-	state variables.
+	It also allows to control the setting of default state variables.
 	*/
 
 	constructor(args: object = {}) {
-	/*
-	A mobject is initialized by providing a dictionary (object)
-	of parameters (args).
-	*/
+		/*
+		A mobject is initialized by providing a dictionary (object) of parameters (args).
+		*/
 		super(args)
 		this.setup()
 		this.update()

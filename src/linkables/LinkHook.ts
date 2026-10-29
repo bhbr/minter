@@ -2,7 +2,7 @@
 import { vertex } from '@bhbr/affr2'
 import { Linkable } from './Linkable.js'
 import { Circle } from 'minter/shapes/Circle.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { HOOK_RADIUS, BULLET_RADIUS } from './constants.js'
 import { LinkOutlet } from './LinkOutlet.js'
 import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'

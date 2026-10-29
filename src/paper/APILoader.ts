@@ -1,6 +1,6 @@
 
 import { BetterObject } from '@bhbr/better-things'
-import { getPaper } from 'minter/functions/getters.js'
+import { getPaper } from 'minter/paper/getPaper.js'
 
 type APILoadStatus = 'pending' | 'loading' | 'loaded'
 

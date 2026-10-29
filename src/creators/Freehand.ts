@@ -2,7 +2,7 @@
 import { Creator } from 'minter/creators/Creator.js'
 import { PolygonalLine } from 'minter/vmobjects/PolygonalLine.js'
 import { vertex, vertexSubtract } from '@bhbr/affr2'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { Transform } from '@bhbr/affr2'
 import { log } from  'minter/functions/logging.js'

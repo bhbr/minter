@@ -2,7 +2,7 @@
 import { SidebarButton } from './SidebarButton.js'
 import { BUTTON_SCALE_FACTOR } from './button_geometry.js'
 import { log, htmlLog } from 'minter/functions/logging.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { ScreenEvent } from 'minter/mobjects/screen_events.js'
 
 export class ToggleButton extends SidebarButton {

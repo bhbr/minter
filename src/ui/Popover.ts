@@ -3,7 +3,7 @@ import { Mobject } from 'minter/mobjects/Mobject.js'
 import { VMobject } from 'minter/vmobjects/VMobject.js'
 import { CurvedShape } from 'minter/vmobjects/CurvedShape.js'
 import { vertex, vertexArray, vertexOrigin, vertexSubtract, Transform } from '@bhbr/affr2'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { log } from 'minter/functions/logging.js'
 import { TAU } from 'minter/constants.js'
 

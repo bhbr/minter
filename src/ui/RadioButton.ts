@@ -2,7 +2,7 @@
 import { Circle } from 'minter/shapes/Circle.js'
 import { TextLabel } from './TextLabel.js'
 import { RadioButtonList } from './RadioButtonList.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 
 export class RadioButton extends Circle {

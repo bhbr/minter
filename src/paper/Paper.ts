@@ -1,16 +1,13 @@
 
 import { log } from 'minter/functions/logging.js'
 import { remove, convertStringToArray } from '@bhbr/betray'
-import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from 'minter/mobjects/screen_events.js'
+import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from '../mobjects/screen_events.js'
 import { vertex, vertexOrigin } from '@bhbr/affr2'
 import { Board } from 'minter/boards/Board.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'minter/constants.js'
 import { PaperView } from './PaperView.js'
-import { APILoader } from 'minter/apis/APILoader.js'
-
-// TestPaper needs to be imported *somewhere* for TS to compile it
-//import { TestPaper } from './TestPaper.js'
+import { APILoader } from './APILoader.js'
 
 export class Paper extends Board {
 
@@ -231,7 +228,7 @@ export class Paper extends Board {
 
 }
 
-
+let p = new Paper()
 
 
 

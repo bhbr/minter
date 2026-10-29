@@ -1,6 +1,6 @@
 
 import { vertex, vertexTranslatedBy, vertexOrigin } from '@bhbr/affr2'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { Linkable } from './Linkable.js'
 import { RoundedRectangle } from 'minter/shapes/RoundedRectangle.js'
 import { LinkHook } from './LinkHook.js'

@@ -2,7 +2,7 @@
 import { BetterObject } from '@bhbr/better-things'
 import { Frame } from './Frame.js'
 import { vertex, Transform } from '@bhbr/affr2'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from './Color.js'
 import { DRAW_BORDERS } from 'minter/constants.js'
 import { Mobject } from 'minter/mobjects/Mobject.js'
 import { log } from 'minter/functions/logging.js'

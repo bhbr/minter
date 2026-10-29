@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "description": "INTERactive Math objects",
   "type": "module",
-  "main": "./dist/minter.js",
-  "types": "./dist/minter.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/minter.d.ts",
-      "import": "./dist/minter.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     }
   },
   "files": [
@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "build": "cd build && ./build.sh",
-    "test": "node dist/_tests/minter_tests.js",
+    "test": "node dist/_tests/all_tests.js",
     "prepack": "npm run build"
   },
   "repository": {

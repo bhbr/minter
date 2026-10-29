@@ -1,9 +1,11 @@
 
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { vertex } from '@bhbr/affr2'
 
+export const TESTING: boolean = true
+
 export const SIDEBAR_WIDTH: number = 100
-export const SHOW_HTML_CONSOLE: boolean = false
+export const SHOW_HTML_CONSOLE: boolean = true
 
 export const DRAW_BORDERS: boolean = false
 export const VIEW_DEBUGGING_OFFSET: vertex = [0, 0]

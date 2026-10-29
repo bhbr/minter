@@ -6,7 +6,7 @@ import { OUTLET_HORIZONTAL_SPACING } from './constants.js'
 // import { EditableLinkHook } from './EditableLinkHook'
  import { Board } from 'minter/boards/Board.js'
 import { LinkOutlet } from 'minter/linkables/LinkOutlet.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { log } from 'minter/functions/logging.js'
 import { IOProperty } from 'minter/linkables/Linkable.js'
 

@@ -2,23 +2,20 @@
 import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { SIDEBAR_WIDTH } from 'minter/constants.js'
 import { convertStringToArray } from '@bhbr/betray'
-import { getPaper } from 'minter/functions/getters.js'
-import { Color } from 'minter/classes/Color.js'
+import { getPaper } from 'minter/paper/getPaper.js'
+import { Color } from 'minter/views/Color.js'
 import { Rectangle } from 'minter/shapes/Rectangle.js'
-import { buttonAnchor } from 'minter/sidebar_buttons/button_geometry.js'
-import { Paper } from 'minter/Paper.js'
+import { buttonAnchor } from 'minter/sidebar/buttons/button_geometry.js'
+import { Paper } from 'minter/paper/Paper.js'
 import { Mobject } from 'minter/mobjects/Mobject.js'
-import { SidebarButton } from 'minter/sidebar_buttons/SidebarButton.js'
-import { DragButton } from 'minter/sidebar_buttons/DragButton.js'
-import { LinkButton } from 'minter/sidebar_buttons/LinkButton.js'
-import { ControlsButton } from 'minter/sidebar_buttons/ControlsButton.js'
-import { EraseButton } from 'minter/sidebar_buttons/EraseButton.js'
+import { SidebarButton } from 'minter/sidebar/buttons/SidebarButton.js'
+import { DragButton } from 'minter/sidebar/buttons/DragButton.js'
+import { LinkButton } from 'minter/sidebar/buttons/LinkButton.js'
+import { ControlsButton } from 'minter/sidebar/buttons/ControlsButton.js'
+import { EraseButton } from 'minter/sidebar/buttons/EraseButton.js'
 import { log } from 'minter/functions/logging.js'
 import { SidebarView } from './SidebarView.js'
 import { ScreenEvent, isTouchDevice, separateSidebar } from 'minter/mobjects/screen_events.js'
-
-// TestSidebar needs to be imported *somewhere* for TS to compile it
-//import { TestSidebar } from './extensions/boards/demo/DemoSidebar.js'
 
 interface Window { webkit?: any }
 
@@ -247,4 +244,6 @@ export class Sidebar extends Mobject {
 
 }
 
-let creating: boolean = false
+
+let s = new Sidebar()
+

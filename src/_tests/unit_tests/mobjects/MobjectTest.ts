@@ -1,9 +1,9 @@
 import { Mobject } from 'minter/mobjects/Mobject.js'
 import { BetterObject } from '@bhbr/better-things'
-import { View } from 'minter/mobjects/View.js'
-import { Frame } from 'minter/mobjects/Frame.js'
+import { View } from 'minter/views/View.js'
+import { Frame } from 'minter/views/Frame.js'
 import { vertexAdd, vertexEquals, Transform } from '@bhbr/affr2'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { log } from 'minter/functions/logging.js'
 import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
 

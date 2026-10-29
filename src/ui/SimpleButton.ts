@@ -2,7 +2,7 @@
 import { Mobject } from 'minter/mobjects/Mobject.js'
 import { TextLabel } from './TextLabel.js'
 import { RoundedRectangle } from 'minter/shapes/RoundedRectangle.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { log } from 'minter/functions/logging.js'
 

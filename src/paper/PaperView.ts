@@ -1,5 +1,5 @@
 
-import { View } from 'minter/mobjects/View.js'
+import { View } from 'minter/views/View.js'
 
 export class PaperView extends View {
 	

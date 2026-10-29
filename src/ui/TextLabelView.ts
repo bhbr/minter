@@ -1,7 +1,7 @@
 
-import { View } from 'minter/mobjects/View.js'
+import { View } from 'minter/views/View.js'
 import { TextLabel, HorizontalAlignment, VerticalAlignment } from './TextLabel.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { log } from 'minter/functions/logging.js'
 
 export class TextLabelView extends View {

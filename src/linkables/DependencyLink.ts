@@ -7,7 +7,7 @@ import { LinkBullet } from './LinkBullet.js'
 import { LINK_LINE_WIDTH } from './constants.js'
 import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
 import { LinkHook } from './LinkHook.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 
 export class DependencyLink extends Mobject {
 /*

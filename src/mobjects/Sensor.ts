@@ -5,7 +5,8 @@ import { ScreenEventHandler, ScreenEventDevice, ScreenEvent, ScreenEventType, sc
 import { vertex, Transform } from '@bhbr/affr2'
 import { MAX_TAP_DELAY, MERE_TAP_DELAY, LONG_PRESS_DURATION } from 'minter/constants.js'
 import { log, logString } from 'minter/functions/logging.js'
-import { getPaper, getSidebar } from 'minter/functions/getters.js'
+import { getPaper } from 'minter/paper/getPaper.js'
+import { getSidebar } from 'minter/sidebar/getSidebar.js'
 
 export class Sensor extends BetterObject {
 	

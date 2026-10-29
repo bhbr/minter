@@ -1,7 +1,7 @@
 
 import { Mobject } from 'minter/mobjects/Mobject.js'
 import { Creator } from './Creator.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { vertex, vertexAdd, vertexSubtract } from '@bhbr/affr2'
 import { Rectangle } from 'minter/shapes/Rectangle.js'
 import { VView } from 'minter/vmobjects/VView.js'

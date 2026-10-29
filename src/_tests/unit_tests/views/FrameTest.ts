@@ -1,5 +1,5 @@
 
-import { Frame } from 'minter/mobjects/Frame.js'
+import { Frame } from 'minter/views/Frame.js'
 import { vertex, vertexEquals } from '@bhbr/affr2'
 import { DEGREES } from 'minter/constants.js'
 import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'

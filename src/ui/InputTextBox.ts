@@ -1,12 +1,13 @@
 
 import { Rectangle } from 'minter/shapes/Rectangle.js'
 import { TextLabel } from './TextLabel.js'
-import { Color } from 'minter/classes/Color.js'
+import { Color } from 'minter/views/Color.js'
 import { Linkable } from 'minter/linkables/Linkable.js'
 import { log  } from 'minter/functions/logging.js'
-import { getPaper, getSidebar } from 'minter/functions/getters.js'
+import { getPaper } from 'minter/paper/getPaper.js'
+import { getSidebar } from 'minter/sidebar/getSidebar.js'
 import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'minter/mobjects/screen_events.js'
-import { SidebarButton } from 'minter/sidebar_buttons/SidebarButton.js'
+import { SidebarButton } from 'minter/sidebar/buttons/SidebarButton.js'
 import { Mobject } from 'minter/mobjects/Mobject.js'
 
 
