@@ -12,12 +12,11 @@
     }
   },
   "files": [
-    "dist/",
-    "!dist/_tests",
-    "!dist/_to_migrate"
+    "dist",
+    "!dist/_tests"
   ],
   "scripts": {
-    "build": "cd build && ./build.sh",
+    "build": "./build.sh",
     "test": "node dist/_tests/all_tests.js",
     "prepack": "npm run build"
   },
@@ -37,6 +36,10 @@
   },
   "dependencies": {
     "@bhbr/affr2": "^1.0.0",
-    "@bhbr/betray": "^1.0.0"
+    "@bhbr/betray": "^1.0.0",
+    "@bhbr/better-things": "^1.0.0",
+    "@bhbr/egalite": "^1.2.0",
+    "@bhbr/upper-class": "^1.0.0",
+    "@bhbr/copycat": "^1.0.0"
   }
 }

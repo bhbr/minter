@@ -1,8 +1,8 @@
 
-import { Mobject } from 'minter/mobjects/Mobject.js'
-import { ScreenEvent } from 'minter/mobjects/screen_events.js'
-import { prettyPrint } from 'minter/functions/various.js'
-import { log } from 'minter/functions/logging.js'
+import { Mobject } from '../mobjects/Mobject.js'
+import { ScreenEvent } from '../mobjects/screen_events.js'
+import { prettyPrint } from '../functions/various.js'
+import { log } from '../functions/logging.js'
 
 export class Scroll extends Mobject {
 

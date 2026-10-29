@@ -1,9 +1,9 @@
 
 import { TextLabel } from './TextLabel.js'
-import { MGroup } from 'minter/mobjects/MGroup.js'
-import { Square } from 'minter/shapes/Square.js'
-import { ScreenEventHandler, ScreenEvent } from 'minter/mobjects/screen_events.js'
-import { log } from 'minter/functions/logging.js'
+import { MGroup } from '../mobjects/MGroup.js'
+import { Square } from '../shapes/Square.js'
+import { ScreenEventHandler, ScreenEvent } from '../mobjects/screen_events.js'
+import { log } from '../functions/logging.js'
 
 export class Checkbox extends MGroup {
 

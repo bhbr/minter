@@ -1,6 +1,6 @@
 
 import { SidebarButton } from './SidebarButton.js'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../../functions/logging.js'
 
 export class CreativeButton extends SidebarButton {
 

@@ -1,6 +1,6 @@
 
 import { Rectangle } from './Rectangle.js'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 
 export class Square extends Rectangle {
 

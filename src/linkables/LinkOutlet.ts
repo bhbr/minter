@@ -1,15 +1,15 @@
 
-import { TextLabel } from 'minter/ui/TextLabel.js'
-import { InputTextBox } from 'minter/ui/InputTextBox.js'
+import { TextLabel } from '../ui/TextLabel.js'
+import { InputTextBox } from '../ui/InputTextBox.js'
 import { LinkHook } from './LinkHook.js'
-import { MGroup } from 'minter/mobjects/MGroup.js'
+import { MGroup } from '../mobjects/MGroup.js'
 import { HOOK_HORIZONTAL_SPACING, IO_LIST_WIDTH } from './constants.js'
-import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
-import { getPaper } from 'minter/paper/getPaper.js'
-import { getSidebar } from 'minter/sidebar/getSidebar.js'
+import { ScreenEvent, ScreenEventHandler } from '../mobjects/screen_events.js'
+import { getPaper } from '../paper/getPaper.js'
+import { getSidebar } from '../sidebar/getSidebar.js'
 import { IOList } from './IOList.js'
 import { InputList } from './InputList.js'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 import { remove } from '@bhbr/betray'
 
 export class LinkOutlet extends MGroup {

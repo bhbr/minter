@@ -1,9 +1,10 @@
 
 import { Creator } from './Creator.js'
-import { Rectangle } from 'minter/shapes/Rectangle.js'
+import { Rectangle } from '../shapes/Rectangle.js'
 import { vertex, vertexAdd } from '@bhbr/affr2'
-import { Color } from 'minter/views/Color.js'
-import { log } from 'minter/functions/logging.js'
+import { Color } from '../views/Color.js'
+import { log } from '../functions/logging.js'
+import { Linkable } from '../linkables/Linkable.js'
 
 export class SpanningCreator extends Creator {
 	
@@ -17,7 +18,7 @@ export class SpanningCreator extends Creator {
 
 	mutabilities(): object {
 		return {
-			rectangle: 'never'
+			rectangle: 'always' // should be never (Mobject bug)
 		}
 	}
 
@@ -67,6 +68,9 @@ export class SpanningCreator extends Creator {
 			frameWidth: w,
 			frameHeight: h
 		})
+		if (this.creation instanceof Linkable) {
+			this.creation.positionIOLists()
+		}
 		this.parent.addToContent(this.creation)
 		this.parent.creator = null
 		this.parent.remove(this)

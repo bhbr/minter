@@ -1,11 +1,11 @@
-import { Mobject } from 'minter/mobjects/Mobject.js'
+import { Mobject } from '../../../mobjects/Mobject.js'
 import { BetterObject } from '@bhbr/better-things'
-import { View } from 'minter/views/View.js'
-import { Frame } from 'minter/views/Frame.js'
+import { View } from '../../../views/View.js'
+import { Frame } from '../../../views/Frame.js'
 import { vertexAdd, vertexEquals, Transform } from '@bhbr/affr2'
-import { Color } from 'minter/views/Color.js'
-import { log } from 'minter/functions/logging.js'
-import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
+import { Color } from '../../../views/Color.js'
+import { log } from '../../../functions/logging.js'
+import { AssertionTest, ValueTest, BundledTest, ExecutionTest } from '@bhbr/tsts'
 
 export const MobjectTest = new BundledTest({
 	name: 'Mobject test',
@@ -35,6 +35,28 @@ export const MobjectTest = new BundledTest({
 				return mob.view.div.style.backgroundColor
 			},
 			value: 'rgb(0, 255, 0)'
+		}),
+
+		new ExecutionTest({
+			name: 'Mobjects work as default values',
+			function: function() {
+
+				class A extends BetterObject {
+					prop: BetterObject
+					defaults(): object {
+						return {
+							prop: new Mobject()
+						}
+					}
+					mutabilities(): object {
+						return {
+							prop: 'never'
+						}
+					}
+				}
+				class B extends A {}
+				let b = new B()
+			}
 		})
 	]
 })

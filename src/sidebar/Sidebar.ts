@@ -1,21 +1,21 @@
 
-import { ScreenEventHandler } from 'minter/mobjects/screen_events.js'
-import { SIDEBAR_WIDTH } from 'minter/constants.js'
+import { ScreenEventHandler } from '../mobjects/screen_events.js'
+import { SIDEBAR_WIDTH } from '../constants.js'
 import { convertStringToArray } from '@bhbr/betray'
-import { getPaper } from 'minter/paper/getPaper.js'
-import { Color } from 'minter/views/Color.js'
-import { Rectangle } from 'minter/shapes/Rectangle.js'
-import { buttonAnchor } from 'minter/sidebar/buttons/button_geometry.js'
-import { Paper } from 'minter/paper/Paper.js'
-import { Mobject } from 'minter/mobjects/Mobject.js'
-import { SidebarButton } from 'minter/sidebar/buttons/SidebarButton.js'
-import { DragButton } from 'minter/sidebar/buttons/DragButton.js'
-import { LinkButton } from 'minter/sidebar/buttons/LinkButton.js'
-import { ControlsButton } from 'minter/sidebar/buttons/ControlsButton.js'
-import { EraseButton } from 'minter/sidebar/buttons/EraseButton.js'
-import { log } from 'minter/functions/logging.js'
+import { getPaper } from '../paper/getPaper.js'
+import { Color } from '../views/Color.js'
+import { Rectangle } from '../shapes/Rectangle.js'
+import { buttonAnchor } from '../sidebar/buttons/button_geometry.js'
+import { Paper } from '../paper/Paper.js'
+import { Mobject } from '../mobjects/Mobject.js'
+import { SidebarButton } from '../sidebar/buttons/SidebarButton.js'
+import { DragButton } from '../sidebar/buttons/DragButton.js'
+import { LinkButton } from '../sidebar/buttons/LinkButton.js'
+import { ControlsButton } from '../sidebar/buttons/ControlsButton.js'
+import { EraseButton } from '../sidebar/buttons/EraseButton.js'
+import { log } from '../functions/logging.js'
 import { SidebarView } from './SidebarView.js'
-import { ScreenEvent, isTouchDevice, separateSidebar } from 'minter/mobjects/screen_events.js'
+import { ScreenEvent, isTouchDevice, separateSidebar } from '../mobjects/screen_events.js'
 
 interface Window { webkit?: any }
 
@@ -243,7 +243,4 @@ export class Sidebar extends Mobject {
 	}
 
 }
-
-
-let s = new Sidebar()
 

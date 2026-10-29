@@ -1,5 +1,5 @@
 
-import { SpanningCreator } from 'minter/creators/SpanningCreator.js'
+import { SpanningCreator } from '../creators/SpanningCreator.js'
 import { Board } from './Board.js'
 
 export class BoardCreator extends SpanningCreator {

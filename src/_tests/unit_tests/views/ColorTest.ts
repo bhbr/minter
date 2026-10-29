@@ -1,5 +1,5 @@
 
-import { Color } from 'minter/views/Color.js'
+import { Color } from '../../../views/Color.js'
 import { ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const ColorTest = new BundledTest({

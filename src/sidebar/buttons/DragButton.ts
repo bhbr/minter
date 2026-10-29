@@ -1,6 +1,6 @@
 
 import { ToggleButton } from './ToggleButton.js'
-import { ImageView } from 'minter/views/ImageView.js'
+import { ImageView } from '../../views/ImageView.js'
 
 export class DragButton extends ToggleButton {
 

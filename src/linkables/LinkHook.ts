@@ -1,13 +1,13 @@
 
 import { vertex } from '@bhbr/affr2'
 import { Linkable } from './Linkable.js'
-import { Circle } from 'minter/shapes/Circle.js'
-import { Color } from 'minter/views/Color.js'
+import { Circle } from '../shapes/Circle.js'
+import { Color } from '../views/Color.js'
 import { HOOK_RADIUS, BULLET_RADIUS } from './constants.js'
 import { LinkOutlet } from './LinkOutlet.js'
-import { ScreenEvent, ScreenEventHandler } from 'minter/mobjects/screen_events.js'
-import { log } from 'minter/functions/logging.js'
-import { Mobject } from 'minter/mobjects/Mobject.js'
+import { ScreenEvent, ScreenEventHandler } from '../mobjects/screen_events.js'
+import { log } from '../functions/logging.js'
+import { Mobject } from '../mobjects/Mobject.js'
 import { LinkBullet } from './LinkBullet.js'
 
 export class LinkHook extends Circle {

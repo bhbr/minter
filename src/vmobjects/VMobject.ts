@@ -1,11 +1,11 @@
 
-import { Mobject } from 'minter/mobjects/Mobject.js'
-import { MGroup } from 'minter/mobjects/MGroup.js'
-import { Color } from 'minter/views/Color.js'
+import { Mobject } from '../mobjects/Mobject.js'
+import { MGroup } from '../mobjects/MGroup.js'
+import { Color } from '../views/Color.js'
 import { vertex, vertexArray, vertexArrayImageUnder } from '@bhbr/affr2'
-import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from 'minter/mobjects/screen_events.js'
+import { addPointerDown, addPointerMove, addPointerUp, removePointerDown, removePointerMove, removePointerUp } from '../mobjects/screen_events.js'
 import { VView } from './VView.js'
-import { Frame } from 'minter/views/Frame.js'
+import { Frame } from '../views/Frame.js'
 import { Transform } from '@bhbr/affr2'
 
 export class VMobject extends Mobject {

@@ -1,7 +1,7 @@
 
 import { vertex, vertexOrigin } from '@bhbr/affr2'
-import { Polygon } from 'minter/vmobjects/Polygon.js'
-import { Color } from 'minter/views/Color.js'
+import { Polygon } from '../vmobjects/Polygon.js'
+import { Color } from '../views/Color.js'
 
 export class Line extends Polygon {
 

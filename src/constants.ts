@@ -1,5 +1,5 @@
 
-import { Color } from 'minter/views/Color.js'
+import { Color } from './views/Color.js'
 import { vertex } from '@bhbr/affr2'
 
 export const TESTING: boolean = true

@@ -1,11 +1,11 @@
 
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 import { remove, convertStringToArray } from '@bhbr/betray'
 import { ScreenEvent, ScreenEventDevice, separateSidebar, ScreenEventHandler, isTouchDevice } from '../mobjects/screen_events.js'
 import { vertex, vertexOrigin } from '@bhbr/affr2'
-import { Board } from 'minter/boards/Board.js'
-import { Color } from 'minter/views/Color.js'
-import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from 'minter/constants.js'
+import { Board } from '../boards/Board.js'
+import { Color } from '../views/Color.js'
+import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from '../constants.js'
 import { PaperView } from './PaperView.js'
 import { APILoader } from './APILoader.js'
 
@@ -227,9 +227,6 @@ export class Paper extends Board {
 	}
 
 }
-
-let p = new Paper()
-
 
 
 

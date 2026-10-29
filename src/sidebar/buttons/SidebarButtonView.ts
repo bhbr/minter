@@ -1,5 +1,5 @@
 
-import { VView } from 'minter/vmobjects/VView.js'
+import { VView } from '../../vmobjects/VView.js'
 
 export class SidebarButtonView extends VView {
 

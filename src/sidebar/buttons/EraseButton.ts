@@ -1,9 +1,9 @@
 
 import { SidebarButton } from './SidebarButton.js'
-import { Color } from 'minter/views/Color.js'
-import { ScreenEvent } from 'minter/mobjects/screen_events.js'
-import { ImageView } from 'minter/views/ImageView.js'
-import { log } from 'minter/functions/logging.js'
+import { Color } from '../../views/Color.js'
+import { ScreenEvent } from '../../mobjects/screen_events.js'
+import { ImageView } from '../../views/ImageView.js'
+import { log } from '../../functions/logging.js'
 
 export class EraseButton extends SidebarButton {
 	

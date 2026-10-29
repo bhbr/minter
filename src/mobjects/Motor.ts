@@ -1,10 +1,10 @@
 
 import { Mobject } from './Mobject.js'
 import { vertex, vertexArray, isVertex, isVertexArray, vertexInterpolate, vertexArrayInterpolate, Transform } from '@bhbr/affr2'
-import { Color } from 'minter/views/Color.js'
+import { Color } from '../views/Color.js'
 import { copy } from '@bhbr/copycat'
 import { BetterObject } from '@bhbr/better-things'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 
 export class Motor extends BetterObject {
 

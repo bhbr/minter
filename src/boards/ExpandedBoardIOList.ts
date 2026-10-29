@@ -1,14 +1,14 @@
 
-import { IOList } from 'minter/linkables/IOList.js'
+import { IOList } from '../linkables/IOList.js'
 // import { vertex } from '@bhbr/affr2'
-import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from 'minter/linkables/constants.js'
+import { HOOK_INSET_X, HOOK_INSET_Y, HOOK_LABEL_INSET, HOOK_VERTICAL_SPACING } from '../linkables/constants.js'
 import { OUTLET_HORIZONTAL_SPACING } from './constants.js'
 // import { EditableLinkHook } from './EditableLinkHook'
- import { Board } from 'minter/boards/Board.js'
-import { LinkOutlet } from 'minter/linkables/LinkOutlet.js'
-import { Color } from 'minter/views/Color.js'
-import { log } from 'minter/functions/logging.js'
-import { IOProperty } from 'minter/linkables/Linkable.js'
+ import { Board } from '../boards/Board.js'
+import { LinkOutlet } from '../linkables/LinkOutlet.js'
+import { Color } from '../views/Color.js'
+import { log } from '../functions/logging.js'
+import { IOProperty } from '../linkables/Linkable.js'
 
 export class ExpandedBoardIOList extends IOList {
 

@@ -2,7 +2,7 @@
 import { BetterObject } from '@bhbr/better-things'
 import { vertex, vertexOrigin, Transform } from '@bhbr/affr2'
 import { View } from './View.js'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 
 export class Frame extends BetterObject {
 	/*

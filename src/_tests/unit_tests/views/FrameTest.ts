@@ -1,7 +1,7 @@
 
-import { Frame } from 'minter/views/Frame.js'
+import { Frame } from '../../../views/Frame.js'
 import { vertex, vertexEquals } from '@bhbr/affr2'
-import { DEGREES } from 'minter/constants.js'
+import { DEGREES } from '../../../constants.js'
 import { AssertionTest, ValueTest, BundledTest } from '@bhbr/tsts'
 
 export const FrameTest = new BundledTest({

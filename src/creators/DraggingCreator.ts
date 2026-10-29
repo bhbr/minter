@@ -1,11 +1,11 @@
 
-import { Mobject } from 'minter/mobjects/Mobject.js'
+import { Mobject } from '../mobjects/Mobject.js'
 import { Creator } from './Creator.js'
-import { Color } from 'minter/views/Color.js'
+import { Color } from '../views/Color.js'
 import { vertex, vertexAdd, vertexSubtract } from '@bhbr/affr2'
-import { Rectangle } from 'minter/shapes/Rectangle.js'
-import { VView } from 'minter/vmobjects/VView.js'
-import { log } from 'minter/functions/logging.js'
+import { Rectangle } from '../shapes/Rectangle.js'
+import { VView } from '../vmobjects/VView.js'
+import { log } from '../functions/logging.js'
 
 export class DraggingCreator extends Creator {
 

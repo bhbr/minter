@@ -1,6 +1,6 @@
 
 import { CircularArc } from './CircularArc.js'
-import { TAU } from 'minter/constants.js'
+import { TAU } from '../constants.js'
 
 export class Circle extends CircularArc {
 	/*

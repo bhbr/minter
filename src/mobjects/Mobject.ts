@@ -1,19 +1,19 @@
 
 import { remove, clear } from '@bhbr/betray'
-import { log } from 'minter/functions/logging.js'
+import { log } from '../functions/logging.js'
 import { copy } from '@bhbr/copycat'
 import { ScreenEventHandler, eventVertex, addPointerDown, addPointerMove, addPointerUp, addPointerOut, ScreenEvent, screenEventType, ScreenEventType } from './screen_events.js'
 import { vertex, vertexAdd, vertexSubtract, Transform } from '@bhbr/affr2'
 import { BetterObject } from '@bhbr/better-things'
-import { Color } from 'minter/views/Color.js'
+import { Color } from '../views/Color.js'
 import { Dependency } from './Dependency.js'
-import { Frame } from 'minter/views/Frame.js'
-import { View } from 'minter/views/View.js'
+import { Frame } from '../views/Frame.js'
+import { View } from '../views/View.js'
 import { Motor } from './Motor.js'
 import { Sensor } from './Sensor.js'
-import { getPaper } from 'minter/paper/getPaper.js'
+import { getPaper } from '../paper/getPaper.js'
 import { UpdateCall, UpdateCalls } from './UpdateCall.js'
-import { Linkable } from 'minter/linkables/Linkable.js'
+import { Linkable } from '../linkables/Linkable.js'
 
 export class Mobject extends BetterObject {
 

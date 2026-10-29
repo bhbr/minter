@@ -1,5 +1,5 @@
 
-import { MGroup } from 'minter/mobjects/MGroup.js'
+import { MGroup } from '../mobjects/MGroup.js'
 import { RadioButton } from './RadioButton.js'
 
 

@@ -4,14 +4,14 @@
 
 
 
-// import { LinkHook } from 'linkables/LinkHook'
-// import { ScreenEvent, ScreenEventHandler, isTouchDevice } from 'mobjects/screen_events'
-// import { getPaper, getSidebar } from 'functions/getters'
+// import { LinkHook } from '../linkables/LinkHook'
+// import { ScreenEvent, ScreenEventHandler, isTouchDevice } from '../mobjects/screen_events'
+// import { getPaper, getSidebar } from '../functions/getters'
 // import { ExpandedBoardIOList }  from './ExpandedBoardIOList'
-// import { Color } from 'classes/Color'
+// import { Color } from '../views/Color'
 // import { vertex } from '@bhbr/affr2'
-// import { MGroup } from 'mobjects/MGroup'
-// import { Line } from 'shapes/Line'
+// import { MGroup } from '../mobjects/MGroup'
+// import { Line } from '../shapes/Line'
 // import { Board } from './Board'
 // import { EditableLinkHookView } from './EditableLinkHookView'
 

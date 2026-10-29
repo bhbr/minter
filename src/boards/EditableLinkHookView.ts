@@ -4,8 +4,8 @@
 
 
 // import { EditableLinkHook } from './EditableLinkHook'
-// import { VView } from 'vmobjects/VView'
-// import { Color } from 'classes/Color'
+// import { VView } from '../vmobjects/VView'
+// import { Color } from '../views/Color'
 
 // export class EditableLinkHookView extends VView {
 
