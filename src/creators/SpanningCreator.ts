@@ -8,26 +8,26 @@ import { Linkable } from '../linkables/Linkable.js'
 
 export class SpanningCreator extends Creator {
 	
-	rectangle: Rectangle
+	outline: Rectangle
 
 	defaults(): object {
 		return {
-			rectangle: new Rectangle()
+			outline: new Rectangle()
 		}
 	}
 
 	mutabilities(): object {
 		return {
-			rectangle: 'always' // should be never (Mobject bug)
+			outline: 'always' // should be never (Mobject bug)
 		}
 	}
 
 	setup() {
 		super.setup()
-		this.add(this.rectangle)
-		//this.addDependency('topLeftVertex', this.rectangle, 'anchor')
-		this.addDependency('getWidth', this.rectangle, 'width')
-		this.addDependency('getHeight', this.rectangle, 'height')
+		this.add(this.outline)
+		//this.addDependency('topLeftVertex', this.outline, 'anchor')
+		this.addDependency('getWidth', this.outline, 'width')
+		this.addDependency('getHeight', this.outline, 'height')
 
 	}
 
