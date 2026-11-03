@@ -5,7 +5,7 @@ import { MobjectTest } from './unit_tests/mobjects/MobjectTest.js'
 import { FrameTest } from './unit_tests/views/FrameTest.js'
 import { TESTING } from '../constants.js'
 
-let allTests = new BundledTest({
+let automatedTests = new BundledTest({
 	name: 'all tests',
 	subtests: [
 		ColorTest,
@@ -15,4 +15,4 @@ let allTests = new BundledTest({
 	silenceSubtests: false
 })
 
-if (TESTING) { allTests.run() }
+if (TESTING) { automatedTests.run() }

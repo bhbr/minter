@@ -1,6 +1,6 @@
 
 // width of input and output lists
-export const IO_LIST_WIDTH: number = 170
+export const IO_LIST_WIDTH: number = 200
 // vertical gap between a linkable mobject and its input and output lists
 export const IO_LIST_OFFSET: number = 10
 

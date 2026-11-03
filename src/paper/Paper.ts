@@ -7,7 +7,7 @@ import { Board } from '../boards/Board.js'
 import { Color } from '../views/Color.js'
 import { SIDEBAR_WIDTH, COLOR_PALETTE, SHOW_HTML_CONSOLE } from '../constants.js'
 import { PaperView } from './PaperView.js'
-import { APILoader } from './APILoader.js'
+import { APILoader } from '../apis/APILoader.js'
 
 export class Paper extends Board {
 
@@ -113,7 +113,6 @@ export class Paper extends Board {
 		if (this.apiLoaders.length == 0) {
 			this.loadContent()
 		}
-
 	}
 
 	resize() {

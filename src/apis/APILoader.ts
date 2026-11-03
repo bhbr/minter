@@ -21,7 +21,4 @@ export class APILoader extends BetterObject {
 		getPaper().loadedAPI(this)
 	}
 
-	onload() {
-		
-	}
 }

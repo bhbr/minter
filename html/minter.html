@@ -1,49 +1,51 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-   <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0'>
+    <head>
+        <meta charset="utf-8">
+     <meta name='viewport' content='width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0'>
 
-    <title></title>
+        <title></title>
 
-    <link rel="stylesheet" href="./minter.css">
+        <link rel="stylesheet" href="./minter.css">
 
-    <!-- extend this import map as needed -->
-    <script type="importmap">
-      {
-        "imports": {
-          "minter/": "../dist/",
-          "@bhbr/tsts": "../node_modules/@bhbr/tsts/dist/index.js",
-          "@bhbr/egalite": "../node_modules/@bhbr/egalite/dist/index.js",
-          "@bhbr/copycat": "../node_modules/@bhbr/copycat/dist/index.js",
-          "@bhbr/betray": "../node_modules/@bhbr/betray/dist/index.js",
-          "@bhbr/upper-class": "../node_modules/@bhbr/upper-class/dist/index.js",
-          "@bhbr/better-things": "../node_modules/@bhbr/better-things/dist/index.js",
-          "@bhbr/affr2": "../node_modules/@bhbr/affr2/dist/index.js"
-        }
-      }
-    </script>
+        <!-- extend this import map as needed -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "minter/": "../dist/",
+                    "@bhbr/tsts": "../node_modules/@bhbr/tsts/dist/index.js",
+                    "@bhbr/egalite": "../node_modules/@bhbr/egalite/dist/index.js",
+                    "@bhbr/copycat": "../node_modules/@bhbr/copycat/dist/index.js",
+                    "@bhbr/betray": "../node_modules/@bhbr/betray/dist/index.js",
+                    "@bhbr/upper-class": "../node_modules/@bhbr/upper-class/dist/index.js",
+                    "@bhbr/better-things": "../node_modules/@bhbr/better-things/dist/index.js",
+                    "@bhbr/affr2": "../node_modules/@bhbr/affr2/dist/index.js",
+                    "cindyjs/": "../node_modules/cindyjs/",
+                    "mathquill/": "../node_modules/mathquill/",
+                    "jQuery/": "../node_modules/jQuery/"
+                }
+            }
+        </script>
 
-  </head>
+    </head>
 
-  <body style="overflow: hidden;">
+    <body style="overflow: hidden;">
 
-    <!-- The main surface for drawing and creating -->
-    <div id='paper_id' style="float: left; display: inline; width: 100%; height: 100%;"></div>
+        <!-- The main surface for drawing and creating -->
+        <div id='paper_id' style="float: left; display: inline; width: 100%; height: 100%;"></div>
 
-    <!-- A simple div for logging on iPad directly instead of the Xcode console -->
-    <div id='htmlConsole' hidden style='width: 100%; height: 20%; position: fixed; bottom: 0px; left: 20%; background-color: green; color: white; white-space: pre; opacity: 0.5; font-size: 14px; font-family: Helvetica; overflow: auto;'></div>
+        <!-- A simple div for logging on iPad directly instead of the Xcode console -->
+        <div id='htmlConsole' hidden style='width: 100%; height: 20%; position: fixed; bottom: 0px; left: 20%; background-color: green; color: white; white-space: pre; opacity: 0.5; font-size: 14px; font-family: Helvetica; overflow: auto;'></div>
 
-    <!-- The sidebar with its buttons -->
-    <div id='sidebar_id' style="float: left; display: inline; width: '100px'; height: 100%;">
-    </div>
-    
-    <script type="module" src='../dist/paper/Paper.js'></script>
-    <script type="module" src='../dist/paper/initPaper.js'></script>
-    <script type="module" src='../dist/sidebar/Sidebar.js'></script>
-    <script type="module" src='../dist/sidebar/initSidebar.js'></script>
-    <script type="module" src='../dist/_tests/all_tests.js'></script>
-    <script type="module" src='../dist/_tests/playground.js'></script>
-      
-  </body>
+        <!-- The sidebar with its buttons -->
+        <div id='sidebar_id' style="float: left; display: inline; width: '100px'; height: 100%;">
+        </div>
+        
+        <script type="module" src='../dist/paper/Paper.js'></script>
+        <script type="module" src='../dist/paper/initPaper.js'></script>
+        <script type="module" src='../dist/sidebar/Sidebar.js'></script>
+        <script type="module" src='../dist/sidebar/initSidebar.js'></script>
+        <script type="module" src='../dist/_tests/automated_tests.js'></script>
+            
+    </body>
 </html>

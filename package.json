@@ -38,8 +38,11 @@
     "@bhbr/affr2": "^1.0.0",
     "@bhbr/betray": "^1.0.0",
     "@bhbr/better-things": "^1.0.0",
+    "@bhbr/copycat": "^1.0.0",
     "@bhbr/egalite": "^1.2.0",
     "@bhbr/upper-class": "^1.0.0",
-    "@bhbr/copycat": "^1.0.0"
+    "cindyjs": "^0.0.5",
+    "jquery": "^4.0.0",
+    "mathquill": "^0.10.1-a"
   }
 }

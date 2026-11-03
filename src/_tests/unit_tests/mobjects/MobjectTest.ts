@@ -39,6 +39,7 @@ export const MobjectTest = new BundledTest({
 
 		new ExecutionTest({
 			name: 'Mobjects work as default values',
+			catchErrors: true,
 			function: function() {
 
 				class A extends BetterObject {
