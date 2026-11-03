@@ -1,5 +1,5 @@
 
-import { TestPaper } from '../_tests/test_papers/TestPaper.js'
+import { Paper } from './Paper.js'
 
-// This is for internal testing only. When working on a minter extension, instantiate your custom subclass of Paper here.
-let p = new TestPaper()
+// Instantiate your custom subclass of Paper here.
+let p = new Paper()

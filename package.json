@@ -13,8 +13,9 @@
   },
   "files": [
     "dist",
+    "!dist/_tests",
     "html",
-    "!dist/_tests"
+    "!dist/tests.html"
   ],
   "scripts": {
     "build": "./build.sh",

@@ -2,8 +2,6 @@
 import { Color } from './views/Color.js'
 import { vertex } from '@bhbr/affr2'
 
-export const TESTING: boolean = true
-
 export const SIDEBAR_WIDTH: number = 100
 export const SHOW_HTML_CONSOLE: boolean = true
 
