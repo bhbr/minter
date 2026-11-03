@@ -1,18 +1,18 @@
 body {
-  width: 100%;
-  margin: 0 auto;
-  position: absolute;
+    width: 100%;
+    margin: 0 auto;
+    position: absolute;
 }
 
 button {
-  border: 0;
-  background: rgba(150, 150, 150, 0.6);
-  text-shadow: 1px 1px 1px white;
-  border: 1px solid #999;
-  position: absolute;
-  cursor: pointer;
-  top: 2px;
-  left: 2px;
+    border: 0;
+    background: rgba(150, 150, 150, 0.6);
+    text-shadow: 1px 1px 1px white;
+    border: 1px solid #999;
+    position: absolute;
+    cursor: pointer;
+    top: 2px;
+    left: 2px;
 }
 
 .mobject-div {
@@ -32,7 +32,6 @@ button {
     width: inherit;
     height: inherit;
 }
-
 
 .unselectable {
     -webkit-touch-callout: none;
