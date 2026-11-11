@@ -4,18 +4,23 @@ import { log } from '../../functions/logging.js'
 import { getPaper } from '../../paper/getPaper.js'
 
 export class DesmosLoader extends APILoader {
+
+	apiKey: string
 	
-	load() {
-		this.update({
-			status: 'loading'
-		})
-		let scriptTag = document.createElement('script')
-		scriptTag.type = 'text/javascript'
-		scriptTag.src = 'https://www.desmos.com/api/v1.10/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6'
-		scriptTag.onload = function() {
-			getPaper().loadedAPI(this)
-		}.bind(this)
-		document.head.append(scriptTag)
+	defaults(): object {
+		return {
+			scriptLocations: [
+				'https://www.desmos.com/api/v1.10/calculator.js'
+			],
+			apiKey: 'dcb31709b452b1cf9dc26972add0fda6'
+		}
 	}
+
+	load() {
+		this.scriptLocations[0] = `${this.scriptLocations[0]}?apiKey=${this.apiKey}`
+		super.load()
+	}
+
+
 
 }
