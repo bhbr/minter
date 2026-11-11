@@ -52,6 +52,8 @@ export class SidebarButton extends Pill {
 	expanded: boolean
 	selectedIndex: number
 
+	iconLocation: string
+
 	defaults(): object {
 		return {
 			baseColor: Color.gray(0.4),
@@ -108,7 +110,9 @@ export class SidebarButton extends Pill {
 				frameWidth: 13,
 				frameHeight: 13,
 				textColor: Color.gray(0.5)
-			})
+			}),
+
+			iconLocation: '../assets'
 		}
 	}
 
@@ -190,7 +194,7 @@ export class SidebarButton extends Pill {
 
 	setupBaseIcon() {
 		let baseIcon = new ImageView({
-				imageLocation: `../assets/${this.baseIconName()}.png`,
+				imageLocation: `${this.iconLocation}/${this.baseIconName()}.png`,
 				frameWidth: this.iconSize,
 				frameHeight: this.iconSize
 			})
@@ -209,7 +213,7 @@ export class SidebarButton extends Pill {
 		for (let i = 1; i < this.nbOptions(); i++) {
 			let iconName = this.imageNameForIndex(i).replaceAll(' ', '_')
 			let icon = new ImageView({
-				imageLocation: `../assets/${iconName}.png`,
+				imageLocation: `.${this.iconLocation}/${iconName}.png`,
 				frameWidth: this.iconSize,
 				frameHeight: this.iconSize,
 				anchor: [this.icons[0].anchor[0] + i * this.optionSpacing, this.icons[0].anchor[1]]
