@@ -103,16 +103,20 @@ export class Paper extends Board {
 			width: width,
 			height: height
 		})
-		let el = document.querySelector('#htmlConsole') as HTMLElement
+		let el = document.querySelector('#htmlConsole')
 		if (el) {
-			el.hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
+		 	(el as HTMLElement).hidden = (isTouchDevice && !SHOW_HTML_CONSOLE) || !isTouchDevice
 		}
-		//window.addEventListener('resize', this.resize.bind(this))
+		window.visualViewport.addEventListener('resize', this.onResize.bind(this))
 		this.resize()
 
 		if (this.apiLoaders.length == 0) {
 			this.loadContent()
 		}
+	}
+
+	onResize(e: Event) {
+		this.resize()
 	}
 
 	resize() {

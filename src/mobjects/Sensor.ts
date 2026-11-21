@@ -215,8 +215,10 @@ export class Sensor extends BetterObject {
 			if (this.mobject) {
 				if (this.mobject.isInstanceOf('Board')) {
 					let sidebar = getSidebar()
-					if (sidebar.activeButton) {
-						sidebar.activeButton.commonButtonUp()
+					if (sidebar !== null) {
+						if (sidebar.activeButton) {
+							sidebar.activeButton.commonButtonUp()
+						}
 					}
 				}
 			}
@@ -265,6 +267,7 @@ export class Sensor extends BetterObject {
 			this.resetPointer()
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Pen && type == ScreenEventType.Up) {
 			//log('case 3')
+			//log(device)
 			// ignore
 		} else if (e instanceof MouseEvent && device == ScreenEventDevice.Finger && type == ScreenEventType.Down) {
 			//log('case 4')

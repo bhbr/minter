@@ -15,6 +15,8 @@ export class TextLabel extends Mobject {
 	set textColor(newValue: Color) { this.view.color = newValue }
 	get fontSize(): number { return this.view.fontSize }
 	set fontSize(newValue: number) { this.view.fontSize = newValue }
+	get font(): string { return this.view.fontFamily }
+	set font(newValue: string) { this.view.fontFamily = newValue }
 	get horizontalAlign(): HorizontalAlignment { return this.view.horizontalAlign }
 	set horizontalAlign(newValue: HorizontalAlignment) { this.view.horizontalAlign = newValue }
 	get verticalAlign(): VerticalAlignment { return this.view.verticalAlign }
@@ -23,6 +25,7 @@ export class TextLabel extends Mobject {
 	defaults(): object {
 		return {
 			text: 'text',
+			font: 'Helvetica',
 			textColor: Color.white(),
 			view: new TextLabelView()
 		}

@@ -4,25 +4,27 @@ import { TAU } from '../constants.js'
 import { vertex } from '@bhbr/affr2'
 import { PolygonalLine } from '../vmobjects/PolygonalLine.js'
 import { log } from '../functions/logging.js'
-
-export type ArrowTipStyle = 'v' | 'triangle' | 'dart'
+import { ArrowTip, ArrowTipStyle } from './ArrowTip.js'
 
 export class CurvedArrow extends CircularArc {
 
-	tip: PolygonalLine
-	tipStyle: ArrowTipStyle
-	tipSize: number
-	tipAngle: number
+	tip: ArrowTip
 	
 	defaults(): object {
 		return {
-			tipStyle: 'v',
-			tipSize: 20,
-			tipAngle: TAU / 12,
-			tip: new PolygonalLine({ closed: false }),
+			tip: new ArrowTip(),
 			fillOpacity: 0
 		}
 	}
+
+	get tipSize(): number { return this.tip.size }
+	set tipSize(newValue: number) { this.tip.size = newValue }
+
+	get tipStyle(): ArrowTipStyle { return this.tip.style }
+	set tipStyle(newValue: ArrowTipStyle) { this.tip.style = newValue }
+
+	get tipOpeningAngle(): number { return this.tip.openingAngle }
+	set tipOpeningAngle(newValue: number) { this.tip.openingAngle = newValue }
 
 	getTangentialUnitVector(): vertex {
 		return [-Math.sin(this.angle), Math.cos(this.angle)]
@@ -34,7 +36,7 @@ export class CurvedArrow extends CircularArc {
 
 	setup() {
 		super.setup()
-		this.applyTipStyle()
+		this.tip.applyTipStyle()
 		this.tip.update({
 			strokeWidth: this.strokeWidth,
 			strokeColor: this.strokeColor,
@@ -50,59 +52,11 @@ export class CurvedArrow extends CircularArc {
 		]
 	}
 
-	applyTipStyle() {
-		let rotatedTipAngle1 = this.angle - TAU / 2 - this.tipAngle
-		let rotatedTipAngle2 = this.angle - TAU / 2 + this.tipAngle
-
-		switch (this.tipStyle) {
-		case 'v':
-			this.tip.update({
-				vertices: [
-					[-this.tipSize * Math.sin(rotatedTipAngle1), this.tipSize * Math.cos(rotatedTipAngle1)],
-					[0, 0],
-					[-this.tipSize * Math.sin(rotatedTipAngle2), this.tipSize * Math.cos(rotatedTipAngle2)]
-				],
-				closed: false,
-				fillOpacity: 0
-			})
-			break
-		case 'triangle':
-			this.tip.update({
-				vertices: [
-					[-this.tipSize * Math.sin(rotatedTipAngle1), this.tipSize * Math.cos(rotatedTipAngle1)],
-					[0, 0],
-					[-this.tipSize * Math.sin(rotatedTipAngle2), this.tipSize * Math.cos(rotatedTipAngle2)]
-				],
-				closed: true,
-				fillOpacity: 1
-			})
-			break
-		case 'dart':
-			this.tip.update({
-				vertices: [
-					[-this.tipSize * Math.sin(rotatedTipAngle1), this.tipSize * Math.cos(rotatedTipAngle1)],
-					[0, 0],
-					[-this.tipSize * Math.sin(rotatedTipAngle2), this.tipSize * Math.cos(rotatedTipAngle2)],
-					[0.5 * this.tipSize * Math.sin(this.angle), -0.5 * this.tipSize * Math.cos(this.angle)]
-				],
-				closed: true,
-				fillOpacity: 1
-			})
-			break
-		}
-	}
-
-	update(args: object = {}, redraw: boolean = true) {
-		super.update(args, redraw)
-		if (args['tipStyle'] !== undefined || args['tipSize'] !== undefined || args['tipAngle'] !== undefined) {
-			this.applyTipStyle()
-		}
-	}
-
 	updateBezierPoints() {
 		super.updateBezierPoints()
 		this.tip.update({
-			anchor: this.tipPoint()
+			anchor: this.tipPoint(),
+			transformAngle: -this.angle + this.tipOpeningAngle
 		})
 	}
 

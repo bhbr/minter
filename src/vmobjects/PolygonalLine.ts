@@ -11,7 +11,7 @@ export class PolygonalLine extends VMobject {
 
 	defaults(): object {
 		return {
-			closed: true,
+			closed: false,
 			fillOpacity: 0
 		}
 	}

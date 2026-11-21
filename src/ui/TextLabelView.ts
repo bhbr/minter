@@ -40,6 +40,7 @@ export class TextLabelView extends View {
 		this.div.style.borderWidth = `${this.borderWidth}px`
 
 		this.div.style.fontSize = `${this.fontSize}px`
+		this.div.style.fontFamily = this.fontFamily
 		switch (this.verticalAlign) {
 		case 'top':
 			this.div.style.alignItems = 'start'

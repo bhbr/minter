@@ -83,8 +83,11 @@ export class InputTextBox extends Mobject {
 		this.inputElement.blur()
 		getPaper().activeKeyboard = true
 		if (!isTouchDevice) {
-			for (let button of getSidebar().buttons) {
-				button.activeKeyboard = true
+			let sidebar = getSidebar()
+			if (sidebar) {
+				for (let button of sidebar.buttons) {
+					button.activeKeyboard = true
+				}
 			}
 		}
 		this.update({ value: this.valueFromString(this.inputElement.value) })

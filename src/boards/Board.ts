@@ -748,6 +748,7 @@ The content children can also be dragged and panned.
 	}
 
 	startCreating(e: ScreenEvent) {
+		log('start creating')
 		this.creationTool = screenEventDevice(e)
 		if (this.creationTool == ScreenEventDevice.Finger && this.creationMode == 'draw') {
 			return
@@ -764,6 +765,7 @@ The content children can also be dragged and panned.
 	}
 
 	creating(e: ScreenEvent) {
+		log('creating')
 		if (this.creator === null) {
 			return
 		}
@@ -781,6 +783,7 @@ The content children can also be dragged and panned.
 	}
 
 	endCreating(e: ScreenEvent) {
+		log('end creating')
 		this.creationStroke = []
 		this.creationTool = null
 		this.creationMode = 'draw'
@@ -1520,6 +1523,7 @@ The content children can also be dragged and panned.
 			let w = window as Window
 			w.webkit.messageHandlers.handleMessageFromPaper.postMessage(message)
 		} catch {
+			if (!this.sidebar) { return }
 			this.sidebar.getMessage(message)
 		}
 	}

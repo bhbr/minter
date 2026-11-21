@@ -42,6 +42,16 @@ export class SimpleButton extends RoundedRectangle {
 		})
 	}
 
+	get font(): string {
+		return this.label.font
+	}
+
+	set font(newValue: string) {
+		this.label.update({
+			font: newValue
+		})
+	}
+
 	get fontSize(): number {
 		return this.label.fontSize
 	}
@@ -70,6 +80,26 @@ export class SimpleButton extends RoundedRectangle {
 		})
 		this.label.update({
 			textColor: Color.black()
+		})
+	}
+
+	disable() {
+		super.disable()
+		this.update({
+			fillColor: Color.gray(0.6)
+		})
+		this.label.update({
+			textColor: Color.gray(0.8)
+		})
+	}
+
+	enable() {
+		super.enable()
+		this.update({
+			fillColor: Color.gray(0.3)
+		})
+		this.label.update({
+			textColor: Color.white()
 		})
 	}
 

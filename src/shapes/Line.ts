@@ -1,9 +1,9 @@
 
 import { vertex, vertexOrigin } from '@bhbr/affr2'
-import { Polygon } from '../vmobjects/Polygon.js'
+import { PolygonalLine } from '../vmobjects/PolygonalLine.js'
 import { Color } from '../views/Color.js'
 
-export class Line extends Polygon {
+export class Line extends PolygonalLine {
 
 	startPoint: vertex
 	endPoint: vertex
